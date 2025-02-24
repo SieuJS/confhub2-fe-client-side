@@ -1,21 +1,110 @@
+// SearchSection.tsx
 "use client";
 
-import React from 'react';
-import { useState } from 'react';
-import Button from './Button'; // Import your Button component
+import React, { useState, useEffect, useRef } from 'react';
+import Button from './Button';
 
-const SearchSection = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+interface SearchSectionProps {
+  onSearch: (query: string) => void;
+  onLocationChange: (location: string | null) => void;
+  selectedLocation: string | null;
+  onTypeChange: (type: 'online' | 'offline' | 'hybrid' | null) => void;
+  selectedType: 'online' | 'offline' | 'hybrid' | null;
+  onStartDateChange: (date: Date | null) => void;
+  onEndDateChange: (date: Date | null) => void;
+  startDate: Date | null;
+  endDate: Date | null;
+}
+
+const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onLocationChange, selectedLocation, onTypeChange, selectedType, onStartDateChange, onEndDateChange, startDate, endDate }) => {
+  const [searchQuery, setSearchQuery] = React.useState<string>('');
+  const [locationSearchQuery, setLocationSearchQuery] = useState('');
+  const [typeSearchQuery, setTypeSearchQuery] = useState('');
+  const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
+  const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
+  const locationDropdownRef = useRef<HTMLDivElement>(null);
+  const typeDropdownRef = useRef<HTMLDivElement>(null);
+
+  const availableLocations = ['New York, USA', 'London, UK', 'Berlin, Germany', 'Tokyo, Japan', 'Paris, France', 'Sydney, Australia', 'Rome, Italy', 'Madrid, Spain'];
+  const availableTypes = ['online', 'offline', 'hybrid']; // Define available types
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
 
+  const handleSearchClick = () => {
+    onSearch(searchQuery);
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      handleSearchClick();
+    }
+  };
+
+  const handleLocationClick = (location: string) => {
+    onLocationChange(location === "" ? null : location);
+  };
+
+  const handleTypeClick = (type: string) => {
+    onTypeChange(type === "" ? null : type as 'online' | 'offline' | 'hybrid' | null);
+  };
+
+  const handleLocationSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLocationSearchQuery(event.target.value);
+  };
+
+  const handleTypeSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTypeSearchQuery(event.target.value);
+  };
+
+  const handleStartDateInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const date = event.target.value ? new Date(event.target.value) : null;
+    onStartDateChange(date);
+  };
+
+  const handleEndDateInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const date = event.target.value ? new Date(event.target.value) : null;
+    onEndDateChange(date);
+  };
+
+  const filteredLocations = availableLocations.filter(location =>
+    location.toLowerCase().includes(locationSearchQuery.toLowerCase())
+  );
+
+  const filteredTypes = availableTypes.filter(type =>
+    type.toLowerCase().includes(typeSearchQuery.toLowerCase())
+  );
+
+  const toggleLocationDropdown = () => {
+    setIsLocationDropdownOpen(!isLocationDropdownOpen);
+  };
+
+  const toggleTypeDropdown = () => {
+    setIsTypeDropdownOpen(!isTypeDropdownOpen);
+  };
+
+  // Close dropdown if clicked outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (locationDropdownRef.current && !locationDropdownRef.current.contains(event.target as Node)) {
+        setIsLocationDropdownOpen(false);
+      }
+      if (typeDropdownRef.current && !typeDropdownRef.current.contains(event.target as Node)) {
+        setIsTypeDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [locationDropdownRef, typeDropdownRef]);
+
   return (
-    <div className="container mx-auto px-4">
-      <div className=" rounded-full shadow-md flex items-center py-8 px-4 space-x-4 ">
-        {/* Search Input */}
-        <div className="flex items-center flex-grow ">
+    <div className="container mx-auto px-4 text-base">
+      <div className="rounded-full shadow-md flex items-center py-8 px-4 space-x-4">
+        <div className="flex items-center flex-grow">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-10 w-10 mr-2"
@@ -34,93 +123,147 @@ const SearchSection = () => {
             className="outline-none w-full bg-transparent"
             value={searchQuery}
             onChange={handleSearchChange}
+            onKeyDown={handleKeyPress}
           />
         </div>
 
-        {/* Separators */}
         <div className="border-l border-gray-300 h-6"></div>
 
-        {/* Date Button */}
-        <button className=" flex items-center space-x-2 bg-transparent  outline-none">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 015.25 16.5h13.5A2.25 2.25 0 0121 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
-            />
-          </svg>
-          <span>Date</span>
-        </button>
+        <div className="flex items-center space-x-2">
+          <label htmlFor="startDate">Start Date:</label>
+          <input
+            type="date"
+            id="startDate"
+            className="border rounded px-2 py-1 bg-transparent"
+            onChange={handleStartDateInputChange}
+            value={startDate ? startDate.toISOString().split('T')[0] : ''}
+          />
+        </div>
 
-        {/* Separators */}
+        <div className="flex items-center space-x-2">
+          <label htmlFor="endDate">End Date:</label>
+          <input
+            type="date"
+            id="endDate"
+            className="border rounded px-2 py-1 bg-transparent"
+            onChange={handleEndDateInputChange}
+            value={endDate ? endDate.toISOString().split('T')[0] : ''}
+          />
+        </div>
+
         <div className="border-l border-gray-300 h-6"></div>
 
-        {/* Location Button */}
-        <button className=" flex items-center space-x-2 bg-transparent  outline-none">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
-            />
-          </svg>
-          <span>Location</span>
-        </button>
+        <div className="relative" ref={locationDropdownRef}>
+          <button className=" flex items-center space-x-2 bg-transparent  outline-none" onClick={toggleLocationDropdown}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
+              />
+            </svg>
+            <span>{selectedLocation ? selectedLocation : 'Location'}</span>
+          </button>
 
-        {/* Separators */}
+          {isLocationDropdownOpen && (
+            <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10" tabIndex={0}>
+              <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                <input
+                  type="text"
+                  placeholder="Search location..."
+                  className="block w-full px-4 py-2 text-sm text-gray-700 focus:outline-none"
+                  onChange={handleLocationSearchChange}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <button
+                  key="all"
+                  onClick={() => handleLocationClick("")}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 role='menuitem'"
+                >
+                  All Locations
+                </button>
+                {filteredLocations.map((location) => (
+                  <button
+                    key={location}
+                    onClick={() => handleLocationClick(location)}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 role='menuitem'"
+                  >
+                    {location}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className="border-l border-gray-300 h-6"></div>
 
-        {/* Type Button */}
-        <button className=" flex items-center space-x-2 bg-transparent  outline-none">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-            />
-          </svg>
-          <span>Type</span>
-        </button>
+        <div className="relative" ref={typeDropdownRef}>
+          <button className=" flex items-center space-x-2 bg-transparent  outline-none" onClick={toggleTypeDropdown}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+              />
+            </svg>
+            <span>{selectedType ? selectedType : 'Type'}</span>
+          </button>
 
-        {/* Search Button */}
-        <Button variant="primary" size="large" rounded className="">
+          {isTypeDropdownOpen && (
+            <div className="absolute left-0 mt-2 w-28 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10" tabIndex={0}>
+              <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                {/* <input
+                  type="text"
+                  placeholder="Search type..."
+                  className="block w-full px-4 py-2 text-sm text-gray-700 focus:outline-none"
+                  onChange={handleTypeSearchChange}
+                  onClick={(e) => e.stopPropagation()}
+                /> */}
+                <button
+                  key="all"
+                  onClick={() => handleTypeClick("")}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 role='menuitem'"
+                >
+                  All Types
+                </button>
+                {filteredTypes.map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => handleTypeClick(type)}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 role='menuitem'"
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <Button variant="primary" size="large" rounded className="" onClick={handleSearchClick}>
           Search
         </Button>
       </div>
-
-      {/* <div className="flex items-center mt-4 ">
-        <a href="#" className="mr-2 ">
-          Home
-        </a>
-        <span></span>
-        <span className="ml-2">Search</span>
-      </div> */}
     </div>
   );
 };

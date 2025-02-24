@@ -52,15 +52,15 @@ const FilterSidebar = () => {
               </label>
               <label className="flex items-center">
               <input type="checkbox" className="mr-2" />
-              Software and architecture
+              Software 1
               </label>
               <label className="flex items-center">
               <input type="checkbox" className="mr-2" />
-              Software and architecture
+              Software 2
               </label>
               <label className="flex items-center">
               <input type="checkbox" className="mr-2" />
-              Software and architecture
+              Software 3
               </label>
               <button className="text-blue-500 hover:text-blue-700 text-xs">
               Show more

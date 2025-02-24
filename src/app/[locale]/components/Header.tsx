@@ -29,6 +29,18 @@ export const Header: FC<Props> = ({ locale }) => {
           <Link lang={locale} href={`/conferences`}>
             {t('Conferences')}
           </Link>
+          <Link lang={locale} href={`/journals`}>
+            {t('Jounals')}
+          </Link>
+          <Link lang={locale} href={`/journaldetails`}>
+            {t('journaldetails')}
+          </Link>
+          <Link lang={locale} href={`/setting`}>
+            {t('Setting')}
+          </Link>
+          <Link lang={locale} href={`/chatbot`}>
+            {t('Chatbot')}
+          </Link>
           <a href=''>{t('Support')}</a>
           <a href=''>{t('Other')}</a>
         </nav>
