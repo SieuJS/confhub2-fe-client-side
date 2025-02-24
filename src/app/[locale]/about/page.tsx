@@ -1,42 +1,65 @@
 "use client";
 
 import { useTranslations } from 'next-intl';
-import SearchSection from '../components/SearchSection';
 import Image from 'next/image';
 import { useState } from 'react'; // Import useState
 import Button from '../components/Button';
 import ConferenceFeedback from '../components/ConferenceFeedback';
 
 interface Conference {
-  imageUrl: string;
-  datePosted: string;
-  postedBy: string;
-  title: string;
-  description: string;
-  dateTime: string;
+  id: number;
+  name: string;
+  shortName: string;
+  startDate: string;
+  endDate: string;
   location: string;
+  imageUrl: string;
+  rank: string;
+  averageScore: number;
+  topics: string[];
+  type: 'online' | 'offline' | 'hybrid';
+  submissionDate: string;
+  source: number;
+  fieldOfResearch: string;
+  publish: boolean;
   website: string;
+  description: string;
 }
 
 export default function About() {
   const t = useTranslations('');
 
   const conferenceData: Conference = {
+    id: 123,
+    name: 'ACM ASIA Conference on Computer and Communications Security',
+    shortName: 'ASIACCS',
+    startDate: '2025-01-21',
+    endDate: '2025-01-22',
+    location: 'Phnom Penh, Cambodia',
     imageUrl: '/conference_image.png',
-    datePosted: '2 Feb, 2025',
-    postedBy: 'Confhub',
-    title: 'ACM ASIA Conference on Computer and Communications Security',
+    rank: 'Top Tier',
+    averageScore: 4.5,
+    topics: ['Computer Security', 'Communications Security', 'Cryptography', 'Network Security'],
+    type: 'hybrid',
+    submissionDate: '2024-10-15',
+    source: 1,
+    fieldOfResearch: 'Computer Science',
+    publish: true,
+    website: 'https://conference.com/infor/callforpapers',
     description:
       'CITA 2025 will be co-organized by Vietnam-Korea University of Information and Communication Technology (Vietnam), Cambodia Academy of Digital Technology (Cambodia) and King Mongkut\'s University of Technology North Bangkok (Thailand). The conference will take place in Phnom Penh, Cambodia on July 14-15, 2025. Phnom Penh, situated at the confluence of three rivers, the mighty Mekong, the Bassac and the great Tonle Sap, is the capital of Cambodia. The capital city has charm and tranquility with tree-lined boulevards amidst monumental Angkoriant architecture.',
-    dateTime: 'Tue, Jan 21, 2025\nWed, Jan 22, 2025',
-    location: '12 Dien Bien Phu,\nHo Chi Minh city',
-    website: 'https://conference.com/infor/callforpapers',
   };
 
   const [isFollowing, setIsFollowing] = useState(false); // State for follow status
 
   const handleFollowClick = () => {
     setIsFollowing(!isFollowing);
+  };
+
+  const handleUpdateClick = () => {
+    // Handle update logic here
+    console.log('Update button clicked');
+    // You can add functionality to update conference details or navigate to an edit page
   };
 
   const handleFeedbackSubmit = (rating: number | null, comment: string) => {
@@ -46,123 +69,134 @@ export default function About() {
     // In a real app, you'd send this data to your backend
   };
 
-  return (
-    <div className='px-10 py-10 text-center text-2xl'>
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  };
 
+  return (
+    <div className='px-10'> {/* Removed py-10 and text-2xl */}
+      <div className="py-14 bg-background w-full"></div>
       <div className="grid grid-cols-5 gap-4 pt-10">
         <div className="col-span-1">
           <div className="relative">
             <Image
               src={conferenceData.imageUrl}
-              alt={conferenceData.title}
+              alt={conferenceData.name}
               width={400}
               height={200} // Adjust height as needed
               style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
-              className="w-full" // Ensure image takes full width
+              className="w-full rounded-lg" // Ensure image takes full width and rounded corners
             />
           </div>
         </div>
 
         <div className="col-span-3">
-        <div className="relative">
-            <Image
-              src={conferenceData.imageUrl}
-              alt={conferenceData.title}
-              width={400}
-              height={200} // Adjust height as needed
-              style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
-              className="w-full" // Ensure image takes full width
-            />
-          </div>
-
-            <div className="flex justify-end mt-2"> {/* Align button to the right and add top margin */}
-              <Button
+          <div className="flex justify-end mt-2">
+            <Button
               onClick={handleFollowClick}
               variant="primary"
               size="medium"
               rounded
-              className={`mr-2 w-24 ${isFollowing ? 'bg-green-500' : 'bg-blue-500'}`} // Change color based on follow status
-              >
+              className={`mr-2 w-24 ${isFollowing ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'}`}
+            >
               {isFollowing ? 'Followed' : 'Follow'}
-              </Button>
-            </div>
-
-          <div className="flex justify-between items-center">  {/* Aligned items vertically */}
-              <p>{conferenceData.dateTime}</p>
-              <div>
-                  
-                  <span>Post by {conferenceData.postedBy}</span>
-              </div>
+            </Button>
+            <Button
+              onClick={handleUpdateClick}
+              variant="secondary" // Or another appropriate variant
+              size="medium"
+              rounded
+              className="w-24" // Adjust width as needed
+            >
+              Update
+            </Button>
           </div>
 
+          <div className="flex justify-between items-center mt-4">
+            <p className="text-lg">{formatDate(conferenceData.startDate)} - {formatDate(conferenceData.endDate)}</p>
+            <div>
+              <span>{conferenceData.shortName}</span>
+            </div>
+          </div>
 
-          <h2 className=" font-bold text-left">{conferenceData.title}</h2>
+          <h2 className=" font-bold text-left text-4xl mt-2">{conferenceData.name}</h2>
 
-          <p className="text-left">{conferenceData.description}</p>
+          <p className="text-left mt-4">{conferenceData.description}</p>
 
+          <div className="flex items-center mt-6 text-left">
+            <span className="font-semibold mr-2">Topics:</span>
+            <div className="flex flex-wrap">
+              {conferenceData.topics.map((topic, index) => (
+                <span key={index} className="bg-gray-200 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2">
+                  {topic}
+                </span>
+              ))}
+            </div>
+          </div>
 
           <ConferenceFeedback onSubmitFeedback={handleFeedbackSubmit} />
         </div>
 
 
-        {/* cột phải */}
+        {/* Right Column */}
         <div className="col-span-1">
-          <section className="bg-background-secondary">
-            <div className="flex items-center space-x-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-12 w-12"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span className="text-left">{conferenceData.dateTime}</span>
+          <section className="bg-background-secondary p-6 rounded-lg">
+            <h3 className="text-xl font-semibold text-left mb-4">{t('Conference Details')}</h3>
+
+            <div className="mb-3">
+              <div className="text-left">
+                <p><span className="font-semibold">{t('Start Date')}:</span> {formatDate(conferenceData.startDate)}</p>
+              </div>
             </div>
 
-            <div className="flex items-center space-x-2 mt-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-12 w-12"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"
-                />
-              </svg>
-              <span className="text-left">{conferenceData.location}</span>
+            <div className="mb-3">
+              <div className="text-left">
+                <p><span className="font-semibold">{t('End Date')}:</span> {formatDate(conferenceData.endDate)}</p>
+              </div>
             </div>
-            <div className="flex items-center space-x-2 mt-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-12 w-12"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0l-3-3a2 2 0 112.828-2.828l3 3a2 2 0 012.828 0l3-3z" />
-              </svg>
-              <div className="overflow-hidden text-ellipsis whitespace-nowrap">
+
+            <div className="mb-3">
+              <div className="text-left">
+                <p><span className="font-semibold">{t('Location')}:</span> {conferenceData.location}</p>
+              </div>
+            </div>
+
+            <div className="mb-3">
+              <div className="overflow-hidden text-ellipsis whitespace-nowrap text-left">
+                <p><span className="font-semibold">{t('Website')}:</span>
                 <a
                   href={conferenceData.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-500 hover:underline"
+                  className="hover:underline"
                 >
                   {conferenceData.website}
                 </a>
+                </p>
               </div>
             </div>
+
+            <div className="mb-3">
+              <p className="text-left"><span className="font-semibold">{t('Rank')}:</span> {conferenceData.rank}</p>
+            </div>
+
+            <div className="mb-3">
+              <p className="text-left"><span className="font-semibold">{t('Type')}:</span> <span className="capitalize">{conferenceData.type}</span></p>
+            </div>
+
+            <div className="mb-3">
+              <p className="text-left"><span className="font-semibold">{t('Submission Date')}:</span> {formatDate(conferenceData.submissionDate)}</p>
+            </div>
+
+            <div className="mb-3">
+              <p className="text-left"><span className="font-semibold">{t('Field')}:</span> {conferenceData.fieldOfResearch}</p>
+            </div>
+
+            <div className="mb-3">
+              <p className="text-left"><span className="font-semibold">{t('Average Score')}:</span> {conferenceData.averageScore} / 5</p>
+            </div>
+
           </section>
         </div>
       </div>

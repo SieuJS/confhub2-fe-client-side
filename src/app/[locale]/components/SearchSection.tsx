@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Button from './Button';
+import SearchAdvanceSection from './SearchAdvanceSection'; // Import the new component
 
 interface SearchSectionProps {
   onSearch: (query: string) => void;
@@ -14,9 +15,25 @@ interface SearchSectionProps {
   onEndDateChange: (date: Date | null) => void;
   startDate: Date | null;
   endDate: Date | null;
+
+  onSubmissionDateChange: (date: Date | null) => void;
+  submissionDate: Date | null;
+  onRankChange: (rank: string | null) => void;
+  selectedRank: string | null;
+  onSourceYearChange: (sourceYear: string | null) => void;
+  selectedSourceYear: string | null;
+  onAverageScoreChange: (averageScore: string | null) => void;
+  selectedAverageScore: string | null;
+  onTopicsChange: (topics: string[]) => void;
+  selectedTopics: string[];
+  onFieldOfResearchChange: (fields: string[]) => void;
+  selectedFieldsOfResearch: string[];
 }
 
-const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onLocationChange, selectedLocation, onTypeChange, selectedType, onStartDateChange, onEndDateChange, startDate, endDate }) => {
+const SearchSection: React.FC<SearchSectionProps> = ({
+  onSearch, onLocationChange, selectedLocation, onTypeChange, selectedType, onStartDateChange, onEndDateChange, startDate, endDate,
+  onSubmissionDateChange, submissionDate, onRankChange, selectedRank, onSourceYearChange, selectedSourceYear, onAverageScoreChange, selectedAverageScore, onTopicsChange, selectedTopics, onFieldOfResearchChange, selectedFieldsOfResearch
+}) => {
   const [searchQuery, setSearchQuery] = React.useState<string>('');
   const [locationSearchQuery, setLocationSearchQuery] = useState('');
   const [typeSearchQuery, setTypeSearchQuery] = useState('');
@@ -24,6 +41,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onLocationChang
   const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
   const locationDropdownRef = useRef<HTMLDivElement>(null);
   const typeDropdownRef = useRef<HTMLDivElement>(null);
+  const [isAdvancedOptionsVisible, setIsAdvancedOptionsVisible] = useState(false); // State for advanced options visibility
 
   const availableLocations = ['New York, USA', 'London, UK', 'Berlin, Germany', 'Tokyo, Japan', 'Paris, France', 'Sydney, Australia', 'Rome, Italy', 'Madrid, Spain'];
   const availableTypes = ['online', 'offline', 'hybrid']; // Define available types
@@ -31,6 +49,10 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onLocationChang
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
+
+  const filteredLocations = availableLocations.filter(location =>
+    location.toLowerCase().includes(locationSearchQuery.toLowerCase())
+  );
 
   const handleSearchClick = () => {
     onSearch(searchQuery);
@@ -41,6 +63,10 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onLocationChang
       handleSearchClick();
     }
   };
+
+  const filteredTypes = availableTypes.filter(type =>
+    type.toLowerCase().includes(typeSearchQuery.toLowerCase())
+  );
 
   const handleLocationClick = (location: string) => {
     onLocationChange(location === "" ? null : location);
@@ -68,20 +94,16 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onLocationChang
     onEndDateChange(date);
   };
 
-  const filteredLocations = availableLocations.filter(location =>
-    location.toLowerCase().includes(locationSearchQuery.toLowerCase())
-  );
-
-  const filteredTypes = availableTypes.filter(type =>
-    type.toLowerCase().includes(typeSearchQuery.toLowerCase())
-  );
-
   const toggleLocationDropdown = () => {
     setIsLocationDropdownOpen(!isLocationDropdownOpen);
   };
 
   const toggleTypeDropdown = () => {
     setIsTypeDropdownOpen(!isTypeDropdownOpen);
+  };
+
+  const toggleAdvancedOptionsVisibility = () => {
+    setIsAdvancedOptionsVisible(!isAdvancedOptionsVisible);
   };
 
   // Close dropdown if clicked outside
@@ -232,13 +254,6 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onLocationChang
           {isTypeDropdownOpen && (
             <div className="absolute left-0 mt-2 w-28 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10" tabIndex={0}>
               <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                {/* <input
-                  type="text"
-                  placeholder="Search type..."
-                  className="block w-full px-4 py-2 text-sm text-gray-700 focus:outline-none"
-                  onChange={handleTypeSearchChange}
-                  onClick={(e) => e.stopPropagation()}
-                /> */}
                 <button
                   key="all"
                   onClick={() => handleTypeClick("")}
@@ -264,6 +279,23 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onLocationChang
           Search
         </Button>
       </div>
+
+      <SearchAdvanceSection
+        isAdvancedOptionsVisible={isAdvancedOptionsVisible}
+        toggleAdvancedOptionsVisibility={toggleAdvancedOptionsVisibility}
+        onSubmissionDateChange={onSubmissionDateChange}
+        submissionDate={submissionDate}
+        onRankChange={onRankChange}
+        selectedRank={selectedRank}
+        onSourceYearChange={onSourceYearChange}
+        selectedSourceYear={selectedSourceYear}
+        onAverageScoreChange={onAverageScoreChange}
+        selectedAverageScore={selectedAverageScore}
+        onTopicsChange={onTopicsChange}
+        selectedTopics={selectedTopics}
+        onFieldOfResearchChange={onFieldOfResearchChange}
+        selectedFieldsOfResearch={selectedFieldsOfResearch}
+      />
     </div>
   );
 };

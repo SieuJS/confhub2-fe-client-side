@@ -10,15 +10,15 @@ const FilterSidebar = () => {
   };
 
   return (
-    <div className="w-1/4 bg-gray-100 rounded-lg shadow-md p-4 min-w-32">
+    <div className="w-1/4  rounded-lg shadow-md p-4 min-w-32">
       <div className="mb-4">
-        <h3 className="font-semibold text-lg">Filter</h3>
+        <h3 className="">Filter</h3>
       </div>
 
       {/* Topics Filter */}
       <div>
         <div className="flex justify-between items-center mb-2 cursor-pointer" onClick={toggleTopics}>
-          <h4 className="font-small">Topics</h4>
+          <h4 className="">Topics</h4>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className={`h-5 w-5 text-gray-500 transition-transform duration-200 ${topicsExpanded ? 'rotate-180' : ''}`}

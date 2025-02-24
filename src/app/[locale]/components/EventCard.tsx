@@ -32,7 +32,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
         />
 
         {event.rank && (
-          <div className="absolute top-2 right-2 bg-green-500 font-bold px-2 py-1 rounded-md text-sm flex items-center space-x-1">
+          <div className="absolute top-2 right-2 bg-background-secondary font-bold px-2 py-1 rounded-md text-sm flex items-center space-x-1">
             <span>{event.rank}</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"

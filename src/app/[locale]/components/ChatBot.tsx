@@ -314,14 +314,10 @@ function ChatBot() {
 
 
     return (
-        <div className="bg-gray-100 font-sans p-5">
-            <div className="container px-4 py-8 gap-8">
-
-                <h1 className="text-2xl font-bold text-gray-800 mb-4">
-                    Chatbot
-                </h1>
-                <div id="chat-container" className="bg-white rounded-xl shadow-lg w-full p-8 flex flex-col">
-                    <h1 className="text-2xl text-center mb-6 font-semibold text-gray-800">Conferences Suggest Chatbot</h1>
+        <div className="">
+            
+                <div id="chat-container" className=" rounded-xl shadow-lg w-full p-8 flex flex-col">
+                    <h1 className="text-2xl text-center mb-6 font-semibold">Conferences Suggest Chatbot</h1>
 
                     <ChatHistory messages={chatMessages} />
 
@@ -346,7 +342,7 @@ function ChatBot() {
                     <ChatInput onSendMessage={handleSendMessage} onFillInput={handleFillInput} />
                 </div>
 
-            </div>
+            
         </div>
     );
 }

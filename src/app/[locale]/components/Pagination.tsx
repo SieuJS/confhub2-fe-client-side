@@ -15,11 +15,11 @@ const Pagination: React.FC<PaginationProps> = ({ eventsPerPage, totalEvents, pag
   }
 
   return (
-    <div className="flex items-center justify-center mt-8">
+    <div className="flex items-center justify-center mt-8 text-xs">
       <button
         onClick={() => paginate(currentPage - 1)}
         disabled={currentPage === 1}
-        className="bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md px-4 py-2 mr-2"
+        className="bg-background hover:bg-background-secondary  rounded-md px-4 py-2 mr-2"
       >
         Previous
       </button>
@@ -27,7 +27,7 @@ const Pagination: React.FC<PaginationProps> = ({ eventsPerPage, totalEvents, pag
         <button
           key={number}
           onClick={() => paginate(number)}
-          className={`bg-white hover:bg-gray-100 text-gray-700 rounded-md px-4 py-2 mr-1 ${currentPage === number ? 'font-bold' : ''}`}
+          className={`bg-background hover:bg-background-secondary  rounded-md px-4 py-2 mr-1 ${currentPage === number ? 'font-bold' : ''}`}
         >
           {number}
         </button>
@@ -35,7 +35,7 @@ const Pagination: React.FC<PaginationProps> = ({ eventsPerPage, totalEvents, pag
       <button
         onClick={() => paginate(currentPage + 1)}
         disabled={currentPage === pageNumbers.length}
-        className="bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md px-4 py-2"
+        className="bg-background hover:bg-background-secondary  rounded-md px-4 py-2"
       >
         Next
       </button>

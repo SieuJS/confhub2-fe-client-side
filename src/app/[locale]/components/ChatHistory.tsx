@@ -19,7 +19,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ messages }) => {
     return (
         <div
             id="chat-history"
-            className="p-2 border border-gray-200 rounded-lg mb-5 relative overflow-y-auto"
+            className="rounded-lg mb-5 relative overflow-y-auto"
             ref={chatHistoryRef}
         >
             {messages.map((msg, index) => (

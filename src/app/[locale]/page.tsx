@@ -1,5 +1,7 @@
 import { useTranslations } from 'next-intl'
 import Button from './components/Button'
+import SearchSection from './components/SearchSection'
+import Conferences from './conferences/page'
 
 export default function DashboardPage() {
   const t = useTranslations('')
@@ -66,6 +68,10 @@ export default function DashboardPage() {
           </div>
         </div>
       </section>
+
+     
+      
+        
     </div>
   )
 }
