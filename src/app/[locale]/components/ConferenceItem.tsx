@@ -31,7 +31,7 @@ const ConferenceItem: React.FC<{ conference: Conference }> = ({ conference }) =>
     setIsFollowing(!isFollowing);
   };
   return (
-    <div className="bg-white rounded-md shadow-md p-4 mb-4 grid grid-cols-8 gap-4">
+    <div className="bg-background rounded-md shadow-md p-4 mb-4 grid grid-cols-9 gap-4">
       {/* cột 1 */}
       <div className="col-span-1 flex items-center justify-center">
         <Image
@@ -44,24 +44,33 @@ const ConferenceItem: React.FC<{ conference: Conference }> = ({ conference }) =>
       </div>
       {/* cột 2 */}
       <div className="col-span-6 text-left">
-        <h3 className="text-lg font-semibold text-blue-700">{conference.name} ({conference.shortName})</h3>
-        <p className="text-gray-700">
+        <h3 className="text-lg font-semibold text-button">{conference.name} ({conference.shortName})</h3>
+        <p className="">
           <strong>Dates:</strong> {conference.startDate} - {conference.endDate}
         </p>
-        <p className="text-gray-700">
+        <p className="">
           <strong>Location:</strong> {conference.location}
         </p>
 
         {/* Add more details or actions here if needed */}
       </div>
       {/* cột 3 */}
-      <div className="col-span-1 flex items-center justify-center">
+      <div className="col-span-2 flex items-center justify-center">
         <Button
-          onClick={handleFollowClick}
           variant="primary"
           size="medium"
           rounded
-          className={`mr-2 w-24 ${isFollowing ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'}`} // Changed hover color
+          className={`mr-2 w-24`} 
+        >
+          Update
+        </Button>
+
+        <Button
+          onClick={handleFollowClick}
+          variant={`${isFollowing ? 'primary' : 'secondary'}`}
+          size="medium"
+          rounded
+          className={`mr-2 w-24 `} 
         >
           {isFollowing ? 'Followed' : 'Follow'}
         </Button>

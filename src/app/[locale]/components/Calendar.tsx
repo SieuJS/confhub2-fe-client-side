@@ -71,15 +71,27 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
   return (
     <section className="p-4 bg-white rounded-md shadow relative"> {/* Make section relative for absolute positioning of dialog */}
       <div className="flex justify-between items-center mb-4">
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline text-sm">
+              Add Schedule
+          </button>
+
+          <div className="flex items-center gap-2">
+            <button onClick={goToPreviousMonth} className=" p-1 hover:bg-gray-200 rounded-full transition-colors duration-200">
+              <svg className="svg-inline--fa fa-arrow-left fa-w-14" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="" style={{ width: '14px', height: '14px', color: 'black' }}>
+                <path fill="currentColor" d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z"></path>
+              </svg>
+            </button>
+            <div className="font-semibold text-lg w-36 text-center">{monthName} {currentYear}</div>
+            <button onClick={goToNextMonth}  className=" p-1 hover:bg-gray-200 rounded-full transition-colors duration-200">
+              <svg className="svg-inline--fa fa-arrow-right fa-w-14" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="" style={{ width: '14px', height: '14px', color: 'black' }}>
+                <path fill="currentColor" d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0-33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"></path>
+              </svg>
+            </button>
+          </div>
           <button onClick={goToToday} className="mx-1 px-3 py-1 text-sm rounded-md bg-gray-200 hover:bg-gray-300">Today</button>
-          <button onClick={goToPreviousYear} className="mx-1 px-3 py-1 text-sm rounded-md bg-gray-200 hover:bg-gray-300">Previous Year</button>
-          <button onClick={goToPreviousMonth} className="mx-1 px-3 py-1 text-sm rounded-md bg-gray-200 hover:bg-gray-300">Previous Month</button>
-          <div className="font-semibold text-lg">{monthName} {currentYear}</div>
-          <button onClick={goToNextMonth} className="mx-1 px-3 py-1 text-sm rounded-md bg-gray-200 hover:bg-gray-300">Next Month</button>
-          <button onClick={goToNextYear} className="mx-1 px-3 py-1 text-sm rounded-md bg-gray-200 hover:bg-gray-300">Next Year</button>
-          <button onClick={goToToday} className="mx-1 px-3 py-1 text-sm rounded-md bg-gray-200 hover:bg-gray-300">Today</button>
-        <div>
-        </div>
+          
+          
+        
       </div>
 
       {/* Calendar Grid */}

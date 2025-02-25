@@ -127,10 +127,10 @@ const MyConferencesTab: React.FC<MyConferencesTabProps> = ({conferences}) => {
 
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4">
-            <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+            <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-background p-6 text-left align-middle shadow-xl transition-all">
               <Dialog.Title
                 as="h3"
-                className="text-lg font-medium leading-6 text-gray-900"
+                className="text-lg font-medium leading-6 "
               >
                 Conference Information
               </Dialog.Title>
@@ -208,39 +208,39 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({ onAdd, onClose }) => {
   return (
     <form onSubmit={handleSubmit} className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
       <div className="sm:col-span-2">
-        <label htmlFor="conferenceName" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="conferenceName" className="block text-sm font-medium ">
           * Conference name:
         </label>
         <input
           type="text"
           id="conferenceName"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="bg-background mt-1 block w-full rounded-md border border-text-secondary shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
       </div>
       <div className="sm:col-span-1">
-        <label htmlFor="acronym" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="acronym" className="block text-sm font-medium ">
           * Acronym:
         </label>
         <input
           type="text"
           id="acronym"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="mt-1 block w-full rounded-md border border-text-secondary bg-background shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           value={acronym}
           onChange={(e) => setAcronym(e.target.value)}
           required
         />
       </div>
       <div className="sm:col-span-1">
-        <label htmlFor="link" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="link" className="block text-sm font-medium ">
           * Link:
         </label>
         <input
           type="url"
           id="link"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="mt-1 block w-full rounded-md border border-text-secondary bg-background shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           value={link}
           onChange={(e) => setLink(e.target.value)}
           required
@@ -248,12 +248,12 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({ onAdd, onClose }) => {
       </div>
 
       <div className="sm:col-span-2">
-        <label htmlFor="type" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="type" className="block text-sm font-medium ">
           * Type:
         </label>
         <select
           id="type"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="mt-1 block w-full rounded-md border border-text-secondary bg-background shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           value={type}
           onChange={(e) => setType(e.target.value as Conference['type'])}
           required
@@ -265,47 +265,47 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({ onAdd, onClose }) => {
       </div>
 
       <div className="sm:col-span-2">
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium ">
           Location:
         </label>
         <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-4">
           <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address:</label>
+            <label htmlFor="address" className="block text-sm font-medium ">Address:</label>
             <input
               type="text"
               id="address"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border border-text-secondary bg-background shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
             />
           </div>
           <div>
-            <label htmlFor="stateProvince" className="block text-sm font-medium text-gray-700">State/Province:</label>
+            <label htmlFor="stateProvince" className="block text-sm font-medium ">State/Province:</label>
             <input
               type="text"
               id="stateProvince"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border border-text-secondary bg-background shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               value={stateProvince}
               onChange={(e) => setStateProvince(e.target.value)}
             />
           </div>
           <div>
-            <label htmlFor="city" className="block text-sm font-medium text-gray-700">* City:</label>
+            <label htmlFor="city" className="block text-sm font-medium ">* City:</label>
             <input
               type="text"
               id="city"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border border-text-secondary bg-background shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               value={city}
               onChange={(e) => setCity(e.target.value)}
               required
             />
           </div>
           <div>
-            <label htmlFor="country" className="block text-sm font-medium text-gray-700">* Country:</label>
+            <label htmlFor="country" className="block text-sm font-medium ">* Country:</label>
             <input
               type="text"
               id="country"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border border-text-secondary bg-background shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               value={country}
               onChange={(e) => setCountry(e.target.value)}
               required
@@ -315,25 +315,25 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({ onAdd, onClose }) => {
       </div>
 
       <div className="sm:col-span-2">
-        <label className="block text-sm font-medium text-gray-700">* Dates:</label>
+        <label className="block text-sm font-medium ">* Dates:</label>
         <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-4">
           <div>
-            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Start Date:</label>
+            <label htmlFor="startDate" className="block text-sm font-medium ">Start Date:</label>
             <input
               type="date"
               id="startDate"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border border-text-secondary bg-background shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               required
             />
           </div>
           <div>
-            <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">End Date:</label>
+            <label htmlFor="endDate" className="block text-sm font-medium ">End Date:</label>
             <input
               type="date"
               id="endDate"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border border-text-secondary bg-background shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               required
@@ -343,24 +343,24 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({ onAdd, onClose }) => {
       </div>
 
       <div className="sm:col-span-2">
-        <label className="block text-sm font-medium text-gray-700">Important Dates:</label>
+        <label className="block text-sm font-medium ">Important Dates:</label>
         <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-4">
           <div>
-            <label htmlFor="submissionDate" className="block text-sm font-medium text-gray-700">Submission Date:</label>
+            <label htmlFor="submissionDate" className="block text-sm font-medium ">Submission Date:</label>
             <input
               type="date"
               id="submissionDate"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border border-text-secondary bg-background shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               value={submissionDate}
               onChange={(e) => setSubmissionDate(e.target.value)}
             />
           </div>
           <div>
-            <label htmlFor="notificationDate" className="block text-sm font-medium text-gray-700">Notification Date:</label>
+            <label htmlFor="notificationDate" className="block text-sm font-medium ">Notification Date:</label>
             <input
               type="date"
               id="notificationDate"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border border-text-secondary bg-background shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               value={notificationDate}
               onChange={(e) => setNotificationDate(e.target.value)}
             />
@@ -369,11 +369,11 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({ onAdd, onClose }) => {
       </div>
 
       <div className="sm:col-span-2">
-        <label htmlFor="callForPaper" className="block text-sm font-medium text-gray-700">Call for Paper Description:</label>
+        <label htmlFor="callForPaper" className="block text-sm font-medium ">Call for Paper Description:</label>
         <textarea
           id="callForPaper"
           rows={3}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="mt-1 block w-full rounded-md border border-text-secondary bg-background shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           value={callForPaper}
           onChange={(e) => setCallForPaper(e.target.value)}
           placeholder="Enter call for paper description"
@@ -381,11 +381,11 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({ onAdd, onClose }) => {
       </div>
 
       <div className="sm:col-span-2">
-        <label htmlFor="generalTopics" className="block text-sm font-medium text-gray-700">General Topics:</label>
+        <label htmlFor="generalTopics" className="block text-sm font-medium ">General Topics:</label>
         <input
           type="text"
           id="generalTopics"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="mt-1 block w-full rounded-md border border-text-secondary bg-background shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           value={generalTopics}
           onChange={(e) => setGeneralTopics(e.target.value)}
           placeholder="Enter general topics separated by commas"
@@ -394,7 +394,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({ onAdd, onClose }) => {
 
 
       <div className="sm:col-span-2">
-        <label htmlFor="fieldsOfResearch" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="fieldsOfResearch" className="block text-sm font-medium ">
           * Field of Research:
         </label>
         <div className="flex flex-wrap gap-2 mt-1">
@@ -404,7 +404,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({ onAdd, onClose }) => {
               <button
                 type="button"
                 onClick={() => handleRemoveFieldOfResearch(field)}
-                className="ml-1 text-gray-500 hover:text-gray-700 focus:outline-none"
+                className="ml-1 text-gray-500 hover: focus:outline-none"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -426,7 +426,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({ onAdd, onClose }) => {
           <input
             type="text"
             id="newFieldOfResearch"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            className="mt-1 block w-full rounded-md border border-text-secondary bg-background shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             value={newFieldOfResearch}
             onChange={(e) => setNewFieldOfResearch(e.target.value)}
             placeholder="Add new"
@@ -440,7 +440,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({ onAdd, onClose }) => {
           Back
         </Button>
         <Button type="submit" variant="primary">
-          Next
+          Finish
         </Button>
       </div>
     </form>

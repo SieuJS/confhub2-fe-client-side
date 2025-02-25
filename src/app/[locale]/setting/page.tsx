@@ -126,7 +126,7 @@ export default function Setting() {
                   {menuItems.map((item) => (
                     <li key={item.page} className="w-full">
                       <button
-                  className={`flex items-center w-full p-3  hover:bg-gray-100 focus:outline-none  focus:secondary ${activePage === item.page ? 'bg-secondary  hover:bg-secondary' : ''}`}
+                  className={`flex items-center w-full p-3  hover:bg-button hover:opacity-60 focus:outline-none  focus:secondary ${activePage === item.page ? 'bg-button text-button-text  hover:bg-secondary' : ''}`}
                   onClick={() => setActivePage(item.page)}
                       >
                   {item.label} 

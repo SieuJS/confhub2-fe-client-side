@@ -67,22 +67,26 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
 
       <div className="p-2">
 
-        <div className="flex items-center justify-between">
-          <div className='flex flex-col items-start text-left'>
-            <h3 className="font-semibold text-lg">{event.name}</h3>
-            <p className="text-xs">{event.shortName}</p>
-          </div>
+      <div className="grid grid-cols-3 items-center gap-2">
+  {/* Cột 1: Thông tin sự kiện */}
+  <div className='flex flex-col items-start text-left col-span-2'> {/* col-span-2 để cột này chiếm 2 cột */}
+    <h6 className="font-semibold text-base">{event.name}</h6>
+    <p className="text-xs">{event.shortName}</p>
+  </div>
 
-          <Button variant="secondary" size="small" rounded className="w-32">
-            Detail
-          </Button>
-        </div>
+  {/* Cột 2: Nút Detail */}
+  <div className="justify-self-end self-start col-span-1"> {/* justify-self-end để đẩy nút về phía bên phải cột, self-start để đẩy nút lên trên */}
+    <Button variant="secondary" size="small" rounded className="w-20">
+      Detail
+    </Button>
+  </div>
+</div>
 
         <div className="flex flex-wrap mt-2 space-x-2 overflow-hidden">
           {event.topics.map((topic, index) => (
             <span
               key={index}
-              className=" rounded-full px-3 py-1 text-xs inline-block mb-2"
+              className=" rounded-full px-2 py-1 text-xs inline-block mb-2 bg-background"
             >
               {topic}
             </span>
