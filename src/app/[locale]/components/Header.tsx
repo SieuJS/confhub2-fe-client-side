@@ -30,7 +30,7 @@ export const Header: FC<Props> = ({ locale }) => {
   return (
     <div
       ref={headerRef}
-      className={`mx-auto flex max-w-screen-2xl flex-row items-center justify-between p-5 bg-background-secondary transition-all duration-300 ease-in-out
+      className={`mx-auto flex max-w-screen-2xl flex-row items-center justify-between p-5 bg-background transition-all duration-300 ease-in-out
         fixed top-0 left-0 right-0 z-50 shadow-md
       `}
     >
@@ -62,7 +62,9 @@ export const Header: FC<Props> = ({ locale }) => {
           <Link lang={locale} href={`/chatbot`}>
             {t('Chatbot')}
           </Link>
-          <a href=''>{t('Support')}</a>
+          <Link lang={locale} href={`/support`}>
+            {t('Support')}
+          </Link>
           <a href=''>{t('Other')}</a>
         </nav>
         <ThemeSwitch />

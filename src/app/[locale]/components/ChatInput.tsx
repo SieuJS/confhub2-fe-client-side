@@ -61,9 +61,9 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onFillInput }) => 
 
 
     return (
-        <div className={`rounded-full shadow-md flex items-center py-4 px-4 space-x-4 border ${isFocused ? 'border-secondary border-2' : 'border-gray-300'}  `}>
+        <div className={`rounded-full shadow-md flex items-center py-4 px-4 space-x-4 border ${isFocused ? 'border-button border-2' : 'border-button'}  `}>
             <TextareaAutosize
-              className="flex-grow rounded-l-md py-2 px-4 bg-transparent  focus:outline-none focus:ring-0"
+              className="flex-grow rounded-l-md py-2 px-4 bg-transparent focus:outline-none focus:ring-0 placeholder-primary"
               placeholder="Nhập tin nhắn..."
               value={message}
               onChange={handleInputChange}
@@ -75,13 +75,13 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onFillInput }) => 
               onBlur={handleBlur}   // Add onBlur handler
             />
             <Button // Replaced <button> with <Button>
-                variant="primary" // Or "secondary" based on your design
-                size="large"     // Or "small", "large"
-                rounded={true}   // Make button rounded
-                onClick={handleSendMessage}
-                className="ml-2 rounded-full" // Make button rounded and add margin
+            variant="primary" // Or "secondary" based on your design
+            size="large"     // Or "small", "large"
+            rounded={true}   // Make button rounded
+            onClick={handleSendMessage}
+            className="ml-2 rounded-full" // Make button rounded and add margin
             >
-                Gửi {/* Children of the Button component */}
+            Gửi {/* Children of the Button component */}
             </Button>
         </div>
     );

@@ -1,12 +1,14 @@
 import { useTranslations } from 'next-intl'
 import Button from './components/Button'
-import SearchSection from './components/SearchSection'
-import Conferences from './conferences/page'
+import Banner from './components/Banner'
+import PopularConferences from './components/PopularConferences'
 
 export default function DashboardPage() {
   const t = useTranslations('')
   return (
     <div>
+      <Banner />
+      <PopularConferences />
       <section className='flex flex-col items-center justify-center py-24'>
         <h1 className='text-center text-7xl font-extrabold leading-tight'>
           {t('An')}{' '}
@@ -68,10 +70,7 @@ export default function DashboardPage() {
           </div>
         </div>
       </section>
-
-     
-      
-        
+   
     </div>
   )
 }

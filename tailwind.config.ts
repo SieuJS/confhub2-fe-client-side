@@ -41,9 +41,22 @@ const config = {
       fontFamily: {
         sans: ['var(--font-space-grotesk)', 'var(--rubik)']
       },
+      keyframes: {
+        ripple: { // Keep the original ripple for button hover if uncommented
+          '0%': { transform: 'scale(0)', opacity: '0.5' },
+          '100%': { transform: 'scale(1.5)', opacity: '0' },
+        },
+        'pulse-ripple': { // New continuous pulse ripple animation
+          '0%': { transform: 'scale(0)', opacity: '0.5' },
+          '50%': { transform: 'scale(1.2)', opacity: '0.2' }, // Scale up and slightly fade
+          '100%': { transform: 'scale(1.5)', opacity: '0' },   // Scale further and fully fade
+        }
+      },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out'
+        'accordion-up': 'accordion-up 0.2s ease-out',
+        ripple: 'ripple 0.5s ease-out', // Animation for button hover (if used)
+        'pulse-ripple': 'pulse-ripple 1s linear infinite', // Continuous pulse ripple for div
       }
     }
   },
