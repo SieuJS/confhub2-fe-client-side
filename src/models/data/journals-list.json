@@ -1,0 +1,521 @@
+[
+  {
+    "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "title": "CA: A Cancer Journal for Clinicians",
+    "abbreviation": "CA Cancer J. Clin.",
+    "publicationType": "Journal",
+    "subjectAreas": [
+      {
+        "area": "Hematology",
+        "quartile": "Q1"
+      },
+      {
+        "area": "Oncology",
+        "quartile": "Q1"
+      }
+    ],
+    "publisher": "Wiley-Blackwell",
+    "countryOfPublication": "United States",
+    "issn": [
+      "1542-4863",
+      "0007-9235"
+    ],
+    "language": "English",
+    "bestQuartileOverall": "Q1",
+    "coverageHistory": {
+      "startYear": 1950,
+      "endYear": 2023,
+      "isCurrentlyPublished": false
+    },
+    "openAccessType": "Closed Access",
+    "peerReviewType": "Double-blind",
+    "contactInfo": {
+      "website": "https://acsjournals.onlinelibrary.wiley.com/journal/15424863"
+    },
+    "indexingDatabases": [
+      {
+        "name": "Scopus",
+        "coverageYears": "1996-2023"
+      },
+      {
+        "name": "Web of Science",
+        "coverageYears": "1945-2023"
+      }
+    ],
+    "metrics": {
+      "impactFactor": 72.5,
+      "citeScore": 50,
+      "overallRank": 1,
+      "hIndex": 1058,
+      "sjr": 15.993,
+      "impactFactorHistory": [
+        {
+          "year": 2023,
+          "impactFactor": 72.5
+        },
+        {
+          "year": 2022,
+          "impactFactor": 78.5
+        },
+        {
+          "year": 2021,
+          "impactFactor": 69.8
+        }
+      ]
+    },
+    "url": "https://acsjournals.onlinelibrary.wiley.com/journal/15424863",
+    "isDiscontinued": true,
+    "imageUrl": "/journal.jpg"
+  },
+  {
+    "id": "b2c3d4e5-f6a7-8901-2345-67890abcdef1",
+    "title": "Nature",
+    "abbreviation": "Nature",
+    "publicationType": "Journal",
+    "subjectAreas": [
+      {
+        "area": "Multidisciplinary",
+        "quartile": "Q1"
+      }
+    ],
+    "publisher": "Nature Portfolio",
+    "countryOfPublication": "United Kingdom",
+    "issn": [
+      "1476-4687",
+      "0028-0836"
+    ],
+    "language": "English",
+    "bestQuartileOverall": "Q1",
+    "coverageHistory": {
+      "startYear": 1869,
+      "isCurrentlyPublished": true
+    },
+    "openAccessType": "Hybrid Open Access",
+    "peerReviewType": "Double-blind",
+    "contactInfo": {
+      "website": "https://www.nature.com/"
+    },
+    "indexingDatabases": [
+      {
+        "name": "Scopus",
+        "coverageYears": "1996-present"
+      },
+      {
+        "name": "Web of Science",
+        "coverageYears": "1945-present"
+      },
+      {
+        "name": "PubMed",
+        "coverageYears": "1945-present"
+      }
+    ],
+    "metrics": {
+      "impactFactor": 64.8,
+      "citeScore": 45,
+      "overallRank": 2,
+      "hIndex": 1500,
+      "sjr": 14.5
+    },
+    "url": "https://www.nature.com/",
+    "imageUrl": "/journal.jpg"
+  },
+  {
+    "id": "c3d4e5f6-a7b8-9012-3456-7890abcdef12",
+    "title": "The Lancet",
+    "abbreviation": "Lancet",
+    "publicationType": "Journal",
+    "subjectAreas": [
+      {
+        "area": "Medicine",
+        "quartile": "Q1"
+      }
+    ],
+    "publisher": "Elsevier",
+    "countryOfPublication": "United Kingdom",
+    "issn": [
+      "1474-547X",
+      "0140-6736"
+    ],
+    "language": "English",
+    "bestQuartileOverall": "Q1",
+    "coverageHistory": {
+      "startYear": 1823,
+      "isCurrentlyPublished": true
+    },
+    "openAccessType": "Hybrid Open Access",
+    "peerReviewType": "Double-blind",
+    "contactInfo": {
+      "website": "https://www.thelancet.com/"
+    },
+    "indexingDatabases": [
+      {
+        "name": "Scopus",
+        "coverageYears": "1996-present"
+      },
+      {
+        "name": "Web of Science",
+        "coverageYears": "1945-present"
+      },
+      {
+        "name": "PubMed",
+        "coverageYears": "1945-present"
+      }
+    ],
+    "metrics": {
+      "impactFactor": 202.7,
+      "citeScore": 120,
+      "overallRank": 3,
+      "hIndex": 1400,
+      "sjr": 13.8
+    },
+    "url": "https://www.thelancet.com/",
+    "imageUrl": "/journal.jpg"
+  },
+  {
+    "id": "d4e5f6a7-b8c9-0123-4567-890abcdef123",
+    "title": "IEEE Transactions on Pattern Analysis and Machine Intelligence",
+    "abbreviation": "IEEE Trans. Pattern Anal. Mach. Intell.",
+    "publicationType": "Journal",
+    "subjectAreas": [
+      {
+        "area": "Computer Science",
+        "quartile": "Q1"
+      },
+      {
+        "area": "Engineering",
+        "quartile": "Q1"
+      }
+    ],
+    "publisher": "IEEE",
+    "countryOfPublication": "United States",
+    "issn": [
+      "0162-8828"
+    ],
+    "language": "English",
+    "bestQuartileOverall": "Q1",
+    "coverageHistory": {
+      "startYear": 1979,
+      "isCurrentlyPublished": true
+    },
+    "openAccessType": "Hybrid Open Access",
+    "peerReviewType": "Double-blind",
+    "contactInfo": {
+      "website": "https://www.computer.org/csdl/journal/tp"
+    },
+    "indexingDatabases": [
+      {
+        "name": "Scopus",
+        "coverageYears": "1996-present"
+      },
+      {
+        "name": "Web of Science",
+        "coverageYears": "1988-present"
+      }
+    ],
+    "metrics": {
+      "impactFactor": 24.5,
+      "citeScore": 35,
+      "overallRank": 5,
+      "hIndex": 500,
+      "sjr": 8.2
+    },
+    "url": "https://www.computer.org/csdl/journal/tp",
+    "imageUrl": "/journal.jpg"
+  },
+  {
+    "id": "e5f6a7b8-c9d0-1234-5678-90abcdef1234",
+    "title": "Advanced Materials",
+    "abbreviation": "Adv. Mater.",
+    "publicationType": "Journal",
+    "subjectAreas": [
+      {
+        "area": "Materials Science",
+        "quartile": "Q1"
+      },
+      {
+        "area": "Chemistry",
+        "quartile": "Q1"
+      },
+      {
+        "area": "Physics",
+        "quartile": "Q1"
+      }
+    ],
+    "publisher": "Wiley-VCH",
+    "countryOfPublication": "Germany",
+    "issn": [
+      "1521-4095",
+      "0935-9648"
+    ],
+    "language": "English",
+    "bestQuartileOverall": "Q1",
+    "coverageHistory": {
+      "startYear": 1993,
+      "isCurrentlyPublished": true
+    },
+    "openAccessType": "Hybrid Open Access",
+    "peerReviewType": "Single-blind",
+    "contactInfo": {
+      "website": "https://onlinelibrary.wiley.com/journal/15214095"
+    },
+    "indexingDatabases": [
+      {
+        "name": "Scopus",
+        "coverageYears": "1996-present"
+      },
+      {
+        "name": "Web of Science",
+        "coverageYears": "1993-present"
+      }
+    ],
+    "metrics": {
+      "impactFactor": 32.2,
+      "citeScore": 40,
+      "overallRank": 7,
+      "hIndex": 600,
+      "sjr": 9.5
+    },
+    "url": "https://onlinelibrary.wiley.com/journal/15214095",
+    "imageUrl": "/journal.jpg"
+  },
+  {
+    "id": "f6a7b8c9-d0e1-2345-6789-0abcdef12345",
+    "title": "Journal of the American Chemical Society",
+    "abbreviation": "J. Am. Chem. Soc.",
+    "publicationType": "Journal",
+    "subjectAreas": [
+      {
+        "area": "Chemistry",
+        "quartile": "Q1"
+      }
+    ],
+    "publisher": "American Chemical Society",
+    "countryOfPublication": "United States",
+    "issn": [
+      "1520-5126",
+      "0002-7863"
+    ],
+    "language": "English",
+    "bestQuartileOverall": "Q1",
+    "coverageHistory": {
+      "startYear": 1879,
+      "isCurrentlyPublished": true
+    },
+    "openAccessType": "Hybrid Open Access",
+    "peerReviewType": "Single-blind",
+    "contactInfo": {
+      "website": "https://pubs.acs.org/journal/jacsat"
+    },
+    "indexingDatabases": [
+      {
+        "name": "Scopus",
+        "coverageYears": "1996-present"
+      },
+      {
+        "name": "Web of Science",
+        "coverageYears": "1945-present"
+      }
+    ],
+    "metrics": {
+      "impactFactor": 16.3,
+      "citeScore": 25,
+      "overallRank": 10,
+      "hIndex": 700,
+      "sjr": 7.8
+    },
+    "url": "https://pubs.acs.org/journal/jacsat",
+    "imageUrl": "/journal.jpg"
+  },
+  {
+    "id": "12345678-90ab-cdef-1234-567890abcdef1",
+    "title": "ACM SIGCOMM Computer Communication Review",
+    "abbreviation": "CCR",
+    "publicationType": "Journal",
+    "subjectAreas": [
+      {
+        "area": "Computer Networks and Communications",
+        "quartile": "Q1"
+      }
+    ],
+    "publisher": "ACM",
+    "countryOfPublication": "United States",
+    "issn": [
+      "0146-4833"
+    ],
+    "language": "English",
+    "bestQuartileOverall": "Q1",
+    "coverageHistory": {
+      "startYear": 1970,
+      "isCurrentlyPublished": true
+    },
+    "openAccessType": "Closed Access",
+    "peerReviewType": "Single-blind",
+    "contactInfo": {
+      "website": "https://dl.acm.org/magazine/ccr"
+    },
+    "indexingDatabases": [
+      {
+        "name": "Scopus",
+        "coverageYears": "1996-present"
+      },
+      {
+        "name": "Web of Science",
+        "coverageYears": "1988-present"
+      }
+    ],
+    "metrics": {
+      "impactFactor": 8.5,
+      "citeScore": 12,
+      "overallRank": 25,
+      "hIndex": 200,
+      "sjr": 3.5
+    },
+    "url": "https://dl.acm.org/magazine/ccr",
+    "imageUrl": "/journal.jpg"
+  },
+  {
+    "id": "23456789-0abc-def1-2345-67890abcdef12",
+    "title": "Conference on Computer Vision and Pattern Recognition (CVPR)",
+    "abbreviation": "CVPR",
+    "publicationType": "Conference Proceedings",
+    "subjectAreas": [
+      {
+        "area": "Computer Vision",
+        "quartile": "Q1"
+      },
+      {
+        "area": "Artificial Intelligence",
+        "quartile": "Q1"
+      }
+    ],
+    "publisher": "IEEE",
+    "countryOfPublication": "United States",
+    "issn": [],
+    "language": "English",
+    "bestQuartileOverall": "Q1",
+    "coverageHistory": {
+      "startYear": 1983,
+      "isCurrentlyPublished": true
+    },
+    "openAccessType": "Closed Access",
+    "peerReviewType": "Double-blind",
+    "contactInfo": {
+      "website": "https://cvpr.thecvf.com/"
+    },
+    "indexingDatabases": [
+      {
+        "name": "Scopus",
+        "coverageYears": "1996-present"
+      },
+      {
+        "name": "Web of Science",
+        "coverageYears": "1993-present"
+      }
+    ],
+    "metrics": {
+      "citeScore": 15,
+      "overallRank": 15,
+      "hIndex": 300,
+      "sjr": 4.2
+    },
+    "url": "https://cvpr.thecvf.com/",
+    "imageUrl": "/journal.jpg"
+  },
+  {
+    "id": "34567890-abcd-ef12-3456-7890abcdef123",
+    "title": "Lecture Notes in Computer Science (LNCS)",
+    "abbreviation": "LNCS",
+    "publicationType": "Book Series",
+    "subjectAreas": [
+      {
+        "area": "Computer Science",
+        "quartile": "Q2"
+      }
+    ],
+    "publisher": "Springer",
+    "countryOfPublication": "Germany",
+    "issn": [
+      "0302-9743"
+    ],
+    "language": "English",
+    "bestQuartileOverall": "Q2",
+    "coverageHistory": {
+      "startYear": 1973,
+      "isCurrentlyPublished": true
+    },
+    "openAccessType": "Hybrid Open Access",
+    "peerReviewType": "Single-blind",
+    "contactInfo": {
+      "website": "https://www.springer.com/series/558"
+    },
+    "indexingDatabases": [
+      {
+        "name": "Scopus",
+        "coverageYears": "1996-present"
+      },
+      {
+        "name": "Web of Science",
+        "coverageYears": "1973-present"
+      }
+    ],
+    "metrics": {
+      "citeScore": 3,
+      "overallRank": 150,
+      "hIndex": 150,
+      "sjr": 1.2
+    },
+    "url": "https://www.springer.com/series/558",
+    "imageUrl": "/journal.jpg"
+  },
+  {
+    "id": "4567890a-bcde-f123-4567-890abcdef1234",
+    "title": "Journal of Machine Learning Research (JMLR)",
+    "abbreviation": "JMLR",
+    "publicationType": "Journal",
+    "subjectAreas": [
+      {
+        "area": "Machine Learning",
+        "quartile": "Q1"
+      },
+      {
+        "area": "Artificial Intelligence",
+        "quartile": "Q1"
+      }
+    ],
+    "publisher": "MIT Press",
+    "countryOfPublication": "United States",
+    "issn": [
+      "1532-4435"
+    ],
+    "language": "English",
+    "bestQuartileOverall": "Q1",
+    "coverageHistory": {
+      "startYear": 2000,
+      "isCurrentlyPublished": true
+    },
+    "openAccessType": "Diamond Open Access",
+    "peerReviewType": "Open Peer Review",
+    "contactInfo": {
+      "website": "http://www.jmlr.org/"
+    },
+    "indexingDatabases": [
+      {
+        "name": "Scopus",
+        "coverageYears": "2000-present"
+      },
+      {
+        "name": "Web of Science",
+        "coverageYears": "2001-present"
+      }
+    ],
+    "metrics": {
+      "impactFactor": 6.1,
+      "citeScore": 10,
+      "overallRank": 30,
+      "hIndex": 250,
+      "sjr": 2.8
+    },
+    "url": "http://www.jmlr.org/",
+    "imageUrl": "/journal.jpg"
+  }
+]

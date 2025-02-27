@@ -2,24 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import EventCard from './EventCard';
 import Pagination from './Pagination';
-
-interface Event {
-    id: number;
-    name: string;
-    shortName: string;
-    startDate: string;
-    endDate: string;
-    location: string;
-    imageUrl: string;
-    rank: string;
-    averageScore: number;
-    topics: string[];
-    type: 'online' | 'offline' | 'hybrid';
-    submissionDate: string;
-    source: number;
-    fieldOfResearch: string;
-    publish: boolean;
-}
+import {ConferenceResponse} from '../../../models/response/conference.response'; // Import your ConferenceResponse type
+import conferenceList from '../../../models/data/conferences-list.json'; // Assuming conference-list.json is in the same directory
 
 interface ResultsSectionProps {
     searchQuery: string;
@@ -35,147 +19,29 @@ interface ResultsSectionProps {
     selectedFieldsOfResearch: string[];
 }
 
-type SortOption = 'date' | 'rank' | 'score' | 'name' | 'submissionDate' | 'startDate' | 'endDate';
+type SortOption = 'date' | 'rank' | 'name' | 'submissionDate' | 'startDate' | 'endDate';
+
+// Define Event type as ConferenceResponse
+type Event = ConferenceResponse;
 
 const ResultsSection: React.FC<ResultsSectionProps> = ({
     searchQuery, selectedLocation, selectedType, startDate, endDate,
-    submissionDate, selectedRank, selectedSourceYear, selectedAverageScore, selectedTopics, selectedFieldsOfResearch
+    submissionDate, selectedRank, selectedTopics, selectedFieldsOfResearch
 }) => {
-    const initialEvents: Event[] = [
-        {
-            id: 1,
-            name: 'Tech Conference 2023',
-            shortName: 'TechConf',
-            startDate: '2023-11-01',
-            endDate: '2023-11-03',
-            location: 'New York',
-            imageUrl: '/conference_image.png',
-            rank: 'A',
-            averageScore: 4.5,
-            topics: ['AI', 'Cloud Computing'],
-            type: 'offline',
-            submissionDate: '2023-10-01',
-            source: 2023,
-            fieldOfResearch: 'Technology',
-            publish: true,
-        },
-        {
-            id: 2,
-            name: 'Online AI Summit',
-            shortName: 'AISummit',
-            startDate: '2023-12-05',
-            endDate: '2023-12-06',
-            location: 'Online',
-            imageUrl: '/conference_image.png',
-            rank: 'B',
-            averageScore: 4.0,
-            topics: ['AI', 'Machine Learning'],
-            type: 'online',
-            submissionDate: '2023-11-15',
-            source: 2023,
-            fieldOfResearch: 'Artificial Intelligence',
-            publish: true,
-        },
-        {
-            id: 3,
-            name: 'Hybrid DevOps Conference',
-            shortName: 'DevOpsConf',
-            startDate: '2023-10-15',
-            endDate: '2023-10-17',
-            location: 'San Francisco',
-            imageUrl: '/conference_image.png',
-            rank: 'A',
-            averageScore: 4.8,
-            topics: ['DevOps', 'Cloud'],
-            type: 'hybrid',
-            submissionDate: '2023-09-30',
-            source: 2023,
-            fieldOfResearch: 'DevOps',
-            publish: true,
-        },
-        {
-            id: 4,
-            name: 'Cybersecurity Workshop',
-            shortName: 'CyberSec',
-            startDate: '2023-09-20',
-            endDate: '2023-09-21',
-            location: 'Chicago',
-            imageUrl: '/conference_image.png',
-            rank: 'C',
-            averageScore: 3.5,
-            topics: ['Cybersecurity'],
-            type: 'offline',
-            submissionDate: '2023-08-20',
-            source: 2023,
-            fieldOfResearch: 'Cybersecurity',
-            publish: true,
-        },
-        {
-            id: 5,
-            name: 'Data Science Bootcamp',
-            shortName: 'DataBootcamp',
-            startDate: '2023-08-10',
-            endDate: '2023-08-12',
-            location: 'Boston',
-            imageUrl: '/conference_image.png',
-            rank: 'B',
-            averageScore: 4.2,
-            topics: ['Data Science', 'Big Data'],
-            type: 'offline',
-            submissionDate: '2023-07-10',
-            source: 2023,
-            fieldOfResearch: 'Data Science',
-            publish: true,
-        },
-        {
-            id: 6,
-            name: 'Virtual Reality Expo',
-            shortName: 'VRExpo',
-            startDate: '2023-07-25',
-            endDate: '2023-07-27',
-            location: 'Online',
-            imageUrl: '/conference_image.png',
-            rank: 'A',
-            averageScore: 4.7,
-            topics: ['Virtual Reality', 'AR'],
-            type: 'online',
-            submissionDate: '2023-06-25',
-            source: 2023,
-            fieldOfResearch: 'Virtual Reality',
-            publish: true,
-        },
-        {
-            id: 7,
-            name: 'Blockchain Summit 2023',
-            shortName: 'BlockchainSummit',
-            startDate: '2023-06-15',
-            endDate: '2023-06-17',
-            location: 'Los Angeles',
-            imageUrl: '/conference_image.png',
-            rank: 'B',
-            averageScore: 4.3,
-            topics: ['Blockchain', 'Cryptocurrency'],
-            type: 'offline',
-            submissionDate: '2023-05-15',
-            source: 2023,
-            fieldOfResearch: 'Blockchain',
-            publish: true,
-        },
-    ];
-
-    const [events, setEvents] = useState<Event[]>(initialEvents);
+    // Initialize events state with conferenceList data loaded from JSON and typed as ConferenceResponse[]
+    const [events, setEvents] = useState<ConferenceResponse[]>(conferenceList as ConferenceResponse[]);
     const [currentPage, setCurrentPage] = useState(1);
     const eventsPerPage = 6;
     const [sortBy, setSortBy] = useState<SortOption>('date'); // Default sort by date
 
     useEffect(() => {
-        let filteredEvents = initialEvents;
+        let filteredEvents = conferenceList as ConferenceResponse[]; // Start filtering from the loaded conferenceList
 
         // Apply filters
         if (searchQuery) {
             filteredEvents = filteredEvents.filter(event =>
                 event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                event.shortName.toLowerCase().includes(searchQuery.toLowerCase())
+                event.acronym.toLowerCase().includes(searchQuery.toLowerCase()) // Using acronym from ConferenceResponse
             );
         }
 
@@ -209,7 +75,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
         if (submissionDate) {
             filteredEvents = filteredEvents.filter(event => {
                 const eventSubmissionDate = new Date(event.submissionDate);
-                return eventSubmissionDate <= submissionDate; // Assuming you want events with submission date before or on selected date
+                return eventSubmissionDate <= submissionDate;
             });
         }
 
@@ -219,38 +85,23 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             );
         }
 
-        if (selectedSourceYear) {
-            filteredEvents = filteredEvents.filter(event =>
-                String(event.source) === selectedSourceYear // Convert source to string for comparison
-            );
-        }
-
-        if (selectedAverageScore) {
-            filteredEvents = filteredEvents.filter(event =>
-                String(event.averageScore) === selectedAverageScore // Convert averageScore to string
-            );
-        }
-
         if (selectedTopics && selectedTopics.length > 0) {
             filteredEvents = filteredEvents.filter(event =>
-                event.topics.some(topic => selectedTopics.includes(topic)) // Event topics contain at least one selected topic
+                event.topics.some(topic => selectedTopics.includes(topic))
             );
         }
 
         if (selectedFieldsOfResearch && selectedFieldsOfResearch.length > 0) {
             filteredEvents = filteredEvents.filter(event =>
-                selectedFieldsOfResearch.includes(event.fieldOfResearch) // Event field matches at least one selected field (exact match for now)
+                selectedFieldsOfResearch.includes(event.category) // Filtering by event.category (from ConferenceResponse)
             );
         }
 
         // Apply sorting
-        let sortedEvents = [...filteredEvents]; // Create a copy to avoid mutating original array
+        let sortedEvents = [...filteredEvents];
         switch (sortBy) {
             case 'rank':
                 sortedEvents.sort((a, b) => a.rank.localeCompare(b.rank));
-                break;
-            case 'score':
-                sortedEvents.sort((a, b) => b.averageScore - a.averageScore); // Sort by score descending
                 break;
             case 'name':
                 sortedEvents.sort((a, b) => a.name.localeCompare(b.name));
@@ -272,7 +123,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
         setEvents(sortedEvents);
         setCurrentPage(1); // Reset to first page when filters or sort change
-    }, [searchQuery, selectedLocation, selectedType, startDate, endDate, submissionDate, selectedRank, selectedSourceYear, selectedAverageScore, selectedTopics, selectedFieldsOfResearch, sortBy]);
+    }, [searchQuery, selectedLocation, selectedType, startDate, endDate, submissionDate, selectedRank, selectedTopics, selectedFieldsOfResearch, sortBy]);
 
     // Calculate the events to display on the current page
     const indexOfLastEvent = currentPage * eventsPerPage;
@@ -312,7 +163,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                     >
                         <option value="date">Conference date</option>
                         <option value="rank">Rank</option>
-                        <option value="score">Score</option>
                         <option value="name">Name</option>
                         <option value="submissionDate">Submission Date</option>
                         <option value="startDate">Start Date</option>

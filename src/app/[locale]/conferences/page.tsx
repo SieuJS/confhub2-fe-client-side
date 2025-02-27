@@ -4,27 +4,16 @@
 import { useTranslations } from 'next-intl';
 import SearchSection from '../components/SearchSection';
 import ResultsSection from '../components/ResultsSection';
-import FilterSidebar from '../components/FilterSidebar';
 import { useState } from 'react';
+import { ConferenceResponse } from '../../../models/response/conference.response'; // Import ConferenceResponse type - Moved to the top and verify path
 
-interface Event {
-    id: number;
-    name: string;
-    shortName: string;
-    startDate: string;
-    endDate: string;
-    location: string;
-    imageUrl: string;
-    rank: string;
-    averageScore: number;
-    topics: string[];
-    type: 'online' | 'offline' | 'hybrid';
-}
+// Removed interface Event as we are using ConferenceResponse type
 
 export default function Conferences() {
     const t = useTranslations('');
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+    // Keep selectedType as string | null to be more flexible, or you can refine it based on possible 'type' values in ConferenceResponse
     const [selectedType, setSelectedType] = useState<'online' | 'offline' | 'hybrid' | null>(null);
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);

@@ -2,124 +2,103 @@
 
 // Journals.tsx
 import { useTranslations } from 'next-intl';
-import SearchSection from '../components/SearchSection';
-import ResultsSection from '../components/ResultsSection';
-import FilterSidebar from '../components/FilterSidebar';
+import SearchJournalSection from '../components/SearchJournalSection';
+import ResultsJournalSection from '../components/ResultsJournalSection';   // Import ResultsJournalSection
 import { useState } from 'react';
+import { JournalResponse } from '../../../models/response/journal.response'; // Import JournalResponse type
 
-interface Event {
-    id: number;
-    name: string;
-    shortName: string;
-    startDate: string;
-    endDate: string;
-    location: string;
-    imageUrl: string;
-    rank: string;
-    averageScore: number;
-    topics: string[];
-    type: 'online' | 'offline' | 'hybrid';
-}
 
 export default function Journals() {
     const t = useTranslations('');
     const [searchQuery, setSearchQuery] = useState<string>('');
-    const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
-    const [selectedType, setSelectedType] = useState<'online' | 'offline' | 'hybrid' | null>(null);
-    const [startDate, setStartDate] = useState<Date | null>(null);
-    const [endDate, setEndDate] = useState<Date | null>(null);
-    const [submissionDate, setSubmissionDate] = useState<Date | null>(null);
-    const [selectedRank, setSelectedRank] = useState<string | null>(null);
-    const [selectedSourceYear, setSelectedSourceYear] = useState<string | null>(null);
-    const [selectedAverageScore, setSelectedAverageScore] = useState<string | null>(null);
-    const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-    const [selectedFieldsOfResearch, setSelectedFieldsOfResearch] = useState<string[]>([]);
+    // Removed journalsData and loading states
+    // const [journalsData, setJournalsData] = useState<JournalResponse[] | null>(null);
+    const [loading, setLoading] = useState<boolean>(false); // Keep loading state if you want to use it for other purposes, otherwise remove it
 
-    const handleSearch = (query: string) => {
-        setSearchQuery(query);
+    // State for search parameters - extract from searchParams in handleSearch for ResultsSection props
+    const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+    const [selectedPublicationType, setSelectedPublicationType] = useState<string | null>(null);
+    const [selectedSubjectAreas, setSelectedSubjectAreas] = useState<string[]>([]);
+    const [selectedQuartile, setSelectedQuartile] = useState<string | null>(null);
+    const [selectedOpenAccessTypes, setSelectedOpenAccessTypes] = useState<string[]>([]);
+    const [selectedPublisher, setSelectedPublisher] = useState<string | null>(null);
+    const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
+    const [selectedImpactFactor, setSelectedImpactFactor] = useState<string | null>(null);
+    const [selectedHIndex, setSelectedHIndex] = useState<string | null>(null);
+    const [selectedCiteScore, setSelectedCiteScore] = useState<string | null>(null);
+    const [selectedSJR, setSelectedSJR] = useState<string | null>(null);
+    const [selectedOverallRank, setSelectedOverallRank] = useState<string | null>(null);
+    const [selectedISSN, setSelectedISSN] = useState<string | null>(null);
+
+
+    const handleSearch = async (searchParams: {
+        keyword?: string;
+        country?: string | null;
+        publicationType?: string | null;
+        subjectAreas?: string[];
+        quartile?: string | null;
+        openAccessTypes?: string[];
+        publisher?: string | null;
+        language?: string | null;
+        impactFactor?: string | null;
+        hIndex?: string | null;
+        citeScore?: string | null;
+        sjr?: string | null;
+        overallRank?: string | null;
+        issn?: string | null;
+    }) => {
+        console.log("Thông số tìm kiếm nhận được từ SearchJournalSection:", searchParams);
+        setSearchQuery(searchParams.keyword || '');
+
+        // Update state variables for ResultsJournalSection props
+        setSelectedCountry(searchParams.country || null);
+        setSelectedPublicationType(searchParams.publicationType || null);
+        setSelectedSubjectAreas(searchParams.subjectAreas || []);
+        setSelectedQuartile(searchParams.quartile || null);
+        setSelectedOpenAccessTypes(searchParams.openAccessTypes || []);
+        setSelectedPublisher(searchParams.publisher || null);
+        setSelectedLanguage(searchParams.language || null);
+        setSelectedImpactFactor(searchParams.impactFactor || null);
+        setSelectedHIndex(searchParams.hIndex || null);
+        setSelectedCiteScore(searchParams.citeScore || null);
+        setSelectedSJR(searchParams.sjr || null);
+        setSelectedOverallRank(searchParams.overallRank || null);
+        setSelectedISSN(searchParams.issn || null);
+
+        // Removed loading and journalsData state updates from handleSearch
+        // setLoading(true);
+        // setJournalsData(null);
+        // setJournalsData(journalsList as JournalResponse[]); // Directly use imported JSON data
+        // setLoading(false);
+
     };
 
-    const handleLocationChange = (location: string | null) => {
-        setSelectedLocation(location);
-    };
-
-    const handleTypeChange = (type: 'online' | 'offline' | 'hybrid' | null) => {
-        setSelectedType(type);
-    };
-
-    const handleStartDateChange = (date: Date | null) => {
-        setStartDate(date);
-    };
-
-    const handleEndDateChange = (date: Date | null) => {
-        setEndDate(date);
-    };
-    const handleSubmissionDateChange = (date: Date | null) => {
-        setSubmissionDate(date);
-    };
-
-    const handleRankChange = (rank: string | null) => {
-        setSelectedRank(rank);
-    };
-
-    const handleSourceYearChange = (sourceYear: string | null) => {
-        setSelectedSourceYear(sourceYear);
-    };
-
-    const handleAverageScoreChange = (averageScore: string | null) => {
-        setSelectedAverageScore(averageScore);
-    };
-
-    const handleTopicsChange = (topics: string[]) => {
-        setSelectedTopics(topics);
-    };
-
-    const handleFieldsOfResearchChange = (fields: string[]) => {
-        setSelectedFieldsOfResearch(fields);
-    };
 
     return (
         <div className="text-center text-2xl">
             <div className="py-14 bg-background w-full"></div>
-        <SearchSection
-            onSearch={handleSearch}
-            onLocationChange={handleLocationChange}
-            selectedLocation={selectedLocation}
-            onTypeChange={handleTypeChange}
-            selectedType={selectedType}
-            onStartDateChange={handleStartDateChange}
-            onEndDateChange={handleEndDateChange}
-            startDate={startDate}
-            endDate={endDate}
-
-            onSubmissionDateChange={handleSubmissionDateChange}
-            submissionDate={submissionDate}
-            onRankChange={handleRankChange}
-            selectedRank={selectedRank}
-            onSourceYearChange={handleSourceYearChange}
-            selectedSourceYear={selectedSourceYear}
-            onAverageScoreChange={handleAverageScoreChange}
-            selectedAverageScore={selectedAverageScore}
-            onTopicsChange={handleTopicsChange}
-            selectedTopics={selectedTopics}
-            onFieldOfResearchChange={handleFieldsOfResearchChange}
-            selectedFieldsOfResearch={selectedFieldsOfResearch}
-        />
-        <div className="container mx-auto mt-8 px-4 flex">
-            <ResultsSection
-                searchQuery={searchQuery}
-                selectedLocation={selectedLocation}
-                selectedType={selectedType}
-                startDate={startDate}
-                endDate={endDate}
-                submissionDate={submissionDate}
-                selectedRank={selectedRank}
-                selectedSourceYear={selectedSourceYear}
-                selectedAverageScore={selectedAverageScore}
-                selectedTopics={selectedTopics}
-                selectedFieldsOfResearch={selectedFieldsOfResearch}
+            <SearchJournalSection
+                onSearch={handleSearch}
             />
+            <div className="container mx-auto mt-8 px-4 ">
+                <ResultsJournalSection
+                    loading={loading} 
+                    searchQuery={searchQuery}
+                    selectedCountry={selectedCountry}
+                    selectedPublicationType={selectedPublicationType}
+                    selectedSubjectAreas={selectedSubjectAreas}
+                    selectedQuartile={selectedQuartile}
+                    selectedOpenAccessTypes={selectedOpenAccessTypes}
+                    selectedPublisher={selectedPublisher}
+                    selectedLanguage={selectedLanguage}
+                    selectedImpactFactor={selectedImpactFactor}
+                    selectedHIndex={selectedHIndex}
+                    selectedCiteScore={selectedCiteScore}
+                    selectedSJR={selectedSJR}
+                    selectedOverallRank={selectedOverallRank}
+                    selectedISSN={selectedISSN}
+                />
+            </div>
         </div>
-    </div>
     );
 }

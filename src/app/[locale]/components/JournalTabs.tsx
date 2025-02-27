@@ -2,6 +2,8 @@
 
 // components/JournalTabs.tsx
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image'; // Import the Image component from next/image
+import { JournalResponse } from '../../../models/response/journal.response'; // Import JournalResponse
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -37,13 +39,28 @@ function a11yProps(index: number) {
     };
 }
 
+interface JournalTabsProps {
+    journal: JournalResponse; // Define the journal prop
+}
 
-export const JournalTabs: React.FC = () => {
+export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Update component signature to accept props
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
+
+    // Placeholder descriptions - ideally these should come from journal.description or similar if available in your JournalResponse type
+    const scopeDescription = `CA provides cancer care professionals with up-to-date information on all aspects of cancer
+    diagnosis, treatment, and prevention.`;
+    const fullDescription = `The journal focuses on keeping physicians and healthcare professionals informed by providing
+    scientific and educational information in the form of comprehensive review articles and online
+    continuing education activities on important cancer topics and issues that are important to
+    cancer care, along with publishing the latest cancer guidelines and statistical articles
+    from the American Cancer Society.
+    This report provides an in-depth look into the conference scope, key speakers, schedule,
+    and much more.`; // You can replace these with actual data if available in your journal type
+
 
     return (
         <div className="container mx-auto mt-4 py-2 px-4  rounded-lg">
@@ -66,7 +83,7 @@ export const JournalTabs: React.FC = () => {
                     className={`nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10 ${value === 2 ? 'active-tab' : ''}`}
                     onClick={(event) => handleChange(event, 2)}
                     {...a11yProps(2)}
-                >
+                    >
                     H-index
                 </button>
                 <button
@@ -88,25 +105,19 @@ export const JournalTabs: React.FC = () => {
             <TabPanel value={value} index={0}>
                 <h2 className="text-3xl font-bold text-secondary mb-4">Overview</h2>
                 <p className=" text-lg">
-                    CA provides cancer care professionals with up-to-date information on all aspects of cancer diagnosis,
-                    treatment, and prevention. The journal focuses on keeping physicians and healthcare professionals
-                    informed by providing scientific and educational information in the form of comprehensive review
-                    articles and online continuing education activities on important cancer topics and issues that are
-                    important to cancer care, along with publishing the latest cancer guidelines and statistical articles
-                    from the American Cancer Society.
+                    {/* Use journal data for overview, if available */}
+                    {journal.publicationType === 'Journal' ? `${journal.title} is a leading academic journal.` : `${journal.title} is a significant publication.`}
+                    {scopeDescription} {/* You can replace scopeDescription with data from journal if you have scope info in JournalResponse */}
                 </p>
             </TabPanel>
 
             <TabPanel value={value} index={1}>
                 <h2 className="text-3xl font-bold text-secondary mb-4">Impact Factor</h2>
                 <p className=" text-lg">
-                    <strong>The Impact IF 2023</strong> of <strong>Ca-A Cancer Journal for Clinicians</strong> is
-                    <strong>381.89</strong>,
+                    <strong>The Impact IF 2023</strong> of <strong>{journal.title}</strong> is
+                    <strong>{journal.metrics?.impactFactor || 'N/A'}</strong>,
                     which is computed in <strong>2024</strong> as per its definition.
-                    <strong>Ca-A Cancer Journal for Clinicians IF</strong> is increased by a factor of <strong>81.9</strong>
-                    and approximate percentage change is
-                    <strong>27.3%</strong> when compared to preceding year <strong>2022</strong>, which shows a rising
-                    trend.
+                    {/* ... rest of the Impact Factor tab content, you can dynamically update journal name and IF value here */}
                 </p>
                 <p className=" text-lg mt-4 mb-4">
                     The impact IF, also denoted as <strong>Journal Impact Score (JIS)</strong>, of an academic journal is a
@@ -126,62 +137,18 @@ export const JournalTabs: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr className="border-b  ">
-                                    <td className="px-6 py-2">2023 (2024 update)</td>
-                                    <td className="px-6 py-2">72.5</td>
-                                </tr>
-                                <tr className="border-b  ">
-                                    <td className="px-6 py-2">2022</td>
-                                    <td className="px-6 py-2">78.5</td>
-                                </tr>
-                                <tr className="border-b  ">
-                                    <td className="px-6 py-2">2021</td>
-                                    <td className="px-6 py-2">69.800</td>
-                                </tr>
-                                <tr className="border-b  ">
-                                    <td className="px-6 py-2">2020</td>
-                                    <td className="px-6 py-2">60.716</td>
-                                </tr>
-                                <tr className="border-b  ">
-                                    <td className="px-6 py-2">2019</td>
-                                    <td className="px-6 py-2">53.030</td>
-                                </tr>
-                                <tr className="border-b  ">
-                                    <td className="px-6 py-2">2018</td>
-                                    <td className="px-6 py-2">51.848</td>
-                                </tr>
-                                <tr className="border-b  ">
-                                    <td className="px-6 py-2">2017</td>
-                                    <td className="px-6 py-2">42.784</td>
-                                </tr>
-                                <tr className="border-b  ">
-                                    <td className="px-6 py-2">2016</td>
-                                    <td className="px-6 py-2">37.147</td>
-                                </tr>
-                                <tr className="border-b  ">
-                                    <td className="px-6 py-2">2015</td>
-                                    <td className="px-6 py-2">34.244</td>
-                                </tr>
-                                <tr className="border-b  ">
-                                    <td className="px-6 py-2">2014</td>
-                                    <td className="px-6 py-2">37.400</td>
-                                </tr>
-                                <tr className="border-b  ">
-                                    <td className="px-6 py-2">2013</td>
-                                    <td className="px-6 py-2">37.912</td>
-                                </tr>
-                                <tr className="border-b  ">
-                                    <td className="px-6 py-2">2012</td>
-                                    <td className="px-6 py-2">35.000</td>
-                                </tr>
-                                <tr className="border-b  ">
-                                    <td className="px-6 py-2">2011</td>
-                                    <td className="px-6 py-2">37.545</td>
-                                </tr>
-                                <tr className="border-b  ">
-                                    <td className="px-6 py-2">2010</td>
-                                    <td className="px-6 py-2">37.178</td>
-                                </tr>
+                                {journal.metrics?.impactFactorHistory?.map((history, index) => ( // Use journal.metrics?.impactFactorHistory
+                                    <tr key={index} className="border-b  ">
+                                        <td className="px-6 py-2">{history.year}</td>
+                                        <td className="px-6 py-2">{history.impactFactor}</td>
+                                    </tr>
+                                ))}
+                                {/* Fallback if no impact factor history */}
+                                {!journal.metrics?.impactFactorHistory && (
+                                    <tr>
+                                        <td className="px-6 py-2" colSpan={2}>No Impact Factor History Available</td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
@@ -218,9 +185,16 @@ export const JournalTabs: React.FC = () => {
                     <div className="flex flex-col items-center">
                         <h2 className="text-3xl font-bold text-secondary mb-4">H-index</h2>
                         <p className=" text-lg mb-4">
-                            The H-index of this journal is <strong className="text-2xl">120</strong>.
+                            The H-index of this journal is <strong className="text-2xl">{journal.metrics?.hIndex || 'N/A'}</strong>. {/* Use journal.metrics?.hIndex */}
                         </p>
-                        <img src="https://www.library.ln.edu.hk/sites/default/files/images/research_support/understanding_research_impact/hindex/1.png" alt="H-index Illustration" className="w-full max-w-xs" />
+                        <div className="w-full max-w-xs relative aspect-square"> {/* Container for Image with aspect ratio */}
+                            <Image
+                                src="/Hindex.png" // Use local image or provide a valid URL
+                                alt="H-index Illustration"
+                                layout="fill"
+                                objectFit="contain" // Use 'contain' to fit image within bounds without cropping
+                            />
+                        </div>
                     </div>
 
                     {/* Right Column: Description of H-index */}
@@ -250,9 +224,16 @@ export const JournalTabs: React.FC = () => {
                     <div className="flex flex-col items-center">
                         <h2 className="text-3xl font-bold text-secondary mb-4">SJR (Scimago Journal Ranking)</h2>
                         <p className=" text-lg mb-4">
-                            The SJR value of this journal is <strong className="text-2xl">15.21</strong>.
+                            The SJR value of this journal is <strong className="text-2xl">{journal.metrics?.sjr || 'N/A'}</strong>. {/* Use journal.metrics?.sjr */}
                         </p>
-                        <img src="https://blog.scopus.com/sites/default/files/SJRCard.jpg" alt="SJR Illustration" className="w-full max-w-xs rounded-lg shadow-lg" />
+                        <div className="w-full max-w-xs rounded-lg shadow-lg relative aspect-square"> {/* Container for Image with aspect ratio and styling */}
+                            <Image
+                                src="/SJRCard.jpg"
+                                alt="SJR Illustration"
+                                layout="fill"
+                                objectFit="cover"
+                            />
+                        </div>
                     </div>
 
                     {/* Right Column: Description of SJR */}
@@ -278,7 +259,12 @@ export const JournalTabs: React.FC = () => {
             <TabPanel value={value} index={4}>
                 <h2 className="text-3xl font-bold text-secondary mb-4">Subject Area and Category</h2>
                 <p className=" text-lg">
-                    Details about the subject area and category go here.
+                    {/* Display Subject Areas and Categories from journal data */}
+                    {journal.subjectAreas?.map((sa, index) => (
+                        <span key={index}>
+                            {sa.area} ({sa.quartile || 'N/A'}){index < journal.subjectAreas.length - 1 ? '; ' : ''}
+                        </span>
+                    )) || "No Subject Areas/Categories Available"}
                 </p>
             </TabPanel>
         </div>

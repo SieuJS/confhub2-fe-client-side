@@ -1,29 +1,19 @@
 import React from 'react';
 import Image from 'next/image';
 import Button from './Button'; // Import your Button component
+import {ConferenceResponse} from '../../../models/response/conference.response'; // Import your ConferenceResponse type
 
 interface EventCardProps {
-  event: {
-    id: number;
-    name: string;
-    shortName: string;
-    startDate: string;
-    endDate: string;
-    location: string;
-    imageUrl: string;
-    rank: string | null;
-    averageScore: number;
-    topics: string[];
-    type: 'online' | 'offline' | 'hybrid'; 
-  };
+  event: ConferenceResponse; // Sử dụng ConferenceResponse type
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
+
   return (
     <div className="rounded-lg shadow-md overflow-hidden bg-gradient-to-r from-background to-background-secondary">
       <div className="relative">
         <Image
-          src={event.imageUrl}
+          src={event.imageUrl} // Sử dụng imageUrl từ ConferenceResponse
           alt={event.name}
           width={400}
           height={200} // Adjust height as needed
@@ -71,7 +61,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
   {/* Cột 1: Thông tin sự kiện */}
   <div className='flex flex-col items-start text-left col-span-2'> {/* col-span-2 để cột này chiếm 2 cột */}
     <h6 className="font-semibold text-base">{event.name}</h6>
-    <p className="text-xs">{event.shortName}</p>
+    <p className="text-xs">{event.acronym}</p> {/* Sử dụng acronym thay vì shortName */}
   </div>
 
   {/* Cột 2: Nút Detail */}
@@ -83,7 +73,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
 </div>
 
         <div className="flex flex-wrap mt-2 space-x-2 overflow-hidden">
-          {event.topics.map((topic, index) => (
+          {event.topics.map((topic, index) => ( // Sử dụng trực tiếp event.topics (đã là mảng)
             <span
               key={index}
               className=" rounded-full px-2 py-1 text-xs inline-block mb-2 bg-background"

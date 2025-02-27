@@ -7,7 +7,7 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = () => {
   return (
-    <div className="flex h-screen bg-gradient-to-br from-blue-100 to-purple-100">
+    <div className="flex h-screen bg-background">
       
 
       {/* Main Content */}
@@ -16,29 +16,6 @@ const Dashboard: React.FC<DashboardProps> = () => {
           <div>
             <h2 className="text-2xl font-semibold">Dashboard</h2>
             <p className="text-gray-500">23th Jan 2024</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <button className="bg-white rounded-full p-2 shadow-md">
-              {/* Icon email */}
-              ✉️
-            </button>
-            <button className="bg-white rounded-full p-2 shadow-md">
-              {/* Icon notification */}
-              🔔
-            </button>
-            <div className="flex items-center">
-              <Image
-                src="/favicon.ico"
-                alt="User Avatar"
-                className="rounded-full h-8 w-8"
-                width={32}
-                height={32}
-              /> {/* Thay /avatar.png bằng đường dẫn avatar của bạn */}
-              <div className="ml-2">
-                <p className="text-sm font-semibold">Tran Van A</p>
-                <p className="text-xs text-gray-500">Conference manager</p>
-              </div>
-            </div>
           </div>
         </header>
 

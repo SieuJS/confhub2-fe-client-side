@@ -1,28 +1,10 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Button from './Button';
+import { ConferenceResponse } from '../../../models/response/conference.response'; // Import ConferenceResponse
 
-interface Conference {
-  id: number;
-  name: string;
-  shortName: string;
-  startDate: string;
-  endDate: string;
-  location: string;
-  imageUrl: string;
-  rank: string;
-  averageScore: number;
-  topics: string[];
-  type: 'online' | 'offline' | 'hybrid';
-  address?: string;
-  stateProvince?: string;
-  city?: string;
-  country?: string;
-  submissionDate?: string;
-  notificationDate?: string;
-  callForPaper?: string;
-  generalTopics?: string;
-}
+// Replace interface Conference with type Conference = ConferenceResponse
+type Conference = ConferenceResponse;
 
 const ConferenceItem: React.FC<{ conference: Conference }> = ({ conference }) => {
   const [isFollowing, setIsFollowing] = useState(false); // State for follow status
@@ -44,7 +26,7 @@ const ConferenceItem: React.FC<{ conference: Conference }> = ({ conference }) =>
       </div>
       {/* cột 2 */}
       <div className="col-span-6 text-left">
-        <h3 className="text-lg font-semibold text-button">{conference.name} ({conference.shortName})</h3>
+        <h3 className="text-lg font-semibold text-button">{conference.name} ({conference.acronym})</h3> {/* Use conference.acronym */}
         <p className="">
           <strong>Dates:</strong> {conference.startDate} - {conference.endDate}
         </p>
@@ -60,7 +42,7 @@ const ConferenceItem: React.FC<{ conference: Conference }> = ({ conference }) =>
           variant="primary"
           size="medium"
           rounded
-          className={`mr-2 w-24`} 
+          className={`mr-2 w-24`}
         >
           Update
         </Button>
@@ -70,7 +52,7 @@ const ConferenceItem: React.FC<{ conference: Conference }> = ({ conference }) =>
           variant={`${isFollowing ? 'primary' : 'secondary'}`}
           size="medium"
           rounded
-          className={`mr-2 w-24 `} 
+          className={`mr-2 w-24 `}
         >
           {isFollowing ? 'Followed' : 'Follow'}
         </Button>

@@ -1,0 +1,45 @@
+import React from 'react';
+import Image from 'next/image';
+import { JournalResponse } from '../../../models/response/journal.response'; // Import your JournalResponse type
+import Button from './Button';
+
+interface EventJournalCardProps {
+  journal: JournalResponse; // Sử dụng JournalResponse type
+}
+
+const EventJournalCard: React.FC<EventJournalCardProps> = ({ journal }) => {
+  return (
+    <div className="rounded-lg shadow-md overflow-hidden bg-gradient-to-r from-background to-background-secondary flex flex-row-reverse relative"> {/* Horizontal flex container và đảo ngược hướng, Thêm relative */}
+
+    <div className=" flex flex-col relative  w-2/3 px-2 py-4"> {/* Content container, chiếm 2/3 chiều rộng */}
+      <h3 className="text-lg font-semibold mb-1 text-left">{journal.title}</h3>
+      {journal.issn && (
+        <p className="text-sm text-left">ISSN: {journal.issn}</p>
+      )}
+    </div>
+
+    <div className="flex h-60 w-1/3 relative"> {/* Image container, chiếm 1/3 chiều rộng */}
+      <Image
+        src={journal.imageUrl || '/default-journal.jpg'}
+        alt={journal.title}
+        fill={true}
+        style={{ objectFit: 'cover', position: 'absolute' }}
+        className="rounded-lg"
+      />
+    </div>
+
+    
+    <Button
+      variant="primary"
+      size="medium"
+      rounded
+      className={`absolute bottom-4 right-4 w-32`} // Nút bấm
+    >
+      Submit
+    </Button>
+
+  </div>
+  );
+};
+
+export default EventJournalCard;

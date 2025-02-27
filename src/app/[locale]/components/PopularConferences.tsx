@@ -2,66 +2,33 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { ConferenceResponse } from '../../../models/response/conference.response'; // Import ConferenceResponse
+import conferenceList from '../../../models/data/conferences-list.json'; // Import conferenceList JSON data
 
-interface Conference {
-    image: string;
-    title: string;
-    startDate: string;
-    endDate: string;
-    location: string;
-    topics: string[];
-}
+// Replace interface Conference with type Conference = ConferenceResponse
+type Conference = ConferenceResponse;
 
-const conferencesData: Conference[] = [
-    {
-        image: "/bg-2.jpg",
-        title: "Sustainable Development Forum",
-        startDate: "May 10, 2024",
-        endDate: "May 12, 2024",
-        location: "Geneva, Switzerland",
-        topics: ["Energy", "Environment", "Social"]
-    },
-    {
-        image: "/bg-2.jpg",
-        title: "Future Tech Summit",
-        startDate: "Jun 15, 2024",
-        endDate: "Jun 17, 2024",
-        location: "London, UK",
-        topics: ["AI", "Robotics", "VR/AR"]
-    },
-    {
-        image: "/bg-2.jpg",
-        title: "Global Health Conference",
-        startDate: "Jul 20, 2024",
-        endDate: "Jul 22, 2024",
-        location: "New York, USA",
-        topics: ["Healthcare", "Medicine", "Wellbeing"]
-    },
-    {
-        image: "/bg-2.jpg",
-        title: "Digital Marketing Expo",
-        startDate: "Aug 5, 2024",
-        endDate: "Aug 7, 2024",
-        location: "Paris, France",
-        topics: ["SEO", "Social Media", "Content"]
-    },
-    {
-        image: "/bg-2.jpg",
-        title: "Finance Innovation Forum",
-        startDate: "Sep 1, 2024",
-        endDate: "Sep 3, 2024",
-        location: "Singapore",
-        topics: ["FinTech", "Investment", "Banking"]
-    },
-    {
-        image: "/bg-2.jpg",
-        title: "Clean Energy Symposium",
-        startDate: "Oct 10, 2024",
-        endDate: "Oct 12, 2024",
-        location: "Berlin, Germany",
-        topics: ["Renewable Energy", "Solar", "Wind"]
-    },
-];
+// Update conferencesData to use the first 5 conferences from conferenceList and map to expected structure
+const conferencesData: Conference[] = conferenceList.slice(0, 6).map(conf => ({ // Use slice(0, 6) to get first 6, as the original had 6 example items, adjust as needed
+    id: conf.id, // Assuming id is in conferenceList, adjust if needed
+    name: conf.name,
+    acronym: conf.acronym, // Use acronym instead of shortName
+    category: conf.category, // Add category, adjust if needed or remove if not used in this component
+    topics: conf.topics,
+    location: conf.location,
+    type: conf.type,
+    startDate: conf.startDate,
+    endDate: conf.endDate,
+    submissionDate: conf.submissionDate,
+    cameraReadyDate: conf.cameraReadyDate,
+    notificationDate: conf.notificationDate,
+    imageUrl: conf.imageUrl, // Use imageUrl instead of image, and ensure conferenceList has imageUrl
+    description: conf.description,
+    rank: conf.rank,
+    sourceYear: conf.sourceYear,
+    link: conf.link
+})) as Conference[]; // Type assertion to Conference[]
+
 
 const PopularConferences: React.FC = () => {
     return (
@@ -85,23 +52,23 @@ const PopularConferences: React.FC = () => {
                                 <div className="relative w-full h-[200px]">
                                     <Image
                                         className="lazyloaded rounded-t-lg object-cover"
-                                        src={conference.image}
+                                        src={conference.imageUrl} // Use imageUrl from ConferenceResponse
                                         fill
-                                        alt={conference.title}
+                                        alt={conference.name} // Use name from ConferenceResponse
                                         loading="lazy"
                                         sizes="w-full"
                                         style={{ objectFit: 'cover' }}
-                                        
+
                                     />
                                 </div>
                                 <div className="p-4 text-left">
-                                    <div className="font-bold text-base mb-2 overflow-hidden text-ellipsis whitespace-nowrap">{conference.title}</div>
-                                    <div className="text-sm  mb-1">{conference.startDate} - {conference.endDate}</div>
-                                    <div className="text-sm  mb-1">{conference.location}</div>
+                                    <div className="font-bold text-base mb-2 overflow-hidden text-ellipsis whitespace-nowrap">{conference.name}</div> {/* Use name from ConferenceResponse */}
+                                    <div className="text-sm  mb-1">{conference.startDate} - {conference.endDate}</div> {/* Use startDate and endDate from ConferenceResponse */}
+                                    <div className="text-sm  mb-1">{conference.location}</div> {/* Use location from ConferenceResponse */}
                                     <div className="text-sm  leading-tight">
                                         <div className="font-bold mb-1">Topics:</div>
                                         <ul className="list-none pl-0">
-                                            {conference.topics.map((topic, topicIndex) => (
+                                            {conference.topics.map((topic, topicIndex) => ( // Use topics from ConferenceResponse
                                                 <li key={topicIndex} className="inline-block mr-2 whitespace-nowrap">{topic}</li>
                                             ))}
                                         </ul>
@@ -119,22 +86,22 @@ const PopularConferences: React.FC = () => {
                                 <div className="relative w-full h-[200px]">
                                     <Image
                                         className="lazyloaded rounded-t-lg object-cover"
-                                        src={conference.image}
+                                        src={conference.imageUrl} // Use imageUrl from ConferenceResponse
                                         fill
-                                        alt={conference.title}
+                                        alt={conference.name} // Use name from ConferenceResponse
                                         loading="lazy"
                                         sizes="w-full"
-                                        style={{ objectFit: 'cover' }} 
+                                        style={{ objectFit: 'cover' }}
                                     />
                                 </div>
                                 <div className="p-4 text-left">
-                                    <div className="font-bold text-base mb-2 overflow-hidden text-ellipsis whitespace-nowrap">{conference.title}</div>
-                                    <div className="text-sm  mb-1">{conference.startDate} - {conference.endDate}</div>
-                                    <div className="text-sm  mb-1">{conference.location}</div>
+                                    <div className="font-bold text-base mb-2 overflow-hidden text-ellipsis whitespace-nowrap">{conference.name}</div> {/* Use name from ConferenceResponse */}
+                                    <div className="text-sm  mb-1">{conference.startDate} - {conference.endDate}</div> {/* Use startDate and endDate from ConferenceResponse */}
+                                    <div className="text-sm  mb-1">{conference.location}</div> {/* Use location from ConferenceResponse */}
                                     <div className="text-sm  leading-tight">
                                         <div className="font-bold mb-1">Topics:</div>
                                         <ul className="list-none pl-0">
-                                            {conference.topics.map((topic, topicIndex) => (
+                                            {conference.topics.map((topic, topicIndex) => ( // Use topics from ConferenceResponse
                                                 <li key={topicIndex} className="inline-block mr-2 whitespace-nowrap">{topic}</li>
                                             ))}
                                         </ul>

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -9,27 +9,16 @@ import NotificationsTab from '../components/NotificationsTab';
 import FollowedTab from '../components/FollowedTab';
 import NoteTab from '../components/NoteTab';
 import MyConferencesTab from '../components/MyConferencesTab';
+import { ConferenceResponse } from '../../../models/response/conference.response'; // Import ConferenceResponse
 
-
-interface Conference {
-    id: number;
-    name: string;
-    shortName: string;
-    startDate: string;
-    endDate: string;
-    location: string;
-    imageUrl: string;
-    rank: string;
-    averageScore: number;
-    topics: string[];
-    type: 'online' | 'offline' | 'hybrid';
-}
+// Replace interface Conference with type Conference = ConferenceResponse
+type Conference = ConferenceResponse;
 
 export default function Setting() {
     const t = useTranslations('');
     const [activePage, setActivePage] = useState('dashboard');
 
-    const notifications: any[] = [ 
+    const notifications: any[] = [
       {
         title: 'The conference SIAM Conference on Discrete Mathematics that you are followed has new updated',
         description: '[UPDATED] Deadline for submission of minisymposium speaker abstracts is changed from 2024/02/15 to 2024/02/15.',
@@ -61,33 +50,42 @@ export default function Setting() {
           detailsLink: '#',
         },
      ];
+    // Updated exampleConferences to use ConferenceResponse type
     const exampleConferences: Conference[] = [
       {
-        id: 1,
+        id: '1', // id is string
         name: 'International Conference on Machine Learning',
-        shortName: 'ICML',
+        acronym: 'ICML', // shortName to acronym
         startDate: '2024-07-22',
         endDate: '2024-07-26',
         location: 'Vienna, Austria',
         imageUrl: '/conference_image.png', // Replace with real URL
         rank: 'A*',
-        averageScore: 4.8,
         topics: ['Machine Learning', 'Deep Learning', 'AI'],
         type: 'offline',
-        },
-        {
-        id: 2,
+        category: 'Computer Science', // Added category
+        description: 'Leading conference in machine learning.', // Added description
+        link: 'https://icml.cc/', // Added link, example URL
+        sourceYear: '2024', // Added sourceYear
+        submissionDate: '2024-05-01', // Added submissionDate - example
+      },
+      {
+        id: '2', // id is string
         name: 'Conference on Neural Information Processing Systems',
-        shortName: 'NeurIPS',
+        acronym: 'NeurIPS', // shortName to acronym
         startDate: '2024-12-08',
         endDate: '2024-12-14',
         location: 'Vancouver, Canada',
         imageUrl: '/conference_image.png', // Replace with real URL
         rank: 'A*',
-        averageScore: 4.9,
         topics: ['Neural Networks', 'Computer Vision', 'Natural Language Processing'],
         type: 'hybrid',
-        },
+        category: 'Artificial Intelligence', // Added category
+        description: 'Top conference for neural information processing.', // Added description
+        link: 'https://neurips.cc/', // Added link, example URL
+        sourceYear: '2024', // Added sourceYear
+        submissionDate: '2024-08-01', // Added submissionDate - example
+      },
     ];
 
     const renderPage = () => {
@@ -113,14 +111,11 @@ export default function Setting() {
 
 
     return (
-        <div className=" justify-center relative">
-
-          <div className="py-12 bg-background w-full"></div>
-
+      <div className=" justify-center relative">
+        <div className="py-12 bg-background w-full"></div>
           <div className="flex">
-
             {/* Sidebar Navigation */}
-            <aside className="flex w-80 fixed h-full bg-background-secondary py-2">
+            <aside className="flex w-80 fixed h-full py-2 ">
               <nav className="w-full">
                 <ul className="w-full">
                   {menuItems.map((item) => (
@@ -129,7 +124,7 @@ export default function Setting() {
                   className={`flex items-center w-full p-3  hover:bg-button hover:opacity-60 focus:outline-none  focus:secondary ${activePage === item.page ? 'bg-button text-button-text  hover:bg-secondary' : ''}`}
                   onClick={() => setActivePage(item.page)}
                       >
-                  {item.label} 
+                  {item.label}
                       </button>
                     </li>
                   ))}
@@ -139,10 +134,9 @@ export default function Setting() {
 
             {/* Main Content Area (Right Side - Columns 2 & 3 or 2/3 width on md+) */}
             <div className=" flex-1 ml-80">
-          {renderPage()} {/* Render the active page content here */}
+              {renderPage()} {/* Render the active page content here */}
             </div>
           </div>
-            
-            </div>
+        </div>
     );
 }

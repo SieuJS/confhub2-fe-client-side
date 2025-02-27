@@ -1,22 +1,12 @@
 import React, { useState } from 'react';
 import ConferenceItem from './ConferenceItem';
+import { ConferenceResponse } from '../../../models/response/conference.response'; // Import ConferenceResponse
 
-interface Conference {
-  id: number;
-  name: string;
-  shortName: string;
-  startDate: string;
-  endDate: string;
-  location: string;
-  imageUrl: string;
-  rank: string;
-  averageScore: number;
-  topics: string[];
-  type: 'online' | 'offline' | 'hybrid';
-}
+// Replace interface Conference with type Conference = ConferenceResponse
+type Conference = ConferenceResponse;
 
 interface FollowedTabProps {
-  conferences: Conference[];
+  conferences: Conference[]; // Use the type alias Conference (which is ConferenceResponse)
 }
 
 const FollowedTab: React.FC<FollowedTabProps> = ({ conferences }) => {

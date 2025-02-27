@@ -2,95 +2,26 @@
 
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useMemo } from 'react'; // Import useMemo
 import Button from '../components/Button';
 import ConferenceFeedback from '../components/ConferenceFeedback';
+import { ConferenceResponse } from '../../../models/response/conference.response'; // Import ConferenceResponse type
+import conferenceList from '../../../models/data/conferences-list.json'; // Import conferenceList JSON data
 
-interface Conference {
-  id: number;
-  name: string;
-  shortName: string;
-  startDate: string;
-  endDate: string;
-  location: string;
-  imageUrl: string;
-  rank: string;
-  averageScore: number;
-  topics: string[];
-  type: 'online' | 'offline' | 'hybrid';
-  submissionDate: string;
-  source: number;
-  fieldOfResearch: string;
-  publish: boolean;
-  website: string;
-  description: string;
-}
+// Removed interface Conference and using ConferenceResponse type alias instead
+type Conference = ConferenceResponse;
 
 export default function About() {
   const t = useTranslations('');
 
-  const conferenceData: Conference = {
-    id: 123,
-    name: 'ACM ASIA Conference on Computer and Communications Security',
-    shortName: 'ASIACCS',
-    startDate: '2025-01-21',
-    endDate: '2025-01-22',
-    location: 'Phnom Penh, Cambodia',
-    imageUrl: '/bg-2.jpg',
-    rank: 'Top Tier',
-    averageScore: 4.5,
-    topics: ['Computer Security', 'Communications Security', 'Cryptography', 'Network Security'],
-    type: 'hybrid',
-    submissionDate: '2024-10-15',
-    source: 1,
-    fieldOfResearch: 'Computer Science',
-    publish: true,
-    website: 'https://conference.com/infor/callforpapers',
-    description:
-      'CITA 2025 will be co-organized by Vietnam-Korea University of Information and Communication Technology (Vietnam), Cambodia Academy of Digital Technology (Cambodia) and King Mongkut\'s University of Technology North Bangkok (Thailand). The conference will take place in Phnom Penh, Cambodia on July 14-15, 2025. Phnom Penh, situated at the confluence of three rivers, the mighty Mekong, the Bassac and the great Tonle Sap, is the capital of Cambodia. The capital city has charm and tranquility with tree-lined boulevards amidst monumental Angkoriant architecture.',
-  };
+  // Use useMemo to ensure conferenceData and otherConferencesData are only computed once
+  const conferenceData: Conference = useMemo(() => {
+    return conferenceList[0] as Conference; // Get the first conference from the list and type assert
+  }, []); // Empty dependency array means it only runs once on mount
 
-  const otherConferencesData: Conference[] = [
-    {
-      id: 456,
-      name: 'International Conference on Software Engineering',
-      shortName: 'ICSE',
-      startDate: '2024-05-14',
-      endDate: '2024-05-19',
-      location: 'Lisbon, Portugal',
-      imageUrl: '/conference_image.png',
-      rank: 'Top Tier',
-      averageScore: 4.8,
-      topics: ['Software Engineering', 'Requirements Engineering', 'Testing', 'Agile'],
-      type: 'offline',
-      submissionDate: '2023-11-15',
-      source: 1,
-      fieldOfResearch: 'Computer Science',
-      publish: true,
-      website: 'https://icse.conf/',
-      description: 'The premier software engineering conference.'
-    },
-    {
-      id: 789,
-      name: 'Conference on Neural Information Processing Systems',
-      shortName: 'NeurIPS',
-      startDate: '2024-12-08',
-      endDate: '2024-12-14',
-      location: 'Vancouver, Canada',
-      imageUrl: '/conference_image.png',
-      rank: 'Top Tier',
-      averageScore: 4.9,
-      topics: ['Machine Learning', 'Deep Learning', 'AI', 'Neuroscience'],
-      type: 'hybrid',
-      submissionDate: '2024-06-01',
-      source: 1,
-      fieldOfResearch: 'Computer Science',
-      publish: true,
-      website: 'https://neurips.cc/',
-      description: 'A leading conference in machine learning and computational neuroscience.'
-    },
-    // Add more conference data as needed
-  ];
+  const otherConferencesData: Conference[] = useMemo(() => {
+    return conferenceList.slice(1, 3) as Conference[]; // Get the second and third conferences and type assert
+  }, []); // Empty dependency array means it only runs once on mount
 
 
   const [isFollowing, setIsFollowing] = useState(false);
@@ -133,7 +64,7 @@ export default function About() {
     <div className='px-10'>
       <div className="py-14 bg-background w-full"></div>
       <div className="container mx-auto py-6 px-4 rounded-lg flex flex-col md:flex-row gap-6">
-        
+
         {/* Left Column */}
         <div className="md:w-2/3">
           {/* Image at the top */}
@@ -193,7 +124,7 @@ export default function About() {
           <div className="flex justify-between items-center mt-4">
             <p className="text-lg">{formatDate(conferenceData.startDate)} - {formatDate(conferenceData.endDate)}</p>
             <div>
-              <span>{conferenceData.shortName}</span>
+              <span>{conferenceData.acronym}</span> {/* shortName to acronym */}
             </div>
           </div>
 
@@ -222,69 +153,64 @@ export default function About() {
           <section className="overflow-x-auto relative bg-gradient-to-r from-background to-background-secondary p-6 rounded-lg shadow-md">
           <h3 className="text-xl font-semibold text-left mb-4">{t('Conference Details')}</h3>
 
-<table className="w-full text-md text-left border-collapse">
-  <thead className="text-md ">
-    <tr className="border-b ">
-      <th scope="col" className="px-3 py-3 font-semibold text-left">Title</th>
-      <th scope="col" className="px-3 py-3 font-semibold text-left">Details</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr className="border-b  ">
-      <td className="px-3 py-2 font-semibold">{t('Start Date')}</td>
-      <td className="px-3 py-2">{formatDate(conferenceData.startDate)}</td>
-    </tr>
+        <table className="w-full text-md text-left border-collapse">
+          <thead className="text-md ">
+            <tr className="border-b ">
+              <th scope="col" className="px-3 py-3 font-semibold text-left">Title</th>
+              <th scope="col" className="px-3 py-3 font-semibold text-left">Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b  ">
+              <td className="px-3 py-2 font-semibold">{t('Start Date')}</td>
+              <td className="px-3 py-2">{formatDate(conferenceData.startDate)}</td>
+            </tr>
 
-    <tr className="border-b  ">
-      <td className="px-3 py-2 font-semibold">{t('End Date')}</td>
-      <td className="px-3 py-2">{formatDate(conferenceData.endDate)}</td>
-    </tr>
+            <tr className="border-b  ">
+              <td className="px-3 py-2 font-semibold">{t('End Date')}</td>
+              <td className="px-3 py-2">{formatDate(conferenceData.endDate)}</td>
+            </tr>
 
-    <tr className="border-b  ">
-      <td className="px-3 py-2 font-semibold">{t('Location')}</td>
-      <td className="px-3 py-2">{conferenceData.location}</td>
-    </tr>
+            <tr className="border-b  ">
+              <td className="px-3 py-2 font-semibold">{t('Location')}</td>
+              <td className="px-3 py-2">{conferenceData.location}</td>
+            </tr>
 
-    <tr className="border-b  ">
-      <td className="px-3 py-2 font-semibold">{t('Website')}</td>
-      <td className="px-3 py-2">
-        <a
-          href={conferenceData.website}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:underline"
-        >
-          {conferenceData.website.length > 30 ? `${conferenceData.website.substring(0, 30)}...` : conferenceData.website}
-        </a>
-      </td>
-    </tr>
+            <tr className="border-b  ">
+              <td className="px-3 py-2 font-semibold">{t('Website')}</td>
+              <td className="px-3 py-2">
+                <a
+                  href={conferenceData.link} // website to link
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  {conferenceData.link.length > 30 ? `${conferenceData.link.substring(0, 30)}...` : conferenceData.link} {/* website to link */}
+                </a>
+              </td>
+            </tr>
 
-    <tr className="border-b  ">
-      <td className="px-3 py-2 font-semibold">{t('Rank')}</td>
-      <td className="px-3 py-2">{conferenceData.rank}</td>
-    </tr>
+            <tr className="border-b  ">
+              <td className="px-3 py-2 font-semibold">{t('Rank')}</td>
+              <td className="px-3 py-2">{conferenceData.rank}</td>
+            </tr>
 
-    <tr className="border-b  ">
-      <td className="px-3 py-2 font-semibold">{t('Type')}</td>
-      <td className="px-3 py-2" >{conferenceData.type}</td>
-    </tr>
+            <tr className="border-b  ">
+              <td className="px-3 py-2 font-semibold">{t('Type')}</td>
+              <td className="px-3 py-2" >{conferenceData.type}</td>
+            </tr>
 
-    <tr className="border-b  ">
-      <td className="px-3 py-2 font-semibold">{t('Submission Date')}</td>
-      <td className="px-3 py-2">{formatDate(conferenceData.submissionDate)}</td>
-    </tr>
+            <tr className="border-b  ">
+              <td className="px-3 py-2 font-semibold">{t('Submission Date')}</td>
+              <td className="px-3 py-2">{formatDate(conferenceData.submissionDate)}</td>
+            </tr>
 
-    <tr className="border-b  ">
-      <td className="px-3 py-2 font-semibold">{t('Field')}</td>
-      <td className="px-3 py-2">{conferenceData.fieldOfResearch}</td>
-    </tr>
-
-    <tr className="border-b  ">
-      <td className="px-3 py-2 font-semibold">{t('Average Score')}</td>
-      <td className="px-3 py-2">{conferenceData.averageScore} / 5</td>
-    </tr>
-  </tbody>
-</table>
+            <tr className="border-b  ">
+              <td className="px-3 py-2 font-semibold">{t('Field')}</td>
+              <td className="px-3 py-2">{conferenceData.category}</td> {/* fieldOfResearch to category */}
+            </tr>
+          </tbody>
+        </table>
           </section>
 
           {/* Other Conferences in right column */}
@@ -304,7 +230,7 @@ export default function About() {
                     />
                     </div>
                   <div>
-                    <h4 className="font-semibold text-left">{conf.shortName}</h4>
+                    <h4 className="font-semibold text-left">{conf.acronym}</h4> {/* shortName to acronym */}
                     <p className="text-sm text-left">{formatDate(conf.startDate)} - {formatDate(conf.endDate)}</p>
                   </div>
                   </div>
@@ -312,7 +238,7 @@ export default function About() {
               ))}
             </ul>
             <p className="text-center mt-4">
-              <a href="" className=" hover:underline"> 
+              <a href="" className=" hover:underline">
                 {t('View All Conferences')}
               </a>
             </p>
