@@ -43,7 +43,7 @@ const Banner: React.FC = () => {
         </div>
         <div className='mt-2 flex flex-row gap-4'>
           <Link href={`/conferences`}>
-            <Button rounded size='large' advanced>
+            <Button rounded size='large' advanced advancedDivColor="p-8">
               {t('Search Conferences')}
             </Button>
           </Link>

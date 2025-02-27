@@ -50,17 +50,23 @@ const config = {
           '0%': { transform: 'scale(0)', opacity: '0.5' },
           '50%': { transform: 'scale(1.2)', opacity: '0.2' }, // Scale up and slightly fade
           '100%': { transform: 'scale(1.5)', opacity: '0' },   // Scale further and fully fade
-        }
+        },
+        'floatUpDown': { // Tên keyframes animation
+          '0%, 100%': { transform: 'translateY(0)' }, // Vị trí ban đầu và cuối
+          '50%': { transform: 'translateY(-20px)' }, // Vị trí ở giữa (di chuyển lên)
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         ripple: 'ripple 0.5s ease-out', // Animation for button hover (if used)
         'pulse-ripple': 'pulse-ripple 1s linear infinite', // Continuous pulse ripple for div
-      }
+        'float-up-down': 'floatUpDown 2s ease-in-out infinite', // Định nghĩa animation sử dụng keyframes 'floatUpDown'
+      },
+     
     }
   },
-  plugins: [require('tailwindcss-animate')]
+  plugins: [require('tailwind-scrollbar'),require('tailwindcss-animate')]
 } satisfies Config
 
 export default config

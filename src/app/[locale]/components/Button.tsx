@@ -44,7 +44,7 @@ const Button: React.FC<ButtonProps> = ({
 
   if (advanced) {
     return (
-      <div className={`${advancedDivColor} rounded-full p-8 relative overflow-hidden`}> {/* Div wrapper with ripple effect and overflow-hidden */}
+      <div className={`${advancedDivColor} rounded-full relative overflow-hidden`}> {/* Div wrapper with ripple effect and overflow-hidden */}
         <span className="absolute inset-0 pointer-events-none before:absolute before:-inset-1 before:bg-button before:opacity-10 before:rounded-full before:scale-0 before:origin-center before:animate-pulse-ripple"></span>
         {renderButton()}
       </div>

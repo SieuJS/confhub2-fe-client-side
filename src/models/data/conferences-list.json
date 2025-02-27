@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "name": "React Conf",
+    "date": "2021-10-01",
+    "city": "New York",
+    "country": "USA",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg",
+    "link": "https://reactconf.com"
+  },
+  {
+    "id": 2,
+    "name": "Vue Conf",
+    "date": "2021-10-15",
+    "city": "Toronto",
+    "country": "Canada",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/9/95/Vue.js_Logo_2.svg",
+    "link": "https://vueconf.com"
+  },
+  {
+    "id": 3,
+    "name": "Angular Conf",
+    "date": "2021-10-30",
+    "city": "Berlin",
+    "country": "Germany",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/c/cf/Angular_full_color_logo.svg",
+    "link": "https://angularconf.com"
+  }
+]

@@ -1,0 +1,20 @@
+export type ConferenceResponse = {
+  id: string;
+  name: string;
+  acronym: string;
+  category: string;
+  subCategory: string;
+  location: string;
+  startDate: string;
+  endDate: string;
+  cfpStartDate: string;
+  cfpEndDate: string;
+  timezone: string;
+  link: string;
+  twitter: string;
+  email: string;
+  codeOfConduct: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
+};

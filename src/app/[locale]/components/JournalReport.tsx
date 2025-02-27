@@ -21,7 +21,7 @@ const JournalReport: React.FC = () => {
             Comprehensive information about the Journal, including Impact factor, H-index, subject Area, Category,
             Scope, ISSN.
           </p>
-          <div className=" p-4 rounded-lg shadow-sm flex items-top mb-4 relative overflow-hidden">
+          <div className=" p-4 rounded-lg shadow-sm flex items-top mb-4 relative overflow-hidden bg-gradient-to-r from-background to-background-secondary">
             {/* Thumbnail */}
             <div className="relative w-50 h-30 mt-4 rounded-lg overflow-hidden">
               {/* Image */}
@@ -139,7 +139,7 @@ const JournalReport: React.FC = () => {
         </div>
 
         {/* Right Section */}
-        <div className="md:w-1/3 bg-background-secondary p-6 rounded-lg shadow-md">
+        <div className="md:w-1/3 bg-gradient-to-r from-background to-background-secondary p-6 rounded-lg shadow-md">
           <div className="overflow-x-auto relative">
             <table className="w-full text-md text-left border-collapse">
               <thead className="text-md ">

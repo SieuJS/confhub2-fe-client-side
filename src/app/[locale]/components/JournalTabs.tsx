@@ -21,7 +21,7 @@ function TabPanel(props: TabPanelProps) {
             {...other}
         >
             {value === index && (
-                <div className="p-6 bg-background-secondary shadow-md rounded-lg">
+                <div className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg">
                     {children}
                 </div>
             )}

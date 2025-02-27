@@ -36,7 +36,7 @@ export default function About() {
     startDate: '2025-01-21',
     endDate: '2025-01-22',
     location: 'Phnom Penh, Cambodia',
-    imageUrl: '/conference_image.png',
+    imageUrl: '/bg-2.jpg',
     rank: 'Top Tier',
     averageScore: 4.5,
     topics: ['Computer Security', 'Communications Security', 'Cryptography', 'Network Security'],
@@ -149,6 +149,34 @@ export default function About() {
 
           {/* Buttons below the image */}
           <div className="flex justify-end mt-4">
+            <div className="">
+
+            <Button
+              onClick={handleFollowClick}
+              variant="primary"
+              size="medium"
+              rounded
+              advanced
+              advancedDivColor="p-4" // Advanced color
+              className={` w-24 hover:opacity-90`} // Hover and Followed color
+            >
+              {isFollowing ? 'Followed' : 'Follow'}
+            </Button>
+            </div>
+            <div className="py-4 px-2">
+
+            <Button
+              onClick={handleUpdateClick}
+              variant="secondary"
+              size="medium"
+              rounded
+              className="mr-2 w-24 hover:opacity-90" // Hover effect
+            >
+              Update
+            </Button>
+            </div>
+            <div className="py-4 px-2">
+
             <Button
               onClick={handleShareClick}
               variant="secondary"
@@ -158,24 +186,7 @@ export default function About() {
             >
               Share
             </Button>
-            <Button
-              onClick={handleFollowClick}
-              variant={isFollowing ? 'primary' : 'secondary'}
-              size="medium"
-              rounded
-              className={`mr-2 w-24 hover:opacity-90`} // Hover and Followed color
-            >
-              {isFollowing ? 'Followed' : 'Follow'}
-            </Button>
-            <Button
-              onClick={handleUpdateClick}
-              variant="secondary"
-              size="medium"
-              rounded
-              className="w-24 hover:opacity-90" // Hover effect
-            >
-              Update
-            </Button>
+            </div>
           </div>
 
 
@@ -192,10 +203,10 @@ export default function About() {
           <p className="text-left mt-4">{conferenceData.description}</p>
 
           <div className="flex items-center mt-6 text-left">
-            <span className="font-semibold mr-2">Topics:</span>
+            <span className="font-semibold mr-2 pb-2">Topics:</span>
             <div className="flex flex-wrap">
               {conferenceData.topics.map((topic, index) => (
-                <span key={index} className="bg-gray-200 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2">
+                <span key={index} className="bg-background-secondary  rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2">
                   {topic}
                 </span>
               ))}
@@ -208,7 +219,7 @@ export default function About() {
 
         {/* Right Column */}
         <div className="md:w-1/3 ">
-          <section className="overflow-x-auto relative bg-background-secondary p-6 rounded-lg shadow-md">
+          <section className="overflow-x-auto relative bg-gradient-to-r from-background to-background-secondary p-6 rounded-lg shadow-md">
           <h3 className="text-xl font-semibold text-left mb-4">{t('Conference Details')}</h3>
 
 <table className="w-full text-md text-left border-collapse">
@@ -277,7 +288,7 @@ export default function About() {
           </section>
 
           {/* Other Conferences in right column */}
-          <section className="mt-8 overflow-x-auto relative bg-background-secondary p-6 rounded-lg shadow-md">
+          <section className="mt-8 overflow-x-auto relative bg-gradient-to-r from-background to-background-secondary p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold text-left mb-4">{t('Other Conferences')}</h3>
             <ul>
               {otherConferencesData.map((conf) => (
@@ -301,7 +312,7 @@ export default function About() {
               ))}
             </ul>
             <p className="text-center mt-4">
-              <a href="" className="text-blue-500 hover:underline"> 
+              <a href="" className=" hover:underline"> 
                 {t('View All Conferences')}
               </a>
             </p>
