@@ -6,14 +6,18 @@ export type ConferenceResponse = {
   topics: string[];
   location: string;
   type: string;
-  startDate: string;
-  endDate: string;
-  submissionDate: string;
-  cameraReadyDate?: string;
-  notificationDate?: string;
+  conferenceDates: ConferenceDates[];
   imageUrl: string;
   description: string;
   rank: string;
   sourceYear: string;
   link: string;
+  likeCount: number;
+  followCount: number;
 };
+
+export type ConferenceDates = {
+  startDate: string;
+  endDate: string;
+  dateName : string ; 
+}; 

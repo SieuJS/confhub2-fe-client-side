@@ -9,13 +9,30 @@
       "AI",
       "Data Science"
     ],
-    "location": "Vienna, Austria",
+    "location": "KTX khu A, Ho Chi Minh City, Vietnam",
     "type": "offline",
-    "startDate": "2022-07-17",
-    "endDate": "2022-07-23",
-    "submissionDate": "2022-03-01",
-    "cameraReadyDate": "2022-06-01",
-    "notificationDate": "2022-05-01",
+    "conferenceDates": [
+      {
+        "startDate": "2022-07-17",
+        "endDate": "2022-07-23",
+        "dateName": "Conference Dates"
+      },
+      {
+        "startDate": "2022-03-01",
+        "endDate": null,
+        "dateName": "Submission Deadline"
+      },
+      {
+        "startDate": "2022-06-01",
+        "endDate": null,
+        "dateName": "Camera Ready Deadline"
+      },
+      {
+        "startDate": "2022-05-01",
+        "endDate": null,
+        "dateName": "Notification Date"
+      }
+    ],
     "imageUrl": "/bg-2.jpg",
     "description": "The International Conference on Machine Learning is one of the top conferences in the field of machine learning.",
     "rank": "A",
@@ -33,11 +50,28 @@
       "AI"
     ],
     "type": "offline",
-    "startDate": "2022-06-19",
-    "endDate": "2022-06-24",
-    "submissionDate": "2022-02-01",
-    "cameraReadyDate": "2022-05-01",
-    "notificationDate": "2022-04-01",
+    "conferenceDates": [
+      {
+        "startDate": "2022-06-19",
+        "endDate": "2022-06-24",
+        "dateName": "Conference Dates"
+      },
+      {
+        "startDate": "2022-02-01",
+        "endDate": null,
+        "dateName": "Submission Deadline"
+      },
+      {
+        "startDate": "2022-05-01",
+        "endDate": null,
+        "dateName": "Camera Ready Deadline"
+      },
+      {
+        "startDate": "2022-04-01",
+        "endDate": null,
+        "dateName": "Notification Date"
+      }
+    ],
     "imageUrl": "/bg-2.jpg",
     "description": "The Conference on Computer Vision and Pattern Recognition is a leading annual conference on computer vision and pattern recognition.",
     "rank": "A",
@@ -56,11 +90,28 @@
     ],
     "location": "Addis Ababa, Ethiopia",
     "type": "offline",
-    "startDate": "2022-05-02",
-    "endDate": "2022-05-07",
-    "submissionDate": "2022-01-15",
-    "cameraReadyDate": "2022-04-01",
-    "notificationDate": "2022-03-01",
+    "conferenceDates": [
+      {
+        "startDate": "2022-05-02",
+        "endDate": "2022-05-07",
+        "dateName": "Conference Dates"
+      },
+      {
+        "startDate": "2022-01-15",
+        "endDate": null,
+        "dateName": "Submission Deadline"
+      },
+      {
+        "startDate": "2022-04-01",
+        "endDate": null,
+        "dateName": "Camera Ready Deadline"
+      },
+      {
+        "startDate": "2022-03-01",
+        "endDate": null,
+        "dateName": "Notification Date"
+      }
+    ],
     "imageUrl": "/bg-2.jpg",
     "description": "The International Conference on Learning Representations is a top conference in the field of deep learning.",
     "rank": "A",
@@ -79,11 +130,28 @@
     ],
     "location": "Singapore",
     "type": "offline",
-    "startDate": "2022-11-14",
-    "endDate": "2022-11-17",
-    "submissionDate": "2022-07-01",
-    "cameraReadyDate": "2022-10-01",
-    "notificationDate": "2022-09-01",
+    "conferenceDates": [
+      {
+        "startDate": "2022-11-14",
+        "endDate": "2022-11-17",
+        "dateName": "Conference Dates"
+      },
+      {
+        "startDate": "2022-07-01",
+        "endDate": null,
+        "dateName": "Submission Deadline"
+      },
+      {
+        "startDate": "2022-10-01",
+        "endDate": null,
+        "dateName": "Camera Ready Deadline"
+      },
+      {
+        "startDate": "2022-09-01",
+        "endDate": null,
+        "dateName": "Notification Date"
+      }
+    ],
     "imageUrl": "/bg-2.jpg",
     "description": "The International Conference on Data Mining is a premier forum for presenting research in data mining.",
     "rank": "A",
@@ -102,11 +170,28 @@
     ],
     "location": "Vancouver, Canada",
     "type": "offline",
-    "startDate": "2022-08-07",
-    "endDate": "2022-08-11",
-    "submissionDate": "2022-03-15",
-    "cameraReadyDate": "2022-07-01",
-    "notificationDate": "2022-06-01",
+    "conferenceDates": [
+      {
+        "startDate": "2022-08-07",
+        "endDate": "2022-08-11",
+        "dateName": "Conference Dates"
+      },
+      {
+        "startDate": "2022-08-07",
+        "endDate": "2022-08-11",
+        "dateName": "Submission Deadline"
+      },
+      {
+        "startDate": "2022-07-01",
+        "endDate": null,
+        "dateName": "Camera Ready Deadline"
+      },
+      {
+        "startDate": "2022-06-01",
+        "endDate": null,
+        "dateName": "Notification Date"
+      }
+    ],
     "imageUrl": "/bg-2.jpg",
     "description": "SIGGRAPH is the premier conference for computer graphics and interactive techniques.",
     "rank": "A",
@@ -125,11 +210,28 @@
     ],
     "location": "Philadelphia, USA",
     "type": "offline",
-    "startDate": "2022-05-23",
-    "endDate": "2022-05-27",
-    "submissionDate": "2022-01-31",
-    "cameraReadyDate": "2022-04-15",
-    "notificationDate": "2022-03-15",
+    "conferenceDates": [
+      {
+        "startDate": "2022-05-23",
+        "endDate": "2022-05-27",
+        "dateName": "Conference Dates"
+      },
+      {
+        "startDate": "2022-01-31",
+        "endDate": null,
+        "dateName": "Submission Deadline"
+      },
+      {
+        "startDate": "2022-04-15",
+        "endDate": null,
+        "dateName": "Camera Ready Deadline"
+      },
+      {
+        "startDate": "2022-03-15",
+        "endDate": null,
+        "dateName": "Notification Date"
+      }
+    ],
     "imageUrl": "/bg-2.jpg",
     "description": "The International Conference on Robotics and Automation is a leading conference in the field of robotics.",
     "rank": "A",
@@ -148,11 +250,28 @@
     ],
     "location": "Pittsburgh, USA",
     "type": "offline",
-    "startDate": "2022-05-21",
-    "endDate": "2022-05-29",
-    "submissionDate": "2022-01-10",
-    "cameraReadyDate": "2022-04-10",
-    "notificationDate": "2022-03-10",
+    "conferenceDates": [
+      {
+        "startDate": "2022-05-21",
+        "endDate": "2022-05-29",
+        "dateName": "Conference Dates"
+      },
+      {
+        "startDate": "2022-01-10",
+        "endDate": null,
+        "dateName": "Submission Deadline"
+      },
+      {
+        "startDate": "2022-04-10",
+        "endDate": null,
+        "dateName": "Camera Ready Deadline"
+      },
+      {
+        "startDate": "2022-03-10",
+        "endDate": null,
+        "dateName": "Notification Date"
+      }
+    ],
     "imageUrl": "/bg-2.jpg",
     "description": "The International Conference on Software Engineering is the premier conference for software engineering research.",
     "rank": "A",
@@ -171,11 +290,28 @@
     ],
     "location": "Atlanta, USA",
     "type": "offline",
-    "startDate": "2022-10-17",
-    "endDate": "2022-10-21",
-    "submissionDate": "2022-06-01",
-    "cameraReadyDate": "2022-09-01",
-    "notificationDate": "2022-08-01",
+    "conferenceDates": [
+      {
+        "startDate": "2022-10-17",
+        "endDate": "2022-10-21",
+        "dateName": "Conference Dates"
+      },
+      {
+        "startDate": "2022-06-01",
+        "endDate": null,
+        "dateName": "Submission Deadline"
+      },
+      {
+        "startDate": "2022-09-01",
+        "endDate": null,
+        "dateName": "Camera Ready Deadline"
+      },
+      {
+        "startDate": "2022-08-01",
+        "endDate": null,
+        "dateName": "Notification Date"
+      }
+    ],
     "imageUrl": "/bg-2.jpg",
     "description": "The International Conference on Information and Knowledge Management is a top conference in the field of information and knowledge management.",
     "rank": "A",
@@ -194,11 +330,28 @@
     ],
     "location": "Phoenix, USA",
     "type": "offline",
-    "startDate": "2022-02-21",
-    "endDate": "2022-02-25",
-    "submissionDate": "2021-10-01",
-    "cameraReadyDate": "2022-01-15",
-    "notificationDate": "2021-12-15",
+    "conferenceDates": [
+      {
+        "startDate": "2022-02-21",
+        "endDate": "2022-02-25",
+        "dateName": "Conference Dates"
+      },
+      {
+        "startDate": "2021-10-01",
+        "endDate": null,
+        "dateName": "Submission Deadline"
+      },
+      {
+        "startDate": "2022-01-15",
+        "endDate": null,
+        "dateName": "Camera Ready Deadline"
+      },
+      {
+        "startDate": "2021-12-15",
+        "endDate": null,
+        "dateName": "Notification Date"
+      }
+    ],
     "imageUrl": "/bg-2.jpg",
     "description": "The International Conference on Web Search and Data Mining is a premier conference on web search and data mining.",
     "rank": "A",
@@ -217,11 +370,28 @@
     ],
     "location": "Valencia, Spain",
     "type": "offline",
-    "startDate": "2022-04-26",
-    "endDate": "2022-04-28",
-    "submissionDate": "2021-12-01",
-    "cameraReadyDate": "2022-03-15",
-    "notificationDate": "2022-02-15",
+    "conferenceDates": [
+      {
+        "startDate": "2022-04-26",
+        "endDate": "2022-04-28",
+        "dateName": "Conference Dates"
+      },
+      {
+        "startDate": "2021-12-01",
+        "endDate": null,
+        "dateName": "Submission Deadline"
+      },
+      {
+        "startDate": "2022-03-15",
+        "endDate": null,
+        "dateName": "Camera Ready Deadline"
+      },
+      {
+        "startDate": "2022-02-15",
+        "endDate": null,
+        "dateName": "Notification Date"
+      }
+    ],
     "imageUrl": "/bg-2.jpg",
     "description": "The International Conference on Artificial Intelligence and Statistics is a leading conference on AI and statistics.",
     "rank": "A",

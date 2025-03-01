@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import EventCard from './EventCard';
 import Pagination from './Pagination';
-import {ConferenceResponse} from '../../../models/response/conference.response'; // Import your ConferenceResponse type
+import { ConferenceResponse } from '../../../models/response/conference.response'; // Import your ConferenceResponse type
 import conferenceList from '../../../models/data/conferences-list.json'; // Assuming conference-list.json is in the same directory
 
 interface ResultsSectionProps {
@@ -47,7 +47,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
         if (selectedLocation) {
             filteredEvents = filteredEvents.filter(event =>
-                event.location === selectedLocation
+                event.location?.toLowerCase().includes(selectedLocation.toLowerCase())
             );
         }
 
@@ -58,25 +58,40 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
         }
 
         if (startDate) {
-            filteredEvents = filteredEvents.filter(event => {
-                const eventStartDate = new Date(event.startDate);
-                return eventStartDate >= startDate;
-            });
+            filteredEvents = filteredEvents.filter(event =>
+                event.conferenceDates.some(dateRange => {
+                    if (dateRange.startDate) { // Check if startDate exists in dateRange
+                        const eventStartDate = new Date(dateRange.startDate);
+                        return eventStartDate >= startDate;
+                    }
+                    return false; // If startDate is not available for this dateRange, don't consider it a match
+                })
+            );
         }
 
         if (endDate) {
-            filteredEvents = filteredEvents.filter(event => {
-                const eventEndDate = new Date(event.endDate);
-                return eventEndDate <= endDate;
-            });
+            filteredEvents = filteredEvents.filter(event =>
+                event.conferenceDates.some(dateRange => {
+                    if (dateRange.endDate) { // Check if endDate exists in dateRange
+                        const eventEndDate = new Date(dateRange.endDate);
+                        return eventEndDate <= endDate;
+                    }
+                    return false; // If endDate is not available for this dateRange, don't consider it a match
+                })
+            );
         }
 
         // Apply advanced filters
         if (submissionDate) {
-            filteredEvents = filteredEvents.filter(event => {
-                const eventSubmissionDate = new Date(event.submissionDate);
-                return eventSubmissionDate <= submissionDate;
-            });
+            filteredEvents = filteredEvents.filter(event =>
+                event.conferenceDates.some(dateRange => {
+                    if (dateRange.dateName === "Submission Deadline" && dateRange.startDate) { // Find Submission Deadline and check startDate
+                        const eventSubmissionDate = new Date(dateRange.startDate);
+                        return eventSubmissionDate <= submissionDate;
+                    }
+                    return false; // If Submission Deadline not found or submissionDate is missing, don't consider it a match
+                })
+            );
         }
 
         if (selectedRank) {
@@ -107,17 +122,47 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 sortedEvents.sort((a, b) => a.name.localeCompare(b.name));
                 break;
             case 'submissionDate':
-                sortedEvents.sort((a, b) => new Date(a.submissionDate).getTime() - new Date(b.submissionDate).getTime());
+                sortedEvents.sort((a, b) => {
+                    const submissionDateA = a.conferenceDates.find(date => date.dateName === "Submission Deadline")?.startDate;
+                    const submissionDateB = b.conferenceDates.find(date => date.dateName === "Submission Deadline")?.startDate;
+
+                    const dateA = submissionDateA ? new Date(submissionDateA).getTime() : -Infinity; // Use -Infinity if not found
+                    const dateB = submissionDateB ? new Date(submissionDateB).getTime() : -Infinity; // Use -Infinity if not found
+
+                    return dateA - dateB;
+                });
                 break;
             case 'startDate':
-                sortedEvents.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+            case 'date': // Sort by conference date (default - which is start date) - vẫn sắp xếp theo startDate sớm nhất
+            default:
+                sortedEvents.sort((a, b) => {
+                    const minStartDateA = Math.min(
+                        ...a.conferenceDates
+                            .filter(date => date.startDate) // Filter out dates without startDate
+                            .map(date => new Date(date.startDate).getTime())
+                    );
+                    const minStartDateB = Math.min(
+                        ...b.conferenceDates
+                            .filter(date => date.startDate) // Filter out dates without startDate
+                            .map(date => new Date(date.startDate).getTime())
+                    );
+                    return minStartDateA - minStartDateB;
+                });
                 break;
             case 'endDate':
-                sortedEvents.sort((a, b) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime());
-                break;
-            case 'date': // Sort by conference date (default - which is start date)
-            default:
-                sortedEvents.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+                sortedEvents.sort((a, b) => {
+                    const maxEndDateA = Math.max(
+                        ...a.conferenceDates
+                            .filter(date => date.endDate) // Filter out dates without endDate
+                            .map(date => new Date(date.endDate).getTime())
+                    );
+                    const maxEndDateB = Math.max(
+                        ...b.conferenceDates
+                            .filter(date => date.endDate) // Filter out dates without endDate
+                            .map(date => new Date(date.endDate).getTime())
+                    );
+                    return maxEndDateA - maxEndDateB;
+                });
                 break;
         }
 

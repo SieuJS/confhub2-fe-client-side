@@ -51,7 +51,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
       </div>
 
       <div className="flex items-center justify-between pt-2 px-2 bg-background">
-        <p className="text-xs">{event.startDate} - {event.endDate}</p>
+        <p className="text-xs">{event.conferenceDates[0].startDate} - {event.conferenceDates[0].endDate}</p>
         <p className="text-xs">{event.location}</p>
       </div>
 

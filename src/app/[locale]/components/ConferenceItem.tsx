@@ -3,10 +3,7 @@ import Image from 'next/image';
 import Button from './Button';
 import { ConferenceResponse } from '../../../models/response/conference.response'; // Import ConferenceResponse
 
-// Replace interface Conference with type Conference = ConferenceResponse
-type Conference = ConferenceResponse;
-
-const ConferenceItem: React.FC<{ conference: Conference }> = ({ conference }) => {
+const ConferenceItem: React.FC<{ conference: ConferenceResponse }> = ({ conference }) => {
   const [isFollowing, setIsFollowing] = useState(false); // State for follow status
 
   const handleFollowClick = () => {
@@ -28,7 +25,12 @@ const ConferenceItem: React.FC<{ conference: Conference }> = ({ conference }) =>
       <div className="col-span-6 text-left">
         <h3 className="text-lg font-semibold text-button">{conference.name} ({conference.acronym})</h3> {/* Use conference.acronym */}
         <p className="">
-          <strong>Dates:</strong> {conference.startDate} - {conference.endDate}
+          <strong>Dates:</strong>
+          {conference.conferenceDates && conference.conferenceDates.length > 0 ? (
+            `${conference.conferenceDates[0].startDate} - ${conference.conferenceDates[0].endDate}`
+          ) : (
+            'Dates not available'
+          )}
         </p>
         <p className="">
           <strong>Location:</strong> {conference.location}

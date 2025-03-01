@@ -35,7 +35,11 @@ export default function About() {
     };
 
     const handleShareClick = (platform: 'facebook' | 'twitter' | 'reddit') => {
-        const shareText = `📢 ${conferenceData.name}\n📅 Thời gian: ${formatDate(conferenceData.startDate)} - ${formatDate(conferenceData.endDate)}\n📍 Địa điểm: ${conferenceData.location}\n🔗 Chi tiết: ${conferenceData.link}`;
+        const conferenceDates = conferenceData.conferenceDates.find(date => date.dateName === "Conference Dates"); // Find main conference dates
+        const startDate = conferenceDates?.startDate;
+        const endDate = conferenceDates?.endDate;
+
+        const shareText = `📢 ${conferenceData.name}\n📅 Thời gian: ${startDate && endDate ? `${formatDate(startDate)} - ${formatDate(endDate)}` : 'Dates not available'}\n📍 Địa điểm: ${conferenceData.location}\n🔗 Chi tiết: ${conferenceData.link}`;
         const shareUrl = encodeURIComponent(conferenceData.link || window.location.href);
         const encodedText = encodeURIComponent(shareText);
 
@@ -70,19 +74,25 @@ export default function About() {
     };
 
 
-    const formatDate = (dateString: string): string => {
+    const formatDate = (dateString: string | undefined): string => { // Allow undefined input
+        if (!dateString) return 'N/A'; // Return N/A if dateString is undefined
         const date = new Date(dateString);
         return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
     };
 
     function createGoogleCalendarLink(conference: Conference) {
-        const startDate = new Date(conference.startDate + 'T00:00:00'); // Giả sử sự kiện bắt đầu lúc 00:00:00
-        const endDate = new Date(conference.endDate + 'T23:59:59');   // Giả sử sự kiện kết thúc lúc 23:59:59
+        const conferenceDates = conference.conferenceDates.find(date => date.dateName === "Conference Dates"); // Find main conference dates
+        const startDate = conferenceDates?.startDate;
+        const endDate = conferenceDates?.endDate;
 
-        const start = startDate.toISOString().replace(/-|:|\.\d+/g, '');
-        const end = endDate.toISOString().replace(/-|:|\.\d+/g, '');
+        const startDateObj = startDate ? new Date(startDate + 'T00:00:00') : new Date(); // Default to current date if not found
+        const endDateObj = endDate ? new Date(endDate + 'T23:59:59') : new Date();     // Default to current date if not found
 
-        const details = `📢 ${conference.name}\n📅 Thời gian: ${formatDate(conferenceData.startDate)} - ${formatDate(conferenceData.endDate)}\n📍 Địa điểm: ${conferenceData.location}\n🔗 Chi tiết: ${conferenceData.link}`;
+
+        const start = startDateObj.toISOString().replace(/-|:|\.\d+/g, '');
+        const end = endDateObj.toISOString().replace(/-|:|\.\d+/g, '');
+
+        const details = `📢 ${conference.name}\n📅 Thời gian: ${startDate && endDate ? `${formatDate(startDate)} - ${formatDate(endDate)}` : 'Dates not available'}\n📍 Địa điểm: ${conference.location}\n🔗 Chi tiết: ${conference.link}`;
 
 
         const params = new URLSearchParams({
@@ -101,29 +111,34 @@ export default function About() {
 
 
     function createICalendarEvent(conference: Conference) {
-        const startDate = new Date(conference.startDate + 'T00:00:00');
-        const endDate = new Date(conference.endDate + 'T23:59:59');
+        const conferenceDates = conference.conferenceDates.find(date => date.dateName === "Conference Dates"); // Find main conference dates
+        const startDate = conferenceDates?.startDate;
+        const endDate = conferenceDates?.endDate;
+
+        const startDateObj = startDate ? new Date(startDate + 'T00:00:00') : new Date(); // Default to current date if not found
+        const endDateObj = endDate ? new Date(endDate + 'T23:59:59') : new Date();     // Default to current date if not found
+
 
         const start = [
-            startDate.getFullYear(),
-            startDate.getMonth() + 1, //getMonth() trả về 0-11
-            startDate.getDate(),
-            startDate.getHours(),
-            startDate.getMinutes(),
+            startDateObj.getFullYear(),
+            startDateObj.getMonth() + 1, //getMonth() trả về 0-11
+            startDateObj.getDate(),
+            startDateObj.getHours(),
+            startDateObj.getMinutes(),
         ];
 
         const end = [
-            endDate.getFullYear(),
-            endDate.getMonth() + 1,
-            endDate.getDate(),
-            endDate.getHours(),
-            endDate.getMinutes(),
+            endDateObj.getFullYear(),
+            endDateObj.getMonth() + 1,
+            endDateObj.getDate(),
+            endDateObj.getHours(),
+            endDateObj.getMinutes(),
         ];
         const event: ics.EventAttributes = {
             start: start as ics.DateArray,
             end: end as ics.DateArray,
             title: conference.name,
-            description: `📢 ${conferenceData.name}\n📅 Thời gian: ${formatDate(conferenceData.startDate)} - ${formatDate(conferenceData.endDate)}\n📍 Địa điểm: ${conferenceData.location}\n🔗 Chi tiết: ${conferenceData.link}`,
+            description: `📢 ${conferenceData.name}\n📅 Thời gian: ${startDate && endDate ? `${formatDate(startDate)} - ${formatDate(endDate)}` : 'Dates not available'}\n📍 Địa điểm: ${conference.location}\n🔗 Chi tiết: ${conference.link}`,
             location: conference.location,
             url: conferenceData.link,
             organizer: { name: 'Conference Organizer' }, // Add organizer info if available
@@ -152,7 +167,10 @@ export default function About() {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                const conferenceDate = new Date(conferenceData.startDate);
+                const conferenceDates = conferenceData.conferenceDates.find(date => date.dateName === "Conference Dates"); // Find main conference dates
+                const startDate = conferenceDates?.startDate;
+                const conferenceDate = startDate ? new Date(startDate) : new Date(); // Default to current date if not found
+
                 a.download = `${conferenceData.acronym + conferenceDate.getFullYear()}.ics`; // Use acronym instead of shortName
                 document.body.appendChild(a);
                 a.click();
@@ -306,7 +324,7 @@ export default function About() {
             size="medium"
             rounded
             className="mr-2 hover:opacity-90 p-2"
-            //ref={shareButtonRef} // Ref cho button Share
+            
           >
             {/* Inline SVG for Share Icon */}
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
@@ -353,7 +371,11 @@ export default function About() {
       </div>
 
       <div className="flex justify-between items-center mt-4">
-        <p className="text-lg">{formatDate(conferenceData.startDate)} - {formatDate(conferenceData.endDate)}</p>
+        <p className="text-lg">
+            {conferenceData.conferenceDates.find(date => date.dateName === "Conference Dates") ? // Find Conference Dates
+                `${formatDate(conferenceData.conferenceDates.find(date => date.dateName === "Conference Dates")?.startDate)} - ${formatDate(conferenceData.conferenceDates.find(date => date.dateName === "Conference Dates")?.endDate)}`
+                : 'Dates not available'}
+        </p>
         <div>
           <span>{conferenceData.acronym}</span> {/* shortName to acronym */}
         </div>
@@ -386,16 +408,20 @@ export default function About() {
           <h3 className="text-xl font-semibold text-left mb-4">{t('Conference Details')}</h3>
 
         <table className="w-full text-md text-left border-collapse">
-          
+
           <tbody>
             <tr className="border-b  ">
               <td className="px-3 py-2 font-semibold">{t('Start Date')}</td>
-              <td className="px-3 py-2">{formatDate(conferenceData.startDate)}</td>
+              <td className="px-3 py-2">
+                {formatDate(conferenceData.conferenceDates.find(date => date.dateName === "Conference Dates")?.startDate)}
+              </td>
             </tr>
 
             <tr className="border-b  ">
               <td className="px-3 py-2 font-semibold">{t('End Date')}</td>
-              <td className="px-3 py-2">{formatDate(conferenceData.endDate)}</td>
+              <td className="px-3 py-2">
+                {formatDate(conferenceData.conferenceDates.find(date => date.dateName === "Conference Dates")?.endDate)}
+              </td>
             </tr>
 
             <tr className="border-b  ">
@@ -429,7 +455,9 @@ export default function About() {
 
             <tr className="border-b  ">
               <td className="px-3 py-2 font-semibold">{t('Submission Date')}</td>
-              <td className="px-3 py-2">{formatDate(conferenceData.submissionDate)}</td>
+              <td className="px-3 py-2">
+                {formatDate(conferenceData.conferenceDates.find(date => date.dateName === "Submission Deadline")?.startDate)}
+              </td>
             </tr>
 
             <tr className="border-b  ">
@@ -458,7 +486,11 @@ export default function About() {
                     </div>
                   <div>
                     <h4 className="font-semibold text-left">{conf.acronym}</h4> {/* shortName to acronym */}
-                    <p className="text-sm text-left">{formatDate(conf.startDate)} - {formatDate(conf.endDate)}</p>
+                    <p className="text-sm text-left">
+                        {conf.conferenceDates.find(date => date.dateName === "Conference Dates") ? // Find Conference Dates
+                            `${formatDate(conf.conferenceDates.find(date => date.dateName === "Conference Dates")?.startDate)} - ${formatDate(conf.conferenceDates.find(date => date.dateName === "Conference Dates")?.endDate)}`
+                            : 'Dates not available'}
+                    </p>
                   </div>
                   </div>
                 </li>

@@ -53,40 +53,7 @@ export default function Setting() {
      ];
     // Updated exampleConferences to use ConferenceResponse type
     const exampleConferences: Conference[] = [
-      {
-        id: '1', // id is string
-        name: 'International Conference on Machine Learning',
-        acronym: 'ICML', // shortName to acronym
-        startDate: '2024-07-22',
-        endDate: '2024-07-26',
-        location: 'Vienna, Austria',
-        imageUrl: '/conference_image.png', // Replace with real URL
-        rank: 'A*',
-        topics: ['Machine Learning', 'Deep Learning', 'AI'],
-        type: 'offline',
-        category: 'Computer Science', // Added category
-        description: 'Leading conference in machine learning.', // Added description
-        link: 'https://icml.cc/', // Added link, example URL
-        sourceYear: '2024', // Added sourceYear
-        submissionDate: '2024-05-01', // Added submissionDate - example
-      },
-      {
-        id: '2', // id is string
-        name: 'Conference on Neural Information Processing Systems',
-        acronym: 'NeurIPS', // shortName to acronym
-        startDate: '2024-12-08',
-        endDate: '2024-12-14',
-        location: 'Vancouver, Canada',
-        imageUrl: '/conference_image.png', // Replace with real URL
-        rank: 'A*',
-        topics: ['Neural Networks', 'Computer Vision', 'Natural Language Processing'],
-        type: 'hybrid',
-        category: 'Artificial Intelligence', // Added category
-        description: 'Top conference for neural information processing.', // Added description
-        link: 'https://neurips.cc/', // Added link, example URL
-        sourceYear: '2024', // Added sourceYear
-        submissionDate: '2024-08-01', // Added submissionDate - example
-      },
+      
     ];
 
     const renderPage = () => {
