@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import EventJournalCard from './EventJournalCard';
 import Pagination from './Pagination';
 import { JournalResponse } from '../../../models/response/journal.response';
-import journalsList from '../../../models/data/journals-list.json'; // Import journals-list.json
+import journalsList from '../../../models/data/journals-list.json'; // Nhập journals-list.json
 
 interface ResultsJournalSectionProps {
     searchQuery: string;
@@ -27,9 +27,9 @@ interface ResultsJournalSectionProps {
 
 type JournalSortOption = 'title' | 'issn' | 'publisher' | 'language' | 'impactFactor' | 'citeScore' | 'sjr' | 'overallRank' | 'hIndex';
 
-type JournalEvent = JournalResponse;
+type JournalEvent = JournalResponse; // Cái này có vẻ không được sử dụng, hãy xem xét xóa.
 
-const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = ({ // Removed journalsData prop
+const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = ({
     searchQuery, selectedCountry, selectedPublicationType,
     selectedSubjectAreas, selectedQuartile, selectedOpenAccessTypes,
     selectedPublisher, selectedLanguage, selectedImpactFactor, selectedHIndex,
@@ -40,18 +40,9 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = ({ // Remove
     const journalsPerPage = 6;
     const [sortBy, setSortBy] = useState<JournalSortOption>('title');
 
-    useEffect(() => {
-        // Load journals data from journalsList.json on component mount
-        setJournals(journalsList as JournalResponse[]);
-    }, []); // Empty dependency array to run only once on mount
-
 
     useEffect(() => {
-        if (journals.length === 0) { // Use the local journals state now
-            return;
-        }
-
-        let filteredJournals = [...journals]; // Use local journals state for filtering
+        let filteredJournals = journalsList as JournalResponse[]; // Bắt đầu với danh sách đầy đủ
 
         if (searchQuery) {
             filteredJournals = filteredJournals.filter(journal =>
@@ -70,7 +61,6 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = ({ // Remove
                 journal.publicationType === selectedPublicationType
             );
         }
-
         if (selectedSubjectAreas && selectedSubjectAreas.length > 0) {
             filteredJournals = filteredJournals.filter(journal =>
                 journal.subjectAreas?.some(subject => selectedSubjectAreas.includes(subject.area))
@@ -107,7 +97,7 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = ({ // Remove
             );
         }
 
-        // Metric filters - Assuming metrics are string ranges like ">10", "<5", "5-10"
+        // Bộ lọc chỉ số
         const filterMetric = (metricValue: number | undefined, selectedValue: string | null): boolean => {
             if (!selectedValue || metricValue === undefined) return true;
             try {
@@ -127,35 +117,29 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = ({ // Remove
 
                 return journalNum === selectedNum;
             } catch (error) {
-                console.error("Error parsing metric value:", error);
-                return true;
+                console.error("Lỗi khi phân tích giá trị chỉ số:", error);
+                return true; // Hoặc xử lý lỗi một cách tốt hơn
             }
         };
-
 
         if (selectedImpactFactor) {
             filteredJournals = filteredJournals.filter(journal => filterMetric(journal.metrics?.impactFactor, selectedImpactFactor));
         }
-
         if (selectedHIndex) {
             filteredJournals = filteredJournals.filter(journal => filterMetric(journal.metrics?.hIndex, selectedHIndex));
         }
-
         if (selectedCiteScore) {
             filteredJournals = filteredJournals.filter(journal => filterMetric(journal.metrics?.citeScore, selectedCiteScore));
         }
-
         if (selectedSJR) {
             filteredJournals = filteredJournals.filter(journal => filterMetric(journal.metrics?.sjr, selectedSJR));
         }
-
         if (selectedOverallRank) {
             filteredJournals = filteredJournals.filter(journal => filterMetric(journal.metrics?.overallRank, selectedOverallRank));
         }
 
-
-        // Apply sorting
-        let sortedJournals = [...filteredJournals];
+        // Áp dụng sắp xếp
+        let sortedJournals = [...filteredJournals]; // Tạo một bản sao *trước khi* sắp xếp
         switch (sortBy) {
             case 'title':
                 sortedJournals.sort((a, b) => a.title.localeCompare(b.title));
@@ -185,13 +169,16 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = ({ // Remove
                 sortedJournals.sort((a, b) => (b.metrics?.hIndex || 0) - (a.metrics?.hIndex || 0));
                 break;
             default:
-                sortedJournals.sort((a, b) => a.title.localeCompare(b.title));
+                sortedJournals.sort((a, b) => a.title.localeCompare(b.title)); // Mặc định sắp xếp theo tiêu đề
                 break;
         }
 
-        setJournals(sortedJournals);
-        // setCurrentPage(1); // REMOVE THIS LINE - Do not reset page on filter/sort
-    }, [searchQuery, selectedCountry, selectedPublicationType, selectedSubjectAreas, selectedQuartile, selectedOpenAccessTypes, selectedPublisher, selectedLanguage, selectedImpactFactor, selectedHIndex, selectedCiteScore, selectedSJR, selectedOverallRank, selectedISSN, sortBy, journals]); // Added journals to dependency array as it's used for filtering
+        setJournals(sortedJournals);  // Cập nhật state với kết quả đã lọc và sắp xếp
+
+    }, [searchQuery, selectedCountry, selectedPublicationType, selectedSubjectAreas,
+        selectedQuartile, selectedOpenAccessTypes, selectedPublisher, selectedLanguage,
+        selectedImpactFactor, selectedHIndex, selectedCiteScore, selectedSJR,
+        selectedOverallRank, selectedISSN, sortBy]); // Mảng phụ thuộc đúng
 
     const indexOfLastJournal = currentPage * journalsPerPage;
     const indexOfFirstJournal = indexOfLastJournal - journalsPerPage;
@@ -201,21 +188,22 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = ({ // Remove
 
     const handleSortByChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSortBy(event.target.value as JournalSortOption);
+        // setCurrentPage(1); // Bạn *có thể* đặt lại về trang 1 khi thay đổi sắp xếp, nhưng thường thì trải nghiệm người dùng tốt hơn *không* làm như vậy.
     };
 
     if (loading) {
-        return <p>Loading journals...</p>;
+        return <p>Đang tải journals...</p>;
     }
 
     if (!journals || journals.length === 0) {
-        return <p>No journals found.</p>;
+        return <p>Không tìm thấy journal nào.</p>;
     }
 
     return (
         <div className="w-full pl-8">
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-semibold">
-                    Journal Results ({journals.length})
+                    Kết quả Journal ({journals.length})
                 </h2>
                 <div className="flex items-center rounded-md px-2 py-1">
                     <svg
@@ -230,20 +218,20 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = ({ // Remove
                             clipRule="evenodd"
                         />
                     </svg>
-                    <span className="text-sm mr-1">Sort by:</span>
+                    <span className="text-sm mr-1">Sắp xếp theo:</span>
                     <select
                         className="text-sm border rounded px-2 py-1 bg-transparent focus:outline-none"
                         value={sortBy}
                         onChange={handleSortByChange}
                     >
-                        <option value="title">Title</option>
+                        <option value="title">Tiêu đề</option>
                         <option value="issn">ISSN</option>
-                        <option value="publisher">Publisher</option>
-                        <option value="language">Language</option>
+                        <option value="publisher">Nhà xuất bản</option>
+                        <option value="language">Ngôn ngữ</option>
                         <option value="impactFactor">Impact Factor</option>
                         <option value="citeScore">CiteScore</option>
                         <option value="sjr">SJR</option>
-                        <option value="overallRank">Overall Rank</option>
+                        <option value="overallRank">Xếp hạng tổng thể</option>
                         <option value="hIndex">H-index</option>
                     </select>
                 </div>

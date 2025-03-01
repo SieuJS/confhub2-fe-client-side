@@ -7,6 +7,7 @@ import Dashboard from '../components/Dashboard';
 import SettingTab from '../components/SettingTab';
 import NotificationsTab from '../components/NotificationsTab';
 import FollowedTab from '../components/FollowedTab';
+import ProfileTab from '../components/ProfileTab';
 import NoteTab from '../components/NoteTab';
 import MyConferencesTab from '../components/MyConferencesTab';
 import { ConferenceResponse } from '../../../models/response/conference.response'; // Import ConferenceResponse
@@ -96,6 +97,7 @@ export default function Setting() {
             case 'Followed': return <FollowedTab conferences={exampleConferences} />;
             case 'Note': return <NoteTab />;
             case 'My Conferences': return <MyConferencesTab conferences={exampleConferences} />;
+            case 'Profile': return <ProfileTab />;
             default: return <Dashboard />;
         }
     };
@@ -107,6 +109,7 @@ export default function Setting() {
         { page: 'Note', label: t('Note') },
         { page: 'Notifications', label: t('Notifications') },
         { page: 'Setting', label: t('Setting') },
+        { page: 'Profile', label: t('Profile') },
     ];
 
 

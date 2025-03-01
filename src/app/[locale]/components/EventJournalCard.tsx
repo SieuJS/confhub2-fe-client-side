@@ -28,15 +28,25 @@ const EventJournalCard: React.FC<EventJournalCardProps> = ({ journal }) => {
       />
     </div>
 
-    
-    <Button
-      variant="primary"
-      size="medium"
-      rounded
-      className={`absolute bottom-4 right-4 w-32`} // Nút bấm
-    >
-      Submit
-    </Button>
+    <div className="absolute bottom-4 right-4"> {/* Thêm nút bấm */}
+
+      <Button
+        variant="primary"
+        size="small"
+        rounded
+        className={` px-3 py-1 mr-2`} // Nút bấm
+      >
+        Details
+      </Button>
+      <Button
+        variant="primary"
+        size="small"
+        rounded
+        className={` px-3 py-1`} // Nút bấm
+      >
+        Submit
+      </Button>
+    </div>
 
   </div>
   );

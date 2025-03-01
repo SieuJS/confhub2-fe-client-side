@@ -10,7 +10,7 @@ const ConferenceByTopic: React.FC = () => {
   const topicData = topicList as TopicData;
 
   const categories = Object.keys(topicData);
-  const [selectedCategory, setSelectedCategory] = React.useState<string>('Engineering'); // Default to Engineering
+  const [selectedCategory, setSelectedCategory] = React.useState<string>('Business And Economics'); // Default to Engineering
 
   const handleCategoryClick = (category: string) => {
     setSelectedCategory(category);
