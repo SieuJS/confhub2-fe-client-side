@@ -6,7 +6,8 @@ import { JournalResponse } from '../../../models/response/journal.response'; // 
 
 export const RecommendedJournals: React.FC = () => {
   // Get the first 5 journals from journalData (assuming they are "recently added" in the order of the JSON file)
-  const journals = (journalData as JournalResponse[]).slice(0, 5);
+  // Ensure journalData is cast to JournalResponse[] to match the expected type
+  const journals = (journalData as any[] as JournalResponse[]).slice(0, 5);
 
   return (
     <div className="container mx-auto py-8">
@@ -14,7 +15,7 @@ export const RecommendedJournals: React.FC = () => {
       <p className=" text-center mb-8 text-2xl">Explore recommended and recent journals</p>
       <div className="overflow-x-auto whitespace-nowrap flex justify-center items-start gap-4 pb-4">
         {journals.map((journal, index) => (
-          <JournalCard key={journal.id} journal={journal} />
+          <JournalCard key={index} journal={journal} />
         ))}
       </div>
     </div>
@@ -28,9 +29,9 @@ interface JournalCardProps {
 const JournalCard: React.FC<JournalCardProps> = ({
   journal,
 }) => {
-  // Extract category from subjectAreas, default to "General" if no subject areas
-  const category = journal.subjectAreas && journal.subjectAreas.length > 0
-    ? journal.subjectAreas[0].area
+  // Extract category from Subject Area and Category -> Topics, default to "General" if not available
+  const category = journal["Subject Area and Category"]?.Topics && journal["Subject Area and Category"].Topics.length > 0
+    ? journal["Subject Area and Category"].Topics[0]
     : 'General';
 
   return (
@@ -40,17 +41,16 @@ const JournalCard: React.FC<JournalCardProps> = ({
           {category}
         </div>
         <div className="relative w-full h-full">
-          <Image
-            src={journal.imageUrl || "https://via.placeholder.com/150/FFFFFF/808080?text=No+Image"}
-            alt={journal.title}
-            layout="fill"
-            objectFit="cover"
+          <img
+            src={journal.Image || "https://via.placeholder.com/150/FFFFFF/808080?text=No+Image"}
+            alt={journal.Title}
+            className="w-full h-full object-cover"
           />
         </div>
       </div>
-      <div className="p-4 ">
-        <h3 className="text-sm font-semibold mb-1 truncate">{journal.title}</h3>
-        <p className="text-xs">{journal.publisher}</p>
+      <div className="p-4">
+        <h3 className="text-sm font-semibold mb-1 truncate">{journal.Title}</h3>
+        <p className="text-xs truncate">{journal.Publisher}</p>
       </div>
 
     </div>

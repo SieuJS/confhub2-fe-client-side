@@ -2,183 +2,243 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { ConferenceResponse } from '../../../models/response/conference.response';
-import conferenceList from '../../../models/data/conferences-list.json';
+
+// Define the ConferenceDates type as provided
+export type ConferenceDates = {
+  startDate: string;
+  endDate: string;
+  dateName: string;
+};
+
+// Define the ConferenceResponse type as provided
+export type ConferenceResponse = {
+  id: string;
+  name: string;
+  acronym: string;
+  category: string;
+  topics: string[];
+  location: string;
+  type: string;
+  conferenceDates: ConferenceDates[];
+  imageUrl: string;
+  description: string;
+  rank: string;
+  sourceYear: string;
+  link: string;
+  likeCount: number;
+  followCount: number;
+};
+
+
+const conferenceList: any[] = require('../../../models/data/conferences-list.json'); // Import json data as any[] for flexible mapping
 
 type Conference = ConferenceResponse;
 
-// Use the first 5 conferences from conferenceList
-const conferencesData: Conference[] = conferenceList.slice(0, 7).map(conf => {
-    const conferenceDates = conf.conferenceDates && conf.conferenceDates.length > 0 ? conf.conferenceDates[0] : null;
-    return {
-        id: conf.id,
-        name: conf.name,
-        acronym: conf.acronym,
-        category: conf.category,
-        topics: conf.topics,
-        location: conf.location,
-        type: conf.type,
-        conferenceDates: conf.conferenceDates,
-        imageUrl: conf.imageUrl,
-        description: conf.description,
-        rank: conf.rank,
-        sourceYear: conf.sourceYear,
-        link: conf.link,
-    };
-}) as Conference[];
+const conferencesData: Conference[] = conferenceList.map(conf => {
+  // Assuming conferenceList.json data structure needs to be adapted to ConferenceResponse
+  // Adjust the mapping logic based on the actual structure of conferenceList.json and how it aligns with ConferenceResponse
+  const startDate = conf.startDate || ''; // Provide default values if startDate/endDate are missing or structured differently
+  const endDate = conf.endDate || '';
+
+  return {
+    id: conf.id,
+    name: conf.name,
+    acronym: conf.acronym,
+    category: conf.category,
+    topics: conf.topics || [], // Ensure topics is always an array, default to empty array if missing
+    location: conf.location,
+    type: conf.type,
+    conferenceDates: [{ startDate: startDate, endDate: endDate, dateName: 'Main Conference' }], // Wrap startDate and endDate in conferenceDates array. You might need to adjust 'dateName' or how you pick dates based on your data
+    imageUrl: conf.imageUrl,
+    description: conf.description,
+    rank: conf.rank,
+    sourceYear: conf.sourceYear,
+    link: conf.link,
+    likeCount: conf.likeCount || 0, // Default likeCount and followCount to 0 if missing
+    followCount: conf.followCount || 0,
+  } as Conference; // Explicitly cast to Conference to ensure type correctness
+});
 
 const PopularConferences: React.FC = () => {
-    const [activeDotIndex, setActiveDotIndex] = useState(0);
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
-    const numConferences = conferencesData.length; // Get number of conferences
+  const [currentIndex, setCurrentIndex] = useState(1);
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const autoScrollInterval = useRef<NodeJS.Timeout | null>(null);
+  const [direction, setDirection] = useState<'left' | 'right'>('right');
+  const transitionDuration = 500;
 
-    const formatDate = (dateString: string | undefined): string => {
-        if (!dateString) return 'N/A';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  const wrapIndex = (index: number) => {
+    return (index + conferencesData.length) % conferencesData.length;
+  };
+
+  const startAutoScroll = () => {
+    if (autoScrollInterval.current) {
+      clearInterval(autoScrollInterval.current);
+    }
+    autoScrollInterval.current = setInterval(() => {
+      scrollRight();
+    }, 3000);
+  };
+
+  const stopAutoScroll = () => {
+    if (autoScrollInterval.current) {
+      clearInterval(autoScrollInterval.current);
+      autoScrollInterval.current = null;
+    }
+  };
+
+  const scrollLeft = () => {
+    if (!scrollerRef.current) return;
+    setDirection('left');
+    const currentCards = scrollerRef.current.querySelectorAll('.card-active');
+    currentCards.forEach(card => card.classList.add('card-leaving'));
+    const newIndex = wrapIndex(currentIndex - 1);
+    setCurrentIndex(newIndex);
+    setTimeout(() => {
+      currentCards.forEach(card => card.classList.remove('card-leaving'));
+    }, transitionDuration);
+  };
+
+  const scrollRight = () => {
+    if (!scrollerRef.current) return;
+    setDirection('right');
+    const currentCards = scrollerRef.current.querySelectorAll('.card-active');
+    currentCards.forEach(card => card.classList.add('card-leaving'));
+    const newIndex = wrapIndex(currentIndex + 1);
+    setCurrentIndex(newIndex);
+    setTimeout(() => {
+      currentCards.forEach(card => card.classList.remove('card-leaving'));
+    }, transitionDuration);
+  };
+
+  useEffect(() => {
+    startAutoScroll();
+    return () => {
+      stopAutoScroll();
     };
+  }, [currentIndex]);
 
-    const scrollToCard = (index: number) => {
-        if (scrollContainerRef.current) {
-            const container = scrollContainerRef.current;
-            const cardWidth = 80 * 4;
-            const cardMargin = 8;
-            const cardTotalWidth = cardWidth + cardMargin;
-            const scrollPosition = index * cardTotalWidth - (container.offsetWidth / 2) + (cardWidth / 2);
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    stopAutoScroll();
+  };
 
-            container.scrollTo({
-                left: Math.max(0, scrollPosition),
-                behavior: 'smooth',
-            });
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    startAutoScroll();
+  };
+
+  const displayedCards = [
+    conferencesData[wrapIndex(currentIndex - 2)],
+    conferencesData[wrapIndex(currentIndex - 1)],
+    conferencesData[currentIndex],
+    conferencesData[wrapIndex(currentIndex + 1)],
+    conferencesData[wrapIndex(currentIndex + 2)],
+  ];
+
+  return (
+    <section id="organizers" className="m-6 px-8 pt-10">
+      <style jsx>{`
+        .card {
+          transition: transform ${transitionDuration}ms ease-in-out, opacity ${transitionDuration}ms ease-in-out;
+          position: absolute;
+          width: 80px;
+          opacity: 0;
+          transform: translateX(100%);
         }
-    };
 
-    const handleDotClick = (index: number) => {
-        setActiveDotIndex(index);
-        scrollToCard(index);
-    };
-
-    const handlePrevClick = () => {
-        const prevIndex = activeDotIndex > 0 ? activeDotIndex - 1 : numConferences - 1; // Loop to last if at first
-        setActiveDotIndex(prevIndex);
-        scrollToCard(prevIndex);
-    };
-
-    const handleNextClick = () => {
-        const nextIndex = activeDotIndex < numConferences - 1 ? activeDotIndex + 1 : 0; // Loop to first if at last
-        setActiveDotIndex(nextIndex);
-        scrollToCard(nextIndex);
-    };
-
-
-    useEffect(() => {
-        if (scrollContainerRef.current && activeDotIndex === 0) {
-            scrollToCard(0);
+        .card-active {
+          transform: translateX(0);
+          opacity: 1;
+          position: relative;
+          z-index: 10;
         }
-    }, [activeDotIndex]);
+        .card-leaving {
+          opacity: 0;
+          transform: translateX(${direction === 'left' ? '-100%' : '100%'});
+          z-index: 5;
+        }
+      `}</style>
+      <h1 className="text-2xl font-bold text-center mb-6">Popular Conferences</h1>
+      <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <button
+          onClick={scrollLeft}
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white bg-opacity-50 rounded-full p-2 hover:bg-opacity-75 focus:outline-none"
+        >
+          <img src="https://cdn-icons-png.flaticon.com/512/271/271220.png" alt="Left" className="w-4 h-4" />
+        </button>
+        <button
+          onClick={scrollRight}
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white bg-opacity-50 rounded-full p-2 hover:bg-opacity-75 focus:outline-none"
+        >
+          <img src="https://cdn-icons-png.flaticon.com/512/271/271228.png" alt="Right" className="w-4 h-4" />
+        </button>
+
+        <div id="organizer" className="flex overflow-x-hidden w-full justify-center" ref={scrollerRef}>
+          <div className="flex w-[calc(240px + 16px)] relative">
+            {displayedCards.map((conference, index) => {
+              const isActive = index >= 1 && index <= 3;
+              const relativeIndex = index - 2;
+              const position = `calc(${relativeIndex * (80 + 8)}px)`;
+
+              // Safely access conferenceDates and its first element
+              const conferenceDate = conference.conferenceDates && conference.conferenceDates.length > 0 ? conference.conferenceDates[0] : null;
+              const startDate = conferenceDate ? conferenceDate.startDate : 'TBD';
+              const endDate = conferenceDate ? conferenceDate.endDate : 'TBD';
 
 
-    return (
-        <section id="organizers" className="m-6 px-8 pt-10 relative"> {/* Make section relative for button positioning */}
-            <style jsx>{`
-                /* Hide scrollbar for Chrome, Safari and Opera */
-                #organizer::-webkit-scrollbar {
-                    display: none;
-                }
-
-                /* Hide scrollbar for Firefox */
-                #organizer {
-                    scrollbar-width: none; /* Firefox 67+ */
-                    -ms-overflow-style: none;  /* IE and Edge */
-                }
-            `}</style>
-
-            <h1 className="text-2xl font-bold text-center mb-6">Popular Conferences</h1>
-
-            <button
-                onClick={handlePrevClick}
-                aria-label="Previous Conferences"
-                className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 bg-background rounded-full shadow hover:bg-gray-100 focus:outline-none"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-6 w-6 text-gray-500">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                </svg>
-            </button>
-
-            <div
-                id="organizer"
-                className="flex overflow-x-scroll snap-x snap-mandatory -webkit-overflow-scrolling-touch justify-start"
-                ref={scrollContainerRef}
-            >
-                {conferencesData.map((conference, index) => {
-                    const isActive = index === activeDotIndex;
-                    return (
-                        <div
-                            key={index}
-                            className={`scroller-item snap-start flex-none w-80 h-[400px] bg-background rounded-lg border border-gray-200 text-center p-2 m-2 transition-all duration-200 cursor-pointer shadow-md
-                                        ${isActive ? 'scale-105 bg-gradient-to-r from-background to-background-secondary border-blue-500 border-2' : 'scale-95 hover:scale-100 hover:bg-gradient-to-r hover:from-background hover:to-background-secondary'}`}
-                        >
-                            <div className="flex flex-col w-full h-full justify-start items-stretch">
-                                <div className="relative w-full h-[200px]">
-                                    <Image
-                                        className="lazyloaded rounded-t-lg object-cover"
-                                        src={conference.imageUrl}
-                                        fill
-                                        alt={conference.name}
-                                        loading="lazy"
-                                        sizes="w-full"
-                                        style={{ objectFit: 'cover' }}
-                                    />
-                                </div>
-                                <div className="p-4 text-left">
-                                    <div className="font-bold text-base mb-2 overflow-hidden text-ellipsis whitespace-nowrap">{conference.name}</div>
-                                    <div className="text-sm  mb-1">
-                                        {conference.conferenceDates && conference.conferenceDates.length > 0 ? (
-                                            `${formatDate(conference.conferenceDates[0].startDate)} - ${formatDate(conference.conferenceDates[0].endDate)}`
-                                        ) : (
-                                            'Dates not available'
-                                        )}
-                                    </div>
-                                    <div className="text-sm  mb-1">{conference.location}</div>
-                                    <div className="text-sm  leading-tight">
-                                        <div className="font-bold mb-1">Topics:</div>
-                                        <ul className="list-none pl-0">
-                                            {conference.topics.map((topic, topicIndex) => (
-                                                <li key={topicIndex} className="inline-block mr-2 whitespace-nowrap">{topic}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
+              return (
+                <div
+                  key={conference.id ? conference.id : `empty-${index}`}
+                  className={`scroller-item snap-start flex-none w-80 h-[400px] bg-background rounded-lg border  text-center p-2 m-2 hover:bg-gradient-to-r hover:from-background hover:to-background-secondary transition-all duration-200 cursor-pointer scale-95 hover:scale-100
+                                      ${isActive ? 'card-active shadow-md' : 'card'}
+                                      card-index-${index}
+                                    `}
+                  style={{ left: position }}
+                >
+                  {isActive && (
+                    <div className="flex flex-col w-full h-full justify-start items-stretch">
+                      <div className="relative w-full h-[200px]">
+                        <Image
+                          className="lazyloaded rounded-t-lg object-cover"
+                          src={conference.imageUrl}
+                          fill
+                          alt={conference.name}
+                          loading="lazy"
+                          sizes="w-full"
+                          style={{ objectFit: 'cover' }}
+                        />
+                      </div>
+                      <div className="p-4 text-left">
+                        <div>ID: {conference.id}</div>
+                        <div className="font-bold text-base mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                          {conference.name}
                         </div>
-                    );
-                })}
-            </div>
-
-            <button
-                onClick={handleNextClick}
-                aria-label="Next Conferences"
-                className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 bg-background rounded-full shadow hover:bg-gray-100 focus:outline-none"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-6 w-6 text-gray-500">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                </svg>
-            </button>
-
-
-            {/* Pagination Dots */}
-            <div className="flex justify-center space-x-2 mt-4"> {/* Added mt-4 for spacing */}
-                {conferencesData.map((_, index) => (
-                    <button
-                        key={index}
-                        className={`h-3 w-3 rounded-full focus:outline-none ${activeDotIndex === index ? 'bg-blue-500' : 'bg-gray-400 hover:bg-gray-500'}`}
-                        onClick={() => handleDotClick(index)}
-                        aria-label={`Go to conference ${index + 1}`}
-                    />
-                ))}
-            </div>
-        </section>
-    );
+                        <div className="text-sm  mb-1">
+                          {startDate} - {endDate}
+                        </div>
+                        <div className="text-sm  mb-1">{conference.location}</div>
+                        <div className="text-sm  leading-tight">
+                          <div className="font-bold mb-1">Topics:</div>
+                          <ul className="list-none pl-0">
+                            {conference.topics.map((topic, topicIndex) => (
+                              <li key={topicIndex} className="inline-block mr-2 whitespace-nowrap">
+                                {topic}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 };
 
 export default PopularConferences;

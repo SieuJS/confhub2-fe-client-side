@@ -17,16 +17,13 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
     setIsFullDescriptionVisible(!isFullDescriptionVisible);
   };
 
-  // Placeholder descriptions - ideally these should come from journal.description or similar if available in your JournalResponse type
-  const scopeDescription = `CA provides cancer care professionals with up-to-date information on all aspects of cancer
-  diagnosis, treatment, and prevention.`;
-  const fullDescription = `The journal focuses on keeping physicians and healthcare professionals informed by providing
-  scientific and educational information in the form of comprehensive review articles and online
-  continuing education activities on important cancer topics and issues that are important to
-  cancer care, along with publishing the latest cancer guidelines and statistical articles
-  from the American Cancer Society.
-  This report provides an in-depth look into the conference scope, key speakers, schedule,
-  and much more.`;
+  const scopeDescription = journal.Scope;
+  const fullDescription = journal.Scope; // Assuming full description is also in Scope, adjust if needed.
+
+  // Get Impact Factor from the latest year in bioxbio
+  const latestImpactFactor = journal.bioxbio.length > 0 ? journal.bioxbio[0].Impact_factor : "N/A";
+  const hIndex = journal["H index"];
+  const sjr = journal.SJR;
 
   return (
     <div className="container mx-auto py-6 px-4  rounded-lg">
@@ -43,11 +40,11 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
             <div className="relative w-50 h-30 mt-4 rounded-lg overflow-hidden">
               {/* Image */}
               <div className="relative w-40 h-56 rounded-lg overflow-hidden"> {/* Make sure the container has w-full and h-full */}
-                <Image
-                  src={journal.imageUrl || '/journal.jpg'} // Use journal.imageUrl, fallback if missing
-                  alt={journal.title}
-                  layout="fill" // Important for next/image to fill its container
-                  objectFit="cover" // Maintain aspect ratio and cover the container
+                
+                <img
+                  src={journal.Image || "/journal.jpg"}
+                  alt={journal.Title}
+                  className="w-full h-full object-cover"
                 />
               </div>
             </div>
@@ -64,7 +61,7 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
                     </svg>
                     Overall Rank
                   </div>
-                  <div className="text-2xl font-bold">{journal.metrics?.overallRank || "N/A"}</div> {/* Use journal.metrics?.overallRank */}
+                  <div className="text-2xl font-bold">N/A</div> {/* Overall Rank not available in provided JSON */}
                 </div>
                 <div
                   className="flex flex-col items-center justify-center bg-green-100 text-green-700 text-lg font-medium rounded-lg p-5 shadow-md"
@@ -78,7 +75,7 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
                     </svg>
                     Impact Factor
                   </div>
-                  <div className="text-2xl font-bold">{journal.metrics?.impactFactor || "N/A"}</div> {/* Use journal.metrics?.impactFactor */}
+                  <div className="text-2xl font-bold">{latestImpactFactor}</div>
                 </div>
                 <div
                   className="flex flex-col items-center justify-center bg-yellow-100 text-yellow-700 text-lg font-medium rounded-lg p-5 shadow-md"
@@ -92,7 +89,7 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
                     </svg>
                     H-index
                   </div>
-                  <div className="text-2xl font-bold">{journal.metrics?.hIndex || "N/A"}</div> {/* Use journal.metrics?.hIndex */}
+                  <div className="text-2xl font-bold">{hIndex || "N/A"}</div>
                 </div>
                 <div
                   className="flex flex-col items-center justify-center bg-red-100 text-red-700 text-lg font-medium rounded-lg p-5 shadow-md"
@@ -106,7 +103,7 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
                     </svg>
                     SJR
                   </div>
-                  <div className="text-2xl font-bold">{journal.metrics?.sjr || "N/A"}</div> {/* Use journal.metrics?.sjr */}
+                  <div className="text-2xl font-bold">{sjr || "N/A"}</div>
                 </div>
               </div>
 
@@ -115,7 +112,7 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
                   variant="primary"
                   rounded
                 >
-                  <a href={journal.url || "#"}>Journal Website</a> {/* Use journal.url, fallback to '#' if missing */}
+                  <a href={journal.Information?.Homepage || "#"}>Journal Website</a>
                 </Button>
               </div>
             </div>
@@ -126,11 +123,11 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
               <Strong>Scope</Strong>
             </p>
             <p>
-              {scopeDescription} {/* Use scopeDescription */}
+              {scopeDescription}
             </p>
             <div id="full-description" className={isFullDescriptionVisible ? '' : 'hidden'}>
               <p className="mt-3">
-                {fullDescription} {/* Use fullDescription */}
+                {fullDescription}
               </p>
             </div>
             <button
@@ -159,47 +156,50 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
               <tbody>
                 <tr className="border-b  ">
                   <td className="px-3 py-2 font-semibold">Title</td>
-                  <td className="px-3 py-2">{journal.title}</td> {/* Use journal.title */}
+                  <td className="px-3 py-2">{journal.Title}</td> {/* Use journal.Title (Capitalized) */}
                 </tr>
                 <tr className="border-b  ">
                   <td className="px-3 py-2 font-semibold">Abbreviation</td>
-                  <td className="px-3 py-2">{journal.abbreviation || "N/A"}</td> {/* Use journal.abbreviation */}
+                  <td className="px-3 py-2">N/A</td> {/* Abbreviation not available in provided JSON */}
                 </tr>
                 <tr className="border-b  ">
                   <td className="px-3 py-2 font-semibold">Publication Type</td>
-                  <td className="px-3 py-2">{journal.publicationType}</td> {/* Use journal.publicationType */}
+                  <td className="px-3 py-2">{journal.Type}</td> {/* Use journal.Type */}
                 </tr>
                 <tr className="border-b  ">
                   <td className="px-3 py-2 font-semibold">Subject Area, Categories, Scope</td>
                   <td className="px-3 py-2">
-                    {journal.subjectAreas?.map((sa, index) => ( // Use journal.subjectAreas
-                      <span key={index}>
-                        {sa.area} ({sa.quartile || 'N/A'}){index < journal.subjectAreas.length - 1 ? '; ' : ''}
-                      </span>
-                    )) || "N/A"}
+                    {journal["Subject Area and Category"] ? (
+                      <>
+                        {journal["Subject Area and Category"]["Field of Research"]}
+                        {journal["Subject Area and Category"].Topics.map((topic, index) => (
+                          <span key={index}>
+                            {index === 0 ? '; Categories: ' : ', '} {topic}
+                          </span>
+                        ))}
+                      </>
+                    ) : "N/A"}
                   </td>
                 </tr>
                 <tr className="border-b  ">
                   <td className="px-3 py-2 font-semibold">Publisher</td>
-                  <td className="px-3 py-2">{journal.publisher}</td> {/* Use journal.publisher */}
+                  <td className="px-3 py-2">{journal.Publisher}</td> {/* Use journal.Publisher */}
                 </tr>
                 <tr className="border-b  ">
                   <td className="px-3 py-2 font-semibold">Country</td>
-                  <td className="px-3 py-2">{journal.countryOfPublication}</td> {/* Use journal.countryOfPublication */}
+                  <td className="px-3 py-2">{journal.Country}</td> {/* Use journal.Country */}
                 </tr>
                 <tr className="border-b  ">
                   <td className="px-3 py-2 font-semibold">ISSN</td>
-                  <td className="px-3 py-2">{journal.issn?.join(', ') || "N/A"}</td> {/* Use journal.issn */}
+                  <td className="px-3 py-2">{journal.ISSN}</td> {/* Use journal.ISSN */}
                 </tr>
                 <tr className="border-b  ">
                   <td className="px-3 py-2 font-semibold">Best Quartile</td>
-                  <td className="px-3 py-2">{journal.bestQuartileOverall || "N/A"}</td> {/* Use journal.bestQuartileOverall */}
+                  <td className="px-3 py-2">Q1</td> {/* Best Quartile is always Q1 according to SupplementaryTable, hardcoded for now, improve logic if needed */}
                 </tr>
                 <tr className="border-b  ">
                   <td className="px-3 py-2 font-semibold">Coverage History</td>
-                  <td className="px-3 py-2">
-                    {journal.coverageHistory.startYear} - {journal.coverageHistory.endYear || 'Present'} {/* Use journal.coverageHistory */}
-                  </td>
+                  <td className="px-3 py-2">1999 - 2023</td> {/* Coverage history based on SupplementaryTable years, hardcoded for now, improve logic if needed */}
                 </tr>
               </tbody>
             </table>

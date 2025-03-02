@@ -42,8 +42,8 @@ export default function DashboardPage() {
     <div className="">
       <Banner />
       <PopularConferences />
-      <ConferenceByCountry />
-      <ConferenceByTopic  />
+      {/* <ConferenceByCountry /> */}
+      {/* <ConferenceByTopic  /> */}
 
       {isVisibleButton && (
         <Button

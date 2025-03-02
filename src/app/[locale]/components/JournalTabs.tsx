@@ -50,16 +50,16 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
         setValue(newValue);
     };
 
-    // Placeholder descriptions - ideally these should come from journal.description or similar if available in your JournalResponse type
-    const scopeDescription = `CA provides cancer care professionals with up-to-date information on all aspects of cancer
-    diagnosis, treatment, and prevention.`;
-    const fullDescription = `The journal focuses on keeping physicians and healthcare professionals informed by providing
-    scientific and educational information in the form of comprehensive review articles and online
-    continuing education activities on important cancer topics and issues that are important to
-    cancer care, along with publishing the latest cancer guidelines and statistical articles
-    from the American Cancer Society.
-    This report provides an in-depth look into the conference scope, key speakers, schedule,
-    and much more.`; // You can replace these with actual data if available in your journal type
+    // Placeholder descriptions - no longer needed as we are using journal data
+    // const scopeDescription = `CA provides cancer care professionals with up-to-date information on all aspects of cancer
+    // diagnosis, treatment, and prevention.`;
+    // const fullDescription = `The journal focuses on keeping physicians and healthcare professionals informed by providing
+    // scientific and educational information in the form of comprehensive review articles and online
+    // continuing education activities on important cancer topics and issues that are important to
+    // cancer care, along with publishing the latest cancer guidelines and statistical articles
+    // from the American Cancer Society.
+    // This report provides an in-depth look into the conference scope, key speakers, schedule,
+    // and much more.`; // You can replace these with actual data if available in your journal type
 
 
     return (
@@ -106,17 +106,17 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                 <h2 className="text-3xl font-bold text-secondary mb-4">Overview</h2>
                 <p className=" text-lg">
                     {/* Use journal data for overview, if available */}
-                    {journal.publicationType === 'Journal' ? `${journal.title} is a leading academic journal.` : `${journal.title} is a significant publication.`}
-                    {scopeDescription} {/* You can replace scopeDescription with data from journal if you have scope info in JournalResponse */}
+                    {journal.Type === 'journal' ? `${journal.Title} is a leading academic journal.` : `${journal.Title} is a significant publication.`}
+                    {journal.Scope} {/* Using Scope from journal data */}
                 </p>
             </TabPanel>
 
             <TabPanel value={value} index={1}>
                 <h2 className="text-3xl font-bold text-secondary mb-4">Impact Factor</h2>
                 <p className=" text-lg">
-                    <strong>The Impact IF 2023</strong> of <strong>{journal.title}</strong> is
-                    <strong>{journal.metrics?.impactFactor || 'N/A'}</strong>,
-                    which is computed in <strong>2024</strong> as per its definition.
+                    <strong>The Impact IF {journal.bioxbio[0]?.Year}</strong> of <strong>{journal.Title}</strong> is
+                    <strong>{journal.bioxbio[0]?.Impact_factor || 'N/A'}</strong>,
+                    which is computed in <strong>{parseInt(journal.bioxbio[0]?.Year || '2023') + 1}</strong> as per its definition.
                     {/* ... rest of the Impact Factor tab content, you can dynamically update journal name and IF value here */}
                 </p>
                 <p className=" text-lg mt-4 mb-4">
@@ -137,14 +137,14 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                                 </tr>
                             </thead>
                             <tbody>
-                                {journal.metrics?.impactFactorHistory?.map((history, index) => ( // Use journal.metrics?.impactFactorHistory
+                                {journal.bioxbio?.map((history, index) => ( // Use journal.bioxbio
                                     <tr key={index} className="border-b  ">
-                                        <td className="px-6 py-2">{history.year}</td>
-                                        <td className="px-6 py-2">{history.impactFactor}</td>
+                                        <td className="px-6 py-2">{history.Year}</td>
+                                        <td className="px-6 py-2">{history.Impact_factor}</td>
                                     </tr>
                                 ))}
                                 {/* Fallback if no impact factor history */}
-                                {!journal.metrics?.impactFactorHistory && (
+                                {journal.bioxbio.length === 0 && (
                                     <tr>
                                         <td className="px-6 py-2" colSpan={2}>No Impact Factor History Available</td>
                                     </tr>
@@ -185,7 +185,7 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                     <div className="flex flex-col items-center">
                         <h2 className="text-3xl font-bold text-secondary mb-4">H-index</h2>
                         <p className=" text-lg mb-4">
-                            The H-index of this journal is <strong className="text-2xl">{journal.metrics?.hIndex || 'N/A'}</strong>. {/* Use journal.metrics?.hIndex */}
+                            The H-index of this journal is <strong className="text-2xl">{journal["H index"] || 'N/A'}</strong>. {/* Use journal["H index"] */}
                         </p>
                         <div className="w-full max-w-xs relative aspect-square"> {/* Container for Image with aspect ratio */}
                             <Image
@@ -224,7 +224,7 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                     <div className="flex flex-col items-center">
                         <h2 className="text-3xl font-bold text-secondary mb-4">SJR (Scimago Journal Ranking)</h2>
                         <p className=" text-lg mb-4">
-                            The SJR value of this journal is <strong className="text-2xl">{journal.metrics?.sjr || 'N/A'}</strong>. {/* Use journal.metrics?.sjr */}
+                            The SJR value of this journal is <strong className="text-2xl">{journal.SJR || 'N/A'}</strong>. {/* Use journal.SJR */}
                         </p>
                         <div className="w-full max-w-xs rounded-lg shadow-lg relative aspect-square"> {/* Container for Image with aspect ratio and styling */}
                             <Image
@@ -260,11 +260,18 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                 <h2 className="text-3xl font-bold text-secondary mb-4">Subject Area and Category</h2>
                 <p className=" text-lg">
                     {/* Display Subject Areas and Categories from journal data */}
-                    {journal.subjectAreas?.map((sa, index) => (
-                        <span key={index}>
-                            {sa.area} ({sa.quartile || 'N/A'}){index < journal.subjectAreas.length - 1 ? '; ' : ''}
-                        </span>
-                    )) || "No Subject Areas/Categories Available"}
+                    {journal["Subject Area and Category"] ? (
+                        <>
+                            <p className="mb-2"><strong>Field of Research:</strong> {journal["Subject Area and Category"]["Field of Research"]}</p>
+                            <p><strong>Categories:</strong>
+                            {journal["Subject Area and Category"].Topics.map((topic, index) => (
+                                <span key={index}>
+                                    {topic}{index < journal["Subject Area and Category"].Topics.length - 1 ? ', ' : ''}
+                                </span>
+                            ))}
+                            </p>
+                        </>
+                    ) : "No Subject Areas/Categories Available"}
                 </p>
             </TabPanel>
         </div>

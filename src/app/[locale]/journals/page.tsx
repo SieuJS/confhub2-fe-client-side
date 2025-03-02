@@ -65,11 +65,6 @@ export default function Journals() {
         setSelectedOverallRank(searchParams.overallRank || null);
         setSelectedISSN(searchParams.issn || null);
 
-        // Removed loading and journalsData state updates from handleSearch
-        // setLoading(true);
-        // setJournalsData(null);
-        // setJournalsData(journalsList as JournalResponse[]); // Directly use imported JSON data
-        // setLoading(false);
 
     };
 
@@ -82,7 +77,7 @@ export default function Journals() {
             />
             <div className="container mx-auto mt-8 px-4 ">
                 <ResultsJournalSection
-                    loading={loading} 
+                    loading={loading}
                     searchQuery={searchQuery}
                     selectedCountry={selectedCountry}
                     selectedPublicationType={selectedPublicationType}

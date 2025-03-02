@@ -12,19 +12,18 @@ const EventJournalCard: React.FC<EventJournalCardProps> = ({ journal }) => {
     <div className="rounded-lg shadow-md overflow-hidden bg-gradient-to-r from-background to-background-secondary flex flex-row-reverse relative"> {/* Horizontal flex container và đảo ngược hướng, Thêm relative */}
 
     <div className=" flex flex-col relative  w-2/3 px-2 py-4"> {/* Content container, chiếm 2/3 chiều rộng */}
-      <h3 className="text-lg font-semibold mb-1 text-left">{journal.title}</h3>
-      {journal.issn && (
-        <p className="text-sm text-left">ISSN: {journal.issn}</p>
+      <h3 className="text-lg font-semibold mb-1 text-left">{journal.Title}</h3> {/* Use journal.Title */}
+      {journal.ISSN && (
+        <p className="text-sm text-left">ISSN: {journal.ISSN}</p>
       )}
     </div>
 
     <div className="flex h-60 w-1/3 relative"> {/* Image container, chiếm 1/3 chiều rộng */}
-      <Image
-        src={journal.imageUrl || '/default-journal.jpg'}
-        alt={journal.title}
-        fill={true}
-        style={{ objectFit: 'cover', position: 'absolute' }}
-        className="rounded-lg"
+      <img
+      src={journal.Image || '/default-journal.jpg'}
+      alt={journal.Title}
+      style={{ objectFit: 'cover', position: 'absolute', width: '100%', height: '100%' }}
+      className="rounded-lg"
       />
     </div>
 

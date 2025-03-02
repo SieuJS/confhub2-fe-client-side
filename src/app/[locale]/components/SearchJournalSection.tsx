@@ -51,7 +51,7 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({ onSearch })
   const [selectedISSN, setSelectedISSN] = useState<string | null>(null);
 
   const availableCountries = ['United States', 'United Kingdom', 'Germany', 'Vietnam', 'Japan', 'China', 'France', 'Canada', 'Australia']; // Ví dụ danh sách quốc gia
-  const availablePublicationTypes = ['Journal', 'Conference Proceedings', 'Book Series'];
+  const availablePublicationTypes = ['journal', 'Conference Proceedings', 'Book Series']; // Use lowercase 'journal' to match JournalResponse "Type"
 
   const handleKeywordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setJournalKeyword(event.target.value);

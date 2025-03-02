@@ -46,63 +46,69 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = ({
 
         if (searchQuery) {
             filteredJournals = filteredJournals.filter(journal =>
-                journal.title.toLowerCase().includes(searchQuery.toLowerCase())
+                journal.Title.toLowerCase().includes(searchQuery.toLowerCase()) // Use journal.Title
             );
         }
 
         if (selectedCountry) {
             filteredJournals = filteredJournals.filter(journal =>
-                journal.countryOfPublication === selectedCountry
+                journal.Country === selectedCountry // Use journal.Country
             );
         }
 
         if (selectedPublicationType) {
             filteredJournals = filteredJournals.filter(journal =>
-                journal.publicationType === selectedPublicationType
+                journal.Type === selectedPublicationType // Use journal.Type
             );
         }
         if (selectedSubjectAreas && selectedSubjectAreas.length > 0) {
             filteredJournals = filteredJournals.filter(journal =>
-                journal.subjectAreas?.some(subject => selectedSubjectAreas.includes(subject.area))
+                journal["Subject Area and Category"]?.Topics?.some(topic => selectedSubjectAreas.includes(topic)) // Use journal["Subject Area and Category"]?.Topics
             );
         }
 
         if (selectedQuartile) {
             filteredJournals = filteredJournals.filter(journal =>
-                journal.bestQuartileOverall === selectedQuartile
+                // bestQuartileOverall is not directly available in JournalResponse, you might need to adjust based on your data source
+                // Assuming Quartile information is in SupplementaryTable, but filtering directly by quartile might not be straightforward
+                // For now, this filter might not work as expected without further logic to derive quartile from JournalResponse
+                journal.SupplementaryTable?.some(item => item.Quartile === selectedQuartile) // Example: Check if ANY SupplementaryTable entry matches selected Quartile
             );
         }
 
         if (selectedOpenAccessTypes && selectedOpenAccessTypes.length > 0) {
             filteredJournals = filteredJournals.filter(journal =>
-                journal.openAccessType && selectedOpenAccessTypes.includes(journal.openAccessType)
+                // openAccessType is not directly available in JournalResponse, you might need to adjust based on your data source
+                // This filter might need to be adjusted or removed based on your JournalResponse structure
+                false // Placeholder: Open Access Type filtering not directly applicable with provided JournalResponse
             );
         }
 
         if (selectedPublisher) {
             filteredJournals = filteredJournals.filter(journal =>
-                journal.publisher === selectedPublisher
+                journal.Publisher === selectedPublisher // Use journal.Publisher
             );
         }
 
         if (selectedLanguage) {
             filteredJournals = filteredJournals.filter(journal =>
-                journal.language === selectedLanguage
+                // Language is not directly available in JournalResponse, you might need to adjust based on your data source
+                false // Placeholder: Language filtering not directly applicable with provided JournalResponse
             );
         }
 
         if (selectedISSN) {
             filteredJournals = filteredJournals.filter(journal =>
-                journal.issn.some(issn => issn === selectedISSN)
+                journal.ISSN.includes(selectedISSN) // Use journal.ISSN.includes
             );
         }
 
-        // Bộ lọc chỉ số
-        const filterMetric = (metricValue: number | undefined, selectedValue: string | null): boolean => {
+        // Bộ lọc chỉ số - Adjust metric filtering to use properties from JournalResponse
+        const filterMetric = (metricValue: string | undefined, selectedValue: string | null): boolean => { // Metric values are strings in JournalResponse
             if (!selectedValue || metricValue === undefined) return true;
             try {
                 const selectedNum = parseFloat(selectedValue.replace(/[^0-9.-]/g, ''));
-                const journalNum = metricValue;
+                const journalNum = parseFloat(metricValue.replace(/[^0-9.-]/g, '')); // Parse metricValue string to number
 
                 if (selectedValue.startsWith(">=")) return journalNum >= selectedNum;
                 if (selectedValue.startsWith(">")) return journalNum > selectedNum;
@@ -123,53 +129,67 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = ({
         };
 
         if (selectedImpactFactor) {
-            filteredJournals = filteredJournals.filter(journal => filterMetric(journal.metrics?.impactFactor, selectedImpactFactor));
+            filteredJournals = filteredJournals.filter(journal => filterMetric(journal.bioxbio[0]?.Impact_factor, selectedImpactFactor)); // Use bioxbio[0]?.Impact_factor
         }
         if (selectedHIndex) {
-            filteredJournals = filteredJournals.filter(journal => filterMetric(journal.metrics?.hIndex, selectedHIndex));
+            filteredJournals = filteredJournals.filter(journal => filterMetric(journal["H index"], selectedHIndex)); // Use journal["H index"]
         }
         if (selectedCiteScore) {
-            filteredJournals = filteredJournals.filter(journal => filterMetric(journal.metrics?.citeScore, selectedCiteScore));
+            // CiteScore is not directly available in JournalResponse, filter might not be applicable
+            // filteredJournals = filteredJournals.filter(journal => filterMetric(journal.metrics?.citeScore, selectedCiteScore));
         }
         if (selectedSJR) {
-            filteredJournals = filteredJournals.filter(journal => filterMetric(journal.metrics?.sjr, selectedSJR));
+            filteredJournals = filteredJournals.filter(journal => filterMetric(journal.SJR, selectedSJR)); // Use journal.SJR
         }
         if (selectedOverallRank) {
-            filteredJournals = filteredJournals.filter(journal => filterMetric(journal.metrics?.overallRank, selectedOverallRank));
+            // OverallRank is not directly available in JournalResponse, filter might not be applicable
+            // filteredJournals = filteredJournals.filter(journal => filterMetric(journal.metrics?.overallRank, selectedOverallRank));
         }
 
         // Áp dụng sắp xếp
         let sortedJournals = [...filteredJournals]; // Tạo một bản sao *trước khi* sắp xếp
         switch (sortBy) {
             case 'title':
-                sortedJournals.sort((a, b) => a.title.localeCompare(b.title));
+                sortedJournals.sort((a, b) => a.Title.localeCompare(b.Title)); // Use journal.Title
                 break;
             case 'issn':
-                sortedJournals.sort((a, b) => (a.issn?.[0] || '').localeCompare(b.issn?.[0] || ''));
+                sortedJournals.sort((a, b) => (a.ISSN || '').localeCompare(b.ISSN || '')); // Use journal.ISSN
                 break;
             case 'publisher':
-                sortedJournals.sort((a, b) => (a.publisher || '').localeCompare(b.publisher || ''));
+                sortedJournals.sort((a, b) => (a.Publisher || '').localeCompare(b.Publisher || '')); // Use journal.Publisher
                 break;
             case 'language':
-                sortedJournals.sort((a, b) => (a.language || '').localeCompare(b.language || ''));
+                // Language is not directly available, sorting by language is not applicable
                 break;
             case 'impactFactor':
-                sortedJournals.sort((a, b) => (b.metrics?.impactFactor || 0) - (a.metrics?.impactFactor || 0));
+                sortedJournals.sort((a, b) => { // Sort by latest Impact Factor
+                    const impactFactorA = parseFloat(a.bioxbio[0]?.Impact_factor || '0');
+                    const impactFactorB = parseFloat(b.bioxbio[0]?.Impact_factor || '0');
+                    return impactFactorB - impactFactorA;
+                });
                 break;
             case 'citeScore':
-                sortedJournals.sort((a, b) => (b.metrics?.citeScore || 0) - (a.metrics?.citeScore || 0));
+                // CiteScore is not directly available, sorting by CiteScore is not applicable
                 break;
             case 'sjr':
-                sortedJournals.sort((a, b) => (b.metrics?.sjr || 0) - (a.metrics?.sjr || 0));
+                sortedJournals.sort((a, b) => { // Sort by SJR
+                    const sjrA = parseFloat(a.SJR?.replace(/[^0-9.-]/g, '') || '0');
+                    const sjrB = parseFloat(b.SJR?.replace(/[^0-9.-]/g, '') || '0');
+                    return sjrB - sjrA;
+                });
                 break;
             case 'overallRank':
-                sortedJournals.sort((a, b) => (a.metrics?.overallRank || Infinity) - (b.metrics?.overallRank || Infinity));
+                // OverallRank is not directly available, sorting by OverallRank is not applicable
                 break;
             case 'hIndex':
-                sortedJournals.sort((a, b) => (b.metrics?.hIndex || 0) - (a.metrics?.hIndex || 0));
+                sortedJournals.sort((a, b) => { // Sort by H-index
+                    const hIndexA = parseFloat(a["H index"] || '0');
+                    const hIndexB = parseFloat(b["H index"] || '0');
+                    return hIndexB - hIndexA;
+                });
                 break;
             default:
-                sortedJournals.sort((a, b) => a.title.localeCompare(b.title)); // Mặc định sắp xếp theo tiêu đề
+                sortedJournals.sort((a, b) => a.Title.localeCompare(b.Title)); // Mặc định sắp xếp theo tiêu đề // Use journal.Title
                 break;
         }
 
@@ -227,11 +247,12 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = ({
                         <option value="title">Tiêu đề</option>
                         <option value="issn">ISSN</option>
                         <option value="publisher">Nhà xuất bản</option>
-                        <option value="language">Ngôn ngữ</option>
+                        {/* Language and other metrics might not be directly filterable/sortable based on provided JournalResponse */}
+                        {/* <option value="language">Ngôn ngữ</option> */}
                         <option value="impactFactor">Impact Factor</option>
-                        <option value="citeScore">CiteScore</option>
+                        {/* <option value="citeScore">CiteScore</option> */}
                         <option value="sjr">SJR</option>
-                        <option value="overallRank">Xếp hạng tổng thể</option>
+                        {/* <option value="overallRank">Xếp hạng tổng thể</option> */}
                         <option value="hIndex">H-index</option>
                     </select>
                 </div>
@@ -239,7 +260,7 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {currentJournals.map((journal) => (
-                    <EventJournalCard key={journal.id} journal={journal} />
+                    <EventJournalCard key={journal.Title} journal={journal} /> 
                 ))}
             </div>
 
