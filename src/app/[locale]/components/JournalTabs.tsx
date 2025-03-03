@@ -1,117 +1,95 @@
 "use client";
 
 // components/JournalTabs.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react'; // Import useRef
 import Image from 'next/image'; // Import the Image component from next/image
 import { JournalResponse } from '../../../models/response/journal.response'; // Import JournalResponse
-
-interface TabPanelProps {
-    children?: React.ReactNode;
-    index: any;
-    value: any;
-}
-
-function TabPanel(props: TabPanelProps) {
-    const { children, value, index, ...other } = props;
-
-    return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`simple-tabpanel-${index}`}
-            aria-labelledby={`simple-tab-${index}`}
-            {...other}
-        >
-            {value === index && (
-                <div className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg">
-                    {children}
-                </div>
-            )}
-        </div>
-    );
-}
-
-
-function a11yProps(index: number) {
-    return {
-        id: `simple-tab-${index}`,
-        'aria-controls': `simple-tabpanel-${index}`,
-    };
-}
 
 interface JournalTabsProps {
     journal: JournalResponse; // Define the journal prop
 }
 
 export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Update component signature to accept props
-    const [value, setValue] = React.useState(0);
+    const navRef = useRef<HTMLElement>(null); // Create a ref for the nav element
 
-    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-        setValue(newValue);
-    };
+    useEffect(() => {
+        const handleAnchorClick = (event: Event) => {
+            event.preventDefault(); // Prevent default anchor behavior
+            const target = event.target as HTMLAnchorElement;
+            const targetId = target.getAttribute('href')?.substring(1); // Remove the '#'
+            if (targetId) {
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    const navElement = navRef.current; // Use navRef.current here
+                    const navHeight = navElement ? navElement.offsetHeight : 0; // Get nav height, default to 0 if not found
+                    const offset = 100;
+                    const targetPosition = targetSection.offsetTop - navHeight - offset; // Calculate scroll position with offset
 
-    // Placeholder descriptions - no longer needed as we are using journal data
-    // const scopeDescription = `CA provides cancer care professionals with up-to-date information on all aspects of cancer
-    // diagnosis, treatment, and prevention.`;
-    // const fullDescription = `The journal focuses on keeping physicians and healthcare professionals informed by providing
-    // scientific and educational information in the form of comprehensive review articles and online
-    // continuing education activities on important cancer topics and issues that are important to
-    // cancer care, along with publishing the latest cancer guidelines and statistical articles
-    // from the American Cancer Society.
-    // This report provides an in-depth look into the conference scope, key speakers, schedule,
-    // and much more.`; // You can replace these with actual data if available in your journal type
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth',
+                    });
+                }
+            }
+        };
 
+        const navLinks = navRef.current?.querySelectorAll('a') || []; // Use navRef.current to query only within this nav
+        navLinks.forEach(link => {
+            link.addEventListener('click', handleAnchorClick);
+        });
+
+        return () => { // Cleanup event listeners when component unmounts
+            navLinks.forEach(link => {
+                link.removeEventListener('click', handleAnchorClick);
+            });
+        };
+    }, []); // Empty dependency array ensures this effect runs only once after initial render
 
     return (
-        <div className="container mx-auto mt-4 py-2 px-4  rounded-lg">
-            <nav className="flex overflow-x-auto mt-1 whitespace-nowrap relative text-lg">
-                <button
-                    className={`nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10 ${value === 0 ? 'active-tab' : ''}`}
-                    onClick={(event) => handleChange(event, 0)}
-                    {...a11yProps(0)}
+        <div className="container mx-auto py-6 rounded-lg md:flex-row " style={{ scrollBehavior: 'smooth' }}>
+            <nav ref={navRef} className="sticky top-24 bg-gradient-to-r from-background to-background-secondary shadow-md z-20 flex overflow-x-auto mt-1 whitespace-nowrap p-3 text-lg">
+                <a
+                    href="#overview"
+                    className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
                 >
                     Overview
-                </button>
-                <button
-                    className={`nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10 ${value === 1 ? 'active-tab' : ''}`}
-                    onClick={(event) => handleChange(event, 1)}
-                    {...a11yProps(1)}
+                </a>
+                <a
+                    href="#impact-factor"
+                    className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
                 >
                     Impact Factor
-                </button>
-                <button
-                    className={`nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10 ${value === 2 ? 'active-tab' : ''}`}
-                    onClick={(event) => handleChange(event, 2)}
-                    {...a11yProps(2)}
+                </a>
+                <a
+                    href="#h-index"
+                    className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
                     >
                     H-index
-                </button>
-                <button
-                    className={`nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10 ${value === 3 ? 'active-tab' : ''}`}
-                    onClick={(event) => handleChange(event, 3)}
-                    {...a11yProps(3)}
+                </a>
+                <a
+                    href="#sjr"
+                    className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
                 >
                     SJR
-                </button>
-                <button
-                    className={`nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10 ${value === 4 ? 'active-tab' : ''}`}
-                    onClick={(event) => handleChange(event, 4)}
-                    {...a11yProps(4)}
+                </a>
+                <a
+                    href="#subject-area-category"
+                    className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
                 >
                     Subject Area and Category
-                </button>
+                </a>
             </nav>
 
-            <TabPanel value={value} index={0}>
+            <section id="overview" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <h2 className="text-3xl font-bold text-secondary mb-4">Overview</h2>
                 <p className=" text-lg">
                     {/* Use journal data for overview, if available */}
                     {journal.Type === 'journal' ? `${journal.Title} is a leading academic journal.` : `${journal.Title} is a significant publication.`}
                     {journal.Scope} {/* Using Scope from journal data */}
                 </p>
-            </TabPanel>
+            </section>
 
-            <TabPanel value={value} index={1}>
+            <section id="impact-factor" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <h2 className="text-3xl font-bold text-secondary mb-4">Impact Factor</h2>
                 <p className=" text-lg">
                     <strong>The Impact IF {journal.bioxbio[0]?.Year}</strong> of <strong>{journal.Title}</strong> is
@@ -177,9 +155,9 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                         </p>
                     </div>
                 </div>
-            </TabPanel>
+            </section>
 
-            <TabPanel value={value} index={2}>
+            <section id="h-index" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Left Column: H-index Value and Image */}
                     <div className="flex flex-col items-center">
@@ -216,9 +194,9 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                         </p>
                     </div>
                 </div>
-            </TabPanel>
+            </section>
 
-            <TabPanel value={value} index={3}>
+            <section id="sjr" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Left Column: SJR Value and Image */}
                     <div className="flex flex-col items-center">
@@ -254,9 +232,9 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                         </p>
                     </div>
                 </div>
-            </TabPanel>
+            </section>
 
-            <TabPanel value={value} index={4}>
+            <section id="subject-area-category" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <h2 className="text-3xl font-bold text-secondary mb-4">Subject Area and Category</h2>
                 <p className=" text-lg">
                     {/* Display Subject Areas and Categories from journal data */}
@@ -273,7 +251,7 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                         </>
                     ) : "No Subject Areas/Categories Available"}
                 </p>
-            </TabPanel>
+            </section>
         </div>
     );
 };

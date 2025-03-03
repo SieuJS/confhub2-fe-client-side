@@ -467,46 +467,12 @@ export default function About() {
         </table>
           </section>
 
-          {/* Other Conferences in right column */}
-          <section className="mt-8 overflow-x-auto relative bg-gradient-to-r from-background to-background-secondary p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold text-left mb-4">{t('Other Conferences')}</h3>
-            <ul>
-              {otherConferencesData.map((conf) => (
-                <li key={conf.id} className="mb-4    hover:cursor-pointer rounded-md"> {/* Hover effect and cursor */}
-                  <div className="flex items-start">
-                    <div className="flex justify-center mr-4 w-20 h-16 relative">
-                    <Image
-                    src={conf.imageUrl}
-                    alt={conf.name}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    className="rounded-md"
-                    />
-                    </div>
-                  <div>
-                    <h4 className="font-semibold text-left">{conf.acronym}</h4> {/* shortName to acronym */}
-                    <p className="text-sm text-left">
-                        {conf.conferenceDates.find(date => date.dateName === "Conference Dates") ? // Find Conference Dates
-                            `${formatDate(conf.conferenceDates.find(date => date.dateName === "Conference Dates")?.startDate)} - ${formatDate(conf.conferenceDates.find(date => date.dateName === "Conference Dates")?.endDate)}`
-                            : 'Dates not available'}
-                    </p>
-                  </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <p className="text-center mt-4">
-              <a href="" className=" hover:underline">
-                {t('View All Conferences')}
-              </a>
-            </p>
-          </section>
+          
         </div>
       </div>
 
       <ConferenceTabs conference={conferenceData} />
-
-      <ConferenceFeedback onSubmitFeedback={handleFeedbackSubmit} />
+      <ConferenceFeedback/>
     </div>
   )
 }

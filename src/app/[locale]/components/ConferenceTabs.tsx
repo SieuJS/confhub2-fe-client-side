@@ -1,130 +1,116 @@
 "use client";
 
-// components/JournalTabs.tsx
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image'; // Import the Image component from next/image
-import { ConferenceResponse } from '../../../models/response/conference.response'; // Import JournalResponse
+// components/ConferenceTabs.tsx
+import React, { useEffect, useRef } from 'react';
+import Image from 'next/image';
+import { ConferenceResponse } from '../../../models/response/conference.response';
 import Map from './Map';
 
-interface TabPanelProps {
-    children?: React.ReactNode;
-    index: any;
-    value: any;
-}
-
-function TabPanel(props: TabPanelProps) {
-    const { children, value, index, ...other } = props;
-
-    return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`simple-tabpanel-${index}`}
-            aria-labelledby={`simple-tab-${index}`}
-            {...other}
-        >
-            {value === index && (
-                <div className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg">
-                    {children}
-                </div>
-            )}
-        </div>
-    );
-}
-
-function a11yProps(index: number) {
-  return {
-      id: `simple-tab-${index}`,
-      'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
-
 interface ConferenceTabsProps {
-    conference: ConferenceResponse; // Define the Conference prop
+    conference: ConferenceResponse;
 }
 
-export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) => { // Update component signature to accept props
-    const [value, setValue] = React.useState(0);
+export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) => {
+    const navRef = useRef<HTMLElement>(null); // Create a ref for the nav element
 
-    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-        setValue(newValue);
-    };
+    useEffect(() => {
+        const handleAnchorClick = (event: Event) => {
+            event.preventDefault(); // Prevent default anchor behavior
+            const target = event.target as HTMLAnchorElement;
+            const targetId = target.getAttribute('href')?.substring(1); // Remove the '#'
+            if (targetId) {
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    const navElement = navRef.current; // Use navRef.current here
+                    const navHeight = navElement ? navElement.offsetHeight : 0;
+                    const offset = 100;
+                    const targetPosition = targetSection.offsetTop - navHeight - offset;
+
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth',
+                    });
+                }
+            }
+        };
+
+        const navLinks = navRef.current?.querySelectorAll('a') || []; // Use navRef.current to query only within this nav
+        navLinks.forEach(link => {
+            link.addEventListener('click', handleAnchorClick);
+        });
+
+        return () => {
+            navLinks.forEach(link => {
+                link.removeEventListener('click', handleAnchorClick);
+            });
+        };
+    }, []); // Empty dependency array ensures this effect runs only once after initial render
 
 
     return (
-        <div className="container mx-auto py-6 px-4 rounded-lg md:flex-row gap-6">
-            <nav className="flex overflow-x-auto mt-1 whitespace-nowrap relative text-lg">
-                <button
-                    className={`nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10 ${value === 0 ? 'active-tab' : ''}`}
-                    onClick={(event) => handleChange(event, 0)}
-                    {...a11yProps(0)}
+        <div className="container mx-auto py-6 rounded-lg md:flex-row " style={{ scrollBehavior: 'smooth' }}>
+            <nav ref={navRef} className="sticky top-24 bg-gradient-to-r from-background to-background-secondary shadow-md z-20 flex overflow-x-auto mt-1 whitespace-nowrap p-3 text-lg">
+                <a
+                    href="#overview"
+                    className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
                 >
                     Overview
-                </button>
-                <button
-                    className={`nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10 ${value === 1 ? 'active-tab' : ''}`}
-                    onClick={(event) => handleChange(event, 1)}
-                    {...a11yProps(1)}
+                </a>
+                <a
+                    href="#important-date"
+                    className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
                 >
                     Important Date
-                </button>
-                <button
-                    className={`nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10 ${value === 2 ? 'active-tab' : ''}`}
-                    onClick={(event) => handleChange(event, 2)}
-                    {...a11yProps(2)}
+                </a>
+                <a
+                    href="#call-for-paper"
+                    className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
                     >
                     Call for paper
-                </button>
-                <button
-                    className={`nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10 ${value === 3 ? 'active-tab' : ''}`}
-                    onClick={(event) => handleChange(event, 3)}
-                    {...a11yProps(3)}
+                </a>
+                <a
+                    href="#category-topics"
+                    className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
                 >
                     Category and Topics
-                </button>
-                <button
-                    className={`nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10 ${value === 4 ? 'active-tab' : ''}`}
-                    onClick={(event) => handleChange(event, 4)}
-                    {...a11yProps(4)}
+                </a>
+                <a
+                    href="#subject-area-category"
+                    className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
                 >
                     Subject Area and Category
-                </button>
-                <button
-                    className={`nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10 ${value === 4 ? 'active-tab' : ''}`}
-                    onClick={(event) => handleChange(event, 5)}
-                    {...a11yProps(4)}
+                </a>
+                <a
+                    href="#maps"
+                    className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
                 >
                     Maps
-                </button>
-                <button
-                    className={`nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10 ${value === 4 ? 'active-tab' : ''}`}
-                    onClick={(event) => handleChange(event, 6)}
-                    {...a11yProps(4)}
+                </a>
+                <a
+                    href="#source"
+                    className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
                 >
                     Source
-                </button>
+                </a>
             </nav>
 
-            <TabPanel value={value} index={0}>
+            <section id="overview" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <h2 className="text-3xl font-bold text-secondary mb-4">Overview</h2>
                 <p className=" text-lg">
-                    {/* Use conference description for overview, if available */}
-                    
-                    {conference.description} {/* You can replace scopeDescription with data from journal if you have scope info in JournalResponse */}
+                    {conference.description}
                 </p>
-            </TabPanel>
+            </section>
 
-            <TabPanel value={value} index={1}>
+            <section id="important-date" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <h2 className="text-3xl font-bold text-secondary mb-4">Important Date</h2>
                 <p className=" text-lg">
                     Stay up-to-date with essential deadlines for the conference.
                 </p>
                 <p className=" text-lg mt-4 mb-4">
-                    
+
                 </p>
 
-                <div className="grid md:grid-cols-1 gap-6 p-6 bg-background shadow-md rounded-lg">
-                    {/* Left Column: Table */}
+                <div className="grid md:grid-cols-1 gap-6 ">
                     <div>
                         <table className="w-full text-lg text-left  border-collapse">
                             <thead className="text-lg  ">
@@ -140,41 +126,29 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
                                         <td className="px-6 py-2">{date.startDate}{date.endDate ? ` - ${date.endDate}` : ''}</td>
                                       </tr>
                                     ))}
-                                    
-
-                                {/* Fallback if no impact factor history */}
-                                {/* {!journal.metrics?.impactFactorHistory && (
-                                    <tr>
-                                        <td className="px-6 py-2" colSpan={2}>No Impact Factor History Available</td>
-                                    </tr>
-                                )} */}
                             </tbody>
                         </table>
                     </div>
-
-                    
                 </div>
-            </TabPanel>
+            </section>
 
-            <TabPanel value={value} index={2}>
+            <section id="call-for-paper" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Left Column: H-index Value and Image */}
                     <div className="flex flex-col items-center">
                         <h2 className="text-3xl font-bold text-secondary mb-4">Call for paper</h2>
                         <p className=" text-lg mb-4">
-                            The H-index of this journal is <strong className="text-2xl"></strong>. {/* Use journal.metrics?.hIndex */}
+                            The H-index of this journal is <strong className="text-2xl"></strong>.
                         </p>
-                        <div className="w-full max-w-xs relative aspect-square"> {/* Container for Image with aspect ratio */}
+                        <div className="w-full max-w-xs relative aspect-square">
                             <Image
-                                src="/Hindex.png" // Use local image or provide a valid URL
+                                src="/Hindex.png"
                                 alt="H-index Illustration"
                                 layout="fill"
-                                objectFit="contain" // Use 'contain' to fit image within bounds without cropping
+                                objectFit="contain"
                             />
                         </div>
                     </div>
 
-                    {/* Right Column: Description of H-index */}
                     <div className="">
                         <h2 className="text-2xl font-bold text-secondary mb-4">What is H-index?</h2>
                         <p className="text-lg mb-4">
@@ -193,17 +167,16 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
                         </p>
                     </div>
                 </div>
-            </TabPanel>
+            </section>
 
-            <TabPanel value={value} index={3}>
+            <section id="category-topics" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Left Column: SJR Value and Image */}
                     <div className="flex flex-col items-center">
                         <h2 className="text-3xl font-bold text-secondary mb-4">Category ad Topics</h2>
                         <p className=" text-lg mb-4">
-                           
+
                         </p>
-                        <div className="w-full max-w-xs rounded-lg shadow-lg relative aspect-square"> {/* Container for Image with aspect ratio and styling */}
+                        <div className="w-full max-w-xs rounded-lg shadow-lg relative aspect-square">
                             <Image
                                 src="/SJRCard.jpg"
                                 alt="SJR Illustration"
@@ -213,7 +186,6 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
                         </div>
                     </div>
 
-                    {/* Right Column: Description of SJR */}
                     <div className="">
                         <h2 className="text-2xl font-bold text-secondary mb-4">What is SJR?</h2>
                         <p className="text-lg mb-4">
@@ -231,36 +203,31 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
                         </p>
                     </div>
                 </div>
-            </TabPanel>
+            </section>
 
-            <TabPanel value={value} index={4}>
+            <section id="subject-area-category" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <h2 className="text-3xl font-bold text-secondary mb-4">Insights</h2>
                 <p className=" text-lg">
-                    {/* Display Subject Areas and Categories from journal data */}
-                    {/* {journal.subjectAreas?.map((sa, index) => (
-                        <span key={index}>
-                            {sa.area} ({sa.quartile || 'N/A'}){index < journal.subjectAreas.length - 1 ? '; ' : ''}
-                        </span>
-                    )) || "No Subject Areas/Categories Available"} */}
                 </p>
-            </TabPanel>
+            </section>
 
-            <TabPanel value={value} index={5}>
+            <section id="maps" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <h2 className="text-3xl font-bold text-secondary mb-4">Maps</h2>
-                <Map location={conference.location} />
-            </TabPanel>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Map location={conference.location} />
+                  </div>
+                  <div>
+                    <h1 className="text-xl font-semibold mb-2">Mô tả về địa điểm hội nghị</h1>
+                  </div>
+                </div>
+            </section>
 
-            <TabPanel value={value} index={6}>
+            <section id="source" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <h2 className="text-3xl font-bold text-secondary mb-4">Sources</h2>
                 <p className=" text-lg">
-                    {/* Display Subject Areas and Categories from journal data */}
-                    {/* {journal.subjectAreas?.map((sa, index) => (
-                        <span key={index}>
-                            {sa.area} ({sa.quartile || 'N/A'}){index < journal.subjectAreas.length - 1 ? '; ' : ''}
-                        </span>
-                    )) || "No Subject Areas/Categories Available"} */}
                 </p>
-            </TabPanel>
+            </section>
         </div>
     );
 };

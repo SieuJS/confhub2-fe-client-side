@@ -4,6 +4,7 @@ import Image from 'next/image';
 import ConferenceItem from './ConferenceItem'; // Import ConferenceItem
 import Button from './Button';
 import { Dialog } from '@headlessui/react';
+import { Link } from '@/src/navigation'
 import ConferenceForm from './ConferenceForm'; // Import ConferenceForm
 import { ConferenceResponse } from '../../../models/response/conference.response'; // Import ConferenceResponse
 
@@ -91,15 +92,18 @@ const MyConferencesTab: React.FC<MyConferencesTabProps> = ({conferences}) => {
 
   return (
     <div className="container mx-auto p-4">
-      <Button
-        onClick={openModal}
-        variant="primary"
-        size="medium"
-        rounded
-        className="mr-2 w-24"
-      >
-        Add
-      </Button>
+      <Link href={`/addconference`}>
+        <Button
+          // onClick={openModal}
+          variant="primary"
+          size="medium"
+          rounded
+          className="mr-2 w-fill"
+        >
+          Add Conference
+        </Button>
+      
+      </Link>
 
       <h1 className="text-2xl font-semibold mb-2">My Conferences</h1>
       {localConferences.length === 0 ? (

@@ -36,7 +36,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
 
   return (
     <div className="bg-background rounded-lg shadow-md w-60 min-w-60 relative">
-      <div className="relative w-full h-32 overflow-hidden">
+      <div className="relative w-full h-80 overflow-hidden">
         <div className={`absolute top-0 left-0 z-10 p-1 px-2 text-xs font-medium  rounded-tl-lg rounded-br-lg bg-secondary text-background`}>
           {category}
         </div>

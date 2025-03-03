@@ -171,6 +171,9 @@ export const Header: FC<Props> = ({ locale }) => {
           <Link lang={locale} href={`/support`}>
             {t('Support')}
           </Link>
+          <Link lang={locale} href={`/addconference`}>
+            {t('Add Conference')}
+          </Link>
           <Link lang={locale} href={`/other`}>
             {t('Other')}
           </Link>

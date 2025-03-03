@@ -32,7 +32,7 @@ const Map: React.FC<MapProps> = ({ location }) => {
     }, [location]);
 
     return (
-        <div className="mt-8">
+        <div className="">
             <h3 className="text-xl font-semibold mb-2">Map</h3>
             <div ref={mapRef} className="map-container" />
         </div>

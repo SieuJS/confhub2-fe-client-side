@@ -17,6 +17,7 @@ export const pathnames = {
   '/chatbot': '/chatbot',
   '/support': '/support',
   '/other': '/other',
+  '/addconference': '/addconference',
 } satisfies Pathnames<typeof locales>
 
 export const { Link, redirect, usePathname, useRouter, getPathname } =
