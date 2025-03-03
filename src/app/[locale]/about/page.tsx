@@ -9,6 +9,7 @@ import { ConferenceResponse } from '../../../models/response/conference.response
 import conferenceList from '../../../models/data/conferences-list.json'; // Import conferenceList JSON data
 import Map from '../components/Map';
 import * as ics from 'ics';
+import { ConferenceTabs } from '../components/ConferenceTabs';
 
 // Removed interface Conference and using ConferenceResponse type alias instead
 type Conference = ConferenceResponse;
@@ -396,9 +397,7 @@ export default function About() {
         </div>
       </div>
 
-      <Map location={conferenceData.location} />
-
-      <ConferenceFeedback onSubmitFeedback={handleFeedbackSubmit} />
+      
     </div>
 
 
@@ -504,6 +503,10 @@ export default function About() {
           </section>
         </div>
       </div>
+
+      <ConferenceTabs conference={conferenceData} />
+
+      <ConferenceFeedback onSubmitFeedback={handleFeedbackSubmit} />
     </div>
   )
 }

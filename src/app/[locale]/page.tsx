@@ -9,6 +9,7 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes'; // Import useTheme from next-themes
 import Footer from './components/Footer';
+import ConsumerInsights from './components/ConsumerInsights';
 
 export default function DashboardPage() {
   const t = useTranslations('')
@@ -44,7 +45,7 @@ export default function DashboardPage() {
       <PopularConferences />
       {/* <ConferenceByCountry /> */}
       {/* <ConferenceByTopic  /> */}
-
+      <ConsumerInsights />
       {isVisibleButton && (
         <Button
           onClick={scrollToTop}
