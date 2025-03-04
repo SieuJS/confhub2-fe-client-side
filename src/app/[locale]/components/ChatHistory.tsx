@@ -1,15 +1,17 @@
 import React, { useRef, useEffect } from 'react';
-import ChatMessage from './ChatMessage'; // Make sure ChatMessage is also in .tsx if converted
+import ChatMessage from './ChatMessage';
+import ChartDisplay from './ChartDisplay';
+import { ChatMessageType } from './ChatBot';
 
 interface ChatHistoryProps {
-    messages: { message: string; isUser: boolean; isStreaming?: boolean; }[];
+    messages: ChatMessageType[];
 }
 
 const ChatHistory: React.FC<ChatHistoryProps> = ({ messages }) => {
-    const chatHistoryRef = useRef<HTMLDivElement>(null); // useRef for a div element
+    const chatHistoryRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        console.log("ChatHistory nhận messages prop:", messages); // LOG 4: Xem prop messages trong ChatHistory
+        console.log("ChatHistory received messages prop:", messages);
         const chatHistoryElement = chatHistoryRef.current;
         if (chatHistoryElement) {
             chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
@@ -17,14 +19,22 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ messages }) => {
     }, [messages]);
 
     return (
-        <div
-            id="chat-history"
-            className="rounded-lg mb-5 relative overflow-y-auto"
-            ref={chatHistoryRef}
-        >
-            {messages.map((msg, index) => (
-                <ChatMessage key={index} message={msg.message} isUser={msg.isUser} />
-            ))}
+        <div id="chat-history" className="p-2 border border-gray-200 rounded-lg mb-5 relative overflow-y-auto" ref={chatHistoryRef}>
+            {messages.map((msg, index) => {
+                // Apply positioning styles to the message-container.
+                const containerClasses = `message-container p-3 rounded-xl mb-3 clear-both max-w-3/4 ${msg.isUser ? 'float-right text-right' : 'float-left text-left'}`;
+                return (
+                    <div key={index} className={containerClasses}>
+                        {msg.isUser ? (
+                            <ChatMessage message={msg.message} isUser={msg.isUser} />
+                        ) : msg.type === 'chart' ? (
+                            <ChartDisplay echartsConfig={msg.echartsConfig} sqlResult={msg.sqlResult} description={msg.description} />
+                        ) : (
+                            <ChatMessage message={msg.message} isUser={msg.isUser} />
+                        )}
+                    </div>
+                );
+            })}
         </div>
     );
 };

@@ -1,17 +1,36 @@
 // src/api/chatbotApi.ts
+const API_BASE_URL = 'http://localhost:3001/api'; // Or your server's URL
 
-const API_BASE_URL = 'http://localhost:3000/api'; // Or your API base URL
-
-interface ChatResponse {
-    success: boolean;
-    response?: any;
-    error?: string;
+// Define types for API responses and requests
+interface TextMessageResponse {
+    type: 'text';
+    message: string;
 }
 
+interface ChartMessageResponse {
+    type: 'chart';
+    echartsConfig: any; // Replace 'any' with a more specific type if you have one for echartsConfig
+    sqlResult: any;     // Replace 'any' with a more specific type if you have one for sqlResult
+    description: string;
+}
 
-export const sendNonStreamChatRequest = async (userInput: string, history: any[]): Promise<ChatResponse> => {
-    console.log("Sending non-stream chat request..."); // Log before fetch
+export type ChatResponse = TextMessageResponse | ChartMessageResponse;
 
+export interface ErrorResponse {
+    error: string;
+}
+
+export type HistoryItem =
+    | { role: "user" | "model"; parts: [{ text: string }]; type?: 'text' | 'chart' | 'error' | undefined }
+    | { role: "model"; parts: [{ text: any }]; type: 'chart' }; // Adjust 'any' if parts.text for charts has a specific type
+
+export type ChatHistoryType = HistoryItem[];
+
+// Non-streaming chat request
+export const sendNonStreamChatRequest = async (
+    userInput: string,
+    history: ChatHistoryType
+): Promise<ChatResponse> => {
     try {
         const response = await fetch(`${API_BASE_URL}/non-stream-chat`, {
             method: 'POST',
@@ -21,105 +40,74 @@ export const sendNonStreamChatRequest = async (userInput: string, history: any[]
             body: JSON.stringify({ userInput, history }),
         });
 
-        const responseText = await response.text(); // Get the response as text
-
         if (!response.ok) {
-            let errorMessage = `HTTP error! status: ${response.status}`;
-            try {
-                const errorData = JSON.parse(responseText); // Try to parse as JSON even if not ok
-                errorMessage = errorData.error || errorMessage; // Use server error if available
-                console.error("Server Error Response (JSON):", errorData);
-            } catch (jsonError: any) {
-                console.error("Could not parse error response as JSON:", jsonError);
-                console.error("Raw Error Response Text (HTML?):", responseText); // Log raw text if JSON parsing fails
-            }
-            throw new Error(errorMessage);
+            const errorData: ErrorResponse = await response.json();
+            throw new Error(errorData.error || 'Network response was not ok');
         }
 
-        const responseData = JSON.parse(responseText); // Parse JSON after checking response.ok
-        console.log("Response Data (JSON):", responseData);
-        return { success: true, response: responseData };
-
-    } catch (error: any) {
-        console.error("Could not send chat message:", error);
-        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+        return await response.json() as ChatResponse; // Expecting ChatResponse
+    } catch (error: any) { // Type error as any for generic error handling
+        console.error('Error in sendNonStreamChatRequest:', error);
+        throw error;
     }
 };
 
+// Streaming chat request
 export const sendStreamChatRequest = async (
     userInput: string,
-    history: any[],
-    onPartialResponse: (partialResponse: string) => void
-): Promise<ChatResponse> => {
-    console.log("Sending stream chat request...");
-
+    history: ChatHistoryType,
+    onPartialResponse: (data: ChatResponse | ErrorResponse) => void // Define type for onPartialResponse data
+): Promise<void> => {
     try {
         const response = await fetch(`${API_BASE_URL}/stream-chat`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'text/event-stream' // Yêu cầu server-sent events
             },
             body: JSON.stringify({ userInput, history }),
         });
 
         if (!response.ok) {
-            let errorMessage = `HTTP error! status: ${response.status}`;
-            try {
-                const responseText = await response.text();
-                const errorData = JSON.parse(responseText);
-                errorMessage = errorData.error || errorMessage;
-                console.error("Server Error Response (JSON):", errorData);
-            } catch (jsonError: any) {
-                console.error("Could not parse error response as JSON:", jsonError);
-                // Có thể không có JSON, có thể là HTML error page
-            }
-            throw new Error(errorMessage);
+            const errorData: ErrorResponse = await response.json();
+            throw new Error(errorData.error || 'Network response was not ok');
         }
 
-        // Đọc stream response
-        const reader = response.body?.getReader(); //Check if response.body exists before calling getReader()
-        if (!reader) {
-            return { success: false, error: "Response body is null" };
+        if (!response.body) {
+            throw new Error('Response body is null');
         }
-        const decoder = new TextDecoder();
-        let partialResponse = ""; // Để lưu response đang xây dựng
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
 
         while (true) {
             const { done, value } = await reader.read();
             if (done) {
-                console.log("Stream complete");
                 break;
             }
-            const chunk = decoder.decode(value);
-            console.log("Raw Chunk from Server:", chunk); // *** LOGGING: Raw data chunk ***
-            // Xử lý từng chunk (server-sent event)
-            const lines = chunk.split('\n');
-            for (const line of lines) {
-                if (line.startsWith('data: ')) {
-                    let content = line.substring(5).trim(); // Loại bỏ "data: " và trim
-                    console.log("Extracted Content from Chunk (before newline):", content);
-                    if (content) {
 
-                        partialResponse += content; // Cộng dồn vào response
-                        onPartialResponse(content); // Gọi callback với partial response
-                    }
-                } else if (line.trim() !== "") {
-                    // If the line is not a data line but contains some text,
-                    // consider it part of the previous message and append it with a newline
-                    if (partialResponse !== "") {
-                        partialResponse += "\n" + line;
-                        onPartialResponse("\n" + line)
+            buffer += decoder.decode(value, { stream: true });
+            let boundary = buffer.indexOf('\n\n');
 
+            while (boundary !== -1) {
+                const chunk = buffer.substring(0, boundary).trim();
+                buffer = buffer.substring(boundary + 2);
+                boundary = buffer.indexOf('\n\n');
+                if (chunk.startsWith('data:')) {
+                    const data = chunk.substring(5);
+                    try {
+                        const parsedData: ChatResponse = JSON.parse(data); // Parse data as ChatResponse
+                         onPartialResponse(parsedData); // Call the callback with the parsed data
+                     } catch (e: any) { // Type error as any for generic error handling
+                          console.error("Error parsing streamed data:", e);
+                          onPartialResponse({ error: "Error parsing stream data." } as ErrorResponse); // Type as ErrorResponse // FIXED HERE
                     }
                 }
             }
         }
-        return { success: true }; // Trả về thành công sau khi stream xong
-
-
-    } catch (error: any) {
-        console.error("Could not send chat message:", error);
-        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    } catch (error: any) { // Type error as any for generic error handling
+        console.error('Error in sendStreamChatRequest:', error);
+        onPartialResponse({ error: error.message || 'Unknown streaming error' } as ErrorResponse); // Send error to partial response handler // FIXED HERE
+        throw error; // Re-throw the error so the caller can handle it
     }
 };

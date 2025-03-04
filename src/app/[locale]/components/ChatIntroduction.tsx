@@ -1,9 +1,10 @@
 import React from 'react';
 
 interface ChatIntroductionProps {
+    onFillInput: (fill: (text: string) => void) => void; // Thêm định nghĩa cho prop onFillInput
 }
 
-const ChatIntroduction: React.FC<ChatIntroductionProps> = () => {
+const ChatIntroduction: React.FC<ChatIntroductionProps> = ({ onFillInput }) => { // Destructure prop onFillInput
     return (
         <div id="ChatIntroduction" className="text-gray-600 text-center p-4">
             <p className="mb-4">Xin chào! Tôi là chatbot hỗ trợ tìm kiếm thông tin về các hội nghị. Hãy đặt câu hỏi hoặc chọn
