@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import Button from './Button';
-import { ConferenceResponse } from '../../../models/response/conference.response'; // Import ConferenceResponse
+import Button from '../utils/Button';
+import { ConferenceResponse } from '../../../../models/response/conference.response'; // Import ConferenceResponse
 
 const ConferenceItem: React.FC<{ conference: ConferenceResponse }> = ({ conference }) => {
   const [isFollowing, setIsFollowing] = useState(false); // State for follow status

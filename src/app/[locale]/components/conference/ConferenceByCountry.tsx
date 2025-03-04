@@ -1,5 +1,5 @@
 import React from 'react';
-import continentList from '../../../models/data/continents-list.json';
+import continentList from '../../../../models/data/continents-list.json';
 
 
 const ConferenceByCountry: React.FC = () => {

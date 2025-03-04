@@ -30,7 +30,7 @@ export type ConferenceResponse = {
 };
 
 
-const conferenceList: any[] = require('../../../models/data/conferences-list.json'); // Import json data as any[] for flexible mapping
+const conferenceList: any[] = require('../../../../models/data/conferences-list.json'); // Import json data as any[] for flexible mapping
 
 type Conference = ConferenceResponse;
 

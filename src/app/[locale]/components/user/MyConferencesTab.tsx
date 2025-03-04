@@ -1,12 +1,12 @@
 // MyConferencesTab.tsx
 import React, { useState } from 'react';
 import Image from 'next/image';
-import ConferenceItem from './ConferenceItem'; // Import ConferenceItem
-import Button from './Button';
+import ConferenceItem from '../conference/ConferenceItem'; // Import ConferenceItem
+import Button from '../utils/Button';
 import { Dialog } from '@headlessui/react';
 import { Link } from '@/src/navigation'
-import ConferenceForm from './ConferenceForm'; // Import ConferenceForm
-import { ConferenceResponse } from '../../../models/response/conference.response'; // Import ConferenceResponse
+import ConferenceForm from '../conference/ConferenceForm'; // Import ConferenceForm
+import { ConferenceResponse } from '../../../../models/response/conference.response'; // Import ConferenceResponse
 
 // Replace interface Conference with type Conference = ConferenceResponse
 type Conference = ConferenceResponse;

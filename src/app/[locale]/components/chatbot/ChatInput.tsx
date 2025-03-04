@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
-import Button from './Button'; // Import your Button component
+import Button from '../utils/Button'; // Import your Button component
 
 interface ChatInputProps {
     onSendMessage: (message: string) => void;

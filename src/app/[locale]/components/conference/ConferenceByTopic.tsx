@@ -1,6 +1,6 @@
 "use client" 
 import React from 'react';
-import topicList from '../../../models/data/topics-list.json';
+import topicList from '../../../../models/data/topics-list.json';
 
 const ConferenceByTopic: React.FC = () => {
   type TopicData = {

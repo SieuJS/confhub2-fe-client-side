@@ -2,8 +2,8 @@
 
 // components/JournalReport.tsx
 import React, { useState } from 'react';
-import Button from './Button'; // Import the Button component
-import { JournalResponse } from '../../../models/response/journal.response'; // Import JournalResponse
+import Button from '../utils/Button'; // Import the Button component
+import { JournalResponse } from '../../../../models/response/journal.response'; // Import JournalResponse
 import Image from 'next/image'; // Import the Image component from next/image
 
 interface JournalReportProps {

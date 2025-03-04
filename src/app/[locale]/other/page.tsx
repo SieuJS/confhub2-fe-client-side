@@ -1,4 +1,4 @@
-import NotFoundPage from "../components/NotFoundPage";
+import NotFoundPage from "../components/utils/NotFoundPage";
 
 export default function Other() {
   return (

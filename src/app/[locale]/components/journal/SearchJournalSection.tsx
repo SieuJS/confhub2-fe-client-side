@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import Button from './Button';
+import Button from '../utils/Button';
 import SearchAdvanceJournalSection from './SearchAdvanceJournalSection';
 
 

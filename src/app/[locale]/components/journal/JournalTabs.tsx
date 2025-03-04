@@ -1,16 +1,15 @@
 "use client";
 
-// components/ConferenceTabs.tsx
-import React, { useEffect, useRef } from 'react';
-import Image from 'next/image';
-import { ConferenceResponse } from '../../../models/response/conference.response';
-import Map from './Map';
+// components/JournalTabs.tsx
+import React, { useEffect, useRef } from 'react'; // Import useRef
+import Image from 'next/image'; // Import the Image component from next/image
+import { JournalResponse } from '../../../../models/response/journal.response'; // Import JournalResponse
 
-interface ConferenceTabsProps {
-    conference: ConferenceResponse;
+interface JournalTabsProps {
+    journal: JournalResponse; // Define the journal prop
 }
 
-export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) => {
+export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Update component signature to accept props
     const navRef = useRef<HTMLElement>(null); // Create a ref for the nav element
 
     useEffect(() => {
@@ -22,9 +21,9 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
                 const targetSection = document.getElementById(targetId);
                 if (targetSection) {
                     const navElement = navRef.current; // Use navRef.current here
-                    const navHeight = navElement ? navElement.offsetHeight : 0;
+                    const navHeight = navElement ? navElement.offsetHeight : 0; // Get nav height, default to 0 if not found
                     const offset = 100;
-                    const targetPosition = targetSection.offsetTop - navHeight - offset;
+                    const targetPosition = targetSection.offsetTop - navHeight - offset; // Calculate scroll position with offset
 
                     window.scrollTo({
                         top: targetPosition,
@@ -39,13 +38,12 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
             link.addEventListener('click', handleAnchorClick);
         });
 
-        return () => {
+        return () => { // Cleanup event listeners when component unmounts
             navLinks.forEach(link => {
                 link.removeEventListener('click', handleAnchorClick);
             });
         };
     }, []); // Empty dependency array ensures this effect runs only once after initial render
-
 
     return (
         <div className="container mx-auto py-6 rounded-lg md:flex-row " style={{ scrollBehavior: 'smooth' }}>
@@ -57,22 +55,22 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
                     Overview
                 </a>
                 <a
-                    href="#important-date"
+                    href="#impact-factor"
                     className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
                 >
-                    Important Date
+                    Impact Factor
                 </a>
                 <a
-                    href="#call-for-paper"
+                    href="#h-index"
                     className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
                     >
-                    Call for paper
+                    H-index
                 </a>
                 <a
-                    href="#category-topics"
+                    href="#sjr"
                     className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
                 >
-                    Category and Topics
+                    SJR
                 </a>
                 <a
                     href="#subject-area-category"
@@ -80,75 +78,104 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
                 >
                     Subject Area and Category
                 </a>
-                <a
-                    href="#maps"
-                    className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
-                >
-                    Maps
-                </a>
-                <a
-                    href="#source"
-                    className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
-                >
-                    Source
-                </a>
             </nav>
 
             <section id="overview" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <h2 className="text-3xl font-bold text-secondary mb-4">Overview</h2>
                 <p className=" text-lg">
-                    {conference.description}
+                    {/* Use journal data for overview, if available */}
+                    {journal.Type === 'journal' ? `${journal.Title} is a leading academic journal.` : `${journal.Title} is a significant publication.`}
+                    {journal.Scope} {/* Using Scope from journal data */}
                 </p>
             </section>
 
-            <section id="important-date" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
-                <h2 className="text-3xl font-bold text-secondary mb-4">Important Date</h2>
+            <section id="impact-factor" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
+                <h2 className="text-3xl font-bold text-secondary mb-4">Impact Factor</h2>
                 <p className=" text-lg">
-                    Stay up-to-date with essential deadlines for the conference.
+                    <strong>The Impact IF {journal.bioxbio[0]?.Year}</strong> of <strong>{journal.Title}</strong> is
+                    <strong>{journal.bioxbio[0]?.Impact_factor || 'N/A'}</strong>,
+                    which is computed in <strong>{parseInt(journal.bioxbio[0]?.Year || '2023') + 1}</strong> as per its definition.
+                    {/* ... rest of the Impact Factor tab content, you can dynamically update journal name and IF value here */}
                 </p>
                 <p className=" text-lg mt-4 mb-4">
-
+                    The impact IF, also denoted as <strong>Journal Impact Score (JIS)</strong>, of an academic journal is a
+                    measure of the yearly average
+                    number of citations to recent articles published in that journal. It is based on <strong>Scopus</strong>
+                    data.
                 </p>
 
-                <div className="grid md:grid-cols-1 gap-6 ">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-background shadow-md rounded-lg">
+                    {/* Left Column: Table */}
                     <div>
                         <table className="w-full text-lg text-left  border-collapse">
                             <thead className="text-lg  ">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3 font-semibold text-left">Event</th>
-                                    <th scope="col" className="px-6 py-3 font-semibold text-left">Date</th>
+                                    <th scope="col" className="px-6 py-3 font-semibold text-left">Year</th>
+                                    <th scope="col" className="px-6 py-3 font-semibold text-left">Impact Factor</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                    {conference.conferenceDates.map((date, index) => (
-                                      <tr key={index} className="border-b">
-                                        <td className="px-6 py-2">{date.dateName}</td>
-                                        <td className="px-6 py-2">{date.startDate}{date.endDate ? ` - ${date.endDate}` : ''}</td>
-                                      </tr>
-                                    ))}
+                                {journal.bioxbio?.map((history, index) => ( // Use journal.bioxbio
+                                    <tr key={index} className="border-b  ">
+                                        <td className="px-6 py-2">{history.Year}</td>
+                                        <td className="px-6 py-2">{history.Impact_factor}</td>
+                                    </tr>
+                                ))}
+                                {/* Fallback if no impact factor history */}
+                                {journal.bioxbio.length === 0 && (
+                                    <tr>
+                                        <td className="px-6 py-2" colSpan={2}>No Impact Factor History Available</td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
+                    </div>
+
+                    {/* Right Column: Description */}
+                    <div className="">
+                        <h2 className="text-2xl font-bold text-secondary mb-4">How Impact Factor is Calculated</h2>
+                        <p className="text-lg mb-4">
+                            The Impact Factor (IF) is a metric that reflects the yearly average number of citations to
+                            recent articles published in a journal.
+                            It is calculated based on the following formula:
+                        </p>
+                        <p className="text-lg font-semibold  p-4 rounded-lg mb-4">
+                            <strong>Impact Factor =</strong> <em>Total citations in the current year to articles published
+                                in the previous two years</em> / <em>Total number of articles published in the previous two
+                                years</em>
+                        </p>
+                        <p className="text-lg">
+                            For example, if a journal has 1,000 citations in 2023 to articles published in 2021 and 2022,
+                            and published 200 articles in those two years combined, the IF would be:
+                            <strong>1,000 / 200 = 5.0</strong>.
+                        </p>
+                        <p className="text-lg">
+                            This metric, provided by databases like <strong>Scopus</strong> and <strong>Clarivate
+                                Analytics</strong>, helps researchers identify influential journals in their field.
+                        </p>
                     </div>
                 </div>
             </section>
 
-            <section id="call-for-paper" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
+            <section id="h-index" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Left Column: H-index Value and Image */}
                     <div className="flex flex-col items-center">
-                        <h2 className="text-3xl font-bold text-secondary mb-4">Call for paper</h2>
+                        <h2 className="text-3xl font-bold text-secondary mb-4">H-index</h2>
                         <p className=" text-lg mb-4">
-                            The H-index of this journal is <strong className="text-2xl"></strong>.
+                            The H-index of this journal is <strong className="text-2xl">{journal["H index"] || 'N/A'}</strong>. {/* Use journal["H index"] */}
                         </p>
-                        <div className="w-full max-w-xs relative aspect-square">
+                        <div className="w-full max-w-xs relative aspect-square"> {/* Container for Image with aspect ratio */}
                             <Image
-                                src="/Hindex.png"
+                                src="/Hindex.png" // Use local image or provide a valid URL
                                 alt="H-index Illustration"
                                 layout="fill"
-                                objectFit="contain"
+                                objectFit="contain" // Use 'contain' to fit image within bounds without cropping
                             />
                         </div>
                     </div>
 
+                    {/* Right Column: Description of H-index */}
                     <div className="">
                         <h2 className="text-2xl font-bold text-secondary mb-4">What is H-index?</h2>
                         <p className="text-lg mb-4">
@@ -169,14 +196,15 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
                 </div>
             </section>
 
-            <section id="category-topics" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
+            <section id="sjr" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Left Column: SJR Value and Image */}
                     <div className="flex flex-col items-center">
-                        <h2 className="text-3xl font-bold text-secondary mb-4">Category ad Topics</h2>
+                        <h2 className="text-3xl font-bold text-secondary mb-4">SJR (Scimago Journal Ranking)</h2>
                         <p className=" text-lg mb-4">
-
+                            The SJR value of this journal is <strong className="text-2xl">{journal.SJR || 'N/A'}</strong>. {/* Use journal.SJR */}
                         </p>
-                        <div className="w-full max-w-xs rounded-lg shadow-lg relative aspect-square">
+                        <div className="w-full max-w-xs rounded-lg shadow-lg relative aspect-square"> {/* Container for Image with aspect ratio and styling */}
                             <Image
                                 src="/SJRCard.jpg"
                                 alt="SJR Illustration"
@@ -186,6 +214,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
                         </div>
                     </div>
 
+                    {/* Right Column: Description of SJR */}
                     <div className="">
                         <h2 className="text-2xl font-bold text-secondary mb-4">What is SJR?</h2>
                         <p className="text-lg mb-4">
@@ -206,26 +235,21 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
             </section>
 
             <section id="subject-area-category" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
-                <h2 className="text-3xl font-bold text-secondary mb-4">Insights</h2>
+                <h2 className="text-3xl font-bold text-secondary mb-4">Subject Area and Category</h2>
                 <p className=" text-lg">
-                </p>
-            </section>
-
-            <section id="maps" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
-                <h2 className="text-3xl font-bold text-secondary mb-4">Maps</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <Map location={conference.location} />
-                  </div>
-                  <div>
-                    <h1 className="text-xl font-semibold mb-2">Mô tả về địa điểm hội nghị</h1>
-                  </div>
-                </div>
-            </section>
-
-            <section id="source" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
-                <h2 className="text-3xl font-bold text-secondary mb-4">Sources</h2>
-                <p className=" text-lg">
+                    {/* Display Subject Areas and Categories from journal data */}
+                    {journal["Subject Area and Category"] ? (
+                        <>
+                            <p className="mb-2"><strong>Field of Research:</strong> {journal["Subject Area and Category"]["Field of Research"]}</p>
+                            <p><strong>Categories:</strong>
+                            {journal["Subject Area and Category"].Topics.map((topic, index) => (
+                                <span key={index}>
+                                    {topic}{index < journal["Subject Area and Category"].Topics.length - 1 ? ', ' : ''}
+                                </span>
+                            ))}
+                            </p>
+                        </>
+                    ) : "No Subject Areas/Categories Available"}
                 </p>
             </section>
         </div>

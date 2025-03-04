@@ -5,7 +5,7 @@ import ChatHistory from './ChatHistory';
 import ChatInput from './ChatInput';
 import LoadingIndicator from './LoadingIndicator';
 import Introduction from './ChatIntroduction';
-import { ChatResponse, sendStreamChatRequest, sendNonStreamChatRequest, ChatHistoryType, HistoryItem, ErrorResponse } from '../../../api/chatbot/chatbotApi';
+import { ChatResponse, sendStreamChatRequest, sendNonStreamChatRequest, ChatHistoryType, HistoryItem, ErrorResponse } from '../../../../api/chatbot/chatbotApi';
 
 export interface ChatMessageType {
     message: string;

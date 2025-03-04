@@ -2,8 +2,8 @@
 import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
 import { FC, useRef, useState, useEffect } from 'react'
-import GithubIcon from '../../icons/github'
-import LogoIcon from '../../icons/logo'
+import GithubIcon from '../../../icons/github'
+import LogoIcon from '../../../icons/logo'
 import LangSwitcher from './LangSwitcher'
 import ThemeSwitch from './ThemeSwitch'
 

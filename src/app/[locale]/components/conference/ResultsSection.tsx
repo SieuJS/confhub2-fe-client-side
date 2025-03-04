@@ -1,9 +1,9 @@
 // ResultsSection.tsx
 import React, { useState, useEffect } from 'react';
 import EventCard from './EventCard';
-import Pagination from './Pagination';
-import { ConferenceResponse } from '../../../models/response/conference.response'; // Import your ConferenceResponse type
-import conferenceList from '../../../models/data/conferences-list.json'; // Assuming conference-list.json is in the same directory
+import Pagination from '../utils/Pagination';
+import { ConferenceResponse } from '../../../../models/response/conference.response'; // Import your ConferenceResponse type
+import conferenceList from '../../../../models/data/conferences-list.json'; // Assuming conference-list.json is in the same directory
 
 interface ResultsSectionProps {
     searchQuery: string;

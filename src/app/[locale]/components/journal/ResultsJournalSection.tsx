@@ -3,9 +3,9 @@
 
 import React, { useState, useEffect } from 'react';
 import EventJournalCard from './EventJournalCard';
-import Pagination from './Pagination';
-import { JournalResponse } from '../../../models/response/journal.response';
-import journalsList from '../../../models/data/journals-list.json'; // Nhập journals-list.json
+import Pagination from '../utils/Pagination';
+import { JournalResponse } from '../../../../models/response/journal.response';
+import journalsList from '../../../../models/data/journals-list.json'; // Nhập journals-list.json
 
 interface ResultsJournalSectionProps {
     searchQuery: string;

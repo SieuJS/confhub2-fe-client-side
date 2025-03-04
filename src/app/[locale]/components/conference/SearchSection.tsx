@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import Button from './Button';
+import Button from '../utils/Button';
 import SearchAdvanceSection from './SearchAdvanceSection'; // Import the new component
-import continentList from '../../../models/data/continents-list.json'; // Import continent-list.json
+import continentList from '../../../../models/data/continents-list.json'; // Import continent-list.json
 
 interface SearchSectionProps {
   onSearch: (query: string) => void;

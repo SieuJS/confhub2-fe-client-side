@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
-import { JournalResponse } from '../../../models/response/journal.response'; // Import your JournalResponse type
-import Button from './Button';
+import { JournalResponse } from '../../../../models/response/journal.response'; // Import your JournalResponse type
+import Button from '../utils/Button';
 
 interface EventJournalCardProps {
   journal: JournalResponse; // Sử dụng JournalResponse type

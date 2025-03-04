@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import Button from '../components/Button';
+import Button from '../utils/Button';
 import { useTranslations } from 'next-intl'
 import { Link } from '@/src/navigation'
 import { useTheme } from 'next-themes'; // Import useTheme from next-themes

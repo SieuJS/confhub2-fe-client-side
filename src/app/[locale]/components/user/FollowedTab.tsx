@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import ConferenceItem from './ConferenceItem';
-import { ConferenceResponse } from '../../../models/response/conference.response'; // Import ConferenceResponse
+import ConferenceItem from '../conference/ConferenceItem';
+import { ConferenceResponse } from '../../../../models/response/conference.response'; // Import ConferenceResponse
 
 // Replace interface Conference with type Conference = ConferenceResponse
 type Conference = ConferenceResponse;

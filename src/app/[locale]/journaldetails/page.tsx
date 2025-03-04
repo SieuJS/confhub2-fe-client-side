@@ -1,10 +1,10 @@
 // Journals.tsx
 import React from 'react';
-import JournalReport from '../components/JournalReport';
-import { RecentlyAddedJournals } from '../components/RecentlyAddedJournals';
-import { JournalTabs } from '../components/JournalTabs';
+import JournalReport from '../components/journal/JournalReport';
+import { RecentlyAddedJournals } from '../components/journal/RecentlyAddedJournals';
+import { JournalTabs } from '../components/journal/JournalTabs';
 import { JournalResponse } from '../../../models/response/journal.response'; // Import JournalResponse
-import { RecommendedJournals } from '../components/RecommendedJournals'; // Import RecommendedJournals
+import { RecommendedJournals } from '../components/journal/RecommendedJournals'; // Import RecommendedJournals
 import journalData from '../../../models/data/journals-list.json'; // Assuming journals.json is in the same directory
 
 const JournalDetails: React.FC = () => {

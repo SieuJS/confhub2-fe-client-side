@@ -1,7 +1,7 @@
 // ConferenceForm.tsx
 import React, { useState } from 'react';
-import Button from './Button';
-import { ConferenceResponse } from '../../../models/response/conference.response'; // Import ConferenceResponse
+import Button from '../utils/Button';
+import { ConferenceResponse } from '../../../../models/response/conference.response'; // Import ConferenceResponse
 
 // Replace interface Conference with type Conference = ConferenceResponse
 type Conference = ConferenceResponse;

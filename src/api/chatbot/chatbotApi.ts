@@ -1,5 +1,5 @@
 // src/api/chatbotApi.ts
-const API_BASE_URL = 'http://localhost:3001/api'; // Or your server's URL
+const API_BASE_URL = 'http://localhost:3000/api'; // Or your server's URL
 
 // Define types for API responses and requests
 interface TextMessageResponse {

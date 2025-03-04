@@ -2,8 +2,8 @@
 
 // Conferences.tsx
 import { useTranslations } from 'next-intl';
-import SearchSection from '../components/SearchSection';
-import ResultsSection from '../components/ResultsSection';
+import SearchSection from '../components/conference/SearchSection';
+import ResultsSection from '../components/conference/ResultsSection';
 import { useState } from 'react';
 import { ConferenceResponse } from '../../../models/response/conference.response'; // Import ConferenceResponse type - Moved to the top and verify path
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
-import Button from './Button'; // Import your Button component
-import {ConferenceResponse} from '../../../models/response/conference.response'; // Import your ConferenceResponse type
+import Button from '../utils/Button'; // Import your Button component
+import {ConferenceResponse} from '../../../../models/response/conference.response'; // Import your ConferenceResponse type
 
 interface EventCardProps {
   event: ConferenceResponse; // Sử dụng ConferenceResponse type
