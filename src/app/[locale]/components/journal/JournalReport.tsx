@@ -1,17 +1,24 @@
 "use client";
 
 // components/JournalReport.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '../utils/Button'; // Import the Button component
 import { JournalResponse } from '../../../../models/response/journal.response'; // Import JournalResponse
 import Image from 'next/image'; // Import the Image component from next/image
 
 interface JournalReportProps {
-  journal: JournalResponse;
+  journal: JournalResponse | undefined; // Make journal optional
 }
 
 const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
   const [isFullDescriptionVisible, setIsFullDescriptionVisible] = useState(false);
+
+  //Handle journal being undefined
+
+  if (!journal) {
+    return <div>Journal not found</div>
+  }
+
 
   const toggleDescription = () => {
     setIsFullDescriptionVisible(!isFullDescriptionVisible);
@@ -20,8 +27,8 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
   const scopeDescription = journal.Scope;
   const fullDescription = journal.Scope; // Assuming full description is also in Scope, adjust if needed.
 
-  // Get Impact Factor from the latest year in bioxbio
-  const latestImpactFactor = journal.bioxbio.length > 0 ? journal.bioxbio[0].Impact_factor : "N/A";
+  // Safely access bioxbio array and its elements
+  const latestImpactFactor = journal.bioxbio && journal.bioxbio.length > 0 ? journal.bioxbio[0].Impact_factor : "N/A";
   const hIndex = journal["H index"];
   const sjr = journal.SJR;
 
@@ -40,7 +47,7 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
             <div className="relative w-50 h-30 mt-4 rounded-lg overflow-hidden">
               {/* Image */}
               <div className="relative w-40 h-56 rounded-lg overflow-hidden"> {/* Make sure the container has w-full and h-full */}
-                
+
                 <img
                   src={journal.Image || "/journal.jpg"}
                   alt={journal.Title}

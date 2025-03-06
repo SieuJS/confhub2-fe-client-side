@@ -98,9 +98,6 @@ export const Header: FC<Props> = ({ locale }) => {
           <Link lang={locale} href={`/journals`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('Journals')}
           </Link>
-          <Link lang={locale} href={`/journaldetails`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
-            {t('Journal Details')}
-          </Link>
           <Link lang={locale} href={`/setting`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('Setting')}
           </Link>
@@ -158,9 +155,6 @@ export const Header: FC<Props> = ({ locale }) => {
           </Link>
           <Link lang={locale} href={`/journals`}>
             {t('Journals')}
-          </Link>
-          <Link lang={locale} href={`/journaldetails`}>
-            {t('Journal Details')}
           </Link>
           <Link lang={locale} href={`/setting`}>
             {t('Setting')}

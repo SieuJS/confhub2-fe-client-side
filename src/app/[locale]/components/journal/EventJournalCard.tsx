@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { JournalResponse } from '../../../../models/response/journal.response'; // Import your JournalResponse type
 import Button from '../utils/Button';
+import {Link} from '@/src/navigation'; // Import next/link
 
 interface EventJournalCardProps {
   journal: JournalResponse; // Sử dụng JournalResponse type
@@ -28,15 +29,17 @@ const EventJournalCard: React.FC<EventJournalCardProps> = ({ journal }) => {
     </div>
 
     <div className="absolute bottom-4 right-4"> {/* Thêm nút bấm */}
-
-      <Button
-        variant="primary"
-        size="small"
-        rounded
-        className={` px-3 py-1 mr-2`} // Nút bấm
-      >
-        Details
-      </Button>
+      <Link href={{ pathname: '/journals/detail', query: { id: journal.id } }}>
+      
+        <Button
+          variant="primary"
+          size="small"
+          rounded
+          className={` px-3 py-1 mr-2`} // Nút bấm
+        >
+          Details
+        </Button>
+      </Link>
       <Button
         variant="primary"
         size="small"

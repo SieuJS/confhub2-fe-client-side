@@ -1,4 +1,5 @@
 export type JournalResponse = {
+  id: string; // Optional, if you still need it
   title: string;
   scimagoLink: string;
   bioxbio: BioxbioItem[]; // Mảng các đối tượng BioxbioItem
