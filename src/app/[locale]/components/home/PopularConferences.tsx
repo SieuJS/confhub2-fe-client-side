@@ -1,33 +1,9 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { ConferenceResponse } from '@/src/models/response/conference.response';
 import Image from 'next/image';
 
-// Define the ConferenceDates type as provided
-export type ConferenceDates = {
-  startDate: string;
-  endDate: string;
-  dateName: string;
-};
-
-// Define the ConferenceResponse type as provided
-export type ConferenceResponse = {
-  id: string;
-  name: string;
-  acronym: string;
-  category: string;
-  topics: string[];
-  location: string;
-  type: string;
-  conferenceDates: ConferenceDates[];
-  imageUrl: string;
-  description: string;
-  rank: string;
-  sourceYear: string;
-  link: string;
-  likeCount: number;
-  followCount: number;
-};
 
 
 const conferenceList: any[] = require('../../../../models/data/conferences-list.json'); // Import json data as any[] for flexible mapping
@@ -37,22 +13,18 @@ type Conference = ConferenceResponse;
 const conferencesData: Conference[] = conferenceList.map(conf => {
   // Assuming conferenceList.json data structure needs to be adapted to ConferenceResponse
   // Adjust the mapping logic based on the actual structure of conferenceList.json and how it aligns with ConferenceResponse
-  const startDate = conf.startDate || ''; // Provide default values if startDate/endDate are missing or structured differently
-  const endDate = conf.endDate || '';
-
   return {
     id: conf.id,
     name: conf.name,
     acronym: conf.acronym,
-    category: conf.category,
-    topics: conf.topics || [], // Ensure topics is always an array, default to empty array if missing
+    fieldOfResearch: conf.fieldOfResearch,
+    topics: conf.topics, // Ensure topics is always an array, default to empty array if missing
     location: conf.location,
     type: conf.type,
-    conferenceDates: [{ startDate: startDate, endDate: endDate, dateName: 'Main Conference' }], // Wrap startDate and endDate in conferenceDates array. You might need to adjust 'dateName' or how you pick dates based on your data
-    imageUrl: conf.imageUrl,
+    conferenceDates: conf.conferenceDates, // Wrap startDate and endDate in conferenceDates array. You might need to adjust 'dateName' or how you pick dates based on your data
     description: conf.description,
     rank: conf.rank,
-    sourceYear: conf.sourceYear,
+    source: conf.source,
     link: conf.link,
     likeCount: conf.likeCount || 0, // Default likeCount and followCount to 0 if missing
     followCount: conf.followCount || 0,
@@ -182,9 +154,7 @@ const PopularConferences: React.FC = () => {
               const position = `calc(${relativeIndex * (80 + 8)}px)`;
 
               // Safely access conferenceDates and its first element
-              const conferenceDate = conference.conferenceDates && conference.conferenceDates.length > 0 ? conference.conferenceDates[0] : null;
-              const startDate = conferenceDate ? conferenceDate.startDate : 'TBD';
-              const endDate = conferenceDate ? conferenceDate.endDate : 'TBD';
+              const conferenceDate = conference.conferenceDates && conference.conferenceDates.length > 0 ? conference.conferenceDates : null;
 
 
               return (
@@ -201,7 +171,7 @@ const PopularConferences: React.FC = () => {
                       <div className="relative w-full h-[200px]">
                         <Image
                           className="lazyloaded rounded-t-lg object-cover"
-                          src={conference.imageUrl}
+                          src={''}
                           fill
                           alt={conference.name}
                           loading="lazy"
@@ -215,17 +185,20 @@ const PopularConferences: React.FC = () => {
                           {conference.name}
                         </div>
                         <div className="text-sm  mb-1">
-                          {startDate} - {endDate}
+                          {conference.conferenceDates}
                         </div>
                         <div className="text-sm  mb-1">{conference.location}</div>
                         <div className="text-sm  leading-tight">
                           <div className="font-bold mb-1">Topics:</div>
                           <ul className="list-none pl-0">
-                            {conference.topics.map((topic, topicIndex) => (
-                              <li key={topicIndex} className="inline-block mr-2 whitespace-nowrap">
-                                {topic}
+                            <div className="flex flex-wrap">
+                              {conference?.topics && conference.topics.split(',').map((topic, index) => (
+                              <li key={index} className="bg-background-secondary  rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2">
+                                {topic.trim()} {/* Trim whitespace */}
                               </li>
-                            ))}
+                              )) || <li>No topics available</li>}  
+                            </div>
+                            
                           </ul>
                         </div>
                       </div>

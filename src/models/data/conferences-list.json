@@ -1,401 +1,429 @@
 [
-  {
-    "id": "1",
-    "name": "International Conference on Machine Learning",
-    "acronym": "ICML",
-    "category": "Artificial Intelligence",
-    "topics": [
-      "Machine Learning",
-      "AI",
-      "Data Science"
-    ],
-    "location": "KTX khu A, Ho Chi Minh City, Vietnam",
-    "type": "offline",
-    "conferenceDates": [
-      {
-        "startDate": "2022-07-17",
-        "endDate": "2022-07-23",
-        "dateName": "Conference Dates"
-      },
-      {
-        "startDate": "2022-03-01",
-        "endDate": null,
-        "dateName": "Submission Deadline"
-      },
-      {
-        "startDate": "2022-06-01",
-        "endDate": null,
-        "dateName": "Camera Ready Deadline"
-      },
-      {
-        "startDate": "2022-05-01",
-        "endDate": null,
-        "dateName": "Notification Date"
-      }
-    ],
-    "imageUrl": "/bg-2.jpg",
-    "description": "The International Conference on Machine Learning is one of the top conferences in the field of machine learning.",
+  {"id":"1",
+    "name": "ACM SIGMOD-SIGACT-SIGART Conference on Principles of Database Systems",
+    "acronym": "PODS",
     "rank": "A",
-    "link": "https://icml.cc",
-    "sourceYear": "2022"
+    "rating": "",
+    "dblp": "",
+    "note": "",
+    "comments": "",
+    "fieldOfResearch": "",
+    "source": "",
+    "link": "https://2025.sigmod.org",
+    "cfpLink": "https://2025.sigmod.org/calls_papers_pods_research.shtml",
+    "impLink": "https://2025.sigmod.org/calls_papers_important_dates.shtml",
+    "information": "Conference dates: June 22-27, 2025\nYear: 2025\nLocation: Berlin, Germany\nCity-State-Province: Berlin\nCountry: Germany\nContinent: Europe\nType: Offline\nFIRST SUBMISSION CYCLE Abstract deadline: May 31, 2024\nFIRST SUBMISSION CYCLE Full paper submission deadline: June 7, 2024\nSECOND SUBMISSION CYCLE Abstract deadline: December 2, 2024\nSECOND SUBMISSION CYCLE Full paper submission deadline: December 9, 2024\nFIRST SUBMISSION CYCLE Initial notification: August 12, 2024\nFIRST SUBMISSION CYCLE Final notification: September 2, 2024\nSECOND SUBMISSION CYCLE Initial notification: February 14, 2025\nSECOND SUBMISSION CYCLE Final notification: March 7, 2025\nRegistration: {}\nFIRST SUBMISSION CYCLE Rebuttal: July 29 - August 1, 2024\nFIRST SUBMISSION CYCLE Revision submission: August 26, 2024\nSECOND SUBMISSION CYCLE Rebuttal: February 3-7, 2025\nSECOND SUBMISSION CYCLE Revision submission: February 28, 2025\nTopics: Database systems, Data management\nPublisher: ACM",
+    "conferenceDates": "June 22-30, 2025",
+    "year": "2025",
+    "location": "Berlin, Germany",
+    "cityStateProvince": "Berlin",
+    "country": "Germany",
+    "continent": "Europe",
+    "type": "Offline",
+    "submissionDate": {
+      "FIRST SUBMISSION CYCLE Abstract deadline": "May 31, 2024",
+      "FIRST SUBMISSION CYCLE Full paper submission deadline": "June 7, 2024",
+      "SECOND SUBMISSION CYCLE Abstract deadline": "December 2, 2024",
+      "SECOND SUBMISSION CYCLE Full paper submission deadline": "December 9, 2024"
+    },
+    "notificationDate": {
+      "FIRST SUBMISSION CYCLE Initial notification": "August 12, 2024",
+      "FIRST SUBMISSION CYCLE Final notification": "September 2, 2024",
+      "SECOND SUBMISSION CYCLE Initial notification": "February 14, 2025",
+      "SECOND SUBMISSION CYCLE Final notification": "March 7, 2025"
+    },
+    "cameraReadyDate": {},
+    "registrationDate": {},
+    "otherDate": {
+      "FIRST SUBMISSION CYCLE Rebuttal": "July 29 - August 1, 2024",
+      "FIRST SUBMISSION CYCLE Revision submission": "August 26, 2024",
+      "SECOND SUBMISSION CYCLE Rebuttal": "February 3-7, 2025",
+      "SECOND SUBMISSION CYCLE Revision submission": "February 28, 2025"
+    },
+    "topics": "Database systems, Data management",
+    "publisher": "ACM",
+    "summary": "The ACM SIGMOD/PODS Conference is a leading international forum for database researchers, practitioners, developers, and users. The 2025 conference will be held in Berlin, Germany, from June 22-27, 2025. The conference features a technical program with research and industrial talks, tutorials, demos, workshops, and poster sessions.",
+    "callForPapers": "PODS 2025 invites scientific articles that present principled contributions to modeling, application, and system building in the context of data management. Key dates are:\n\n*   **FIRST SUBMISSION PHASE:**\n    *   Abstract: May 31, 2024\n    *   Submission: June 7, 2024\n    *   Rebuttal: July 29 - August 1, 2024\n    *   Initial notification: August 12, 2024\n    *   Revision submission: August 26, 2024\n    *   Final notification: September 2, 2024\n*   **SECOND SUBMISSION PHASE:**\n    *   Abstract: December 2, 2024\n    *   Submission: December 9, 2024\n    *   Rebuttal: February 3-7, 2025\n    *   Initial notification: February 14, 2025\n    *   Revision submission: February 28, 2025\n    *   Final notification: March 7, 2025\n\n*   **Submission Guidelines:**\n    *   Maximum length: 15 pages, not including references, plus unlimited space for references. Additional details may be included in a clearly marked appendix.\n    *   Format: LaTex users must format their submission using the standard ACM \"acmsmall\" proceedings stylesheet.\n    *   Double-anonymous reviewing will be applied.\n*   **Publication:** Accepted papers will be published in a PODS 2025 issue of the PACMMOD journal."
   },
   {
     "id": "2",
-    "name": "Conference on Computer Vision and Pattern Recognition",
-    "acronym": "CVPR",
-    "category": "Computer Vision",
-    "topics": [
-      "Computer Vision",
-      "Pattern Recognition",
-      "AI"
-    ],
-    "type": "offline",
-    "conferenceDates": [
-      {
-        "startDate": "2022-06-19",
-        "endDate": "2022-06-24",
-        "dateName": "Conference Dates"
-      },
-      {
-        "startDate": "2022-02-01",
-        "endDate": null,
-        "dateName": "Submission Deadline"
-      },
-      {
-        "startDate": "2022-05-01",
-        "endDate": null,
-        "dateName": "Camera Ready Deadline"
-      },
-      {
-        "startDate": "2022-04-01",
-        "endDate": null,
-        "dateName": "Notification Date"
-      }
-    ],
-    "imageUrl": "/bg-2.jpg",
-    "description": "The Conference on Computer Vision and Pattern Recognition is a leading annual conference on computer vision and pattern recognition.",
+    "name": "International Conference on Machine Learning",
+    "acronym": "ICML",
     "rank": "A",
-    "link": "https://cvpr2022.thecvf.com",
-    "sourceYear": "2022"
+    "rating": "",
+    "dblp": "",
+    "note": "",
+    "comments": "",
+    "fieldOfResearch": "Artificial Intelligence",
+    "source": "",
+    "link": "https://icml.cc",
+    "cfpLink": "",
+    "impLink": "",
+    "information": "Conference Dates: July 17-23, 2022\nLocation: KTX khu A, Ho Chi Minh City, Vietnam\nType: offline\nSubmission Deadline: March 1, 2022\nCamera Ready Deadline: June 1, 2022\nNotification Date: May 1, 2022\nTopics: Machine Learning, AI, Data Science",
+    "conferenceDates": "July 17-23, 2022",
+    "year": "2022",
+    "location": "KTX khu A, Ho Chi Minh City, Vietnam",
+    "cityStateProvince": "Ho Chi Minh City",
+    "country": "Vietnam",
+    "continent": "",
+    "type": "offline",
+    "submissionDate": {
+      "Submission Deadline": "2022-03-01"
+    },
+    "notificationDate": {
+      "Notification Date": "2022-05-01"
+    },
+    "cameraReadyDate": {
+      "Camera Ready Deadline": "2022-06-01"
+    },
+    "registrationDate": {},
+    "otherDate": {},
+    "topics": "Machine Learning, AI, Data Science",
+    "publisher": "",
+      "summary": "The International Conference on Machine Learning is one of the top conferences in the field of machine learning.",
+      "callForPapers": ""
   },
   {
     "id": "3",
-    "name": "International Conference on Learning Representations",
-    "acronym": "ICLR",
-    "category": "Machine Learning",
-    "topics": [
-      "Deep Learning",
-      "AI",
-      "Neural Networks"
-    ],
-    "location": "Addis Ababa, Ethiopia",
-    "type": "offline",
-    "conferenceDates": [
-      {
-        "startDate": "2022-05-02",
-        "endDate": "2022-05-07",
-        "dateName": "Conference Dates"
-      },
-      {
-        "startDate": "2022-01-15",
-        "endDate": null,
-        "dateName": "Submission Deadline"
-      },
-      {
-        "startDate": "2022-04-01",
-        "endDate": null,
-        "dateName": "Camera Ready Deadline"
-      },
-      {
-        "startDate": "2022-03-01",
-        "endDate": null,
-        "dateName": "Notification Date"
-      }
-    ],
-    "imageUrl": "/bg-2.jpg",
-    "description": "The International Conference on Learning Representations is a top conference in the field of deep learning.",
+    "name": "Conference on Computer Vision and Pattern Recognition",
+    "acronym": "CVPR",
     "rank": "A",
-    "link": "https://iclr.cc",
-    "sourceYear": "2022"
+    "rating": "",
+    "dblp": "",
+    "note": "",
+    "comments": "",
+    "fieldOfResearch": "Computer Vision",
+    "source": "",
+    "link": "https://cvpr2022.thecvf.com",
+    "cfpLink": "",
+    "impLink": "",
+      "information": "Conference Dates: June 19-24, 2022\nType: offline\nSubmission Deadline: February 1, 2022\nCamera Ready Deadline: May 1, 2022\nNotification Date: April 1, 2022\nTopics: Computer Vision, Pattern Recognition, AI",
+    "conferenceDates": "June 19-24, 2022",
+    "year": "2022",
+    "location": "",
+    "cityStateProvince": "",
+    "country": "",
+    "continent": "",
+    "type": "offline",
+    "submissionDate": {
+      "Submission Deadline": "2022-02-01"
+    },
+    "notificationDate": {
+      "Notification Date": "2022-04-01"
+    },
+    "cameraReadyDate": {
+      "Camera Ready Deadline": "2022-05-01"
+    },
+    "registrationDate": {},
+    "otherDate": {},
+    "topics": "Computer Vision, Pattern Recognition, AI",
+    "publisher": "",
+    "summary": "The Conference on Computer Vision and Pattern Recognition is a leading annual conference on computer vision and pattern recognition.",
+    "callForPapers": ""
   },
   {
     "id": "4",
-    "name": "International Conference on Data Mining",
-    "acronym": "ICDM",
-    "category": "Data Mining",
-    "topics": [
-      "Data Mining",
-      "Big Data",
-      "AI"
-    ],
-    "location": "Singapore",
-    "type": "offline",
-    "conferenceDates": [
-      {
-        "startDate": "2022-11-14",
-        "endDate": "2022-11-17",
-        "dateName": "Conference Dates"
-      },
-      {
-        "startDate": "2022-07-01",
-        "endDate": null,
-        "dateName": "Submission Deadline"
-      },
-      {
-        "startDate": "2022-10-01",
-        "endDate": null,
-        "dateName": "Camera Ready Deadline"
-      },
-      {
-        "startDate": "2022-09-01",
-        "endDate": null,
-        "dateName": "Notification Date"
-      }
-    ],
-    "imageUrl": "/bg-2.jpg",
-    "description": "The International Conference on Data Mining is a premier forum for presenting research in data mining.",
+    "name": "International Conference on Learning Representations",
+    "acronym": "ICLR",
     "rank": "A",
-    "link": "https://icdm2022.org",
-    "sourceYear": "2022"
+    "rating": "",
+    "dblp": "",
+    "note": "",
+    "comments": "",
+    "fieldOfResearch": "Machine Learning",
+    "source": "",
+    "link": "https://iclr.cc",
+    "cfpLink": "",
+    "impLink": "",
+    "information": "Conference Dates: May 2-7, 2022\nLocation: Addis Ababa, Ethiopia\nType: offline\nSubmission Deadline: January 15, 2022\nCamera Ready Deadline: April 1, 2022\nNotification Date: March 1, 2022\nTopics: Deep Learning, AI, Neural Networks",
+    "conferenceDates": "May 2-7, 2022",
+    "year": "2022",
+    "location": "Addis Ababa, Ethiopia",
+    "cityStateProvince": "Addis Ababa",
+    "country": "Ethiopia",
+    "continent": "",
+    "type": "offline",
+    "submissionDate": {
+      "Submission Deadline": "2022-01-15"
+    },
+    "notificationDate": {
+      "Notification Date": "2022-03-01"
+    },
+    "cameraReadyDate": {
+      "Camera Ready Deadline": "2022-04-01"
+    },
+    "registrationDate": {},
+    "otherDate": {},
+    "topics": "Deep Learning, AI, Neural Networks",
+    "publisher": "",
+      "summary": "The International Conference on Learning Representations is a top conference in the field of deep learning.",
+    "callForPapers": ""
+
   },
   {
     "id": "5",
-    "name": "International Conference on Computer Graphics and Interactive Techniques",
-    "acronym": "SIGGRAPH",
-    "category": "Computer Graphics",
-    "topics": [
-      "Computer Graphics",
-      "Interactive Techniques",
-      "AI"
-    ],
-    "location": "Vancouver, Canada",
-    "type": "offline",
-    "conferenceDates": [
-      {
-        "startDate": "2022-08-07",
-        "endDate": "2022-08-11",
-        "dateName": "Conference Dates"
-      },
-      {
-        "startDate": "2022-08-07",
-        "endDate": "2022-08-11",
-        "dateName": "Submission Deadline"
-      },
-      {
-        "startDate": "2022-07-01",
-        "endDate": null,
-        "dateName": "Camera Ready Deadline"
-      },
-      {
-        "startDate": "2022-06-01",
-        "endDate": null,
-        "dateName": "Notification Date"
-      }
-    ],
-    "imageUrl": "/bg-2.jpg",
-    "description": "SIGGRAPH is the premier conference for computer graphics and interactive techniques.",
+    "name": "International Conference on Data Mining",
+    "acronym": "ICDM",
     "rank": "A",
-    "link": "https://s2022.siggraph.org",
-    "sourceYear": "2022"
+    "rating": "",
+    "dblp": "",
+    "note": "",
+    "comments": "",
+    "fieldOfResearch": "Data Mining",
+    "source": "",
+    "link": "https://icdm2022.org",
+    "cfpLink": "",
+    "impLink": "",
+    "information": "Conference Dates: November 14-17, 2022\nLocation: Singapore\nType: offline\nSubmission Deadline: July 1, 2022\nCamera Ready Deadline: October 1, 2022\nNotification Date: September 1, 2022\nTopics: Data Mining, Big Data, AI",
+    "conferenceDates": "November 14-17, 2022",
+    "year": "2022",
+    "location": "Singapore",
+    "cityStateProvince": "",
+    "country": "Singapore",
+    "continent": "",
+    "type": "offline",
+    "submissionDate": {
+      "Submission Deadline": "2022-07-01"
+    },
+    "notificationDate": {
+      "Notification Date": "2022-09-01"
+    },
+    "cameraReadyDate": {
+      "Camera Ready Deadline": "2022-10-01"
+    },
+    "registrationDate": {},
+    "otherDate": {},
+    "topics": "Data Mining, Big Data, AI",
+    "publisher": "",
+    "summary": "The International Conference on Data Mining is a premier forum for presenting research in data mining.",
+    "callForPapers": ""
   },
   {
     "id": "6",
-    "name": "International Conference on Robotics and Automation",
-    "acronym": "ICRA",
-    "category": "Robotics",
-    "topics": [
-      "Robotics",
-      "Automation",
-      "AI"
-    ],
-    "location": "Philadelphia, USA",
-    "type": "offline",
-    "conferenceDates": [
-      {
-        "startDate": "2022-05-23",
-        "endDate": "2022-05-27",
-        "dateName": "Conference Dates"
-      },
-      {
-        "startDate": "2022-01-31",
-        "endDate": null,
-        "dateName": "Submission Deadline"
-      },
-      {
-        "startDate": "2022-04-15",
-        "endDate": null,
-        "dateName": "Camera Ready Deadline"
-      },
-      {
-        "startDate": "2022-03-15",
-        "endDate": null,
-        "dateName": "Notification Date"
-      }
-    ],
-    "imageUrl": "/bg-2.jpg",
-    "description": "The International Conference on Robotics and Automation is a leading conference in the field of robotics.",
+    "name": "International Conference on Computer Graphics and Interactive Techniques",
+    "acronym": "SIGGRAPH",
     "rank": "A",
-    "link": "https://icra2022.org",
-    "sourceYear": "2022"
+    "rating": "",
+    "dblp": "",
+    "note": "",
+    "comments": "",
+    "fieldOfResearch": "Computer Graphics",
+    "source": "",
+    "link": "https://s2022.siggraph.org",
+    "cfpLink": "",
+    "impLink": "",
+    "information": "Conference Dates: August 7-11, 2022\nLocation: Vancouver, Canada\nType: offline\nSubmission Deadline: August 7-11, 2022\nCamera Ready Deadline: July 1, 2022\nNotification Date: June 1, 2022\nTopics: Computer Graphics, Interactive Techniques, AI",
+    "conferenceDates": "August 7-11, 2022",
+    "year": "2022",
+    "location": "Vancouver, Canada",
+    "cityStateProvince": "Vancouver",
+    "country": "Canada",
+    "continent": "",
+    "type": "offline",
+    "submissionDate": {
+      "Submission Deadline": "2022-08-07"
+    },
+    "notificationDate": {
+      "Notification Date": "2022-06-01"
+    },
+    "cameraReadyDate": {
+      "Camera Ready Deadline": "2022-07-01"
+    },
+    "registrationDate": {},
+    "otherDate": {},
+    "topics": "Computer Graphics, Interactive Techniques, AI",
+    "publisher": "",
+    "summary": "SIGGRAPH is the premier conference for computer graphics and interactive techniques.",
+      "callForPapers": ""
   },
   {
     "id": "7",
-    "name": "International Conference on Software Engineering",
-    "acronym": "ICSE",
-    "category": "Software Engineering",
-    "topics": [
-      "Software Engineering",
-      "Programming Languages",
-      "AI"
-    ],
-    "location": "Pittsburgh, USA",
-    "type": "offline",
-    "conferenceDates": [
-      {
-        "startDate": "2022-05-21",
-        "endDate": "2022-05-29",
-        "dateName": "Conference Dates"
-      },
-      {
-        "startDate": "2022-01-10",
-        "endDate": null,
-        "dateName": "Submission Deadline"
-      },
-      {
-        "startDate": "2022-04-10",
-        "endDate": null,
-        "dateName": "Camera Ready Deadline"
-      },
-      {
-        "startDate": "2022-03-10",
-        "endDate": null,
-        "dateName": "Notification Date"
-      }
-    ],
-    "imageUrl": "/bg-2.jpg",
-    "description": "The International Conference on Software Engineering is the premier conference for software engineering research.",
+    "name": "International Conference on Robotics and Automation",
+    "acronym": "ICRA",
     "rank": "A",
-    "link": "https://conf.researchr.org/home/icse-2022",
-    "sourceYear": "2022"
+    "rating": "",
+    "dblp": "",
+    "note": "",
+    "comments": "",
+    "fieldOfResearch": "Robotics",
+    "source": "",
+    "link": "https://icra2022.org",
+    "cfpLink": "",
+    "impLink": "",
+      "information": "Conference Dates: May 23-27, 2022\nLocation: Philadelphia, USA\nType: offline\nSubmission Deadline: January 31, 2022\nCamera Ready Deadline: April 15, 2022\nNotification Date: March 15, 2022\nTopics: Robotics, Automation, AI",
+    "conferenceDates": "May 23-27, 2022",
+    "year": "2022",
+    "location": "Philadelphia, USA",
+    "cityStateProvince": "Philadelphia",
+    "country": "USA",
+    "continent": "",
+    "type": "offline",
+    "submissionDate": {
+      "Submission Deadline": "2022-01-31"
+    },
+    "notificationDate": {
+      "Notification Date": "2022-03-15"
+    },
+    "cameraReadyDate": {
+      "Camera Ready Deadline": "2022-04-15"
+    },
+    "registrationDate": {},
+    "otherDate": {},
+    "topics": "Robotics, Automation, AI",
+    "publisher": "",
+      "summary": "The International Conference on Robotics and Automation is a leading conference in the field of robotics.",
+      "callForPapers": ""
   },
   {
     "id": "8",
-    "name": "International Conference on Information and Knowledge Management",
-    "acronym": "CIKM",
-    "category": "Information Management",
-    "topics": [
-      "Information Management",
-      "Knowledge Management",
-      "AI"
-    ],
-    "location": "Atlanta, USA",
-    "type": "offline",
-    "conferenceDates": [
-      {
-        "startDate": "2022-10-17",
-        "endDate": "2022-10-21",
-        "dateName": "Conference Dates"
-      },
-      {
-        "startDate": "2022-06-01",
-        "endDate": null,
-        "dateName": "Submission Deadline"
-      },
-      {
-        "startDate": "2022-09-01",
-        "endDate": null,
-        "dateName": "Camera Ready Deadline"
-      },
-      {
-        "startDate": "2022-08-01",
-        "endDate": null,
-        "dateName": "Notification Date"
-      }
-    ],
-    "imageUrl": "/bg-2.jpg",
-    "description": "The International Conference on Information and Knowledge Management is a top conference in the field of information and knowledge management.",
+    "name": "International Conference on Software Engineering",
+    "acronym": "ICSE",
     "rank": "A",
-    "link": "https://www.cikm2022.org",
-    "sourceYear": "2022"
+    "rating": "",
+    "dblp": "",
+    "note": "",
+    "comments": "",
+    "fieldOfResearch": "Software Engineering",
+    "source": "",
+    "link": "https://conf.researchr.org/home/icse-2022",
+    "cfpLink": "",
+    "impLink": "",
+    "information": "Conference Dates: May 21-29, 2022\nLocation: Pittsburgh, USA\nType: offline\nSubmission Deadline: January 10, 2022\nCamera Ready Deadline: April 10, 2022\nNotification Date: March 10, 2022\nTopics: Software Engineering, Programming Languages, AI",
+    "conferenceDates": "May 21-29, 2022",
+    "year": "2022",
+    "location": "Pittsburgh, USA",
+    "cityStateProvince": "Pittsburgh",
+    "country": "USA",
+    "continent": "",
+    "type": "offline",
+    "submissionDate": {
+      "Submission Deadline": "2022-01-10"
+    },
+    "notificationDate": {
+      "Notification Date": "2022-03-10"
+    },
+    "cameraReadyDate": {
+      "Camera Ready Deadline": "2022-04-10"
+    },
+    "registrationDate": {},
+    "otherDate": {},
+    "topics": "Software Engineering, Programming Languages, AI",
+    "publisher": "",
+    "summary": "The International Conference on Software Engineering is the premier conference for software engineering research.",
+    "callForPapers": ""
   },
   {
     "id": "9",
-    "name": "International Conference on Web Search and Data Mining",
-    "acronym": "WSDM",
-    "category": "Web Search",
-    "topics": [
-      "Web Search",
-      "Data Mining",
-      "AI"
-    ],
-    "location": "Phoenix, USA",
-    "type": "offline",
-    "conferenceDates": [
-      {
-        "startDate": "2022-02-21",
-        "endDate": "2022-02-25",
-        "dateName": "Conference Dates"
-      },
-      {
-        "startDate": "2021-10-01",
-        "endDate": null,
-        "dateName": "Submission Deadline"
-      },
-      {
-        "startDate": "2022-01-15",
-        "endDate": null,
-        "dateName": "Camera Ready Deadline"
-      },
-      {
-        "startDate": "2021-12-15",
-        "endDate": null,
-        "dateName": "Notification Date"
-      }
-    ],
-    "imageUrl": "/bg-2.jpg",
-    "description": "The International Conference on Web Search and Data Mining is a premier conference on web search and data mining.",
+    "name": "International Conference on Information and Knowledge Management",
+    "acronym": "CIKM",
     "rank": "A",
-    "link": "https://www.wsdm2022.org",
-    "sourceYear": "2022"
+    "rating": "",
+    "dblp": "",
+    "note": "",
+    "comments": "",
+    "fieldOfResearch": "Information Management",
+    "source": "",
+    "link": "https://www.cikm2022.org",
+    "cfpLink": "",
+    "impLink": "",
+    "information": "Conference Dates: October 17-21, 2022\nLocation: Atlanta, USA\nType: offline\nSubmission Deadline: June 1, 2022\nCamera Ready Deadline: September 1, 2022\nNotification Date: August 1, 2022\nTopics: Information Management, Knowledge Management, AI",
+    "conferenceDates": "October 17-21, 2022",
+    "year": "2022",
+    "location": "Atlanta, USA",
+    "cityStateProvince": "Atlanta",
+    "country": "USA",
+    "continent": "",
+    "type": "offline",
+    "submissionDate": {
+      "Submission Deadline": "2022-06-01"
+    },
+    "notificationDate": {
+      "Notification Date": "2022-08-01"
+    },
+    "cameraReadyDate": {
+      "Camera Ready Deadline": "2022-09-01"
+    },
+    "registrationDate": {},
+    "otherDate": {},
+    "topics": "Information Management, Knowledge Management, AI",
+    "publisher": "",
+    "summary": "The International Conference on Information and Knowledge Management is a top conference in the field of information and knowledge management.",
+      "callForPapers": ""
   },
   {
     "id": "10",
+    "name": "International Conference on Web Search and Data Mining",
+    "acronym": "WSDM",
+    "rank": "A",
+    "rating": "",
+    "dblp": "",
+    "note": "",
+    "comments": "",
+    "fieldOfResearch": "Web Search",
+    "source": "",
+    "link": "https://www.wsdm2022.org",
+    "cfpLink": "",
+    "impLink": "",
+    "information": "Conference Dates: February 21-25, 2022\nLocation: Phoenix, USA\nType: offline\nSubmission Deadline: October 1, 2021\nCamera Ready Deadline: January 15, 2022\nNotification Date: December 15, 2021\nTopics: Web Search, Data Mining, AI",
+    "conferenceDates": "February 21-25, 2022",
+    "year": "2022",
+    "location": "Phoenix, USA",
+    "cityStateProvince": "Phoenix",
+    "country": "USA",
+    "continent": "",
+    "type": "offline",
+    "submissionDate": {
+      "Submission Deadline": "2021-10-01"
+    },
+    "notificationDate": {
+      "Notification Date": "2021-12-15"
+    },
+    "cameraReadyDate": {
+      "Camera Ready Deadline": "2022-01-15"
+    },
+    "registrationDate": {},
+    "otherDate": {},
+    "topics": "Web Search, Data Mining, AI",
+    "publisher": "",
+      "summary": "The International Conference on Web Search and Data Mining is a premier conference on web search and data mining.",
+    "callForPapers": ""
+  },
+  {
+    "id": "11",
     "name": "International Conference on Artificial Intelligence and Statistics",
     "acronym": "AISTATS",
-    "category": "Artificial Intelligence",
-    "topics": [
-      "Artificial Intelligence",
-      "Statistics",
-      "Machine Learning"
-    ],
-    "location": "Valencia, Spain",
-    "type": "offline",
-    "conferenceDates": [
-      {
-        "startDate": "2022-04-26",
-        "endDate": "2022-04-28",
-        "dateName": "Conference Dates"
-      },
-      {
-        "startDate": "2021-12-01",
-        "endDate": null,
-        "dateName": "Submission Deadline"
-      },
-      {
-        "startDate": "2022-03-15",
-        "endDate": null,
-        "dateName": "Camera Ready Deadline"
-      },
-      {
-        "startDate": "2022-02-15",
-        "endDate": null,
-        "dateName": "Notification Date"
-      }
-    ],
-    "imageUrl": "/bg-2.jpg",
-    "description": "The International Conference on Artificial Intelligence and Statistics is a leading conference on AI and statistics.",
     "rank": "A",
+    "rating": "",
+    "dblp": "",
+    "note": "",
+    "comments": "",
+    "fieldOfResearch": "Artificial Intelligence",
+    "source": "",
     "link": "https://aistats.org",
-    "sourceYear": "2022"
+    "cfpLink": "",
+    "impLink": "",
+    "information": "Conference Dates: April 26-28, 2022\nLocation: Valencia, Spain\nType: offline\nSubmission Deadline: December 1, 2021\nCamera Ready Deadline: March 15, 2022\nNotification Date: February 15, 2022\nTopics: Artificial Intelligence, Statistics, Machine Learning",
+    "conferenceDates": "April 26-28, 2022",
+    "year": "2022",
+    "location": "Valencia, Spain",
+    "cityStateProvince": "Valencia",
+    "country": "Spain",
+    "continent": "",
+    "type": "offline",
+    "submissionDate": {
+      "Submission Deadline": "2021-12-01"
+    },
+    "notificationDate": {
+      "Notification Date": "2022-02-15"
+    },
+    "cameraReadyDate": {
+      "Camera Ready Deadline": "2022-03-15"
+    },
+    "registrationDate": {},
+    "otherDate": {},
+    "topics": "Artificial Intelligence, Statistics, Machine Learning",
+    "publisher": "",
+      "summary": "The International Conference on Artificial Intelligence and Statistics is a leading conference on AI and statistics.",
+    "callForPapers": ""
   }
 ]

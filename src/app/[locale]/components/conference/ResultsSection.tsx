@@ -57,42 +57,42 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             );
         }
 
-        if (startDate) {
-            filteredEvents = filteredEvents.filter(event =>
-                event.conferenceDates.some(dateRange => {
-                    if (dateRange.startDate) { // Check if startDate exists in dateRange
-                        const eventStartDate = new Date(dateRange.startDate);
-                        return eventStartDate >= startDate;
-                    }
-                    return false; // If startDate is not available for this dateRange, don't consider it a match
-                })
-            );
-        }
+        // if (startDate) {
+        //     filteredEvents = filteredEvents.filter(event =>
+        //         event.conferenceDates.some(dateRange => {
+        //             if (dateRange.startDate) { // Check if startDate exists in dateRange
+        //                 const eventStartDate = new Date(dateRange.startDate);
+        //                 return eventStartDate >= startDate;
+        //             }
+        //             return false; // If startDate is not available for this dateRange, don't consider it a match
+        //         })
+        //     );
+        // }
 
-        if (endDate) {
-            filteredEvents = filteredEvents.filter(event =>
-                event.conferenceDates.some(dateRange => {
-                    if (dateRange.endDate) { // Check if endDate exists in dateRange
-                        const eventEndDate = new Date(dateRange.endDate);
-                        return eventEndDate <= endDate;
-                    }
-                    return false; // If endDate is not available for this dateRange, don't consider it a match
-                })
-            );
-        }
+        // if (endDate) {
+        //     filteredEvents = filteredEvents.filter(event =>
+        //         event.conferenceDates.some(dateRange => {
+        //             if (dateRange.endDate) { // Check if endDate exists in dateRange
+        //                 const eventEndDate = new Date(dateRange.endDate);
+        //                 return eventEndDate <= endDate;
+        //             }
+        //             return false; // If endDate is not available for this dateRange, don't consider it a match
+        //         })
+        //     );
+        // }
 
         // Apply advanced filters
-        if (submissionDate) {
-            filteredEvents = filteredEvents.filter(event =>
-                event.conferenceDates.some(dateRange => {
-                    if (dateRange.dateName === "Submission Deadline" && dateRange.startDate) { // Find Submission Deadline and check startDate
-                        const eventSubmissionDate = new Date(dateRange.startDate);
-                        return eventSubmissionDate <= submissionDate;
-                    }
-                    return false; // If Submission Deadline not found or submissionDate is missing, don't consider it a match
-                })
-            );
-        }
+        // if (submissionDate) {
+        //     filteredEvents = filteredEvents.filter(event =>
+        //         event.conferenceDates.some(dateRange => {
+        //             if (dateRange.dateName === "Submission Deadline" && dateRange.startDate) { // Find Submission Deadline and check startDate
+        //                 const eventSubmissionDate = new Date(dateRange.startDate);
+        //                 return eventSubmissionDate <= submissionDate;
+        //             }
+        //             return false; // If Submission Deadline not found or submissionDate is missing, don't consider it a match
+        //         })
+        //     );
+        // }
 
         if (selectedRank) {
             filteredEvents = filteredEvents.filter(event =>
@@ -102,13 +102,13 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
         if (selectedTopics && selectedTopics.length > 0) {
             filteredEvents = filteredEvents.filter(event =>
-                event.topics.some(topic => selectedTopics.includes(topic))
+                event.topics.split(',').some(topic => selectedTopics.includes(topic))
             );
         }
 
         if (selectedFieldsOfResearch && selectedFieldsOfResearch.length > 0) {
             filteredEvents = filteredEvents.filter(event =>
-                selectedFieldsOfResearch.includes(event.category) // Filtering by event.category (from ConferenceResponse)
+                selectedFieldsOfResearch.includes(event.fieldOfResearch) // Filtering by event.category (from ConferenceResponse)
             );
         }
 
@@ -122,47 +122,47 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 sortedEvents.sort((a, b) => a.name.localeCompare(b.name));
                 break;
             case 'submissionDate':
-                sortedEvents.sort((a, b) => {
-                    const submissionDateA = a.conferenceDates.find(date => date.dateName === "Submission Deadline")?.startDate;
-                    const submissionDateB = b.conferenceDates.find(date => date.dateName === "Submission Deadline")?.startDate;
+                // sortedEvents.sort((a, b) => {
+                //     const submissionDateA = a.conferenceDates.find(date => date.dateName === "Submission Deadline")?.startDate;
+                //     const submissionDateB = b.conferenceDates.find(date => date.dateName === "Submission Deadline")?.startDate;
 
-                    const dateA = submissionDateA ? new Date(submissionDateA).getTime() : -Infinity; // Use -Infinity if not found
-                    const dateB = submissionDateB ? new Date(submissionDateB).getTime() : -Infinity; // Use -Infinity if not found
+                //     const dateA = submissionDateA ? new Date(submissionDateA).getTime() : -Infinity; // Use -Infinity if not found
+                //     const dateB = submissionDateB ? new Date(submissionDateB).getTime() : -Infinity; // Use -Infinity if not found
 
-                    return dateA - dateB;
-                });
+                //     return dateA - dateB;
+                // });
                 break;
             case 'startDate':
             case 'date': // Sort by conference date (default - which is start date) - vẫn sắp xếp theo startDate sớm nhất
             default:
-                sortedEvents.sort((a, b) => {
-                    const minStartDateA = Math.min(
-                        ...a.conferenceDates
-                            .filter(date => date.startDate) // Filter out dates without startDate
-                            .map(date => new Date(date.startDate).getTime())
-                    );
-                    const minStartDateB = Math.min(
-                        ...b.conferenceDates
-                            .filter(date => date.startDate) // Filter out dates without startDate
-                            .map(date => new Date(date.startDate).getTime())
-                    );
-                    return minStartDateA - minStartDateB;
-                });
+                // sortedEvents.sort((a, b) => {
+                //     const minStartDateA = Math.min(
+                //         ...a.conferenceDates
+                //             .filter(date => date.startDate) // Filter out dates without startDate
+                //             .map(date => new Date(date.startDate).getTime())
+                //     );
+                //     const minStartDateB = Math.min(
+                //         ...b.conferenceDates
+                //             .filter(date => date.startDate) // Filter out dates without startDate
+                //             .map(date => new Date(date.startDate).getTime())
+                //     );
+                //     return minStartDateA - minStartDateB;
+                // });
                 break;
             case 'endDate':
-                sortedEvents.sort((a, b) => {
-                    const maxEndDateA = Math.max(
-                        ...a.conferenceDates
-                            .filter(date => date.endDate) // Filter out dates without endDate
-                            .map(date => new Date(date.endDate).getTime())
-                    );
-                    const maxEndDateB = Math.max(
-                        ...b.conferenceDates
-                            .filter(date => date.endDate) // Filter out dates without endDate
-                            .map(date => new Date(date.endDate).getTime())
-                    );
-                    return maxEndDateA - maxEndDateB;
-                });
+                // sortedEvents.sort((a, b) => {
+                //     const maxEndDateA = Math.max(
+                //         ...a.conferenceDates
+                //             .filter(date => date.endDate) // Filter out dates without endDate
+                //             .map(date => new Date(date.endDate).getTime())
+                //     );
+                //     const maxEndDateB = Math.max(
+                //         ...b.conferenceDates
+                //             .filter(date => date.endDate) // Filter out dates without endDate
+                //             .map(date => new Date(date.endDate).getTime())
+                //     );
+                //     return maxEndDateA - maxEndDateB;
+                // });
                 break;
         }
 
