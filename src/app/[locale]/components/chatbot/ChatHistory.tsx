@@ -1,3 +1,4 @@
+// Trong ChatHistory.tsx
 import React, { useRef, useEffect } from 'react';
 import ChatMessage from './ChatMessage';
 import ChartDisplay from './ChartDisplay';
@@ -21,8 +22,8 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ messages }) => {
     return (
         <div id="chat-history" className="p-2 border border-gray-200 rounded-lg mb-5 relative overflow-y-auto" ref={chatHistoryRef}>
             {messages.map((msg, index) => {
-                // Apply positioning styles to the message-container.
-                const containerClasses = `message-container p-3 rounded-xl mb-3 clear-both max-w-3/4 ${msg.isUser ? 'float-right text-right' : 'float-left text-left'}`;
+                // Thay đổi ở đây: max-w-full hoặc max-w-screen-md (hoặc lớn hơn)
+                const containerClasses = `message-container p-3 rounded-xl mb-3 clear-both max-w-full ${msg.isUser ? 'float-right text-right' : 'float-left text-left'}`;
                 return (
                     <div key={index} className={containerClasses}>
                         {msg.isUser ? (

@@ -308,15 +308,19 @@
 
 // export default ChatBot;
 
-"use client";
+
+
+"use client"; // This MUST be the very first line
+
 
 import React, { useState, useRef, useCallback } from 'react';
 import ChatHistory from './ChatHistory';
 import ChatInput from './ChatInput';
 import LoadingIndicator from './LoadingIndicator';
 import Introduction from './ChatIntroduction';
-import { sendNonStreamChatRequest, ChatResponse, ChatHistoryType, HistoryItem, ErrorResponse } from '../../../../api/chatbot/chatbotApi';
-import { useRouter, usePathname, pathnames } from '../../../../navigation';
+import { sendNonStreamChatRequest, ChatResponse, ChatHistoryType, HistoryItem, ErrorResponse, TextMessageResponse, ChartMessageResponse, InternalNavigationResponse, ExternalNavigationResponse } from '../../../../api/chatbot/chatbotApi';
+import { useRouter, usePathname } from 'next/navigation';
+import { getPathname } from '@/src/navigation';
 
 export interface ChatMessageType {
     message: string;
@@ -328,28 +332,34 @@ export interface ChatMessageType {
     echartsConfig?: any;
     sqlResult?: any;
     description?: string;
+    thought?: string;
 }
 
-type ApiResponse = ChatResponse & {
-    action?: 'redirect';
-    navigationType?: 'internal' | 'external';
-    path?: string;
-    url?: string;
-    message?: string;
-    echartsConfig?: any;
-    sqlResult?: any;
-    description?: string;
-};
+// --- Type Guards (Corrected Order) ---
 
-function isApiResponse(response: ChatResponse | ErrorResponse): response is ApiResponse {
-    return (
-        ('type' in response && (response.type === 'text' || response.type === 'chart')) ||
-        ('action' in response && response.action === 'redirect')
-    );
-}
-
+// Check for ErrorResponse *FIRST*
 function isErrorResponse(response: ChatResponse | ErrorResponse): response is ErrorResponse {
     return 'error' in response;
+}
+
+// Type guard for TextMessageResponse
+function isTextMessageResponse(response: ChatResponse): response is TextMessageResponse {
+    return 'type' in response && response.type === 'text'; // Add 'type' in response
+}
+
+// Type guard for ChartMessageResponse
+function isChartMessageResponse(response: ChatResponse): response is ChartMessageResponse {
+    return 'type' in response && response.type === 'chart';// Add 'type' in response
+}
+
+// Type guard for InternalNavigationResponse
+function isInternalNavigationResponse(response: ChatResponse): response is InternalNavigationResponse {
+    return 'type' in response && response.type === 'navigation' && 'navigationType' in response && response.navigationType === 'internal'; // Add 'type' in response
+}
+
+// Type guard for ExternalNavigationResponse
+function isExternalNavigationResponse(response: ChatResponse): response is ExternalNavigationResponse {
+    return 'type' in response && response.type === 'navigation' && 'navigationType' in response && response.navigationType === 'external'; // Add 'type' in response
 }
 
 function ChatBot() {
@@ -384,78 +394,69 @@ function ChatBot() {
                 type: msg.type
             }));
 
-            const response: ChatResponse | ErrorResponse = await sendNonStreamChatRequest(userMessage, historyForApi);
+            const response = await sendNonStreamChatRequest(userMessage, historyForApi);
 
-            if (isApiResponse(response)) {
-                // ... (handle ApiResponse, this part is correct) ...
-                let newBotMessage: ChatMessageType;
-                let userMessageType: 'text' | 'chart' | 'error' | 'navigation' = 'text';
+            let newBotMessage: ChatMessageType;
+            let userMessageType: 'text' | 'chart' | 'error' | 'navigation' = 'text';
 
-                if (response.action === 'redirect') {
-                    if (response.navigationType === 'internal' && response.path) {
-                        newBotMessage = { message: `Redirecting to ${response.path}...`, isUser: false, type: 'navigation', path: response.path, navigationType: 'internal' };
-                        userMessageType = 'navigation';
+            // --- Use Type Guards (Correct Order) ---
+            if (isErrorResponse(response)) {
+                console.error('Chat API error:', response.error);
+                newBotMessage = { message: `Sorry, I encountered an error: ${response.error}`, isUser: false, type: 'error', thought: response.thought };
+                userMessageType = 'error'
+            }
+            else if (isInternalNavigationResponse(response)) {
+                newBotMessage = { message: `Redirecting to ${response.path}...`, isUser: false, type: 'navigation', path: response.path, navigationType: 'internal' };
+                userMessageType = 'navigation';
+                if (typeof window !== 'undefined') {
 
-                        const validPathnames = Object.values(pathnames) as (keyof typeof pathnames)[]; // Correct way to get the array of pathnames
-                        if (validPathnames.includes(response.path as keyof typeof pathnames)) {
-                            router.push(response.path as keyof typeof pathnames);
-                        } else {
-                            console.error("Invalid path received from chatbot:", response.path);
-                            newBotMessage = { message: "Sorry, I couldn't navigate to that page.", isUser: false, type: 'error' };
-                            userMessageType = "error";
-                        }
-                    } else if (response.navigationType === 'external' && response.url) {
-                        newBotMessage = { message: `Redirecting to ${response.url}...`, isUser: false, type: 'navigation', url: response.url, navigationType: 'external' };
-                        userMessageType = 'navigation';
-                        window.location.href = response.url;
-                    } else {
-                        console.error("Invalid navigation response:", response);
-                        newBotMessage = { message: "Sorry, I couldn't perform the requested navigation.", isUser: false, type: 'error' };
-                        userMessageType = 'error';
-                    }
-                } else if (response.type === 'chart' && response.echartsConfig && response.sqlResult && response.description) {
-                    newBotMessage = {
-                        message: response.description,
-                        isUser: false,
-                        type: 'chart',
-                        echartsConfig: response.echartsConfig,
-                        sqlResult: response.sqlResult,
-                        description: response.description
-                    };
-                    userMessageType = 'chart';
-                } else if (response.type === 'text' && response.message) {
-                    newBotMessage = { message: response.message, isUser: false, type: 'text' };
-                    userMessageType = 'text';
+                    // --- Prepend Locale Prefix ---
+                    const localePrefix = pathname.split('/')[1]; // Extract locale prefix (e.g., "en")
+                    const pathWithLocale = `/${localePrefix}${response.path}`; // Construct path with locale
+
+                    router.push(pathWithLocale); // Use path with locale for internal navigation
                 } else {
-                    console.error('Unexpected response format:', response);
-                    newBotMessage = { message: "Sorry, I encountered an unexpected response format.", isUser: false, type: 'error' };
-                    userMessageType = 'error';
+                    console.error("Cannot navigate on the server-side.");
+                    newBotMessage = { message: "Sorry, I couldn't navigate to that page.", isUser: false, type: 'error' };
+                    userMessageType = "error";
                 }
-
-                setChatMessages(prevMessages => {
-                    const updatedChatMessages = [...prevMessages];
-                    if (userMessageIndex !== undefined && updatedChatMessages[userMessageIndex]) {
-                        updatedChatMessages[userMessageIndex] = { ...updatedChatMessages[userMessageIndex], type: userMessageType };
-                    }
-                    updatedChatMessages.push(newBotMessage);
-                    return updatedChatMessages;
-                });
-
+            } else if (isExternalNavigationResponse(response)) {
+                newBotMessage = { message: `Redirecting to ${response.url}...`, isUser: false, type: 'navigation', url: response.url, navigationType: 'external' };
+                userMessageType = 'navigation';
+                if (typeof window !== 'undefined') {
+                    window.location.href = response.url;
+                }
+            } else if (isChartMessageResponse(response)) {
+                newBotMessage = {
+                    message: response.description,
+                    isUser: false,
+                    type: 'chart',
+                    echartsConfig: response.echartsConfig,
+                    sqlResult: response.sqlResult,
+                    description: response.description,
+                    thought: response.thought,
+                };
+                userMessageType = 'chart';
+            } else if (isTextMessageResponse(response)) {
+                newBotMessage = { message: response.message, isUser: false, type: 'text', thought: response.thought };
+                userMessageType = 'text';
             } else {
-                if (isErrorResponse(response)) { // Kiểm tra xem response có phải là ErrorResponse không
-                    console.error('Chat API error:', response.error);
-                    const errorBotMessage: ChatMessageType = { message: `Sorry, I encountered an error: ${response.error}`, isUser: false, type: 'error' };
-                    setChatMessages(prevMessages => [...prevMessages, errorBotMessage]);
-                } else {
-                    // Trường hợp response không phải ApiResponse và không phải ErrorResponse (trường hợp bất ngờ)
-                    console.error('Unexpected response type:', response);
-                    const unexpectedErrorBotMessage: ChatMessageType = { message: "Sorry, I encountered an unexpected response type from the API.", isUser: false, type: 'error' };
-                    setChatMessages(prevMessages => [...prevMessages, unexpectedErrorBotMessage]);
-                }
+                console.error('Unexpected response format:', response);
+                newBotMessage = { message: "Sorry, I encountered an unexpected response format.", isUser: false, type: 'error' };
+                userMessageType = 'error';
             }
 
+
+            setChatMessages(prevMessages => {
+                const updatedChatMessages = [...prevMessages];
+                if (userMessageIndex !== undefined && updatedChatMessages[userMessageIndex]) {
+                    updatedChatMessages[userMessageIndex] = { ...updatedChatMessages[userMessageIndex], type: userMessageType };
+                }
+                updatedChatMessages.push(newBotMessage);
+                return updatedChatMessages;
+            });
+
         } catch (error: any) {
-            // ... (handle network errors, this part is correct) ...
             console.error('Error sending message:', error);
             const networkErrorBotMessage: ChatMessageType = { message: "Sorry, I encountered a network error. Please check your connection and try again.", isUser: false, type: 'error' };
             setChatMessages(prevMessages => [...prevMessages, networkErrorBotMessage]);
@@ -463,7 +464,8 @@ function ChatBot() {
             setIsChatbotLoading(false);
             stopTimer();
         }
-    }, [chatMessages, router, pathname]);
+    }, [chatMessages, router, pathname, getPathname]);
+
 
     const startTimer = () => {
         const startTime = Date.now();

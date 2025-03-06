@@ -112,42 +112,48 @@
 //     }
 // };
 
-// src/api/chatbot/chatbotApi.ts (No changes needed here, but included for completeness)
+// File chatbotApi.ts:
+
 const API_BASE_URL = 'http://localhost:3000/api';
 
-interface TextMessageResponse {
+export interface TextMessageResponse {
     type: 'text';
     message: string;
+    thought?: string; // Add thought
 }
 
-interface ChartMessageResponse {
+export interface ChartMessageResponse {
     type: 'chart';
     echartsConfig: any;
     sqlResult: any;
     description: string;
+    thought?: string; // Add thought
 }
 
-interface InternalNavigationResponse {
-    action: 'redirect';
+export interface InternalNavigationResponse {
+    type: 'navigation';
     navigationType: 'internal';
     path: string;
 }
 
-interface ExternalNavigationResponse {
-    action: 'redirect';
+export interface ExternalNavigationResponse {
+    type: 'navigation';
     navigationType: 'external';
     url: string;
+}
+// Add thought
+export interface ErrorResponse {
+    error: string;
+    thought?:string;
 }
 
 export type ChatResponse =
     | TextMessageResponse
     | ChartMessageResponse
     | InternalNavigationResponse
-    | ExternalNavigationResponse;
+    | ExternalNavigationResponse
+    | ErrorResponse; // Make sure to include ErrorResponse in ChatResponse union
 
-export interface ErrorResponse {
-    error: string;
-}
 
 export type HistoryItem =
     { role: "user" | "model"; parts: [{ text: string }]; type?: 'text' | 'chart' | 'error' | 'navigation' }
@@ -170,14 +176,17 @@ export const sendNonStreamChatRequest = async (
         });
 
         if (!response.ok) {
-            const errorData: ErrorResponse = await response.json();
-            throw new Error(errorData.error || 'Network response was not ok');
+            const errorData = await response.json();
+            // Check if the error is an object and has an 'error' property.  Be robust.
+            const errorMessage = typeof errorData === 'object' && errorData !== null && 'error' in errorData ? errorData.error : 'Network response was not ok';
+            throw new Error(errorMessage);
         }
+        return await response.json() as ChatResponse;
 
-        return await response.json();
 
     } catch (error: any) {
         console.error('Error in sendNonStreamChatRequest:', error);
-        return { error: error.message || "An unexpected error occurred." };
+         // Return a consistent error object.
+         return { error: error.message || "An unexpected error occurred." };
     }
 };
