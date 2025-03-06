@@ -1,3 +1,4 @@
+// Trong ChatMessage.tsx
 import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -28,7 +29,8 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({ message, isUser }) =
 
     return (
         <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}>
-            <div className={`p-4 rounded-lg max-w-md  ${isUser ? 'bg-dropdown text-gray-700' : 'bg-selected text-black'} break-words w-full text-left`}>
+            {/* Thay đổi ở đây: bỏ max-w-md hoặc thay bằng giá trị lớn hơn, có thể bỏ w-full */}
+            <div className={`p-4 rounded-lg  ${isUser ? 'bg-dropdown text-gray-700' : 'bg-selected text-black'} break-words`}>
                     <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={linkTarget}
