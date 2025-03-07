@@ -89,9 +89,6 @@ export const Header: FC<Props> = ({ locale }) => {
     return (
       <div className="absolute top-full left-0 right-0 bg-background-secondary border-b border-border shadow-md z-40 sm:hidden"> {/* Chỉ hiển thị trên mobile */}
         <nav className="flex flex-col p-4">
-          <Link lang={locale} href={`/about`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
-            {t('About')}
-          </Link>
           <Link lang={locale} href={`/conferences`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('Conferences')}
           </Link>
@@ -106,6 +103,9 @@ export const Header: FC<Props> = ({ locale }) => {
           </Link>
           <Link lang={locale} href={`/support`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('Support')}
+          </Link>
+          <Link lang={locale} href={`/about`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+            {t('About')}
           </Link>
           <Link lang={locale} href={`/other`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('Other')}
@@ -147,9 +147,6 @@ export const Header: FC<Props> = ({ locale }) => {
       <div className='flex flex-row items-center gap-3 relative'>
         {/* Navigation for larger screens - Hiển thị trên sm trở lên */}
         <nav className='mr-10  gap-5 sm:inline-flex hidden'> {/* Ẩn mặc định, hiển thị trên sm */}
-          <Link lang={locale} href={`/about`}>
-            {t('About')}
-          </Link>
           <Link lang={locale} href={`/conferences`}>
             {t('Conferences')}
           </Link>
@@ -167,6 +164,9 @@ export const Header: FC<Props> = ({ locale }) => {
           </Link>
           <Link lang={locale} href={`/addconference`}>
             {t('Add Conference')}
+          </Link>
+          <Link lang={locale} href={`/about`}>
+            {t('About')}
           </Link>
           <Link lang={locale} href={`/other`}>
             {t('Other')}

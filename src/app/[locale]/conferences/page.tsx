@@ -94,7 +94,7 @@ export default function Conferences() {
             onFieldOfResearchChange={handleFieldsOfResearchChange}
             selectedFieldsOfResearch={selectedFieldsOfResearch}
         />
-        <div className="container mx-auto mt-8 px-4 flex">
+        <div className="container mx-auto mt-8 px-4">
             <ResultsSection
                 searchQuery={searchQuery}
                 selectedLocation={selectedLocation}

@@ -1,235 +1,298 @@
-// ResultsSection.tsx
+// components/conference/ResultsSection.tsx
 import React, { useState, useEffect } from 'react';
 import EventCard from './EventCard';
 import Pagination from '../utils/Pagination';
-import { ConferenceResponse } from '../../../../models/response/conference.response'; // Import your ConferenceResponse type
-import conferenceList from '../../../../models/data/conferences-list.json'; // Assuming conference-list.json is in the same directory
+import { ConferenceResponse } from '../../../../models/response/conference.response';
+import conferenceList from '../../../../models/data/conferences-list.json';
+
 
 interface ResultsSectionProps {
-    searchQuery: string;
-    selectedLocation: string | null;
-    selectedType: 'online' | 'offline' | 'hybrid' | null;
-    startDate: Date | null;
-    endDate: Date | null;
-    submissionDate: Date | null;
-    selectedRank: string | null;
-    selectedSourceYear: string | null;
-    selectedAverageScore: string | null;
-    selectedTopics: string[];
-    selectedFieldsOfResearch: string[];
+  searchQuery: string;
+  selectedLocation: string | null;
+  selectedType: 'online' | 'offline' | 'hybrid' | null;
+  startDate: Date | null;
+  endDate: Date | null;
+  submissionDate: Date | null;
+  selectedRank: string | null;
+  selectedSourceYear: string | null;
+  selectedAverageScore: string | null;
+  selectedTopics: string[];
+  selectedFieldsOfResearch: string[];
 }
 
 type SortOption = 'date' | 'rank' | 'name' | 'submissionDate' | 'startDate' | 'endDate';
 
-// Define Event type as ConferenceResponse
-type Event = ConferenceResponse;
+interface ConferenceDates {
+  startDate: Date | null;
+  endDate: Date | null;
+}
+
+function parseConferenceDates(dateString: string | undefined | null): ConferenceDates {
+    if (!dateString) {
+        return { startDate: null, endDate: null };
+    }
+
+    const dateParts = dateString.split(' - ');
+    if (dateParts.length === 0 || dateParts.length > 2) {
+        console.error("Invalid date format:", dateString);
+        return { startDate: null, endDate: null };
+    }
+
+    try {
+        if (dateParts.length === 1) {
+            const [singleDatePart] = dateParts;
+            const [monthAndDay, year] = singleDatePart.split(', ');
+            const [month, days] = monthAndDay.split(" ");
+
+            if (days.includes("-")) {
+                const [startDay, endDay] = days.split('-');
+                const startDate = new Date(`${month} ${startDay}, ${year}`);
+                const endDate = new Date(`${month} ${endDay}, ${year}`);
+                 if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                  throw new Error("Invalid date format") // Handle invalid date
+                }
+                return { startDate, endDate };
+            } else {
+                const startDate = new Date(`${month} ${days}, ${year}`);
+                 if (isNaN(startDate.getTime())) {
+                    throw new Error("Invalid date format")
+                 }
+                return { startDate, endDate: startDate }
+            }
+        } else {
+            let [startDateStr, endDateStr] = dateParts;
+            const [startMonth, startDay] = startDateStr.split(" ");
+
+            let endMonth, endDay, year;
+            if (startDateStr.includes(",")) {
+              console.error("Invalid date format:", dateString)
+              return { startDate: null, endDate: null };
+            }
+
+            if (!endDateStr.includes(",")) {
+              const currentYear = new Date().getFullYear();
+              endDateStr = endDateStr + `, ${currentYear}`;
+            }
+            [endMonth, endDay, year] = endDateStr.split(/[, ]+/);
+
+            const startDate = new Date(`${startMonth} ${startDay}, ${year}`);
+            const endDate = new Date(`${endMonth} ${endDay}, ${year}`);
+             if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+              throw new Error("Invalid date format") // Handle invalid date
+            }
+            return { startDate, endDate };
+        }
+    } catch (error) {
+        console.error("Error parsing date string:", dateString, error);
+        return { startDate: null, endDate: null };
+    }
+}
 
 const ResultsSection: React.FC<ResultsSectionProps> = ({
-    searchQuery, selectedLocation, selectedType, startDate, endDate,
-    submissionDate, selectedRank, selectedTopics, selectedFieldsOfResearch
+  searchQuery, selectedLocation, selectedType, startDate, endDate,
+  submissionDate, selectedRank, selectedTopics, selectedFieldsOfResearch
 }) => {
-    // Initialize events state with conferenceList data loaded from JSON and typed as ConferenceResponse[]
-    const [events, setEvents] = useState<ConferenceResponse[]>(conferenceList as ConferenceResponse[]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const eventsPerPage = 6;
-    const [sortBy, setSortBy] = useState<SortOption>('date'); // Default sort by date
+  const [events, setEvents] = useState<ConferenceResponse[]>(conferenceList as ConferenceResponse[]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const eventsPerPage = 8;
+  const [sortBy, setSortBy] = useState<SortOption>(); // Default sort by date
 
-    useEffect(() => {
-        let filteredEvents = conferenceList as ConferenceResponse[]; // Start filtering from the loaded conferenceList
+  useEffect(() => {
+    let filteredEvents = conferenceList as ConferenceResponse[];
 
-        // Apply filters
-        if (searchQuery) {
-            filteredEvents = filteredEvents.filter(event =>
-                event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                event.acronym.toLowerCase().includes(searchQuery.toLowerCase()) // Using acronym from ConferenceResponse
-            );
+    // Apply filters
+    if (searchQuery) {
+      filteredEvents = filteredEvents.filter(event =>
+        event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        event.acronym.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    if (selectedLocation) {
+      filteredEvents = filteredEvents.filter(event =>
+        event.location?.toLowerCase().includes(selectedLocation.toLowerCase())
+      );
+    }
+
+    if (selectedType) {
+      filteredEvents = filteredEvents.filter(event =>
+        event.type === selectedType
+      );
+    }
+
+    // --- Date Filtering ---
+    if (startDate) {
+      filteredEvents = filteredEvents.filter(event => {
+        const { startDate: eventStartDate } = parseConferenceDates(event.conferenceDates);
+        return eventStartDate && (eventStartDate >= startDate || eventStartDate.toDateString() == startDate.toDateString());
+      });
+    }
+
+    if (endDate) {
+      filteredEvents = filteredEvents.filter(event => {
+        const { endDate: eventEndDate } = parseConferenceDates(event.conferenceDates);
+        return eventEndDate && (eventEndDate <= endDate || eventEndDate.toDateString() == endDate.toDateString());
+      });
+    }
+
+    if (submissionDate) {
+        filteredEvents = filteredEvents.filter(event => {
+            // Assuming submissionDate is a single date, not a range.  Adjust if needed.
+            const eventSubmissionDates = event.submissionDate; // This is a Record<string, string>
+             if(!eventSubmissionDates) return false; // If no submission dates at all, filter it out.
+
+             // Check *any* of the submission dates.
+             for(const deadline of Object.values(eventSubmissionDates)) { // Iterate through values.
+                const parsedSubmissionDate = new Date(deadline);  // Parse the individual date string.
+                if(!isNaN(parsedSubmissionDate.getTime()) && parsedSubmissionDate <= submissionDate) { // Make sure it is a valid date.
+                    return true; // If *any* date matches, include the event.
+                }
+             }
+             return false; // If no dates matched, filter the event out.
+        });
+    }
+
+    if (selectedRank) {
+      filteredEvents = filteredEvents.filter(event =>
+        event.rank === selectedRank
+      );
+    }
+
+    if (selectedTopics && selectedTopics.length > 0) {
+      filteredEvents = filteredEvents.filter(event => {
+          if (!event.topics) {
+              return false;
+          }
+          const eventTopics = event.topics.split(',').map(topic => topic.trim());
+          return eventTopics.some(topic => selectedTopics.includes(topic));
+      });
+  }
+
+  if (selectedFieldsOfResearch && selectedFieldsOfResearch.length > 0) {
+    filteredEvents = filteredEvents.filter(event => {
+        if(!event.fieldOfResearch) {
+          return false;
         }
+        const eventFields = event.fieldOfResearch.split(',').map(field => field.trim());
+        return eventFields.some(field => selectedFieldsOfResearch.includes(field));
+    });
+}
 
-        if (selectedLocation) {
-            filteredEvents = filteredEvents.filter(event =>
-                event.location?.toLowerCase().includes(selectedLocation.toLowerCase())
-            );
-        }
+    // --- Sorting ---
+    let sortedEvents = [...filteredEvents];
+    switch (sortBy) {
+      case 'rank':
+        sortedEvents.sort((a, b) => a.rank.localeCompare(b.rank));
+        break;
+      case 'name':
+        sortedEvents.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'submissionDate':
+        sortedEvents.sort((a, b) => {
+            // Find the *earliest* submission deadline for each conference.
+            const submissionDatesA = a.submissionDate ? Object.values(a.submissionDate) : [];
+            const submissionDatesB = b.submissionDate ? Object.values(b.submissionDate) : [];
+            // Use Infinity so if no date, this event is put at last
+            const earliestDateA = submissionDatesA.length > 0 ? Math.min(...submissionDatesA.map(date => new Date(date).getTime())) : Infinity;
+            const earliestDateB = submissionDatesB.length > 0 ? Math.min(...submissionDatesB.map(date => new Date(date).getTime())) : Infinity;
 
-        if (selectedType) {
-            filteredEvents = filteredEvents.filter(event =>
-                event.type === selectedType
-            );
-        }
+            return earliestDateA - earliestDateB;
+        });
+        break;
+      case 'startDate':
+      case 'date':
+        sortedEvents.sort((a, b) => {
+          const { startDate: startDateA } = parseConferenceDates(a.conferenceDates);
+          const { startDate: startDateB } = parseConferenceDates(b.conferenceDates);
 
-        // if (startDate) {
-        //     filteredEvents = filteredEvents.filter(event =>
-        //         event.conferenceDates.some(dateRange => {
-        //             if (dateRange.startDate) { // Check if startDate exists in dateRange
-        //                 const eventStartDate = new Date(dateRange.startDate);
-        //                 return eventStartDate >= startDate;
-        //             }
-        //             return false; // If startDate is not available for this dateRange, don't consider it a match
-        //         })
-        //     );
-        // }
+          if (!startDateA) return 1;   // Put events without start date at the end
+          if (!startDateB) return -1;  // Put events without start date at the end
 
-        // if (endDate) {
-        //     filteredEvents = filteredEvents.filter(event =>
-        //         event.conferenceDates.some(dateRange => {
-        //             if (dateRange.endDate) { // Check if endDate exists in dateRange
-        //                 const eventEndDate = new Date(dateRange.endDate);
-        //                 return eventEndDate <= endDate;
-        //             }
-        //             return false; // If endDate is not available for this dateRange, don't consider it a match
-        //         })
-        //     );
-        // }
+          return startDateA.getTime() - startDateB.getTime();
+        });
+        break;
+      case 'endDate':
+        sortedEvents.sort((a, b) => {
+            const { endDate: endDateA } = parseConferenceDates(a.conferenceDates);
+            const { endDate: endDateB } = parseConferenceDates(b.conferenceDates);
 
-        // Apply advanced filters
-        // if (submissionDate) {
-        //     filteredEvents = filteredEvents.filter(event =>
-        //         event.conferenceDates.some(dateRange => {
-        //             if (dateRange.dateName === "Submission Deadline" && dateRange.startDate) { // Find Submission Deadline and check startDate
-        //                 const eventSubmissionDate = new Date(dateRange.startDate);
-        //                 return eventSubmissionDate <= submissionDate;
-        //             }
-        //             return false; // If Submission Deadline not found or submissionDate is missing, don't consider it a match
-        //         })
-        //     );
-        // }
+            if (!endDateA) return 1; // Put events without end date at the end
+            if (!endDateB) return -1;
 
-        if (selectedRank) {
-            filteredEvents = filteredEvents.filter(event =>
-                event.rank === selectedRank
-            );
-        }
+            return endDateA.getTime() - endDateB.getTime();
+        });
+        break;
 
-        if (selectedTopics && selectedTopics.length > 0) {
-            filteredEvents = filteredEvents.filter(event =>
-                event.topics.split(',').some(topic => selectedTopics.includes(topic))
-            );
-        }
+    }
 
-        if (selectedFieldsOfResearch && selectedFieldsOfResearch.length > 0) {
-            filteredEvents = filteredEvents.filter(event =>
-                selectedFieldsOfResearch.includes(event.fieldOfResearch) // Filtering by event.category (from ConferenceResponse)
-            );
-        }
 
-        // Apply sorting
-        let sortedEvents = [...filteredEvents];
-        switch (sortBy) {
-            case 'rank':
-                sortedEvents.sort((a, b) => a.rank.localeCompare(b.rank));
-                break;
-            case 'name':
-                sortedEvents.sort((a, b) => a.name.localeCompare(b.name));
-                break;
-            case 'submissionDate':
-                // sortedEvents.sort((a, b) => {
-                //     const submissionDateA = a.conferenceDates.find(date => date.dateName === "Submission Deadline")?.startDate;
-                //     const submissionDateB = b.conferenceDates.find(date => date.dateName === "Submission Deadline")?.startDate;
+    setEvents(sortedEvents);
+    setCurrentPage(1);
+  }, [searchQuery, selectedLocation, selectedType, startDate, endDate, submissionDate, selectedRank, selectedTopics, selectedFieldsOfResearch, sortBy]);
 
-                //     const dateA = submissionDateA ? new Date(submissionDateA).getTime() : -Infinity; // Use -Infinity if not found
-                //     const dateB = submissionDateB ? new Date(submissionDateB).getTime() : -Infinity; // Use -Infinity if not found
+  const indexOfLastEvent = currentPage * eventsPerPage;
+  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+  const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent);
 
-                //     return dateA - dateB;
-                // });
-                break;
-            case 'startDate':
-            case 'date': // Sort by conference date (default - which is start date) - vẫn sắp xếp theo startDate sớm nhất
-            default:
-                // sortedEvents.sort((a, b) => {
-                //     const minStartDateA = Math.min(
-                //         ...a.conferenceDates
-                //             .filter(date => date.startDate) // Filter out dates without startDate
-                //             .map(date => new Date(date.startDate).getTime())
-                //     );
-                //     const minStartDateB = Math.min(
-                //         ...b.conferenceDates
-                //             .filter(date => date.startDate) // Filter out dates without startDate
-                //             .map(date => new Date(date.startDate).getTime())
-                //     );
-                //     return minStartDateA - minStartDateB;
-                // });
-                break;
-            case 'endDate':
-                // sortedEvents.sort((a, b) => {
-                //     const maxEndDateA = Math.max(
-                //         ...a.conferenceDates
-                //             .filter(date => date.endDate) // Filter out dates without endDate
-                //             .map(date => new Date(date.endDate).getTime())
-                //     );
-                //     const maxEndDateB = Math.max(
-                //         ...b.conferenceDates
-                //             .filter(date => date.endDate) // Filter out dates without endDate
-                //             .map(date => new Date(date.endDate).getTime())
-                //     );
-                //     return maxEndDateA - maxEndDateB;
-                // });
-                break;
-        }
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-        setEvents(sortedEvents);
-        setCurrentPage(1); // Reset to first page when filters or sort change
-    }, [searchQuery, selectedLocation, selectedType, startDate, endDate, submissionDate, selectedRank, selectedTopics, selectedFieldsOfResearch, sortBy]);
+  const handleSortByChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortBy(event.target.value as SortOption);
+  };
 
-    // Calculate the events to display on the current page
-    const indexOfLastEvent = currentPage * eventsPerPage;
-    const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
-    const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent);
-
-    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-
-    const handleSortByChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSortBy(event.target.value as SortOption);
-    };
-
-    return (
-        <div className="w-full pl-8">
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-semibold">
-                    Recommended for you ({events.length})
-                </h2>
-                <div className="flex items-center rounded-md px-2 py-1">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 mr-1"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                    >
-                        <path
-                            fillRule="evenodd"
-                            d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                            clipRule="evenodd"
-                        />
-                    </svg>
-                    <span className="text-sm mr-1">Sort by:</span>
-                    <select
-                        className="text-sm border rounded px-2 py-1 bg-transparent focus:outline-none"
-                        value={sortBy}
-                        onChange={handleSortByChange}
-                    >
-                        <option value="date">Conference date</option>
-                        <option value="rank">Rank</option>
-                        <option value="name">Name</option>
-                        <option value="submissionDate">Submission Date</option>
-                        <option value="startDate">Start Date</option>
-                        <option value="endDate">End Date</option>
-                    </select>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {currentEvents.map((event) => (
-                    <EventCard key={event.id} event={event} />
-                ))}
-            </div>
-
-            <Pagination
-                eventsPerPage={eventsPerPage}
-                totalEvents={events.length}
-                paginate={paginate}
-                currentPage={currentPage}
+  
+  if (!currentEvents || currentEvents.length === 0) {
+    return <p>Không tìm thấy hội nghị nào.</p>;
+  }
+  return (
+    <div className="w-full pl-8">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-semibold">
+          Recommended for you ({events.length})
+        </h2>
+        <div className="flex items-center rounded-md px-2 py-1">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 mr-1"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+              clipRule="evenodd"
             />
+          </svg>
+          <span className="text-sm mr-1">Sort by:</span>
+          <select
+            className="text-sm border rounded px-2 py-1 bg-transparent focus:outline-none"
+            value={sortBy}
+            onChange={handleSortByChange}
+          >
+            <option value=""></option>
+            <option value="rank">Rank</option>
+            <option value="name">Name</option>
+            <option value="submissionDate">Submission Date</option>
+            <option value="startDate">Start Date</option>
+            <option value="endDate">End Date</option>
+          </select>
         </div>
-    );
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {currentEvents.map((event) => (
+          <EventCard key={event.id} event={event} />
+        ))}
+      </div>
+
+      <Pagination
+        eventsPerPage={eventsPerPage}
+        totalEvents={events.length}
+        paginate={paginate}
+        currentPage={currentPage}
+      />
+    </div>
+  );
 };
 
 export default ResultsSection;

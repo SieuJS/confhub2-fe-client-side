@@ -15,7 +15,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
     <div className="rounded-lg shadow-md overflow-hidden bg-gradient-to-r from-background to-background-secondary">
       <div className="relative">
         <Image
-          src={''} // Sử dụng imageUrl từ ConferenceResponse
+          src={'/bg-2.jpg'} // Sử dụng imageUrl từ ConferenceResponse
           alt={event.name}
           width={400}
           height={200} // Adjust height as needed

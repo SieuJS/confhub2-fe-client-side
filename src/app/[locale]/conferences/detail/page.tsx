@@ -17,6 +17,10 @@ import { useSearchParams } from 'next/navigation'; //  USE THIS for query params
 
 type Conference = ConferenceResponse;
 
+interface ConferenceDates {
+  startDate: Date | null;
+  endDate: Date | null;
+}
 interface EventCardProps {
     conference: Conference; // Sử dụng ConferenceResponse type
 }
@@ -99,6 +103,7 @@ const Detail: React.FC<EventCardProps> = () => {
 
     async function handleUpdateClick () {
       setUpdating(true); // Set updating state to true
+      {updating && <Loading />}
       setError(null);    // Clear any previous errors
       console.log('Update button clicked');
       let fetchedData: Conference;
@@ -135,25 +140,82 @@ const Detail: React.FC<EventCardProps> = () => {
     //     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
     // };
 
+    function parseConferenceDates(dateString: string | undefined | null): ConferenceDates {
+      if (!dateString) {
+          return { startDate: null, endDate: null };
+      }
+  
+      const dateParts = dateString.split(' - ');
+      if (dateParts.length === 0 || dateParts.length > 2) {
+          console.error("Invalid date format:", dateString);
+          return { startDate: new Date(), endDate: new Date() };
+      }
+  
+      try {
+          if (dateParts.length === 1) {
+              const [singleDatePart] = dateParts;
+              const [monthAndDay, year] = singleDatePart.split(', ');
+              const [month, days] = monthAndDay.split(" ");
+  
+              if (days.includes("-")) {
+                  const [startDay, endDay] = days.split('-');
+                  const startDate = new Date(`${month} ${startDay}, ${year}`);
+                  const endDate = new Date(`${month} ${endDay}, ${year}`);
+                   if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                    throw new Error("Invalid date format") // Handle invalid date
+                  }
+                  return { startDate, endDate };
+              } else {
+                  const startDate = new Date(`${month} ${days}, ${year}`);
+                   if (isNaN(startDate.getTime())) {
+                      throw new Error("Invalid date format")
+                   }
+                  return { startDate, endDate: startDate }
+              }
+          } else {
+              let [startDateStr, endDateStr] = dateParts;
+              const [startMonth, startDay] = startDateStr.split(" ");
+  
+              let endMonth, endDay, year;
+              if (startDateStr.includes(",")) {
+                console.error("Invalid date format:", dateString)
+                return { startDate: null, endDate: null };
+              }
+  
+              if (!endDateStr.includes(",")) {
+                const currentYear = new Date().getFullYear();
+                endDateStr = endDateStr + `, ${currentYear}`;
+              }
+              [endMonth, endDay, year] = endDateStr.split(/[, ]+/);
+  
+              const startDate = new Date(`${startMonth} ${startDay}, ${year}`);
+              const endDate = new Date(`${endMonth} ${endDay}, ${year}`);
+               if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                throw new Error("Invalid date format") // Handle invalid date
+              }
+              return { startDate, endDate };
+          }
+      } catch (error) {
+          console.error("Error parsing date string:", dateString, error);
+          return { startDate: null, endDate: null };
+      }
+  }
     function createGoogleCalendarLink(conference: Conference) {
         const conferenceDates = conference.conferenceDates; // Find main conference dates
+        const { startDate, endDate } = parseConferenceDates(conference.conferenceDates);
         // const startDate = conferenceDates?.startDate;
         // const endDate = conferenceDates?.endDate;
+        
+        const start = startDate.toISOString().replace(/-|:|\.\d+/g, '');
+        const end = endDate.toISOString().replace(/-|:|\.\d+/g, '');
 
-        // const startDateObj = startDate ? new Date(startDate + 'T00:00:00') : new Date(); // Default to current date if not found
-        // const endDateObj = endDate ? new Date(endDate + 'T23:59:59') : new Date();     // Default to current date if not found
-
-
-        // const start = startDateObj.toISOString().replace(/-|:|\.\d+/g, '');
-        // const end = endDateObj.toISOString().replace(/-|:|\.\d+/g, '');
-
-        const details = `📢 ${conference.name}\n📅 Thời gian: ${conference.conferenceDates} : 'Dates not available'}\n📍 Địa điểm: ${conference.location}\n🔗 Chi tiết: ${conference.link}`;
+        const details = `📢 ${conference.name}\n📅 Thời gian: ${startDate && endDate ? `${(startDate)} - ${(endDate)}` : 'Dates not available'}\n📍 Địa điểm: ${conference.location}\n🔗 Chi tiết: ${conference.link}`;
 
 
         const params = new URLSearchParams({
             action: 'TEMPLATE',
             text: conference.name,
-            dates: conference.conferenceDates,
+            dates: `${start}/${end}`,
             details: details,
             location: conference.location,
             trp: 'false', // Optional: Show/hide "Add to my calendar" button (true/false)
@@ -170,30 +232,31 @@ const Detail: React.FC<EventCardProps> = () => {
         // const startDate = conferenceDates?.startDate;
         // const endDate = conferenceDates?.endDate;
         const conferenceDates = conferenceData.conferenceDates;
+        const { startDate, endDate } = parseConferenceDates(conferenceDates);
         // const startDateObj = startDate ? new Date(startDate + 'T00:00:00') : new Date(); // Default to current date if not found
         // const endDateObj = endDate ? new Date(endDate + 'T23:59:59') : new Date();     // Default to current date if not found
 
 
-        // const start = [
-        //     startDateObj.getFullYear(),
-        //     startDateObj.getMonth() + 1, //getMonth() trả về 0-11
-        //     startDateObj.getDate(),
-        //     startDateObj.getHours(),
-        //     startDateObj.getMinutes(),
-        // ];
+        const start = [
+            startDate.getFullYear(),
+            startDate.getMonth() + 1, //getMonth() trả về 0-11
+            startDate.getDate(),
+            startDate.getHours(),
+            startDate.getMinutes(),
+        ];
 
-        // const end = [
-        //     endDateObj.getFullYear(),
-        //     endDateObj.getMonth() + 1,
-        //     endDateObj.getDate(),
-        //     endDateObj.getHours(),
-        //     endDateObj.getMinutes(),
-        // ];
+        const end = [
+            endDate.getFullYear(),
+            endDate.getMonth() + 1,
+            endDate.getDate(),
+            endDate.getHours(),
+            endDate.getMinutes(),
+        ];
         const event: ics.EventAttributes = {
-            start: null, //start as ics.DateArray,
-            end: null, //end as ics.DateArray,
+            start: start as ics.DateArray,
+            end: end as ics.DateArray,
             title: conference.name,
-            description: `📢 ${conferenceData.name}\n📅 Thời gian: ${conferenceDates} : 'Dates not available'}\n📍 Địa điểm: ${conference.location}\n🔗 Chi tiết: ${conference.link}`,
+            description: `📢 ${conferenceData.name}\n📅 Thời gian: ${startDate && endDate ? `${startDate} - ${endDate}` : 'Dates not available'}\n📍 Địa điểm: ${conference.location}\n🔗 Chi tiết: ${conference.link}`,
             location: conference.location,
             url: conferenceData.link,
             organizer: { name: 'Conference Organizer' }, // Add organizer info if available
@@ -207,7 +270,6 @@ const Detail: React.FC<EventCardProps> = () => {
             console.error('Error creating iCalendar event:', error);
             return null; // Or handle the error appropriately
         }
-        // console.log(value);
         return value; // This is the iCalendar data as a string.
     }
 
@@ -222,12 +284,10 @@ const Detail: React.FC<EventCardProps> = () => {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                //const conferenceDates = conferenceData.conferenceDates.find(date => date.dateName === "Conference Dates"); // Find main conference dates
                 const conferenceDates = conferenceData.conferenceDates;
-                // const startDate = conferenceDates?.startDate;
+                const { startDate, endDate } = parseConferenceDates(conferenceDates);
                 // const conferenceDate = startDate ? new Date(startDate) : new Date(); // Default to current date if not found
-
-                a.download = `${conferenceData.acronym + conferenceDate.getFullYear()}.ics`; // Use acronym instead of shortName
+                a.download = `${conferenceData.acronym + startDate.getFullYear()}.ics`; // Use acronym instead of shortName
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -359,187 +419,197 @@ const Detail: React.FC<EventCardProps> = () => {
     <div>
       {isLoading && <Loading />}
       {notFound && <NotFoundPage />}
-      {!notFound && conferenceData && <div className='px-10'>
-      <div className="py-14 bg-background w-full"></div>
-      {updating ? <Loading />:
-      <div>
-        <div className="container mx-auto py-6 px-4 rounded-lg flex flex-col md:flex-row gap-6">
+      <div className='relative'>
+        {updating && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <Loading />
+          </div>
+        )}
+        {conferenceData && 
+          <div className='px-10'>
 
-{/* Left Column */}
-<div className="md:w-2/3">
-{/* Image at the top */}
-<div className="relative  rounded-lg overflow-hidden">
-<Image
-  src={'/conference_image.png'}
-  alt={`${conferenceData.name} - secondary`}
-  width={800}
-  height={400}
-  style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
-/>
-</div>
+          <div>
+            <div className="py-14 bg-background w-full"></div>
+            <div className="container mx-auto py-6 px-4 rounded-lg flex flex-col md:flex-row gap-6">
 
-{/* Buttons below the image */}
-<div className="flex justify-end mt-4">
-<div className="relative share-menu-container">
-  <Button
-    onClick={toggleShareMenu}
-    variant="secondary"
-    size="medium"
-    rounded
-    className="mr-2 hover:opacity-90 p-2"
+            {/* Left Column */}
+            <div className="md:w-2/3">
+            {/* Image at the top */}
+            <div className="relative  rounded-lg overflow-hidden">
+            <Image
+              src={'/conference_image.png'}
+              alt={`${conferenceData.name} - secondary`}
+              width={800}
+              height={400}
+              style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
+            />
+            </div>
+
+            {/* Buttons below the image */}
+            <div className="flex justify-end mt-4">
+            <div className="relative share-menu-container">
+              <Button
+                onClick={toggleShareMenu}
+                variant="secondary"
+                size="medium"
+                rounded
+                className="mr-2 hover:opacity-90 p-2"
+                
+              >
+                {/* Inline SVG for Share Icon */}
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+            </svg>
+
+              </Button>
+              {renderShareMenu()}
+            </div>
+            <div className="relative share-menu-container">
+              <Button
+                onClick={toggleCalendarMenu}
+                variant="secondary"
+                size="medium"
+                rounded
+                className="mr-2 hover:opacity-90 p-2"
+              >
+                {/* Inline SVG for Calendar Icon */}
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+            </svg>
+
+              </Button>
+              {renderCalendarMenu()}
+            </div>
+            <Button
+              onClick={handleFollowClick}
+              variant={isFollowing ? 'primary' : 'secondary'}
+              size="medium"
+              rounded
+              className={`mr-2 w-24 hover:opacity-90`} // Hover and Followed color
+            >
+              {isFollowing ? 'Followed' : 'Follow'}
+            </Button>
+            <Button
+              onClick={handleUpdateClick}
+              variant="secondary"
+              size="medium"
+              rounded
+              className={`mr-2 hover:opacity-90 ${updating ? 'w-32' : 'w-24'}`} // Hover effect
+            >
+              {updating ? 'Updating' : 'Update'}
+            </Button> 
+            </div>
+
+            <div className="flex justify-between items-center mt-4">
+            <p className="text-lg">
+                {conferenceData.conferenceDates != null ? // Find Conference Dates
+                    `${conferenceData.conferenceDates}`
+                    : 'Dates not available'}
+            </p>
+            <div>
+              <span>{conferenceData.acronym}</span> {/* shortName to acronym */}
+            </div>
+            </div>
+
+            <h2 className=" font-bold text-left text-4xl mt-2">{conferenceData.name}</h2>
+
+            <p className="text-left mt-4">{conferenceData.description}</p>
+
+            <div className="flex items-center mt-6 text-left">
+            <span className="font-semibold mr-2 pb-2">Topics:</span>
+            <div className="flex flex-wrap">
+              {conferenceData.topics?.split(',').map((topic, index) => (
+                <span key={index} className="bg-background-secondary  rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2">
+                  {topic.trim()} {/* Trim whitespace */}
+                </span>
+              )) || <span>No topics available</span>}
+            </div>
+            </div>
+
+
+          </div>
+
+
+          {/* Right Column */}
+          <div className="md:w-1/3 ">
+            <section className="overflow-x-auto relative bg-gradient-to-r from-background to-background-secondary p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold text-left mb-4">{t('Conference Details')}</h3>
+
+          <table className="w-full text-md text-left border-collapse">
+
+            <tbody>
+              <tr className="border-b  ">
+                <td className="px-3 py-2 font-semibold">{t('Start Date')}</td>
+                <td className="px-3 py-2">
+                  {conferenceData.conferenceDates}
+                </td>
+              </tr>
+
+              <tr className="border-b  ">
+                <td className="px-3 py-2 font-semibold">{t('End Date')}</td>
+                <td className="px-3 py-2">
+                  {/* {formatDate(conferenceData.conferenceDates.find(date => date.dateName === "Conference Dates")?.endDate)} */}
+                </td>
+              </tr>
+
+              <tr className="border-b  ">
+                <td className="px-3 py-2 font-semibold">{t('Location')}</td>
+                <td className="px-3 py-2">{conferenceData.location}</td>
+              </tr>
+
+              <tr className="border-b  ">
+                <td className="px-3 py-2 font-semibold">{t('Website')}</td>
+                <td className="px-3 py-2">
+                  <a
+                    href={conferenceData.link} // website to link
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    {conferenceData.link === null ? '' : conferenceData.link} {/* website to link */}
+                  </a>
+                </td>
+              </tr>
+
+              <tr className="border-b  ">
+                <td className="px-3 py-2 font-semibold">{t('Rank')}</td>
+                <td className="px-3 py-2">{conferenceData.rank}</td>
+              </tr>
+
+              <tr className="border-b  ">
+                <td className="px-3 py-2 font-semibold">{t('Type')}</td>
+                <td className="px-3 py-2" >{conferenceData.type}</td>
+              </tr>
+
+              <tr className="border-b  ">
+                <td className="px-3 py-2 font-semibold">{t('Submission Date')}</td>
+                <td className="px-3 py-2">
+                  {/* {formatDate(conferenceData.conferenceDates.find(date => date.dateName === "Submission Deadline")?.startDate)} */}
+                </td>
+              </tr>
+
+              <tr className="border-b  ">
+                <td className="px-3 py-2 font-semibold">{t('Field')}</td>
+                <td className="px-3 py-2">{conferenceData.fieldOfResearch}</td> {/* fieldOfResearch to category */}
+              </tr>
+            </tbody>
+          </table>
+            </section>
+
+            {/* Other Conferences in right column */}
+          </div>
+            </div>
+
+            <ConferenceTabs conference={conferenceData} />
+
+            <ConferenceFeedback/>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
     
-  >
-    {/* Inline SVG for Share Icon */}
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
-<path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
-</svg>
-
-  </Button>
-  {renderShareMenu()}
-</div>
-<div className="relative share-menu-container">
-  <Button
-    onClick={toggleCalendarMenu}
-    variant="secondary"
-    size="medium"
-    rounded
-    className="mr-2 hover:opacity-90 p-2"
-  >
-    {/* Inline SVG for Calendar Icon */}
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
-<path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-</svg>
-
-  </Button>
-  {renderCalendarMenu()}
-</div>
-<Button
-  onClick={handleFollowClick}
-  variant={isFollowing ? 'primary' : 'secondary'}
-  size="medium"
-  rounded
-  className={`mr-2 w-24 hover:opacity-90`} // Hover and Followed color
->
-  {isFollowing ? 'Followed' : 'Follow'}
-</Button>
-<Button
-  onClick={handleUpdateClick}
-  variant="secondary"
-  size="medium"
-  rounded
-  className={`mr-2 hover:opacity-90 w-24`} // Hover effect
->
-  {updating ? 'Updating' : 'Update'}
-</Button> 
-</div>
-
-<div className="flex justify-between items-center mt-4">
-<p className="text-lg">
-    {conferenceData.conferenceDates != null ? // Find Conference Dates
-        `${conferenceData.conferenceDates}`
-        : 'Dates not available'}
-</p>
-<div>
-  <span>{conferenceData.acronym}</span> {/* shortName to acronym */}
-</div>
-</div>
-
-<h2 className=" font-bold text-left text-4xl mt-2">{conferenceData.name}</h2>
-
-<p className="text-left mt-4">{conferenceData.description}</p>
-
-<div className="flex items-center mt-6 text-left">
-<span className="font-semibold mr-2 pb-2">Topics:</span>
-<div className="flex flex-wrap">
-  {conferenceData.topics?.split(',').map((topic, index) => (
-    <span key={index} className="bg-background-secondary  rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2">
-      {topic.trim()} {/* Trim whitespace */}
-    </span>
-  )) || <span>No topics available</span>}
-</div>
-</div>
-
-
-</div>
-
-
-{/* Right Column */}
-<div className="md:w-1/3 ">
-  <section className="overflow-x-auto relative bg-gradient-to-r from-background to-background-secondary p-6 rounded-lg shadow-md">
-  <h3 className="text-xl font-semibold text-left mb-4">{t('Conference Details')}</h3>
-
-<table className="w-full text-md text-left border-collapse">
-
-  <tbody>
-    <tr className="border-b  ">
-      <td className="px-3 py-2 font-semibold">{t('Start Date')}</td>
-      <td className="px-3 py-2">
-        {conferenceData.conferenceDates}
-      </td>
-    </tr>
-
-    <tr className="border-b  ">
-      <td className="px-3 py-2 font-semibold">{t('End Date')}</td>
-      <td className="px-3 py-2">
-        {/* {formatDate(conferenceData.conferenceDates.find(date => date.dateName === "Conference Dates")?.endDate)} */}
-      </td>
-    </tr>
-
-    <tr className="border-b  ">
-      <td className="px-3 py-2 font-semibold">{t('Location')}</td>
-      <td className="px-3 py-2">{conferenceData.location}</td>
-    </tr>
-
-    <tr className="border-b  ">
-      <td className="px-3 py-2 font-semibold">{t('Website')}</td>
-      <td className="px-3 py-2">
-        <a
-          href={conferenceData.link} // website to link
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:underline"
-        >
-          {conferenceData.link === null ? '' : conferenceData.link} {/* website to link */}
-        </a>
-      </td>
-    </tr>
-
-    <tr className="border-b  ">
-      <td className="px-3 py-2 font-semibold">{t('Rank')}</td>
-      <td className="px-3 py-2">{conferenceData.rank}</td>
-    </tr>
-
-    <tr className="border-b  ">
-      <td className="px-3 py-2 font-semibold">{t('Type')}</td>
-      <td className="px-3 py-2" >{conferenceData.type}</td>
-    </tr>
-
-    <tr className="border-b  ">
-      <td className="px-3 py-2 font-semibold">{t('Submission Date')}</td>
-      <td className="px-3 py-2">
-        {/* {formatDate(conferenceData.conferenceDates.find(date => date.dateName === "Submission Deadline")?.startDate)} */}
-      </td>
-    </tr>
-
-    <tr className="border-b  ">
-      <td className="px-3 py-2 font-semibold">{t('Field')}</td>
-      <td className="px-3 py-2">{conferenceData.fieldOfResearch}</td> {/* fieldOfResearch to category */}
-    </tr>
-  </tbody>
-</table>
-  </section>
-
-  {/* Other Conferences in right column */}
-</div>
-</div>
-
-<ConferenceTabs conference={conferenceData} />
-
-<ConferenceFeedback/></div>}
-      
-    </div>
-    }
-    </div>
+    
     
   )
 }
