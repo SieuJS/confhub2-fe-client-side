@@ -1,5 +1,7 @@
 import React from 'react';
 import ChatBot from '../components/chatbot/ChatBot';
+import { Altair } from "../components/chatbot/live-chat/components/altair/Altair";
+
 // import "./page.css";
 import { LiveAPIProvider } from "../components/chatbot/live-chat/contexts/LiveAPIContext";
 
@@ -21,6 +23,8 @@ const ChatBotPage: React.FC<ChatBotPageProps> = () => {
       {/* Live API Provider Wrapper */}
       <LiveAPIProvider url={uri} apiKey={API_KEY}>
         <div className="chatbot-wrapper">
+        <Altair />
+
           <ChatBot />
         </div>
       </LiveAPIProvider>

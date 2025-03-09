@@ -1,0 +1,272 @@
+[
+  {
+    "name": "informationFiltering",
+    "description": "Filters information about conferences or journals based on specified criteria.",
+    "parameters": {
+      "type": SchemaType.OBJECT,
+      "properties": {
+        "Intent": {
+          "type": SchemaType.ARRAY,
+          "description": "The intent of the user's request.",
+          "items": {
+            "type": SchemaType.STRING,
+            format: "enum",
+            enum: [
+              "No intent",
+              "Find information",
+              "Draw chart",
+              "Website navigation",
+              "Invalid"
+            ]
+          }
+        },
+        "About": {
+          "type": SchemaType.STRING,
+          format: "enum",
+          "description": "The type of information the user is requesting.",
+          "enum": [
+            "Conference",
+            "Journal",
+            "Website",
+            "Invalid"
+          ]
+        },
+        "Filter conference": {
+          "type": SchemaType.OBJECT,
+          "description": "Filters for conference information.",
+          "properties": {
+            "Topics": {
+              "type": SchemaType.ARRAY,
+              "description": "List of topics to filter conferences by.",
+              "items": {
+                "type": SchemaType.STRING
+              }
+            },
+            "Country": {
+              "type": SchemaType.ARRAY,
+              "description": "List of countries to filter conferences by.",
+              "items": {
+                "type": SchemaType.STRING
+              }
+            },
+            "Conferences name list": {
+              "type": SchemaType.ARRAY,
+              "description": "List of conference names to filter by.",
+              "items": {
+                "type": SchemaType.STRING
+              }
+            },
+            "Conferences acronym list": {
+              "type": SchemaType.ARRAY,
+              "description": "List of conference acronyms to filter by.",
+              "items": {
+                "type": SchemaType.STRING
+              }
+            },
+            "Type": {
+              "type": SchemaType.ARRAY,
+              "description": "List of conference types (Hybrid, Offline, Online) to filter by.",
+              "items": {
+                "type": SchemaType.STRING,
+                format: "enum",
+                "enum": [
+                  "Hybrid",
+                  "Offline",
+                  "Online"
+                ]
+              }
+            },
+            "Rank": {
+              "type": SchemaType.ARRAY,
+              "description": "List of conference ranks to filter by.",
+              "items": {
+                "type": SchemaType.STRING,
+                format: "enum",
+  
+                "enum": [
+                  "A*",
+                  "A",
+                  "B",
+                  "C",
+                  "National",
+                  "Regional",
+                  "Unranked"
+                ]
+              }
+            },
+            "Continent": {
+              "type": SchemaType.ARRAY,
+              "description": "List of continents to filter conferences by.",
+              "items": {
+                "type": SchemaType.STRING,
+                format: "enum",
+  
+                "enum": [
+                  "Asia",
+                  "Africa",
+                  "North America",
+                  "South America",
+                  "Oceania",
+                  "Europe"
+                ]
+              }
+            },
+            "Conference dates": {
+              "type": SchemaType.STRING,
+              "description": "Conference dates to filter by."
+            },
+            "Submision date": {
+              "type": SchemaType.STRING,
+              "description": "Submission date to filter by."
+            },
+            "Notification date": {
+              "type": SchemaType.STRING,
+              "description": "Notification date to filter by."
+            },
+            "Camera-ready date": {
+              "type": SchemaType.STRING,
+              "description": "Camera-ready date to filter by."
+            },
+            "Registration date": {
+              "type": SchemaType.STRING,
+              "description": "Registration date to filter by."
+            }
+          }
+        },
+        "Filter journal": {
+          "type": SchemaType.OBJECT,
+          "description": "Filters for journal information.",
+          "properties": {
+            "Rank": {
+              "type": SchemaType.ARRAY,
+              "description": "List of journal ranks to filter by.",
+              "items": {
+                "type": SchemaType.NUMBER
+              }
+            },
+            "Title": {
+              "type": SchemaType.ARRAY,
+              "description": "List of journal titles to filter by.",
+              "items": {
+                "type": SchemaType.STRING
+              }
+            },
+            "Issn": {
+              "type": SchemaType.ARRAY,
+              "description": "List of journal ISSNs to filter by.",
+              "items": {
+                "type": SchemaType.STRING
+              }
+            },
+            "SJR": {
+              "type": SchemaType.ARRAY,
+              "description": "List of journal SJR values to filter by.",
+              "items": {
+                "type": SchemaType.NUMBER
+              }
+            },
+            "SJR Best Quartile": {
+              "type": SchemaType.ARRAY,
+              "description": "List of journal SJR Best Quartile values to filter by.",
+              "items": {
+                "type": SchemaType.STRING
+              }
+            },
+            "H index": {
+              "type": SchemaType.NUMBER,
+              "description": "Journal H index to filter by."
+            },
+            "Country": {
+              "type": SchemaType.ARRAY,
+              "description": "List of countries to filter journals by.",
+              "items": {
+                "type": SchemaType.STRING
+              }
+            },
+            "Region": {
+              "type": SchemaType.ARRAY,
+              "description": "List of regions to filter journals by.",
+              "items": {
+                "type": SchemaType.STRING
+              }
+            },
+            "Publisher": {
+              "type": SchemaType.ARRAY,
+              "description": "List of publishers to filter journals by.",
+              "items": {
+                "type": SchemaType.STRING
+              }
+            },
+            "Areas": {
+              "type": SchemaType.ARRAY,
+              "description": "List of areas to filter journals by.",
+              "items": {
+                "type": SchemaType.STRING
+              }
+            },
+            "Categories": {
+              "type": SchemaType.ARRAY,
+              "description": "List of categories to filter journals by.",
+              "items": {
+                "type": SchemaType.STRING
+              }
+            },
+            "Overton": {
+              "type": SchemaType.ARRAY,
+              "description": "List of Overton values to filter journals by.",
+              "items": {
+                "type": SchemaType.NUMBER
+              }
+            },
+            "SDG": {
+              "type": SchemaType.ARRAY,
+              "description": "List of SDGs to filter journals by.",
+              "items": {
+                "type": SchemaType.STRING
+              }
+            }
+          }
+        },
+        "Redirect": {
+          "type": SchemaType.OBJECT,
+          "description": "Information for redirection.",
+          "properties": {
+            "Type": {
+              "type": SchemaType.STRING,
+              "description": "The type of website to redirect to.",
+              format: "enum",
+              "enum": [
+                "Internal website",
+                "Conference website",
+                "Journal website",
+                "Invalid"
+              ]
+            },
+            "Value": {
+              "type": SchemaType.STRING,
+              "description": "The URL to redirect to."
+            },
+            "Message": {
+              "type": SchemaType.STRING,
+              "description": "A message to display upon redirection."
+            }
+          },
+          "required": [
+            "Type",
+            "Message"
+          ]
+        },
+        "Description": {
+          "type": SchemaType.STRING,
+          "description": "A description of the information being requested or filtered."
+        }
+      },
+      "required": [
+        "Intent",
+        "Description"
+      ]
+    }
+  
+  }
+  ]
+  
