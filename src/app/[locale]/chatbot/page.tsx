@@ -1,16 +1,29 @@
 import React from 'react';
-import Image from 'next/image';
-import ChatBot from '../components/chatbot/ChatBot'; // Import ChatBot component
+import ChatBot from '../components/chatbot/ChatBot';
+// import "./page.css";
+import { LiveAPIProvider } from "../components/chatbot/live-chat/contexts/LiveAPIContext";
 
-interface ChatBotPageProps {
-  // Định nghĩa props cho component nếu cần
+const API_KEY = process.env.REACT_APP_GEMINI_API_KEY as string;
+if (typeof API_KEY !== "string") {
+  throw new Error("set REACT_APP_GEMINI_API_KEY in .env");
 }
+
+const host = "generativelanguage.googleapis.com";
+const uri = `wss://${host}/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent`;
+
+interface ChatBotPageProps {}
 
 const ChatBotPage: React.FC<ChatBotPageProps> = () => {
   return (
-    <div className="px-10 py-10 text-center text-2xl">
+    <div className="chatbot-page-container px-10 py-10 text-center text-2xl">
       <div className="py-14 bg-background w-full"></div>
-      <ChatBot />
+      
+      {/* Live API Provider Wrapper */}
+      <LiveAPIProvider url={uri} apiKey={API_KEY}>
+        <div className="chatbot-wrapper">
+          <ChatBot />
+        </div>
+      </LiveAPIProvider>
     </div>
   );
 };

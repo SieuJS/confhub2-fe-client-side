@@ -132,13 +132,14 @@ export const Header: FC<Props> = ({ locale }) => {
   return (
     <div
       ref={headerRef}
-      className={`mx-auto flex max-w-screen-2xl flex-row items-center justify-between p-5 bg-gradient-to-r from-background to-background-secondary transition-all duration-300 ease-in-out
+      className={`mx-auto flex max-w-screen-2xl flex-row items-center justify-between p-3 bg-gradient-to-r from-background to-background-secondary transition-all duration-300 ease-in-out
         fixed top-0 left-0 right-0 z-50 shadow-md
       `}
+      style={{ height: '60px' }} // Reduced height
     >
       <Link lang={locale} href='/'>
         <div className='flex flex-row items-center'>
-          <div className='mb-2 h-14 w-14'>
+          <div className='mb-2 h-10 w-10'> {/* Reduced logo size */}
             <LogoIcon />
           </div>
           <strong className='mx-2 select-none'>ConFHub</strong>
@@ -147,28 +148,28 @@ export const Header: FC<Props> = ({ locale }) => {
       <div className='flex flex-row items-center gap-3 relative'>
         {/* Navigation for larger screens - Hiển thị trên sm trở lên */}
         <nav className='mr-10  gap-5 sm:inline-flex hidden'> {/* Ẩn mặc định, hiển thị trên sm */}
-          <Link lang={locale} href={`/conferences`}>
+          <Link lang={locale} href={`/conferences`} style={{ fontWeight: 'bold' }}>
             {t('Conferences')}
           </Link>
-          <Link lang={locale} href={`/journals`}>
+          <Link lang={locale} href={`/journals`} style={{ fontWeight: 'bold' }}>
             {t('Journals')}
           </Link>
-          <Link lang={locale} href={`/setting`}>
+          <Link lang={locale} href={`/setting`} style={{ fontWeight: 'bold' }}>
             {t('Setting')}
           </Link>
-          <Link lang={locale} href={`/chatbot`}>
+          <Link lang={locale} href={`/chatbot`} style={{ fontWeight: 'bold' }}>
             {t('Chatbot')}
           </Link>
-          <Link lang={locale} href={`/support`}>
+          <Link lang={locale} href={`/support`} style={{ fontWeight: 'bold' }}>
             {t('Support')}
           </Link>
-          <Link lang={locale} href={`/addconference`}>
+          <Link lang={locale} href={`/addconference`} style={{ fontWeight: 'bold' }}>
             {t('Add Conference')}
           </Link>
-          <Link lang={locale} href={`/about`}>
+          <Link lang={locale} href={`/about`} style={{ fontWeight: 'bold' }}>
             {t('About')}
           </Link>
-          <Link lang={locale} href={`/other`}>
+          <Link lang={locale} href={`/other`} style={{ fontWeight: 'bold' }}>
             {t('Other')}
           </Link>
         </nav>
