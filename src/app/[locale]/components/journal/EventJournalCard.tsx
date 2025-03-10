@@ -19,7 +19,7 @@ const EventJournalCard: React.FC<EventJournalCardProps> = ({ journal }) => {
       )}
     </div>
 
-    <div className="flex h-60 w-1/3 relative"> {/* Image container, chiếm 1/3 chiều rộng */}
+    <div className="flex h-52 w-40 relative"> {/* Image container, chiếm 1/3 chiều rộng */}
       <img
       src={journal.Image || '/default-journal.jpg'}
       alt={journal.Title}
