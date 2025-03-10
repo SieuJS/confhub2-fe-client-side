@@ -1,0 +1,50 @@
+.audioPulse {
+  display: flex;
+  width: 24px;
+  justify-content: space-evenly;
+  align-items: center;
+  transition: all 0.5s;
+  height: 4px;
+  transition: opacity 0.333s;
+  opacity: 0; /* Ẩn mặc định, chỉ hiển thị khi có class 'active' */
+}
+
+.audioPulse > div {
+  background-color: var(--Neutral-30); /* Sử dụng biến CSS nếu có, nếu không thì thay bằng màu cụ thể */
+  border-radius: 1000px;
+  width: 4px;
+  min-height: 4px;
+  transition: height 0.1s;
+}
+
+.audioPulse.hover > div {
+  animation: hover 1.4s infinite alternate ease-in-out;
+}
+
+.audioPulse.active {
+  opacity: 1;
+}
+
+.audioPulse.active > div {
+  background-color: var(--Neutral-80); /* Sử dụng biến CSS nếu có, nếu không thì thay bằng màu cụ thể */
+}
+
+@keyframes hover {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-3.5px);
+  }
+}
+
+@keyframes pulse {
+  from {
+    scale: 1 1;
+  }
+
+  to {
+    scale: 1.2 1.2;
+  }
+}

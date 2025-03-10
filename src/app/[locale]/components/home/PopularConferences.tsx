@@ -1,34 +1,31 @@
-'use client';
+"use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ConferenceResponse } from '@/src/models/response/conference.response';
+import { ConferenceResponse } from '@/src/models/response/conference.response'; // Correct import path
 import Image from 'next/image';
-
-
-
-const conferenceList: any[] = require('../../../../models/data/conferences-list.json'); // Import json data as any[] for flexible mapping
+import { useRouter } from '@/src/navigation'; // Import YOUR custom useRouter
 
 type Conference = ConferenceResponse;
 
+const conferenceList: any[] = require('../../../../models/data/conferences-list.json'); // Import json data
+
 const conferencesData: Conference[] = conferenceList.map(conf => {
-  // Assuming conferenceList.json data structure needs to be adapted to ConferenceResponse
-  // Adjust the mapping logic based on the actual structure of conferenceList.json and how it aligns with ConferenceResponse
   return {
     id: conf.id,
     name: conf.name,
     acronym: conf.acronym,
     fieldOfResearch: conf.fieldOfResearch,
-    topics: conf.topics, // Ensure topics is always an array, default to empty array if missing
+    topics: conf.topics,
     location: conf.location,
     type: conf.type,
-    conferenceDates: conf.conferenceDates, // Wrap startDate and endDate in conferenceDates array. You might need to adjust 'dateName' or how you pick dates based on your data
+    conferenceDates: conf.conferenceDates,
     description: conf.description,
     rank: conf.rank,
     source: conf.source,
     link: conf.link,
-    likeCount: conf.likeCount || 0, // Default likeCount and followCount to 0 if missing
+    likeCount: conf.likeCount || 0,
     followCount: conf.followCount || 0,
-  } as Conference; // Explicitly cast to Conference to ensure type correctness
+  } as Conference;
 });
 
 const PopularConferences: React.FC = () => {
@@ -38,6 +35,7 @@ const PopularConferences: React.FC = () => {
   const autoScrollInterval = useRef<NodeJS.Timeout | null>(null);
   const [direction, setDirection] = useState<'left' | 'right'>('right');
   const transitionDuration = 500;
+  const router = useRouter();  // Use YOUR custom useRouter hook
 
   const wrapIndex = (index: number) => {
     return (index + conferencesData.length) % conferencesData.length;
@@ -100,6 +98,14 @@ const PopularConferences: React.FC = () => {
     startAutoScroll();
   };
 
+    const handleClick = (id: string | undefined) => {
+        if (id) {
+            router.push({ pathname: '/conferences/detail', query: { id: id } });
+        } else {
+            console.error("Conference ID is undefined"); // Or handle the error appropriately
+        }
+  };
+
   const displayedCards = [
     conferencesData[wrapIndex(currentIndex - 2)],
     conferencesData[wrapIndex(currentIndex - 1)],
@@ -153,25 +159,23 @@ const PopularConferences: React.FC = () => {
               const relativeIndex = index - 2;
               const position = `calc(${relativeIndex * (80 + 8)}px)`;
 
-              // Safely access conferenceDates and its first element
-              const conferenceDate = conference.conferenceDates && conference.conferenceDates.length > 0 ? conference.conferenceDates : null;
-
 
               return (
                 <div
-                  key={conference.id ? conference.id : `empty-${index}`}
+                  key={conference.id ? conference.id : `empty-${index}`}  // Use a unique key
                   className={`scroller-item snap-start flex-none w-80 h-[400px] bg-background rounded-lg border  text-center p-2 m-2 hover:bg-gradient-to-r hover:from-background hover:to-background-secondary transition-all duration-200 cursor-pointer scale-95 hover:scale-100
                                       ${isActive ? 'card-active shadow-md' : 'card'}
                                       card-index-${index}
                                     `}
                   style={{ left: position }}
+                  onClick={() => handleClick(conference.id)} //  Call handleClick with the ID
                 >
                   {isActive && (
                     <div className="flex flex-col w-full h-full justify-start items-stretch">
                       <div className="relative w-full h-[200px]">
                         <Image
                           className="lazyloaded rounded-t-lg object-cover"
-                          src={''}
+                          src={'/bg-2.jpg'} //  Use a placeholder or default image
                           fill
                           alt={conference.name}
                           loading="lazy"
@@ -180,7 +184,6 @@ const PopularConferences: React.FC = () => {
                         />
                       </div>
                       <div className="p-4 text-left">
-                        <div>ID: {conference.id}</div>
                         <div className="font-bold text-base mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
                           {conference.name}
                         </div>

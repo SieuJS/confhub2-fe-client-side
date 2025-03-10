@@ -34,7 +34,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
   const availableTopics = [
     "Artificial Intelligence", "Machine Learning", "Data Science", "Cloud Computing", "Cybersecurity",
     "Web Development", "Mobile Development", "Database Management", "Software Engineering", "Network Security",
-    "UX/UI Design", "Project Management", "Agile Methodologies", "DevOps", "Blockchain Technology"
+    "UX/UI Design", "Project Management", "Agile Methodologies", "DevOps", "Blockchain Technology", "Big Data"
   ];
   const availableFieldsOfResearch = [
     "Computer Science", "Information Technology", "Software Engineering", "Data Analytics", "Artificial Intelligence",

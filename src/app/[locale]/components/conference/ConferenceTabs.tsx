@@ -108,54 +108,49 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
 
             <section id="important-date" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <h2 className="text-3xl font-bold text-secondary mb-4">Important Date</h2>
-                <p className=" text-lg">
-                    Stay up-to-date with essential deadlines for the conference.
-                </p>
-                <p className=" text-lg mt-4 mb-4">
-                    
-                </p>
 
+                {(!conference?.submissionDate || Object.keys(conference.submissionDate).length === 0) &&
+                (!conference?.notificationDate || Object.keys(conference.notificationDate).length === 0) &&
+                (!conference?.cameraReadyDate || Object.keys(conference.cameraReadyDate).length === 0) &&
+                (!conference?.otherDate || Object.keys(conference.otherDate).length === 0) ? (
+                    <p className=" text-lg">
+                        <div>No Important Date Available</div>
+                    </p>
+                    
+                ):
                 <div className="grid md:grid-cols-1 gap-6 p-6 bg-background shadow-md rounded-lg">
                     <div>
-                        
+                            
                         <table className="w-full text-lg text-left border-collapse">
                             <thead className="text-lg  ">
                                 <tr className="bg-gray-100">
-                                    <th scope="col" className="px-6 py-3 font-semibold text-left border-2">Event</th>
-                                    <th scope="col" className="px-6 py-3 font-semibold text-left border-2">Date</th>
+                                    <th scope="col" className="px-6 py-3 font-semibold text-left border-2 border-gray-600">Event</th>
+                                    <th scope="col" className="px-6 py-3 font-semibold text-left border-2 border-gray-600">Date</th>
                                 </tr>
                             </thead>
                             <tbody>
-                            {(!conference?.submissionDate || Object.keys(conference.submissionDate).length === 0) &&
-                            (!conference?.notificationDate || Object.keys(conference.notificationDate).length === 0) &&
-                            (!conference?.cameraReadyDate || Object.keys(conference.cameraReadyDate).length === 0) &&
-                            (!conference?.otherDate || Object.keys(conference.otherDate).length === 0) && (
-                                <tr>
-                                    <td className="px-6 py-4" colSpan={2}>No Important Date Available</td>
-                                </tr>
-                            )}
                                 {conference?.submissionDate && Object.entries(conference.submissionDate).map(([name, value]) => (
-                                <tr key={name} className="border-b">
-                                    <td className="px-6 py-2 border-2">{name}</td>
-                                    <td className="px-6 py-2 border-2">{value}</td>
+                                <tr key={name} className="border-b border-gray-600">
+                                    <td className="px-6 py-2 border-2 border-gray-600">{name}</td>
+                                    <td className="px-6 py-2 border-2 border-gray-600">{value}</td>
                                 </tr>
                                 ))}
                                 {conference?.notificationDate && Object.entries(conference.notificationDate).map(([name, value]) => (
-                                <tr key={name} className="border-b">
-                                    <td className="px-6 py-2 border-2">{name}</td>
-                                    <td className="px-6 py-2 border-2">{value}</td>
+                                <tr key={name} className="border-b border-gray-600">
+                                    <td className="px-6 py-2 border-2 border-gray-600">{name}</td>
+                                    <td className="px-6 py-2 border-2 border-gray-600">{value}</td>
                                 </tr>
                                 ))}
                                 {conference?.cameraReadyDate && Object.entries(conference.cameraReadyDate).map(([name, value]) => (
-                                <tr key={name} className="border-b">
-                                    <td className="px-6 py-2 border-2">{name}</td>
-                                    <td className="px-6 py-2 border-2">{value}</td>
+                                <tr key={name} className="border-b border-gray-600">
+                                    <td className="px-6 py-2 border-2 border-gray-600">{name}</td>
+                                    <td className="px-6 py-2 border-2 border-gray-600">{value}</td>
                                 </tr>
                                 ))}
                                 {conference?.otherDate && Object.entries(conference.otherDate).map(([name, value]) => (
-                                <tr key={name} className="border-b">
-                                    <td className="px-6 py-2 border-2">{name}</td>
-                                    <td className="px-6 py-2 border-2">{value}</td>
+                                <tr key={name} className="border-b border-gray-600">
+                                    <td className="px-6 py-2 border-2 border-gray-600">{name}</td>
+                                    <td className="px-6 py-2 border-2 border-gray-600">{value}</td>
                                 </tr>
                                 ))}
                             </tbody>
@@ -163,7 +158,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
                     </div>
 
                     
-                </div>
+                </div>}
             </section>
 
             <section id="cfp" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
