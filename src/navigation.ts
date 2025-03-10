@@ -15,6 +15,7 @@ export const pathnames = {
   '/journals': '/journals',
   '/journaldetails': '/journaldetails',
   '/chatbot': '/chatbot',
+  '/chatbot2': '/chatbot2',
   '/support': '/support',
   '/other': '/other',
   '/addconference': '/addconference',

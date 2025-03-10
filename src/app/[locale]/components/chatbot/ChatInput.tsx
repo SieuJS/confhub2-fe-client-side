@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import Button from '../utils/Button';
-import ControlTray from './live-chat/components/control-tray/ControlTray'; // Import ControlTray
-
 interface ChatInputProps {
     onSendMessage: (message: string) => void;
     onFillInput?: (fillInputCallback: (text: string) => void) => void;
@@ -82,8 +80,6 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onFillInput }) => 
 
     return (
         <div className="chat-input-container bg-gray-100" style={chatInputContainerStyle}>
-            {/* Control Tray (Left) */}
-            <ControlTray />
 
             {/* Text Input (Center) */}
             <TextareaAutosize

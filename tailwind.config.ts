@@ -35,7 +35,11 @@ const config = {
         selected: 'var(--selected)',
         dropdown: 'var(--dropdown)',
         dropdownHover: 'var(--dropdown-hover)',
-        buttonSecondary: 'var(--button-secondary)'
+        buttonSecondary: 'var(--button-secondary)',
+
+
+          
+        
       },
 
       fontFamily: {
@@ -63,8 +67,13 @@ const config = {
         'pulse-ripple': 'pulse-ripple 1s linear infinite', // Continuous pulse ripple for div
         'float-up-down': 'floatUpDown 2s ease-in-out infinite', // Định nghĩa animation sử dụng keyframes 'floatUpDown'
       },
+      
      
     }
+    // ,
+    // corePlugins: {
+    //   preflight: false
+    // }
   },
   plugins: [require('tailwind-scrollbar'),require('tailwindcss-animate')]
 } satisfies Config

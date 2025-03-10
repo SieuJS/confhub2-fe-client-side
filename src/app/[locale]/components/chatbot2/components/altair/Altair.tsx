@@ -2,7 +2,9 @@
 import { useEffect, memo, useRef } from "react";
 import { useLiveAPIContext } from "../../contexts/LiveAPIContext"; // Thay đổi đường dẫn import nếu cần
 import { ToolCall } from "../../multimodal-live-types";
-import { getConferencesDeclaration, getJournalsDeclaration, getWebsiteInformationDeclaration, drawChartDeclaration, yourResponseDeclaration, systemInstructions } from "./functionDeclaration"
+
+
+import { getConferencesDeclaration, getJournalsDeclaration, getWebsiteInformationDeclaration, drawChartDeclaration, systemInstructions } from "./functionDeclaration"
 function AltairComponent() {
   const { client, setConfig } = useLiveAPIContext();
 
@@ -10,7 +12,7 @@ function AltairComponent() {
     setConfig({
       model: "models/gemini-2.0-flash-exp",
       generationConfig: {
-        responseModalities: "text", // Nếu bạn muốn phản hồi bằng giọng nói
+        responseModalities: "audio", // Nếu bạn muốn phản hồi bằng giọng nói
         speechConfig: {
           voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } },
         },
@@ -25,7 +27,6 @@ function AltairComponent() {
             getJournalsDeclaration,
             getWebsiteInformationDeclaration,
             // drawChartDeclaration,
-            yourResponseDeclaration
           ],
         },
       ],
@@ -36,7 +37,7 @@ function AltairComponent() {
     const onToolCall = async (toolCall: ToolCall) => {
       console.log(`got toolcall`, toolCall);
 
-    
+
       const BASE_URL = "http://localhost:3000";
       console.log(BASE_URL);
       // Không cần tìm kiếm function call cụ thể nữa, xử lý tất cả
@@ -50,7 +51,7 @@ function AltairComponent() {
               body: JSON.stringify(fc.args),
             });
             responseData = await response.json();
-          } 
+          }
           else if (fc.name === "getJournals") {
             const response = await fetch(`${BASE_URL}/api/get_journals`, {
               method: 'POST',
@@ -75,12 +76,13 @@ function AltairComponent() {
             });
             responseData = await response.json();
           }
-          else if (fc.name === "yourResponse") {
-            // Khi gặp yourResponse, gửi phản hồi cuối cùng
-            const finalResponse = (fc.args as any).finalResponse; // Lấy nội dung phản hồi
-            console.log("Final Response:", finalResponse);
-            continue; // Không cần gửi lại yourResponse cho LLM
-          }
+          // else if (fc.name === "yourResponse") {
+          //   // Khi gặp yourResponse, gửi phản hồi cuối cùng
+          //   const finalResponse = await (fc.args as any).finalResponse; // Lấy nội dung phản hồi
+          //   console.log("Final Response:", finalResponse);
+          //   responseData = finalResponse
+          //   // continue
+          // }
           else {
             console.warn(`Unknown function call: ${fc.name}`);
             continue;
@@ -109,7 +111,7 @@ function AltairComponent() {
     return () => {
       client.off("toolcall", onToolCall);
     };
-  }, [client, setConfig]);
+  }, [client]);
 
   return null; // Hoặc các component UI của bạn
 }

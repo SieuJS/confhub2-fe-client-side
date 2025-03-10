@@ -160,6 +160,9 @@ export const Header: FC<Props> = ({ locale }) => {
           <Link lang={locale} href={`/chatbot`} style={{ fontWeight: 'bold' }}>
             {t('Chatbot')}
           </Link>
+          <Link lang={locale} href={`/chatbot2`} style={{ fontWeight: 'bold' }}>
+            {t('Chatbot2')}
+          </Link>
           <Link lang={locale} href={`/support`} style={{ fontWeight: 'bold' }}>
             {t('Support')}
           </Link>
