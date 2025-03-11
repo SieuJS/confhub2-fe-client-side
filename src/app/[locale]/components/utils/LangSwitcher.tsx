@@ -1,7 +1,7 @@
 'use client'
 import { capitalize } from '@/lib/utils'
 import Link from 'next/link'
-import { usePathname, useSelectedLayoutSegments } from 'next/navigation'
+import { usePathname, useSearchParams, useSelectedLayoutSegments } from 'next/navigation'
 import React, { useState } from 'react'
 import { FiGlobe } from 'react-icons/fi'
 import Button from './Button'
@@ -11,12 +11,14 @@ const LangSwitcher: React.FC = () => {
     country: string
     code: string
   }
+
   const pathname = usePathname()
+  const searchParams = useSearchParams() // Lấy query params
   const urlSegments = useSelectedLayoutSegments()
 
   const [isOptionsExpanded, setIsOptionsExpanded] = useState(false)
   const options: Option[] = [
-    { country: 'English', code: 'en' }, // Native name is the same
+    { country: 'English', code: 'en' },
     { country: 'Deutsch', code: 'de' },
     { country: 'Français', code: 'fr' },
     { country: 'Español', code: 'es' },
@@ -25,6 +27,14 @@ const LangSwitcher: React.FC = () => {
     { country: 'العربية', code: 'ar' },
     { country: 'فارسی', code: 'fa' }
   ]
+
+  // Hàm tạo URL giữ nguyên query params
+  const getLocalizedUrl = (locale: string) => {
+    const newPath = `/${locale}/${urlSegments.join('/')}` // Chuyển đổi đường dẫn theo locale
+    const queryString = searchParams.toString() // Lấy query string
+
+    return queryString ? `${newPath}?${queryString}` : newPath // Giữ nguyên query
+  }
 
   return (
     <div className='flex items-center justify-center'>
@@ -48,17 +58,12 @@ const LangSwitcher: React.FC = () => {
             >
               {options.map(lang => {
                 return (
-                  <Link
-                    key={lang.code}
-                    href={`/${lang.code}/${urlSegments.join('/')}`}
-                  >
+                  <Link key={lang.code} href={getLocalizedUrl(lang.code)}>
                     <button
                       lang={lang.code}
-                      onMouseDown={e => {
-                        e.preventDefault()
-                      }}
+                      onMouseDown={e => e.preventDefault()}
                       className={`block w-full px-4 py-2 text-left text-sm hover:bg-dropdownHover ${
-                        pathname === `/${lang.code}`
+                        pathname.startsWith(`/${lang.code}`)
                           ? 'bg-selected text-primary hover:bg-selected'
                           : 'text-secondary'
                       }`}
