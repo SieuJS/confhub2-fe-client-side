@@ -1,3 +1,4 @@
+
 import React from "react";
 import "./logger.css";
 
@@ -23,7 +24,15 @@ import {
   ToolCallCancellationMessage,
   ToolCallMessage,
   ToolResponseMessage,
+  ClientAudioMessage,
+  ServerAudioMessage,
+  isClientAudioMessage,
+  isServerAudioMessage
 } from "../../multimodal-live-types";
+
+import AudioPlayer from "../audio-player/AudioPlayer"; // Import AudioPlayer
+
+
 import { debounce } from 'lodash';
 
 const formatTime = (d: Date) => d.toLocaleTimeString().slice(0, -3);
@@ -199,17 +208,49 @@ export type LoggerProps = {
   filter: LoggerFilterType;
 };
 
+// Logger.tsx
+const ClientAudioLog = ({ message }: Message) => {
+  const { audioData } = (message as ClientAudioMessage).clientAudio;
+  // Only render AudioPlayer if audioData exists and is not empty
+  return (
+    <div className="rich-log client-audio">
+      {audioData ? <AudioPlayer audioData={audioData} /> : <p>Loading audio...</p>}
+    </div>
+  );
+};
+
+const ServerAudioLog = ({ message }: Message) => {
+  const { audioData } = (message as ServerAudioMessage).serverAudio;
+  // Only render AudioPlayer if audioData exists and is not empty
+  return (
+    <div className="rich-log server-audio">
+      {audioData ? <AudioPlayer audioData={audioData} autoPlay /> : <p>Loading audio...</p>}
+    </div>
+  );
+};
+
 const filters: Record<LoggerFilterType, (log: StreamingLog) => boolean> = {
   tools: (log: StreamingLog) =>
     isToolCallMessage(log.message) ||
     isToolResponseMessage(log.message) ||
     isToolCallCancellationMessage(log.message),
   conversations: (log: StreamingLog) =>
-    isClientContentMessage(log.message) || isServerContentMessage(log.message),
+    isClientContentMessage(log.message) || isServerContentMessage(log.message) || isClientAudioMessage(log.message) || isServerAudioMessage(log.message), // Add audio message
   none: () => true,
 };
 
+
 const component = (log: StreamingLog) => {
+  console.log("Log:", log);
+
+  if (isClientAudioMessage(log.message)) {
+    return ClientAudioLog;
+  }
+
+  if (isServerAudioMessage(log.message)) {
+    return ServerAudioLog;
+  }
+
   if (typeof log.message === "string") {
     return PlainTextMessage;
   }
@@ -237,6 +278,8 @@ const component = (log: StreamingLog) => {
       return ModelTurnLog;
     }
   }
+
+
   return AnyMessage;
 };
 

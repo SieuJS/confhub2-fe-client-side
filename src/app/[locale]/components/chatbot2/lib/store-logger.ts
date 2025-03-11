@@ -1,3 +1,4 @@
+
 import { create } from "zustand";
 import { StreamingLog } from "../multimodal-live-types";
 
@@ -14,6 +15,21 @@ export const useLoggerStore = create<StoreLoggerState>((set, get) => ({
   logs: [],
   log: ({ date, type, message }: StreamingLog) => {
     set((state) => {
+      // Do NOT combine audio messages
+      if (type.includes("audio")) {
+        return {
+          logs: [
+            ...state.logs.slice(-(get().maxLogs - 1)),
+            {
+              date,
+              type,
+              message,
+              count: 1,
+            } as StreamingLog,
+          ],
+        };
+      }
+
       const prevLog = state.logs.at(-1);
       if (
         prevLog &&
@@ -52,3 +68,4 @@ export const useLoggerStore = create<StoreLoggerState>((set, get) => ({
   },
   setMaxLogs: (n: number) => set({ maxLogs: n }),
 }));
+

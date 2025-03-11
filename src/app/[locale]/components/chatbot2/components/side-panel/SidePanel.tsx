@@ -1,15 +1,19 @@
+
+// SidePanel.tsx
 "use client";
 import cn from "classnames";
-import { useEffect, useRef, useState, memo, ReactNode } from "react";
-import { useLiveAPIContext } from "../../contexts/LiveAPIContext";
+import { useEffect, useRef, useState, memo } from "react";
+import { useLiveAPIContext } from "../../contexts/LiveAPIContext"; // Use context
 import { useLoggerStore } from "../../lib/store-logger";
-import Logger, { LoggerFilterType } from "../logger/Logger";
+import Logger from "../logger/Logger";
 import "./side-panel.css";
 import { AudioRecorder } from "../../lib/audio-recorder";
 import AudioPulse from "../audio-pulse/AudioPulse";
 import { UseMediaStreamResult } from "../../hooks/use-media-stream-mux";
 import { useScreenCapture } from "../../hooks/use-screen-capture";
 import { useWebcam } from "../../hooks/use-webcam";
+
+// ... (rest of the imports and component definitions)
 
 type MediaStreamButtonProps = {
   isStreaming: boolean;
@@ -65,19 +69,22 @@ const MicButton: React.FC<{
   </div>
 );
 
+
 export default function SidePanel({
   videoRef,
   supportsVideo,
-  onVideoStreamChange = () => {},
+  onVideoStreamChange = () => { },
 }: {
   videoRef: any;
   supportsVideo: boolean;
   onVideoStreamChange: (stream: MediaStream | null) => void;
 }) {
-  const { connected, client, connect, disconnect, volume } = useLiveAPIContext();
+  const { connected, client, connect, disconnect, volume, on, off } = useLiveAPIContext(); // Get 'on' and 'off' from the hook
   const loggerRef = useRef<HTMLDivElement>(null);
   const loggerLastHeightRef = useRef<number>(-1);
-  const { log, logs } = useLoggerStore();
+  const { log } = useLoggerStore();
+  const [userAudioData, setUserAudioData] = useState<string | null>(null);
+  const [modelAudioData, setModelAudioData] = useState<string | null>(null);
 
   const [textInput, setTextInput] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -112,15 +119,24 @@ export default function SidePanel({
         loggerLastHeightRef.current = scrollHeight;
       }
     }
-  }, [logs]);
+  }, [loggerRef, loggerLastHeightRef]);
 
   useEffect(() => {
-    client.on("log", log);
+    on("log", log); // Use the 'on' from useLiveAPIContext
     return () => {
-      client.off("log", log);
+      off("log", log); // Use the 'off' from useLiveAPIContext
     };
-  }, [client, log]);
+  }, [on, off, log]); // Correct dependencies
 
+
+  useEffect(() => {
+    on("log", log); // Use the 'on' from useLiveAPIContext
+    return () => {
+      off("log", log); // Use the 'off' from useLiveAPIContext
+    };
+  }, [on, off, log]); // Correct dependencies
+
+  // ... (your video frame sending useEffect)
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.srcObject = activeVideoStream;
@@ -155,7 +171,7 @@ export default function SidePanel({
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [connected, activeVideoStream, client, videoRef]);
+  }, [connected, activeVideoStream, client, videoRef, renderCanvasRef]);
 
   useEffect(() => {
     const onData = (base64: string) => {
@@ -166,15 +182,62 @@ export default function SidePanel({
         },
       ]);
     };
+
+    const onStopRecording = (recorder: AudioRecorder) => {
+      let fullAudioData = "";
+
+      const combineAudioChunks = (recorder: AudioRecorder) => {
+        recorder.off("data", onData);
+
+        recorder.on("data", (chunkBase64) => {
+          fullAudioData += chunkBase64;
+        });
+
+        setTimeout(() => {
+          setUserAudioData(fullAudioData);
+          recorder.off("data", combineAudioChunks);
+          recorder.on("data", onData);
+          log({
+            date: new Date(),
+            type: "send.clientAudio",
+            message: { clientAudio: { audioData: fullAudioData } },
+          });
+        }, 500);
+      };
+
+      recorder.on("data", combineAudioChunks);
+    };
+
     if (connected && !muted && audioRecorder) {
-      audioRecorder.on("data", onData).on("volume", setInVolume).start();
+      audioRecorder.on("data", onData).on("volume", setInVolume);
+      audioRecorder.start();
+      audioRecorder.on("stop", (recorder) => onStopRecording(recorder));
     } else {
       audioRecorder.stop();
+      audioRecorder.off("stop", (recorder) => onStopRecording(recorder));
     }
     return () => {
       audioRecorder.off("data", onData).off("volume", setInVolume);
+      audioRecorder.off("stop", (recorder) => onStopRecording(recorder));
     };
-  }, [connected, client, muted, audioRecorder]);
+  }, [connected, client, muted, audioRecorder, log, setInVolume]);
+
+  useEffect(() => {
+    const onAudioResponse = (audioResponse: any) => {
+      setModelAudioData(audioResponse.data);
+      log({
+        date: new Date(),
+        type: "receive.serverAudio",
+        message: { serverAudio: { audioData: audioResponse.data } },
+      });
+    };
+
+    // --- CRITICAL CHANGE: Use the 'on' and 'off' from useLiveAPIContext ---
+    on("audioResponse", onAudioResponse);
+    return () => {
+      off("audioResponse", onAudioResponse);
+    };
+  }, [on, off, log]); // Correct dependencies
 
   useEffect(() => {
     document.documentElement.style.setProperty(
@@ -194,6 +257,8 @@ export default function SidePanel({
       inputRef.current.value = ""; // Use .value for textarea
     }
   };
+
+
 
   return (
     <div className="side-panel">
