@@ -35,15 +35,18 @@ const Footer = () => {
         {/* Company Info */}
         <div className="md:col-span-1">
           <div className='absolute bottom-0 left-0 w-[300px] h-[300px] max-lg:w-[200px] max-lg:h-[200px] animate-float-up-down p-4'> {/* Thêm class animate-float-up-down */}
-            <Image
-              src={imageSrc}
-              alt='Background image'
-              layout='responsive'
-              width={300}
-              height={300}
-              objectFit='contain'
-              className='object-contain'
-            />
+          <Image
+            src={imageSrc}
+            alt="Background image"
+            width={300} // Kích thước ban đầu (có thể lớn hơn)
+            height={300} // Kích thước ban đầu (có thể lớn hơn)
+            style={{
+              objectFit: 'contain',
+              width: '100%',   // Hình ảnh co giãn theo chiều rộng của container
+              height: 'auto',  // Giữ tỷ lệ khung hình
+            }}
+            className="object-contain" // Có thể thừa, xem xét loại bỏ nếu không cần
+          />
           </div>
         </div>
 

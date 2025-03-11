@@ -24,7 +24,7 @@ const ConsumerInsights: React.FC<ConsumerInsightsProps> = ({
     { value: "500+", label: "industries" },
     { value: "15,000+", label: "brands" },
   ],
-  imageUrl = "/placeholder-image.png", //  placeholder, bạn cần thay bằng URL thật
+  imageUrl = "/bg-2.jpg", //  placeholder, bạn cần thay bằng URL thật
   imageAlt = "Placeholder Image",
   buttonText = "Explore the tool",
   buttonLink = "#", // Placeholder link
