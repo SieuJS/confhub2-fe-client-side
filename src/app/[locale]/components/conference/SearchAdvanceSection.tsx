@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 interface SearchAdvanceSectionProps {
   isAdvancedOptionsVisible: boolean;
   toggleAdvancedOptionsVisibility: () => void;
-
   onSubmissionDateChange: (date: Date | null) => void;
   submissionDate: Date | null;
   onRankChange: (rank: string | null) => void;
@@ -19,16 +18,19 @@ interface SearchAdvanceSectionProps {
   selectedTopics: string[];
   onFieldOfResearchChange: (fields: string[]) => void;
   selectedFieldsOfResearch: string[];
+  onPublisherChange: (publisher: string | null) => void;
+  selectedPublisher: string | null;
 }
 
 const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
   isAdvancedOptionsVisible, toggleAdvancedOptionsVisibility,
-  onSubmissionDateChange, submissionDate, onRankChange, selectedRank, onSourceYearChange, selectedSourceYear, onAverageScoreChange, selectedAverageScore, onTopicsChange, selectedTopics, onFieldOfResearchChange, selectedFieldsOfResearch
+  onSubmissionDateChange, submissionDate, onRankChange, selectedRank, onSourceYearChange, selectedSourceYear, onAverageScoreChange, selectedAverageScore, onTopicsChange, selectedTopics, onFieldOfResearchChange, selectedFieldsOfResearch, onPublisherChange, selectedPublisher
 }) => {
   const [topicsInput, setTopicsInput] = useState('');
   const [topicSuggestions, setTopicSuggestions] = useState<string[]>([]);
   const [fieldOfResearchInput, setFieldOfResearchInput] = useState('');
   const [fieldOfResearchSuggestions, setFieldOfResearchSuggestions] = useState<string[]>([]);
+  const [publisher, setPublisher] = useState('')
 
   // Example lists - replace with your actual lists
   const availableTopics = [
@@ -146,6 +148,14 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
     onAverageScoreChange(event.target.value === "" ? null : event.target.value);
   };
 
+  const handlePublisherChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPublisher(event.target.value);
+  };
+
+  const handleSearchPublisherClick = () => {
+    onPublisherChange(publisher);
+  };
+
 
   return (
     <div>
@@ -183,6 +193,9 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 id="publisher"
                 type="text"
                 placeholder="Publisher"
+                value={selectedPublisher || ""}
+                onChange={handlePublisherChange}
+                onKeyDown={handleSearchPublisherClick }
               />
             </div>
 
@@ -214,6 +227,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 onChange={handleSourceYearChangeInput}
               >
                 <option value="">Year</option>
+                <option value="2022">2022</option>
                 <option value="2023">2023</option>
                 <option value="2024">2024</option>
                 <option value="2025">2025</option>

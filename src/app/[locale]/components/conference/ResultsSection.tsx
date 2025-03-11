@@ -14,6 +14,7 @@ interface ResultsSectionProps {
   endDate: Date | null;
   submissionDate: Date | null;
   selectedRank: string | null;
+  selectedPublisher: string | null;
   selectedSourceYear: string | null;
   selectedAverageScore: string | null;
   selectedTopics: string[];
@@ -90,7 +91,7 @@ function parseConferenceDates(dateString: string | undefined | null): Conference
 
 const ResultsSection: React.FC<ResultsSectionProps> = ({
   searchQuery, selectedLocation, selectedType, startDate, endDate,
-  submissionDate, selectedRank, selectedTopics, selectedFieldsOfResearch
+  submissionDate, selectedRank, selectedTopics, selectedFieldsOfResearch, selectedPublisher, selectedAverageScore, selectedSourceYear
 }) => {
   const [events, setEvents] = useState<ConferenceResponse[]>(conferenceList as ConferenceResponse[]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -158,6 +159,26 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
       );
     }
 
+    if (selectedSourceYear) {
+      filteredEvents = filteredEvents.filter(event =>
+        event.source === selectedSourceYear
+      );
+    }
+    
+    if (selectedPublisher) {
+      filteredEvents = filteredEvents.filter(event =>
+        event.publisher === selectedPublisher
+      );
+      
+    }
+
+    if (selectedAverageScore) {
+      filteredEvents = filteredEvents.filter(event =>
+        event.rating === selectedAverageScore
+      );
+      
+    }
+
     if (selectedTopics && selectedTopics.length > 0) {
       filteredEvents = filteredEvents.filter(event => {
           if (!event.topics) {
@@ -166,16 +187,18 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
           const eventTopics = event.topics.split(',').map(topic => topic.trim());
           return eventTopics.some(topic => selectedTopics.includes(topic));
       });
-  }
+    }
 
-  if (selectedFieldsOfResearch && selectedFieldsOfResearch.length > 0) {
-    filteredEvents = filteredEvents.filter(event => {
-        if(!event.fieldOfResearch) {
-          return false;
-        }
-        const eventFields = event.fieldOfResearch.split(',').map(field => field.trim());
-        return eventFields.some(field => selectedFieldsOfResearch.includes(field));
-    });
+    if (selectedFieldsOfResearch && selectedFieldsOfResearch.length > 0) {
+      filteredEvents = filteredEvents.filter(event => {
+          if(!event.fieldOfResearch) {
+            return false;
+          }
+          const eventFields = event.fieldOfResearch.split(',').map(field => field.trim());
+          return eventFields.some(field => selectedFieldsOfResearch.includes(field));
+      });
+
+    
 }
 
     // --- Sorting ---
@@ -228,7 +251,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
     setEvents(sortedEvents);
     setCurrentPage(1);
-  }, [searchQuery, selectedLocation, selectedType, startDate, endDate, submissionDate, selectedRank, selectedTopics, selectedFieldsOfResearch, sortBy]);
+  }, [searchQuery, selectedLocation, selectedType, startDate, endDate, submissionDate, selectedRank, selectedTopics, selectedFieldsOfResearch, selectedPublisher, selectedSourceYear, sortBy]);
 
   const indexOfLastEvent = currentPage * eventsPerPage;
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
@@ -246,6 +269,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   }
   return (
     <div className="w-full pl-8">
+      {selectedSourceYear && <div>Query: {selectedSourceYear}</div>}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-semibold">
           Recommended for you ({events.length})

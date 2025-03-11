@@ -6,35 +6,29 @@ import SearchAdvanceSection from './SearchAdvanceSection'; // Import the new com
 import continentList from '../../../../models/data/continents-list.json'; // Import continent-list.json
 
 interface SearchSectionProps {
-  onSearch: (query: string) => void;
-  onLocationChange: (location: string | null) => void;
-  selectedLocation: string | null;
-  onTypeChange: (type: 'online' | 'offline' | 'hybrid' | null) => void;
-  selectedType: 'online' | 'offline' | 'hybrid' | null;
-  onStartDateChange: (date: Date | null) => void;
-  onEndDateChange: (date: Date | null) => void;
-  startDate: Date | null;
-  endDate: Date | null;
-
-  onSubmissionDateChange: (date: Date | null) => void;
-  submissionDate: Date | null;
-  onRankChange: (rank: string | null) => void;
-  selectedRank: string | null;
-  onSourceYearChange: (sourceYear: string | null) => void;
-  selectedSourceYear: string | null;
-  onAverageScoreChange: (averageScore: string | null) => void;
-  selectedAverageScore: string | null;
-  onTopicsChange: (topics: string[]) => void;
-  selectedTopics: string[];
-  onFieldOfResearchChange: (fields: string[]) => void;
-  selectedFieldsOfResearch: string[];
+  onSearch: (searchParams: {
+    keyword?: string;
+    startDate?: Date | null;
+    endDate?: Date | null;
+    location?: string | null;
+    type?: 'online' | 'offline' | 'hybrid' | null;
+    submissionDate?: Date | null;
+    publisher?: string | null;
+    rank?: string | null;
+    sourceYear?: string | null;
+    averageScore?: string | null;
+    topics?: string[];
+    fieldOfResearch?: string[];
+  }) => void;
 }
 
-const SearchSection: React.FC<SearchSectionProps> = ({
-  onSearch, onLocationChange, selectedLocation, onTypeChange, selectedType, onStartDateChange, onEndDateChange, startDate, endDate,
-  onSubmissionDateChange, submissionDate, onRankChange, selectedRank, onSourceYearChange, selectedSourceYear, onAverageScoreChange, selectedAverageScore, onTopicsChange, selectedTopics, onFieldOfResearchChange, selectedFieldsOfResearch
-}) => {
-  const [searchQuery, setSearchQuery] = React.useState<string>('');
+const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
+  const [confKeyword, setConfKeyword] = React.useState<string>('');
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  // Keep selectedType as string | null to be more flexible, or you can refine it based on possible 'type' values in ConferenceResponse
+  const [selectedType, setSelectedType] = useState<'online' | 'offline' | 'hybrid' | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
   const [locationSearchQuery, setLocationSearchQuery] = useState('');
   const [typeSearchQuery, setTypeSearchQuery] = useState('');
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
@@ -43,6 +37,14 @@ const SearchSection: React.FC<SearchSectionProps> = ({
   const typeDropdownRef = useRef<HTMLDivElement>(null);
   const [isAdvancedOptionsVisible, setIsAdvancedOptionsVisible] = useState(false); // State for advanced options visibility
   const [availableLocations, setAvailableLocations] = useState<string[]>([]); // State to hold locations
+
+  const [submissionDate, setSubmissionDate] = useState<Date | null>(null);
+  const [selectedRank, setSelectedRank] = useState<string | null>(null);
+  const [selectedSourceYear, setSelectedSourceYear] = useState<string | null>(null);
+  const [selectedAverageScore, setSelectedAverageScore] = useState<string | null>(null);
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [selectedFieldsOfResearch, setSelectedFieldsOfResearch] = useState<string[]>([]);
+  const [selectedPublisher, setSelectedPublisher] = useState<string | null>(null);
 
   const availableTypes = ['online', 'offline', 'hybrid']; // Define available types
 
@@ -53,8 +55,8 @@ const SearchSection: React.FC<SearchSectionProps> = ({
   }, []);
 
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
+  const handleKeywordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setConfKeyword(event.target.value);
   };
 
   const filteredLocations = availableLocations.filter(location =>
@@ -62,7 +64,20 @@ const SearchSection: React.FC<SearchSectionProps> = ({
   );
 
   const handleSearchClick = () => {
-    onSearch(searchQuery);
+    onSearch({
+      keyword: confKeyword,
+      startDate: startDate,
+      endDate: endDate,
+      location: selectedLocation,
+      type: selectedType,
+      submissionDate: submissionDate,
+      publisher: selectedPublisher,
+      rank: selectedRank,
+      sourceYear: selectedSourceYear,
+      averageScore: selectedAverageScore,
+      topics: selectedTopics,
+      fieldOfResearch: selectedFieldsOfResearch,
+    });
   };
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -76,11 +91,11 @@ const SearchSection: React.FC<SearchSectionProps> = ({
   );
 
   const handleLocationClick = (location: string) => {
-    onLocationChange(location === "" ? null : location);
+    setSelectedLocation(location === "" ? null : location);
   };
 
   const handleTypeClick = (type: string) => {
-    onTypeChange(type === "" ? null : type as 'online' | 'offline' | 'hybrid' | null);
+    setSelectedType(type === "" ? null : type as 'online' | 'offline' | 'hybrid' | null);
   };
 
   const handleLocationSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,12 +108,12 @@ const SearchSection: React.FC<SearchSectionProps> = ({
 
   const handleStartDateInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const date = event.target.value ? new Date(event.target.value) : null;
-    onStartDateChange(date);
+    setStartDate(date);
   };
 
   const handleEndDateInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const date = event.target.value ? new Date(event.target.value) : null;
-    onEndDateChange(date);
+    setEndDate(date);
   };
 
   const toggleLocationDropdown = () => {
@@ -111,6 +126,35 @@ const SearchSection: React.FC<SearchSectionProps> = ({
 
   const toggleAdvancedOptionsVisibility = () => {
     setIsAdvancedOptionsVisible(!isAdvancedOptionsVisible);
+  };
+
+
+  const handleSubmissionDateChange = (date: Date | null) => {
+      setSubmissionDate(date);
+  };
+
+  const handleRankChange = (rank: string | null) => {
+      setSelectedRank(rank);
+  };
+
+  const handleSourceYearChange = (sourceYear: string | null) => {
+      setSelectedSourceYear(sourceYear);
+  };
+
+  const handleAverageScoreChange = (averageScore: string | null) => {
+      setSelectedAverageScore(averageScore);
+  };
+
+  const handleTopicsChange = (topics: string[]) => {
+      setSelectedTopics(topics);
+  };
+
+  const handleFieldsOfResearchChange = (fields: string[]) => {
+      setSelectedFieldsOfResearch(fields);
+  };
+
+  const handlePublisher = (publisher: string | null) => {
+      setSelectedPublisher(publisher);
   };
 
   // Close dropdown if clicked outside
@@ -150,8 +194,8 @@ const SearchSection: React.FC<SearchSectionProps> = ({
             type="text"
             placeholder="Type a command or search..."
             className="outline-none w-full bg-transparent"
-            value={searchQuery}
-            onChange={handleSearchChange}
+            value={confKeyword}
+            onChange={handleKeywordChange}
             onKeyDown={handleKeyPress}
           />
         </div>
@@ -291,18 +335,20 @@ const SearchSection: React.FC<SearchSectionProps> = ({
       <SearchAdvanceSection
         isAdvancedOptionsVisible={isAdvancedOptionsVisible}
         toggleAdvancedOptionsVisibility={toggleAdvancedOptionsVisibility}
-        onSubmissionDateChange={onSubmissionDateChange}
+        onSubmissionDateChange={handleSubmissionDateChange}
         submissionDate={submissionDate}
-        onRankChange={onRankChange}
+        onRankChange={handleRankChange}
         selectedRank={selectedRank}
-        onSourceYearChange={onSourceYearChange}
+        onSourceYearChange={handleSourceYearChange}
         selectedSourceYear={selectedSourceYear}
-        onAverageScoreChange={onAverageScoreChange}
+        onAverageScoreChange={handleAverageScoreChange}
         selectedAverageScore={selectedAverageScore}
-        onTopicsChange={onTopicsChange}
+        onTopicsChange={handleTopicsChange}
         selectedTopics={selectedTopics}
-        onFieldOfResearchChange={onFieldOfResearchChange}
+        onFieldOfResearchChange={handleFieldsOfResearchChange}
         selectedFieldsOfResearch={selectedFieldsOfResearch}
+        onPublisherChange={handlePublisher}
+        selectedPublisher={selectedPublisher}
       />
     </div>
   );

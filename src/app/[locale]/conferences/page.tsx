@@ -23,92 +23,66 @@ export default function Conferences() {
     const [selectedAverageScore, setSelectedAverageScore] = useState<string | null>(null);
     const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
     const [selectedFieldsOfResearch, setSelectedFieldsOfResearch] = useState<string[]>([]);
+    const [selectedPublisher, setSelectedPublisher] = useState<string | null>(null);
 
-    const handleSearch = (query: string) => {
-        setSearchQuery(query);
-    };
+    // const handleSearch = (query: string) => {
+    //     setSearchQuery(query);
+    // };
 
-    const handleLocationChange = (location: string | null) => {
-        setSelectedLocation(location);
-    };
+    const handleSearch = async (searchParams: {
+        keyword?: string;
+        startDate?: Date | null;
+        endDate?: Date | null;
+        location?: string | null;
+        type?: 'online' | 'offline' | 'hybrid' | null;
+        submissionDate?: Date | null;
+        publisher?: string | null;
+        rank?: string | null;
+        sourceYear?: string | null;
+        averageScore?: string | null;
+        topics?: string[];
+        fieldOfResearch?: string[];
+    }) => {
+        console.log("Thông số tìm kiếm nhận được từ SearchJournalSection:", searchParams);
+        setSearchQuery(searchParams.keyword || '');
 
-    const handleTypeChange = (type: 'online' | 'offline' | 'hybrid' | null) => {
-        setSelectedType(type);
-    };
+        // Update state variables for ResultsJournalSection props
+        setStartDate(searchParams.startDate || null);
+        setEndDate(searchParams.endDate || null);
+        setSelectedLocation(searchParams.location || null);
+        setSelectedType(searchParams.type || null);
+        setSubmissionDate(searchParams.submissionDate || null);
+        setSelectedPublisher(searchParams.publisher || null);
+        setSelectedRank(searchParams.rank || null);
+        setSelectedSourceYear(searchParams.sourceYear || null);
+        setSelectedAverageScore(searchParams.averageScore || null);
+        setSelectedTopics(searchParams.topics || []);
+        setSelectedFieldsOfResearch(searchParams.fieldOfResearch || []);
 
-    const handleStartDateChange = (date: Date | null) => {
-        setStartDate(date);
-    };
-
-    const handleEndDateChange = (date: Date | null) => {
-        setEndDate(date);
-    };
-    const handleSubmissionDateChange = (date: Date | null) => {
-        setSubmissionDate(date);
-    };
-
-    const handleRankChange = (rank: string | null) => {
-        setSelectedRank(rank);
-    };
-
-    const handleSourceYearChange = (sourceYear: string | null) => {
-        setSelectedSourceYear(sourceYear);
-    };
-
-    const handleAverageScoreChange = (averageScore: string | null) => {
-        setSelectedAverageScore(averageScore);
-    };
-
-    const handleTopicsChange = (topics: string[]) => {
-        setSelectedTopics(topics);
-    };
-
-    const handleFieldsOfResearchChange = (fields: string[]) => {
-        setSelectedFieldsOfResearch(fields);
     };
 
     return (
         <div className="text-center text-2xl">
             <div className="py-14 bg-background w-full"></div>
-        <SearchSection
-            onSearch={handleSearch}
-            onLocationChange={handleLocationChange}
-            selectedLocation={selectedLocation}
-            onTypeChange={handleTypeChange}
-            selectedType={selectedType}
-            onStartDateChange={handleStartDateChange}
-            onEndDateChange={handleEndDateChange}
-            startDate={startDate}
-            endDate={endDate}
-
-            onSubmissionDateChange={handleSubmissionDateChange}
-            submissionDate={submissionDate}
-            onRankChange={handleRankChange}
-            selectedRank={selectedRank}
-            onSourceYearChange={handleSourceYearChange}
-            selectedSourceYear={selectedSourceYear}
-            onAverageScoreChange={handleAverageScoreChange}
-            selectedAverageScore={selectedAverageScore}
-            onTopicsChange={handleTopicsChange}
-            selectedTopics={selectedTopics}
-            onFieldOfResearchChange={handleFieldsOfResearchChange}
-            selectedFieldsOfResearch={selectedFieldsOfResearch}
-        />
-        <div className="container mx-auto mt-8 px-4">
-            <ResultsSection
-                searchQuery={searchQuery}
-                selectedLocation={selectedLocation}
-                selectedType={selectedType}
-                startDate={startDate}
-                endDate={endDate}
-                submissionDate={submissionDate}
-                selectedRank={selectedRank}
-                selectedSourceYear={selectedSourceYear}
-                selectedAverageScore={selectedAverageScore}
-                selectedTopics={selectedTopics}
-                selectedFieldsOfResearch={selectedFieldsOfResearch}
+            <SearchSection
+                onSearch={handleSearch}
             />
-        </div>
+            <div className="container mx-auto mt-8 px-4">
+                <ResultsSection
+                    searchQuery={searchQuery}
+                    selectedLocation={selectedLocation}
+                    selectedType={selectedType}
+                    startDate={startDate}
+                    endDate={endDate}
+                    submissionDate={submissionDate}
+                    selectedRank={selectedRank}
+                    selectedSourceYear={selectedSourceYear}
+                    selectedAverageScore={selectedAverageScore}
+                    selectedTopics={selectedTopics}
+                    selectedFieldsOfResearch={selectedFieldsOfResearch}
+                    selectedPublisher={selectedPublisher}
+                />
+            </div>
     </div>
     );
 }
