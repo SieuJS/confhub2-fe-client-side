@@ -1,6 +1,6 @@
 // components/AudioPlayer.tsx
 import React, { useState, useRef, useEffect } from 'react';
-import "./audio-player.css"
+import AudioPulse from '../audio-pulse/AudioPulse'; // Import the AudioPulse component
 
 interface AudioPlayerProps {
   audioData: string; // Base64 encoded audio data
@@ -11,13 +11,17 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false }
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const audioContextRef = useRef<AudioContext | null>(null); // Ref for AudioContext
-  const bufferSourceRef = useRef<AudioBufferSourceNode | null>(null); // Ref for AudioBufferSourceNode
-  const audioBufferRef = useRef<AudioBuffer | null>(null); // Ref for AudioBuffer
+  const [isHovered, setIsHovered] = useState(false); // For hover effect on AudioPulse
+  const [volume, setVolume] = useState(0); // For volume indicator
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const bufferSourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const audioBufferRef = useRef<AudioBuffer | null>(null);
+    const gainNodeRef = useRef<GainNode | null>(null); // Ref for GainNode
 
 
   useEffect(() => {
-    audioContextRef.current = new AudioContext({ sampleRate: 24000 }); //sample rate = 24000
+    audioContextRef.current = new AudioContext({ sampleRate: 24000 });
+      gainNodeRef.current = audioContextRef.current.createGain(); // Create a GainNode
     return () => {
       if (audioContextRef.current) audioContextRef.current.close();
     }
@@ -31,73 +35,62 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false }
     const audioBuffer = base64ToAudioBuffer(audioData, audioContextRef.current);
     if (!audioBuffer) return;
 
-    audioBufferRef.current = audioBuffer; // Store the decoded audio buffer
+    audioBufferRef.current = audioBuffer;
     setDuration(audioBuffer.duration);
-
 
     const onEnded = () => {
       setIsPlaying(false);
       setCurrentTime(0);
-      // No need to disconnect here, as it will be handled in togglePlay and seek
     };
 
-
-      // timeupdate event will not be fired from AudioContext, so no need to handle it
-    return () => { // Cleanup
+    return () => {
         if (bufferSourceRef.current) {
             bufferSourceRef.current.stop();
             bufferSourceRef.current.disconnect();
         }
     };
-  }, [audioData]); // Removed autoPlay from dependency array.
+  }, [audioData]);
+
 
 
   const togglePlay = () => {
-    if (!audioContextRef.current || !audioBufferRef.current) {
+    if (!audioContextRef.current || !audioBufferRef.current || !gainNodeRef.current) {
       return;
     }
 
     if (isPlaying) {
       if(bufferSourceRef.current) {
-          bufferSourceRef.current.stop(); // Stop before disconnect
+          bufferSourceRef.current.stop();
           bufferSourceRef.current.disconnect();
-          bufferSourceRef.current = null; // Clear it after stop.
+          bufferSourceRef.current = null;
       }
-
       setIsPlaying(false);
     } else {
-      // Create a *new* source node each time we play.
       const newSource = audioContextRef.current.createBufferSource();
-      newSource.buffer = audioBufferRef.current; // Use the stored buffer
-      newSource.connect(audioContextRef.current.destination);
-      bufferSourceRef.current = newSource; // Update the ref
+      newSource.buffer = audioBufferRef.current;
+        newSource.connect(gainNodeRef.current); // Connect to the GainNode
+        gainNodeRef.current.connect(audioContextRef.current.destination); // Connect GainNode to destination
+      bufferSourceRef.current = newSource;
 
       newSource.addEventListener('ended', () => {
         setIsPlaying(false);
         setCurrentTime(0);
-        if (bufferSourceRef.current) { // Check again before disconnecting
+        if (bufferSourceRef.current) {
             bufferSourceRef.current.disconnect();
-            bufferSourceRef.current = null; // Clear it after disconnect
+            bufferSourceRef.current = null;
         }
       });
-
-      // Update currentTime *before* starting playback, to avoid 0s issues
-      newSource.context.addEventListener('timeupdate', () => {
-        if(bufferSourceRef.current && bufferSourceRef.current.context){
-           setCurrentTime(bufferSourceRef.current.context.currentTime);
-        }
-
-      });
-
+        // removed timeupdate event
 
       try {
-        newSource.start(0); // Start from the beginning.
+        newSource.start(0);
         setIsPlaying(true);
       } catch (e) {
         console.error("Play failed", e);
       }
     }
   };
+
 
 
   const formatTime = (time: number) => {
@@ -107,50 +100,42 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false }
   };
 
   const seek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!audioContextRef.current || !audioBufferRef.current) {
+    if (!audioContextRef.current || !audioBufferRef.current || !gainNodeRef.current) {
       return;
     }
 
     const time = parseFloat(e.target.value);
     setCurrentTime(time);
 
-    if (isPlaying) { // Stop if Playing
-        if(bufferSourceRef.current) { // Check before stopping
+    if (isPlaying) {
+        if(bufferSourceRef.current) {
           bufferSourceRef.current.stop();
           bufferSourceRef.current.disconnect();
           bufferSourceRef.current = null
         }
     }
 
-
-    // Create a new source node for the new playback position.
     const newSource = audioContextRef.current.createBufferSource();
     newSource.buffer = audioBufferRef.current;
-    newSource.connect(audioContextRef.current.destination);
+      newSource.connect(gainNodeRef.current);
+        gainNodeRef.current.connect(audioContextRef.current.destination);
     bufferSourceRef.current = newSource;
 
     newSource.addEventListener('ended', () => {
         setIsPlaying(false);
         setCurrentTime(0);
-
         if (bufferSourceRef.current) {
           bufferSourceRef.current.disconnect();
           bufferSourceRef.current = null;
         }
-
     });
-
-    newSource.context.addEventListener('timeupdate', () => {
-        if(bufferSourceRef.current && bufferSourceRef.current.context)
-        setCurrentTime(bufferSourceRef.current.context.currentTime);
-      });
+      // removed timeupdate event
 
     try {
-      newSource.start(0, time); // Start at the seeked time.
+      newSource.start(0, time);
       if (!isPlaying) {
-          setIsPlaying(true); //Set isPlaying to true, when start by seeking
+          setIsPlaying(true);
       }
-
     } catch (e) {
       console.error("seek failed", e)
     }
@@ -158,7 +143,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false }
 
 
 
-  // Helper function to convert base64 to AudioBuffer
   const base64ToAudioBuffer = (base64: string, context: AudioContext) => {
     try {
       const binaryString = atob(base64);
@@ -168,22 +152,16 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false }
         bytes[i] = binaryString.charCodeAt(i);
       }
 
-      // Convert to Int16Array (assuming 16-bit PCM)
       const int16View = new Int16Array(bytes.buffer);
-
-      // Create an AudioBuffer
       const audioBuffer = context.createBuffer(
-        1, // Number of channels (1 for mono, 2 for stereo)
-        int16View.length, // Number of samples
-        24000 // Sample rate (24kHz)
+        1,
+        int16View.length,
+        24000
       );
 
-      // Get the channel data (Float32Array)
       const channelData = audioBuffer.getChannelData(0);
-
-      // Fill the channel data with the PCM values (normalized to -1 to 1)
       for (let i = 0; i < int16View.length; i++) {
-        channelData[i] = int16View[i] / 32768; // 32768 for 16-bit audio
+        channelData[i] = int16View[i] / 32768;
       }
 
       return audioBuffer;
@@ -191,32 +169,64 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false }
       console.error("decode audio error", e);
       return null;
     }
-
   };
 
+    const toggleMute = () => {
+      if (audioContextRef.current && gainNodeRef.current) {
+          if(gainNodeRef.current.gain.value > 0){
+              gainNodeRef.current.gain.value = 0; // Mute
+              setVolume(0)
+          } else {
+              gainNodeRef.current.gain.value = 1; // Unmute (set to your desired default volume)
+              setVolume(1)
+          }
+
+      }
+  };
 
   return (
-    <div className="audio-player">
-      <button onClick={togglePlay} className="audio-control">
+    <div
+      className="flex items-center rounded-full bg-primary p-1 pl-2 pr-2"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <button onClick={togglePlay} className="audio-control  rounded-full bg-button p-1 text-button-text hover:bg-button-secondary">
         {isPlaying ? (
           <span className="material-symbols-outlined">pause</span>
         ) : (
           <span className="material-symbols-outlined">play_arrow</span>
         )}
       </button>
-      <span className="audio-time">
+      <span className="audio-time ml-2 mr-2 text-sm text-text-secondary">
         {formatTime(currentTime)} / {formatTime(duration)}
       </span>
-      <input
-        type="range"
-        min="0"
-        max={duration}
-        value={currentTime}
-        onChange={seek}
-        className="audio-slider"
-      />
-      <button onClick={() => { if (audioContextRef.current) audioContextRef.current.resume() }} className="audio-control">
-        <span className="material-symbols-outlined">{audioContextRef.current && audioContextRef.current.state === "running" ? "volume_up" : "volume_off"}</span>
+      <div className='relative flex-grow'> {/* Container for the slider and pulse */}
+        <input
+          type="range"
+          min="0"
+          max={duration}
+          value={currentTime}
+          onChange={seek}
+          className="audio-slider absolute top-0 z-10 h-full w-full appearance-none bg-transparent" // Make slider full width and height, on top
+          style={{
+              background: 'transparent',
+          }}
+
+        />
+          <div className='pointer-events-none absolute top-1/2 -translate-y-1/2'> {/*  Position the pulse in the middle */}
+            <AudioPulse active={isPlaying} volume={isPlaying? (gainNodeRef.current ? gainNodeRef.current.gain.value : 0): 0} hover={isHovered} /> {/* Use the imported AudioPulse component */}
+          </div>
+
+      </div>
+      <button onClick={toggleMute} className="audio-control ml-2  rounded-full bg-button p-1 text-button-text hover:bg-button-secondary">
+        <span className="material-symbols-outlined">
+          {gainNodeRef.current && gainNodeRef.current.gain.value > 0 ? "volume_up" : "volume_off"}
+        </span>
+      </button>
+        <button  className="audio-control ml-2 rounded-full bg-button p-1 text-button-text hover:bg-button-secondary">
+        <span className="material-symbols-outlined">
+          more_vert
+        </span>
       </button>
     </div>
   );

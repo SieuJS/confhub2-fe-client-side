@@ -1,4 +1,3 @@
-
 // SidePanel.tsx
 "use client";
 import cn from "classnames";
@@ -6,14 +5,12 @@ import { useEffect, useRef, useState, memo } from "react";
 import { useLiveAPIContext } from "../../contexts/LiveAPIContext"; // Use context
 import { useLoggerStore } from "../../lib/store-logger";
 import Logger from "../logger/Logger";
-import "./side-panel.css";
+import "./side-panel.css"; //  Keep this for any CSS that can't be easily Tailwind-ified, if any.
 import { AudioRecorder } from "../../lib/audio-recorder";
 import AudioPulse from "../audio-pulse/AudioPulse";
 import { UseMediaStreamResult } from "../../hooks/use-media-stream-mux";
 import { useScreenCapture } from "../../hooks/use-screen-capture";
 import { useWebcam } from "../../hooks/use-webcam";
-
-// ... (rest of the imports and component definitions)
 
 type MediaStreamButtonProps = {
   isStreaming: boolean;
@@ -25,7 +22,10 @@ type MediaStreamButtonProps = {
 
 const MediaStreamButton = memo(
   ({ isStreaming, onIcon, offIcon, start, stop }: MediaStreamButtonProps) => (
-    <button className="action-button" onClick={isStreaming ? stop : start}>
+    <button
+      className="flex items-center justify-center w-12 h-12 rounded-2xl border border-transparent text-xl text-gray-400 bg-gray-800 hover:bg-gray-700 hover:text-gray-100 transition-all duration-200 ease-in-out focus:outline-2 focus:outline-gray-200 focus:outline-offset-2 select-none"
+      onClick={isStreaming ? stop : start}
+    >
       <span className="material-symbols-outlined">
         {isStreaming ? onIcon : offIcon}
       </span>
@@ -39,7 +39,13 @@ const ConnectionButton: React.FC<{
   disconnect: () => void;
 }> = ({ connected, connect, disconnect }) => (
   <button
-    className={cn("action-button", "connect-toggle", { connected })}
+    className={cn(
+      "flex items-center justify-center w-12 h-12 rounded-2xl border border-transparent text-xl transition-all duration-200 ease-in-out focus:outline-2 focus:outline-offset-2 select-none",
+      {
+        "bg-blue-800 text-blue-500 hover:bg-blue-600 hover:border-blue-500": connected,
+        "bg-blue-500 text-gray-900 hover:bg-blue-400 focus:outline-gray-200": !connected,
+      },
+    )}
     onClick={connected ? disconnect : connect}
   >
     <span className="material-symbols-outlined filled">
@@ -54,21 +60,39 @@ const MicButton: React.FC<{
   volume: number;
   connected: boolean;
 }> = ({ muted, setMuted, volume, connected }) => (
-  <div className="mic-controls">
+  <div className="flex items-center gap-2">
     <button
-      className={cn("action-button", "mic-button")}
+      className={cn(
+        "flex items-center justify-center w-12 h-12 rounded-2xl text-xl transition-all duration-200 ease-in select-none relative z-10",
+        {
+          "bg-red-600 text-black hover:bg-red-400 focus:outline-2 focus:outline-red-500 focus:border-gray-800": !muted, // Corrected focus
+          "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-100 focus:outline-2 focus:outline-gray-200 focus:border-transparent": muted
+        },
+      )}
       onClick={() => setMuted(!muted)}
     >
       <span className="material-symbols-outlined filled">
         {muted ? "mic_off" : "mic"}
       </span>
+      {!muted && (
+        <div
+          
+          className="absolute inset-0 rounded-2xl bg-red-500 opacity-35 z-0 pointer-events-none transition-all duration-200 ease-in-out"
+          style={{
+            top: `calc(var(--volume) * -1)`,
+            left: `calc(var(--volume) * -1)`,
+            width: `calc(100% + var(--volume) * 2)`,
+            height: `calc(100% + var(--volume) * 2)`,
+          }}
+        />
+      )}
+
     </button>
-    <div className="audio-pulse-container">
+    <div className="w-12 h-12 flex items-center justify-center">
       <AudioPulse volume={volume} active={connected} hover={false} />
     </div>
   </div>
 );
-
 
 export default function SidePanel({
   videoRef,
@@ -79,7 +103,8 @@ export default function SidePanel({
   supportsVideo: boolean;
   onVideoStreamChange: (stream: MediaStream | null) => void;
 }) {
-  const { connected, client, connect, disconnect, volume, on, off } = useLiveAPIContext(); // Get 'on' and 'off' from the hook
+  const { connected, client, connect, disconnect, volume, on, off } =
+    useLiveAPIContext(); // Get 'on' and 'off' from the hook
   const loggerRef = useRef<HTMLDivElement>(null);
   const loggerLastHeightRef = useRef<number>(-1);
   const { log } = useLoggerStore();
@@ -90,7 +115,9 @@ export default function SidePanel({
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const videoStreams = [useWebcam(), useScreenCapture()];
-  const [activeVideoStream, setActiveVideoStream] = useState<MediaStream | null>(null);
+  const [activeVideoStream, setActiveVideoStream] = useState<MediaStream | null>(
+    null,
+  );
   const [webcam, screenCapture] = videoStreams;
   const [inVolume, setInVolume] = useState(0);
   const [audioRecorder] = useState(() => new AudioRecorder());
@@ -122,21 +149,20 @@ export default function SidePanel({
   }, [loggerRef, loggerLastHeightRef]);
 
   useEffect(() => {
-    on("log", log); // Use the 'on' from useLiveAPIContext
+    on("log", log);
     return () => {
-      off("log", log); // Use the 'off' from useLiveAPIContext
+      off("log", log);
     };
-  }, [on, off, log]); // Correct dependencies
+  }, [on, off, log]);
 
 
   useEffect(() => {
-    on("log", log); // Use the 'on' from useLiveAPIContext
+    on("log", log);
     return () => {
-      off("log", log); // Use the 'off' from useLiveAPIContext
+      off("log", log);
     };
-  }, [on, off, log]); // Correct dependencies
+  }, [on, off, log]);
 
-  // ... (your video frame sending useEffect)
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.srcObject = activeVideoStream;
@@ -232,12 +258,11 @@ export default function SidePanel({
       });
     };
 
-    // --- CRITICAL CHANGE: Use the 'on' and 'off' from useLiveAPIContext ---
     on("audioResponse", onAudioResponse);
     return () => {
       off("audioResponse", onAudioResponse);
     };
-  }, [on, off, log]); // Correct dependencies
+  }, [on, off, log]);
 
   useEffect(() => {
     document.documentElement.style.setProperty(
@@ -248,31 +273,33 @@ export default function SidePanel({
 
   const handleSubmit = () => {
     if (textInput.trim() === "") {
-      // Prevent sending empty messages
       return;
     }
     client.send([{ text: textInput }]);
     setTextInput("");
     if (inputRef.current) {
-      inputRef.current.value = ""; // Use .value for textarea
+      inputRef.current.value = "";
     }
   };
 
-
-
   return (
-    <div className="side-panel">
+    <div className="flex flex-col h-screen w-screen bg-gray-950 border-r border-gray-600 text-gray-200 font-sans text-sm leading-6">
       <canvas style={{ display: "none" }} ref={renderCanvasRef} />
-      <header className="side-panel-header">
-        <h2>Console</h2>
+      <header className="flex items-center justify-between px-5 py-3 border-b border-gray-800">
+        <h2 className="font-googleSans text-xl font-medium leading-4">
+          Console
+        </h2>
       </header>
 
-      <div className="side-panel-container" ref={loggerRef}>
+      <div
+        className="flex-grow overflow-x-hidden overflow-y-auto w-1/4"
+        ref={loggerRef}
+      >
         <Logger filter="none" />
       </div>
 
-      <div className="controls-container">
-        <div className="media-controls">
+      <div className="flex flex-col p-4 border-t border-gray-800 bg-gray-900">
+        <div className="flex gap-2.5 mb-4">
           <ConnectionButton
             connected={connected}
             connect={connect}
@@ -304,9 +331,13 @@ export default function SidePanel({
           )}
         </div>
 
-        <div className={cn("input-container", { disabled: !connected })}>
+        <div
+          className={cn("flex items-center p-2 border border-gray-800 rounded-lg", {
+            "opacity-50 cursor-not-allowed": !connected,
+          })}
+        >
           <textarea
-            className="input-area"
+            className="flex-grow bg-transparent border-none text-gray-200 text-sm resize-none h-10 py-2 px-0 outline-none placeholder-gray-500 disabled:cursor-not-allowed"
             ref={inputRef}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -321,7 +352,7 @@ export default function SidePanel({
             disabled={!connected}
           />
           <button
-            className="send-button material-symbols-outlined filled"
+            className="material-symbols-outlined filled p-2 text-gray-500 rounded cursor-pointer disabled:cursor-not-allowed disabled:text-gray-700 hover:text-gray-200"
             onClick={handleSubmit}
             disabled={!connected}
           >

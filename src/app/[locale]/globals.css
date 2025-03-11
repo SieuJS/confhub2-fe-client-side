@@ -18,23 +18,38 @@
     --logo-shadow: #053949;
     --logo-body: #00d8fe;
     --span-bg: linear-gradient(to right, #4e4e9e, #097fa5, #3e87ed);
+    /* Light mode */
+    --Neutral-30: #d4d4d8;
+    /* Example color */
+    --Neutral-80: #27272a;
+    /* Example color */
+    --Neutral-20: #f4f4f5;
   }
+
   .dark {
     --primary: #d6deff;
-    --secondary: #B892F2; /*0ba6d1*/
+    --secondary: #B892F2;
+    /*0ba6d1*/
     --background: #121212;
     --background-secondary: #1b1b1b;
-    --button: #6a00ff; /*097fa5*/
+    --button: #6a00ff;
+    /*097fa5*/
     --button-text: #fff;
     --text-secondary: #bbbbbb;
     --dropdown: #2d2d2d;
     --dropdown-hover: #454545;
     --button-secondary: #1d1d1d;
     --selected: #324e70;
-    --logo-shadow: #24094b; /*0a2e36*/
+    --logo-shadow: #24094b;
+    /*0a2e36*/
     --logo-body: #6a00ff;
     --span-bg: linear-gradient(to right, #8c00ff, #0fb4e1, #a1d930, #ae0000);
+    /* dark mode */
+    --Neutral-30: #404040;
+    --Neutral-80: #e4e4e7;
+    --Neutral-20: #18181b;
   }
+
   .sunset {
     --primary: #ff6b6b;
     --secondary: #ff9966;
@@ -51,6 +66,7 @@
     --logo-body: #ff6b6b;
     --span-bg: linear-gradient(to right, #ff6b6b, #ff9966, #ffcc66);
   }
+
   .instagram {
     --primary: #cc3f7e;
     --secondary: #fcb045;
@@ -67,6 +83,7 @@
     --logo-body: #cc3f7e;
     --span-bg: linear-gradient(to right, #833ab4, #fd1d1d, #fcb045);
   }
+
   .facebook {
     --primary: #3b5998;
     --secondary: #4267b2;
@@ -83,6 +100,7 @@
     --logo-body: #3b5998;
     --span-bg: linear-gradient(to right, #3b5998, #4267b2, #5578c2);
   }
+
   .discord {
     --primary: #7289da;
     --secondary: #7289da;
@@ -99,6 +117,7 @@
     --logo-body: #7289da;
     --span-bg: linear-gradient(to right, #7289da, #7289da, #7289da);
   }
+
   .netflix {
     --primary: #ff0000;
     --secondary: #ffffff;
@@ -115,6 +134,7 @@
     --logo-body: #ff0000;
     --span-bg: linear-gradient(to right, #ff0000, #ff0000, #ff0000);
   }
+
   .reddit {
     --primary: #ff4500;
     --secondary: #ff6347;
@@ -131,6 +151,7 @@
     --logo-body: #ff4500;
     --span-bg: linear-gradient(to right, #ff4500, #ff6347, #ff4500);
   }
+
   .twilight {
     --primary: #a296e0;
     --secondary: #d84c21;
@@ -153,9 +174,11 @@
   *:lang(ar) {
     font-family: var(--rubik) !important;
   }
+
   *:lang(fa) {
     font-family: var(--rubik) !important;
   }
+
   div::selection,
   h1::selection,
   button::selection,
@@ -167,9 +190,10 @@
     text-shadow: rgb(0, 102, 255) 0px 0px 7px;
     color: rgb(248, 28, 229);
   }
+
   body {
     @apply bg-background text-primary;
   }
 
-  
+
 }

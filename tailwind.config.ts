@@ -26,6 +26,12 @@ const config = {
         primary: {
           DEFAULT: 'var(--primary)'
         },
+        neutral: {
+          DEFAULT: 'var(--neutral)',
+          30: 'var(--Neutral-30)',
+          80: 'var(--Neutral-80)',
+          20: 'var(--Neutral-20)'
+        },
         'button-secondary': 'var(--button-secondary)',
         'button-text': 'var(--button-text)',
         'text-secondary': 'var(--text-secondary)',
@@ -38,8 +44,8 @@ const config = {
         buttonSecondary: 'var(--button-secondary)',
 
 
-          
-        
+
+
       },
 
       fontFamily: {
@@ -59,6 +65,14 @@ const config = {
           '0%, 100%': { transform: 'translateY(0)' }, // Vị trí ban đầu và cuối
           '50%': { transform: 'translateY(-20px)' }, // Vị trí ở giữa (di chuyển lên)
         },
+        hover: {
+          from: {
+            transform: 'translateY(0)'
+          },
+          to: {
+            transform: 'translateY(-3.5px)'
+          }
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -66,16 +80,18 @@ const config = {
         ripple: 'ripple 0.5s ease-out', // Animation for button hover (if used)
         'pulse-ripple': 'pulse-ripple 1s linear infinite', // Continuous pulse ripple for div
         'float-up-down': 'floatUpDown 2s ease-in-out infinite', // Định nghĩa animation sử dụng keyframes 'floatUpDown'
+        hover: 'hover 1.4s infinite alternate ease-in-out',
+
       },
-      
-     
+
+
     }
     // ,
     // corePlugins: {
     //   preflight: false
     // }
   },
-  plugins: [require('tailwind-scrollbar'),require('tailwindcss-animate')]
+  plugins: [require('tailwind-scrollbar'), require('tailwindcss-animate')]
 } satisfies Config
 
 export default config
