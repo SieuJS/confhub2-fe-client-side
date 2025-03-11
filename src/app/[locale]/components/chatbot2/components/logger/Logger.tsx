@@ -1,4 +1,4 @@
-
+import React from "react";
 import "./logger.css";
 
 import { Part } from "@google/generative-ai";
@@ -24,6 +24,7 @@ import {
   ToolCallMessage,
   ToolResponseMessage,
 } from "../../multimodal-live-types";
+import { debounce } from 'lodash';
 
 const formatTime = (d: Date) => d.toLocaleTimeString().slice(0, -3);
 
@@ -239,10 +240,51 @@ const component = (log: StreamingLog) => {
   return AnyMessage;
 };
 
+async function sendLogToBackend(log: StreamingLog) {
+  try {
+    const standardizedLog = {
+      date: log.date.toISOString(),
+      type: log.type,
+      message: log.message,
+      count: log.count || null,
+    };
+
+    const response = await fetch('http://localhost:3000/log', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(standardizedLog, null, 2),
+    });
+
+    if (!response.ok) {
+      console.error('Lỗi khi gửi log đến backend:', response.status, response.statusText);
+    }
+  } catch (error) {
+    console.error('Lỗi khi gửi log đến backend:', error);
+  }
+}
+
+
 export default function Logger({ filter = "none" }: LoggerProps) {
   const { logs } = useLoggerStore();
-
   const filterFn = filters[filter];
+
+  // Sử dụng debounce để giảm tần suất gửi log
+  const debouncedSendLogs = React.useCallback(
+    debounce((logsToSend: StreamingLog[]) => {
+      logsToSend.forEach(log => sendLogToBackend(log));
+    }, 500), // Điều chỉnh thời gian trễ cho phù hợp
+    []
+  );
+
+  React.useEffect(() => {
+    debouncedSendLogs(logs);
+
+    return () => {
+      debouncedSendLogs.cancel();
+    };
+  }, [logs, debouncedSendLogs]);
 
   return (
     <div className="logger">
