@@ -29,7 +29,6 @@ const JournalDetails: React.FC = () => {
   return (
     <div className="">
       <div className="py-14 bg-background w-full">
-        <h1>{journal.title}</h1>
       </div>
       <JournalReport journal={journal} />
       <JournalTabs journal={journal} />
