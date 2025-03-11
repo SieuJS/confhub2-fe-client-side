@@ -221,10 +221,17 @@ const ClientAudioLog = ({ message }: Message) => {
 
 const ServerAudioLog = ({ message }: Message) => {
   const { audioData } = (message as ServerAudioMessage).serverAudio;
-  // Only render AudioPlayer if audioData exists and is not empty
   return (
     <div className="rich-log server-audio">
-      {audioData ? <AudioPlayer audioData={audioData} autoPlay /> : <p>Loading audio...</p>}
+      {audioData ? (
+        <AudioPlayer 
+          key={audioData} // Thêm key để force re-render khi audio thay đổi
+          audioData={audioData} 
+          autoPlay 
+        />
+      ) : (
+        <p>Loading audio...</p>
+      )}
     </div>
   );
 };
