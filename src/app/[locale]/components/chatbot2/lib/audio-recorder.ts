@@ -1,4 +1,4 @@
-// audio-recorder.ts
+// audio-recorder.ts (Corrected VAD without 'buffering')
 import { audioContext } from "./utils";
 import AudioRecordingWorklet from "./worklets/audio-processing";
 import VolMeterWorket from "./worklets/vol-meter";
@@ -44,23 +44,29 @@ export class AudioRecorder extends EventEmitter {
       this.audioContext = await audioContext({ sampleRate: this.sampleRate });
       this.source = this.audioContext.createMediaStreamSource(this.stream);
 
+      // --- CORRECTED VAD OPTIONS ---
       const vadOptions: VoiceActivityDetectionOptions = {
         minCaptureFreq: 85,
         maxCaptureFreq: 255,
+        noiseCaptureDuration: 1000, // 1 second of noise capture
+        smoothingTimeConstant: 0.99, // High smoothing for stability
+        // Optional: Further refine with noise levels if needed
+        // minNoiseLevel: 0.1,
+        // maxNoiseLevel: 0.8,
+        // avgNoiseMultiplier: 1.5, // Adjust threshold
         onVoiceStart: () => {
           console.log("voice start");
-          if (this.silenceTimer) { //This is probably unnecessary now.
+          if (this.silenceTimer) {
             clearTimeout(this.silenceTimer);
             this.silenceTimer = null;
           }
         },
         onVoiceStop: () => {
           console.log("voice stop");
-          this.emit("stop", this); // Emit the stop event.
-        }
+          this.emit("stop", this);
+        },
       };
 
-      // Call VAD directly, without 'new'
       this.vad = VAD(this.audioContext, this.stream, vadOptions);
       this.vad.connect();
 

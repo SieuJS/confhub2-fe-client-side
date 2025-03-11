@@ -1,4 +1,5 @@
-// SidePanel.tsx (Main Component)
+
+// SidePanel.tsx (Simplified useAudioRecorder)
 "use client";
 import { useEffect, useRef, useState, memo } from "react";
 import { useLiveAPIContext } from "../contexts/LiveAPIContext";
@@ -53,7 +54,7 @@ export default function SidePanel({
   useLoggerScroll(loggerRef);
   useLoggerEvents(on, off, log);
   useVideoFrameSender(connected, activeVideoStream, client, videoRef);
-  useAudioRecorder(connected, muted, audioRecorder, client, log, setInVolume);
+  useAudioRecorder(connected, muted, audioRecorder, client, log, setInVolume); // Simplified
   useModelAudioResponse(on, off, log);
   useVolumeControl(inVolume);
 
@@ -187,6 +188,21 @@ const useVideoFrameSender = (
   }, [connected, activeVideoStream, client, videoRef, renderCanvasRef]);
 };
 
+// Helper function to concatenate Uint8Arrays
+function concatenateUint8Arrays(arrays: Uint8Array[]): Uint8Array {
+  if (arrays.length === 1) {
+    return arrays[0];
+  }
+  const totalLength = arrays.reduce((acc, val) => acc + val.length, 0);
+  const result = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const arr of arrays) {
+    result.set(arr, offset);
+    offset += arr.length;
+  }
+  return result;
+}
+
 const useAudioRecorder = (
   connected: boolean,
   muted: boolean,
@@ -194,59 +210,75 @@ const useAudioRecorder = (
   client: any,
   log: (entry: any) => void,
   setInVolume: (volume: number) => void,
-  // Removed: setUserAudioData: (data: string | null) => void,  // No longer passed
 ) => {
-  // Hàm gửi realtime audio từ recorder
-  const onData = (base64: string) => {
-    client.sendRealtimeInput([
-      {
-        mimeType: "audio/pcm;rate=16000",
-        data: base64,
-      },
-    ]);
-  };
-
-  // Khi recorder phát hiện hết im lặng, tổng hợp audio từ các chunk đã nhận được
-  const onStopRecording = (recorder: AudioRecorder) => {
-    let fullAudioData = "";
-    const combineAudioChunks = (chunkBase64: string) => {
-      fullAudioData += chunkBase64;
-    };
-
-    // Tạm thời tắt realtime gửi dữ liệu
-    recorder.off("data", onData);
-    // Đăng ký nhận lại dữ liệu để cộng dồn
-    recorder.on("data", combineAudioChunks);
-
-    setTimeout(() => {
-      recorder.off("data", combineAudioChunks);
-      // Khôi phục gửi realtime cho lần thu tiếp theo
-      recorder.on("data", onData);
-      // setUserAudioData(fullAudioData); // Removed the call
-      log({
-        date: new Date(),
-        type: "send.clientAudio",
-        message: { clientAudio: { audioData: fullAudioData } },
-      });
-    }, 500);
-  };
-
   useEffect(() => {
     if (connected && !muted && audioRecorder) {
+      let audioChunks: Uint8Array[] = []; // Store binary chunks
+
+      const onData = (base64: string) => {
+        // console.log("onData called!", base64.substring(0, 20)); // Keep for debugging
+        try {
+            // Decode the base64 string to a Uint8Array
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            audioChunks.push(bytes);
+        } catch (error) {
+            console.error("Error decoding base64 chunk in onData", error)
+        }
+
+        client.sendRealtimeInput([
+          {
+            mimeType: "audio/pcm;rate=16000",
+            data: base64,
+          },
+        ]);
+      };
+
+      const onStop = () => {
+          try{
+            // Concatenate the binary chunks
+            const combinedBinary = concatenateUint8Arrays(audioChunks);
+
+            // Re-encode the combined binary data to base64
+            let binary = "";
+            const len = combinedBinary.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(combinedBinary[i]);
+            }
+            const combinedBase64 = window.btoa(binary);
+
+            // Log the correctly padded base64 data
+            if (combinedBase64.length > 0) {
+              log({
+                date: new Date(),
+                type: "send.clientAudio",
+                message: { clientAudio: { audioData: combinedBase64 } },
+              });
+            }
+
+          } catch (error){
+            console.error("Error encoding base64 in onStop", error)
+          }
+        audioChunks = []; // Reset for the next recording
+      };
+
       audioRecorder.on("data", onData).on("volume", setInVolume);
-      // Start recording có tích hợp VAD để phát hiện khi người dùng ngừng nói
-      audioRecorder.start();
-      audioRecorder.on("stop", (recorder) => onStopRecording(recorder));
-    } else {
-      audioRecorder.stop();
-      audioRecorder.off("stop", (recorder) => onStopRecording(recorder));
+      audioRecorder.on("stop", onStop);
+      audioRecorder.start().catch(console.error);
+
+      return () => {
+        audioRecorder.stop();
+        audioRecorder.off("data", onData).off("volume", setInVolume);
+        audioRecorder.off("stop", onStop);
+      };
     }
-    return () => {
-      audioRecorder.off("data", onData).off("volume", setInVolume);
-      audioRecorder.off("stop", (recorder) => onStopRecording(recorder));
-    };
   }, [connected, client, muted, audioRecorder, log, setInVolume]);
 };
+
 
 // --- Generic Event Hook ---
 const useModelAudioResponse = <E extends string>(
