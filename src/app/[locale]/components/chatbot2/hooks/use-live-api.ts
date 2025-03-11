@@ -106,38 +106,39 @@ export function useLiveAPI({
 
     const stopAudioStreamer = () => audioStreamerRef.current?.stop();
 
+    // Sửa phần xử lý audio stream
     const onAudio = (data: ArrayBuffer) => {
       audioStreamerRef.current?.addPCM16(new Uint8Array(data));
-
       const audioDataBase64 = btoa(String.fromCharCode(...new Uint8Array(data)));
-      console.log("audioDataBase64 (first 50 chars):", audioDataBase64.substring(0, 50)); // Add this line
 
-      // Update the ref *immediately*.
+      // Chỉ cập nhật data mà không gửi log ở đây
       accumulatedServerAudioRef.current += audioDataBase64;
-      setAccumulatedServerAudio((prev) => prev + audioDataBase64); //keep state update
-
-      // Call the debounced function with the *current* data from the ref.
-      debouncedEmitServerAudioLog(accumulatedServerAudioRef.current);
+      setAccumulatedServerAudio((prev) => prev + audioDataBase64);
     };
 
 
     const onGenerate = (data: any) => {
-        if (data.responseModalities && data.responseModalities.includes("audio")) {
-          if (
-            data.multimodalResponse &&
-            data.multimodalResponse.parts &&
-            data.multimodalResponse.parts.length
-          ) {
-            data.multimodalResponse.parts.forEach((part: Part) => {
-              if (part.inlineData) {
-                  // Still emit audioResponse for complete audio
-                emitter.emit("audioResponse", {
-                  data: part.inlineData.data,
-                });
-              }
-            });
-          }
+
+      // Reset accumulated audio data khi bắt đầu turn mới
+      accumulatedServerAudioRef.current = "";
+      setAccumulatedServerAudio("");
+
+      if (data.responseModalities && data.responseModalities.includes("audio")) {
+        if (
+          data.multimodalResponse &&
+          data.multimodalResponse.parts &&
+          data.multimodalResponse.parts.length
+        ) {
+          data.multimodalResponse.parts.forEach((part: Part) => {
+            if (part.inlineData) {
+              // Still emit audioResponse for complete audio
+              emitter.emit("audioResponse", {
+                data: part.inlineData.data,
+              });
+            }
+          });
         }
+      }
       emitter.emit("generate", data);
     };
 
@@ -150,13 +151,25 @@ export function useLiveAPI({
 
     };
 
-      const onTurnComplete = () => {
-          emitter.emit("turncomplete");
-          // debouncedEmitServerAudioLog(accumulatedServerAudioRef.current); // Force emit on turn complete.
-          // setAccumulatedServerAudio("");
-          // accumulatedServerAudioRef.current = ""; // Clear the ref.
-          // debouncedEmitServerAudioLog.cancel();
+    const onTurnComplete = () => {
+      // Gửi log audio khi turn hoàn thành
+      const audioData = accumulatedServerAudioRef.current;
+      if (audioData) {
+        const serverAudioMessage: ServerAudioMessage = {
+          serverAudio: { audioData },
+        };
+        emitter.emit("log", {
+          date: new Date(),
+          type: "receive.serverAudio",
+          message: serverAudioMessage,
+        });
       }
+
+      // Reset accumulated data
+      accumulatedServerAudioRef.current = "";
+      setAccumulatedServerAudio("");
+      emitter.emit("turncomplete");
+    };
 
 
     client.on("close", onClose);
@@ -171,7 +184,7 @@ export function useLiveAPI({
     client.on("setupcomplete", () => {
       emitter.emit("setupcomplete");
     });
-    client.on("turncomplete",onTurnComplete); //NEW: on turn complete
+    client.on("turncomplete", onTurnComplete); //NEW: on turn complete
     client.on("open", () => emitter.emit("open"));
 
     emitter.on("generate", onGenerate);

@@ -15,17 +15,12 @@ export const useLoggerStore = create<StoreLoggerState>((set, get) => ({
   logs: [],
   log: ({ date, type, message }: StreamingLog) => {
     set((state) => {
-      // Do NOT combine audio messages
+      // Luôn tạo log mới cho audio
       if (type.includes("audio")) {
         return {
           logs: [
             ...state.logs.slice(-(get().maxLogs - 1)),
-            {
-              date,
-              type,
-              message,
-              count: 1,
-            } as StreamingLog,
+            { date, type, message, count: 1 } as StreamingLog,
           ],
         };
       }
