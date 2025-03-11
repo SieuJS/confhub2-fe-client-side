@@ -6,9 +6,9 @@
 import { useRef, useState } from "react";
 import "./chatbot2.css"; // Remove this line
 import { LiveAPIProvider } from "../components/chatbot2/contexts/LiveAPIContext";
-import SidePanel from "../components/chatbot2/components/side-panel/SidePanel";
+import SidePanel from "../components/chatbot2/side-panel/SidePanel";
 import cn from "classnames";
-import { Altair } from "../components/chatbot2/components/altair/Altair";
+import { Altair } from "../components/chatbot2/altair/Altair";
 
 const API_KEY = "AIzaSyAV319MCiDorKNeNykl68MAzlIJk6YRz3g" as string;
 if (typeof API_KEY !== "string") {
