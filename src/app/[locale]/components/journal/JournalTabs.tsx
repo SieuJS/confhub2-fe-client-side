@@ -236,12 +236,12 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
 
             <section id="subject-area-category" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <h2 className="text-3xl font-bold text-secondary mb-4">Subject Area and Category</h2>
-                <p className=" text-lg">
+                <div className=" text-lg">
                     {/* Display Subject Areas and Categories from journal data */}
                     {journal["Subject Area and Category"] ? (
                         <>
-                            <p className="mb-2"><strong>Field of Research:</strong> {journal["Subject Area and Category"]["Field of Research"]}</p>
-                            <p><strong>Categories:</strong>
+                            <p className="mb-2"><strong>Field of Research: </strong> {journal["Subject Area and Category"]["Field of Research"]}</p>
+                            <p><strong>Categories: </strong>
                             {journal["Subject Area and Category"].Topics.map((topic, index) => (
                                 <span key={index}>
                                     {topic}{index < journal["Subject Area and Category"].Topics.length - 1 ? ', ' : ''}
@@ -250,7 +250,7 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                             </p>
                         </>
                     ) : "No Subject Areas/Categories Available"}
-                </p>
+                </div>
             </section>
         </div>
     );

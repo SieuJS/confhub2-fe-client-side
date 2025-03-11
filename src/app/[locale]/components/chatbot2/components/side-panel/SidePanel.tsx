@@ -65,8 +65,8 @@ const MicButton: React.FC<{
       className={cn(
         "flex items-center justify-center w-12 h-12 rounded-2xl text-xl transition-all duration-200 ease-in select-none relative z-10",
         {
-          "bg-red-600 text-black hover:bg-red-400 focus:outline-2 focus:outline-red-500 focus:border-gray-800": !muted, // Corrected focus
-          "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-100 focus:outline-2 focus:outline-gray-200 focus:border-transparent": muted
+          "bg-red-600 text-black hover:bg-red-400 focus:outline-2 focus:outline-red-500 focus:border-gray-800": !muted,
+          "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-100 focus:outline-2 focus:outline-gray-200 focus:border-transparent": muted,
         },
       )}
       onClick={() => setMuted(!muted)}
@@ -76,7 +76,6 @@ const MicButton: React.FC<{
       </span>
       {!muted && (
         <div
-          
           className="absolute inset-0 rounded-2xl bg-red-500 opacity-35 z-0 pointer-events-none transition-all duration-200 ease-in-out"
           style={{
             top: `calc(var(--volume) * -1)`,
@@ -86,7 +85,6 @@ const MicButton: React.FC<{
           }}
         />
       )}
-
     </button>
     <div className="w-12 h-12 flex items-center justify-center">
       <AudioPulse volume={volume} active={connected} hover={false} />
@@ -97,14 +95,14 @@ const MicButton: React.FC<{
 export default function SidePanel({
   videoRef,
   supportsVideo,
-  onVideoStreamChange = () => { },
+  onVideoStreamChange = () => {},
 }: {
   videoRef: any;
   supportsVideo: boolean;
   onVideoStreamChange: (stream: MediaStream | null) => void;
 }) {
   const { connected, client, connect, disconnect, volume, on, off } =
-    useLiveAPIContext(); // Get 'on' and 'off' from the hook
+    useLiveAPIContext();
   const loggerRef = useRef<HTMLDivElement>(null);
   const loggerLastHeightRef = useRef<number>(-1);
   const { log } = useLoggerStore();
@@ -133,7 +131,6 @@ export default function SidePanel({
       setActiveVideoStream(null);
       onVideoStreamChange(null);
     }
-
     videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
   };
 
@@ -155,14 +152,6 @@ export default function SidePanel({
     };
   }, [on, off, log]);
 
-
-  useEffect(() => {
-    on("log", log);
-    return () => {
-      off("log", log);
-    };
-  }, [on, off, log]);
-
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.srcObject = activeVideoStream;
@@ -173,11 +162,9 @@ export default function SidePanel({
     function sendVideoFrame() {
       const video = videoRef.current;
       const canvas = renderCanvasRef.current;
-
       if (!video || !canvas) {
         return;
       }
-
       const ctx = canvas.getContext("2d")!;
       canvas.width = video.videoWidth * 0.25;
       canvas.height = video.videoHeight * 0.25;
@@ -199,43 +186,45 @@ export default function SidePanel({
     };
   }, [connected, activeVideoStream, client, videoRef, renderCanvasRef]);
 
+  // Hàm gửi realtime audio từ recorder
+  const onData = (base64: string) => {
+    client.sendRealtimeInput([
+      {
+        mimeType: "audio/pcm;rate=16000",
+        data: base64,
+      },
+    ]);
+  };
+
+  // Khi recorder phát hiện hết im lặng, tổng hợp audio từ các chunk đã nhận được
+  const onStopRecording = (recorder: AudioRecorder) => {
+    let fullAudioData = "";
+    const combineAudioChunks = (chunkBase64: string) => {
+      fullAudioData += chunkBase64;
+    };
+
+    // Tạm thời tắt realtime gửi dữ liệu
+    recorder.off("data", onData);
+    // Đăng ký nhận lại dữ liệu để cộng dồn
+    recorder.on("data", combineAudioChunks);
+
+    setTimeout(() => {
+      recorder.off("data", combineAudioChunks);
+      // Khôi phục gửi realtime cho lần thu tiếp theo
+      recorder.on("data", onData);
+      setUserAudioData(fullAudioData);
+      log({
+        date: new Date(),
+        type: "send.clientAudio",
+        message: { clientAudio: { audioData: fullAudioData } },
+      });
+    }, 500);
+  };
+
   useEffect(() => {
-    const onData = (base64: string) => {
-      client.sendRealtimeInput([
-        {
-          mimeType: "audio/pcm;rate=16000",
-          data: base64,
-        },
-      ]);
-    };
-
-    const onStopRecording = (recorder: AudioRecorder) => {
-      let fullAudioData = "";
-
-      const combineAudioChunks = (recorder: AudioRecorder) => {
-        recorder.off("data", onData);
-
-        recorder.on("data", (chunkBase64) => {
-          fullAudioData += chunkBase64;
-        });
-
-        setTimeout(() => {
-          setUserAudioData(fullAudioData);
-          recorder.off("data", combineAudioChunks);
-          recorder.on("data", onData);
-          log({
-            date: new Date(),
-            type: "send.clientAudio",
-            message: { clientAudio: { audioData: fullAudioData } },
-          });
-        }, 500);
-      };
-
-      recorder.on("data", combineAudioChunks);
-    };
-
     if (connected && !muted && audioRecorder) {
       audioRecorder.on("data", onData).on("volume", setInVolume);
+      // Start recording có tích hợp VAD để phát hiện khi người dùng ngừng nói
       audioRecorder.start();
       audioRecorder.on("stop", (recorder) => onStopRecording(recorder));
     } else {
