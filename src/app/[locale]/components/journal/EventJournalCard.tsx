@@ -29,7 +29,7 @@ const EventJournalCard: React.FC<EventJournalCardProps> = ({ journal }) => {
     </div>
 
     <div className="absolute bottom-4 right-4"> {/* Thêm nút bấm */}
-      <Link href={{ pathname: '/journals/detail', query: { id: journal.id } }}>
+      <Link href={{ pathname: '/tabs/journals/detail', query: { id: journal.id } }}>
       
         <Button
           variant="primary"

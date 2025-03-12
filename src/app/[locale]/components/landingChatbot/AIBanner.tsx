@@ -36,12 +36,12 @@ const AIBanner: React.FC = () => {
         <h1 className="text-6xl md:text-8xl font-bold mb-4">The next era <br /> of Gemini</h1>
         <p className="text-lg mb-8">Gemini 2.0 is our most capable AI model yet, built for the agentic era</p>
         <div className="flex justify-center gap-4">
-          <Link href="/chatbot/chat">
+          <Link href="/tabs/chatbot/chat">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
               Chat bot
             </button>
           </Link>
-          <Link href="/chatbot/livechat">
+          <Link href="/tabs/chatbot/livechat">
             <button className="border border-white hover:border-gray-300 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center">
               Live Chat <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

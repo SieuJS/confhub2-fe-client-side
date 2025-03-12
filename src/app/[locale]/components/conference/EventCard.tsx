@@ -68,7 +68,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
 
           {/* Cột 2: Nút Detail */}
           <div className="justify-self-end self-start col-span-1">
-            <Link href={{ pathname: '/conferences/detail', query: { id: event.id } }}>
+            <Link href={{ pathname: '/tabs/conferences/detail', query: { id: event.id } }}>
                <Button variant="secondary" size="small" rounded className="w-20">
                    Detail
                </Button>

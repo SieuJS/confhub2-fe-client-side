@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Odometer from 'react-odometerjs';
 import 'odometer/themes/odometer-theme-default.css';
+import Image from 'next/image'; // Import thẻ Image của Next.js
 
 interface Statistic {
   label: string;
@@ -18,24 +19,52 @@ const AIStatistics = () => {
   ];
 
   const odometerStyle = {
-    fontSize: '2.5rem',
+    fontSize: '10rem',
     fontWeight: 'bold',
     color: '#A7C4BC',
     lineHeight: 1.2,
   };
 
   const [odometerValues, setOdometerValues] = useState(
-    statistics.map(stat => 0) // Khởi tạo với giá trị 0 cho mỗi thống kê
+    statistics.map(stat => 0)
   );
+  const [isIntersecting, setIsIntersecting] = useState(false);
+  const componentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            setIsIntersecting(true);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+      }
+    );
+
+    if (componentRef.current) {
+      observer.observe(componentRef.current);
+    }
+
+    return () => {
+      if (componentRef.current) {
+        observer.unobserve(componentRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isIntersecting) return;
+
     const intervals = statistics.map((stat, index) => {
       const intervalId = setInterval(() => {
-        // Tạo giá trị ngẫu nhiên để tăng/giảm
-        const increment = (Math.random() * (stat.value / 5)); // Điều chỉnh tốc độ biến động
+        const increment = (Math.random() * (stat.value / 5));
         const currentValue = odometerValues[index];
 
-        // Tính giá trị mới, đảm bảo không vượt quá giá trị cuối cùng
         const newValue = Math.min(currentValue + increment, stat.value);
         setOdometerValues(prevValues => {
           const newValues = [...prevValues];
@@ -43,36 +72,41 @@ const AIStatistics = () => {
           return newValues;
         });
 
-        // Dừng interval khi đạt đến giá trị cuối cùng
         if (newValue >= stat.value) {
           clearInterval(intervalId);
         }
-      }, 50); // Điều chỉnh tốc độ cập nhật (mili giây)
+      }, 50);
 
       return intervalId;
     });
 
     return () => {
-      // Xóa tất cả các interval khi component unmount
       intervals.forEach(intervalId => clearInterval(intervalId));
     };
-  }, [statistics]); // Chạy lại effect khi `statistics` thay đổi
+  }, [statistics, isIntersecting]);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white py-8">
-      <div className="container mx-auto">
+    <div className="relative min-h-screen bg-gray-900 text-white py-8 overflow-hidden" ref={componentRef}>
+      <Image
+        src="/banner3.png" // Thay đổi đường dẫn này
+        alt="AI Background"
+        fill
+        style={{ objectFit: 'cover' }}
+        className="absolute top-0 left-0 w-full h-full object-cover opacity-20 z-0" // Giảm độ mờ và đưa xuống layer dưới
+      />
+      <div className="container mx-auto relative z-10"> {/* Thêm relative và z-10 để nội dung nằm trên ảnh */}
         <h1 className="text-3xl font-semibold mb-6 text-center text-gray-100">AI Statistics</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {statistics.map((stat, index) => (
-            <div key={index} className="bg-gray-800 rounded-lg shadow-md p-6 transform transition-transform duration-200">
-              <h2 className="text-xl font-bold text-blue-400 mb-2">{stat.label}</h2>
+            <div key={index} className=" text-center p-6 transform transition-transform duration-200">
+              <h2 className="text-3xl font-bold text-blue-400 mb-2">{stat.label}</h2>
               <div className="text-3xl font-semibold">
                 <Odometer value={Number(odometerValues[index])} format="(,ddd).d" theme="default" style={odometerStyle} />
-                {stat.unit && <span className="text-lg text-gray-400 ml-1">{stat.unit}</span>}
+                {stat.unit && <span className="text-6xl text-gray-400 ml-4">{stat.unit}</span>}
               </div>
               {stat.description && (
-                <p className="text-gray-400 mt-2 text-sm">{stat.description}</p>
+                <p className="text-gray-400 mt-2 text-3xl">{stat.description}</p>
               )}
             </div>
           ))}
