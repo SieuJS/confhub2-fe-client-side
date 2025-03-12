@@ -2,8 +2,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { ConferenceResponse, ConferenceDates } from '../../../models/response/conference.response';
-import conferenceList from '../../../models/data/conferences-list.json';
+import { ConferenceResponse, ConferenceDates } from '../../../../models/response/conference.response';
+import conferenceList from '../../../../models/data/conferences-list.json';
 import { useRouter } from 'next/navigation';
 
 

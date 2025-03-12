@@ -59,7 +59,7 @@ export const Header: FC<Props> = ({ locale }) => {
 
   useEffect(() => {
     // Check if the current path is /en/chatbot or /chatbot. Adjust as needed.
-    if (pathname === `/${locale}/chatbot` || pathname === `/${locale}/chatbot/chat` || pathname === `/${locale}/chatbot/livechat`) {
+    if (pathname === `/tabs/${locale}/chatbot` || pathname === `/tabs/${locale}/chatbot/chat` || pathname === `/tabs/${locale}/chatbot/livechat`) {
       setShowHeader(false);
     } else {
       setShowHeader(true);
@@ -90,7 +90,7 @@ export const Header: FC<Props> = ({ locale }) => {
             Notification 3: Reminder for conference call
           </div>
           <div className="px-4 py-2 text-sm text-foreground hover:bg-button/10 text-center border-t border-border">
-            <Link href="/setting" lang={locale} onClick={closeNotification} className="text-button hover:underline block">
+            <Link href="/tabs/setting" lang={locale} onClick={closeNotification} className="text-button hover:underline block">
               {t('View all notifications')}
             </Link>
           </div>
@@ -105,25 +105,25 @@ export const Header: FC<Props> = ({ locale }) => {
     return (
       <div className="absolute top-full left-0 right-0 bg-background-secondary border-b border-border shadow-md z-40 sm:hidden"> {/* Chỉ hiển thị trên mobile */}
         <nav className="flex flex-col p-4">
-          <Link lang={locale} href={`/conferences`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+          <Link lang={locale} href={`/tabs/conferences`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('Conferences')}
           </Link>
-          <Link lang={locale} href={`/journals`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+          <Link lang={locale} href={`/tabs/journals`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('Journals')}
           </Link>
-          <Link lang={locale} href={`/setting`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+          <Link lang={locale} href={`/tabs/setting`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('Setting')}
           </Link>
-          <Link lang={locale} href={`/chatbot`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+          <Link lang={locale} href={`/tabs/chatbot`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('Chatbot')}
           </Link>
-          <Link lang={locale} href={`/support`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+          <Link lang={locale} href={`/tabs/support`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('Support')}
           </Link>
-          <Link lang={locale} href={`/about`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+          <Link lang={locale} href={`/tabs/about`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('About')}
           </Link>
-          <Link lang={locale} href={`/other`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+          <Link lang={locale} href={`/tabs/other`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('Other')}
           </Link>
         </nav>
@@ -166,28 +166,28 @@ export const Header: FC<Props> = ({ locale }) => {
           <div className='flex flex-row items-center gap-3 relative'>
             {/* Navigation for larger screens - Hiển thị trên sm trở lên */}
             <nav className='mr-10  gap-5 sm:inline-flex hidden'> {/* Ẩn mặc định, hiển thị trên sm */}
-              <Link lang={locale} href={`/conferences`} style={{ fontWeight: 'bold' }}>
+              <Link lang={locale} href={`/tabs/conferences`} style={{ fontWeight: 'bold' }}>
                 {t('Conferences')}
               </Link>
-              <Link lang={locale} href={`/journals`} style={{ fontWeight: 'bold' }}>
+              <Link lang={locale} href={`/tabs/journals`} style={{ fontWeight: 'bold' }}>
                 {t('Journals')}
               </Link>
-              <Link lang={locale} href={`/setting`} style={{ fontWeight: 'bold' }}>
+              <Link lang={locale} href={`/tabs/setting`} style={{ fontWeight: 'bold' }}>
                 {t('Setting')}
               </Link>
-              <Link lang={locale} href={`/chatbot`} style={{ fontWeight: 'bold' }}>
+              <Link lang={locale} href={`/tabs/chatbot`} style={{ fontWeight: 'bold' }}>
                 {t('Chatbot')}
               </Link>
-              <Link lang={locale} href={`/support`} style={{ fontWeight: 'bold' }}>
+              <Link lang={locale} href={`/tabs/support`} style={{ fontWeight: 'bold' }}>
                 {t('Support')}
               </Link>
-              <Link lang={locale} href={`/addconference`} style={{ fontWeight: 'bold' }}>
+              <Link lang={locale} href={`/tabs/addconference`} style={{ fontWeight: 'bold' }}>
                 Add Conference
               </Link>
-              <Link lang={locale} href={`/about`} style={{ fontWeight: 'bold' }}>
+              <Link lang={locale} href={`/tabs/about`} style={{ fontWeight: 'bold' }}>
                 {t('About')}
               </Link>
-              <Link lang={locale} href={`/other`} style={{ fontWeight: 'bold' }}>
+              <Link lang={locale} href={`/tabs/other`} style={{ fontWeight: 'bold' }}>
                 {t('Other')}
               </Link>
             </nav>

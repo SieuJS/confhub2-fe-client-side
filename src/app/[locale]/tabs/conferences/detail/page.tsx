@@ -3,16 +3,16 @@
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useState, useMemo, useEffect, useRef } from 'react'; // Import useMemo
-import Button from '../../components/utils/Button';
-import ConferenceFeedback from '../../components/conference/ConferenceFeedback';
-import { ConferenceResponse } from '../../../../models/response/conference.response'; // Import ConferenceResponse type
-import conferenceList from '../../../../models/data/conferences-list.json'; 
-import { fetchConferences } from '../../../../api/crawl/test_api'; // Import fetchConferences, adjust path.
-import Map from '../../components/conference/Map';
-import NotFoundPage from "../../components/utils/NotFoundPage";
-import Loading from "../../components/utils/Loading";
+import Button from '../../../components/utils/Button';
+import ConferenceFeedback from '../../../components/conference/ConferenceFeedback';
+import { ConferenceResponse } from '../../../../../models/response/conference.response'; // Import ConferenceResponse type
+import conferenceList from '../../../../../models/data/conferences-list.json'; 
+import { fetchConferences } from '../../../../../api/crawl/test_api'; // Import fetchConferences, adjust path.
+import Map from '../../../components/conference/Map';
+import NotFoundPage from "../../../components/utils/NotFoundPage";
+import Loading from "../../../components/utils/Loading";
 import * as ics from 'ics';
-import { ConferenceTabs } from '../../components/conference/ConferenceTabs';
+import { ConferenceTabs } from '../../../components/conference/ConferenceTabs';
 import { useSearchParams } from 'next/navigation'; //  USE THIS for query params
 
 type Conference = ConferenceResponse;

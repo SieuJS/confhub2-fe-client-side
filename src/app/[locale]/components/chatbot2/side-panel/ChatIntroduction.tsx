@@ -18,58 +18,57 @@ const ChatIntroduction: React.FC<ChatIntroductionProps> = ({
       id="ChatIntroduction"
       className="flex h-full flex-col items-center justify-center"
     >
-      <h2 className="mb-4 text-7xl font-bold text-gray-800">
-        Talk with Gemini live
+      <h2 className="mb-4 text-5xl font-bold text-gray-800"> {/* Reduced heading size */}
+        Live Chat with Our Chatbot
       </h2>
-      <p className="mb-20 text-center text-gray-400">
-        Interact with Gemini using text, voice, video, or screen sharing.
+      <p className="mb-12 text-xl text-center text-gray-600"> {/* Reduced text size and changed color */}
+        Engage in a real-time conversation with our chatbot using voice, video, or screen sharing.
       </p>
 
       <div className="mx-auto w-full max-w-3xl">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {/* Option 1: Talk to Gemini */}
+          {/* Option 1: Voice Chat */}
           <button
-            className="flex flex-col items-center rounded-lg bg-gray-800 p-6 shadow-md transition-colors duration-200 hover:bg-gray-700"
+            className="flex flex-col items-center rounded-lg bg-gray-200 p-6 shadow-md transition-colors duration-200 hover:bg-gray-300"
             onClick={onStartVoice}
             type="button"
           >
-            <BsMic className="mb-4 text-gray-400" />
-            <h3 className="mb-2 text-lg font-semibold text-gray-200">
-              Talk to Gemini
+            <BsMic className="mb-4 text-3xl text-blue-500" />
+            <h3 className="mb-2 text-lg font-semibold text-gray-900">
+              Voice Chat
             </h3>
-            <p className="text-sm text-center text-gray-400">
-              Start a real-time conversation using your microphone.
+            <p className="text-sm text-center text-gray-900">
+              Have a real-time voice conversation with the chatbot.
             </p>
           </button>
 
-          {/* Option 2: Show Gemini */}
+          {/* Option 2: Video Chat */}
           <button
-            className="flex flex-col items-center rounded-lg bg-gray-800 p-6 shadow-md transition-colors duration-200 hover:bg-gray-700"
+            className="flex flex-col items-center rounded-lg bg-gray-200 p-6 shadow-md transition-colors duration-200 hover:bg-gray-300"
             onClick={onStartWebcam}
             type="button"
           >
-            <BsCameraVideo className="mb-4 text-gray-400" />
-            <h3 className="mb-2 text-lg font-semibold text-gray-200">
-              Show Gemini
+            <BsCameraVideo className="mb-4 text-3xl text-blue-500" />
+            <h3 className="mb-2 text-lg font-semibold text-gray-900">
+              Video Chat
             </h3>
-            <p className="text-sm text-center text-gray-400">
-              Use your webcam to share what you're looking at and get
-              real-time feedback.
+            <p className="text-sm text-center text-gray-900">
+              Start a video call and interact with the chatbot face-to-face.
             </p>
           </button>
 
-          {/* Option 3: Share your screen */}
+          {/* Option 3: Screen Share */}
           <button
-            className="flex flex-col items-center rounded-lg bg-gray-800 p-6 shadow-md transition-colors duration-200 hover:bg-gray-700"
+            className="flex flex-col items-center rounded-lg bg-gray-200 p-6 shadow-md transition-colors duration-200 hover:bg-gray-300"
             onClick={onStartScreenShare}
             type="button"
           >
-            <BsDisplay className="mb-4 text-gray-400" />
-            <h3 className="mb-2 text-lg font-semibold text-gray-200">
-              Share your screen
+            <BsDisplay className="mb-4 text-3xl text-blue-500" />
+            <h3 className="mb-2 text-lg font-semibold text-gray-900">
+              Screen Share
             </h3>
-            <p className="text-sm text-center text-gray-400">
-              Share your screen to show Gemini what you're working on.
+            <p className="text-sm text-center text-gray-900">
+              Share your screen for interactive discussions and assistance.
             </p>
           </button>
         </div>

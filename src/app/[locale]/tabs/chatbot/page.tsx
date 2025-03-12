@@ -1,5 +1,5 @@
-import AIBanner from "../components/landingChatbot/AIBanner";
-import AIFAQ from "../components/landingChatbot/AIFAQ";
+import AIBanner from "../../components/landingChatbot/AIBanner";
+import AIFAQ from "../../components/landingChatbot/AIFAQ";
 
 
 export default function AILanding() {

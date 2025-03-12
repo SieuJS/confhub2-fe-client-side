@@ -170,7 +170,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false, 
   // --- Rendering (with updated styling) ---
   return (
     <div
-      className="flex items-center rounded-full bg-gray-100 dark:bg-gray-700 p-1 pl-2 pr-2"
+      className="flex items-center rounded-full bg-gray-100 dark:bg-gray-700 m-4 p-2 pl-2 pr-2"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

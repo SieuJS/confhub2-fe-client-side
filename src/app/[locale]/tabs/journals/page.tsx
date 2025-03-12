@@ -2,10 +2,9 @@
 
 // Journals.tsx
 import { useTranslations } from 'next-intl';
-import SearchJournalSection from '../components/journal/SearchJournalSection';
-import ResultsJournalSection from '../components/journal/ResultsJournalSection';   // Import ResultsJournalSection
+import SearchJournalSection from '../../components/journal/SearchJournalSection';
+import ResultsJournalSection from '../../components/journal/ResultsJournalSection';   // Import ResultsJournalSection
 import { useState } from 'react';
-import { JournalResponse } from '../../../models/response/journal.response'; // Import JournalResponse type
 
 
 export default function Journals() {

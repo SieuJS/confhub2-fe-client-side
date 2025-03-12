@@ -32,20 +32,20 @@ const CustomPlainTextLog = ({ msg }: { msg: string }): ReactNode => {
 
 const MessageRenderer = ({ message }: { message: StreamingLog["message"] }) => {
   if (isClientAudioMessage(message)) {
-    console.log(message);
     return <ClientAudioLog message={message} />;
   }
 
   if (isServerAudioMessage(message)) {
-    console.log(message);
-
     return <ServerAudioLog message={message} />;
   }
 
   if (typeof message === "string") {
+    console.log("PlainTextMessage", message);
     return <PlainTextMessage message={message} />;
   }
   if (isClientContentMessage(message)) {
+    console.log("isClientContentMessage", message);
+
     return <ClientContentLog message={message} />;
   }
   if (isToolCallMessage(message)) {
@@ -58,6 +58,7 @@ const MessageRenderer = ({ message }: { message: StreamingLog["message"] }) => {
     return <ToolResponseLog message={message} />;
   }
   if (isServerContentMessage(message)) {
+
     const { serverContent } = message;
     if (isInterrupted(serverContent)) {
       return <CustomPlainTextLog msg="interrupted" />;
@@ -66,6 +67,8 @@ const MessageRenderer = ({ message }: { message: StreamingLog["message"] }) => {
       return <CustomPlainTextLog msg="turnComplete" />;
     }
     if (isModelTurn(serverContent)) {
+      console.log("isModelTurn", message);
+
       return <ModelTurnLog message={message} />;
     }
   }

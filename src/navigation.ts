@@ -9,19 +9,18 @@ export const localePrefix = 'always'
 
 export const pathnames = {
   '/': '/',
-  '/about': '/about',
-  '/conferences': '/conferences',
-  '/setting': '/setting',
-  '/journals': '/journals',
-  '/journaldetails': '/journaldetails',
-  '/chatbot': '/chatbot',
-  '/chatbot/chat': '/chatbot/chat',
-  '/chatbot/livechat': '/chatbot/livechat',
-  '/support': '/support',
-  '/other': '/other',
-  '/addconference': '/addconference',
-  '/conferences/detail': '/conferences/detail',
-  '/journals/detail': '/journals/detail',
+  '/tabs/about': '/tabs/about',
+  '/tabs/conferences': '/tabs/conferences',
+  '/tabs/setting': '/tabs/setting',
+  '/tabs/journals': '/tabs/journals',
+  '/tabs/chatbot': '/tabs/chatbot',
+  '/tabs/chatbot/chat': '/tabs/chatbot/chat',
+  '/tabs/chatbot/livechat': '/tabs/chatbot/livechat',
+  '/tabs/support': '/tabs/support',
+  '/tabs/other': '/tabs/other',
+  '/tabs/addconference': '/tabs/addconference',
+  '/tabs/conferences/detail': '/tabs/conferences/detail',
+  '/tabs/journals/detail': '/tabs/journals/detail',
 } satisfies Pathnames<typeof locales>
 
 export const { Link, redirect, usePathname, useRouter, getPathname } =

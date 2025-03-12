@@ -250,46 +250,6 @@
 
 }
 
-/* Remove or comment out the global styles that are causing issues */
-/*
-@layer components {
-  .streaming-console {
-    @apply --background-secondary: text-[var(--gray-300)] items-center h-screen w-screen;
-  }
-
-  .streaming-console a,
-  .streaming-console a:visited,
-  .streaming-console a:active {
-    @apply text-[var(--gray-300)];
-  }
-
-  .streaming-console .disabled {
-    @apply pointer-events-none;
-  }
-
-  .streaming-console .disabled > * {
-    @apply pointer-events-none;
-  }
-
-  .streaming-console main {
-    @apply relative flex flex-col items-center justify-center flex-grow gap-4 max-w-full overflow-hidden;
-  }
-
-  .streaming-console .main-app-area {
-    @apply flex flex-1 items-center justify-center;
-  }
-
-  .streaming-console .function-call {
-    @apply absolute top-0 w-full h-1/2 overflow-y-auto;
-  }
-
-  .stream {
-    @apply flex-grow max-w-full rounded-[32px] max-h-fit;
-  }
-}
-*/
-
-
 @layer components {
   @keyframes hover {
     from {

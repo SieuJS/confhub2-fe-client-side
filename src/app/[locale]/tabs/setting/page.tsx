@@ -3,14 +3,14 @@
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import Dashboard from '../components/user/Dashboard';
-import SettingTab from '../components/user/SettingTab';
-import NotificationsTab from '../components/user/NotificationsTab';
-import FollowedTab from '../components/user/FollowedTab';
-import ProfileTab from '../components/user/ProfileTab';
-import NoteTab from '../components/user/NoteTab';
-import MyConferencesTab from '../components/user/MyConferencesTab';
-import { ConferenceResponse } from '../../../models/response/conference.response'; // Import ConferenceResponse
+import Dashboard from '../../components/user/Dashboard';
+import SettingTab from '../../components/user/SettingTab';
+import NotificationsTab from '../../components/user/NotificationsTab';
+import FollowedTab from '../../components/user/FollowedTab';
+import ProfileTab from '../../components/user/ProfileTab';
+import NoteTab from '../../components/user/NoteTab';
+import MyConferencesTab from '../../components/user/MyConferencesTab';
+import { ConferenceResponse } from '../../../../models/response/conference.response'; // Import ConferenceResponse
 
 // Replace interface Conference with type Conference = ConferenceResponse
 type Conference = ConferenceResponse;

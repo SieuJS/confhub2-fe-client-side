@@ -2,10 +2,10 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { LiveAPIProvider } from "../../components/chatbot2/contexts/LiveAPIContext";
-import SidePanel from "../../components/chatbot2/side-panel/SidePanel";
+import { LiveAPIProvider } from "../../../components/chatbot2/contexts/LiveAPIContext";
+import SidePanel from "../../../components/chatbot2/side-panel/SidePanel";
 import cn from "classnames";
-import { Altair } from "../../components/chatbot2/altair/Altair";
+import { Altair } from "../../../components/chatbot2/altair/Altair";
 
 const API_KEY = "AIzaSyAV319MCiDorKNeNykl68MAzlIJk6YRz3g" as string;
 if (typeof API_KEY !== "string") {
@@ -20,8 +20,6 @@ function ChatBot2() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   return (
-    <div className="px-4 py-4 text-center text-2xl">
-      <div className="py-6 bg-background w-full"></div>
       <LiveAPIProvider url={uri} apiKey={API_KEY}>
         <SidePanel
           videoRef={videoRef}
@@ -41,7 +39,6 @@ function ChatBot2() {
           />
         </div>
       </LiveAPIProvider>
-    </div>
   );
 }
 

@@ -1,5 +1,6 @@
+// SidePanel.tsx
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";  // Import useEffect
 import { useLiveAPIContext } from "../contexts/LiveAPIContext";
 import { useLoggerStore } from "../lib/store-logger";
 import Logger from "../logger/Logger";
@@ -16,235 +17,138 @@ import useVolumeControl from "../hooks/useVolumeControl";
 import ConnectionButton from "./ConnectionButton";
 import MicButton from "./MicButton";
 import MediaStreamButton from "./MediaStreamButton";
-import ReactModal from 'react-modal';
-import ChatIntroduction from "./ChatIntroduction"; // Import the updated component
+import ChatIntroduction from "./ChatIntroduction";
+import RestartStreamButton from "./RestartStreamButton";
+import ConnectionStatus from "./ConnectionStatus";
+import { VideoStreamPopup } from "./VideoStreamPopup";  // Import the popup
+import useConnection from "../hooks/useConnection";        // Import the new hooks
+import useStreamSwitching from "../hooks/useStreamSwitching";
+import useInteractionHandlers from "../hooks/useInteractionHandlers";
+import useTimer from "../hooks/useTimer";
 
 
-const useVideoStreamPopup = () => {
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const [modalPosition, setModalPosition] = useState({ top: 'auto', right: '1rem', bottom: '1rem', left: 'auto' });
-
-  const openModal = (stream: MediaStream) => {
-    setStream(stream);
-    setModalIsOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalIsOpen(false);
-  };
-
-  return { modalIsOpen, openModal, closeModal, stream, modalPosition };
-};
-
-const VideoPopup: React.FC = () => {
-  const { stream, closeModal, modalIsOpen, modalPosition } = useVideoStreamPopup();
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    if (videoRef.current && stream) {
-      videoRef.current.srcObject = stream;
-    }
-  }, [stream]);
-
-  return (
-    <ReactModal
-      isOpen={modalIsOpen}
-      onRequestClose={closeModal}
-      contentLabel="Video Stream"
-      className={{
-        base: 'fixed bg-white/90 rounded-2xl shadow-xl',
-        afterOpen: '',
-        beforeClose: ''
-      }}
-      style={{
-        overlay: { backgroundColor: 'rgba(0, 0, 0, 0.25)' },
-        content: {
-          ...modalPosition,
-          border: 'none',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        },
-      }}
-      shouldCloseOnOverlayClick={false}
-      closeTimeoutMS={200}
-    >
-      <div className="relative">
-        <video ref={videoRef} autoPlay playsInline className="w-full h-full rounded-xl" style={{ width: '320px', height: '240px' }} />
-        <button
-          onClick={closeModal}
-          className="absolute top-1 right-1 p-1 bg-gray-200 text-gray-600 rounded-full hover:bg-gray-300 focus:outline-none transition-all duration-200"
-          title="Close">
-          ×
-        </button>
-      </div>
-    </ReactModal>
-  );
-};
 export default function SidePanel({
-  videoRef,
-  supportsVideo,
-  onVideoStreamChange = () => { },
+    videoRef,
+    supportsVideo,
+    onVideoStreamChange = () => { },
 }: {
-  videoRef: any;
-  supportsVideo: boolean;
-  onVideoStreamChange: (stream: MediaStream | null) => void;
+    videoRef: any;
+    supportsVideo: boolean;
+    onVideoStreamChange: (stream: MediaStream | null) => void;
 }) {
-  const { connected, client, connect, disconnect, volume, on, off } = useLiveAPIContext();
-  const loggerRef = useRef<HTMLDivElement>(null);
-  const { log } = useLoggerStore();
+    const {  client, volume, on, off } = useLiveAPIContext(); // Only get what you need
+    const loggerRef = useRef<HTMLDivElement>(null);
+    const { log, clearLogs } = useLoggerStore(); // Get clearLogs
 
-  const videoStreams = [useWebcam(), useScreenCapture()];
-  const [activeVideoStream, setActiveVideoStream] = useState<MediaStream | null>(null);
-  const [webcam, screenCapture] = videoStreams;
-  const [inVolume, setInVolume] = useState(0);
-  const [audioRecorder] = useState(() => new AudioRecorder());
-  const [muted, setMuted] = useState(false);
-  const { openModal } = useVideoStreamPopup();
-  // const [hasLog, setHasLog] = useState(false); // No longer the primary control
-  const [hasInteracted, setHasInteracted] = useState(false); // New state
+    const videoStreams = [useWebcam(), useScreenCapture()];
+    const [webcam, screenCapture] = videoStreams;
+    const [inVolume, setInVolume] = useState(0);
+    const [audioRecorder] = useState(() => new AudioRecorder());
+    const [muted, setMuted] = useState(false);
+    const [hasInteracted, setHasInteracted] = useState(false);
 
-  // Remove hasMounted and related logic
 
-  useEffect(() => {
-    ReactModal.setAppElement(':root');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const changeStreams = (next?: { start: () => Promise<MediaStream>, stop: () => void }) => async () => {
-    let newStream: MediaStream | null = null;
-    if (next) {
-      newStream = await next.start();
-      setActiveVideoStream(newStream);
-      onVideoStreamChange(newStream);
+    // Custom Hooks
+    const {
+        connected,
+        isConnecting,
+        streamStartTime,
+        connectionStatusMessage,
+        setConnectionStatusMessage,
+        connectWithPermissions,
+        handleDisconnect,
+        handleReconnect
+    } = useConnection();
 
-      if (supportsVideo && newStream) { // Check newStream before opening
-        openModal(newStream);
-      }
-    } else {
-      setActiveVideoStream(null);
-      onVideoStreamChange(null);
-      if (activeVideoStream) {
-        activeVideoStream.getTracks().forEach(track => track.stop());
-      }
+    const { activeVideoStream, changeStreams } = useStreamSwitching(videoStreams, supportsVideo, onVideoStreamChange);
+    const { elapsedTime, showTimer, handleCloseTimer } = useTimer(isConnecting, connected, streamStartTime);
 
-    }
-    videoStreams.filter(msr => msr !== next).forEach(msr => {
-      if (msr.isStreaming) {
-        msr.stop()
-      }
+    const { handleSendMessage, handleStartVoice, handleStartWebcam, handleStartScreenShare } = useInteractionHandlers({
+        connected,
+        connectWithPermissions, // Pass the function down
+        changeStreams,        // Pass the function down
+        setMuted,
+        webcam,
+        screenCapture,
+        supportsVideo,
+        client,
+        log
     });
 
-  };
+     useEffect(() => {
+        // Set hasInteracted to true on any interaction
+        if (connected || isConnecting || activeVideoStream) {
+            setHasInteracted(true);
+        }
+    }, [connected, isConnecting, activeVideoStream]);
 
+    useLoggerScroll(loggerRef);
+    useLoggerEvents(on, off, log);
+    useVideoFrameSender(connected, activeVideoStream, client, videoRef);
+    useAudioRecorder(connected, muted, audioRecorder, client, log, setInVolume);
+    useModelAudioResponse(on, off, log);
+    useVolumeControl(inVolume);
+    return (
+        <>
+            <VideoStreamPopup />
 
+            <div className="flex flex-col h-screen bg-white text-gray-700 rounded-2xl p-2">
+                {/* Logger Area */}
+                <div className="flex-grow overflow-y-auto" ref={loggerRef}>
+                    {!connected && !hasInteracted ? (
+                        <ChatIntroduction
+                            onStartVoice={() => { handleStartVoice(); setHasInteracted(true); }}
+                            onStartWebcam={() => { handleStartWebcam(); setHasInteracted(true); }}
+                            onStartScreenShare={() => { handleStartScreenShare(); setHasInteracted(true); }}
+                        />
+                    ) : (
+                        <Logger filter="none" />
+                    )}
+                </div>
 
-  useLoggerScroll(loggerRef);
-  useLoggerEvents(on, off, log);
-  useVideoFrameSender(connected, activeVideoStream, client, videoRef);
-  useAudioRecorder(connected, muted, audioRecorder, client, log, setInVolume);
-  useModelAudioResponse(on, off, log);
-  useVolumeControl(inVolume);
+                {/* Container for Timer and Restart Button */}
+                <div className="relative py-2 min-w-[100px]">
+                    {(showTimer) && (
+                        <div className="absolute mb-20 left-1/2 transform -translate-x-1/2 z-40">
+                            <ConnectionStatus
+                                message={connectionStatusMessage}
+                                elapsedTime={elapsedTime}
+                                onClose={handleCloseTimer}
+                            />
+                        </div>
+                    )}
+                    {!connected && streamStartTime && (
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 z-40">
+                            <RestartStreamButton onRestart={() => { handleReconnect(supportsVideo); clearLogs(); }} />
+                        </div>
+                    )}
+                </div>
 
-  const handleSendMessage = (textInput: string) => {
-    if (textInput.trim() === "") {
-      return;
-    }
-    setHasInteracted(true); // User has interacted
-    client.send([{ text: textInput }]);
-    log({ date: new Date(), type: "send.text", message: textInput });
-    // setHasLog(true);  // Still update hasLog for the Logger
-  };
-
-  // useEffect(() => { // Simplified useEffect
-  //     if (!hasMounted.current) {
-  //         // Initial render:  Check the *initial* log length.
-  //         hasMounted.current = true;
-  //         setHasLog(log.length > 0); // If there are initial logs, hide the intro.
-  //     } else {
-  //         // Subsequent renders: Update based on whether the log has entries.
-  //         setHasLog(log.length > 0);
-  //     }
-  // }, [log]); // Depend on the log.  This useEffect runs whenever the log changes.
-
-
-
-  const handleStartVoice = () => {
-    if (!connected) {
-      connect();
-    }
-    setHasInteracted(true); // User has interacted
-    setMuted(false);
-  };
-
-  const handleStartWebcam = () => {
-    if (!connected) {
-      connect();
-    }
-    setHasInteracted(true); // User has interacted
-    changeStreams(webcam)();
-    if (webcam.stream) {
-      openModal(webcam.stream)
-    }
-  };
-
-  const handleStartScreenShare = () => {
-    if (!connected) {
-      connect();
-    }
-
-    setHasInteracted(true);  // User has interacted
-    changeStreams(screenCapture)();
-    if (screenCapture.stream) {
-      openModal(screenCapture.stream);
-    }
-  };
-
-
-
-  return (
-    <>
-      <VideoPopup />
-      <div className="flex flex-col h-screen bg-white text-gray-700 rounded-2xl p-2 m-4 shadow-xl">
-       
-
-        {/* Logger Area */}
-        <div className="flex-grow overflow-y-auto p-5" ref={loggerRef}>
-          {/* Show introduction only if NOT connected AND NOT interacted */}
-          {!connected && !hasInteracted ? (
-            <ChatIntroduction
-              onStartVoice={handleStartVoice}
-              onStartWebcam={handleStartWebcam}
-              onStartScreenShare={handleStartScreenShare}
-            />
-          ) : (
-            <Logger filter="none" /> // Show the Logger once connected or interacted
-          )}
-        </div>
-
-        {/* Combined Input Area */}
-        <div className="flex gap-2 rounded-full border border-gray-300 p-2 bg-gray-100 items-center">
-          <ConnectionButton connected={connected} connect={connect} disconnect={disconnect} />
-          <MicButton muted={muted} setMuted={setMuted} volume={volume} connected={connected} />
-          {supportsVideo && (
-            <>
-              <MediaStreamButton
-                isStreaming={screenCapture.isStreaming}
-                start={changeStreams(screenCapture)}
-                stop={changeStreams()}
-                onIcon="cancel_presentation"
-                offIcon="present_to_all"
-              />
-              <MediaStreamButton
-                isStreaming={webcam.isStreaming}
-                start={changeStreams(webcam)}
-                stop={changeStreams()}
-                onIcon="videocam_off"
-                offIcon="videocam"
-              />
-            </>
-          )}
-          <ChatInput onSendMessage={handleSendMessage} />
-        </div>
-      </div>
-    </>
-  );
+                {/* Combined Input Area */}
+                <div className="flex gap-3 rounded-full border border-gray-300 p-2 bg-gray-100 items-center">
+                    <ConnectionButton connected={connected} connect={() => connectWithPermissions(supportsVideo)} disconnect={handleDisconnect} />
+                    <MicButton muted={muted} setMuted={setMuted} volume={volume} connected={connected} />
+                    {supportsVideo && (
+                        <>
+                            <MediaStreamButton
+                                isStreaming={screenCapture.isStreaming}
+                                start={changeStreams(screenCapture)}
+                                stop={changeStreams()}
+                                onIcon="cancel_presentation"
+                                offIcon="present_to_all"
+                            />
+                            <MediaStreamButton
+                                isStreaming={webcam.isStreaming}
+                                start={changeStreams(webcam)}
+                                stop={changeStreams()}
+                                onIcon="videocam_off"
+                                offIcon="videocam"
+                            />
+                        </>
+                    )}
+                    <ChatInput onSendMessage={handleSendMessage} disabled={!connected} />
+                </div>
+            </div>
+        </>
+    );
 }

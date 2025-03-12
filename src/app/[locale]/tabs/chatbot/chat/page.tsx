@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import ChatBot from '../../components/chatbot/ChatBot'; // Import ChatBot component
+import ChatBot from '../../../components/chatbot/ChatBot'; // Import ChatBot component
 
 interface ChatBotPageProps {
   // Định nghĩa props cho component nếu cần
