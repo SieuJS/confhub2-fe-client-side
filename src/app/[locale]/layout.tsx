@@ -1,7 +1,3 @@
-
-
-
-
 import { ThemeProvider } from '@/src/app/[locale]/components/utils/ThemeProvider';
 import type { Metadata } from 'next';
 import {
