@@ -1,15 +1,15 @@
-
+// useLiveApi.ts (Corrected for Accumulation)
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   MultimodalLiveAPIClientConnection,
   MultimodalLiveClient,
 } from "../lib/multimodal-live-client";
-import { LiveConfig, ServerAudioMessage } from "../multimodal-live-types";
-import { AudioStreamer } from "../lib/audio-streamer"; // Keep
+import { LiveConfig, ServerAudioMessage, ServerContentMessage, ServerContent, ModelTurn } from "../multimodal-live-types"; // Import ModelTurn
+import { AudioStreamer } from "../lib/audio-streamer";
 import { audioContext } from "../lib/utils";
 import VolMeterWorket from "../lib/worklets/vol-meter";
 import EventEmitter from "eventemitter3";
-import { base64ToArrayBuffer } from "../lib/utils"; // Keep
+import { base64ToArrayBuffer } from "../lib/utils";
 import { debounce } from 'lodash';
 import { Part } from "@google/generative-ai";
 
@@ -56,15 +56,15 @@ export function useLiveAPI({
   });
   const [volume, setVolume] = useState(0);
   const [accumulatedServerAudio, setAccumulatedServerAudio] = useState("");
-  // useRef to hold the current audio data.  Refs persist across renders
-  // without causing re-renders, and they don't form stale closures.
   const accumulatedServerAudioRef = useRef("");
+
+    // *** NEW: Ref to accumulate text parts ***
+  const accumulatedTextPartsRef = useRef<Part[]>([]);
 
   const emitter = useRef(new EventEmitter()).current;
 
 
-  // Debounced log emission.  Crucially, this function now takes the
-  // audio data as an argument.  This avoids the stale closure problem.
+
   const debouncedEmitServerAudioLog = useCallback(
     debounce((audioData: string) => {
       const serverAudioMessage: ServerAudioMessage = {
@@ -76,7 +76,7 @@ export function useLiveAPI({
         message: serverAudioMessage,
       });
     }, 500),
-    [emitter] // Only depends on 'emitter'.
+    [emitter]
   );
 
 
@@ -99,29 +99,26 @@ export function useLiveAPI({
       setConnected(false);
       emitter.emit("close");
       setAccumulatedServerAudio("");
-      accumulatedServerAudioRef.current = ""; // Clear the ref
+      accumulatedServerAudioRef.current = "";
       debouncedEmitServerAudioLog.cancel();
+        accumulatedTextPartsRef.current = []; // Clear accumulated parts
 
     };
 
     const stopAudioStreamer = () => audioStreamerRef.current?.stop();
 
-    // Sửa phần xử lý audio stream
     const onAudio = (data: ArrayBuffer) => {
       audioStreamerRef.current?.addPCM16(new Uint8Array(data));
       const audioDataBase64 = btoa(String.fromCharCode(...new Uint8Array(data)));
-
-      // Chỉ cập nhật data mà không gửi log ở đây
       accumulatedServerAudioRef.current += audioDataBase64;
       setAccumulatedServerAudio((prev) => prev + audioDataBase64);
     };
 
 
     const onGenerate = (data: any) => {
-
-      // Reset accumulated audio data khi bắt đầu turn mới
       accumulatedServerAudioRef.current = "";
       setAccumulatedServerAudio("");
+        accumulatedTextPartsRef.current = []; // Clear accumulated parts
 
       if (data.responseModalities && data.responseModalities.includes("audio")) {
         if (
@@ -131,7 +128,6 @@ export function useLiveAPI({
         ) {
           data.multimodalResponse.parts.forEach((part: Part) => {
             if (part.inlineData) {
-              // Still emit audioResponse for complete audio
               emitter.emit("audioResponse", {
                 data: part.inlineData.data,
               });
@@ -146,13 +142,13 @@ export function useLiveAPI({
       stopAudioStreamer();
       emitter.emit("interrupted");
       setAccumulatedServerAudio("");
-      accumulatedServerAudioRef.current = ""; // Clear the ref.
-      debouncedEmitServerAudioLog.cancel(); // Cancel debounced calls.
-
+      accumulatedServerAudioRef.current = "";
+      debouncedEmitServerAudioLog.cancel();
+        accumulatedTextPartsRef.current = []; // Clear accumulated parts
     };
 
+
     const onTurnComplete = () => {
-      // Gửi log audio khi turn hoàn thành
       const audioData = accumulatedServerAudioRef.current;
       if (audioData) {
         const serverAudioMessage: ServerAudioMessage = {
@@ -165,10 +161,32 @@ export function useLiveAPI({
         });
       }
 
-      // Reset accumulated data
       accumulatedServerAudioRef.current = "";
       setAccumulatedServerAudio("");
       emitter.emit("turncomplete");
+
+        // *** NEW: Log accumulated text parts ***
+      if (accumulatedTextPartsRef.current.length > 0) {
+        const completeModelTurn: ModelTurn = {
+          modelTurn: { parts: accumulatedTextPartsRef.current },
+        };
+        const serverContentMessage: ServerContentMessage = {
+          serverContent: completeModelTurn,
+        };
+        emitter.emit("log", {
+          date: new Date(),
+          type: "receive.content",
+          message: serverContentMessage,
+        });
+      }
+      accumulatedTextPartsRef.current = []; // Clear for the next turn
+    };
+
+    const onContent = (data: ServerContent) => {
+        // *** MODIFIED: Accumulate parts instead of logging immediately ***
+      if (data && 'modelTurn' in data && data.modelTurn.parts) {
+        accumulatedTextPartsRef.current = accumulatedTextPartsRef.current.concat(data.modelTurn.parts);
+      }
     };
 
 
@@ -184,8 +202,10 @@ export function useLiveAPI({
     client.on("setupcomplete", () => {
       emitter.emit("setupcomplete");
     });
-    client.on("turncomplete", onTurnComplete); //NEW: on turn complete
+    client.on("turncomplete", onTurnComplete);
     client.on("open", () => emitter.emit("open"));
+    client.on("content", onContent);
+
 
     emitter.on("generate", onGenerate);
 
@@ -202,13 +222,16 @@ export function useLiveAPI({
       client.off("setupcomplete", () => {
         emitter.emit("setupcomplete");
       });
-      client.off("turncomplete", onTurnComplete); // NEW: on turn complete.
+      client.off("turncomplete", onTurnComplete);
       client.off("open", () => emitter.emit("open"));
+      client.off("content", onContent);
 
       emitter.off("generate", onGenerate);
-      debouncedEmitServerAudioLog.cancel(); // Cancel any pending debounced calls.
+      debouncedEmitServerAudioLog.cancel();
+        accumulatedTextPartsRef.current = []; // Clear accumulated parts
+
     };
-  }, [client, audioStreamerRef, emitter, debouncedEmitServerAudioLog]); // No accumulatedServerAudio here
+  }, [client, audioStreamerRef, emitter, debouncedEmitServerAudioLog]);
 
   const connect = useCallback(async () => {
     if (!config) {
@@ -240,5 +263,3 @@ export function useLiveAPI({
     },
   };
 }
-
-

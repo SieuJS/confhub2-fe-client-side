@@ -18,7 +18,21 @@ const ClientContentLog: React.FC<ClientContentLogProps> = ({ message }) => {
           {turn.parts
             .filter((part) => !(part.text && part.text === "\n"))
             .map((part, j) => (
-              <RenderPart part={part} key={`message-turn-${i}-part-${j}`} />
+              // Apply ModelTurnLog's styling for text parts here
+              part.text ? (
+                <p
+                  key={`message-turn-${i}-part-${j}`}
+                  className="part part-text" // Keep existing classes
+                  style={{ whiteSpace: "pre-wrap" }} // Add pre-wrap for proper line breaks
+                >
+                  {part.text}
+                </p>
+              ) : (
+                <RenderPart
+                  part={part}
+                  key={`message-turn-${i}-part-${j}`}
+                />
+              )
             ))}
         </div>
       ))}

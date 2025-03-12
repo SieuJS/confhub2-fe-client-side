@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 
 import React from 'react';
+=======
+>>>>>>> 18f02932726afb404678b571fae7d340cec3cd0c
 import { ThemeProvider } from '@/src/app/[locale]/components/utils/ThemeProvider';
 import type { Metadata } from 'next';
 import {
