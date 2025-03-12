@@ -39,7 +39,7 @@ const Footer: FC<Props> = ({ locale }) => {
 
   useEffect(() => {
       // Check if the current path is /en/chatbot or /chatbot. Adjust as needed.
-      if (pathname === `/${locale}/chatbot` || pathname === '/chatbot') {
+      if (pathname === `/${locale}/chatbot` || pathname === `/${locale}/chatbot/chat` || pathname === `/${locale}/chatbot/livechat`) {
         setShowHeader(false);
       } else {
         setShowHeader(true);
@@ -50,7 +50,7 @@ const Footer: FC<Props> = ({ locale }) => {
   return (
     <>
       {showHeader && (
-        <footer className="bg-gradient-to-r from-background to-background-secondary py-14 ">
+        <footer className="mx-auto flex max-w-screen-2xl items-center justify-between p-3 bg-gradient-to-r from-background to-background-secondary">
         <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-5 gap-8 relative">
           {/* Company Info */}
           <div className="md:col-span-1">
@@ -142,9 +142,9 @@ const Footer: FC<Props> = ({ locale }) => {
         </div>
   
         {/* Copyright */}
-        <div className="mt-12 border-t border-text-secondary pt-8">
+        {/* <div className="mt-12 border-t border-text-secondary pt-8">
           <p className="text-center text-sm">Copyrights © 2025. All Rights Reserved.</p>
-        </div>
+        </div> */}
       </footer>
 
       )}

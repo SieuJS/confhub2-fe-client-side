@@ -59,7 +59,7 @@ export const Header: FC<Props> = ({ locale }) => {
 
   useEffect(() => {
     // Check if the current path is /en/chatbot or /chatbot. Adjust as needed.
-    if (pathname === `/${locale}/chatbot` || pathname === '/chatbot') {
+    if (pathname === `/${locale}/chatbot` || pathname === `/${locale}/chatbot/chat` || pathname === `/${locale}/chatbot/livechat`) {
       setShowHeader(false);
     } else {
       setShowHeader(true);
