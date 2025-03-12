@@ -6,9 +6,10 @@ import Button from '../../utils/Button';
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   onFillInput?: (fillInputCallback: (text: string) => void) => void;
+  disabled?: boolean; // Add the disabled prop
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onFillInput }) => {
+const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onFillInput, disabled = false }) => { // Add disabled with default
   const [message, setMessage] = useState<string>('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [isFocused, setIsFocused] = useState<boolean>(false);
@@ -31,21 +32,27 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onFillInput }) => 
   }, []);
 
   const handleSendMessage = useCallback(() => {
-    if (message.trim()) {
+    if (message.trim() && !disabled) { // Check disabled here too
       onSendMessage(message);
       setMessage('');
     }
-  }, [message, onSendMessage]);
+  }, [message, onSendMessage, disabled]); // Add disabled to dependency array
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Enter' && !e.ctrlKey) {
-          setMessage(prevMessage => prevMessage + '\n');
-          e.preventDefault();
-      } else if (e.key === 'Enter' && e.ctrlKey) {
-          handleSendMessage();
-          e.preventDefault();
-      }
-  }, [handleSendMessage]);
+    if (disabled) { // Prevent key presses if disabled
+        e.preventDefault();
+        return;
+    }
+
+    if (e.key === 'Enter' && !e.ctrlKey) {
+        setMessage(prevMessage => prevMessage + '\n');
+        e.preventDefault();
+    } else if (e.key === 'Enter' && e.ctrlKey) {
+        handleSendMessage();
+        e.preventDefault();
+    }
+}, [handleSendMessage, disabled]); // Add disabled to the dependency array
+
 
   const handleFocus = useCallback(() => {
     setIsFocused(true);
@@ -60,7 +67,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onFillInput }) => 
   return (
     <div className="flex-grow flex rounded-full focus-within:border-blue-500" >
       <TextareaAutosize
-        className="flex-grow px-4 py-2 text-gray-900 bg-transparent outline-none resize-none"
+        className="flex-grow px-4 p-4 text-gray-900 bg-transparent outline-none resize-none"
         placeholder="Nhập tin nhắn..."
         value={message}
         onChange={handleInputChange}
@@ -69,14 +76,16 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onFillInput }) => 
         rows={1}
         onFocus={handleFocus}
         onBlur={handleBlur}
+        disabled={disabled} // Apply disabled to TextareaAutosize
       />
       <Button
           variant="primary"
-          size="small"
+          size="medium"
           rounded={true}
           onClick={handleSendMessage}
-          className="text-blue-500 hover:bg-gray-600  m-1"
-          style={{minWidth: '36px'}} // Ensure consistent size
+          className="text-blue-500 hover:bg-gray-600 p-2 m-1"
+          style={{minWidth: '36px'}}
+          disabled={disabled} // Apply disabled to the Button
 
       >
         <svg

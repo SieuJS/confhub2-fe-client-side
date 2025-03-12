@@ -71,6 +71,7 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({ onSearch })
   const handleCountryClick = (country: string) => {
     setSelectedCountry(country === "" ? null : country);
     setIsCountryDropdownOpen(false);
+    setCountrySearchQuery("");
   };
 
   const handlePublicationTypeClick = (type: string) => {
@@ -176,7 +177,7 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({ onSearch })
 
   return (
     <div className="container mx-auto px-4 text-base">
-      <div className="rounded-full shadow-md flex items-center py-8 px-4 space-x-4">
+      <div className="rounded-full shadow-md flex border border-black items-center py-8 px-4 space-x-4">
         <div className="flex items-center flex-grow">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -243,13 +244,13 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({ onSearch })
                 >
                   Tất cả Quốc gia
                 </button>
-                {filteredCountries.map((country) => (
+                {[...new Set(filteredCountries)].map((location) => (
                   <button
-                    key={country}
-                    onClick={() => handleCountryClick(country)}
+                    key={location}
+                    onClick={() => handleCountryClick(location)}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 role='menuitem'"
                   >
-                    {country}
+                    {location}
                   </button>
                 ))}
               </div>

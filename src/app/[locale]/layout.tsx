@@ -9,7 +9,8 @@ import {
   NextIntlClientProvider,
   useMessages,
 } from 'next-intl';
-import { Inter, Rubik, Space_Grotesk } from 'next/font/google';
+import { Inter, Rubik } from 'next/font/google';
+import localFont from 'next/font/local'
 import NextTopLoader from 'nextjs-toploader';
 import { Header } from './components/utils/Header';
 import './globals.css';
@@ -23,9 +24,23 @@ const rubik = Rubik({
   subsets: ['arabic'],
   variable: '--rubik',
 });
-const space_grotesk = Space_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-space-grotesk',
+// Tải Space Grotesk cục bộ
+const spaceGrotesk = localFont({
+  src: [
+    {
+      path: '../../../public/fonts/SpaceGrotesk-Regular.ttf', // Đường dẫn đến file font
+      weight: '400', // Độ đậm của font (Regular)
+      style: 'normal', // Kiểu font
+    },
+    {
+      path: '../../../public/fonts/SpaceGrotesk-Bold.ttf',
+      weight: '700',  // Bold
+      style: 'normal',
+    },
+    // Thêm các kiểu/độ đậm khác nếu cần
+  ],
+  variable: '--font-space-grotesk', // Tên biến CSS
+  display: 'swap', // Khuyến nghị để tối ưu hiệu suất, xem giải thích bên dưới
 });
 export const metadata: Metadata = {
   title: 'Next Temp',
@@ -45,7 +60,7 @@ export default function RootLayout({
     <html
       lang={locale}
       dir={locale === 'ar' || locale == 'fa' ? 'rtl' : 'ltr'}
-      className={`${space_grotesk.variable} ${rubik.variable} scroll-smooth scrollbar scrollbar-thumb-background-secondary scrollbar-track-background  `}
+      className={`${spaceGrotesk.variable} ${rubik.variable} scroll-smooth scrollbar scrollbar-thumb-background-secondary scrollbar-track-background  `}
       suppressHydrationWarning
     >
       <head>
