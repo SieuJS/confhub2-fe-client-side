@@ -92,6 +92,8 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
 
   const handleLocationClick = (location: string) => {
     setSelectedLocation(location === "" ? null : location);
+    setIsLocationDropdownOpen(!isLocationDropdownOpen);
+    setLocationSearchQuery("");
   };
 
   const handleTypeClick = (type: string) => {
@@ -176,7 +178,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
 
   return (
     <div className="container mx-auto px-4 text-base">
-      <div className="rounded-full shadow-md flex items-center py-8 px-4 space-x-4">
+      <div className="rounded-full shadow-md flex border border-black items-center py-8 px-4 space-x-4">
         <div className="flex items-center flex-grow">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -267,16 +269,16 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
                 >
                   All Locations
                 </button>
-                {filteredLocations.map((location) => (
+                {[...new Set(filteredLocations)].map((location) => (
                   <button
                     key={location}
                     onClick={() => handleLocationClick(location)}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 role='menuitem'"
                   >
                     {location}
-                    {/* You can add flag or continent info here if needed from continentList */}
                   </button>
                 ))}
+
               </div>
             </div>
           )}

@@ -52,7 +52,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
 
     return (
         <div className="container mx-auto py-6 rounded-lg md:flex-row " style={{ scrollBehavior: 'smooth' }}>
-            <nav ref={navRef} className="sticky top-24 bg-gradient-to-r from-background to-background-secondary shadow-md z-20 flex overflow-x-auto mt-1 whitespace-nowrap p-3 text-lg">
+            <nav ref={navRef} className="sticky top-16 bg-gradient-to-r from-background to-background-secondary shadow-md z-20 flex overflow-x-auto mt-1 whitespace-nowrap p-3 text-lg">
                 <a
                     href="#overview"
                     className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"
