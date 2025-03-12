@@ -1,4 +1,4 @@
-// audio-recorder.ts (Corrected VAD without 'buffering')
+// audio-recorder.ts (với avgNoiseMultiplier lớn hơn)
 import { audioContext } from "./utils";
 import AudioRecordingWorklet from "./worklets/audio-processing";
 import VolMeterWorket from "./worklets/vol-meter";
@@ -27,6 +27,7 @@ export class AudioRecorder extends EventEmitter {
 
   vad: ReturnType<typeof VAD> | undefined;
   silenceTimer: ReturnType<typeof setTimeout> | null = null;
+  silenceDuration: number = 2000; // Thời gian im lặng tối đa (ms).
 
   private starting: Promise<void> | null = null;
 
@@ -44,16 +45,17 @@ export class AudioRecorder extends EventEmitter {
       this.audioContext = await audioContext({ sampleRate: this.sampleRate });
       this.source = this.audioContext.createMediaStreamSource(this.stream);
 
-      // --- CORRECTED VAD OPTIONS ---
+      // --- CORRECTED VAD OPTIONS (với avgNoiseMultiplier lớn hơn) ---
       const vadOptions: VoiceActivityDetectionOptions = {
-        minCaptureFreq: 85,
-        maxCaptureFreq: 255,
-        noiseCaptureDuration: 1000, // 1 second of noise capture
-        smoothingTimeConstant: 0.99, // High smoothing for stability
-        // Optional: Further refine with noise levels if needed
-        // minNoiseLevel: 0.1,
-        // maxNoiseLevel: 0.8,
-        // avgNoiseMultiplier: 1.5, // Adjust threshold
+        minCaptureFreq: 300,
+        maxCaptureFreq: 1500,
+        noiseCaptureDuration: 1000,
+        smoothingTimeConstant: 0.99,
+        // Bắt đầu với giá trị lớn hơn, ví dụ 3.0
+        avgNoiseMultiplier: 3.0,
+        // Các options khác:
+        fftSize: 1024,
+        bufferLen: 4096,
         onVoiceStart: () => {
           console.log("voice start");
           if (this.silenceTimer) {
@@ -63,7 +65,12 @@ export class AudioRecorder extends EventEmitter {
         },
         onVoiceStop: () => {
           console.log("voice stop");
-          this.emit("stop", this);
+          this.silenceTimer = setTimeout(() => {
+            this.emit("stop", this);
+          }, this.silenceDuration);
+        },
+        onUpdate: (val) => {
+          // console.log("volume:", val);
         },
       };
 

@@ -1,10 +1,8 @@
-// Logger.tsx (Corrected - No unused imports)
 import React from "react";
-import "./logger.css";
 import { useLoggerStore } from "../lib/store-logger";
 import LogEntry from "./LogEntry";
 import MessageRenderer from "./MessageRenderer";
-import { filters, LoggerFilterType } from "./LogFilters"; // LoggerFilterType is used in the type definition
+import { filters, LoggerFilterType } from "./LogFilters";
 
 export type LoggerProps = {
   filter: LoggerFilterType;
