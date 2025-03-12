@@ -32,10 +32,13 @@ const CustomPlainTextLog = ({ msg }: { msg: string }): ReactNode => {
 
 const MessageRenderer = ({ message }: { message: StreamingLog["message"] }) => {
   if (isClientAudioMessage(message)) {
+    console.log(message);
     return <ClientAudioLog message={message} />;
   }
 
   if (isServerAudioMessage(message)) {
+    console.log(message);
+
     return <ServerAudioLog message={message} />;
   }
 

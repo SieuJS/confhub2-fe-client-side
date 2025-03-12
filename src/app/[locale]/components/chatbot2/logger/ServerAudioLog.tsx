@@ -16,6 +16,7 @@ const ServerAudioLog: React.FC<ServerAudioLogProps> = ({ message }) => {
         <AudioPlayer
           key={audioData}
           audioData={audioData}
+          sampleRate={24000}
           autoPlay
         />
       ) : (

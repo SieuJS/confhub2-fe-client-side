@@ -1,108 +1,147 @@
-// components/AudioPlayer.tsx
+// AudioPlayer.tsx (REVISED)
 import React, { useState, useRef, useEffect } from 'react';
 import AudioPulse from '../audio-pulse/AudioPulse';
 
 interface AudioPlayerProps {
-  audioData: string; // Base64 encoded audio data
+  audioData: string;
   autoPlay?: boolean;
-  sampleRate?: number; // Add sampleRate prop
+  sampleRate: number; // Make sampleRate required
 }
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false, sampleRate = 16000 }) => {
+const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false, sampleRate }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-  const [volume, setVolume] = useState(0);
   const audioContextRef = useRef<AudioContext | null>(null);
-  const bufferSourceRef = useRef<AudioBufferSourceNode | null>(null);
   const audioBufferRef = useRef<AudioBuffer | null>(null);
+  const bufferSourceRef = useRef<AudioBufferSourceNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
+  const volumeRef = useRef(1); // Store volume in a ref
 
-    useEffect(() => {
-    // Initialize AudioContext with the correct sampleRate
-    audioContextRef.current = new AudioContext({ sampleRate });
-    gainNodeRef.current = audioContextRef.current.createGain();
+  // --- Audio Context Setup (with sampleRate) ---
+  useEffect(() => {
+    try {
+      audioContextRef.current = new AudioContext({ sampleRate });
+      gainNodeRef.current = audioContextRef.current.createGain();
+      gainNodeRef.current.gain.value = volumeRef.current; // Initial volume
+    } catch (error) {
+      console.error("Failed to create AudioContext:", error);
+    }
 
     return () => {
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
-      }
+      audioContextRef.current?.close();
     };
-  }, [sampleRate]); // Depend on sampleRate
+  }, [sampleRate]);
 
+  // --- Decode Audio Data & Buffer Setup ---
   useEffect(() => {
     if (!audioData || !audioContextRef.current) return;
 
-    const audioBuffer = base64ToAudioBuffer(audioData, audioContextRef.current);
-    if (!audioBuffer) return;
+    const decodeAndSetBuffer = async () => {
+      try {
+        const audioBuffer = await base64ToAudioBuffer(audioData, audioContextRef.current!);
+        if (!audioBuffer) return;
 
-    audioBufferRef.current = audioBuffer;
-    setDuration(audioBuffer.duration);
+        audioBufferRef.current = audioBuffer;
+        setDuration(audioBuffer.duration);
+        setCurrentTime(0); // Reset current time on new data
 
-    // No onEnded here, it's handled within togglePlay and seek
-
-    return () => {
-      if (bufferSourceRef.current) {
-        bufferSourceRef.current.stop();
-        bufferSourceRef.current.disconnect();
+        if (autoPlay) {
+          // Immediately play if autoPlay is true
+          playFrom(0);
+        }
+      } catch (error) {
+        console.error("Error decoding audio data:", error);
       }
     };
-  }, [audioData, audioContextRef]); // Add audioContextRef to dependencies
+    decodeAndSetBuffer();
 
-  const togglePlay = () => {
+    return () => { //Proper Cleanup
+        stopAndDisconnect();
+    }
+
+  }, [audioData, autoPlay, sampleRate]);
+
+    const stopAndDisconnect = () => {
+     if (bufferSourceRef.current) {
+        try {
+            bufferSourceRef.current.stop();
+        } catch(e) {
+          //Source already stopped
+        }
+        bufferSourceRef.current.disconnect();
+        bufferSourceRef.current = null;
+      }
+    }
+
+
+  // --- Playback Logic ---
+    const playFrom = (startTime: number) => {
     if (!audioContextRef.current || !audioBufferRef.current || !gainNodeRef.current) return;
 
-    if (isPlaying) {
-      if (bufferSourceRef.current) {
-          bufferSourceRef.current.disconnect();
-          bufferSourceRef.current = null;
-      }
-      setIsPlaying(false);
-    } else {
-      const newSource = audioContextRef.current.createBufferSource();
-      newSource.buffer = audioBufferRef.current;
-      newSource.connect(gainNodeRef.current);
-      gainNodeRef.current.connect(audioContextRef.current.destination);
-      bufferSourceRef.current = newSource;
+    stopAndDisconnect(); // Ensure any previous source is stopped
 
-      newSource.addEventListener('ended', () => {
+    const newSource = audioContextRef.current.createBufferSource();
+    newSource.buffer = audioBufferRef.current;
+    newSource.connect(gainNodeRef.current);
+    gainNodeRef.current.connect(audioContextRef.current.destination);
+    bufferSourceRef.current = newSource;
+
+    newSource.onended = () => {
+      setIsPlaying(false);
+      setCurrentTime(0);
+      stopAndDisconnect(); // Clean up after playback
+    };
+
+    try {
+      newSource.start(0, startTime);
+      setIsPlaying(true);
+    } catch (error) {
+      console.error("Failed to start playback:", error);
+      setIsPlaying(false); // Ensure isPlaying is false on error
+    }
+  };
+
+  const togglePlay = () => {
+    if (isPlaying) {
+        stopAndDisconnect();
         setIsPlaying(false);
-        setCurrentTime(0);
-        if (bufferSourceRef.current) {
-          bufferSourceRef.current.disconnect();
-          bufferSourceRef.current = null;
-        }
-      });
-      try {
-        newSource.start(0, currentTime); // Start at currentTime
-        setIsPlaying(true);
-      } catch (e) {
-        console.error("Play failed", e);
+    } else {
+      playFrom(currentTime);
+    }
+  };
+
+  // --- Seek Logic ---
+  const seek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const time = parseFloat(e.target.value);
+    setCurrentTime(time);
+     if (isPlaying) {
+          playFrom(time);
+      }
+  };
+
+  // --- Mute/Unmute Logic ---
+  const toggleMute = () => {
+    if (gainNodeRef.current) {
+      if (gainNodeRef.current.gain.value > 0) {
+        gainNodeRef.current.gain.value = 0;
+        volumeRef.current = 0;
+      } else {
+        gainNodeRef.current.gain.value = 1;
+        volumeRef.current = 1;
       }
     }
   };
 
+  // --- Helper Functions ---
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
-    const seek = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!audioContextRef.current || !audioBufferRef.current) return;
-
-        const time = parseFloat(e.target.value);
-        setCurrentTime(time);
-
-        if (isPlaying) {
-            togglePlay(); // Stop and disconnect current source
-        }
-
-     //No need to recreate buffer source, toggle play will handle it
-  };
-
-  const base64ToAudioBuffer = (base64: string, context: AudioContext) => {
+   const base64ToAudioBuffer = async (base64: string, context: AudioContext): Promise<AudioBuffer | null> => {
     try {
       const binaryString = atob(base64);
       const len = binaryString.length;
@@ -126,18 +165,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false, 
     }
   };
 
-  const toggleMute = () => {
-    if (audioContextRef.current && gainNodeRef.current) {
-      if (gainNodeRef.current.gain.value > 0) {
-        gainNodeRef.current.gain.value = 0;
-        setVolume(0);
-      } else {
-        gainNodeRef.current.gain.value = 1;
-        setVolume(1);
-      }
-    }
-  };
-
+  // --- Rendering ---
   return (
     <div
       className="flex items-center rounded-full bg-primary p-1 pl-2 pr-2"
@@ -165,12 +193,12 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false, 
           style={{ background: 'transparent' }}
         />
         <div className='pointer-events-none absolute top-1/2 -translate-y-1/2'>
-          <AudioPulse active={isPlaying} volume={isPlaying ? (gainNodeRef.current ? gainNodeRef.current.gain.value : 0) : 0} hover={isHovered} />
+          <AudioPulse active={isPlaying} volume={isPlaying ? volumeRef.current: 0} hover={isHovered} />
         </div>
       </div>
       <button onClick={toggleMute} className="audio-control ml-2 rounded-full bg-button p-1 text-button-text hover:bg-button-secondary">
         <span className="material-symbols-outlined">
-          {gainNodeRef.current && gainNodeRef.current.gain.value > 0 ? "volume_up" : "volume_off"}
+          {volumeRef.current > 0 ? "volume_up" : "volume_off"}
         </span>
       </button>
       <button className="audio-control ml-2 rounded-full bg-button p-1 text-button-text hover:bg-button-secondary">

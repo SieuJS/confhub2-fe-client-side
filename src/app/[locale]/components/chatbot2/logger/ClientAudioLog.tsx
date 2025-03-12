@@ -11,8 +11,8 @@ const ClientAudioLog: React.FC<ClientAudioLogProps> = ({ message }) => {
   const { audioData } = message.clientAudio;
   return (
     <div className="rich-log client-audio">
-      {audioData ? <AudioPlayer audioData={audioData} /> : <p>Loading audio...</p>}
-    </div>
+      {audioData ? <AudioPlayer audioData={audioData} sampleRate={16000}/> : <p>Loading audio...</p>}
+      </div>
   );
 };
 
