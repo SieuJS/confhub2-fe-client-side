@@ -92,9 +92,9 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
             <section id="impact-factor" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <h2 className="text-3xl font-bold text-secondary mb-4">Impact Factor</h2>
                 <p className=" text-lg">
-                    <strong>The Impact IF {journal.bioxbio[0]?.Year}</strong> of <strong>{journal.Title}</strong> is
-                    <strong>{journal.bioxbio[0]?.Impact_factor || 'N/A'}</strong>,
-                    which is computed in <strong>{parseInt(journal.bioxbio[0]?.Year || '2023') + 1}</strong> as per its definition.
+                    <strong>The Impact IF {journal.bioxbio ? journal.bioxbio[0]?.Year: new Date().getFullYear()}</strong> of <strong>{journal.Title}</strong> is 
+                    <strong>{journal.bioxbio ? ' ' + journal.bioxbio[0]?.Impact_factor : 'N/A'}</strong>
+                    {journal.bioxbio && <div className='inline'>, which is computed in <strong>{parseInt(journal.bioxbio[0]?.Year || '2023') + 1}</strong> as per its definition.</div>}  
                     {/* ... rest of the Impact Factor tab content, you can dynamically update journal name and IF value here */}
                 </p>
                 <p className=" text-lg mt-4 mb-4">
@@ -122,7 +122,7 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                                     </tr>
                                 ))}
                                 {/* Fallback if no impact factor history */}
-                                {journal.bioxbio.length === 0 && (
+                                {(journal.bioxbio == null || (journal.bioxbio && journal.bioxbio.length === 0)) && (
                                     <tr>
                                         <td className="px-6 py-2" colSpan={2}>No Impact Factor History Available</td>
                                     </tr>
