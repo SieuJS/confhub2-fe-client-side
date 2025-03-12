@@ -5,11 +5,13 @@ import { useTranslations } from 'next-intl';
 import SearchSection from '../../components/conference/SearchSection';
 import ResultsSection from '../../components/conference/ResultsSection';
 import { useState } from 'react';
-import { ConferenceResponse } from '../../../../models/response/conference.response'; // Import ConferenceResponse type - Moved to the top and verify path
+import { ConferenceResponse } from '../../../../models/response/conference.response'; 
+import { Header } from '../../components/utils/Header';
+import Footer from '../../components/utils/Footer';
 
 // Removed interface Event as we are using ConferenceResponse type
 
-export default function Conferences() {
+export default function Conferences({ locale }: { locale: string }) {
     const t = useTranslations('');
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
@@ -62,27 +64,31 @@ export default function Conferences() {
     };
 
     return (
-        <div className="text-center text-2xl">
-            <div className="py-14 bg-background w-full"></div>
-            <SearchSection
-                onSearch={handleSearch}
-            />
-            <div className="container mx-auto mt-8 px-4">
-                <ResultsSection
-                    searchQuery={searchQuery}
-                    selectedLocation={selectedLocation}
-                    selectedType={selectedType}
-                    startDate={startDate}
-                    endDate={endDate}
-                    submissionDate={submissionDate}
-                    selectedRank={selectedRank}
-                    selectedSourceYear={selectedSourceYear}
-                    selectedAverageScore={selectedAverageScore}
-                    selectedTopics={selectedTopics}
-                    selectedFieldsOfResearch={selectedFieldsOfResearch}
-                    selectedPublisher={selectedPublisher}
+        <>
+            <Header locale={locale}/>
+            <div className="text-center text-2xl">
+                <div className="py-14 bg-background w-full"></div>
+                <SearchSection
+                    onSearch={handleSearch}
                 />
+                <div className="container mx-auto mt-8 px-4">
+                    <ResultsSection
+                        searchQuery={searchQuery}
+                        selectedLocation={selectedLocation}
+                        selectedType={selectedType}
+                        startDate={startDate}
+                        endDate={endDate}
+                        submissionDate={submissionDate}
+                        selectedRank={selectedRank}
+                        selectedSourceYear={selectedSourceYear}
+                        selectedAverageScore={selectedAverageScore}
+                        selectedTopics={selectedTopics}
+                        selectedFieldsOfResearch={selectedFieldsOfResearch}
+                        selectedPublisher={selectedPublisher}
+                    />
+                </div>
             </div>
-    </div>
+            <Footer />
+        </>
     );
 }

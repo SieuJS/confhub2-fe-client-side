@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslations } from 'next-intl'
 
 interface PaginationProps {
   eventsPerPage: number;
@@ -9,6 +10,7 @@ interface PaginationProps {
 
 const Pagination: React.FC<PaginationProps> = ({ eventsPerPage, totalEvents, paginate, currentPage }) => {
   const pageNumbers = [];
+  const t = useTranslations('');
 
   for (let i = 1; i <= Math.ceil(totalEvents / eventsPerPage); i++) {
     pageNumbers.push(i);
@@ -21,7 +23,7 @@ const Pagination: React.FC<PaginationProps> = ({ eventsPerPage, totalEvents, pag
         disabled={currentPage === 1}
         className="bg-background hover:bg-background-secondary  rounded-md px-4 py-2 mr-2"
       >
-        Previous
+        {t('Previous')}
       </button>
       {pageNumbers.map(number => (
         <button
@@ -37,7 +39,7 @@ const Pagination: React.FC<PaginationProps> = ({ eventsPerPage, totalEvents, pag
         disabled={currentPage === pageNumbers.length}
         className="bg-background hover:bg-background-secondary  rounded-md px-4 py-2"
       >
-        Next
+        {t('Next')}
       </button>
     </div>
   );

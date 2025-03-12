@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ConferenceResponse } from '@/src/models/response/conference.response'; // Correct import path
 import Image from 'next/image';
 import { useRouter } from '@/src/navigation'; // Import YOUR custom useRouter
+import { useTranslations } from 'next-intl'
 
 type Conference = ConferenceResponse;
 
@@ -29,6 +30,7 @@ const conferencesData: Conference[] = conferenceList.map(conf => {
 });
 
 const PopularConferences: React.FC = () => {
+  const t = useTranslations('');
   const [currentIndex, setCurrentIndex] = useState(1);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -100,7 +102,7 @@ const PopularConferences: React.FC = () => {
 
     const handleClick = (id: string | undefined) => {
         if (id) {
-            router.push({ pathname: '/conferences/detail', query: { id: id } });
+            router.push({ pathname: '/tabs/conferences/detail', query: { id: id } });
         } else {
             console.error("Conference ID is undefined"); // Or handle the error appropriately
         }
@@ -137,7 +139,7 @@ const PopularConferences: React.FC = () => {
           z-index: 5;
         }
       `}</style>
-      <h1 className="text-2xl font-bold text-center mb-6">Popular Conferences</h1>
+      <h1 className="text-2xl font-bold text-center mb-6">{t('Popular_Conferences')}</h1>
       <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
         <button
           onClick={scrollLeft}

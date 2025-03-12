@@ -46,15 +46,15 @@ const Banner: React.FC = () => {
 
         {/* <div className='py-12'></div> */}
         <div className='mt-2 flex flex-row gap-4'>
-          <Link href={`/conferences`}>
+          <Link href={`/tabs/conferences`}>
             <Button rounded size='large' advanced advancedDivColor="p-8">
-              Search Conferences
+              {t('Search_Conferences')}
             </Button>
           </Link>
           <div className="py-8">
-            <Link href={`/journals`}>
+            <Link href={`/tabs/journals`}>
               <Button rounded size='large' variant='secondary'>
-                Search Journals
+              {t('Search_Journals')}
               </Button>
             </Link>
           </div>

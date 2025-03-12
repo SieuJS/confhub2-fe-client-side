@@ -2,12 +2,12 @@ import React from 'react';
 
 const AIAbilities = () => {
   return (
-    <div className="bg-gray-900 text-white flex flex-col items-center gap-6 p-4">
+    <div className="bg-gray-900 text-white flex flex-col items-center gap-8 p-4">
 
       {/* Row 1 */}
-      <div className="flex flex-wrap justify-center gap-6">
+      <div className="flex flex-wrap justify-center gap-8">
         {/* EASE OF USE */}
-        <div className="bg-gray-800 rounded-lg shadow-md p-6 w-full md:w-[350px] lg:w-[350px]">
+        <div className="bg-gray-800 rounded-lg shadow-md p-6 w-full md:w-[350px] lg:w-[500px] lg:h-[500px]">
           <h3 className="text-lg font-semibold text-blue-400 mb-2">EASE OF USE</h3>
           <h2 className="text-2xl font-semibold text-white mb-4">Complex requests solved simply</h2>
           <p className="text-gray-400 text-sm">
@@ -18,25 +18,13 @@ const AIAbilities = () => {
           <div className="mt-4 flex flex-wrap gap-4">
             <div className="border border-gray-700 rounded-md p-2 w-full">
               <h4 className="text-gray-300 text-sm font-medium">The most spoken languages <br /> worldwide in 2023 <br /> <span className="text-xs text-gray-500">(by speakers in millions)</span></h4>
-              <img
-                src="https://i.imgur.com/QeJt13g.png"
-                alt="Most Spoken Languages"
-                className="w-full"
-              />
-            </div>
-            <div className="border border-gray-700 rounded-md p-2 w-full">
-              <h4 className="text-gray-300 text-sm font-medium">How many languages <br /> do you speak?</h4>
-              <img
-                src="https://i.imgur.com/XU2hU1s.png"
-                alt="How Many Languages"
-                className="w-full"
-              />
+              
             </div>
           </div>
         </div>
 
         {/* EFFICIENCY */}
-        <div className="bg-gray-800 rounded-lg shadow-md p-6 w-full md:w-[350px] lg:w-[350px]">
+        <div className="bg-gray-800 rounded-lg shadow-md p-6 w-full md:w-[350px] lg:w-[350px] lg:h-[400px] lg:mt-24">
           <h3 className="text-lg font-semibold text-blue-400 mb-2">EFFICIENCY</h3>
           <h2 className="text-2xl font-semibold text-white mb-4">Your shortcut to lasting good decisions</h2>
           <p className="text-gray-400 text-sm">
@@ -48,25 +36,20 @@ const AIAbilities = () => {
           <div className="mt-4 border border-gray-700 rounded-md p-2">
             <h4 className="text-gray-300 text-sm font-medium">Average time to insights</h4>
             <p className="text-gray-400 text-xs mb-2">Split by different steps during a typical research, in minutes</p>
-            <img
-              src="https://i.imgur.com/M9Y1n0J.png"
-              alt="Average time to insights"
-              className="w-full"
-            />
+            
           </div>
         </div>
       </div>
 
       {/* Row 2 */}
-      <div className="flex flex-wrap justify-center gap-6">
+      <div className="flex flex-wrap justify-center gap-8">
         {/* QUALITY */}
-        <div className="bg-gray-800 rounded-lg shadow-md p-6 w-full md:w-[350px] lg:w-[350px]">
+        <div className="bg-gray-800 rounded-lg shadow-md p-6 w-full md:w-[350px] lg:w-[350px] lg:h-[300px]">
           <h3 className="text-lg font-semibold text-blue-400 mb-2">QUALITY</h3>
           <h2 className="text-2xl font-semibold text-white mb-4">Half human, half AI</h2>
           <p className="text-gray-400 text-sm">
             The decisions you are facing are too important to be made on the basis of opaque, possibly erroneous data.
-            With Research AI, artificial and human intelligence work hand in hand to create unique synergies: the AI presents
-            you with data that has been curated and carefully checked by Statista experts.
+            With Research AI
           </p>
           <div className="mt-4 p-2 bg-gray-700 rounded-md text-gray-300 text-xs">
             The best solution to transform complex data into understandable insights: Research AI.
@@ -74,7 +57,7 @@ const AIAbilities = () => {
         </div>
 
         {/* INNOVATION */}
-        <div className="bg-gray-800 rounded-lg shadow-md p-6 w-full md:w-[350px] lg:w-[350px]">
+        <div className="bg-gray-800 rounded-lg shadow-md p-6 w-full md:w-[350px] lg:w-[500px]">
           <h3 className="text-lg font-semibold text-blue-400 mb-2">INNOVATION</h3>
           <h2 className="text-2xl font-semibold text-white mb-4">Uniquely customized</h2>
           <p className="text-gray-400 text-sm">

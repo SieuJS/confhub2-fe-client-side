@@ -18,9 +18,8 @@ export const Header: FC<Props> = ({ locale }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname(); // Get current pathname
-
-  const [showHeader, setShowHeader] = useState(true); // State to control header visibility
-
+  // Check if current path included '/tabs/conferences'
+  const conferencesActive = pathname.includes('/tabs/conferences');
 
   const toggleNotification = () => {
     setIsNotificationOpen(!isNotificationOpen);
@@ -55,17 +54,6 @@ export const Header: FC<Props> = ({ locale }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isNotificationOpen, isMobileMenuOpen, headerRef]);
-
-
-  useEffect(() => {
-    // Check if the current path is /en/chatbot or /chatbot. Adjust as needed.
-    if (pathname === `/${locale}/tabs/chatbot` || pathname === `/${locale}/tabs/chatbot/chat` || pathname === `/${locale}/tabs/chatbot/livechat`) {
-      setShowHeader(false);
-    } else {
-      setShowHeader(true);
-    }
-  }, [pathname]);
-
 
 
   const NotificationIcon = () => (
@@ -120,6 +108,9 @@ export const Header: FC<Props> = ({ locale }) => {
           <Link lang={locale} href={`/tabs/support`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('Support')}
           </Link>
+          <Link lang={locale} href={`/tabs/support`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+            {t('Add_Conference')}
+          </Link>
           <Link lang={locale} href={`/tabs/about`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('About')}
           </Link>
@@ -144,10 +135,14 @@ export const Header: FC<Props> = ({ locale }) => {
     </svg>
   );
 
+  const isActive = (href: string) => {
+      return pathname === href;
+  };
+
 
   return (
     <>
-      {showHeader && ( // Conditionally render the header
+      
         <div
           ref={headerRef}
           className={`mx-auto flex max-w-screen-2xl flex-row items-center justify-between p-3 bg-gradient-to-r from-background to-background-secondary transition-all duration-300 ease-in-out
@@ -166,29 +161,77 @@ export const Header: FC<Props> = ({ locale }) => {
           <div className='flex flex-row items-center gap-3 relative'>
             {/* Navigation for larger screens - Hiển thị trên sm trở lên */}
             <nav className='mr-10  gap-5 sm:inline-flex hidden'> {/* Ẩn mặc định, hiển thị trên sm */}
-              <Link lang={locale} href={`/tabs/conferences`} style={{ fontWeight: 'bold' }}>
+              <Link
+                lang={locale}
+                href={`/tabs/conferences`}
+                style={{ fontWeight: 'bold' }}
+                className={`relative group ${pathname.includes('/tabs/conferences') ? 'text-selected' : ''}`} // Conditional styling
+              >
                 {t('Conferences')}
+                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/conferences') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
-              <Link lang={locale} href={`/tabs/journals`} style={{ fontWeight: 'bold' }}>
+              <Link
+                lang={locale}
+                href={`/tabs/journals`}
+                style={{ fontWeight: 'bold' }}
+                className={`relative group ${pathname.includes('/tabs/journals') ? 'text-selected' : ''}`} // Conditional styling
+              >
                 {t('Journals')}
+                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/journals') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
-              <Link lang={locale} href={`/tabs/setting`} style={{ fontWeight: 'bold' }}>
+              <Link
+                lang={locale}
+                href={`/tabs/setting`}
+                style={{ fontWeight: 'bold' }}
+                className={`relative group ${pathname.includes('/tabs/setting') ? 'text-selected' : ''}`} // Conditional styling
+              >
                 {t('Setting')}
+                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/setting') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
-              <Link lang={locale} href={`/tabs/chatbot`} style={{ fontWeight: 'bold' }}>
+              <Link
+                lang={locale}
+                href={`/tabs/chatbot`}
+                style={{ fontWeight: 'bold' }}
+                className={`relative group ${pathname.includes('/tabs/chatbot') ? 'text-selected' : ''}`} // Conditional styling
+              >
                 {t('Chatbot')}
+                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/chatbot') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
-              <Link lang={locale} href={`/tabs/support`} style={{ fontWeight: 'bold' }}>
+              <Link
+                lang={locale}
+                href={`/tabs/support`}
+                style={{ fontWeight: 'bold' }}
+                className={`relative group ${pathname.includes('/tabs/support') ? 'text-selected' : ''}`} // Conditional styling
+              >
                 {t('Support')}
+                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/support') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
-              <Link lang={locale} href={`/tabs/addconference`} style={{ fontWeight: 'bold' }}>
-                Add Conference
+              <Link
+                lang={locale}
+                href={`/tabs/addconference`}
+                style={{ fontWeight: 'bold' }}
+                className={`relative group ${pathname.includes('/tabs/addconference') ? 'text-selected' : ''}`} // Conditional styling
+              >
+                {t('Add_Conference')}
+                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/addconference') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
-              <Link lang={locale} href={`/tabs/about`} style={{ fontWeight: 'bold' }}>
+              <Link
+                lang={locale}
+                href={`/tabs/about`}
+                style={{ fontWeight: 'bold' }}
+                className={`relative group ${pathname.includes('/tabs/about') ? 'text-selected' : ''}`} // Conditional styling
+              >
                 {t('About')}
+                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/about') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
-              <Link lang={locale} href={`/tabs/other`} style={{ fontWeight: 'bold' }}>
+              <Link
+                lang={locale}
+                href={`/tabs/other`}
+                style={{ fontWeight: 'bold' }}
+                className={`relative group ${pathname.includes('/tabs/other') ? 'text-selected' : ''}`} // Conditional styling
+              >
                 {t('Other')}
+                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/other') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
             </nav>
 
@@ -220,10 +263,10 @@ export const Header: FC<Props> = ({ locale }) => {
               </div>
             </a>
             <NotificationDropdown />
-            <MobileNavigation /> {/* Mobile navigation dropdown - Chỉ hiển thị khi menu mobile mở và trên màn hình nhỏ */}
+            <MobileNavigation /> 
           </div>
         </div>
-      )}
+      
     </>
   )
 }

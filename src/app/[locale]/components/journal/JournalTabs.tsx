@@ -22,7 +22,7 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                 if (targetSection) {
                     const navElement = navRef.current; // Use navRef.current here
                     const navHeight = navElement ? navElement.offsetHeight : 0; // Get nav height, default to 0 if not found
-                    const offset = 100;
+                    const offset = 50;
                     const targetPosition = targetSection.offsetTop - navHeight - offset; // Calculate scroll position with offset
 
                     window.scrollTo({
@@ -47,7 +47,7 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
 
     return (
         <div className="container mx-auto py-6 rounded-lg md:flex-row " style={{ scrollBehavior: 'smooth' }}>
-            <nav ref={navRef} className="sticky top-24 bg-gradient-to-r from-background to-background-secondary shadow-md z-20 flex overflow-x-auto mt-1 whitespace-nowrap p-3 text-lg">
+            <nav ref={navRef} className="sticky top-14 bg-gradient-to-r from-background to-background-secondary shadow-md z-20 flex overflow-x-auto mt-1 whitespace-nowrap p-3 text-lg">
                 <a
                     href="#overview"
                     className="nav-tab px-4 py-2  border-b border-transparent hover:border-b-secondary focus:outline-none focus:border-b-secondary font-semibold relative z-10"

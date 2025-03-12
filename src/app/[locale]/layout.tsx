@@ -1,7 +1,5 @@
 
-
-
-
+import React from 'react';
 import { ThemeProvider } from '@/src/app/[locale]/components/utils/ThemeProvider';
 import type { Metadata } from 'next';
 import {
@@ -28,19 +26,18 @@ const rubik = Rubik({
 const spaceGrotesk = localFont({
   src: [
     {
-      path: '../../../public/fonts/SpaceGrotesk-Regular.ttf', // Đường dẫn đến file font
-      weight: '400', // Độ đậm của font (Regular)
-      style: 'normal', // Kiểu font
+      path: '../../../public/fonts/SpaceGrotesk-Regular.ttf', 
+      weight: '400', 
+      style: 'normal', 
     },
     {
       path: '../../../public/fonts/SpaceGrotesk-Bold.ttf',
-      weight: '700',  // Bold
+      weight: '700',  
       style: 'normal',
     },
-    // Thêm các kiểu/độ đậm khác nếu cần
   ],
   variable: '--font-space-grotesk', // Tên biến CSS
-  display: 'swap', // Khuyến nghị để tối ưu hiệu suất, xem giải thích bên dưới
+  display: 'swap', 
 });
 export const metadata: Metadata = {
   title: 'Next Temp',
@@ -55,7 +52,6 @@ export default function RootLayout({
   params: { locale: string };
 }) {
   const messages = useMessages();
-  
   return (
     <html
       lang={locale}
@@ -100,9 +96,7 @@ export default function RootLayout({
               color="var(--primary)"
               showSpinner={false}
             />
-            <Header locale={locale} />
-            <main className="mx-auto max-w-screen-2xl ">{children}</main>
-            <Footer locale={locale}/>
+            <main className="mx-auto max-w-screen-2xl">{children}</main>
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>

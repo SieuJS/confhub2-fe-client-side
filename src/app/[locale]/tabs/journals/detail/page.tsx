@@ -9,8 +9,10 @@ import { RecommendedJournals } from '../../../components/journal/RecommendedJour
 import journalData from '../../../../../models/data/journals-list.json'; // Assuming journals.json is in the same directory
 import { useSearchParams } from 'next/navigation'; //  USE THIS for query params
 import NotFoundPage from '../../../components/utils/NotFoundPage';
+import { Header } from '../../../components/utils/Header';
+import Footer from '../../../components/utils/Footer';
 
-const JournalDetails: React.FC = () => {
+const JournalDetails = ({ locale }: { locale: string }) => {
   const searchParams = useSearchParams(); // Use useSearchParams
   const id = searchParams.get('id');  // Get the 'id' parameter
 
@@ -28,12 +30,14 @@ const JournalDetails: React.FC = () => {
 
   return (
     <div className="">
+      <Header locale={locale} />
       <div className="py-14 bg-background w-full">
       </div>
       <JournalReport journal={journal} />
       <JournalTabs journal={journal} />
       <RecommendedJournals />
       <RecentlyAddedJournals />
+      <Footer />
     </div>
   );
 };

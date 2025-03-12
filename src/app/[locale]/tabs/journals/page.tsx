@@ -5,9 +5,11 @@ import { useTranslations } from 'next-intl';
 import SearchJournalSection from '../../components/journal/SearchJournalSection';
 import ResultsJournalSection from '../../components/journal/ResultsJournalSection';   // Import ResultsJournalSection
 import { useState } from 'react';
+import { Header } from '../../components/utils/Header';
+import Footer from '../../components/utils/Footer';
 
 
-export default function Journals() {
+export default function Journals({ locale }: { locale: string }) {
     const t = useTranslations('');
     const [searchQuery, setSearchQuery] = useState<string>('');
     // Removed journalsData and loading states
@@ -69,30 +71,34 @@ export default function Journals() {
 
 
     return (
-        <div className="text-center text-2xl">
-            <div className="py-14 bg-background w-full"></div>
-            <SearchJournalSection
-                onSearch={handleSearch}
-            />
-            <div className="container mx-auto mt-8 px-4 ">
-                <ResultsJournalSection
-                    loading={loading}
-                    searchQuery={searchQuery}
-                    selectedCountry={selectedCountry}
-                    selectedPublicationType={selectedPublicationType}
-                    selectedSubjectAreas={selectedSubjectAreas}
-                    selectedQuartile={selectedQuartile}
-                    selectedOpenAccessTypes={selectedOpenAccessTypes}
-                    selectedPublisher={selectedPublisher}
-                    selectedLanguage={selectedLanguage}
-                    selectedImpactFactor={selectedImpactFactor}
-                    selectedHIndex={selectedHIndex}
-                    selectedCiteScore={selectedCiteScore}
-                    selectedSJR={selectedSJR}
-                    selectedOverallRank={selectedOverallRank}
-                    selectedISSN={selectedISSN}
+        <>  
+            <Header locale={locale} />
+            <div className="text-center text-2xl">
+                <div className="py-14 bg-background w-full"></div>
+                <SearchJournalSection
+                    onSearch={handleSearch}
                 />
+                <div className="container mx-auto mt-8 px-4 ">
+                    <ResultsJournalSection
+                        loading={loading}
+                        searchQuery={searchQuery}
+                        selectedCountry={selectedCountry}
+                        selectedPublicationType={selectedPublicationType}
+                        selectedSubjectAreas={selectedSubjectAreas}
+                        selectedQuartile={selectedQuartile}
+                        selectedOpenAccessTypes={selectedOpenAccessTypes}
+                        selectedPublisher={selectedPublisher}
+                        selectedLanguage={selectedLanguage}
+                        selectedImpactFactor={selectedImpactFactor}
+                        selectedHIndex={selectedHIndex}
+                        selectedCiteScore={selectedCiteScore}
+                        selectedSJR={selectedSJR}
+                        selectedOverallRank={selectedOverallRank}
+                        selectedISSN={selectedISSN}
+                    />
+                </div>
             </div>
-        </div>
+            <Footer />
+        </>
     );
 }

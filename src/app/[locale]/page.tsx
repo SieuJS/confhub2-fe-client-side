@@ -3,17 +3,14 @@ import { useTranslations } from 'next-intl'
 import Button from './components/utils/Button'
 import Banner from './components/home/Banner'
 import PopularConferences from './components/home/PopularConferences'
-import ConferenceByCountry from './components/conference/ConferenceByCountry'
-import ConferenceByTopic from './components/conference/ConferenceByTopic'
-import Image from 'next/image'
 import { useEffect, useState } from 'react';
-import { useTheme } from 'next-themes'; // Import useTheme from next-themes
 import Footer from './components/utils/Footer';
 import ConsumerInsights from './components/home/ConsumerInsights';
+import { Header } from './components/utils/Header';
 
-export default function DashboardPage() {
+
+export default function HomePage({ locale }: { locale: string }) {
   const t = useTranslations('')
-  const { theme } = useTheme(); // Use the useTheme hook to get the current theme
   const [isVisibleButton, setIsVisibleButton] = useState(false);
 
   useEffect(() => {
@@ -41,11 +38,11 @@ export default function DashboardPage() {
 
   return (
     <div className="">
+      <Header locale={locale}/>
       <Banner />
       <PopularConferences />
-      {/* <ConferenceByCountry /> */}
-      {/* <ConferenceByTopic  /> */}
       <ConsumerInsights />
+      <Footer />
       {isVisibleButton && (
         <Button
           onClick={scrollToTop}

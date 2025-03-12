@@ -4,18 +4,11 @@ import React from 'react';
 import { useTheme } from 'next-themes'; // Import useTheme from next-themes
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'; // Import usePathname
-import { FC, useEffect, useState } from 'react';
 
-interface Props {
-  locale: string
-}
 
-const Footer: FC<Props> = ({ locale }) => {
+const Footer = () => {
   const t = useTranslations('')
-  const pathname = usePathname(); // Get current pathname
 
-  const [showHeader, setShowHeader] = useState(true); // State to control header visibility
   const { theme } = useTheme(); // Use the useTheme hook to get the current theme
 
   // Determine image source based on 4 themes
@@ -37,19 +30,12 @@ const Footer: FC<Props> = ({ locale }) => {
     }
   })();
 
-  useEffect(() => {
-      // Check if the current path is /en/chatbot or /chatbot. Adjust as needed.
-      if (pathname === `/${locale}/tabs/chatbot` || pathname === `/${locale}/tabs/chatbot/chat` || pathname === `/${locale}/tabs/chatbot/livechat`) {
-        setShowHeader(false);
-      } else {
-        setShowHeader(true);
-      }
-    }, [pathname]);
+  
 
 
   return (
     <>
-      {showHeader && (
+      
         <footer className="mx-auto flex max-w-screen-2xl items-center justify-between bg-gradient-to-r from-background to-background-secondary pt-16 pb-4">
         <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-5 gap-8 relative">
           {/* Company Info */}
@@ -147,7 +133,7 @@ const Footer: FC<Props> = ({ locale }) => {
         </div> */}
       </footer>
 
-      )}
+      
     </>
     
   );

@@ -14,6 +14,8 @@ import Loading from "../../../components/utils/Loading";
 import * as ics from 'ics';
 import { ConferenceTabs } from '../../../components/conference/ConferenceTabs';
 import { useSearchParams } from 'next/navigation'; //  USE THIS for query params
+import { Header } from '../../../components/utils/Header';
+import Footer from '../../../components/utils/Footer';
 
 type Conference = ConferenceResponse;
 
@@ -25,7 +27,7 @@ interface EventCardProps {
     conference: Conference; // Sử dụng ConferenceResponse type
 }
 
-const Detail: React.FC<EventCardProps> = () => {
+const Detail: React.FC<EventCardProps> = ({ locale }: { locale: string }) => {
   const t = useTranslations('');
 
   const searchParams = useSearchParams(); // Use useSearchParams
@@ -417,6 +419,7 @@ const Detail: React.FC<EventCardProps> = () => {
 
   return (
     <div>
+      <Header locale={locale} />
       {isLoading && <Loading />}
       {notFound && <NotFoundPage />}
       <div className='relative'>
@@ -607,6 +610,7 @@ const Detail: React.FC<EventCardProps> = () => {
           </div>
         }
       </div>
+      <Footer />
     </div>
     
     
