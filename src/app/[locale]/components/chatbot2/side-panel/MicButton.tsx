@@ -18,7 +18,7 @@ const MicButton: React.FC<MicButtonProps> = ({
   <div className="flex items-center gap-2">
     <button
       className={cn(
-        "flex items-center justify-center w-12 h-12 rounded-2xl text-xl transition-all duration-200 ease-in select-none relative z-10",
+        "flex items-center justify-center w-12 h-12 rounded-full text-xl transition-all duration-200 ease-in select-none relative z-10",
         {
           "bg-red-600 text-black hover:bg-red-400 focus:outline-2 focus:outline-red-500 focus:border-gray-800":
             !muted,
@@ -33,10 +33,10 @@ const MicButton: React.FC<MicButtonProps> = ({
       </span>
       {!muted && (
         <div
-          className="absolute inset-0 rounded-2xl bg-red-500 opacity-35 z-0 pointer-events-none transition-all duration-200 ease-in-out"
+          className="absolute inset-0 rounded-full bg-red-500 opacity-35 z-0 pointer-events-none transition-all duration-200 ease-in-out"
           style={{
-            top: `calc(var(--volume) * -1)`,
-            left: `calc(var(--volume) * -1)`,
+            top: `calc((var(--volume) * -1))`,
+            left: `calc((var(--volume) * -1))`,
             width: `calc(100% + var(--volume) * 2)`,
             height: `calc(100% + var(--volume) * 2)`,
           }}

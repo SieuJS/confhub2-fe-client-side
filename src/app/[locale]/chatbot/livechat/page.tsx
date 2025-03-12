@@ -20,7 +20,7 @@ function ChatBot2() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   return (
-    <div className="px-10 py-10 text-center text-2xl">
+    <div className="px-4 py-4 text-center text-2xl">
       <div className="py-6 bg-background w-full"></div>
       <LiveAPIProvider url={uri} apiKey={API_KEY}>
         <SidePanel

@@ -13,7 +13,7 @@ const ConnectionButton: React.FC<ConnectionButtonProps> = ({
 }) => (
   <button
     className={cn(
-      "flex items-center justify-center w-12 h-12 rounded-2xl border border-transparent text-xl transition-all duration-200 ease-in-out focus:outline-2 focus:outline-offset-2 select-none",
+      "flex items-center justify-center w-12 h-12 rounded-full border border-transparent text-xl transition-all duration-200 ease-in-out focus:outline-2 focus:outline-offset-2 select-none",
       {
         "bg-blue-800 text-blue-500 hover:bg-blue-600 hover:border-blue-500":
           connected,

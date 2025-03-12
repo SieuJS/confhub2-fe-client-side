@@ -1,11 +1,12 @@
-// AudioPlayer.tsx (REVISED)
+// AudioPlayer.tsx (FINAL REVISED with Styling)
 import React, { useState, useRef, useEffect } from 'react';
 import AudioPulse from '../audio-pulse/AudioPulse';
+import { debounce } from 'lodash';
 
 interface AudioPlayerProps {
   audioData: string;
   autoPlay?: boolean;
-  sampleRate: number; // Make sampleRate required
+  sampleRate: number;
 }
 
 const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false, sampleRate }) => {
@@ -13,20 +14,22 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false, 
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioBufferRef = useRef<AudioBuffer | null>(null);
   const bufferSourceRef = useRef<AudioBufferSourceNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
-  const volumeRef = useRef(1); // Store volume in a ref
+  const volumeRef = useRef(1);
 
-  // --- Audio Context Setup (with sampleRate) ---
+  // --- Audio Context Setup, Decode, Playback, Seek, Mute - No changes needed here ---
   useEffect(() => {
     try {
       audioContextRef.current = new AudioContext({ sampleRate });
       gainNodeRef.current = audioContextRef.current.createGain();
-      gainNodeRef.current.gain.value = volumeRef.current; // Initial volume
+      gainNodeRef.current.gain.value = volumeRef.current;
     } catch (error) {
       console.error("Failed to create AudioContext:", error);
+      setError("Failed to initialize audio.");
     }
 
     return () => {
@@ -34,54 +37,53 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false, 
     };
   }, [sampleRate]);
 
-  // --- Decode Audio Data & Buffer Setup ---
   useEffect(() => {
     if (!audioData || !audioContextRef.current) return;
 
     const decodeAndSetBuffer = async () => {
       try {
         const audioBuffer = await base64ToAudioBuffer(audioData, audioContextRef.current!);
-        if (!audioBuffer) return;
+        if (!audioBuffer) {
+          setError("Failed to decode audio data.");
+          return;
+        }
 
         audioBufferRef.current = audioBuffer;
         setDuration(audioBuffer.duration);
-        setCurrentTime(0); // Reset current time on new data
+        setCurrentTime(0);
+        setError(null);
 
         if (autoPlay) {
-          // Immediately play if autoPlay is true
           playFrom(0);
         }
       } catch (error) {
         console.error("Error decoding audio data:", error);
+        setError("Error decoding audio data.");
       }
     };
     decodeAndSetBuffer();
 
-    return () => { //Proper Cleanup
-        stopAndDisconnect();
-    }
-
+    return () => {
+      stopAndDisconnect();
+    };
   }, [audioData, autoPlay, sampleRate]);
 
-    const stopAndDisconnect = () => {
-     if (bufferSourceRef.current) {
-        try {
-            bufferSourceRef.current.stop();
-        } catch(e) {
-          //Source already stopped
-        }
-        bufferSourceRef.current.disconnect();
-        bufferSourceRef.current = null;
+  const stopAndDisconnect = () => {
+    if (bufferSourceRef.current) {
+      try {
+        bufferSourceRef.current.stop();
+      } catch (e) {
+        // Already stopped
       }
+      bufferSourceRef.current.disconnect();
+      bufferSourceRef.current = null;
     }
+  };
 
-
-  // --- Playback Logic ---
-    const playFrom = (startTime: number) => {
+  const playFrom = (startTime: number) => {
     if (!audioContextRef.current || !audioBufferRef.current || !gainNodeRef.current) return;
 
-    stopAndDisconnect(); // Ensure any previous source is stopped
-
+    stopAndDisconnect();
     const newSource = audioContextRef.current.createBufferSource();
     newSource.buffer = audioBufferRef.current;
     newSource.connect(gainNodeRef.current);
@@ -91,7 +93,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false, 
     newSource.onended = () => {
       setIsPlaying(false);
       setCurrentTime(0);
-      stopAndDisconnect(); // Clean up after playback
+      stopAndDisconnect();
     };
 
     try {
@@ -99,29 +101,32 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false, 
       setIsPlaying(true);
     } catch (error) {
       console.error("Failed to start playback:", error);
-      setIsPlaying(false); // Ensure isPlaying is false on error
+      setIsPlaying(false);
+      setError("Failed to start playback.");
     }
   };
 
   const togglePlay = () => {
     if (isPlaying) {
-        stopAndDisconnect();
-        setIsPlaying(false);
+      stopAndDisconnect();
+      setIsPlaying(false);
     } else {
       playFrom(currentTime);
     }
   };
 
-  // --- Seek Logic ---
+  const debouncedSeek = debounce((time: number) => {
+    setCurrentTime(time);
+    if (isPlaying) {
+      playFrom(time);
+    }
+  }, 250);
+
   const seek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const time = parseFloat(e.target.value);
-    setCurrentTime(time);
-     if (isPlaying) {
-          playFrom(time);
-      }
+    debouncedSeek(time);
   };
 
-  // --- Mute/Unmute Logic ---
   const toggleMute = () => {
     if (gainNodeRef.current) {
       if (gainNodeRef.current.gain.value > 0) {
@@ -134,14 +139,13 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false, 
     }
   };
 
-  // --- Helper Functions ---
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
-   const base64ToAudioBuffer = async (base64: string, context: AudioContext): Promise<AudioBuffer | null> => {
+  const base64ToAudioBuffer = async (base64: string, context: AudioContext): Promise<AudioBuffer | null> => {
     try {
       const binaryString = atob(base64);
       const len = binaryString.length;
@@ -149,61 +153,96 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioData, autoPlay = false, 
       for (let i = 0; i < len; i++) {
         bytes[i] = binaryString.charCodeAt(i);
       }
-       const int16View = new Int16Array(bytes.buffer);
-      const audioBuffer = context.createBuffer(1, int16View.length, context.sampleRate); //Use context sampleRate
+
+      const int16View = new Int16Array(bytes.buffer);
+      const audioBuffer = context.createBuffer(1, int16View.length, context.sampleRate);
       const channelData = audioBuffer.getChannelData(0);
 
-      // Convert Int16 samples to Float32 (-1.0 to 1.0)
       for (let i = 0; i < int16View.length; i++) {
-        channelData[i] = int16View[i] / 32768.0; // Correct scaling
+        channelData[i] = int16View[i] / 32768.0;
       }
-
       return audioBuffer;
     } catch (e) {
       console.error("Decode audio error", e);
       return null;
     }
   };
-
-  // --- Rendering ---
+  // --- Rendering (with updated styling) ---
   return (
     <div
-      className="flex items-center rounded-full bg-primary p-1 pl-2 pr-2"
+      className="flex items-center rounded-full bg-gray-100 dark:bg-gray-700 p-1 pl-2 pr-2"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <button onClick={togglePlay} className="audio-control rounded-full bg-button p-1 text-button-text hover:bg-button-secondary">
+      <button
+        onClick={togglePlay}
+        aria-label={isPlaying ? "Pause" : "Play"}
+        className="
+          flex items-center justify-center
+          w-8 h-8 rounded-full
+          bg-gray-300 dark:bg-gray-600
+          text-gray-700 dark:text-gray-300
+          hover:bg-gray-400 dark:hover:bg-gray-500
+          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
+      >
         {isPlaying ? (
           <span className="material-symbols-outlined">pause</span>
         ) : (
           <span className="material-symbols-outlined">play_arrow</span>
         )}
       </button>
-      <span className="audio-time ml-2 mr-2 text-sm text-text-secondary">
+
+      <span className="mx-2 text-xs text-gray-600 dark:text-gray-400">
         {formatTime(currentTime)} / {formatTime(duration)}
       </span>
-      <div className='relative flex-grow'>
+
+      <div className="relative flex-grow">
         <input
           type="range"
           min="0"
           max={duration}
           value={currentTime}
           onChange={seek}
-          className="audio-slider absolute top-0 z-10 h-full w-full appearance-none bg-transparent"
-          style={{ background: 'transparent' }}
+          className="
+            absolute top-0 left-2 z-10
+            w-full h-full
+            opacity-0 cursor-pointer"
         />
-        <div className='pointer-events-none absolute top-1/2 -translate-y-1/2'>
-          <AudioPulse active={isPlaying} volume={isPlaying ? volumeRef.current: 0} hover={isHovered} />
+        <div className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 w-full">
+          <AudioPulse active={isPlaying} volume={isPlaying ? volumeRef.current : 0} hover={isHovered} />
         </div>
       </div>
-      <button onClick={toggleMute} className="audio-control ml-2 rounded-full bg-button p-1 text-button-text hover:bg-button-secondary">
+
+      <button
+        onClick={toggleMute}
+        aria-label={volumeRef.current > 0 ? "Mute" : "Unmute"}
+        className="
+          flex items-center justify-center
+          w-7 h-7 rounded-full ml-8
+          bg-transparent text-gray-600 dark:text-gray-400
+          hover:bg-gray-200 dark:hover:bg-gray-600
+          focus:outline-none
+          transition-colors"
+      >
         <span className="material-symbols-outlined">
           {volumeRef.current > 0 ? "volume_up" : "volume_off"}
         </span>
       </button>
-      <button className="audio-control ml-2 rounded-full bg-button p-1 text-button-text hover:bg-button-secondary">
+
+      {/* Optional "More" Button -  Implement functionality as needed */}
+      <button
+        className="
+            flex items-center justify-center
+            w-7 h-7 rounded-full ml-1
+            bg-transparent text-gray-600 dark:text-gray-400
+            hover:bg-gray-200 dark:hover:bg-gray-600
+            focus:outline-none
+            transition-colors"
+      >
         <span className="material-symbols-outlined">more_vert</span>
       </button>
+
+      {error && <div className="text-red-500 text-xs mt-1">{error}</div>}
     </div>
   );
 };

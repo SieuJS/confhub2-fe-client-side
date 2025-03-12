@@ -288,3 +288,26 @@
   }
 }
 */
+
+
+@layer components {
+  @keyframes hover {
+    from {
+      transform: translateY(0);
+    }
+  
+    to {
+      transform: translateY(-3.5px);
+    }
+  }
+  
+  @keyframes pulse {
+    from {
+      scale: 1 1;
+    }
+  
+    to {
+      scale: 1.2 1.2;
+    }
+  }
+}

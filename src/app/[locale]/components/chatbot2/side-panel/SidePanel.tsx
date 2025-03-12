@@ -1,4 +1,3 @@
-// SidePanel.tsx (đã chỉnh sửa)
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useLiveAPIContext } from "../contexts/LiveAPIContext";
@@ -18,6 +17,8 @@ import ConnectionButton from "./ConnectionButton";
 import MicButton from "./MicButton";
 import MediaStreamButton from "./MediaStreamButton";
 import ReactModal from 'react-modal';
+import ChatIntroduction from "./ChatIntroduction"; // Import the updated component
+
 
 const useVideoStreamPopup = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -41,42 +42,42 @@ const VideoPopup: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-      if (videoRef.current && stream) {
-          videoRef.current.srcObject = stream;
-      }
+    if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+    }
   }, [stream]);
 
   return (
-      <ReactModal
-          isOpen={modalIsOpen}
-          onRequestClose={closeModal}
-          contentLabel="Video Stream"
-          className={{
-              base: 'fixed bg-white/90 rounded-2xl shadow-xl', // Thay đổi ở đây
-              afterOpen: '',
-              beforeClose: ''
-          }}
-          style={{
-              overlay: { backgroundColor: 'rgba(0, 0, 0, 0.25)' }, // Mờ nền nhẹ
-              content: {
-                  ...modalPosition,
-                  border: 'none', // Loại bỏ border
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',  // Thêm đổ bóng nhẹ
-              },
-          }}
-          shouldCloseOnOverlayClick={false}
-          closeTimeoutMS={200}
-      >
-          <div className="relative">
-              <video ref={videoRef} autoPlay playsInline className="w-full h-full rounded-xl" style={{ width: '320px', height: '240px' }} />
-              <button
-                  onClick={closeModal}
-                  className="absolute top-1 right-1 p-1 bg-gray-200 text-gray-600 rounded-full hover:bg-gray-300 focus:outline-none transition-all duration-200"
-                  title="Close">
-                  × {/* Giữ nguyên icon "x" */}
-              </button>
-          </div>
-      </ReactModal>
+    <ReactModal
+      isOpen={modalIsOpen}
+      onRequestClose={closeModal}
+      contentLabel="Video Stream"
+      className={{
+        base: 'fixed bg-white/90 rounded-2xl shadow-xl',
+        afterOpen: '',
+        beforeClose: ''
+      }}
+      style={{
+        overlay: { backgroundColor: 'rgba(0, 0, 0, 0.25)' },
+        content: {
+          ...modalPosition,
+          border: 'none',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        },
+      }}
+      shouldCloseOnOverlayClick={false}
+      closeTimeoutMS={200}
+    >
+      <div className="relative">
+        <video ref={videoRef} autoPlay playsInline className="w-full h-full rounded-xl" style={{ width: '320px', height: '240px' }} />
+        <button
+          onClick={closeModal}
+          className="absolute top-1 right-1 p-1 bg-gray-200 text-gray-600 rounded-full hover:bg-gray-300 focus:outline-none transition-all duration-200"
+          title="Close">
+          ×
+        </button>
+      </div>
+    </ReactModal>
   );
 };
 export default function SidePanel({
@@ -99,10 +100,14 @@ export default function SidePanel({
   const [audioRecorder] = useState(() => new AudioRecorder());
   const [muted, setMuted] = useState(false);
   const { openModal } = useVideoStreamPopup();
+  // const [hasLog, setHasLog] = useState(false); // No longer the primary control
+  const [hasInteracted, setHasInteracted] = useState(false); // New state
 
+  // Remove hasMounted and related logic
 
   useEffect(() => {
     ReactModal.setAppElement(':root');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const changeStreams = (next?: { start: () => Promise<MediaStream>, stop: () => void }) => async () => {
     let newStream: MediaStream | null = null;
@@ -111,7 +116,7 @@ export default function SidePanel({
       setActiveVideoStream(newStream);
       onVideoStreamChange(newStream);
 
-      if (supportsVideo) {
+      if (supportsVideo && newStream) { // Check newStream before opening
         openModal(newStream);
       }
     } else {
@@ -143,58 +148,101 @@ export default function SidePanel({
     if (textInput.trim() === "") {
       return;
     }
+    setHasInteracted(true); // User has interacted
     client.send([{ text: textInput }]);
     log({ date: new Date(), type: "send.text", message: textInput });
+    // setHasLog(true);  // Still update hasLog for the Logger
   };
+
+  // useEffect(() => { // Simplified useEffect
+  //     if (!hasMounted.current) {
+  //         // Initial render:  Check the *initial* log length.
+  //         hasMounted.current = true;
+  //         setHasLog(log.length > 0); // If there are initial logs, hide the intro.
+  //     } else {
+  //         // Subsequent renders: Update based on whether the log has entries.
+  //         setHasLog(log.length > 0);
+  //     }
+  // }, [log]); // Depend on the log.  This useEffect runs whenever the log changes.
+
+
+
+  const handleStartVoice = () => {
+    if (!connected) {
+      connect();
+    }
+    setHasInteracted(true); // User has interacted
+    setMuted(false);
+  };
+
+  const handleStartWebcam = () => {
+    if (!connected) {
+      connect();
+    }
+    setHasInteracted(true); // User has interacted
+    changeStreams(webcam)();
+    if (webcam.stream) {
+      openModal(webcam.stream)
+    }
+  };
+
+  const handleStartScreenShare = () => {
+    if (!connected) {
+      connect();
+    }
+
+    setHasInteracted(true);  // User has interacted
+    changeStreams(screenCapture)();
+    if (screenCapture.stream) {
+      openModal(screenCapture.stream);
+    }
+  };
+
+
 
   return (
     <>
       <VideoPopup />
-      <div className="flex flex-col h-screen bg-gray-100 text-gray-700 rounded-2xl"> {/* Thay đổi ở đây */}
-        {/* Top Bar */}
-        <div className="flex items-center justify-between px-4 py-2 bg-gray-200 rounded-t-2xl"> {/* Thay đổi ở đây */}
-          <h1 className="text-xl font-semibold">Live Console</h1>
-        </div>
+      <div className="flex flex-col h-screen bg-white text-gray-700 rounded-2xl p-2 m-4 shadow-xl">
+       
 
         {/* Logger Area */}
-        <div className="flex-grow overflow-y-auto p-5" ref={loggerRef}> {/* Thay đổi ở đây */}
-          <Logger filter="none" />
+        <div className="flex-grow overflow-y-auto p-5" ref={loggerRef}>
+          {/* Show introduction only if NOT connected AND NOT interacted */}
+          {!connected && !hasInteracted ? (
+            <ChatIntroduction
+              onStartVoice={handleStartVoice}
+              onStartWebcam={handleStartWebcam}
+              onStartScreenShare={handleStartScreenShare}
+            />
+          ) : (
+            <Logger filter="none" /> // Show the Logger once connected or interacted
+          )}
         </div>
 
         {/* Combined Input Area */}
-        <div className="p-3 bg-gray-200 rounded-b-2xl"> {/* Thay đổi ở đây */}
-          <div className="flex gap-2 rounded-xl p-2 bg-gray-100 items-center"> {/* Thay đổi ở đây */}
-            <ConnectionButton
-              connected={connected}
-              connect={connect}
-              disconnect={disconnect}
-            />
-            <MicButton
-              muted={muted}
-              setMuted={setMuted}
-              volume={volume}
-              connected={connected}
-            />
-            {supportsVideo && (
-              <>
-                <MediaStreamButton
-                  isStreaming={screenCapture.isStreaming}
-                  start={changeStreams(screenCapture)}
-                  stop={changeStreams()}
-                  onIcon="cancel_presentation"
-                  offIcon="present_to_all"
-                />
-                <MediaStreamButton
-                  isStreaming={webcam.isStreaming}
-                  start={changeStreams(webcam)}
-                  stop={changeStreams()}
-                  onIcon="videocam_off"
-                  offIcon="videocam"
-                />
-              </>
-            )}
-            <ChatInput onSendMessage={handleSendMessage} />
-          </div>
+        <div className="flex gap-2 rounded-full border border-gray-300 p-2 bg-gray-100 items-center">
+          <ConnectionButton connected={connected} connect={connect} disconnect={disconnect} />
+          <MicButton muted={muted} setMuted={setMuted} volume={volume} connected={connected} />
+          {supportsVideo && (
+            <>
+              <MediaStreamButton
+                isStreaming={screenCapture.isStreaming}
+                start={changeStreams(screenCapture)}
+                stop={changeStreams()}
+                onIcon="cancel_presentation"
+                offIcon="present_to_all"
+              />
+              <MediaStreamButton
+                isStreaming={webcam.isStreaming}
+                start={changeStreams(webcam)}
+                stop={changeStreams()}
+                onIcon="videocam_off"
+                offIcon="videocam"
+              />
+            </>
+          )}
+          <ChatInput onSendMessage={handleSendMessage} />
         </div>
       </div>
     </>

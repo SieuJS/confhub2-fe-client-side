@@ -1,4 +1,4 @@
-// LogEntry.tsx
+// LogEntry.tsx (Minor Adjustments for Clarity)
 import React, { ReactNode } from "react";
 import cn from "classnames";
 import { StreamingLog } from "../multimodal-live-types";
@@ -16,29 +16,19 @@ type LogEntryProps = {
 };
 
 const LogEntry: React.FC<LogEntryProps> = ({ log, MessageComponent }): JSX.Element => {
-  // Determine if the message is from the user (send) or the system (receive)
   const isUserMessage = log.type.startsWith("send");
 
   return (
     <li
       className={cn(
-        "mb-4", // Margin between messages
-        isUserMessage ? "float-right clear-both" : "float-left clear-both" // Float right for user, left for system
+        "mb-4",
+        isUserMessage ? "float-right clear-both" : "float-left clear-both"
       )}
     >
-      <div
-        className={cn(
-          "p-3 rounded-lg max-w-[70%]", // Padding, rounded corners, max-width
-          isUserMessage ? "bg-blue-500 text-white ml-auto" : "bg-gray-700 text-gray-200 mr-auto" // Styling based on sender
-        )}
-      >
-        <div className="text-xs text-gray-400">
-          {/* Display the time above the message */}
+        {/* <div className="text-xs text-gray-400">
           {formatTime(log.date)} - {log.type}
-        </div>
+        </div> */}
         <MessageComponent message={log.message} />
-        {log.count && <span className="text-xs text-gray-400 ml-2">({log.count})</span>}
-      </div>
     </li>
   );
 };
