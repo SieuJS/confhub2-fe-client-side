@@ -39,10 +39,7 @@ const MessageRenderer = ({ message }: { message: StreamingLog["message"] }) => {
     return <ServerAudioLog message={message} />;
   }
 
-  if (typeof message === "string") {
-    console.log("PlainTextMessage", message);
-    return <PlainTextMessage message={message} />;
-  }
+  
   if (isClientContentMessage(message)) {
     console.log("isClientContentMessage", message);
 
@@ -72,7 +69,10 @@ const MessageRenderer = ({ message }: { message: StreamingLog["message"] }) => {
       return <ModelTurnLog message={message} />;
     }
   }
-
+  if (typeof message === "string") {
+    console.log("PlainTextMessage", message);
+    return <PlainTextMessage message={message} />;
+  }
   return <AnyMessage message={message} />;
 };
 
