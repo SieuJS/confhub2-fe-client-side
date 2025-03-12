@@ -1,11 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const AIFAQ: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<'getting-started' | 'functionality-features' | 'general'>('getting-started');
   const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
   const [titleVisible, setTitleVisible] = useState(false);
+  const faqRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false); // New state for hover effect
+
 
   type CategoryKey = 'getting-started' | 'functionality-features' | 'general';
 
@@ -65,17 +68,41 @@ const AIFAQ: React.FC = () => {
   };
 
   useEffect(() => {
-    // Trigger the animation after the component mounts
-    setTimeout(() => {
-      setTitleVisible(true);
-    }, 100); // A small delay to ensure component is mounted
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setTitleVisible(true);
+            observer.unobserve(entry.target); // Stop observing once visible
+          }
+        });
+      },
+      {
+        root: null, // Use the viewport as the root
+        threshold: 0.2, // Trigger when 20% of the element is visible
+      }
+    );
+
+    if (faqRef.current) {
+      observer.observe(faqRef.current);
+    }
+
+    return () => {
+      if (faqRef.current) {
+        observer.unobserve(faqRef.current);
+      }
+    };
   }, []);
 
 
-  const titleClasses = `text-4xl font-semibold text-gray-100 mt-2 transition-opacity duration-500 ${titleVisible ? 'opacity-100' : 'opacity-0'}`;
+  const titleClasses = `text-4xl font-semibold text-gray-100 mt-2 transition-opacity duration-1000 transition-transform duration-1000 ${titleVisible || isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-[-20px]'}`;
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen py-12 px-6">
+    <div className="bg-gray-900 text-white min-h-screen py-12 px-6"
+        ref={faqRef}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="container mx-auto">
         {/* Title */}
         <div className="mb-12">
