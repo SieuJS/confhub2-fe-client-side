@@ -1,7 +1,6 @@
-<link
-  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
-  rel="stylesheet"
-/>
+
+
+
 
 import { ThemeProvider } from '@/src/app/[locale]/components/utils/ThemeProvider';
 import type { Metadata } from 'next';
@@ -41,6 +40,7 @@ export default function RootLayout({
   params: { locale: string };
 }) {
   const messages = useMessages();
+  
   return (
     <html
       lang={locale}
@@ -87,7 +87,7 @@ export default function RootLayout({
             />
             <Header locale={locale} />
             <main className="mx-auto max-w-screen-2xl ">{children}</main>
-            <Footer />
+            <Footer locale={locale}/>
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>

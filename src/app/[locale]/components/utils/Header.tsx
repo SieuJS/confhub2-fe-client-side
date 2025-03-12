@@ -6,6 +6,7 @@ import GithubIcon from '../../../icons/github'
 import LogoIcon from '../../../icons/logo'
 import LangSwitcher from './LangSwitcher'
 import ThemeSwitch from './ThemeSwitch'
+import { usePathname } from 'next/navigation'; // Import usePathname
 
 interface Props {
   locale: string
@@ -16,6 +17,10 @@ export const Header: FC<Props> = ({ locale }) => {
   const headerRef = useRef<HTMLDivElement>(null);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname(); // Get current pathname
+
+  const [showHeader, setShowHeader] = useState(true); // State to control header visibility
+
 
   const toggleNotification = () => {
     setIsNotificationOpen(!isNotificationOpen);
@@ -50,6 +55,17 @@ export const Header: FC<Props> = ({ locale }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isNotificationOpen, isMobileMenuOpen, headerRef]);
+
+
+  useEffect(() => {
+    // Check if the current path is /en/chatbot or /chatbot. Adjust as needed.
+    if (pathname === `/${locale}/chatbot` || pathname === '/chatbot') {
+      setShowHeader(false);
+    } else {
+      setShowHeader(true);
+    }
+  }, [pathname]);
+
 
 
   const NotificationIcon = () => (
@@ -130,83 +146,87 @@ export const Header: FC<Props> = ({ locale }) => {
 
 
   return (
-    <div
-      ref={headerRef}
-      className={`mx-auto flex max-w-screen-2xl flex-row items-center justify-between p-3 bg-gradient-to-r from-background to-background-secondary transition-all duration-300 ease-in-out
-        fixed top-0 left-0 right-0 z-50 shadow-md
+    <>
+      {showHeader && ( // Conditionally render the header
+        <div
+          ref={headerRef}
+          className={`mx-auto flex max-w-screen-2xl flex-row items-center justify-between p-3 bg-gradient-to-r from-background to-background-secondary transition-all duration-300 ease-in-out
+        fixed top-0 left-0 right-0 z-40 shadow-md
       `}
-      style={{ height: '60px' }} // Reduced height
-    >
-      <Link lang={locale} href='/'>
-        <div className='flex flex-row items-center'>
-          <div className='mb-2 h-10 w-10'> {/* Reduced logo size */}
-            <LogoIcon />
+          style={{ height: '60px' }} // Reduced height
+        >
+          <Link lang={locale} href='/'>
+            <div className='flex flex-row items-center'>
+              <div className='mb-2 h-10 w-10'> {/* Reduced logo size */}
+                <LogoIcon />
+              </div>
+              <strong className='mx-2 select-none'>ConFHub</strong>
+            </div>
+          </Link>
+          <div className='flex flex-row items-center gap-3 relative'>
+            {/* Navigation for larger screens - Hiển thị trên sm trở lên */}
+            <nav className='mr-10  gap-5 sm:inline-flex hidden'> {/* Ẩn mặc định, hiển thị trên sm */}
+              <Link lang={locale} href={`/conferences`} style={{ fontWeight: 'bold' }}>
+                {t('Conferences')}
+              </Link>
+              <Link lang={locale} href={`/journals`} style={{ fontWeight: 'bold' }}>
+                {t('Journals')}
+              </Link>
+              <Link lang={locale} href={`/setting`} style={{ fontWeight: 'bold' }}>
+                {t('Setting')}
+              </Link>
+              <Link lang={locale} href={`/chatbot`} style={{ fontWeight: 'bold' }}>
+                {t('Chatbot')}
+              </Link>
+              <Link lang={locale} href={`/chatbot2`} style={{ fontWeight: 'bold' }}>
+                Chatbot2
+              </Link>
+              <Link lang={locale} href={`/support`} style={{ fontWeight: 'bold' }}>
+                {t('Support')}
+              </Link>
+              <Link lang={locale} href={`/addconference`} style={{ fontWeight: 'bold' }}>
+                Add Conference
+              </Link>
+              <Link lang={locale} href={`/about`} style={{ fontWeight: 'bold' }}>
+                {t('About')}
+              </Link>
+              <Link lang={locale} href={`/other`} style={{ fontWeight: 'bold' }}>
+                {t('Other')}
+              </Link>
+            </nav>
+
+            {/* Mobile Menu Button - Chỉ hiển thị trên màn hình nhỏ (dưới sm) */}
+            <button
+              className='sm:hidden block' // Hiển thị mặc định, ẩn trên sm
+              onClick={toggleMobileMenu}
+            >
+              {isMobileMenuOpen ? (
+                <CloseIcon />
+              ) : (
+                <MenuIcon />
+              )}
+            </button>
+
+            <ThemeSwitch />
+            <LangSwitcher />
+            <button className='' onClick={toggleNotification}>
+              <div className='size-8 items-center justify-center relative'>
+                <NotificationIcon />
+              </div>
+            </button>
+            <a
+              href='https://github.com/yahyaparvar/nextjs-template'
+              target='_blank'
+            >
+              <div className='size-8'>
+                <GithubIcon />
+              </div>
+            </a>
+            <NotificationDropdown />
+            <MobileNavigation /> {/* Mobile navigation dropdown - Chỉ hiển thị khi menu mobile mở và trên màn hình nhỏ */}
           </div>
-          <strong className='mx-2 select-none'>ConFHub</strong>
         </div>
-      </Link>
-      <div className='flex flex-row items-center gap-3 relative'>
-        {/* Navigation for larger screens - Hiển thị trên sm trở lên */}
-        <nav className='mr-10  gap-5 sm:inline-flex hidden'> {/* Ẩn mặc định, hiển thị trên sm */}
-          <Link lang={locale} href={`/conferences`} style={{ fontWeight: 'bold' }}>
-            {t('Conferences')}
-          </Link>
-          <Link lang={locale} href={`/journals`} style={{ fontWeight: 'bold' }}>
-            {t('Journals')}
-          </Link>
-          <Link lang={locale} href={`/setting`} style={{ fontWeight: 'bold' }}>
-            {t('Setting')}
-          </Link>
-          <Link lang={locale} href={`/chatbot`} style={{ fontWeight: 'bold' }}>
-            {t('Chatbot')}
-          </Link>
-          <Link lang={locale} href={`/chatbot2`} style={{ fontWeight: 'bold' }}>
-            Chatbot2
-          </Link>
-          <Link lang={locale} href={`/support`} style={{ fontWeight: 'bold' }}>
-            {t('Support')}
-          </Link>
-          <Link lang={locale} href={`/addconference`} style={{ fontWeight: 'bold' }}>
-            Add Conference
-          </Link>
-          <Link lang={locale} href={`/about`} style={{ fontWeight: 'bold' }}>
-            {t('About')}
-          </Link>
-          <Link lang={locale} href={`/other`} style={{ fontWeight: 'bold' }}>
-            {t('Other')}
-          </Link>
-        </nav>
-
-        {/* Mobile Menu Button - Chỉ hiển thị trên màn hình nhỏ (dưới sm) */}
-        <button
-          className='sm:hidden block' // Hiển thị mặc định, ẩn trên sm
-          onClick={toggleMobileMenu}
-        >
-          {isMobileMenuOpen ? (
-            <CloseIcon />
-          ) : (
-            <MenuIcon />
-          )}
-        </button>
-
-        <ThemeSwitch />
-        <LangSwitcher />
-        <button className='' onClick={toggleNotification}>
-          <div className='size-8 items-center justify-center relative'>
-            <NotificationIcon />
-          </div>
-        </button>
-        <a
-          href='https://github.com/yahyaparvar/nextjs-template'
-          target='_blank'
-        >
-          <div className='size-8'>
-            <GithubIcon />
-          </div>
-        </a>
-        <NotificationDropdown />
-        <MobileNavigation /> {/* Mobile navigation dropdown - Chỉ hiển thị khi menu mobile mở và trên màn hình nhỏ */}
-      </div>
-    </div>
+      )}
+    </>
   )
 }
