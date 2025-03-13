@@ -2,7 +2,7 @@ import React from 'react';
 import Button from './Button';
 import Link from 'next/link';
 
-const NotFoundPage: React.FC = () => {
+const NotFoundPage = () => {
   return (
     <div className="bg-gradient-to-r from-background to-background-secondary min-h-screen flex items-center justify-center">
       <div className="text-center">
