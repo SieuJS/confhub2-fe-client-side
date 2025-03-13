@@ -1,6 +1,6 @@
-// SidePanel.tsx
+// SidePanel.tsx (Modified)
 "use client";
-import { useRef, useState, useEffect } from "react";  // Import useEffect
+import { useRef, useState, useEffect } from "react";
 import { useLiveAPIContext } from "../contexts/LiveAPIContext";
 import { useLoggerStore } from "../lib/store-logger";
 import Logger from "../logger/Logger";
@@ -20,8 +20,8 @@ import MediaStreamButton from "./MediaStreamButton";
 import ChatIntroduction from "./ChatIntroduction";
 import RestartStreamButton from "./RestartStreamButton";
 import ConnectionStatus from "./ConnectionStatus";
-import { VideoStreamPopup } from "./VideoStreamPopup";  // Import the popup
-import useConnection from "../hooks/useConnection";        // Import the new hooks
+import { VideoStreamPopup } from "./VideoStreamPopup";
+import useConnection from "../hooks/useConnection";
 import useStreamSwitching from "../hooks/useStreamSwitching";
 import useInteractionHandlers from "../hooks/useInteractionHandlers";
 import useTimer from "../hooks/useTimer";
@@ -36,7 +36,7 @@ export default function SidePanel({
     supportsVideo: boolean;
     onVideoStreamChange: (stream: MediaStream | null) => void;
 }) {
-    const {  client, volume, on, off } = useLiveAPIContext(); // Only get what you need
+    const {  client, volume, on, off } = useLiveAPIContext();
     const loggerRef = useRef<HTMLDivElement>(null);
     const { log, clearLogs } = useLoggerStore(); // Get clearLogs
 
@@ -65,8 +65,8 @@ export default function SidePanel({
 
     const { handleSendMessage, handleStartVoice, handleStartWebcam, handleStartScreenShare } = useInteractionHandlers({
         connected,
-        connectWithPermissions, // Pass the function down
-        changeStreams,        // Pass the function down
+        connectWithPermissions,
+        changeStreams,
         setMuted,
         webcam,
         screenCapture,
@@ -74,6 +74,14 @@ export default function SidePanel({
         client,
         log
     });
+
+    // Clear logs whenever 'connected' changes to true (new connection)
+    useEffect(() => {
+        if (connected) {
+            clearLogs();
+        }
+    }, [connected, clearLogs]); // Add clearLogs to the dependency array
+
 
      useEffect(() => {
         // Set hasInteracted to true on any interaction
@@ -92,7 +100,7 @@ export default function SidePanel({
         <>
             <VideoStreamPopup />
 
-            <div className="flex flex-col h-screen bg-white text-gray-700 rounded-2xl p-2">
+            <div className="flex flex-col h-screen bg-white text-gray-700 rounded-2xl p-4">
                 {/* Logger Area */}
                 <div className="flex-grow overflow-y-auto" ref={loggerRef}>
                     {!connected && !hasInteracted ? (

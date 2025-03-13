@@ -12,7 +12,7 @@ function AltairComponent() {
     setConfig({
       model: "models/gemini-2.0-flash-exp",
       generationConfig: {
-        responseModalities: "audio", // Nếu bạn muốn phản hồi bằng giọng nói
+        responseModalities: "text", // Nếu bạn muốn phản hồi bằng giọng nói
         speechConfig: {
           voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } },
         },

@@ -1,8 +1,8 @@
-// hooks/useInteractionHandlers.ts
-
+// hooks/useInteractionHandlers.ts (Corrected)
 import { useLiveAPIContext } from "../contexts/LiveAPIContext";
 import { useLoggerStore } from "../lib/store-logger";
 import { AudioRecorder } from "../lib/audio-recorder"; // If needed within these handlers
+import { ClientContentMessage } from "../multimodal-live-types"; // Import ClientContentMessage
 
 interface InteractionHandlersProps {
     connected: boolean;
@@ -33,8 +33,22 @@ const useInteractionHandlers = ({
         if (!connected || textInput.trim() === "") {
             return;
         }
-        client.send([{ text: textInput }]);
-        log({ date: new Date(), type: "send.text", message: textInput });
+        const parts = [{ text: textInput }];
+        client.send(parts);
+
+        // Create a proper ClientContentMessage for logging
+        const clientContentMessage: ClientContentMessage = {
+            clientContent: {
+                turns: [{ role: "user", parts }],
+                turnComplete: true, // Important: Indicate the turn is complete
+            },
+        };
+
+        log({
+            date: new Date(),
+            type: "send.text",
+            message: clientContentMessage,  // Log the full object
+        });
     };
 
     const handleStartVoice = async () => {

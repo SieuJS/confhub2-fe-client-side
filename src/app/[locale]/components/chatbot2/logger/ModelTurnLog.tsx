@@ -19,7 +19,7 @@ const ModelTurnLog: React.FC<ModelTurnLogProps> = ({ message }): JSX.Element => 
     .join("");
 
   return (
-    <div className="bg-green-50 rounded-lg p-4 shadow-md">
+    <div className="m-4 bg-green-100 rounded-lg p-4 shadow-md">
       <h4 className="text-lg font-semibold text-green-700 mb-2">Model</h4>
       {/* Render combined text */}
       {combinedText && <p className="part part-text">{combinedText}</p>}
