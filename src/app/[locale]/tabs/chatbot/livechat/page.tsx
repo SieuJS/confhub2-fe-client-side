@@ -20,6 +20,7 @@ function ChatBot2() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   return (
+    <div className="px-10 max-h-3/4">
       <LiveAPIProvider url={uri} apiKey={API_KEY}>
         <SidePanel
           videoRef={videoRef}
@@ -39,6 +40,9 @@ function ChatBot2() {
           />
         </div>
       </LiveAPIProvider>
+      {/* <div className="mt-4"></div> */}
+
+      </div>
   );
 }
 

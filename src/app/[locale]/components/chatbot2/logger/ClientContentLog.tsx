@@ -3,15 +3,16 @@ import React from "react";
 import { ClientContentMessage } from "../multimodal-live-types";
 import RenderPart from "./RenderPart";
 
+// FIX: Use the correct type for the message prop
 type ClientContentLogProps = {
-  message: ClientContentMessage;
+  message: ClientContentMessage['clientContent']; // Corrected type
 };
 
 const ClientContentLog: React.FC<ClientContentLogProps> = ({ message }) => {
-  const { turns, turnComplete } = message.clientContent;
+  const { turns, turnComplete } = message;  // Destructure directly
 
   return (
-    <div className="bg-gray-50 rounded-lg p-4 shadow-md">
+    <div className="m-4 bg-blue-100 rounded-lg p-4 shadow-md">
       <h4 className="text-lg font-semibold text-blue-600 mb-2">User</h4>
       {turns.map((turn, i) => (
         <div key={`message-turn-${i}`} className="mb-4 last:mb-0">

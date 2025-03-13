@@ -10,8 +10,8 @@ import {
   isInterrupted,
   isTurnComplete,
   isModelTurn,
-    isClientAudioMessage,
-    isServerAudioMessage,
+  isClientAudioMessage,
+  isServerAudioMessage,
 } from "../multimodal-live-types";
 import ClientContentLog from "./ClientContentLog";
 import ToolCallLog from "./ToolCallLog";
@@ -39,11 +39,10 @@ const MessageRenderer = ({ message }: { message: StreamingLog["message"] }) => {
     return <ServerAudioLog message={message} />;
   }
 
-  
-  if (isClientContentMessage(message)) {
-    console.log("isClientContentMessage", message);
 
-    return <ClientContentLog message={message} />;
+  if (isClientContentMessage(message)) {
+    // FIX: Pass message.clientContent, not the whole message
+    return <ClientContentLog message={message.clientContent} />;
   }
   if (isToolCallMessage(message)) {
     return <ToolCallLog message={message} />;
