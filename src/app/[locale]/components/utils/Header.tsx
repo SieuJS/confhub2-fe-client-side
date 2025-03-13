@@ -18,8 +18,6 @@ export const Header: FC<Props> = ({ locale }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname(); // Get current pathname
-  // Check if current path included '/tabs/conferences'
-  const conferencesActive = pathname.includes('/tabs/conferences');
 
   const toggleNotification = () => {
     setIsNotificationOpen(!isNotificationOpen);
@@ -78,7 +76,7 @@ export const Header: FC<Props> = ({ locale }) => {
             Notification 3: Reminder for conference call
           </div>
           <div className="px-4 py-2 text-sm text-foreground hover:bg-button/10 text-center border-t border-border">
-            <Link href="/tabs/setting" lang={locale} onClick={closeNotification} className="text-button hover:underline block">
+            <Link href={{ pathname: "/tabs/setting", query: { tab: "notifications" } }} lang={locale} onClick={closeNotification} className="text-button hover:underline block">
               {t('View all notifications')}
             </Link>
           </div>
