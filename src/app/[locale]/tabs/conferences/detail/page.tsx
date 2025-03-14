@@ -32,42 +32,17 @@ const Detail: React.FC<EventCardProps> = ({ locale }: { locale: string }) => {
 
   const searchParams = useSearchParams(); // Use useSearchParams
   const id = searchParams.get('id');  // Get the 'id' parameter
-  const [conferenceData, setConferenceData] = useState<Conference | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
   const [openMenu, setOpenMenu] = useState<"share" | "calendar" | null>(null); // State chung
   const shareButtonRef = useRef<HTMLButtonElement>(null);
   const [updating, setUpdating] = useState(false); // Track if update is in progress
   const [error, setError] = useState<string | null>(null);
-  const [notFound, setNotFound] = useState(false);
 
-  useEffect(() => { // Start filtering from the loaded conferenceList
-    
-    async function fetchData() {
-        if (conferenceList == null)
-            setNotFound(true);
-        else
-        {
-            // Apply filters
-            if (id !== null) {
-                let filteredEvent = conferenceList.find(conf => conf.id.toString() === id);
-                if (filteredEvent)
-                {
-                  setConferenceData(filteredEvent as Conference);
-                }
-                else
-                  setNotFound(true);
-            }
-            else
-            {
-                setNotFound(true);
-            }
-        }
-        
-    }
-    fetchData();
-    setIsLoading(false);
-}, [id]);
+  const conference: ConferenceResponse | undefined = conferenceList.find(
+      conf => conf.id.toString() === id
+    ) as ConferenceResponse | undefined;
+
+  const [conferenceData, setConferenceData] = useState<ConferenceResponse | undefined>(conference);
 
     const handleFollowClick = () => {
         setIsFollowing(!isFollowing);
@@ -78,7 +53,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: { locale: string }) => {
         // const startDate = conferenceDates?.startDate;
         // const endDate = conferenceDates?.endDate;
 
-        const shareText = `📢 ${conferenceData.name}\n📅 Thời gian: ${ conferenceData.conferenceDates} \n📍 Địa điểm: ${conferenceData.location}\n🔗 Chi tiết: ${conferenceData.link}`;
+        const shareText = `📢 ${conferenceData.name}\n📅 Thời gian: ${ conferenceDates} \n📍 Địa điểm: ${conferenceData.location}\n🔗 Chi tiết: ${conferenceData.link}`;
         const shareUrl = encodeURIComponent(conferenceData.link || window.location.href);
         const encodedText = encodeURIComponent(shareText);
 
@@ -203,7 +178,6 @@ const Detail: React.FC<EventCardProps> = ({ locale }: { locale: string }) => {
       }
   }
     function createGoogleCalendarLink(conference: Conference) {
-        const conferenceDates = conference.conferenceDates; // Find main conference dates
         const { startDate, endDate } = parseConferenceDates(conference.conferenceDates);
         // const startDate = conferenceDates?.startDate;
         // const endDate = conferenceDates?.endDate;
@@ -233,7 +207,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: { locale: string }) => {
         // const conferenceDates = conference.conferenceDates.find(date => date.dateName === "Conference Dates"); // Find main conference dates
         // const startDate = conferenceDates?.startDate;
         // const endDate = conferenceDates?.endDate;
-        const conferenceDates = conferenceData.conferenceDates;
+        const conferenceDates = conference.conferenceDates;
         const { startDate, endDate } = parseConferenceDates(conferenceDates);
         // const startDateObj = startDate ? new Date(startDate + 'T00:00:00') : new Date(); // Default to current date if not found
         // const endDateObj = endDate ? new Date(endDate + 'T23:59:59') : new Date();     // Default to current date if not found
@@ -258,9 +232,9 @@ const Detail: React.FC<EventCardProps> = ({ locale }: { locale: string }) => {
             start: start as ics.DateArray,
             end: end as ics.DateArray,
             title: conference.name,
-            description: `📢 ${conferenceData.name}\n📅 Thời gian: ${startDate && endDate ? `${startDate} - ${endDate}` : 'Dates not available'}\n📍 Địa điểm: ${conference.location}\n🔗 Chi tiết: ${conference.link}`,
+            description: `📢 ${conference.name}\n📅 Thời gian: ${startDate && endDate ? `${startDate} - ${endDate}` : 'Dates not available'}\n📍 Địa điểm: ${conference.location}\n🔗 Chi tiết: ${conference.link}`,
             location: conference.location,
-            url: conferenceData.link,
+            url: conference.link,
             organizer: { name: 'Conference Organizer' }, // Add organizer info if available
             status: 'CONFIRMED',
             busyStatus: 'BUSY',
@@ -420,8 +394,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: { locale: string }) => {
   return (
     <div>
       <Header locale={locale} />
-      {isLoading && <Loading />}
-      {notFound && <NotFoundPage />}
+      {!conferenceData && <NotFoundPage />}
       <div className='relative'>
         {updating && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
