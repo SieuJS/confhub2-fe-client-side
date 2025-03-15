@@ -102,7 +102,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
                 <p className=" text-lg">
                     {/* Use conference description for overview, if available */}
                     
-                    {conference.description} {/* You can replace scopeDescription with data from journal if you have scope info in JournalResponse */}
+                    {conference.organization.summerize} {/* You can replace scopeDescription with data from journal if you have scope info in JournalResponse */}
                 </p>
             </section>
 
@@ -167,7 +167,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
                 <ReactMarkdown
                         remarkPlugins={[remarkGfm, remarkBreaks]}
                     >
-                    {conference.callForPapers}
+                    {conference.organization.callForPaper}
                 </ReactMarkdown> {/* You can replace scopeDescription with data from journal if you have scope info in JournalResponse */}   
             </section>
 
@@ -223,7 +223,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
 
             <section id="map" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <h2 className="text-3xl font-bold text-secondary mb-4">Maps</h2>
-                {conference?.location && <Map location={conference.location} />}
+                {conference?.locations[0].country && <Map location={conference.locations[0].country} />}
             </section>
 
             <section id="source" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
