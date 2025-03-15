@@ -6,9 +6,8 @@ import { useState, useMemo, useEffect, useRef } from 'react'; // Import useMemo
 import Button from '../../../components/utils/Button';
 import ConferenceFeedback from '../../../components/conference/ConferenceFeedback';
 import { ConferenceResponse } from '../../../../../models/response/conference.response'; // Import ConferenceResponse type
-import conferenceList from '../../../../../models/data/conferences-list.json'; 
+import {getConference} from '../../../../../api/get_info/get_info'; 
 import { fetchConferences } from '../../../../../api/crawl/test_api'; // Import fetchConferences, adjust path.
-import Map from '../../../components/conference/Map';
 import NotFoundPage from "../../../components/utils/NotFoundPage";
 import Loading from "../../../components/utils/Loading";
 import * as ics from 'ics';
@@ -16,13 +15,10 @@ import { ConferenceTabs } from '../../../components/conference/ConferenceTabs';
 import { useSearchParams } from 'next/navigation'; //  USE THIS for query params
 import { Header } from '../../../components/utils/Header';
 import Footer from '../../../components/utils/Footer';
+import { findIndex } from 'lodash';
 
 type Conference = ConferenceResponse;
 
-interface ConferenceDates {
-  startDate: Date | null;
-  endDate: Date | null;
-}
 interface EventCardProps {
     conference: Conference; // Sử dụng ConferenceResponse type
 }
@@ -31,18 +27,28 @@ const Detail: React.FC<EventCardProps> = ({ locale }: { locale: string }) => {
   const t = useTranslations('');
 
   const searchParams = useSearchParams(); // Use useSearchParams
-  const id = searchParams.get('id');  // Get the 'id' parameter
+  const acronym = searchParams.get('acronym');
+  const [conferenceData, setConferenceData] = useState<ConferenceResponse | undefined>();
   const [isFollowing, setIsFollowing] = useState(false);
   const [openMenu, setOpenMenu] = useState<"share" | "calendar" | null>(null); // State chung
   const shareButtonRef = useRef<HTMLButtonElement>(null);
   const [updating, setUpdating] = useState(false); // Track if update is in progress
   const [error, setError] = useState<string | null>(null);
-
-  const conference: ConferenceResponse | undefined = conferenceList.find(
-      conf => conf.id.toString() === id
-    ) as ConferenceResponse | undefined;
-
-  const [conferenceData, setConferenceData] = useState<ConferenceResponse | undefined>(conference);
+  
+  useEffect(() => {
+    async function getInfoConference() {
+        try {
+        // Use the imported fetchConferences function.
+        const conferenceInfo = await getConference(acronym); // false to use API, true to use client-side data
+        setConferenceData(conferenceInfo);
+      } catch (err: any) {
+        setError(err.message || 'An error occurred during update.');
+        //alert(t('Error while updating conference!'));
+        console.error('Error updating conference data:', err);
+      }
+    }
+    getInfoConference();
+  }, [acronym])
 
     const handleFollowClick = () => {
         setIsFollowing(!isFollowing);
@@ -78,32 +84,32 @@ const Detail: React.FC<EventCardProps> = ({ locale }: { locale: string }) => {
     };
 
 
-    async function handleUpdateClick () {
-      setUpdating(true); // Set updating state to true
-      {updating && <Loading />}
-      setError(null);    // Clear any previous errors
-      console.log('Update button clicked');
-      let fetchedData: Conference;
-         try {
-          // Use the imported fetchConferences function.
-          const newConferenceInfo = await fetchConferences(true, conferenceData); // false to use API, true to use client-side data
-          newConferenceInfo.acronym = conferenceData.acronym;
-          newConferenceInfo.name = conferenceData.name;
-          newConferenceInfo.link = conferenceData.link;
-          newConferenceInfo.impLink = conferenceData.impLink;
-          newConferenceInfo.cfpLink = conferenceData.cfpLink;
-          fetchedData = newConferenceInfo;
-          setConferenceData(fetchedData);
-          alert(t('Update successful!'));
-          //console.log(fetchedData);
-        } catch (err: any) {
-          setError(err.message || 'An error occurred during update.');
-          alert(t('Error while updating conference!'));
-          console.error('Error updating conference data:', err);
-        } finally {
-          setUpdating(false);
-        }
-}
+//     async function handleUpdateClick () {
+//       setUpdating(true); // Set updating state to true
+//       {updating && <Loading />}
+//       setError(null);    // Clear any previous errors
+//       console.log('Update button clicked');
+//       let fetchedData: Conference;
+//          try {
+//           // Use the imported fetchConferences function.
+//           const newConferenceInfo = await fetchConferences(true, conferenceData); // false to use API, true to use client-side data
+//           newConferenceInfo.acronym = conferenceData.acronym;
+//           newConferenceInfo.title = conferenceData.title;
+//           newConferenceInfo.link = conferenceData.link;
+//           newConferenceInfo.impLink = conferenceData.impLink;
+//           newConferenceInfo.cfpLink = conferenceData.cfpLink;
+//           fetchedData = newConferenceInfo;
+//           setConferenceData(fetchedData);
+//           alert(t('Update successful!'));
+//           //console.log(fetchedData);
+//         } catch (err: any) {
+//           setError(err.message || 'An error occurred during update.');
+//           alert(t('Error while updating conference!'));
+//           console.error('Error updating conference data:', err);
+//         } finally {
+//           setUpdating(false);
+//         }
+// }
 
     const handleFeedbackSubmit = (rating: number | null, comment: string) => {
       console.log('Rating:', rating);
@@ -117,160 +123,110 @@ const Detail: React.FC<EventCardProps> = ({ locale }: { locale: string }) => {
     //     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
     // };
 
-    function parseConferenceDates(dateString: string | undefined | null): ConferenceDates {
-      if (!dateString) {
-          return { startDate: null, endDate: null };
+    function removeTime(date: Date): string {
+      if (!date) {
+          return '';
       }
-  
-      const dateParts = dateString.split(' - ');
-      if (dateParts.length === 0 || dateParts.length > 2) {
-          console.error("Invalid date format:", dateString);
-          return { startDate: new Date(), endDate: new Date() };
-      }
-  
-      try {
-          if (dateParts.length === 1) {
-              const [singleDatePart] = dateParts;
-              const [monthAndDay, year] = singleDatePart.split(', ');
-              const [month, days] = monthAndDay.split(" ");
-  
-              if (days.includes("-")) {
-                  const [startDay, endDay] = days.split('-');
-                  const startDate = new Date(`${month} ${startDay}, ${year}`);
-                  const endDate = new Date(`${month} ${endDay}, ${year}`);
-                   if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-                    throw new Error("Invalid date format") // Handle invalid date
-                  }
-                  return { startDate, endDate };
-              } else {
-                  const startDate = new Date(`${month} ${days}, ${year}`);
-                   if (isNaN(startDate.getTime())) {
-                      throw new Error("Invalid date format")
-                   }
-                  return { startDate, endDate: startDate }
-              }
-          } else {
-              let [startDateStr, endDateStr] = dateParts;
-              const [startMonth, startDay] = startDateStr.split(" ");
-  
-              let endMonth, endDay, year;
-              if (startDateStr.includes(",")) {
-                console.error("Invalid date format:", dateString)
-                return { startDate: null, endDate: null };
-              }
-  
-              if (!endDateStr.includes(",")) {
-                const currentYear = new Date().getFullYear();
-                endDateStr = endDateStr + `, ${currentYear}`;
-              }
-              [endMonth, endDay, year] = endDateStr.split(/[, ]+/);
-  
-              const startDate = new Date(`${startMonth} ${startDay}, ${year}`);
-              const endDate = new Date(`${endMonth} ${endDay}, ${year}`);
-               if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-                throw new Error("Invalid date format") // Handle invalid date
-              }
-              return { startDate, endDate };
-          }
-      } catch (error) {
-          console.error("Error parsing date string:", dateString, error);
-          return { startDate: null, endDate: null };
+      else
+      {
+        const dateString = date.toDateString();
+        return dateString;
       }
   }
-    function createGoogleCalendarLink(conference: Conference) {
-        const { startDate, endDate } = parseConferenceDates(conference.conferenceDates);
-        // const startDate = conferenceDates?.startDate;
-        // const endDate = conferenceDates?.endDate;
+    // function createGoogleCalendarLink(conference: Conference) {
+    //     const { startDate, endDate } = parseConferenceDates(conference.conferenceDates);
+    //     // const startDate = conferenceDates?.startDate;
+    //     // const endDate = conferenceDates?.endDate;
         
-        const start = startDate.toISOString().replace(/-|:|\.\d+/g, '');
-        const end = endDate.toISOString().replace(/-|:|\.\d+/g, '');
+    //     const start = startDate.toISOString().replace(/-|:|\.\d+/g, '');
+    //     const end = endDate.toISOString().replace(/-|:|\.\d+/g, '');
 
-        const details = `📢 ${conference.name}\n📅 Thời gian: ${startDate && endDate ? `${(startDate)} - ${(endDate)}` : 'Dates not available'}\n📍 Địa điểm: ${conference.location}\n🔗 Chi tiết: ${conference.link}`;
-
-
-        const params = new URLSearchParams({
-            action: 'TEMPLATE',
-            text: conference.name,
-            dates: `${start}/${end}`,
-            details: details,
-            location: conference.location,
-            trp: 'false', // Optional: Show/hide "Add to my calendar" button (true/false)
-            sprop: `website:${conferenceData.link}`, //Optional. Good practice
-            // ctz: 'Asia/Ho_Chi_Minh', // Time zone (optional, but recommended!)
-        });
-
-        return `https://www.google.com/calendar/render?${params.toString()}`;
-    }
+    //     const details = `📢 ${conference.name}\n📅 Thời gian: ${startDate && endDate ? `${(startDate)} - ${(endDate)}` : 'Dates not available'}\n📍 Địa điểm: ${conference.location}\n🔗 Chi tiết: ${conference.link}`;
 
 
-    function createICalendarEvent(conference: Conference) {
-        // const conferenceDates = conference.conferenceDates.find(date => date.dateName === "Conference Dates"); // Find main conference dates
-        // const startDate = conferenceDates?.startDate;
-        // const endDate = conferenceDates?.endDate;
-        const conferenceDates = conference.conferenceDates;
-        const { startDate, endDate } = parseConferenceDates(conferenceDates);
-        // const startDateObj = startDate ? new Date(startDate + 'T00:00:00') : new Date(); // Default to current date if not found
-        // const endDateObj = endDate ? new Date(endDate + 'T23:59:59') : new Date();     // Default to current date if not found
+    //     const params = new URLSearchParams({
+    //         action: 'TEMPLATE',
+    //         text: conference.name,
+    //         dates: `${start}/${end}`,
+    //         details: details,
+    //         location: conference.location,
+    //         trp: 'false', // Optional: Show/hide "Add to my calendar" button (true/false)
+    //         sprop: `website:${conferenceData.link}`, //Optional. Good practice
+    //         // ctz: 'Asia/Ho_Chi_Minh', // Time zone (optional, but recommended!)
+    //     });
+
+    //     return `https://www.google.com/calendar/render?${params.toString()}`;
+    // }
 
 
-        const start = [
-            startDate.getFullYear(),
-            startDate.getMonth() + 1, //getMonth() trả về 0-11
-            startDate.getDate(),
-            startDate.getHours(),
-            startDate.getMinutes(),
-        ];
+    // function createICalendarEvent(conference: Conference) {
+    //     // const conferenceDates = conference.conferenceDates.find(date => date.dateName === "Conference Dates"); // Find main conference dates
+    //     // const startDate = conferenceDates?.startDate;
+    //     // const endDate = conferenceDates?.endDate;
+    //     const conferenceDates = conference.conferenceDates;
+    //     const { startDate, endDate } = parseConferenceDates(conferenceDates);
+    //     // const startDateObj = startDate ? new Date(startDate + 'T00:00:00') : new Date(); // Default to current date if not found
+    //     // const endDateObj = endDate ? new Date(endDate + 'T23:59:59') : new Date();     // Default to current date if not found
 
-        const end = [
-            endDate.getFullYear(),
-            endDate.getMonth() + 1,
-            endDate.getDate(),
-            endDate.getHours(),
-            endDate.getMinutes(),
-        ];
-        const event: ics.EventAttributes = {
-            start: start as ics.DateArray,
-            end: end as ics.DateArray,
-            title: conference.name,
-            description: `📢 ${conference.name}\n📅 Thời gian: ${startDate && endDate ? `${startDate} - ${endDate}` : 'Dates not available'}\n📍 Địa điểm: ${conference.location}\n🔗 Chi tiết: ${conference.link}`,
-            location: conference.location,
-            url: conference.link,
-            organizer: { name: 'Conference Organizer' }, // Add organizer info if available
-            status: 'CONFIRMED',
-            busyStatus: 'BUSY',
-        };
 
-        const { error, value } = ics.createEvent(event);
+    //     const start = [
+    //         startDate.getFullYear(),
+    //         startDate.getMonth() + 1, //getMonth() trả về 0-11
+    //         startDate.getDate(),
+    //         startDate.getHours(),
+    //         startDate.getMinutes(),
+    //     ];
 
-        if (error) {
-            console.error('Error creating iCalendar event:', error);
-            return null; // Or handle the error appropriately
-        }
-        return value; // This is the iCalendar data as a string.
-    }
+    //     const end = [
+    //         endDate.getFullYear(),
+    //         endDate.getMonth() + 1,
+    //         endDate.getDate(),
+    //         endDate.getHours(),
+    //         endDate.getMinutes(),
+    //     ];
+    //     const event: ics.EventAttributes = {
+    //         start: start as ics.DateArray,
+    //         end: end as ics.DateArray,
+    //         title: conference.name,
+    //         description: `📢 ${conference.name}\n📅 Thời gian: ${startDate && endDate ? `${startDate} - ${endDate}` : 'Dates not available'}\n📍 Địa điểm: ${conference.location}\n🔗 Chi tiết: ${conference.link}`,
+    //         location: conference.location,
+    //         url: conference.link,
+    //         organizer: { name: 'Conference Organizer' }, // Add organizer info if available
+    //         status: 'CONFIRMED',
+    //         busyStatus: 'BUSY',
+    //     };
 
-    const handleAddToCalendar = (type: 'google' | 'ical') => {
-        if (type === 'google') {
-            const googleLink = createGoogleCalendarLink(conferenceData);
-            window.open(googleLink, '_blank');
-        } else if (type === 'ical') {
-            const icalData = createICalendarEvent(conferenceData);
-            if (icalData) {
-                const blob = new Blob([icalData], { type: 'text/calendar;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                const conferenceDates = conferenceData.conferenceDates;
-                const { startDate, endDate } = parseConferenceDates(conferenceDates);
-                // const conferenceDate = startDate ? new Date(startDate) : new Date(); // Default to current date if not found
-                a.download = `${conferenceData.acronym + startDate.getFullYear()}.ics`; // Use acronym instead of shortName
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url); // Clean up
-            }
-        }
-    };
+    //     const { error, value } = ics.createEvent(event);
+
+    //     if (error) {
+    //         console.error('Error creating iCalendar event:', error);
+    //         return null; // Or handle the error appropriately
+    //     }
+    //     return value; // This is the iCalendar data as a string.
+    // }
+
+    // const handleAddToCalendar = (type: 'google' | 'ical') => {
+    //     if (type === 'google') {
+    //         const googleLink = createGoogleCalendarLink(conferenceData);
+    //         window.open(googleLink, '_blank');
+    //     } else if (type === 'ical') {
+    //         const icalData = createICalendarEvent(conferenceData);
+    //         if (icalData) {
+    //             const blob = new Blob([icalData], { type: 'text/calendar;charset=utf-8' });
+    //             const url = URL.createObjectURL(blob);
+    //             const a = document.createElement('a');
+    //             a.href = url;
+    //             const conferenceDates = conferenceData.conferenceDates;
+    //             const { startDate, endDate } = parseConferenceDates(conferenceDates);
+    //             // const conferenceDate = startDate ? new Date(startDate) : new Date(); // Default to current date if not found
+    //             a.download = `${conferenceData.acronym + startDate.getFullYear()}.ics`; // Use acronym instead of shortName
+    //             document.body.appendChild(a);
+    //             a.click();
+    //             document.body.removeChild(a);
+    //             URL.revokeObjectURL(url); // Clean up
+    //         }
+    //     }
+    // };
 
     const toggleShareMenu = () => {
         setOpenMenu(prev => prev === "share" ? null : "share"); // Mở/đóng menu Share
@@ -351,42 +307,42 @@ const Detail: React.FC<EventCardProps> = ({ locale }: { locale: string }) => {
         );
     };
 
-    const renderCalendarMenu = () => {
-        if (openMenu !== "calendar") { // Kiểm tra state chung
-            return null;
-        }
-        return (
-            <div className="absolute z-10 right-0 mt-2 w-56  rounded-md shadow-lg p-2 ring-1 ring-black ring-opacity-5 focus:outline-none">
-                <Button
-                    onClick={() => { handleAddToCalendar('google'); closeMenu(); }}
-                    variant="secondary"
-                    size="small"
-                    className="px-2 py-2 text-sm  w-full text-left flex items-center mb-1"
-                >
-                    {/* Google Calendar Icon SVG Path (Simple G icon - you might want a more detailed one) */}
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6 mr-2">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-</svg>
+//     const renderCalendarMenu = () => {
+//         if (openMenu !== "calendar") { // Kiểm tra state chung
+//             return null;
+//         }
+//         return (
+//             <div className="absolute z-10 right-0 mt-2 w-56  rounded-md shadow-lg p-2 ring-1 ring-black ring-opacity-5 focus:outline-none">
+//                 <Button
+//                     onClick={() => { handleAddToCalendar('google'); closeMenu(); }}
+//                     variant="secondary"
+//                     size="small"
+//                     className="px-2 py-2 text-sm  w-full text-left flex items-center mb-1"
+//                 >
+//                     {/* Google Calendar Icon SVG Path (Simple G icon - you might want a more detailed one) */}
+//                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6 mr-2">
+//   <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+// </svg>
 
 
-                    Add to Google Calendar
-                </Button>
-                <Button
-                    onClick={() => { handleAddToCalendar('ical'); closeMenu(); }}
-                    variant="secondary"
-                    size="small"
-                    className="px-2 py-2 text-sm  w-full text-left flex items-center"
-                >
-                    {/* iCal/Download Icon SVG Path (Simple download icon - can be replaced with a calendar icon if desired) */}
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6 mr-2">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-</svg>
+//                     Add to Google Calendar
+//                 </Button>
+//                 <Button
+//                     onClick={() => { handleAddToCalendar('ical'); closeMenu(); }}
+//                     variant="secondary"
+//                     size="small"
+//                     className="px-2 py-2 text-sm  w-full text-left flex items-center"
+//                 >
+//                     {/* iCal/Download Icon SVG Path (Simple download icon - can be replaced with a calendar icon if desired) */}
+//                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6 mr-2">
+//   <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+// </svg>
 
-                    Download iCal
-                </Button>
-            </div>
-        );
-    };
+//                     Download iCal
+//                 </Button>
+//             </div>
+//         );
+//     };
 
 
 
@@ -395,6 +351,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: { locale: string }) => {
     <div>
       <Header locale={locale} />
       {!conferenceData && <NotFoundPage />}
+      
       <div className='relative'>
         {updating && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -414,7 +371,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: { locale: string }) => {
             <div className="relative  rounded-lg overflow-hidden">
             <Image
               src={'/conference_image.png'}
-              alt={`${conferenceData.name} - secondary`}
+              alt={`${conferenceData.payload[0].title} - secondary`}
               width={800}
               height={400}
               style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
@@ -454,7 +411,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: { locale: string }) => {
             </svg>
 
               </Button>
-              {renderCalendarMenu()}
+              {/* {renderCalendarMenu()} */}
             </div>
             <Button
               onClick={handleFollowClick}
@@ -466,7 +423,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: { locale: string }) => {
               {isFollowing ? 'Followed' : 'Follow'}
             </Button>
             <Button
-              onClick={handleUpdateClick}
+              // onClick={handleUpdateClick}
               variant="secondary"
               size="medium"
               rounded
@@ -478,25 +435,29 @@ const Detail: React.FC<EventCardProps> = ({ locale }: { locale: string }) => {
 
             <div className="flex justify-between items-center mt-4">
             <p className="text-lg">
-                {conferenceData.conferenceDates != null ? // Find Conference Dates
-                    `${conferenceData.conferenceDates}`
-                    : 'Dates not available'}
+            {conferenceData?.payload?.[0]?.dates &&
+              conferenceData.payload[0].dates.findIndex((date) => date.name === 'conferenceDates') !== -1
+                ? new Date(conferenceData.payload[0].dates.find((date) => date.name === 'conferenceDates')?.fromDate).toLocaleDateString()
+                : ''} - {conferenceData?.payload?.[0]?.dates &&
+                  conferenceData.payload[0].dates.findIndex((date) => date.name === 'conferenceDates') !== -1
+                    ? new Date(conferenceData.payload[0].dates.find((date) => date.name === 'conferenceDates')?.toDate).toLocaleDateString()
+                    : ''}
             </p>
             <div>
-              <span>{conferenceData.acronym}</span> {/* shortName to acronym */}
+              <span>{conferenceData.payload[0].acronym}</span> {/* shortName to acronym */}
             </div>
             </div>
 
-            <h2 className=" font-bold text-left text-4xl mt-2">{conferenceData.name}</h2>
+            <h2 className=" font-bold text-left text-4xl mt-2">{conferenceData.payload[0].title}</h2>
 
             <p className="text-left mt-4">{conferenceData.description}</p>
 
             <div className="flex items-center mt-6 text-left">
             <span className="font-semibold mr-2 pb-2">Topics:</span>
             <div className="flex flex-wrap">
-              {conferenceData.topics?.split(',').map((topic, index) => (
+              {conferenceData.payload[0].topics.map((topic, index) => (
                 <span key={index} className="bg-background-secondary  rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2">
-                  {topic.trim()} {/* Trim whitespace */}
+                  {topic}
                 </span>
               )) || <span>No topics available</span>}
             </div>
@@ -517,56 +478,55 @@ const Detail: React.FC<EventCardProps> = ({ locale }: { locale: string }) => {
               <tr className="border-b  ">
                 <td className="px-3 py-2 font-semibold">{t('Start Date')}</td>
                 <td className="px-3 py-2">
-                  {conferenceData.conferenceDates}
+                {conferenceData?.payload?.[0]?.dates &&
+              conferenceData.payload[0].dates.findIndex((date) => date.name === 'conferenceDates') !== -1
+                ? new Date(conferenceData.payload[0].dates.find((date) => date.name === 'conferenceDates').fromDate).toLocaleDateString()
+                : 'Dates not available'}
                 </td>
               </tr>
 
               <tr className="border-b  ">
                 <td className="px-3 py-2 font-semibold">{t('End Date')}</td>
                 <td className="px-3 py-2">
-                  {/* {formatDate(conferenceData.conferenceDates.find(date => date.dateName === "Conference Dates")?.endDate)} */}
+                {conferenceData?.payload?.[0]?.dates &&
+              conferenceData.payload[0].dates.findIndex((date) => date.name === 'conferenceDates') !== -1
+                ? new Date(conferenceData.payload[0].dates.find((date) => date.name === 'conferenceDates').toDate).toLocaleDateString()
+                : 'Dates not available'}
                 </td>
               </tr>
 
               <tr className="border-b  ">
                 <td className="px-3 py-2 font-semibold">{t('Location')}</td>
-                <td className="px-3 py-2">{conferenceData.location}</td>
+                <td className="px-3 py-2">{conferenceData.payload[0].location['country']}</td>
               </tr>
 
               <tr className="border-b  ">
                 <td className="px-3 py-2 font-semibold">{t('Website')}</td>
                 <td className="px-3 py-2">
                   <a
-                    href={conferenceData.link} // website to link
+                    href={conferenceData.payload[0].link} // website to link
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:underline"
                   >
-                    {conferenceData.link === null ? '' : conferenceData.link} {/* website to link */}
+                    {conferenceData.payload[0].link === null ? '' : conferenceData.payload[0].link} {/* website to link */}
                   </a>
                 </td>
               </tr>
 
               <tr className="border-b  ">
                 <td className="px-3 py-2 font-semibold">{t('Rank')}</td>
-                <td className="px-3 py-2">{conferenceData.rank}</td>
+                <td className="px-3 py-2">{conferenceData.payload[0].rank}</td>
               </tr>
 
               <tr className="border-b  ">
                 <td className="px-3 py-2 font-semibold">{t('Type')}</td>
-                <td className="px-3 py-2" >{conferenceData.type}</td>
-              </tr>
-
-              <tr className="border-b  ">
-                <td className="px-3 py-2 font-semibold">{t('Submission Date')}</td>
-                <td className="px-3 py-2">
-                  {/* {formatDate(conferenceData.conferenceDates.find(date => date.dateName === "Submission Deadline")?.startDate)} */}
-                </td>
+                <td className="px-3 py-2" >{conferenceData.payload[0].type}</td>
               </tr>
 
               <tr className="border-b  ">
                 <td className="px-3 py-2 font-semibold">{t('Field')}</td>
-                <td className="px-3 py-2">{conferenceData.fieldOfResearch}</td> {/* fieldOfResearch to category */}
+                <td className="px-3 py-2">{conferenceData.payload[0].researchFields}</td> {/* fieldOfResearch to category */}
               </tr>
             </tbody>
           </table>
