@@ -21,6 +21,8 @@ export const pathnames = {
   '/tabs/addconference': '/tabs/addconference',
   '/tabs/conferences/detail': '/tabs/conferences/detail',
   '/tabs/journals/detail': '/tabs/journals/detail',
+  '/tabs/login': '/tabs/login',
+  '/tabs/register': '/tabs/register',
 } satisfies Pathnames<typeof locales>
 
 export const { Link, redirect, usePathname, useRouter, getPathname } =

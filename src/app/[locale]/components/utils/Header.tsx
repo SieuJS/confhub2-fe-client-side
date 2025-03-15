@@ -112,6 +112,12 @@ export const Header: FC<Props> = ({ locale }) => {
           <Link lang={locale} href={`/tabs/about`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('About')}
           </Link>
+          <Link lang={locale} href={`/tabs/login`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+            {t('Login')}
+          </Link>
+          <Link lang={locale} href={`/tabs/register`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+            {t('Register')}
+          </Link>
           {/* <Link lang={locale} href={`/tabs/other`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('Other')}
           </Link> */}
@@ -221,6 +227,24 @@ export const Header: FC<Props> = ({ locale }) => {
               >
                 {t('About')}
                 <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/about') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
+              </Link>
+              <Link
+                lang={locale}
+                href={`/tabs/login`}
+                style={{ fontWeight: 'bold' }}
+                className={`relative group ${pathname.includes('/tabs/login') ? 'text-selected' : ''}`} // Conditional styling
+              >
+                {t('Login')}
+                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/login') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
+              </Link>
+              <Link
+                lang={locale}
+                href={`/tabs/register`}
+                style={{ fontWeight: 'bold' }}
+                className={`relative group ${pathname.includes('/tabs/register') ? 'text-selected' : ''}`} // Conditional styling
+              >
+                {t('Register')}
+                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/register') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
               {/* <Link
                 lang={locale}
