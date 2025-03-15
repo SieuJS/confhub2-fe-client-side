@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
+
 
 const languages = [
   "mọi ngôn ngữ", // Vietnamese
@@ -39,6 +41,8 @@ const languages = [
 
 
 const AIAbout: React.FC = () => {
+  const t = useTranslations('');
+  
   const [currentLanguage, setCurrentLanguage] = useState(languages[0]);
   const [languageIndex, setLanguageIndex] = useState(0);
   const [animate, setAnimate] = useState(false);
@@ -69,8 +73,8 @@ const AIAbout: React.FC = () => {
   const [typingUser, setTypingUser] = useState(false);
   const [typingAI, setTypingAI] = useState(false);
 
-  const initialUserMessage = "What are the key benefits of using AI for research?";
-  const initialAiResponse = "AI can significantly speed up research, identify patterns, and provide insights that might be missed by human analysis. It also allows for processing large datasets more efficiently.";
+  const initialUserMessage = t('Chatbot_AI_Message');
+  const initialAiResponse = t('Chatbot_User_Message');
 
   const resetTyping = () => {
       setUserMessage('');
@@ -162,11 +166,11 @@ const AIAbout: React.FC = () => {
           <h1
             className={`text-5xl font-bold mb-12`}
           >
-            Take a decisive step toward fact based decisions
+            {t('Slogan_Chatbot_about')}
           </h1>
           <p className="text-xl text-gray-400 mb-12">
-            Through efficiency, quality, and ease of use, <br />
-            Research AI enables you to think in a data-driven, fact-based and unbiased way.
+            {t('Slogan_Chatbot_about1')}<br />
+            {t('Slogan_Chatbot_about2')}
           </p>
 
           {/* AI-Powered Insights Section */}
@@ -174,7 +178,7 @@ const AIAbout: React.FC = () => {
             {/* Explanation of AI Understanding */}
             <div className="text-left">
               <h2 className="text-3xl font-semibold mb-4">
-                We understand you in{' '}
+                {t('We_understand_you_in')}{' '}
                 <span
                   ref={languageRef}
                   className={`text-blue-400 inline-block transition-opacity duration-300 ${animate ? 'opacity-0' : 'opacity-100'
@@ -185,14 +189,7 @@ const AIAbout: React.FC = () => {
                 </span>
               </h2>
               <p className="text-gray-300">
-                Making wise decisions is the key to success in virtually any
-                field of work. Yet there is little guidance available to help
-                nurture this unique and valuable skill. This is where our
-                Research AI proves to be your most valuable companion, with a
-                unique combination of human-curated, rich data, perfectly
-                intuitive operation, speed, and an almost infinite variety of
-                languages. Choosing Research AI will therefore be the first of
-                many great decisions you will make in the future.
+                {t('Slogan_Chatbot_about_describe')}
               </p>
             </div>
 

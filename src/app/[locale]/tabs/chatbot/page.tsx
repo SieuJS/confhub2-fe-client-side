@@ -8,9 +8,11 @@ import AIFAQ from "../../components/landingChatbot/AIFAQ";
 import AIStatistics from "../../components/landingChatbot/AIStatistics";
 import { useEffect, useState } from 'react';
 import Button from '../../components/utils/Button';
+import { useTranslations } from 'next-intl';
 
 export default function AILanding() {
   const [isVisibleButton, setIsVisibleButton] = useState(false);
+  const t = useTranslations('');
   
   useEffect(() => {
     const handleScroll = () => {
@@ -37,7 +39,6 @@ export default function AILanding() {
   return (
     <div className="bg-black">
       <AIBanner />
-      {/* <AIBanner2 /> */}
       <AIAbout />
       <AIAbilities />
       <AIStatistics />
@@ -48,7 +49,7 @@ export default function AILanding() {
           onClick={scrollToTop}
           className="fixed bottom-20 right-20 bg-button hover:bg-logo-shadow font-bold px-8 py-4 rounded z-10"
         >
-         Chat Now        
+         {t('Chat_now')}        
         </Button>
       )}
     </div>

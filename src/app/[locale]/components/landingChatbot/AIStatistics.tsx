@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import Odometer from 'react-odometerjs';
 import 'odometer/themes/odometer-theme-default.css';
 import Image from 'next/image'; // Import thẻ Image của Next.js
+import { useTranslations } from 'next-intl';
+
 
 interface Statistic {
   label: string;
@@ -13,9 +15,11 @@ interface Statistic {
 }
 
 const AIStatistics = () => {
+  const t = useTranslations('');
+  
   const statistics: Statistic[] = [
-    { label: 'Model Accuracy', value: 95.7, unit: '%', description: 'Average accuracy across all models.' },
-    { label: 'Inference Speed', value: 5.5, unit: 'ms', description: 'Average time to process a single inference.' },
+    { label: t('Model_Accuracy'), value: 95.7, unit: '%', description: t('Model_Accuracy_describe') },
+    { label: t('Inference_Speed'), value: 5.5, unit: 'ms', description: t('Inference_Speed_describe') },
   ];
 
   const odometerStyle = {
