@@ -1,46 +1,67 @@
-// conference.response.ts
-
-export interface ConferenceLocation {
-  cityStateProvince: string;
-  country: string;
-  address: string;
-  continent: string;
+// File ConferenceResponse:
+export type ConferenceResponse = {
+  conference: ConferenceIdentity;
+  organization: ConferenceInfo;
+  locations: Location[];
+  dates: ImportantDates[];
+  ranks: Rank[];
 }
 
-export interface ConferenceDate {
-  name: string;
-  type: string; // Consider using an enum if the possible values are limited
-  fromDate: string; // ISO 8601 date string
-  toDate: string;   // ISO 8601 date string
-}
+export type ConferenceInfo = {
+  year: string;
+  accessType: string;
+  isAvailable: boolean;
+  category: string;
+  summerize: string;
+  callForPaper: string;
+  link: string;
+  cfpLink: string;
+  impLink: string;
+  topics: string[];
+};
 
-export interface Conference {
+export type ConferenceIdentity = {
   id: string;
   title: string;
   acronym: string;
-  location: ConferenceLocation;
-  rank: string;
-  source: string;
-  year: number;
-  researchFields: string[];
-  topics: string[];
-  dates: ConferenceDate[];
-  link: string;
-  createdAt: string; // ISO 8601 date string
-  updatedAt: string; // ISO 8601 date string
+  createdAt: Date | string;
+  updatedAt: Date | string;
   creatorId: string;
-  accessType: string; // Consider using an enum if the possible values are limited
 }
 
-export interface ConferenceMeta {
-  curPage: number;
-  perPage: number;
-  totalPage: number;
-  prevPage: number | null;
-  nextPage: number | null;
+export type ImportantDates = {
+  fromDate: Date;
+  toDate: Date;
+  type: string;
+  name: string;
+  isAvailable: boolean
+};
+
+export type Location = {
+  address: string;
+  cityStateProvince: string;
+  country: string;
+  continent: string;
+  isAvailable: boolean
+};
+
+export type Rank = {
+  year: string;
+  inFieldOfResearch: FieldOfResearch;
+  byRank: RankDetail[];
 }
 
-export interface ConferenceResponse {
-  payload: Conference[];
-  meta: ConferenceMeta;
+export type FieldOfResearch = {
+  name: string
+}
+
+export type RankDetail = {
+  name: string;
+  value: string;
+  belongsToSource: Source;
+}
+
+export type Source = {
+  name: string;
+  link: string;
 }
