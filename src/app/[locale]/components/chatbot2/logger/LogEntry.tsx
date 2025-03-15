@@ -21,7 +21,7 @@ const LogEntry: React.FC<LogEntryProps> = ({ log, MessageComponent }): JSX.Eleme
   return (
     <li
       className={cn(
-        "mb-4",
+        "max-w-full mb-4",
         isUserMessage ? "float-right clear-both" : "float-left clear-both"
       )}
     >

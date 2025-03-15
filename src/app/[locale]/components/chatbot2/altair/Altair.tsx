@@ -50,7 +50,7 @@ function AltairComponent() {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(fc.args),
             });
-            responseData = await response.json();
+            responseData = await response.text();
           }
           else if (fc.name === "getJournals") {
             const response = await fetch(`${BASE_URL}/api/get_journals`, {
@@ -58,7 +58,7 @@ function AltairComponent() {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(fc.args),
             });
-            responseData = await response.json();
+            responseData = await response.text();
           }
           else if (fc.name === "getWebsiteInformation") {
             const response = await fetch(`${BASE_URL}/api/get_website_information`, {
