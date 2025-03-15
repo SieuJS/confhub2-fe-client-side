@@ -2,7 +2,7 @@ import { ConferenceResponse } from '../../models/response/conference.response';
 
 const API_GET_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/conference';
 
-async function getConference(acronym: string) : Promise<ConferenceResponse> {
+async function getConference(acronym: string | null) : Promise<ConferenceResponse> {
     try {
         const response = await fetch(`${API_GET_CONFERENCE_ENDPOINT}?${acronym}`, {
             method: 'GET', // Specify the method

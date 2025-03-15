@@ -112,9 +112,9 @@ export const Header: FC<Props> = ({ locale }) => {
           <Link lang={locale} href={`/tabs/about`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('About')}
           </Link>
-          <Link lang={locale} href={`/tabs/other`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+          {/* <Link lang={locale} href={`/tabs/other`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
             {t('Other')}
-          </Link>
+          </Link> */}
         </nav>
       </div>
     );
@@ -222,7 +222,7 @@ export const Header: FC<Props> = ({ locale }) => {
                 {t('About')}
                 <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/about') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
               </Link>
-              <Link
+              {/* <Link
                 lang={locale}
                 href={`/tabs/other`}
                 style={{ fontWeight: 'bold' }}
@@ -230,7 +230,7 @@ export const Header: FC<Props> = ({ locale }) => {
               >
                 {t('Other')}
                 <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/other') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
-              </Link>
+              </Link> */}
             </nav>
 
             {/* Mobile Menu Button - Chỉ hiển thị trên màn hình nhỏ (dưới sm) */}
