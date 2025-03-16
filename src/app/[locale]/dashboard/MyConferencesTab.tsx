@@ -1,138 +1,145 @@
 // MyConferencesTab.tsx
-import React, { useState } from 'react';
-import ConferenceItem from '../conferences/ConferenceItem'; // Import ConferenceItem
-import Button from '../utils/Button';
-import { Dialog } from '@headlessui/react';
+import React, { useState, useEffect } from 'react'
+import ConferenceItem from '../conferences/ConferenceItem'
+import Button from '../utils/Button'
 import { Link } from '@/src/navigation'
-import ConferenceForm from '../conferences/ConferenceForm'; // Import ConferenceForm
-import { ConferenceResponse } from '../../../models/response/conference.response'; // Import ConferenceResponse
+import { ConferenceResponse } from '../../../models/response/conference.response'
+import ConferencesData from '../../../models/data/conferences-list.json'
 
-// Replace interface Conference with type Conference = ConferenceResponse
-type Conference = ConferenceResponse;
-
-interface MyConferencesTabProps {
-  // Định nghĩa props cho component nếu cần
-  conferences: Conference[];
+// Define ConferenceInfo *inside* MyConferencesTab.tsx
+interface ConferenceInfo {
+  id: string
+  title: string
+  acronym: string
+  location: string
+  fromDate?: string
+  toDate?: string
+  summary?: string
+  websiteUrl?: string
+  year?: number
+  status?: ConferenceStatus // Add a status property
 }
 
-const MyConferencesTab: React.FC<MyConferencesTabProps> = ({conferences}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  // Sample localConferences data - Updated to ConferenceResponse type
-  const [localConferences, setLocalConferences] = useState<Conference[]>([
-    {
-      id: '1', // id is string
-      name: 'International Conference on Machine Learning',
-      acronym: 'ICML', // shortName to acronym
-      startDate: '2024-07-21',
-      endDate: '2024-07-27',
-      location: 'Vienna, Austria',
-      imageUrl: '/bg-2.jpg', // Example image path, replace with actual paths or URLs
-      rank: 'A*',
-      topics: ['Machine Learning', 'Deep Learning', 'AI'], // topics is already correct
-      type: 'hybrid',
-      category: 'Computer Science', // Added category, using 'Computer Science' as example
-      description: 'Leading conference on machine learning.', // Added description
-      link: 'https://icml.cc/', // Added link, using ICML website as example
-      sourceYear: '2024', // Added sourceYear, using 2024 as example
-      submissionDate: '2024-05-01', // Added submissionDate, using example date
-    },
-    {
-      id: '2', // id is string
-      name: 'Conference on Computer Vision and Pattern Recognition',
-      acronym: 'CVPR', // shortName to acronym
-      startDate: '2024-06-17',
-      endDate: '2024-06-21',
-      location: 'Seattle, USA',
-      imageUrl: '/bg-2.jpg', // Example image path, replace with actual paths or URLs
-      rank: 'A*',
-      topics: ['Computer Vision', 'Image Recognition', 'Pattern Recognition'], // topics is already correct
-      type: 'offline',
-      category: 'Computer Science', // Added category, using 'Computer Science' as example
-      description: 'Premier conference for computer vision research.', // Added description
-      link: 'https://cvpr.org/', // Added link, using CVPR website as example
-      sourceYear: '2024', // Added sourceYear, using 2024 as example
-      submissionDate: '2024-05-01', // Added submissionDate, using example date
+// Enum for conference status
+enum ConferenceStatus {
+  Active = 'active',
+  Pending = 'pending',
+  Cancelled = 'cancelled'
+}
 
-    },
-    {
-      id: '3', // id is string
-      name: 'International World Wide Web Conference',
-      acronym: 'WWW', // shortName to acronym
-      startDate: '2025-05-12',
-      endDate: '2025-05-16',
-      location: 'Singapore',
-      imageUrl: '/bg-2.jpg', // Example image path, replace with actual paths or URLs
-      rank: 'A*',
-      topics: ['Web Technologies', 'Internet of Things', 'Social Networks'], // topics is already correct
-      type: 'hybrid',
-      category: 'Information Technology', // Added category, using 'Information Technology' as example
-      description: 'Conference on the evolution of the web.', // Added description
-      link: 'https://www2025.org/', // Added link, using WWW 2025 website as example
-      sourceYear: '2025', // Added sourceYear, using 2025 as example
-      submissionDate: '2024-05-01', // Added submissionDate, using example date
+const MyConferencesTab: React.FC = () => {
+  const [localConferences, setLocalConferences] = useState<ConferenceInfo[]>([])
+  const [displayStatus, setDisplayStatus] = useState<ConferenceStatus>(
+    ConferenceStatus.Active
+  ) // State to control which list is displayed
 
-    },
-  ]);
+  useEffect(() => {
+    // Simulate fetching and transforming data, including setting a status.  In a real app,
+    // this would come from your API and likely already have a status field.
+    const transformedConferences = (ConferencesData as ConferenceResponse[])
+      .slice(0, 6) // Take more for variety of statuses
+      .map((confRes, index): ConferenceInfo => {
+        let status: ConferenceStatus
+        if (index < 2) {
+          status = ConferenceStatus.Active
+        } else if (index < 4) {
+          status = ConferenceStatus.Pending
+        } else {
+          status = ConferenceStatus.Cancelled
+        }
 
-  function closeModal() {
-    setIsOpen(false);
+        return {
+          id: confRes.conference.id,
+          title: confRes.conference.title,
+          acronym: confRes.conference.acronym,
+          location: `${confRes.locations.cityStateProvince}, ${confRes.locations.country}`,
+          year: confRes.organization.year,
+          summary: confRes.organization.summary,
+          fromDate:
+            confRes.dates.length > 0 ? confRes.dates[0].fromDate : undefined,
+          toDate:
+            confRes.dates.length > 0 ? confRes.dates[0].toDate : undefined,
+          websiteUrl: confRes.organization.link,
+          status: status // Assign the status
+        }
+      })
+    setLocalConferences(transformedConferences)
+  }, [])
+
+  // Filter conferences based on the selected status
+  const filteredConferences = localConferences.filter(
+    conference => conference.status === displayStatus
+  )
+
+  const getStatusTitle = (status: ConferenceStatus) => {
+    switch (status) {
+      case ConferenceStatus.Active:
+        return 'My Conferences'
+      case ConferenceStatus.Pending:
+        return 'My Conferences are pending'
+      case ConferenceStatus.Cancelled:
+        return 'My Conferences are cancel'
+      default:
+        return 'My Conferences'
+    }
   }
-
-  function openModal() {
-    setIsOpen(true);
-  }
-
-  const handleAddConference = (conferenceData: Conference) => {
-    // Assuming you have a way to generate a unique ID
-    const { id, ...rest } = conferenceData;
-    setLocalConferences([...localConferences, { id: Date.now().toString(), ...rest }]); // Ensure id is string
-    closeModal();
-  };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className='container mx-auto p-4'>
       <Link href={`/addconference`}>
-        <Button
-          // onClick={openModal}
-          variant="primary"
-          size="medium"
-          rounded
-          className="mr-2 w-fill"
-        >
+        <Button variant='primary' size='medium' rounded className='w-fill mr-2'>
           Add Conference
         </Button>
-      
       </Link>
 
-      <h1 className="text-2xl font-semibold mb-2">My Conferences</h1>
-      {localConferences.length === 0 ? (
-        <p className="text-gray-500">You are not have any conferences yet.</p>
+      {/* Status Switching Buttons */}
+      <div className='my-4 flex space-x-4'>
+        <Button
+          variant={
+            displayStatus === ConferenceStatus.Active ? 'primary' : 'secondary'
+          }
+          size='small'
+          onClick={() => setDisplayStatus(ConferenceStatus.Active)}
+        >
+          Active
+        </Button>
+        <Button
+          variant={
+            displayStatus === ConferenceStatus.Pending ? 'primary' : 'secondary'
+          }
+          size='small'
+          onClick={() => setDisplayStatus(ConferenceStatus.Pending)}
+        >
+          Pending
+        </Button>
+        <Button
+          variant={
+            displayStatus === ConferenceStatus.Cancelled
+              ? 'primary'
+              : 'secondary'
+          }
+          size='small'
+          onClick={() => setDisplayStatus(ConferenceStatus.Cancelled)}
+        >
+          Cancelled
+        </Button>
+      </div>
+
+      {/* Display the selected list */}
+      <h1 className='my-2 text-2xl font-semibold'>
+        {getStatusTitle(displayStatus)}
+      </h1>
+      {filteredConferences.length === 0 ? (
+        <p className='text-gray-500'>
+          You do not have any conferences in this category yet.
+        </p>
       ) : (
-        localConferences.map((conference) => (
-          <ConferenceItem key={conference.id} conference={conference} /> // Use ConferenceItem here
+        filteredConferences.map(conference => (
+          <ConferenceItem key={conference.id} conference={conference} />
         ))
       )}
-
-      {/* Modal Dialog */}
-      <Dialog open={isOpen} onClose={closeModal} className="relative z-50">
-        <div className="fixed inset-0 bg-black/25" aria-hidden="true" />
-
-        <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4">
-            <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-background p-6 text-left align-middle shadow-xl transition-all">
-              <Dialog.Title
-                as="h3"
-                className="text-lg font-medium leading-6 "
-              >
-                Conference Information
-              </Dialog.Title>
-              <ConferenceForm onAdd={handleAddConference} onClose={closeModal} />
-            </Dialog.Panel>
-          </div>
-        </div>
-      </Dialog>
     </div>
-  );
-};
+  )
+}
 
-export default MyConferencesTab;
+export default MyConferencesTab
