@@ -184,7 +184,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
                 {isLoading ? 'Đang đăng ký...' : 'Đăng ký'}
               </button>
               <Link
-                href='/login'
+                href='/auth/login'
                 className='inline-block align-baseline text-sm font-bold text-blue-500 hover:text-blue-800'
               >
                 Đã có tài khoản? Đăng nhập

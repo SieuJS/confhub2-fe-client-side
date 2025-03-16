@@ -21,8 +21,8 @@ export const pathnames = {
   '/addconference': '/addconference',
   '/conferences/detail': '/conferences/detail',
   '/journals/detail': '/journals/detail',
-  '/login': '/login',
-  '/register': '/register',
+  '/auth/login': '/auth/login',
+  '/auth/register': '/auth/register',
 } satisfies Pathnames<typeof locales>
 
 export const { Link, redirect, usePathname, useRouter, getPathname } =

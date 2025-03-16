@@ -1,70 +1,86 @@
-// FollowedTab.tsx
 import React, { useState, useEffect } from 'react';
 import ConferenceItem from '../conferences/ConferenceItem';
 import { getListConference } from '../../../api/getConference/getListConferences'; // Import getListConference
-import { ConferenceListResponse } from '../../../models/response/conference.list.response';
-
+import { ConferenceListResponse, ConferenceInfo } from '../../../models/response/conference.list.response'; // Import types
+import { UserResponse } from '../../../models/response/user.response'; // Import UserResponse
 
 interface FollowedTabProps { }
 
+const API_GET_USER_ENDPOINT = 'http://localhost:3000/api/v1/user'; // Endpoint lấy thông tin user
+
 const FollowedTab: React.FC<FollowedTabProps> = () => {
-    const [followedConferences, setFollowedConferences] = useState<any[]>([]); // Use any[] for now
-    const [loading, setLoading] = useState(true);
-    const [loggedIn, setLoggedIn] = useState(false);
-    const [allConferences, setAllConferences] = useState<ConferenceListResponse | null>(null); // Store all conferences
+  const [followedConferences, setFollowedConferences] = useState<ConferenceInfo[]>([]); // Sử dụng ConferenceInfo[]
+  const [loading, setLoading] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
+  // Không cần allConferences nữa
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const conferencesData = await getListConference();
-                setAllConferences(conferencesData); // Store the full conference list
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const userData = localStorage.getItem('user');
+        if (!userData) {
+          setLoggedIn(false);
+          setLoading(false);
+          return;
+        }
 
-                const userData = localStorage.getItem('user');
-                if (userData) {
-                    const user = JSON.parse(userData);
-                    setLoggedIn(user.loginStatus !== null);
+        const user = JSON.parse(userData);
+        setLoggedIn(true); // Người dùng đã đăng nhập
 
-                    if (user.loginStatus !== null && user.followedConferences && Array.isArray(user.followedConferences)) {
-                        // Filter based on the full conference list
-                        const followed = conferencesData.payload.filter(conf =>
-                            user.followedConferences.includes(conf.id)
-                        );
-                        setFollowedConferences(followed);
-                    }
-                }
-            } catch (error) {
-                console.error("Failed to fetch conferences:", error);
-                // Handle error appropriately, e.g., show an error message to the user
-            } finally {
-                setLoading(false);
-            }
-        };
+        // 1. Lấy thông tin user (bao gồm followedConferences)
+        const userResponse = await fetch(`${API_GET_USER_ENDPOINT}/${user.id}`);
+        if (!userResponse.ok) {
+          throw new Error(`HTTP error! status: ${userResponse.status}`);
+        }
+        const userDetails: UserResponse = await userResponse.json();
 
-        fetchData();
-    }, []);
+        // 2. Lấy danh sách tất cả conferences (nếu cần hiển thị thông tin chi tiết)
+        // Tối ưu hóa: Chỉ fetch nếu có followed conferences
+        if (userDetails.followedConferences.length > 0) {
+            const conferencesData = await getListConference();
+
+            // 3. Lọc danh sách conferences dựa trên followedConferences từ userDetails
+            const followed = conferencesData.payload.filter(conf =>
+              userDetails.followedConferences.includes(conf.id)
+            );
+            setFollowedConferences(followed);
+
+        } else {
+             setFollowedConferences([]); // Nếu không có conference nào được follow
+        }
+
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+        // Handle error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []); // Chạy một lần khi component mount
 
 
+  if (!loggedIn) {
+    return <div className="container mx-auto p-4">Please log in to view followed conferences.</div>;
+  }
 
-    if (!loggedIn) {
-        return <div className="container mx-auto p-4">Please log in to view followed conferences.</div>;
-    }
+  if (loading) {
+    return <div className="container mx-auto p-4">Loading...</div>;
+  }
 
-    if (loading) {
-        return <div className="container mx-auto p-4">Loading...</div>;
-    }
-
-    return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-semibold mb-2">Followed Conferences</h1>
-            {followedConferences.length === 0 ? (
-                <p>You are not following any conferences yet.</p>
-            ) : (
-                followedConferences.map((conference) => (
-                    <ConferenceItem key={conference.id} conference={conference} />
-                ))
-            )}
-        </div>
-    );
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-semibold mb-2">Followed Conferences</h1>
+      {followedConferences.length === 0 ? (
+        <p>You are not following any conferences yet.</p>
+      ) : (
+        followedConferences.map((conference) => (
+          <ConferenceItem key={conference.id} conference={conference} />
+        ))
+      )}
+    </div>
+  );
 };
 
 export default FollowedTab;
