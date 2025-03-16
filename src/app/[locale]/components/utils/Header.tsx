@@ -25,11 +25,12 @@ export const Header: FC<Props> = ({ locale }) => {
 
   const [firstname, setFirstname] = useLocalStorage<string>('firstname', '')
   const [lastname, setLastname] = useLocalStorage<string>('lastname', '')
+  const [userEmail, setUserEmail] = useLocalStorage<string>('email', '')
   const [loginStatus, setLoginStatus] = useLocalStorage<string | null>(
     'loginStatus',
     null
   )
-  console.log('loginStatus:', loginStatus) // This will now update correctly
+  console.log('loginStatus:', loginStatus)
 
   const toggleNotification = () => {
     setIsNotificationOpen(!isNotificationOpen)
@@ -92,85 +93,52 @@ export const Header: FC<Props> = ({ locale }) => {
 
     return (
       <div className='border-border absolute left-0 right-0 top-full z-40 border-b bg-background-secondary shadow-md sm:hidden'>
-        <nav className='flex flex-col p-4'>
-          {/* ... Các link ... */}
+        <div className='flex flex-col p-4'>
           <Link
             lang={locale}
             href={`/tabs/conferences`}
-            className='hover:bg-button/10 block py-2'
             onClick={closeMobileMenu}
           >
-            {t('Conferences')}
+            <div className='hover:bg-button/10 py-2'>{t('Conferences')}</div>
           </Link>
-          <Link
-            lang={locale}
-            href={`/tabs/journals`}
-            className='hover:bg-button/10 block py-2'
-            onClick={closeMobileMenu}
-          >
-            {t('Journals')}
+          <Link lang={locale} href={`/tabs/journals`} onClick={closeMobileMenu}>
+            <div className='hover:bg-button/10 py-2'>{t('Journals')}</div>
           </Link>
-          <Link
-            lang={locale}
-            href={`/tabs/dashboard`}
-            className='hover:bg-button/10 block py-2'
-            onClick={closeMobileMenu}
-          >
-            {t('Setting')}
+          <Link lang={locale} href={`/tabs/chatbot`} onClick={closeMobileMenu}>
+            <div className='hover:bg-button/10 py-2'>{t('Chatbot')}</div>
           </Link>
-          <Link
-            lang={locale}
-            href={`/tabs/chatbot`}
-            className='hover:bg-button/10 block py-2'
-            onClick={closeMobileMenu}
-          >
-            {t('Chatbot')}
-          </Link>
-          <Link
-            lang={locale}
-            href={`/tabs/support`}
-            className='hover:bg-button/10 block py-2'
-            onClick={closeMobileMenu}
-          >
-            {t('Support')}
+          <Link lang={locale} href={`/tabs/support`} onClick={closeMobileMenu}>
+            <div className='hover:bg-button/10 py-2'>{t('Support')}</div>
           </Link>
           <Link
             lang={locale}
             href={`/tabs/addconference`}
-            className='hover:bg-button/10 block py-2'
             onClick={closeMobileMenu}
           >
-            {t('Add_Conference')}
+            <div className='hover:bg-button/10 py-2'>{t('Add_Conference')}</div>
           </Link>
-          <Link
-            lang={locale}
-            href={`/tabs/about`}
-            className='hover:bg-button/10 block py-2'
-            onClick={closeMobileMenu}
-          >
-            {t('About')}
+          <Link lang={locale} href={`/tabs/about`} onClick={closeMobileMenu}>
+            <div className='hover:bg-button/10 py-2'>{t('About')}</div>
           </Link>
           {loginStatus ? null : (
             <>
               <Link
                 lang={locale}
                 href={`/tabs/login`}
-                className='hover:bg-button/10 block py-2'
                 onClick={closeMobileMenu}
               >
-                {t('Login')}
+                <div className='hover:bg-button/10 py-2'>{t('Login')}</div>
               </Link>
               <Link
                 lang={locale}
                 href={`/tabs/register`}
-                className='hover:bg-button/10 block py-2'
                 onClick={closeMobileMenu}
               >
-                {t('Register')}
+                <div className='hover:bg-button/10 py-2'>{t('Register')}</div>
               </Link>
             </>
           )}
-        </nav>
+        </div>
       </div>
     )
   }
@@ -186,7 +154,7 @@ export const Header: FC<Props> = ({ locale }) => {
       strokeWidth='2'
       strokeLinecap='round'
       strokeLinejoin='round'
-      className='lucide lucide-menu' // Use lucide-menu for a standard menu icon
+      className='lucide lucide-menu'
     >
       <line x1='3' x2='21' y1='12' y2='12' />
       <line x1='3' x2='21' y1='6' y2='6' />
@@ -244,26 +212,28 @@ export const Header: FC<Props> = ({ locale }) => {
           <div className='px-4 py-2 text-sm text-gray-700 dark:text-gray-300'>
             Chào mừng! {firstname} {lastname}
           </div>
-
           <Link
             href='/tabs/dashboard'
             lang={locale}
             onClick={closeUserDropdown}
-            className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:bg-gray-700'
           >
-            Bảng điều khiển
+            <div className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-700'>
+              Bảng điều khiển
+            </div>
           </Link>
-
-          <ThemeSwitch />
-          <LangSwitcher />
-
+          <div className='px-4 py-2'>
+            <ThemeSwitch />
+          </div>
+          <div className='px-4 py-2'>
+            <LangSwitcher />
+          </div>
           <button
+            className='block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:bg-gray-700'
             onClick={() => {
-              // Use the setter functions from useLocalStorage to clear the values
               setLoginStatus(null)
               setFirstname('')
               setLastname('')
-              // ... (rest of your logout logic) ...
+              setUserEmail('')
               let pathWithLocale = '/tabs/login'
               if (pathname) {
                 const pathParts = pathname.split('/')
@@ -276,7 +246,6 @@ export const Header: FC<Props> = ({ locale }) => {
               router.push(pathWithLocale)
               closeUserDropdown()
             }}
-            className='block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:bg-gray-700'
           >
             Đăng xuất
           </button>
@@ -293,27 +262,7 @@ export const Header: FC<Props> = ({ locale }) => {
     <>
       <div
         ref={headerRef}
-        className={`
-          /*
-          Canh
-          giữa
-          dọc
-          các phần tử */ fixed left-0 right-0 top-0 z-40
-          mx-auto
-          flex
-          max-w-screen-2xl
-          flex-row
-          items-center
-          justify-between
-          bg-gradient-to-r
-          from-background
-          to-background-secondary
-          p-3
-          shadow-md
-          transition-all
-          duration-300
-          ease-in-out
-        `}
+        className={`fixed left-0 right-0 top-0 z-40 mx-auto flex max-w-screen-2xl flex-row items-center justify-between bg-gradient-to-r from-background to-background-secondary p-3 shadow-md transition-all duration-300 ease-in-out`}
         style={{ height: '60px' }}
       >
         <Link lang={locale} href='/'>
@@ -326,251 +275,156 @@ export const Header: FC<Props> = ({ locale }) => {
         </Link>
 
         <div className='relative flex flex-row items-center gap-3'>
-          {/* Navigation for larger screens */}
-          <nav className='mr-10 hidden gap-5 sm:inline-flex'>
-            {/* Ẩn mặc định, hiển thị trên sm */}
-            {/* ... Các link ... */}
+          {/* Desktop Navigation */}
+          <div className='mr-10 hidden gap-5 sm:inline-flex'>
             <Link
               lang={locale}
               href={`/tabs/conferences`}
-              className={`
-                group
-                relative
-                font-semibold
-                ${pathname.includes('/tabs/conferences') ? 'text-selected' : ''}
-              `}
+              className={`group relative font-semibold ${
+                pathname.includes('/tabs/conferences') ? 'text-selected' : ''
+              }`}
             >
-              {t('Conferences')}
-              <span
-                className={`
-                  absolute
-                  bottom-0
-                  left-0
-                  h-0.5
-                  w-full
-                  transform
-                  bg-selected
-                  transition-transform
-                  duration-300
-                  ${
+              <div>
+                {t('Conferences')}
+                <span
+                  className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${
                     pathname.includes('/tabs/conferences')
                       ? 'scale-x-100'
                       : 'scale-x-0 group-hover:scale-x-100'
-                  }
-                `}
-              ></span>
+                  }`}
+                ></span>
+              </div>
             </Link>
             <Link
               lang={locale}
               href={`/tabs/journals`}
-              className={`
-                group
-                relative
-                font-semibold
-                ${pathname.includes('/tabs/journals') ? 'text-selected' : ''}
-              `}
+              className={`group relative font-semibold ${
+                pathname.includes('/tabs/journals') ? 'text-selected' : ''
+              }`}
             >
-              {t('Journals')}
-              <span
-                className={`
-                  absolute
-                  bottom-0
-                  left-0
-                  h-0.5
-                  w-full
-                  transform
-                  bg-selected
-                  transition-transform
-                  duration-300
-                  ${
+              <div>
+                {t('Journals')}
+                <span
+                  className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${
                     pathname.includes('/tabs/journals')
                       ? 'scale-x-100'
                       : 'scale-x-0 group-hover:scale-x-100'
-                  }
-                `}
-              ></span>
+                  }`}
+                ></span>
+              </div>
             </Link>
             <Link
               lang={locale}
               href={`/tabs/chatbot`}
-              className={`
-                group
-                relative
-                font-semibold
-                ${pathname.includes('/tabs/chatbot') ? 'text-selected' : ''}
-              `}
+              className={`group relative font-semibold ${
+                pathname.includes('/tabs/chatbot') ? 'text-selected' : ''
+              }`}
             >
-              {t('Chatbot')}
-              <span
-                className={`
-                  absolute
-                  bottom-0
-                  left-0
-                  h-0.5
-                  w-full
-                  transform
-                  bg-selected
-                  transition-transform
-                  duration-300
-                  ${
+              <div>
+                {t('Chatbot')}
+                <span
+                  className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${
                     pathname.includes('/tabs/chatbot')
                       ? 'scale-x-100'
                       : 'scale-x-0 group-hover:scale-x-100'
-                  }
-                `}
-              ></span>
+                  }`}
+                ></span>
+              </div>
             </Link>
+
             <Link
               lang={locale}
               href={`/tabs/support`}
-              className={`
-                group
-                relative
-                font-semibold
-                ${pathname.includes('/tabs/support') ? 'text-selected' : ''}
-              `}
+              className={`group relative font-semibold ${
+                pathname.includes('/tabs/support') ? 'text-selected' : ''
+              }`}
             >
-              {t('Support')}
-              <span
-                className={`
-                  absolute
-                  bottom-0
-                  left-0
-                  h-0.5
-                  w-full
-                  transform
-                  bg-selected
-                  transition-transform
-                  duration-300
-                  ${
+              <div>
+                {t('Support')}
+                <span
+                  className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${
                     pathname.includes('/tabs/support')
                       ? 'scale-x-100'
                       : 'scale-x-0 group-hover:scale-x-100'
-                  }
-                `}
-              ></span>
+                  }`}
+                ></span>
+              </div>
             </Link>
+
             <Link
               lang={locale}
               href={`/tabs/addconference`}
-              className={`
-                group
-                relative
-                font-semibold
-                ${
-                  pathname.includes('/tabs/addconference')
-                    ? 'text-selected'
-                    : ''
-                }
-              `}
+              className={`group relative font-semibold ${
+                pathname.includes('/tabs/addconference') ? 'text-selected' : ''
+              }`}
             >
-              {t('Add_Conference')}
-              <span
-                className={`
-                  absolute
-                  bottom-0
-                  left-0
-                  h-0.5
-                  w-full
-                  transform
-                  bg-selected
-                  transition-transform
-                  duration-300
-                  ${
+              <div>
+                {t('Add_Conference')}
+                <span
+                  className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${
                     pathname.includes('/tabs/addconference')
                       ? 'scale-x-100'
                       : 'scale-x-0 group-hover:scale-x-100'
-                  }
-                `}
-              ></span>
+                  }`}
+                ></span>
+              </div>
             </Link>
             <Link
               lang={locale}
               href={`/tabs/about`}
-              className={`
-                group
-                relative
-                font-semibold
-                ${pathname.includes('/tabs/about') ? 'text-selected' : ''}
-              `}
+              className={`group relative font-semibold ${
+                pathname.includes('/tabs/about') ? 'text-selected' : ''
+              }`}
             >
-              {t('About')}
-              <span
-                className={`
-                  absolute
-                  bottom-0
-                  left-0
-                  h-0.5
-                  w-full
-                  transform
-                  bg-selected
-                  transition-transform
-                  duration-300
-                  ${
+              <div>
+                {t('About')}
+                <span
+                  className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${
                     pathname.includes('/tabs/about')
                       ? 'scale-x-100'
                       : 'scale-x-0 group-hover:scale-x-100'
-                  }
-                `}
-              ></span>
+                  }`}
+                ></span>
+              </div>
             </Link>
+
             {loginStatus ? null : (
-              <>
-                <Link
-                  lang={locale}
-                  href={`/tabs/login`}
-                  className={`
-                    group
-                    inline-flex
-                    items-center
-                    rounded-md
-                    bg-blue-500
-                    px-4
-                    py-2
-                    font-semibold
-                    text-white
-                    shadow-md
-                    transition-colors
-                    duration-200
-                    hover:bg-blue-700
-                    hover:shadow-lg
-                    focus:outline-none
-                    focus:ring-2
-                    focus:ring-blue-400
-                    ${pathname.includes('/tabs/login') ? 'bg-blue-600' : ''}
-                  `}
-                >
+              <Link
+                lang={locale}
+                href={`/tabs/login`}
+                className={`group relative inline-flex items-center rounded-md bg-blue-500 px-4 py-2 font-semibold text-white shadow-md transition-colors duration-200 hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                  pathname.includes('/tabs/login') ? 'bg-blue-600' : ''
+                }`}
+              >
+                <div className='flex items-center'>
+                  {' '}
+                  {/* Container for icon and text */}
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
                     width='24'
                     height='24'
                     viewBox='0 0 24 24'
                     fill='none'
-                    stroke='#ff0000'
-                    stroke-width='2'
-                    stroke-linecap='round'
-                    stroke-linejoin='round'
-                    className='lucide lucide-log-in'
+                    stroke='#ffffff'
+                    strokeWidth='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    className='lucide lucide-log-in mr-2'
                   >
                     <path d='M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4' />
                     <polyline points='10 17 15 12 10 7' />
                     <line x1='15' x2='3' y1='12' y2='12' />
-                  </svg>{' '}
+                  </svg>
                   {t('Login')}
-                </Link>
-              </>
+                </div>
+              </Link>
             )}
-          </nav>
+          </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            className='block sm:hidden' // Hiển thị mặc định, ẩn trên sm
-            onClick={toggleMobileMenu}
-          >
+          <button className='block sm:hidden' onClick={toggleMobileMenu}>
             {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
           </button>
 
-          {/* User dropdown */}
           {loginStatus ? (
             <div className='relative'>
               <button onClick={toggleUserDropdown}>

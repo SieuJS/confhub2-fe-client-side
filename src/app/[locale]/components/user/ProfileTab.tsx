@@ -12,7 +12,7 @@ const ProfileTab: React.FC<ProfileTabProps> = () => {
   const [userData, setUserData] = useState<UserResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [userEmail, setUserEmail] = useLocalStorage<string>('userEmail', '')
+  const [userEmail, setUserEmail] = useLocalStorage<string>('email', '')
   const [loginStatus, setLoginStatus] = useLocalStorage<string | null>(
     'loginStatus',
     null

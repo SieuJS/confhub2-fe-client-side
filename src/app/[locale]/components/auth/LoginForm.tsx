@@ -10,7 +10,7 @@ interface LoginFormProps {
 }
 
 const LoginForm: React.FC<LoginFormProps> = () => {
-  const [email, setEmail] = useState('')
+  // const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -24,7 +24,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
   )
   const [firstname, setFirstname] = useLocalStorage<string>('firstname', '')
   const [lastname, setLastname] = useLocalStorage<string>('lastname', '')
-  const [userEmail, setUserEmail] = useLocalStorage<string>('userEmail', '')
+  const [email, setEmail] = useLocalStorage<string>('email', '')
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -54,7 +54,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         setLoginStatus('Logined')
         setFirstname(data.user.firstName)
         setLastname(data.user.lastName)
-        setUserEmail(data.user.email)
+        setEmail(data.user.email)
 
         const localePrefix = pathname.split('/')[1]
         const pathWithLocale = `/${localePrefix}`
