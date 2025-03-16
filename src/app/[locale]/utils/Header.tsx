@@ -127,14 +127,14 @@ export const Header: FC<Props> = ({ locale }) => {
             <>
               <Link
                 lang={locale}
-                href={`/login`}
+                href={`/auth/login`}
                 onClick={closeMobileMenu}
               >
                 <div className='hover:bg-button/10 py-2'>{t('Login')}</div>
               </Link>
               <Link
                 lang={locale}
-                href={`/register`}
+                href={`/auth/register`}
                 onClick={closeMobileMenu}
               >
                 <div className='hover:bg-button/10 py-2'>{t('Register')}</div>
@@ -393,9 +393,9 @@ export const Header: FC<Props> = ({ locale }) => {
             {loginStatus ? null : (
               <Link
                 lang={locale}
-                href={`/login`}
+                href={`/auth/login`}
                 className={`group relative inline-flex items-center rounded-md bg-blue-500 px-4 py-2 font-semibold text-white shadow-md transition-colors duration-200 hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                  pathname.includes('/login') ? 'bg-blue-600' : ''
+                  pathname.includes('/auth/login') ? 'bg-blue-600' : ''
                 }`}
               >
                 <div className='flex items-center'>

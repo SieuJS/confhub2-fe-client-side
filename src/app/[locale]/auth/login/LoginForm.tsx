@@ -124,7 +124,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
                 {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
               </button>
               <Link
-                href='/register'
+                href='/auth/register'
                 className='inline-block align-baseline text-sm font-bold text-blue-500 hover:text-blue-800'
               >
                 Chưa có tài khoản? Đăng ký
