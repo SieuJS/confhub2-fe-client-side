@@ -1,15 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
-import Image from 'next/image'
-import { useRouter } from 'next/navigation'
 import { Header } from '../utils/Header'
 import Footer from '../utils/Footer'
-import {
-  ConferenceResponse,
-  ImportantDate,
-  Location
-} from '../../../models/response/conference.response' // Import all relevant types
+import { useRouter, usePathname } from 'next/navigation';
+import { getPathname } from '@/src/navigation';
+
+const API_ADD_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/conferences';
 
 interface ConferenceFormData {
   title: string
@@ -38,7 +35,6 @@ interface ImportantDateInput {
 }
 
 const AddConference = ({ locale }: { locale: string }) => {
-  const router = useRouter()
   const [title, setTitle] = useState('')
   const [acronym, setAcronym] = useState('')
   const [link, setLink] = useState('')
@@ -62,8 +58,9 @@ const AddConference = ({ locale }: { locale: string }) => {
 
   const [imageUrl, setImageUrl] = useState('')
   const [description, setDescription] = useState('')
-  const [rank, setRank] = useState('') //  Keep these, but don't render if unused
-  const [source, setsource] = useState('')
+
+  const router = useRouter()
+  const pathname = usePathname();
 
   const handleAddTopic = () => {
     if (newTopic.trim() !== '') {
@@ -106,9 +103,8 @@ const AddConference = ({ locale }: { locale: string }) => {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-
+  const handleSubmit = async (e: React.FormEvent) => { // Hàm async
+    e.preventDefault();
     if (
       !title ||
       !acronym ||
@@ -120,8 +116,8 @@ const AddConference = ({ locale }: { locale: string }) => {
       !location.continent ||
       dates.some(date => !date.fromDate || !date.toDate || !date.name)
     ) {
-      alert('Please fill in all required fields.')
-      return
+      alert('Please fill in all required fields.');
+      return;
     }
 
     const conferenceData: ConferenceFormData = {
@@ -133,16 +129,48 @@ const AddConference = ({ locale }: { locale: string }) => {
       location,
       dates,
       imageUrl,
-      description
+      description,
+    };
+
+    const userData = localStorage.getItem('user');
+    if (!userData) {
+      console.error('User not logged in');
+      alert("Please log in to add new Conference")
+      return; // Kết thúc sớm nếu không có thông tin người dùng
+    }
+    const user = JSON.parse(userData);
+    const userId = user.id; // Lấy userId từ localStorage
+    console.log(conferenceData);
+    try {
+      const response = await fetch(API_ADD_CONFERENCE_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Thêm Authorization header nếu cần
+        },
+        body: JSON.stringify({ ...conferenceData, userId }), // GỬI userId TRONG BODY
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message}`);
+      }
+
+      const addedConference = await response.json(); // Lấy conference đã thêm từ response
+      console.log('Conference added:', addedConference);
+
+      // --- Prepend Locale Prefix ---
+      const localePrefix = pathname.split('/')[1]; // Extract locale prefix (e.g., "en")
+      const pathWithLocale = `/${localePrefix}/dashboard?tab=myconferences`; // Construct path with locale
+
+      router.push(pathWithLocale); // Use path with locale for internal navigation   
+
+    } catch (error: any) {
+      console.error('Error adding conference:', error.message);
+      // Xử lý lỗi (hiển thị thông báo, v.v.)
     }
 
-    const existingConferences = JSON.parse(
-      localStorage.getItem('conferences') || '[]'
-    )
-    const newConferences = [...existingConferences, conferenceData]
-    localStorage.setItem('conferences', JSON.stringify(newConferences))
-    router.push('/my-conferences')
-  }
+  };
 
   return (
     <>
@@ -503,4 +531,4 @@ const AddConference = ({ locale }: { locale: string }) => {
   )
 }
 
-export default AddConference
+export default AddConference;
