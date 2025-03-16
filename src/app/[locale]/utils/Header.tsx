@@ -97,11 +97,7 @@ export const Header: FC<Props> = ({ locale }) => {
     return (
       <div className='border-border absolute left-0 right-0 top-full z-40 border-b bg-background-secondary shadow-md sm:hidden'>
         <div className='flex flex-col p-4'>
-          <Link
-            lang={locale}
-            href={`/conferences`}
-            onClick={closeMobileMenu}
-          >
+          <Link lang={locale} href={`/conferences`} onClick={closeMobileMenu}>
             <div className='hover:bg-button/10 py-2'>{t('Conferences')}</div>
           </Link>
           <Link lang={locale} href={`/journals`} onClick={closeMobileMenu}>
@@ -113,16 +109,10 @@ export const Header: FC<Props> = ({ locale }) => {
           <Link lang={locale} href={`/support`} onClick={closeMobileMenu}>
             <div className='hover:bg-button/10 py-2'>{t('Support')}</div>
           </Link>
-          <Link
-            lang={locale}
-            href={`/addconference`}
-            onClick={closeMobileMenu}
-          >
+          <Link lang={locale} href={`/addconference`} onClick={closeMobileMenu}>
             <div className='hover:bg-button/10 py-2'>{t('Add_Conference')}</div>
           </Link>
-          <Link lang={locale} href={`/about`} onClick={closeMobileMenu}>
-            <div className='hover:bg-button/10 py-2'>{t('About')}</div>
-          </Link>
+
           {loginStatus ? null : (
             <>
               <Link
@@ -208,20 +198,12 @@ export const Header: FC<Props> = ({ locale }) => {
 
     return (
       <div
-        className='absolute right-0 top-full z-50 mt-2 w-56 rounded-md border border-gray-200 bg-white shadow-lg focus:outline-none dark:border-gray-700 dark:bg-gray-800'
+        className='absolute right-0 top-full z-50 mt-2 w-36 rounded-md border border-gray-200 bg-white shadow-lg focus:outline-none dark:border-gray-700 dark:bg-gray-800'
         aria-labelledby='user-menu-button'
       >
         <div className='flex flex-col gap-1 py-1'>
-          <div className='px-4 py-2 text-sm text-gray-700 dark:text-gray-300'>
-            {/* Use the user object */}
-            Chào mừng! {user?.firstname} {user?.lastname}
-          </div>
-          <Link
-            href='/dashboard'
-            lang={locale}
-            onClick={closeUserDropdown}
-          >
-            <div className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-700'>
+          <Link href='/dashboard' lang={locale} onClick={closeUserDropdown}>
+            <div className='block px-4 py-2 text-sm  hover:bg-gray-100 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-700'>
               Bảng điều khiển
             </div>
           </Link>
@@ -232,7 +214,7 @@ export const Header: FC<Props> = ({ locale }) => {
             <LangSwitcher />
           </div>
           <button
-            className='block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:bg-gray-700'
+            className='block w-full px-4 py-2 text-left text-sm  hover:bg-gray-100 focus:bg-gray-100 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:bg-gray-700'
             onClick={() => {
               setLoginStatus(null)
               setUser(null) // Clear the user object
@@ -365,24 +347,6 @@ export const Header: FC<Props> = ({ locale }) => {
                 <span
                   className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${
                     pathname.includes('/addconference')
-                      ? 'scale-x-100'
-                      : 'scale-x-0 group-hover:scale-x-100'
-                  }`}
-                ></span>
-              </div>
-            </Link>
-            <Link
-              lang={locale}
-              href={`/about`}
-              className={`group relative font-semibold ${
-                pathname.includes('/about') ? 'text-selected' : ''
-              }`}
-            >
-              <div>
-                {t('About')}
-                <span
-                  className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${
-                    pathname.includes('/about')
                       ? 'scale-x-100'
                       : 'scale-x-0 group-hover:scale-x-100'
                   }`}

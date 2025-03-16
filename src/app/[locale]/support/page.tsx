@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useTheme } from 'next-themes'
 import { Header } from '../utils/Header'
 import Footer from '../utils/Footer'
+import About from './about'
 
 const FAQ = ({ locale }: { locale: string }) => {
   const t = useTranslations('FAQ')
@@ -327,44 +328,20 @@ const FAQ = ({ locale }: { locale: string }) => {
   return (
     <>
       <Header locale={locale} />
-      <div className='w-full bg-gradient-to-r from-background to-background-secondary p-14'>
-        {' '}
+      <About />
+      <div className='w-full bg-gradient-to-r from-background to-background-secondary p-8'>
         {/* Added padding */}
-        <div className='container relative grid grid-cols-1 items-center gap-4 md:grid-cols-5'>
-          <div className='relative mt-6 h-[200px] animate-float-up-down max-lg:hidden md:col-span-1 md:h-[200px]'>
-            {' '}
-            {/* Image left - fixed height */}
-            {/* <Image
-              src='/s1.png'
-              alt='Background image left'
-              layout='fill' // Use fill layout
-              objectFit='contain'
-              className='object-contain'
-            /> */}
-          </div>
+        <div className='container relative grid grid-cols-1 items-center gap-4 md:grid-cols-3'>
           <div className='flex flex-col items-center md:col-span-3'>
-            {' '}
             {/* Title and search bar column */}
-            <h2 className='pt-28 text-center text-3xl font-bold'>
+            <h2 className='py-8 text-center text-3xl font-bold'>
               {t('How can we help you?')}
-            </h2>{' '}
+            </h2>
             {/* Removed pt-40 */}
-          </div>
-          <div className='relative mt-10 h-[200px] animate-float-up-down max-lg:hidden md:col-span-1 md:h-[200px]'>
-            {' '}
-            {/* Image left - fixed height */}
-            {/* <Image
-              src='/s2.png'
-              alt='Background image left'
-              layout='fill' // Use fill layout
-              objectFit='contain'
-              className='object-contain'
-            /> */}
           </div>
         </div>
         {/* Search Bar */}
         <div className='relative mx-20 mb-12 md:mx-40 lg:mx-60 '>
-          {' '}
           {/* Increased mb for spacing */}
           <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3'>
             <svg
@@ -390,11 +367,9 @@ const FAQ = ({ locale }: { locale: string }) => {
         </div>
         {/* Two-Column Layout */}
         <div className='mx-12 flex gap-4'>
-          {' '}
           {/* Using grid for 2-column layout */}
           {/* Left Column - Categories */}
           <div className='w-full rounded-lg  p-4 shadow-lg md:w-1/3'>
-            {' '}
             {/* Adjusted width for smaller screens */}
             <h3 className='mb-4 text-lg font-semibold'>
               {t('categoriesTitle') || 'Categories'}
@@ -420,7 +395,6 @@ const FAQ = ({ locale }: { locale: string }) => {
           </div>
           {/* Right Column - Questions and Answers */}
           <div className='w-full rounded-lg  p-4 shadow-xl md:w-2/3'>
-            {' '}
             {/* Adjusted width for smaller screens */}
             <div className='space-y-4'>
               {filteredFaqData.map((item, index) => (
@@ -447,7 +421,7 @@ const FAQ = ({ locale }: { locale: string }) => {
                   </div>
                   {expandedIndex === index && (
                     <div className='px-4 pb-4 pt-0'>
-                      <p className=''>{item.answer}</p>
+                      <p>{item.answer}</p>
                     </div>
                   )}
                 </div>
