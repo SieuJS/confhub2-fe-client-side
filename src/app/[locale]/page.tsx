@@ -1,12 +1,12 @@
 "use client";
 import { useTranslations } from 'next-intl'
-import Button from './components/utils/Button'
-import Banner from './components/home/Banner'
-import PopularConferences from './components/home/PopularConferences'
+import Button from './utils/Button'
+import Banner from './home/Banner'
+import PopularConferences from './home/PopularConferences'
 import { useEffect, useState } from 'react';
-import Footer from './components/utils/Footer';
-import ConsumerInsights from './components/home/ConsumerInsights';
-import { Header } from './components/utils/Header';
+import Footer from './utils/Footer';
+import ConsumerInsights from './home/ConsumerInsights';
+import { Header } from './utils/Header';
 
 
 export default function HomePage({ locale }: { locale: string }) {

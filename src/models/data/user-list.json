@@ -6,6 +6,7 @@
     "lastName": "Doe",
     "dob": "1990-05-15",
     "role": "user",
+    "followedConferences": [],
     "createdAt": "2023-01-20T10:00:00Z",
     "updatedAt": "2023-01-20T10:00:00Z"
   },
@@ -16,6 +17,7 @@
     "lastName": "NGUYỄN",
     "dob": "2025-03-16T02:23:28.637Z",
     "role": "user",
+    "followedConferences": [],
     "createdAt": "2025-03-16T02:23:28.642Z",
     "updatedAt": "2025-03-16T02:23:28.642Z"
   },
@@ -25,7 +27,8 @@
     "firstName": "Jane",
     "lastName": "Admin",
     "dob": "1985-12-10",
-    "role": "admin",
+    "role": "user",
+    "followedConferences": [],
     "createdAt": "2022-11-05T14:30:00Z",
     "updatedAt": "2023-02-10T16:45:00Z"
   },
@@ -36,6 +39,7 @@
     "lastName": "Pan",
     "dob": "2000-03-22",
     "role": "user",
+    "followedConferences": [],
     "createdAt": "2024-02-28T09:15:00Z",
     "updatedAt": "2024-03-01T11:20:00Z"
   },
@@ -45,8 +49,21 @@
     "firstName": "Special",
     "lastName": "User",
     "dob": "1978-07-04",
-    "role": "guest",
+    "role": "user",
+    "followedConferences": [],
+    "createdAt": "2021-06-05T12:00:00.000Z",
+    "updatedAt": "2021-06-05T12:00:00.000Z"
+  },
+  {
+    "id": "specialUser",
+    "email": "test@gmail.com",
+    "firstName": "test",
+    "lastName": "test",
+    "dob": "1978-07-04",
+    "role": "user",
+    "followedConferences": [],
     "createdAt": "2021-06-05T12:00:00.000Z",
     "updatedAt": "2021-06-05T12:00:00.000Z"
   }
+
 ]

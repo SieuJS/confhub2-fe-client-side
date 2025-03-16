@@ -1,3 +1,5 @@
+import { ConferenceResponse } from "./conference.response";
+
 export type UserResponse = {
   id: string;
   email: string;
@@ -5,6 +7,7 @@ export type UserResponse = {
   lastName: string;
   dob: string; 
   role: "user" | "admin" | string; 
+  followedConferences: string[];
   createdAt: string; 
   updatedAt: string; 
 }

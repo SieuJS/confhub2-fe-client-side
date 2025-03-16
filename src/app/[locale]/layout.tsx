@@ -4,7 +4,7 @@
         />
 
 import React from 'react';
-import { ThemeProvider } from '@/src/app/[locale]/components/utils/ThemeProvider';
+import { ThemeProvider } from '@/src/app/[locale]/utils/ThemeProvider';
 import type { Metadata } from 'next';
 import {
   AbstractIntlMessages,
