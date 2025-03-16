@@ -123,7 +123,7 @@ export default function Setting({ locale }: { locale: string }) {
                                     return (
                                         <li key={item.page} className="w-full">
                                             <Link
-                                                href={{ pathname: "/tabs/setting", query: { tab: tabValue } }}
+                                                href={{ pathname: "/tabs/dashboard", query: { tab: tabValue } }}
                                                 className={`flex items-center w-full p-3 hover:bg-button hover:opacity-60 focus:outline-none focus:secondary ${activePage === item.page ? 'bg-button text-button-text hover:bg-secondary' : ''}`}
                                             >
                                                 {item.label}

@@ -1,16 +1,21 @@
 "use client";
 import React, { useState } from 'react';
+import { Link } from '@/src/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface LoginFormProps {
-  onLoginSuccess?: () => void; // Callback khi đăng nhập thành công (tùy chọn)
+  // Không cần onLoginSuccess nữa, vì chuyển hướng trực tiếp trong component
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
+const LoginForm: React.FC<LoginFormProps> = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // Thêm trạng thái loading
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError('');
 
@@ -19,18 +24,46 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       return;
     }
 
-    // --- Gọi API đăng nhập ở đây ---
-    // Thay thế dòng `setTimeout` bằng logic đăng nhập thực tế của bạn
-    setTimeout(() => {
-      // Giả sử đăng nhập thành công sau 1 giây
-      console.log('Đăng nhập thành công!', { email, password });
-      if (onLoginSuccess) {
-        onLoginSuccess(); // Gọi callback thành công nếu có
+    setIsLoading(true); // Bắt đầu loading
+    try {
+      const response = await fetch('http://localhost:3000/api/v1/user/signin', { // Use relative URL for client-side
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Đăng nhập thành công
+        console.log('Đăng nhập thành công!', data);
+
+        // --- LƯU TRẠNG THÁI ĐĂNG NHẬP VÀO LOCALSTORAGE ---
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('loginStatus', "Logined"); // Lưu thông tin người dùng (hoặc token) vào localStorage
+          localStorage.setItem('firstname', data.user.firstName);
+          localStorage.setItem('lastname', data.user.lastName);
+
+          // --- Prepend Locale Prefix ---
+          const localePrefix = pathname.split('/')[1]; // Extract locale prefix (e.g., "en")
+          const pathWithLocale = `/${localePrefix}`; // Construct path with locale
+
+          router.push(pathWithLocale); // Use path with locale for internal navigation
+        } else {
+          console.error("Error in signin");
+        }
+      } else {
+        // Xử lý lỗi đăng nhập
+        setError(data.message || 'Đăng nhập không thành công. Vui lòng kiểm tra thông tin đăng nhập.');
       }
-      // Reset form hoặc chuyển hướng người dùng nếu cần
-      setEmail('');
-      setPassword('');
-    }, 1000);
+    } catch (error: any) {
+      console.error('Lỗi đăng nhập:', error);
+      setError('Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại sau.');
+    } finally {
+      setIsLoading(false); // Kết thúc loading, bất kể thành công hay thất bại
+    }
   };
 
   return (
@@ -70,12 +103,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
               <button
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                 type="submit"
+                disabled={isLoading} // Vô hiệu hóa nút khi đang tải
               >
-                Đăng nhập
+                {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
               </button>
-              <a className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="/signup">
+              <Link href="/tabs/register" className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
                 Chưa có tài khoản? Đăng ký
-              </a>
+              </Link>
             </div>
           </div>
         </form>

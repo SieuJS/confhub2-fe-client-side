@@ -1,23 +1,32 @@
-'use client'
-import { Link } from '@/src/navigation'
-import { useTranslations } from 'next-intl'
-import { FC, useRef, useState, useEffect } from 'react'
-import GithubIcon from '../../../icons/github'
-import LogoIcon from '../../../icons/logo'
-import LangSwitcher from './LangSwitcher'
-import ThemeSwitch from './ThemeSwitch'
-import { usePathname } from 'next/navigation'; // Import usePathname
+import { Link } from '@/src/navigation';
+import { useTranslations } from 'next-intl';
+import { FC, useRef, useState, useEffect } from 'react';
+import GithubIcon from '../../../icons/github';
+import LogoIcon from '../../../icons/logo';
+import LangSwitcher from './LangSwitcher';
+import ThemeSwitch from './ThemeSwitch';
+import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { useLocalStorage } from 'usehooks-ts';
 
 interface Props {
-  locale: string
+  locale: string;
 }
 
 export const Header: FC<Props> = ({ locale }) => {
-  const t = useTranslations('')
+  const t = useTranslations('');
   const headerRef = useRef<HTMLDivElement>(null);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const pathname = usePathname(); // Get current pathname
+  const pathname = usePathname();
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const router = useRouter();
+
+  // Sử dụng useLocalStorage cho firstname, lastname, và loginStatus
+  const [firstname, setFirstname] = useLocalStorage<string>('firstname', '');
+  const [lastname, setLastname] = useLocalStorage<string>('lastname', '');
+  const [loginStatus, setLoginStatus] = useLocalStorage<string | null>('loginStatus', null); // Sử dụng string | null để cho phép giá trị null
+
 
   const toggleNotification = () => {
     setIsNotificationOpen(!isNotificationOpen);
@@ -35,14 +44,36 @@ export const Header: FC<Props> = ({ locale }) => {
     setIsMobileMenuOpen(false);
   };
 
+  const toggleUserDropdown = () => {
+    setIsUserDropdownOpen(!isUserDropdownOpen);
+  };
+
+  const closeUserDropdown = () => {
+    setIsUserDropdownOpen(false);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (isNotificationOpen && headerRef.current && !headerRef.current.contains(event.target as Node)) {
+      if (
+        isNotificationOpen &&
+        headerRef.current &&
+        !headerRef.current.contains(event.target as Node)
+      ) {
         closeNotification();
       }
-      if (isMobileMenuOpen && headerRef.current && !headerRef.current.contains(event.target as Node)) {
+      if (
+        isMobileMenuOpen &&
+        headerRef.current &&
+        !headerRef.current.contains(event.target as Node)
+      ) {
         closeMobileMenu();
+      }
+      if (
+        isUserDropdownOpen &&
+        headerRef.current &&
+        !headerRef.current.contains(event.target as Node)
+      ) {
+        closeUserDropdown();
       }
     };
 
@@ -51,244 +82,481 @@ export const Header: FC<Props> = ({ locale }) => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isNotificationOpen, isMobileMenuOpen, headerRef]);
-
-
-  const NotificationIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-9 text-button ">
-      <path fillRule="evenodd" d="M5.25 9a6.75 6.75 0 0 1 13.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 0 1-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 1 1-7.48 0 24.585 24.585 0 0 1-4.831-1.244.75.75 0 0 1-.298-1.205A8.217 8.217 0 0 0 5.25 9.75V9Zm4.502 8.9a2.25 2.25 0 1 0 4.496 0 25.057 25.057 0 0 1-4.496 0Z" clipRule="evenodd" />
-    </svg>
-  );
-
-  const NotificationDropdown = () => {
-    if (!isNotificationOpen) return null;
-
-    return (
-      <div className="absolute right-0 top-full mt-2 w-80 bg-background-secondary border border-border rounded-md shadow-lg z-50">
-        <div className="py-2">
-          <div className="px-4 py-2 text-sm text-foreground hover:bg-button/10">
-            Notification 1: New message from user A
-          </div>
-          <div className="px-4 py-2 text-sm text-foreground hover:bg-button/10">
-            Notification 2: System update available
-          </div>
-          <div className="px-4 py-2 text-sm text-foreground hover:bg-button/10">
-            Notification 3: Reminder for conference call
-          </div>
-          <div className="px-4 py-2 text-sm text-foreground hover:bg-button/10 text-center border-t border-border">
-            <Link href={{ pathname: "/tabs/setting", query: { tab: "notifications" } }} lang={locale} onClick={closeNotification} className="text-button hover:underline block">
-              {t('View all notifications')}
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  };
+  }, [isNotificationOpen, isMobileMenuOpen, isUserDropdownOpen, headerRef]);
 
   const MobileNavigation = () => {
     if (!isMobileMenuOpen) return null;
 
     return (
-      <div className="absolute top-full left-0 right-0 bg-background-secondary border-b border-border shadow-md z-40 sm:hidden"> {/* Chỉ hiển thị trên mobile */}
+      <div className="absolute top-full left-0 right-0 bg-background-secondary border-b border-border shadow-md z-40 sm:hidden">
         <nav className="flex flex-col p-4">
-          <Link lang={locale} href={`/tabs/conferences`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+          {/* ... Các link ... */}
+          <Link
+            lang={locale}
+            href={`/tabs/conferences`}
+            className="block py-2 hover:bg-button/10"
+            onClick={closeMobileMenu}
+          >
             {t('Conferences')}
           </Link>
-          <Link lang={locale} href={`/tabs/journals`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+          <Link
+            lang={locale}
+            href={`/tabs/journals`}
+            className="block py-2 hover:bg-button/10"
+            onClick={closeMobileMenu}
+          >
             {t('Journals')}
           </Link>
-          <Link lang={locale} href={`/tabs/setting`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+          <Link
+            lang={locale}
+            href={`/tabs/dashboard`}
+            className="block py-2 hover:bg-button/10"
+            onClick={closeMobileMenu}
+          >
             {t('Setting')}
           </Link>
-          <Link lang={locale} href={`/tabs/chatbot`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+          <Link
+            lang={locale}
+            href={`/tabs/chatbot`}
+            className="block py-2 hover:bg-button/10"
+            onClick={closeMobileMenu}
+          >
             {t('Chatbot')}
           </Link>
-          <Link lang={locale} href={`/tabs/support`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+          <Link
+            lang={locale}
+            href={`/tabs/support`}
+            className="block py-2 hover:bg-button/10"
+            onClick={closeMobileMenu}
+          >
             {t('Support')}
           </Link>
-          <Link lang={locale} href={`/tabs/support`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+          <Link
+            lang={locale}
+            href={`/tabs/addconference`}
+            className="block py-2 hover:bg-button/10"
+            onClick={closeMobileMenu}
+          >
             {t('Add_Conference')}
           </Link>
-          <Link lang={locale} href={`/tabs/about`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
+          <Link
+            lang={locale}
+            href={`/tabs/about`}
+            className="block py-2 hover:bg-button/10"
+            onClick={closeMobileMenu}
+          >
             {t('About')}
           </Link>
-          <Link lang={locale} href={`/tabs/login`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
-            {t('Login')}
-          </Link>
-          <Link lang={locale} href={`/tabs/register`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
-            {t('Register')}
-          </Link>
-          {/* <Link lang={locale} href={`/tabs/other`} className="block py-2 hover:bg-button/10" onClick={closeMobileMenu}>
-            {t('Other')}
-          </Link> */}
+          {loginStatus ? null : (
+            <>
+              <Link
+                lang={locale}
+                href={`/tabs/login`}
+                className="block py-2 hover:bg-button/10"
+                onClick={closeMobileMenu}
+              >
+                {t('Login')}
+              </Link>
+              <Link
+                lang={locale}
+                href={`/tabs/register`}
+                className="block py-2 hover:bg-button/10"
+                onClick={closeMobileMenu}
+              >
+                {t('Register')}
+              </Link>
+            </>
+          )}
         </nav>
       </div>
     );
   };
 
-
   const MenuIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-8 w-8 text-foreground">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="lucide lucide-menu" // Use lucide-menu for a standard menu icon
+    >
+      <line x1="3" x2="21" y1="12" y2="12" />
+      <line x1="3" x2="21" y1="6" y2="6" />
+      <line x1="3" x2="21" y1="18" y2="18" />
     </svg>
   );
 
   const CloseIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-8 w-8 text-foreground">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      className="h-8 w-8 text-foreground"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M6 18L18 6M6 6l12 12"
+      />
     </svg>
   );
 
-  const isActive = (href: string) => {
-      return pathname === href;
+  const UserIcon = () => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="lucide lucide-user-check"
+    >
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <polyline points="16 11 18 13 22 9" />
+    </svg>
+  );
+
+  const UserDropdown = () => {
+    const router = useRouter();
+
+    if (!isUserDropdownOpen) return null;
+
+    return (
+      <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 focus:outline-none" aria-labelledby="user-menu-button">
+        <div className="py-1">
+          <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+            Chào mừng! {firstname} {lastname}
+          </div>
+
+          <Link
+            href="/tabs/dashboard"
+            lang={locale}
+            onClick={closeUserDropdown}
+            className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700"
+          >
+            Bảng điều khiển
+          </Link>
+
+          <ThemeSwitch />
+          <LangSwitcher />
+
+          <button
+            onClick={() => {
+              // Sử dụng các hàm setter của hook để xóa dữ liệu
+              setLoginStatus(null);
+              setFirstname('');
+              setLastname('');
+
+              let pathWithLocale = '/tabs/login';
+              if (pathname) {
+                const pathParts = pathname.split('/');
+                if (pathParts.length > 1) {
+                  const localePrefix = pathParts[1];
+                  pathWithLocale = `/${localePrefix}/tabs/login`;
+                }
+              }
+
+              router.push(pathWithLocale);
+              closeUserDropdown();
+            }}
+            className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700 w-full text-left"
+          >
+            Đăng xuất
+          </button>
+        </div>
+      </div>
+    );
   };
 
 
+  const isActive = (href: string) => {
+    return pathname === href;
+  };
+
   return (
     <>
-      
-        <div
-          ref={headerRef}
-          className={`mx-auto flex max-w-screen-2xl flex-row items-center justify-between p-3 bg-gradient-to-r from-background to-background-secondary transition-all duration-300 ease-in-out
-        fixed top-0 left-0 right-0 z-40 shadow-md
-      `}
-          style={{ height: '60px' }} // Reduced height
-        >
-          <Link lang={locale} href='/'>
-            <div className='flex flex-row items-center'>
-              <div className='mb-2 h-10 w-10'> {/* Reduced logo size */}
-                <LogoIcon />
-              </div>
-              <strong className='mx-2 select-none'>ConFHub</strong>
+      <div
+        ref={headerRef}
+        className={`
+          mx-auto
+          flex
+          max-w-screen-2xl
+          flex-row
+          items-center /* Canh giữa dọc các phần tử */
+          justify-between
+          p-3
+          bg-gradient-to-r
+          from-background
+          to-background-secondary
+          transition-all
+          duration-300
+          ease-in-out
+          fixed
+          top-0
+          left-0
+          right-0
+          z-40
+          shadow-md
+        `}
+        style={{ height: '60px' }}
+      >
+        <Link lang={locale} href="/">
+          <div className="flex flex-row items-center">
+            <div className="mb-2 h-10 w-10">
+              <LogoIcon />
             </div>
-          </Link>
-          <div className='flex flex-row items-center gap-3 relative'>
-            {/* Navigation for larger screens - Hiển thị trên sm trở lên */}
-            <nav className='mr-10  gap-5 sm:inline-flex hidden'> {/* Ẩn mặc định, hiển thị trên sm */}
-              <Link
-                lang={locale}
-                href={`/tabs/conferences`}
-                style={{ fontWeight: 'bold' }}
-                className={`relative group ${pathname.includes('/tabs/conferences') ? 'text-selected' : ''}`} // Conditional styling
-              >
-                {t('Conferences')}
-                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/conferences') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
-              </Link>
-              <Link
-                lang={locale}
-                href={`/tabs/journals`}
-                style={{ fontWeight: 'bold' }}
-                className={`relative group ${pathname.includes('/tabs/journals') ? 'text-selected' : ''}`} // Conditional styling
-              >
-                {t('Journals')}
-                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/journals') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
-              </Link>
-              <Link
-                lang={locale}
-                href={`/tabs/setting`}
-                style={{ fontWeight: 'bold' }}
-                className={`relative group ${pathname.includes('/tabs/setting') ? 'text-selected' : ''}`} // Conditional styling
-              >
-                {t('Setting')}
-                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/setting') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
-              </Link>
-              <Link
-                lang={locale}
-                href={`/tabs/chatbot`}
-                style={{ fontWeight: 'bold' }}
-                className={`relative group ${pathname.includes('/tabs/chatbot') ? 'text-selected' : ''}`} // Conditional styling
-              >
-                {t('Chatbot')}
-                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/chatbot') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
-              </Link>
-              <Link
-                lang={locale}
-                href={`/tabs/support`}
-                style={{ fontWeight: 'bold' }}
-                className={`relative group ${pathname.includes('/tabs/support') ? 'text-selected' : ''}`} // Conditional styling
-              >
-                {t('Support')}
-                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/support') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
-              </Link>
-              <Link
-                lang={locale}
-                href={`/tabs/addconference`}
-                style={{ fontWeight: 'bold' }}
-                className={`relative group ${pathname.includes('/tabs/addconference') ? 'text-selected' : ''}`} // Conditional styling
-              >
-                {t('Add_Conference')}
-                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/addconference') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
-              </Link>
-              <Link
-                lang={locale}
-                href={`/tabs/about`}
-                style={{ fontWeight: 'bold' }}
-                className={`relative group ${pathname.includes('/tabs/about') ? 'text-selected' : ''}`} // Conditional styling
-              >
-                {t('About')}
-                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/about') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
-              </Link>
-              <Link
-                lang={locale}
-                href={`/tabs/login`}
-                style={{ fontWeight: 'bold' }}
-                className={`relative group ${pathname.includes('/tabs/login') ? 'text-selected' : ''}`} // Conditional styling
-              >
-                {t('Login')}
-                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/login') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
-              </Link>
-              <Link
-                lang={locale}
-                href={`/tabs/register`}
-                style={{ fontWeight: 'bold' }}
-                className={`relative group ${pathname.includes('/tabs/register') ? 'text-selected' : ''}`} // Conditional styling
-              >
-                {t('Register')}
-                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/register') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
-              </Link>
-              {/* <Link
-                lang={locale}
-                href={`/tabs/other`}
-                style={{ fontWeight: 'bold' }}
-                className={`relative group ${pathname.includes('/tabs/other') ? 'text-selected' : ''}`} // Conditional styling
-              >
-                {t('Other')}
-                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-selected transform transition-transform duration-300 ${pathname.includes('/tabs/other') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
-              </Link> */}
-            </nav>
-
-            {/* Mobile Menu Button - Chỉ hiển thị trên màn hình nhỏ (dưới sm) */}
-            <button
-              className='sm:hidden block' // Hiển thị mặc định, ẩn trên sm
-              onClick={toggleMobileMenu}
-            >
-              {isMobileMenuOpen ? (
-                <CloseIcon />
-              ) : (
-                <MenuIcon />
-              )}
-            </button>
-
-            <ThemeSwitch />
-            <LangSwitcher />
-            <button className='' onClick={toggleNotification}>
-              <div className='size-8 items-center justify-center relative'>
-                <NotificationIcon />
-              </div>
-            </button>
-            <a
-              href='https://github.com/yahyaparvar/nextjs-template'
-              target='_blank'
-            >
-              <div className='size-8'>
-                <GithubIcon />
-              </div>
-            </a>
-            <NotificationDropdown />
-            <MobileNavigation /> 
+            <strong className="mx-2 select-none">ConFHub</strong>
           </div>
+        </Link>
+
+        <div className="flex flex-row items-center gap-3 relative">
+          {/* Navigation for larger screens */}
+          <nav className="mr-10 gap-5 sm:inline-flex hidden">
+            {/* Ẩn mặc định, hiển thị trên sm */}
+             {/* ... Các link ... */}
+            <Link
+              lang={locale}
+              href={`/tabs/conferences`}
+              className={`
+                relative
+                group
+                font-semibold
+                ${pathname.includes('/tabs/conferences')
+                  ? 'text-selected'
+                  : ''
+                }
+              `}
+            >
+              {t('Conferences')}
+              <span
+                className={`
+                  absolute
+                  bottom-0
+                  left-0
+                  w-full
+                  h-0.5
+                  bg-selected
+                  transform
+                  transition-transform
+                  duration-300
+                  ${pathname.includes('/tabs/conferences')
+                    ? 'scale-x-100'
+                    : 'scale-x-0 group-hover:scale-x-100'
+                  }
+                `}
+              ></span>
+            </Link>
+            <Link
+              lang={locale}
+              href={`/tabs/journals`}
+              className={`
+                relative
+                group
+                font-semibold
+                ${pathname.includes('/tabs/journals') ? 'text-selected' : ''}
+              `}
+            >
+              {t('Journals')}
+              <span
+                className={`
+                  absolute
+                  bottom-0
+                  left-0
+                  w-full
+                  h-0.5
+                  bg-selected
+                  transform
+                  transition-transform
+                  duration-300
+                  ${pathname.includes('/tabs/journals')
+                    ? 'scale-x-100'
+                    : 'scale-x-0 group-hover:scale-x-100'
+                  }
+                `}
+              ></span>
+            </Link>
+            <Link
+              lang={locale}
+              href={`/tabs/chatbot`}
+              className={`
+                relative
+                group
+                font-semibold
+                ${pathname.includes('/tabs/chatbot') ? 'text-selected' : ''}
+              `}
+            >
+              {t('Chatbot')}
+              <span
+                className={`
+                  absolute
+                  bottom-0
+                  left-0
+                  w-full
+                  h-0.5
+                  bg-selected
+                  transform
+                  transition-transform
+                  duration-300
+                  ${pathname.includes('/tabs/chatbot')
+                    ? 'scale-x-100'
+                    : 'scale-x-0 group-hover:scale-x-100'
+                  }
+                `}
+              ></span>
+            </Link>
+            <Link
+              lang={locale}
+              href={`/tabs/support`}
+              className={`
+                relative
+                group
+                font-semibold
+                ${pathname.includes('/tabs/support') ? 'text-selected' : ''}
+              `}
+            >
+              {t('Support')}
+              <span
+                className={`
+                  absolute
+                  bottom-0
+                  left-0
+                  w-full
+                  h-0.5
+                  bg-selected
+                  transform
+                  transition-transform
+                  duration-300
+                  ${pathname.includes('/tabs/support')
+                    ? 'scale-x-100'
+                    : 'scale-x-0 group-hover:scale-x-100'
+                  }
+                `}
+              ></span>
+            </Link>
+            <Link
+              lang={locale}
+              href={`/tabs/addconference`}
+              className={`
+                relative
+                group
+                font-semibold
+                ${pathname.includes('/tabs/addconference')
+                  ? 'text-selected'
+                  : ''
+                }
+              `}
+            >
+              {t('Add_Conference')}
+              <span
+                className={`
+                  absolute
+                  bottom-0
+                  left-0
+                  w-full
+                  h-0.5
+                  bg-selected
+                  transform
+                  transition-transform
+                  duration-300
+                  ${pathname.includes('/tabs/addconference')
+                    ? 'scale-x-100'
+                    : 'scale-x-0 group-hover:scale-x-100'
+                  }
+                `}
+              ></span>
+            </Link>
+            <Link
+              lang={locale}
+              href={`/tabs/about`}
+              className={`
+                relative
+                group
+                font-semibold
+                ${pathname.includes('/tabs/about') ? 'text-selected' : ''}
+              `}
+            >
+              {t('About')}
+              <span
+                className={`
+                  absolute
+                  bottom-0
+                  left-0
+                  w-full
+                  h-0.5
+                  bg-selected
+                  transform
+                  transition-transform
+                  duration-300
+                  ${pathname.includes('/tabs/about')
+                    ? 'scale-x-100'
+                    : 'scale-x-0 group-hover:scale-x-100'
+                  }
+                `}
+              ></span>
+            </Link>
+            {loginStatus ? null : (
+              <>
+                <Link
+                  lang={locale}
+                  href={`/tabs/login`}
+                  className={`
+                    group
+                    inline-flex
+                    items-center
+                    font-semibold
+                    text-white
+                    bg-blue-500
+                    hover:bg-blue-700
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-blue-400
+                    transition-colors
+                    duration-200
+                    px-4
+                    py-2
+                    rounded-md
+                    shadow-md
+                    hover:shadow-lg
+                    ${pathname.includes('/tabs/login') ? 'bg-blue-600' : ''}
+                  `}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-log-in"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><polyline points="10 17 15 12 10 7" /><line x1="15" x2="3" y1="12" y2="12" /></svg>                  {t('Login')}
+                </Link>
+              </>
+            )}
+          </nav>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="sm:hidden block" // Hiển thị mặc định, ẩn trên sm
+            onClick={toggleMobileMenu}
+          >
+            {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
+          </button>
+
+          {/* User dropdown */}
+          {loginStatus ? (
+            <div className="relative">
+              <button onClick={toggleUserDropdown}>
+                <UserIcon />
+              </button>
+              <UserDropdown />
+            </div>
+          ) : null}
+          <MobileNavigation />
         </div>
-      
+      </div>
     </>
-  )
-}
+  );
+};

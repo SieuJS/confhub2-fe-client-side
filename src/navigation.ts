@@ -11,7 +11,7 @@ export const pathnames = {
   '/': '/',
   '/tabs/about': '/tabs/about',
   '/tabs/conferences': '/tabs/conferences',
-  '/tabs/setting': '/tabs/setting',
+  '/tabs/dashboard': '/tabs/dashboard',
   '/tabs/journals': '/tabs/journals',
   '/tabs/chatbot': '/tabs/chatbot',
   '/tabs/chatbot/chat': '/tabs/chatbot/chat',
