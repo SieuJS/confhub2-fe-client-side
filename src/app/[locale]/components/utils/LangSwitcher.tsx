@@ -7,14 +7,14 @@ import {
   useSelectedLayoutSegments
 } from 'next/navigation'
 import React, { useState, useRef, useEffect } from 'react'
-import { FiGlobe } from 'react-icons/fi'
+import { FiGlobe, FiChevronDown } from 'react-icons/fi' // Import FiChevronDown
+
+interface Option {
+  country: string
+  code: string
+}
 
 const LangSwitcher: React.FC = () => {
-  interface Option {
-    country: string
-    code: string
-  }
-
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const urlSegments = useSelectedLayoutSegments()
@@ -36,7 +36,9 @@ const LangSwitcher: React.FC = () => {
   ]
 
   const getLocalizedUrl = (locale: string) => {
-    const newPath = `/${locale}/${urlSegments.join('/')}`
+    // Handle edge case where there are no segments (e.g., homepage)
+    const segments = urlSegments.join('/')
+    const newPath = `/${locale}${segments ? `/${segments}` : ''}`
     const queryString = searchParams.toString()
     return queryString ? `${newPath}?${queryString}` : newPath
   }
@@ -60,24 +62,27 @@ const LangSwitcher: React.FC = () => {
     }
   }, [isOptionsExpanded])
 
-  const currentLocale = options.find(option =>
-    pathname.startsWith(`/${option.code}`)
-  ) || { country: 'Language', code: '' }
+  // Determine the current locale, defaulting to English if none is found
+  const currentLocale =
+    options.find(option => pathname.startsWith(`/${option.code}`)) || options[0] // Default to the first option (English)
 
   return (
-    <div className='flex items-center px-4'>
+    <div className='flex items-center '>
       <div className='relative' ref={dropdownRef}>
         <button
-          className='text-destructive inline-flex w-full items-center justify-between gap-3 text-sm'
+          className='text-destructive inline-flex w-full items-center justify-between gap-3 rounded px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700' // Added hover styles
           onClick={() => setIsOptionsExpanded(!isOptionsExpanded)}
         >
-          {capitalize(currentLocale.country)} <FiGlobe />
+          {capitalize(currentLocale.country)}
+          {/* Use FiChevronDown for a more appropriate icon */}
+          <FiChevronDown
+            className={`transition-transform ${isOptionsExpanded ? 'rotate-180' : ''}`}
+          />
         </button>
 
+        {/* Added z-50 to ensure the dropdown is above other elements */}
         {isOptionsExpanded && (
-          <div className='absolute right-0 mt-2 w-max origin-top-right rounded-md bg-dropdown shadow-lg'>
-            {' '}
-            {/* Changed w-full to w-max */}
+          <div className='absolute right-0 z-50 mt-2 w-max origin-top-right rounded-md bg-dropdown shadow-lg'>
             <div
               className='py-1'
               role='menu'
@@ -85,12 +90,16 @@ const LangSwitcher: React.FC = () => {
               aria-labelledby='options-menu'
             >
               {options.map(lang => (
-                <Link key={lang.code} href={getLocalizedUrl(lang.code)}>
+                <Link
+                  key={lang.code}
+                  href={getLocalizedUrl(lang.code)}
+                  passHref
+                >
+                  {/* Added passHref for proper Link behavior */}
                   <button
                     lang={lang.code}
-                    onMouseDown={e => e.preventDefault()}
+                    onClick={() => setIsOptionsExpanded(false)} // Close on click
                     className={`block w-full whitespace-nowrap px-4 py-2 text-left text-sm hover:bg-dropdownHover ${
-                      //Added whitespace-nowrap
                       pathname.startsWith(`/${lang.code}`)
                         ? 'bg-selected text-primary hover:bg-selected'
                         : 'text-secondary'
