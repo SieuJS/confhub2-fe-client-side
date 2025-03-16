@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { UserResponse } from '@/src/models/response/user.response' // Corrected import path
-import userList from '@/src/models/data/user-list.json' // Corrected import path
+import { UserResponse } from '@/src/models/response/user.response'
+import userList from '@/src/models/data/user-list.json'
 import { useLocalStorage } from 'usehooks-ts'
 
 interface ProfileTabProps {
@@ -12,30 +12,43 @@ const ProfileTab: React.FC<ProfileTabProps> = () => {
   const [userData, setUserData] = useState<UserResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [userEmail, setUserEmail] = useLocalStorage<string>('email', '')
+
+  // Use the user object from local storage
+  const [user, setUser] = useLocalStorage<{
+    firstname: string
+    lastname: string
+    email: string
+  } | null>('user', null)
+
   const [loginStatus, setLoginStatus] = useLocalStorage<string | null>(
     'loginStatus',
     null
   )
-  useEffect(() => {
-    // const loginStatus = localStorage.getItem('loginStatus')
-    // const userEmail = localStorage.getItem('userEmail')
 
-    if (loginStatus !== null && userEmail) {
-      // No need for async/await here, since we are using the imported JSON directly
+  useEffect(() => {
+    if (loginStatus !== null && user?.email) {
       const fetchUserData = () => {
         try {
-          // Directly use the imported userList
-          const foundUser = userList.find(user => user.email === userEmail)
+          // Check if the email exists in userList
+          const foundUser = userList.find(u => u.email === user.email)
 
           if (foundUser) {
-            setUserData(foundUser)
+            // Map the found user to UserResponse
+            const mappedUser: UserResponse = {
+              firstName: foundUser.firstName,
+              lastName: foundUser.lastName,
+              email: foundUser.email,
+              id: foundUser.id,
+              dob: foundUser.dob || '', // Provide a default value or map from foundUser
+              role: foundUser.role || 'user', // Provide a default value or map from foundUser
+              createdAt: foundUser.createdAt || new Date().toISOString(), // Default to current date
+              updatedAt: foundUser.updatedAt || new Date().toISOString() // Default to current date
+            }
+            setUserData(mappedUser)
           } else {
-            setError('User not found')
+            setError('User not found') // User's email not in userList
           }
         } catch (err) {
-          // This error handling is less likely to be triggered now,
-          // but it's still good practice to keep it.
           setError('Error fetching user data')
           console.error(err)
         } finally {
@@ -46,9 +59,9 @@ const ProfileTab: React.FC<ProfileTabProps> = () => {
       fetchUserData()
     } else {
       setLoading(false)
-      setError('User not logged in')
+      setError('User not logged in') // loginStatus is null or user is null
     }
-  }, [])
+  }, [loginStatus, user])
 
   // SVG path for email icon
   const emailIcon = (
@@ -72,7 +85,7 @@ const ProfileTab: React.FC<ProfileTabProps> = () => {
   }
 
   if (!userData) {
-    return <div>No user data found.</div> // Should not happen, but good for safety
+    return <div>No user data found.</div>
   }
 
   return (
@@ -82,7 +95,7 @@ const ProfileTab: React.FC<ProfileTabProps> = () => {
         <div className='flex items-start'>
           <div className='relative h-24 w-24 overflow-hidden rounded-full border-2 border-blue-500'>
             <Image
-              src={'/s1.png'} // You might want to store user avatar URLs in your user data
+              src={'/s1.png'}
               alt={`Avatar of ${userData.firstName} ${userData.lastName}`}
               fill
               style={{ objectFit: 'cover' }}
@@ -93,8 +106,7 @@ const ProfileTab: React.FC<ProfileTabProps> = () => {
             <h2 className='text-2xl font-semibold '>
               {userData.firstName} {userData.lastName}
             </h2>
-            <p className='mt-2 '>This is a user profile.</p>{' '}
-            {/* Replace with actual bio if you have it */}
+            <p className='mt-2 '>This is a user profile.</p>
             {/* Contact Information */}
             <div className='mt-3 space-y-1'>
               <div className='flex items-center gap-2'>

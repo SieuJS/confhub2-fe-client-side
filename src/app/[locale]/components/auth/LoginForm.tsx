@@ -3,34 +3,36 @@
 import React, { useState } from 'react'
 import { Link } from '@/src/navigation'
 import { useRouter, usePathname } from 'next/navigation'
-import { useLocalStorage } from 'usehooks-ts' // Import useLocalStorage
+import { useLocalStorage } from 'usehooks-ts'
 
 interface LoginFormProps {
   // No onLoginSuccess needed
 }
 
 const LoginForm: React.FC<LoginFormProps> = () => {
-  // const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [emailInput, setEmailInput] = useState('') // Separate state for input field
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
 
-  // Use useLocalStorage for loginStatus, firstname, and lastname
+  // Use useLocalStorage for loginStatus and user object
   const [loginStatus, setLoginStatus] = useLocalStorage<string | null>(
     'loginStatus',
     null
   )
-  const [firstname, setFirstname] = useLocalStorage<string>('firstname', '')
-  const [lastname, setLastname] = useLocalStorage<string>('lastname', '')
-  const [email, setEmail] = useLocalStorage<string>('email', '')
+  const [user, setUser] = useLocalStorage<{
+    firstname: string
+    lastname: string
+    email: string
+  } | null>('user', null)
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     setError('')
 
-    if (!email || !password) {
+    if (!emailInput || !password) {
       setError('Vui lòng nhập email và mật khẩu.')
       return
     }
@@ -42,7 +44,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email: emailInput, password }) // Use emailInput
       })
 
       const data = await response.json()
@@ -52,9 +54,11 @@ const LoginForm: React.FC<LoginFormProps> = () => {
 
         // Use the setter functions from useLocalStorage
         setLoginStatus('Logined')
-        setFirstname(data.user.firstName)
-        setLastname(data.user.lastName)
-        setEmail(data.user.email)
+        setUser({
+          firstname: data.user.firstName,
+          lastname: data.user.lastName,
+          email: data.user.email
+        })
 
         const localePrefix = pathname.split('/')[1]
         const pathWithLocale = `/${localePrefix}`
@@ -88,8 +92,8 @@ const LoginForm: React.FC<LoginFormProps> = () => {
                 id='email'
                 type='email'
                 placeholder='Email'
-                value={email}
-                onChange={e => setEmail(e.target.value)}
+                value={emailInput}
+                onChange={e => setEmailInput(e.target.value)} // Update emailInput
               />
             </div>
             <div className='mt-4'>
@@ -115,7 +119,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
               <button
                 className='focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none'
                 type='submit'
-                disabled={isLoading} // Vô hiệu hóa nút khi đang tải
+                disabled={isLoading}
               >
                 {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
               </button>

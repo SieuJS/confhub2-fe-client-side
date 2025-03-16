@@ -23,9 +23,13 @@ export const Header: FC<Props> = ({ locale }) => {
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
   const router = useRouter()
 
-  const [firstname, setFirstname] = useLocalStorage<string>('firstname', '')
-  const [lastname, setLastname] = useLocalStorage<string>('lastname', '')
-  const [userEmail, setUserEmail] = useLocalStorage<string>('email', '')
+  // Use the user object from local storage
+  const [user, setUser] = useLocalStorage<{
+    firstname: string
+    lastname: string
+    email: string
+  } | null>('user', null)
+
   const [loginStatus, setLoginStatus] = useLocalStorage<string | null>(
     'loginStatus',
     null
@@ -210,7 +214,8 @@ export const Header: FC<Props> = ({ locale }) => {
       >
         <div className='flex flex-col gap-1 py-1'>
           <div className='px-4 py-2 text-sm text-gray-700 dark:text-gray-300'>
-            Chào mừng! {firstname} {lastname}
+            {/* Use the user object */}
+            Chào mừng! {user?.firstname} {user?.lastname}
           </div>
           <Link
             href='/tabs/dashboard'
@@ -221,19 +226,17 @@ export const Header: FC<Props> = ({ locale }) => {
               Bảng điều khiển
             </div>
           </Link>
-          <div className='px-4 py-2'>
+          <div className=' '>
             <ThemeSwitch />
           </div>
-          <div className='px-4 py-2'>
+          <div className=' '>
             <LangSwitcher />
           </div>
           <button
             className='block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:bg-gray-700'
             onClick={() => {
               setLoginStatus(null)
-              setFirstname('')
-              setLastname('')
-              setUserEmail('')
+              setUser(null) // Clear the user object
               let pathWithLocale = '/tabs/login'
               if (pathname) {
                 const pathParts = pathname.split('/')
@@ -439,3 +442,5 @@ export const Header: FC<Props> = ({ locale }) => {
     </>
   )
 }
+
+export default Header
