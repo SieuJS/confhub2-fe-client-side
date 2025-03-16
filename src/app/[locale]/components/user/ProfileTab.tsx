@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { UserResponse } from '@/src/models/response/user.response'
 import userList from '@/src/models/data/user-list.json'
 import { useLocalStorage } from 'usehooks-ts'
+import Button from '../utils/Button'
 
 interface ProfileTabProps {
   // You can define props if needed
@@ -125,9 +126,7 @@ const ProfileTab: React.FC<ProfileTabProps> = () => {
 
       {/* Action (e.g., Edit Profile, ...) - Placeholder */}
       <div className='border-t border-gray-200 bg-background px-6 py-4 text-right'>
-        <button className='focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none'>
-          Chỉnh sửa Profile
-        </button>
+        <Button variant='primary'>Chỉnh sửa Profile</Button>
       </div>
     </div>
   )
