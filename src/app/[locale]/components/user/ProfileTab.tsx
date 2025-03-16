@@ -1,19 +1,56 @@
-import React from 'react'
-import Image from 'next/image' // Import Image từ next/image
+import React, { useState, useEffect } from 'react'
+import Image from 'next/image'
+import { UserResponse } from '@/src/models/response/user.response' // Corrected import path
+import userList from '@/src/models/data/user-list.json' // Corrected import path
+import { useLocalStorage } from 'usehooks-ts'
 
 interface ProfileTabProps {
-  // Bạn có thể định nghĩa props nếu cần
+  // You can define props if needed
 }
 
 const ProfileTab: React.FC<ProfileTabProps> = () => {
-  // Dữ liệu profile mẫu (đã chỉnh sửa cho hội nghị và thông tin liên hệ)
-  const profileData = {
-    name: 'Nguyễn Văn A',
-    bio: 'Một người yêu thích công nghệ và hội nghị web.',
-    email: 'nguyenvana@example.com'
-  }
+  const [userData, setUserData] = useState<UserResponse | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [userEmail, setUserEmail] = useLocalStorage<string>('userEmail', '')
+  const [loginStatus, setLoginStatus] = useLocalStorage<string | null>(
+    'loginStatus',
+    null
+  )
+  useEffect(() => {
+    // const loginStatus = localStorage.getItem('loginStatus')
+    // const userEmail = localStorage.getItem('userEmail')
 
-  // SVG path cho icon email
+    if (loginStatus !== null && userEmail) {
+      // No need for async/await here, since we are using the imported JSON directly
+      const fetchUserData = () => {
+        try {
+          // Directly use the imported userList
+          const foundUser = userList.find(user => user.email === userEmail)
+
+          if (foundUser) {
+            setUserData(foundUser)
+          } else {
+            setError('User not found')
+          }
+        } catch (err) {
+          // This error handling is less likely to be triggered now,
+          // but it's still good practice to keep it.
+          setError('Error fetching user data')
+          console.error(err)
+        } finally {
+          setLoading(false)
+        }
+      }
+
+      fetchUserData()
+    } else {
+      setLoading(false)
+      setError('User not logged in')
+    }
+  }, [])
+
+  // SVG path for email icon
   const emailIcon = (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -26,36 +63,47 @@ const ProfileTab: React.FC<ProfileTabProps> = () => {
     </svg>
   )
 
+  if (loading) {
+    return <div>Loading...</div>
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>
+  }
+
+  if (!userData) {
+    return <div>No user data found.</div> // Should not happen, but good for safety
+  }
+
   return (
     <div className='mx-auto max-w-5xl overflow-hidden bg-background py-4'>
-      {/* Phần Header Profile */}
+      {/* Profile Header */}
       <div className='px-6 py-4'>
         <div className='flex items-start'>
-          {' '}
-          {/* Đổi items-center thành items-start để align top */}
           <div className='relative h-24 w-24 overflow-hidden rounded-full border-2 border-blue-500'>
-            <Image // Sử dụng component Image từ next/image
-              src={'/s1.png'} // Đường dẫn ảnh
-              alt={`Avatar của ${profileData.name}`}
-              fill // Để ảnh lấp đầy container
-              style={{ objectFit: 'cover' }} // Để đảm bảo ảnh không bị méo và cover container
-              sizes='(max-width: 768px) 100vw, 25vw' // Tùy chỉnh sizes cho responsive (ví dụ)
+            <Image
+              src={'/s1.png'} // You might want to store user avatar URLs in your user data
+              alt={`Avatar of ${userData.firstName} ${userData.lastName}`}
+              fill
+              style={{ objectFit: 'cover' }}
+              sizes='(max-width: 768px) 100vw, 25vw'
             />
           </div>
           <div className='ml-4'>
-            <h2 className='text-2xl font-semibold '>{profileData.name}</h2>
-
-            <p className='mt-2 '>{profileData.bio}</p>
-
-            {/* Thông tin liên hệ */}
+            <h2 className='text-2xl font-semibold '>
+              {userData.firstName} {userData.lastName}
+            </h2>
+            <p className='mt-2 '>This is a user profile.</p>{' '}
+            {/* Replace with actual bio if you have it */}
+            {/* Contact Information */}
             <div className='mt-3 space-y-1'>
               <div className='flex items-center gap-2'>
                 {emailIcon}
                 <a
-                  href={`mailto:${profileData.email}`}
+                  href={`mailto:${userData.email}`}
                   className='text-blue-500 hover:underline'
                 >
-                  {profileData.email}
+                  {userData.email}
                 </a>
               </div>
             </div>
@@ -63,7 +111,7 @@ const ProfileTab: React.FC<ProfileTabProps> = () => {
         </div>
       </div>
 
-      {/* Phần Action (ví dụ: Chỉnh sửa Profile, ...) - Placeholder */}
+      {/* Action (e.g., Edit Profile, ...) - Placeholder */}
       <div className='border-t border-gray-200 bg-background px-6 py-4 text-right'>
         <button className='focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none'>
           Chỉnh sửa Profile
