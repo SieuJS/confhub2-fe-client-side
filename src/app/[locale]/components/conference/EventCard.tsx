@@ -2,11 +2,11 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Button from '../../components/utils/Button'; // Import your Button component
-import { ConferenceResponse } from '../../../../models/response/conference.response'; // Import your ConferenceResponse type
+import { ConferenceInfo } from '../../../../models/response/conference.list.response'; // Import your ConferenceResponse type
 import {Link} from '@/src/navigation'; // Import next/link
 
 interface EventCardProps {
-  event: ConferenceResponse; // Sử dụng ConferenceResponse type
+  event: ConferenceInfo; // Sử dụng ConferenceResponse type
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
@@ -16,7 +16,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
       <div className="relative">
         <Image
           src={'/bg-2.jpg'} // Sử dụng imageUrl từ ConferenceResponse
-          alt={event.name}
+          alt={event.title}
           width={400}
           height={200} // Adjust height as needed
           style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
@@ -53,8 +53,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
       </div>
 
       <div className="flex items-center justify-between pt-2 px-2 bg-background">
-        <p className="text-xs">{event.conferenceDates}</p>
-        <p className="text-xs">{event.location}</p>
+        <p className="text-xs">{event.location['country']}</p>
       </div>
 
       <div className="p-2">
@@ -62,7 +61,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
         <div className="grid grid-cols-3 items-center gap-2">
           {/* Cột 1: Thông tin sự kiện */}
           <div className='flex flex-col items-start text-left col-span-2'> {/* col-span-2 để cột này chiếm 2 cột */}
-            <h6 className="font-semibold text-base">{event.name}</h6>
+            <h6 className="font-semibold text-base">{event.title}</h6>
             <p className="text-xs">{event.acronym}</p> {/* Sử dụng acronym thay vì shortName */}
           </div>
 
@@ -77,7 +76,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
         </div>
 
         <div className="flex flex-wrap mt-2 space-x-2 overflow-hidden">
-          {event?.topics && event.topics.split(',').map((topic, index) => (
+          {event?.topics && event.topics.map((topic, index) => (
             <span
               key={index}
               className=" rounded-full px-2 py-1 text-xs inline-block mb-2 bg-background"

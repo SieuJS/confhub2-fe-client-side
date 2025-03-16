@@ -2,7 +2,7 @@
 export type ConferenceResponse = {
   conference: ConferenceIdentity;
   organization: ConferenceInfo;
-  locations: Location[];
+  locations: Location;
   dates: ImportantDates[];
   ranks: Rank[];
 }
@@ -47,21 +47,7 @@ export type Location = {
 
 export type Rank = {
   year: string;
-  inFieldOfResearch: FieldOfResearch;
-  byRank: RankDetail[];
-}
-
-export type FieldOfResearch = {
-  name: string
-}
-
-export type RankDetail = {
-  name: string;
-  value: string;
-  belongsToSource: Source;
-}
-
-export type Source = {
-  name: string;
-  link: string;
+  fieldOfResearch : string;
+  rank : string
+  source : string
 }

@@ -16,13 +16,13 @@ async function fetchConferences(useClientData: boolean = false, curr: Conference
   try {
     const conferences = [ // Moved the data inside the function
         {
-          "Title": curr.name,
-          "Acronym": curr.acronym,
-          "mainLink": curr.link,
-          "cfpLink": curr.cfpLink,
-          "impLink": curr.impLink,
-          "Source": curr.source,
-          "Rank": curr.rank,
+          "Title": curr.conference.title,
+          "Acronym": curr.conference.acronym,
+          "mainLink": curr.organization.link,
+          "cfpLink": curr.organization.cfpLink,
+          "impLink": curr.organization.impLink,
+          "Source": "",
+          "Rank": "",
           "Note": "",
           "DBLP": "",
           "Comments": "",

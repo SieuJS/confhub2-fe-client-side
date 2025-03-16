@@ -3,8 +3,9 @@ import React, { useState, useEffect } from 'react';
 import EventCard from './EventCard';
 import Pagination from '../utils/Pagination';
 import { ConferenceResponse } from '../../../../models/response/conference.response';
-import conferenceList from '../../../../models/data/conferences-list.json';
-
+import { ConferenceListResponse, ConferenceInfo } from '@/src/models/response/conference.list.response';
+//import conferenceList from '../../../../models/data/conferences-list.json';
+import { getListConference } from '@/src/api/get_info/get_info';
 
 interface ResultsSectionProps {
   searchQuery: string;
@@ -93,38 +94,53 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   searchQuery, selectedLocation, selectedType, startDate, endDate,
   submissionDate, selectedRank, selectedTopics, selectedFieldsOfResearch, selectedPublisher, selectedAverageScore, selectedSourceYear
 }) => {
-  const [events, setEvents] = useState<ConferenceResponse[]>(conferenceList as ConferenceResponse[]);
+  
+  const [events, setEvents] = useState<ConferenceListResponse | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 8;
   const [sortBy, setSortBy] = useState<SortOption>(); // Default sort by date
 
   useEffect(() => {
-    let filteredEvents = conferenceList as ConferenceResponse[];
+    async function getListConf() {
+        try {
+        // Use the imported fetchConferences function.
+        const conferenceInfo = await getListConference(); // false to use API, true to use client-side data
+        setEvents(conferenceInfo);
+      } catch (err: any) {
+        //setError(err.message || 'An error occurred during update.');
+        //alert(t('Error while updating conference!'));
+        console.error('Error updating conference data:', err);
+      }
+    }
+    getListConf();
+  }, [])
 
+  useEffect(() => {
+    let filteredEvents = events?.payload as ConferenceInfo[];
     // Apply filters
     if (searchQuery) {
       filteredEvents = filteredEvents.filter(event =>
-        event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         event.acronym.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
     if (selectedLocation) {
       filteredEvents = filteredEvents.filter(event =>
-        event.location?.toLowerCase().includes(selectedLocation.toLowerCase())
+        event.location['country'].toLowerCase().includes(selectedLocation.toLowerCase())
       );
     }
 
     if (selectedType) {
       filteredEvents = filteredEvents.filter(event =>
-        event.type === selectedType
+        event.accessType === selectedType
       );
     }
 
     // --- Date Filtering ---
     if (startDate) {
       filteredEvents = filteredEvents.filter(event => {
-        const { startDate: eventStartDate } = parseConferenceDates(event.conferenceDates);
+        const { startDate: eventStartDate } = parseConferenceDates(event.dates[0].fromDate);
         return eventStartDate && (eventStartDate >= startDate || eventStartDate.toDateString() == startDate.toDateString());
       });
     }
@@ -161,40 +177,34 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
     if (selectedSourceYear) {
       filteredEvents = filteredEvents.filter(event =>
-        event.source === selectedSourceYear
+        event.year === selectedSourceYear
       );
     }
     
-    if (selectedPublisher) {
-      filteredEvents = filteredEvents.filter(event =>
-        event.publisher === selectedPublisher
-      );
-      
-    }
 
-    if (selectedAverageScore) {
-      filteredEvents = filteredEvents.filter(event =>
-        event.rating === selectedAverageScore
-      );
+    // if (selectedAverageScore) {
+    //   filteredEvents = filteredEvents.filter(event =>
+    //     event.rating === selectedAverageScore
+    //   );
       
-    }
+    // }
 
     if (selectedTopics && selectedTopics.length > 0) {
       filteredEvents = filteredEvents.filter(event => {
           if (!event.topics) {
               return false;
           }
-          const eventTopics = event.topics.split(',').map(topic => topic.trim());
+          const eventTopics = event.topics.map(topic => topic.trim());
           return eventTopics.some(topic => selectedTopics.includes(topic));
       });
     }
 
     if (selectedFieldsOfResearch && selectedFieldsOfResearch.length > 0) {
       filteredEvents = filteredEvents.filter(event => {
-          if(!event.fieldOfResearch) {
+          if(!event.category) {
             return false;
           }
-          const eventFields = event.fieldOfResearch.split(',').map(field => field.trim());
+          const eventFields = event.researchFields.map(field => field.trim());
           return eventFields.some(field => selectedFieldsOfResearch.includes(field));
       });
 
@@ -202,13 +212,13 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 }
 
     // --- Sorting ---
-    let sortedEvents = [...filteredEvents];
+    let sortedEvents = filteredEvents;
     switch (sortBy) {
       case 'rank':
         sortedEvents.sort((a, b) => a.rank.localeCompare(b.rank));
         break;
       case 'name':
-        sortedEvents.sort((a, b) => a.name.localeCompare(b.name));
+        sortedEvents.sort((a, b) => a.title.localeCompare(b.title));
         break;
       case 'submissionDate':
         sortedEvents.sort((a, b) => {
@@ -255,7 +265,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
   const indexOfLastEvent = currentPage * eventsPerPage;
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
-  const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent);
+  const currentEvents = events?.payload?.slice(indexOfFirstEvent, indexOfLastEvent);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
@@ -272,7 +282,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
       {selectedSourceYear && <div>Query: {selectedSourceYear}</div>}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-semibold">
-          Recommended for you ({events.length})
+          Recommended for you ({events?.payload.length})
         </h2>
         <div className="flex items-center rounded-md px-2 py-1">
           <svg
@@ -304,14 +314,14 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {currentEvents.map((event) => (
+        {currentEvents.map((event: any) => (
           <EventCard key={event.id} event={event} />
         ))}
       </div>
 
       <Pagination
         eventsPerPage={eventsPerPage}
-        totalEvents={events.length}
+        totalEvents={events?.payload.length}
         paginate={paginate}
         currentPage={currentPage}
       />
