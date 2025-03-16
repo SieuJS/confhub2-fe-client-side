@@ -1,3 +1,5 @@
+// page.tsx:
+
 "use client";
 
 import { useTranslations } from 'next-intl';
@@ -18,37 +20,45 @@ interface EventCardProps {
   locale: string;
 }
 
-interface CustomLocation {
-  cityStateProvince: string;
-  country: string;
-}
+// No longer needed, Location type is in conference.response.ts
+// interface CustomLocation {
+//   cityStateProvince: string;
+//   country: string;
+// }
 
 const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
-  const t = useTranslations('');
+  const t = useTranslations('');  // Consider moving this to a component higher in the tree if used in multiple places
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
-  const [conferenceData, setConferenceData] = useState<ConferenceResponse | undefined>();
+  const [conferenceData, setConferenceData] = useState<ConferenceResponse | null>(null); // Use null, not undefined
   const [isFollowing, setIsFollowing] = useState(false);
   const [openMenu, setOpenMenu] = useState<"share" | "calendar" | null>(null);
   const shareButtonRef = useRef<HTMLButtonElement>(null);
   const [updating, setUpdating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null); // Not strictly needed if you handle errors in getConference
   const [showAllTopics, setShowAllTopics] = useState(false);
 
 
   useEffect(() => {
     async function getInfoConference() {
       try {
-        const conferenceInfo = await getConference(id as string);
-        setConferenceData(conferenceInfo);
+        if (id) {  // Check id here, before calling getConference
+            const conferenceInfo = await getConference(id);
+            setConferenceData(conferenceInfo);
+        }
       } catch (err: any) {
-        setError(err.message || 'An error occurred during update.');
-        console.error('Error updating conference data:', err);
+        // Improved error handling
+        if (err.status === 404) {
+            setError("Conference not found"); // Specific 404 message
+            setConferenceData(null);  // Set to null so NotFoundPage renders
+        } else {
+          setError(err.message || 'An error occurred during update.'); // Generic error
+          console.error('Error updating conference data:', err);
+        }
       }
     }
-    if (id) {
       getInfoConference();
-    }
+    
   }, [id]);
 
   const handleFollowClick = () => {
@@ -56,30 +66,21 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   };
 
   const handleShareClick = (platform: 'facebook' | 'twitter' | 'reddit') => {
-    if (!conferenceData?.conference) {
-      return;
-    }
+    // Simpler access to data, no need for repeated checks
+    if (!conferenceData) return;
 
-    const conference = conferenceData.conference;
-    const organization = conferenceData.organization;
-    const locations = conferenceData.locations;
-    const dates = conferenceData.dates;
+    const { conference, organization, locations, dates } = conferenceData;
 
-    let fromDateStr = '';
-    let toDateStr = '';
+      // Use optional chaining and nullish coalescing for safer access
+    const conferenceDate = dates.find(date => date.type === 'conferenceDates');
+    const fromDateStr = conferenceDate?.fromDate ?? '';  // Use optional chaining and nullish coalescing
+    const toDateStr = conferenceDate?.toDate ?? '';   // Use optional chaining and nullish coalescing
 
-    if (dates && dates.length > 0) {
-      const conferenceDate = dates.find(date => date.name === 'conferenceDates');
-      if (conferenceDate) {
-        fromDateStr = conferenceDate.fromDate as unknown as string; // Assuming backend sends string, if Date object, adjust accordingly
-        toDateStr = conferenceDate.toDate as unknown as string;   // Assuming backend sends string, if Date object, adjust accordingly
-      }
-    }
 
     const fromDateFormatted = fromDateStr ? new Date(fromDateStr).toLocaleDateString() : 'N/A';
     const toDateFormatted = toDateStr ? new Date(toDateStr).toLocaleDateString() : 'N/A';
 
-    const location = locations && locations.length > 0 ? locations[0] : { cityStateProvince: 'N/A', country: 'N/A' } as CustomLocation; // Assuming first location is the main one
+    const location = locations;  // No need to check for length, locations is not an array
     const shareText = `📢 ${conference.title}\n📅 Thời gian: ${fromDateFormatted} - ${toDateFormatted} \n📍 Địa điểm: ${location.cityStateProvince}, ${location.country}\n🔗 Chi tiết: ${organization.link}`;
     const shareUrl = encodeURIComponent(organization.link || window.location.href);
     const encodedText = encodeURIComponent(shareText);
@@ -109,15 +110,17 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     console.log('Comment:', comment);
   };
 
-  function removeTime(date: Date): string {
-    if (!date) {
-      return '';
-    }
-    else {
-      const dateString = date.toDateString();
-      return dateString;
-    }
-  }
+
+  // This function is no longer needed, use toLocaleDateString directly
+  // function removeTime(date: Date): string {
+  //   if (!date) {
+  //     return '';
+  //   }
+  //   else {
+  //     const dateString = date.toDateString();
+  //     return dateString;
+  //   }
+  // }
 
   const toggleShareMenu = () => {
     setOpenMenu(prev => prev === "share" ? null : "share");
@@ -197,33 +200,33 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   const displayedTopics = showAllTopics ? conferenceData?.organization.topics || [] : (conferenceData?.organization.topics || []).slice(0, 10);
   const hasMoreTopics = (conferenceData?.organization.topics || []).length > 10;
 
-  const conference = conferenceData?.conference;
-  const organization = conferenceData?.organization;
-  const locations = conferenceData?.locations;
-  const dates = conferenceData?.dates;
+  // Destructure for cleaner access, only if conferenceData is not null
+  const { conference, organization, locations } = conferenceData || {}; // Provide empty defaults
+    const dates = conferenceData?.dates;
 
-  if (!conference || !organization || !locations || !dates) return <NotFoundPage />;
-
-  let fromDateStr = '';
-  let toDateStr = '';
-  if (dates && dates.length > 0) {
-    const conferenceDate = dates.find(date => date.name === 'conferenceDates');
-    if (conferenceDate) {
-      fromDateStr = conferenceDate.fromDate as unknown as string; // Assuming backend sends string, if Date object, adjust accordingly
-      toDateStr = conferenceDate.toDate as unknown as string;   // Assuming backend sends string, if Date object, adjust accordingly
+  //  Handle loading and not found states
+    if (error === "Conference not found") {
+        return <NotFoundPage />;  // Render NotFoundPage directly
     }
-  }
+  if (!conferenceData) return <Loading />;  // Render Loading while fetching
+
+
+   // Safely access conferenceDate, even if dates is undefined or empty
+  const conferenceDate = dates?.find(date => date.type === 'conferenceDates');
+  const fromDateStr = conferenceDate?.fromDate ?? '';
+  const toDateStr = conferenceDate?.toDate ?? '';
+
   const fromDateFormatted = fromDateStr ? new Date(fromDateStr).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, ' ') : 'TBD';
   const toDateFormatted = toDateStr ? new Date(toDateStr).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, ' ') : 'TBD';
   const dateDisplay = fromDateFormatted === 'TBD' || toDateFormatted === 'TBD' ? 'TBD' : `${fromDateFormatted.slice(0, 6)} - ${toDateFormatted}`;
 
-  const location = locations && locations.length > 0 ? locations[0] : { cityStateProvince: 'N/A', country: 'N/A' } as CustomLocation;
-
+//   const location = locations && locations.length > 0 ? locations[0] : { cityStateProvince: 'N/A', country: 'N/A' } as CustomLocation;
+  const location = locations; // No need to get locations[0], locations is already an object
 
   return (
     <div>
       <Header locale={locale} />
-      {!conferenceData && <NotFoundPage />}
+        {/* Removed unnecessary check. NotFoundPage is handled above */}
 
       <div className='relative'>
         {updating && (
@@ -231,7 +234,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
             <Loading />
           </div>
         )}
-        {conferenceData && conferenceData.conference && (
+        {/* No need for conferenceData.conference check, already handled above */}
           <div className='px-10'>
             <div>
               <div className="py-12 w-full"></div>
@@ -243,14 +246,14 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                       <Image
                         src={'/bg-2.jpg'} // Replace with actual logo or placeholder
                         alt={`Logo`}
-                        width="200"
-                        height="200"
+                        width="300"
+                        height="300"
                         className="mr-4"
                         style={{ objectFit: 'contain' }}
                       />
                       <div className="flex-1">
                         <p className="text-red-500 text-sm">{dateDisplay}</p>
-                        <h2 className="font-bold text-left text-4xl mt-0">{conference.title}</h2>
+                        <h2 className="font-bold text-left text-4xl mt-0">{conference?.title}</h2> {/* Use optional chaining */}
                         <p className="text-gray-600 text-sm mt-1">
                           4.5 (89 Ratings)
                         </p>
@@ -259,7 +262,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                           </svg>
-                          {location.cityStateProvince}, {location.country}
+                          {location?.cityStateProvince}, {location?.country} {/* Use optional chaining */}
                           <a href="#" className="ml-1 text-blue-700 hover:underline"> Get Directions
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4 inline ml-1">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H12m-2 1a5.5 5.5 0 00-5.5 5.5V18m0-10.5A5.5 5.5 0 018 7m3 3h7.5m-7.5 3l3-3m-3 3l-3-3m3 3V15m-6-1.5a5.5 5.5 0 00-5.5 5.5V21m0-3.5A5.5 5.5 0 018 18.5" />
@@ -353,8 +356,8 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                       </Button>
                       <Button
                         onClick={() => {
-                          if (conferenceData?.organization?.link) {
-                            window.open(conferenceData.organization.link, '_blank');
+                          if (organization?.link) {  // Use optional chaining
+                            window.open(organization.link, '_blank');
                           } else {
                             alert("Website link is not available.");
                           }
@@ -373,11 +376,10 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
               </div>
 
-              <ConferenceTabs conference={conferenceData} /> {/* Pass the whole conferenceData as prop, ConferenceTabs component needs to be adjusted accordingly if it expects the old structure */}
+              <ConferenceTabs conference={conferenceData} /> {/* Pass the whole conferenceData */}
               <ConferenceFeedback />
             </div>
           </div>
-        )}
       </div>
       <Footer />
     </div>

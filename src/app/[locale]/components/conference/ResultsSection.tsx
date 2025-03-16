@@ -21,87 +21,27 @@ interface ResultsSectionProps {
 }
 type SortOption = 'date' | 'rank' | 'name' | 'submissionDate' | 'startDate' | 'endDate';
 
-// interface ConferenceDates {
-//   startDate: Date | null;
-//   endDate: Date | null;
-// }
-
-// function parseConferenceDates(dateString: string | undefined | null): ConferenceDates {
-//     if (!dateString) {
-//         return { startDate: null, endDate: null };
-//     }
-
-//     const dateParts = dateString.split(' - ');
-//     if (dateParts.length === 0 || dateParts.length > 2) {
-//         console.error("Invalid date format:", dateString);
-//         return { startDate: null, endDate: null };
-//     }
-
-//     try {
-//         if (dateParts.length === 1) {
-//             const [singleDatePart] = dateParts;
-//             const [monthAndDay, year] = singleDatePart.split(', ');
-//             const [month, days] = monthAndDay.split(" ");
-
-//             if (days.includes("-")) {
-//                 const [startDay, endDay] = days.split('-');
-//                 const startDate = new Date(`${month} ${startDay}, ${year}`);
-//                 const endDate = new Date(`${month} ${endDay}, ${year}`);
-//                  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-//                   throw new Error("Invalid date format") // Handle invalid date
-//                 }
-//                 return { startDate, endDate };
-//             } else {
-//                 const startDate = new Date(`${month} ${days}, ${year}`);
-//                  if (isNaN(startDate.getTime())) {
-//                     throw new Error("Invalid date format")
-//                  }
-//                 return { startDate, endDate: startDate }
-//             }
-//         } else {
-//             let [startDateStr, endDateStr] = dateParts;
-//             const [startMonth, startDay] = startDateStr.split(" ");
-
-//             let endMonth, endDay, year;
-//             if (startDateStr.includes(",")) {
-//               console.error("Invalid date format:", dateString)
-//               return { startDate: null, endDate: null };
-//             }
-
-//             if (!endDateStr.includes(",")) {
-//               const currentYear = new Date().getFullYear();
-//               endDateStr = endDateStr + `, ${currentYear}`;
-//             }
-//             [endMonth, endDay, year] = endDateStr.split(/[, ]+/);
-
-//             const startDate = new Date(`${startMonth} ${startDay}, ${year}`);
-//             const endDate = new Date(`${endMonth} ${endDay}, ${year}`);
-//              if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-//               throw new Error("Invalid date format") // Handle invalid date
-//             }
-//             return { startDate, endDate };
-//         }
-//     } catch (error) {
-//         console.error("Error parsing date string:", dateString, error);
-//         return { startDate: null, endDate: null };
-//     }
-// }
 
 const ResultsSection: React.FC<ResultsSectionProps> = ({
   searchQuery, selectedLocation, selectedType, startDate, endDate,
   submissionDate, selectedRank, selectedTopics, selectedFieldsOfResearch, selectedPublisher, selectedAverageScore, selectedSourceYear
 }) => {
 
-  const [events, setEvents] = useState<ConferenceListResponse | null>(null);
+  const [events, setEvents] = useState<ConferenceInfo[]>([]); //  Store the filtered/sorted events directly
+  const [initialEvents, setInitialEvents] = useState<ConferenceInfo[]>([]); // Store *all* events, unfiltered
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 8;
   const [sortBy, setSortBy] = useState<SortOption>('date'); // Default sort by date
+  const [totalItems, setTotalItems] = useState(0); //Total number of events
+
 
   useEffect(() => {
     async function getListConf() {
       try {
         const conferenceInfo = await getListConference();
-        setEvents(conferenceInfo);
+        setInitialEvents(conferenceInfo.payload); // Store *all* conferences here
+        setEvents(conferenceInfo.payload);  // Initially, filtered events are the same as all events
+        setTotalItems(conferenceInfo.meta.totalItems) // Set initial total item
       } catch (err: any) {
         console.error('Error updating conference data:', err);
       }
@@ -109,14 +49,16 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     getListConf();
   }, []);
 
-  useEffect(() => {
-    if (!events?.payload) {
-      return; // No data yet, don't filter
-    }
 
-    let filteredEvents: ConferenceInfo[] = [...events.payload]; // Create a copy to avoid modifying the original
+   // Filtering and Sorting logic (inside a useCallback for performance)
+   const filterAndSortEvents = React.useCallback(() => {
+      if (!initialEvents) {
+        return []; // No initial data, return empty array
+      }
 
-    // Apply filters
+      let filteredEvents = [...initialEvents];
+
+    // Apply filters (same as before, but using initialEvents)
     if (searchQuery) {
       filteredEvents = filteredEvents.filter(event =>
         event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -126,16 +68,16 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
     if (selectedLocation) {
       filteredEvents = filteredEvents.filter(event =>
-        event.location['country'].toLowerCase().includes(selectedLocation.toLowerCase())
+        event.location.country.toLowerCase().includes(selectedLocation.toLowerCase())
       );
     }
 
     if (selectedType) {
       filteredEvents = filteredEvents.filter(event =>
-        event.accessType === selectedType
+        event.accessType.toLowerCase() === selectedType.toLowerCase() //convert selected type to lowercase
       );
     }
-    // Date Filtering (using Date objects directly)
+
     if (startDate) {
       filteredEvents = filteredEvents.filter(event =>
         event.dates.fromDate && new Date(event.dates.fromDate) >= startDate
@@ -149,7 +91,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     }
     if (selectedRank) {
       filteredEvents = filteredEvents.filter(event =>
-        event.rank === selectedRank
+        event.rankSourceFoRData.rank === selectedRank  //  use rankSourceFoRData.rank
       );
     }
 
@@ -160,35 +102,31 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     }
 
     if (selectedTopics && selectedTopics.length > 0) {
-      filteredEvents = filteredEvents.filter(event => {
-        if (!event.topics) {
-          return false;
-        }
-        const eventTopics = event.topics.map(topic => topic.trim());
-        return eventTopics.some(topic => selectedTopics.includes(topic));
-      });
+      filteredEvents = filteredEvents.filter(event =>
+        event.topics.some(topic => selectedTopics.includes(topic))
+      );
     }
 
-    if (selectedFieldsOfResearch && selectedFieldsOfResearch.length > 0) {
-      filteredEvents = filteredEvents.filter(event => {
-        if (!event.researchFields) {
-          return false;
-        }
-        const eventFields = event.researchFields.map(field => field.trim());
-        return eventFields.some(field => selectedFieldsOfResearch.includes(field));
-      });
-    }
-    // Sorting
-    let sortedEvents = [...filteredEvents]; // Copy again before sorting
+
+     if (selectedFieldsOfResearch && selectedFieldsOfResearch.length > 0) {
+        filteredEvents = filteredEvents.filter(event =>
+        // Check if event.rankSourceFoRData and event.rankSourceFoRData.researchFields exist
+            event.rankSourceFoRData?.researchFields.includes(selectedFieldsOfResearch.join(', '))
+        );
+     }
+
+
+    // Sorting (same as before, but operates on filteredEvents)
+    let sortedEvents = [...filteredEvents];
     switch (sortBy) {
       case 'rank':
-        sortedEvents.sort((a, b) => a.rank.localeCompare(b.rank));
+        sortedEvents.sort((a, b) => a.rankSourceFoRData.rank.localeCompare(b.rankSourceFoRData.rank)); // Use rankSourceFoRData
         break;
       case 'name':
         sortedEvents.sort((a, b) => a.title.localeCompare(b.title));
         break;
       case 'startDate':
-      case 'date': // Assuming 'date' sorts by start date
+      case 'date':
         sortedEvents.sort((a, b) => {
           const dateA = a.dates.fromDate ? new Date(a.dates.fromDate).getTime() : -Infinity;
           const dateB = b.dates.fromDate ? new Date(b.dates.fromDate).getTime() : -Infinity;
@@ -204,13 +142,23 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
         break;
     }
 
-    setEvents({ ...events, payload: sortedEvents });  // Update events with the filtered and sorted data
-    setCurrentPage(1); // Reset to the first page after filtering/sorting
-  }, [searchQuery, selectedLocation, selectedType, startDate, endDate, selectedRank, selectedTopics, selectedFieldsOfResearch, selectedSourceYear, sortBy, events?.meta]); // Include events.meta in dependency array
+      return sortedEvents;
+
+   }, [initialEvents, searchQuery, selectedLocation, selectedType, startDate, endDate, selectedRank, selectedTopics, selectedFieldsOfResearch, selectedSourceYear, sortBy]); // Dependencies for useCallback
+
+
+  //  Update 'events' and 'currentPage' whenever filters or sorting change
+  useEffect(() => {
+      const newFilteredEvents = filterAndSortEvents();
+      setEvents(newFilteredEvents);
+      setCurrentPage(1); // Reset to page 1 on filter/sort change
+      setTotalItems(newFilteredEvents.length); //update the total items
+  }, [filterAndSortEvents]); //  use the useCallback result as a dependency
+
 
   const indexOfLastEvent = currentPage * eventsPerPage;
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
-  const currentEvents = events?.payload?.slice(indexOfFirstEvent, indexOfLastEvent);
+  const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent); // Use the 'events' state (filtered/sorted)
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
@@ -225,10 +173,9 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
   return (
     <div className="w-full pl-8">
-      {/* {selectedSourceYear && <div>Query: {selectedSourceYear}</div>} */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-semibold">
-          Recommended for you ({events?.payload.length})
+          Recommended for you ({totalItems})
         </h2>
         <div className="flex items-center rounded-md px-2 py-1">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
@@ -239,7 +186,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             <option value="date">Date</option>
             <option value="rank">Rank</option>
             <option value="name">Name</option>
-            {/* <option value="submissionDate">Submission Date</option> */}
             <option value="startDate">Start Date</option>
             <option value="endDate">End Date</option>
           </select>
@@ -254,7 +200,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 
       <Pagination
         eventsPerPage={eventsPerPage}
-        totalEvents={events?.payload.length}
+        totalEvents={totalItems}  // Use the total items
         paginate={paginate}
         currentPage={currentPage}
       />

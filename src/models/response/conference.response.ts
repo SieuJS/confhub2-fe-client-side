@@ -1,53 +1,62 @@
-// File ConferenceResponse:
 export type ConferenceResponse = {
   conference: ConferenceIdentity;
-  organization: ConferenceInfo;
+  organization: Organization;
   locations: Location;
-  dates: ImportantDates[];
-  ranks: Rank[];
-}
-
-export type ConferenceInfo = {
-  year: string;
-  accessType: string;
-  isAvailable: boolean;
-  category: string;
-  summerize: string;
-  callForPaper: string;
-  link: string;
-  cfpLink: string;
-  impLink: string;
-  topics: string[];
+  dates: ImportantDate[];
+  rankSourceFoRData: Rank[];
 };
 
 export type ConferenceIdentity = {
   id: string;
   title: string;
   acronym: string;
-  createdAt: Date | string;
-  updatedAt: Date | string;
   creatorId: string;
-}
+  createdAt: string;
+  updatedAt: string;
+};
 
-export type ImportantDates = {
-  fromDate: Date;
-  toDate: Date;
+export type Organization = {
+  id: string;
+  year: number;
+  accessType: string;
+  isAvailable: boolean;
+  conferenceId: string;
+  summary: string;
+  callForPaper: string;
+  link: string;
+  cfpLink: string;
+  impLink: string;
+  topics: string[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ImportantDate = {
+  id: string;
+  organizedId: string;
+  fromDate: string;
+  toDate: string;
   type: string;
   name: string;
-  isAvailable: boolean
+  createdAt: string;
+  updatedAt: string;
+  isAvailable: boolean;
 };
 
 export type Location = {
+  id: string;
   address: string;
   cityStateProvince: string;
   country: string;
   continent: string;
-  isAvailable: boolean
+  createdAt: string;
+  updatedAt: string;
+  isAvailable: boolean;
+  organizeId: string;
 };
 
 export type Rank = {
-  year: string;
-  fieldOfResearch : string;
-  rank : string
-  source : string
-}
+  rank: string;
+  source: string;
+  researchFields: string;
+};
