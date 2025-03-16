@@ -1,10 +1,13 @@
 'use client'
 import { capitalize } from '@/lib/utils'
 import Link from 'next/link'
-import { usePathname, useSearchParams, useSelectedLayoutSegments } from 'next/navigation'
-import React, { useState } from 'react'
+import {
+  usePathname,
+  useSearchParams,
+  useSelectedLayoutSegments
+} from 'next/navigation'
+import React, { useState, useRef, useEffect } from 'react'
 import { FiGlobe } from 'react-icons/fi'
-import Button from './Button'
 
 const LangSwitcher: React.FC = () => {
   interface Option {
@@ -13,10 +16,12 @@ const LangSwitcher: React.FC = () => {
   }
 
   const pathname = usePathname()
-  const searchParams = useSearchParams() // Lấy query params
+  const searchParams = useSearchParams()
   const urlSegments = useSelectedLayoutSegments()
 
   const [isOptionsExpanded, setIsOptionsExpanded] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
   const options: Option[] = [
     { country: 'English', code: 'en' },
     { country: 'Deutsch', code: 'de' },
@@ -30,51 +35,71 @@ const LangSwitcher: React.FC = () => {
     { country: 'فارسی', code: 'fa' }
   ]
 
-  // Hàm tạo URL giữ nguyên query params
   const getLocalizedUrl = (locale: string) => {
-    const newPath = `/${locale}/${urlSegments.join('/')}` // Chuyển đổi đường dẫn theo locale
-    const queryString = searchParams.toString() // Lấy query string
-
-    return queryString ? `${newPath}?${queryString}` : newPath // Giữ nguyên query
+    const newPath = `/${locale}/${urlSegments.join('/')}`
+    const queryString = searchParams.toString()
+    return queryString ? `${newPath}?${queryString}` : newPath
   }
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOptionsExpanded(false)
+      }
+    }
+
+    if (isOptionsExpanded) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOptionsExpanded])
+
+  const currentLocale = options.find(option =>
+    pathname.startsWith(`/${option.code}`)
+  ) || { country: 'Language', code: '' }
+
   return (
-    <div className='flex items-center justify-center'>
-      <div className='relative'>
-        <Button
-          className='text-destructive inline-flex w-full items-center justify-between gap-3'
-          size='small'
+    <div className='flex items-center px-4'>
+      <div className='relative' ref={dropdownRef}>
+        <button
+          className='text-destructive inline-flex w-full items-center justify-between gap-3 text-sm'
           onClick={() => setIsOptionsExpanded(!isOptionsExpanded)}
-          onBlur={() => setIsOptionsExpanded(false)}
         >
-          Language
-          <FiGlobe />
-        </Button>
+          {capitalize(currentLocale.country)} <FiGlobe />
+        </button>
+
         {isOptionsExpanded && (
-          <div className='absolute right-0 mt-2 w-full origin-top-right rounded-md bg-dropdown shadow-lg'>
+          <div className='absolute right-0 mt-2 w-max origin-top-right rounded-md bg-dropdown shadow-lg'>
+            {' '}
+            {/* Changed w-full to w-max */}
             <div
               className='py-1'
               role='menu'
               aria-orientation='vertical'
               aria-labelledby='options-menu'
             >
-              {options.map(lang => {
-                return (
-                  <Link key={lang.code} href={getLocalizedUrl(lang.code)}>
-                    <button
-                      lang={lang.code}
-                      onMouseDown={e => e.preventDefault()}
-                      className={`block w-full px-4 py-2 text-left text-sm hover:bg-dropdownHover ${
-                        pathname.startsWith(`/${lang.code}`)
-                          ? 'bg-selected text-primary hover:bg-selected'
-                          : 'text-secondary'
-                      }`}
-                    >
-                      {capitalize(lang.country)}
-                    </button>
-                  </Link>
-                )
-              })}
+              {options.map(lang => (
+                <Link key={lang.code} href={getLocalizedUrl(lang.code)}>
+                  <button
+                    lang={lang.code}
+                    onMouseDown={e => e.preventDefault()}
+                    className={`block w-full whitespace-nowrap px-4 py-2 text-left text-sm hover:bg-dropdownHover ${
+                      //Added whitespace-nowrap
+                      pathname.startsWith(`/${lang.code}`)
+                        ? 'bg-selected text-primary hover:bg-selected'
+                        : 'text-secondary'
+                    }`}
+                  >
+                    {capitalize(lang.country)}
+                  </button>
+                </Link>
+              ))}
             </div>
           </div>
         )}

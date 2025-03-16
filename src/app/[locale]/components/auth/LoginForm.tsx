@@ -1,19 +1,27 @@
+// LoginForm.tsx
 "use client";
 import React, { useState } from 'react';
 import { Link } from '@/src/navigation';
 import { useRouter, usePathname } from 'next/navigation';
+import { useLocalStorage } from 'usehooks-ts'; // Import useLocalStorage
 
 interface LoginFormProps {
-  // Không cần onLoginSuccess nữa, vì chuyển hướng trực tiếp trong component
+  // No onLoginSuccess needed
 }
 
 const LoginForm: React.FC<LoginFormProps> = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // Thêm trạng thái loading
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+
+  // Use useLocalStorage for loginStatus, firstname, and lastname
+  const [loginStatus, setLoginStatus] = useLocalStorage<string | null>('loginStatus', null);
+  const [firstname, setFirstname] = useLocalStorage<string>('firstname', '');
+  const [lastname, setLastname] = useLocalStorage<string>('lastname', '');
+
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -24,9 +32,9 @@ const LoginForm: React.FC<LoginFormProps> = () => {
       return;
     }
 
-    setIsLoading(true); // Bắt đầu loading
+    setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/api/v1/user/signin', { // Use relative URL for client-side
+      const response = await fetch('http://localhost:3000/api/v1/user/signin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,32 +45,26 @@ const LoginForm: React.FC<LoginFormProps> = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Đăng nhập thành công
         console.log('Đăng nhập thành công!', data);
 
-        // --- LƯU TRẠNG THÁI ĐĂNG NHẬP VÀO LOCALSTORAGE ---
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('loginStatus', "Logined"); // Lưu thông tin người dùng (hoặc token) vào localStorage
-          localStorage.setItem('firstname', data.user.firstName);
-          localStorage.setItem('lastname', data.user.lastName);
+        // Use the setter functions from useLocalStorage
+        setLoginStatus("Logined");
+        setFirstname(data.user.firstName);
+        setLastname(data.user.lastName);
 
-          // --- Prepend Locale Prefix ---
-          const localePrefix = pathname.split('/')[1]; // Extract locale prefix (e.g., "en")
-          const pathWithLocale = `/${localePrefix}`; // Construct path with locale
 
-          router.push(pathWithLocale); // Use path with locale for internal navigation
-        } else {
-          console.error("Error in signin");
-        }
+        const localePrefix = pathname.split('/')[1];
+        const pathWithLocale = `/${localePrefix}`;
+        router.push(pathWithLocale);
+
       } else {
-        // Xử lý lỗi đăng nhập
-        setError(data.message || 'Đăng nhập không thành công. Vui lòng kiểm tra thông tin đăng nhập.');
+        setError(data.message || 'Đăng nhập không thành công.');
       }
     } catch (error: any) {
       console.error('Lỗi đăng nhập:', error);
-      setError('Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại sau.');
+      setError('Đã xảy ra lỗi khi đăng nhập.');
     } finally {
-      setIsLoading(false); // Kết thúc loading, bất kể thành công hay thất bại
+      setIsLoading(false);
     }
   };
 
