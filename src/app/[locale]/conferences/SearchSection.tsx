@@ -23,9 +23,10 @@ interface SearchSectionProps {
     topics?: string[];
     fieldOfResearch?: string[];
   }) => void;
+  onClear: () => void; // Add onClear prop
 }
 
-const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
+const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => { // Destructure onClear
   const {
     confKeyword,
     selectedLocation,
@@ -65,9 +66,10 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
     selectedTopics,
     handleFieldsOfResearchChange,
     selectedFieldsOfResearch,
-    handlePublisherChange,  // Use the corrected handler name
-    selectedPublisher,     // Include selectedPublisher
-  } = useSearchForm({ onSearch });
+    handlePublisherChange,
+    selectedPublisher,
+    handleClear, // Get handleClear from the hook
+  } = useSearchForm({ onSearch, onClear }); // Pass onClear to the hook
 
 
   return (
@@ -186,10 +188,14 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
             </div>
           )}
         </div>
-
-        <Button variant="primary" size="large" rounded className="" onClick={handleSearchClick}>
-          Search
-        </Button>
+        <div className="flex space-x-2">
+          <Button variant="primary" size="large" rounded className="" onClick={handleSearchClick}>
+            Search
+          </Button>
+          <Button variant="secondary" size="large" rounded className="" onClick={handleClear}>
+            Clear
+          </Button>
+        </div>
       </div>
 
       <SearchAdvanceSection
@@ -207,8 +213,8 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
         selectedTopics={selectedTopics}
         onFieldOfResearchChange={handleFieldsOfResearchChange}
         selectedFieldsOfResearch={selectedFieldsOfResearch}
-        onPublisherChange={handlePublisherChange} // Pass the corrected handler
-        selectedPublisher={selectedPublisher}   // Pass selectedPublisher
+        onPublisherChange={handlePublisherChange}
+        selectedPublisher={selectedPublisher}
       />
     </div>
   );

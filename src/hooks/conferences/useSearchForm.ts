@@ -20,9 +20,10 @@ interface SearchParams {
 
 interface UseSearchFormProps {
   onSearch: (searchParams: SearchParams) => void;
+  onClear?: () => void; // Add onClear prop
 }
 
-const useSearchForm = ({ onSearch }: UseSearchFormProps) => {
+const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   const [confKeyword, setConfKeyword] = useState<string>('');
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<'Online' | 'Offline' | 'Hybrid' | null>(null);
@@ -173,9 +174,30 @@ const useSearchForm = ({ onSearch }: UseSearchFormProps) => {
     setSelectedFieldsOfResearch(fields);
   };
 
-  const handlePublisherChange = (publisher: string | null) => { // Corrected handler name
+  const handlePublisherChange = (publisher: string | null) => {
     setSelectedPublisher(publisher);
   };
+
+  const handleClear = () => {
+    if (onClear) {
+      onClear();
+    }
+    setConfKeyword('');
+    setSelectedLocation(null);
+    setSelectedType(null);
+    setStartDate(null);
+    setEndDate(null);
+    setLocationSearchQuery('');
+    setTypeSearchQuery('');
+    setSubmissionDate(null);
+    setSelectedRank(null);
+    setSelectedSourceYear(null);
+    setSelectedAverageScore(null);
+    setSelectedTopics([]);
+    setSelectedFieldsOfResearch([]);
+    setSelectedPublisher(null);
+  };
+
 
   return {
     confKeyword,
@@ -219,7 +241,8 @@ const useSearchForm = ({ onSearch }: UseSearchFormProps) => {
     handleAverageScoreChange,
     handleTopicsChange,
     handleFieldsOfResearchChange,
-    handlePublisherChange, // Corrected handler name in return
+    handlePublisherChange,
+    handleClear, // Return handleClear
   };
 };
 

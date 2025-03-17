@@ -1,80 +1,79 @@
-// page.tsx (Conferences Page)
+// pages/conferences.tsx (Conferences Page)
 "use client";
 
 import { useTranslations } from 'next-intl';
 import SearchSection from '../conferences/SearchSection';
 import ResultsSection from '../conferences/ResultsSection';
-import { useState } from 'react';
 import { Header } from '../utils/Header';
 import Footer from '../utils/Footer';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useState, useEffect } from 'react';
 
-export default function Conferences({ locale }: { locale: string }) {
+export default function Conferences({ params: { locale } }: { params: { locale: string } }) {
   const t = useTranslations('');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
-  const [selectedType, setSelectedType] = useState<'Online' | 'Offline' | 'Hybrid' | null>(null);
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const [submissionDate, setSubmissionDate] = useState<Date | null>(null);
-  const [selectedRank, setSelectedRank] = useState<string | null>(null);
-  const [selectedSourceYear, setSelectedSourceYear] = useState<string | null>(null);
-  const [selectedAverageScore, setSelectedAverageScore] = useState<string | null>(null);
-  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  const [selectedFieldsOfResearch, setSelectedFieldsOfResearch] = useState<string[]>([]);
-  const [selectedPublisher, setSelectedPublisher] = useState<string | null>(null); // Keep as string | null
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [initialSearchParams, setInitialSearchParams] = useState<string>(""); // Store as a string
 
-  const handleSearch = async (searchParams: {
+  // Initialize initialSearchParams when the component mounts.
+  useEffect(() => {
+    setInitialSearchParams(searchParams.toString()); // Convert to string
+  }, [searchParams]);
+
+  const handleSearch = useCallback(async (searchParamsFromComponent: {
     keyword?: string;
     startDate?: Date | null;
     endDate?: Date | null;
     location?: string | null;
     type?: 'Online' | 'Offline' | 'Hybrid' | null;
     submissionDate?: Date | null;
-    publisher?: string | null; // Change to string | null
+    publisher?: string | null;
     rank?: string | null;
     sourceYear?: string | null;
     averageScore?: string | null;
     topics?: string[];
     fieldOfResearch?: string[];
   }) => {
-    console.log("Search parameters received from SearchJournalSection:", searchParams);
-    setSearchQuery(searchParams.keyword || '');
 
-    // Update state variables for ResultsJournalSection props
-    setStartDate(searchParams.startDate || null);
-    setEndDate(searchParams.endDate || null);
-    setSelectedLocation(searchParams.location || null);
-    setSelectedType(searchParams.type || null);
-    setSubmissionDate(searchParams.submissionDate || null);
-    setSelectedPublisher(searchParams.publisher || null); // Update publisher state
-    setSelectedRank(searchParams.rank || null);
-    setSelectedSourceYear(searchParams.sourceYear || null);
-    setSelectedAverageScore(searchParams.averageScore || null);
-    setSelectedTopics(searchParams.topics || []);
-    setSelectedFieldsOfResearch(searchParams.fieldOfResearch || []);
-  };
+    const newParams = new URLSearchParams();
+    if (searchParamsFromComponent.keyword) newParams.set('keyword', searchParamsFromComponent.keyword);
+    if (searchParamsFromComponent.location) newParams.set('country', searchParamsFromComponent.location);
+    if (searchParamsFromComponent.type) newParams.set('type', searchParamsFromComponent.type);
+    if (searchParamsFromComponent.startDate) {
+      newParams.set('startDate', searchParamsFromComponent.startDate.toISOString().split('T')[0]);
+    }
+    if (searchParamsFromComponent.endDate) {
+      newParams.set('endDate', searchParamsFromComponent.endDate.toISOString().split('T')[0]);
+    }
+    if (searchParamsFromComponent.rank) newParams.set('rank', searchParamsFromComponent.rank);
+    if (searchParamsFromComponent.sourceYear) newParams.set('sourceYear', searchParamsFromComponent.sourceYear);
+    if (searchParamsFromComponent.publisher) newParams.set('publisher', searchParamsFromComponent.publisher);
+
+    if (searchParamsFromComponent.topics && searchParamsFromComponent.topics.length > 0) {
+        searchParamsFromComponent.topics.forEach(topic => newParams.append('topics', topic));
+    }
+    if (searchParamsFromComponent.fieldOfResearch && searchParamsFromComponent.fieldOfResearch.length > 0) {
+        searchParamsFromComponent.fieldOfResearch.forEach(field => newParams.append('fieldOfResearch', field));
+    }
+
+
+    router.push(`/${locale}/conferences?${newParams.toString()}`);
+  }, [locale, router]);
+
+
+  const handleClear = useCallback(() => {
+    router.push(`/${locale}/conferences`);
+  }, [locale, router]);
+
 
   return (
     <>
       <Header locale={locale} />
       <div className="text-center text-2xl">
         <div className="py-14 bg-background w-full"></div>
-        <SearchSection onSearch={handleSearch} />
+        <SearchSection onSearch={handleSearch} onClear={handleClear} />
         <div className="container mx-auto mt-8 px-4">
-          <ResultsSection
-            searchQuery={searchQuery}
-            selectedLocation={selectedLocation}
-            selectedType={selectedType}
-            startDate={startDate}
-            endDate={endDate}
-            submissionDate={submissionDate}
-            selectedRank={selectedRank}
-            selectedSourceYear={selectedSourceYear}
-            selectedAverageScore={selectedAverageScore}
-            selectedTopics={selectedTopics}
-            selectedFieldsOfResearch={selectedFieldsOfResearch}
-            selectedPublisher={selectedPublisher} // Pass selectedPublisher
-          />
+          <ResultsSection />
         </div>
       </div>
       <Footer />
