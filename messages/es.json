@@ -109,5 +109,50 @@
   "Follow_us": "Síguenos",
   "Quick_link": "Enlace rápido",
   "Popular_topics": "Temas populares",
-  "Popular_countries": "Países populares"
+  "Popular_countries": "Países populares",
+  "AboutWebsite": "Acerca del sitio web",
+  "Account": "Cuenta",
+  "ConferenceJournal": "Revista de conferencias",
+  "PostConference": "Después de la conferencia",
+  "Favorite": "Favorito",
+  "Title": "Título",
+  "noResultsFound": "No se encontraron preguntas en esta categoría o que coincidan con su búsqueda.",
+  "All": "Todo",
+  "AboutPage": {
+    "hero": {
+      "title": "Acerca de HCMUS",
+      "subtitle": "Una plataforma integral para conferencias y revistas científicas."
+    },
+    "mission": {
+      "title": "Nuestra misión",
+      "description": "HCMUS se crea con el objetivo de ayudar a los investigadores, académicos y estudiantes a encontrar y acceder fácilmente a eventos y publicaciones científicas relevantes para sus campos. Creemos que conectar a la comunidad investigadora es clave para el avance de la ciencia."
+    },
+    "features": {
+      "title": "Lo que ofrecemos",
+      "feature1": {
+        "title": "Datos completos",
+        "description": "Agrega información de diversos campos científicos, incluidas las ciencias naturales, las ciencias sociales, la ingeniería, la medicina y los campos interdisciplinarios."
+      },
+      "feature2": {
+        "title": "Actualizaciones diarias",
+        "description": "La información se actualiza diariamente y se agrega automáticamente de fuentes oficiales, lo que garantiza los datos más recientes y precisos."
+      },
+      "feature3": {
+        "title": "Acceso gratuito",
+        "description": "Las funciones básicas son completamente gratuitas.  Las funciones avanzadas pueden requerir una cuenta (es posible que haya planes de membresía disponibles en el futuro)."
+      },
+      "feature4": {
+        "title": "Cuenta y beneficios",
+        "description": "Regístrese para obtener una cuenta para publicar información, guardar conferencias, recibir notificaciones, usar el chatbot de consultoría y disfrutar de muchos otros beneficios."
+      },
+      "feature5": {
+        "title": "Búsqueda y filtrado inteligentes",
+        "description": "Busque fácilmente conferencias/revistas por nombre, palabras clave, campo, hora, ubicación y muchos otros criterios."
+      },
+      "feature6": {
+        "title": "Soporte de chatbot con tecnología de IA",
+        "description": "Un chatbot proporciona información sobre conferencias/revistas, ayuda con la carga de archivos y sugiere conferencias adecuadas para sus artículos."
+      }
+    }
+  }
 }

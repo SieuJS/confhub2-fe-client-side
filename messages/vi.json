@@ -109,5 +109,50 @@
   "Follow_us": "Theo dõi chúng tôi",
   "Quick_link": "Liên kết nhanh",
   "Popular_topics": "Chủ đề phổ biến",
-  "Popular_countries": "Quốc gia phổ biến"
+  "Popular_countries": "Quốc gia phổ biến",
+  "AboutWebsite": "Về trang web",
+  "Account": "Tài khoản",
+  "ConferenceJournal": "Kỷ yếu hội nghị",
+  "PostConference": "Hậu Hội nghị",
+  "Favorite": "Yêu thích",
+  "Title": "Tiêu đề",
+  "noResultsFound": "Không tìm thấy câu hỏi nào trong danh mục này hoặc phù hợp với tìm kiếm của bạn.",
+  "All": "Tất cả",
+  "AboutPage": {
+    "hero": {
+      "title": "Về HCMUS",
+      "subtitle": "Nền tảng tổng hợp thông tin hội nghị và tạp chí khoa học toàn diện."
+    },
+    "mission": {
+      "title": "Sứ Mệnh Của Chúng Tôi",
+      "description": "HCMUS được xây dựng với mục tiêu giúp các nhà nghiên cứu, học giả và sinh viên dễ dàng tìm kiếm và tiếp cận các sự kiện và ấn phẩm khoa học phù hợp với lĩnh vực của mình. Chúng tôi tin rằng việc kết nối cộng đồng nghiên cứu là chìa khóa cho sự phát triển của khoa học."
+    },
+    "features": {
+      "title": "Chúng Tôi Cung Cấp",
+      "feature1": {
+        "title": "Dữ Liệu Toàn Diện",
+        "description": "Tổng hợp thông tin từ nhiều lĩnh vực khoa học, bao gồm khoa học tự nhiên, khoa học xã hội, kỹ thuật, y học và các lĩnh vực liên ngành."
+      },
+      "feature2": {
+        "title": "Cập Nhật Hàng Ngày",
+        "description": "Thông tin được cập nhật hàng ngày và tự động tổng hợp từ các nguồn chính thức, đảm bảo tính mới nhất và chính xác."
+      },
+      "feature3": {
+        "title": "Truy Cập Miễn Phí",
+        "description": "Các tính năng cơ bản hoàn toàn miễn phí. Tính năng nâng cao có thể yêu cầu tài khoản (có thể có các gói thành viên trong tương lai)."
+      },
+      "feature4": {
+        "title": "Tài Khoản và Lợi Ích",
+        "description": "Đăng ký tài khoản để đăng tải thông tin, lưu hội nghị, nhận thông báo, sử dụng chatbot tư vấn và nhiều lợi ích khác."
+      },
+      "feature5": {
+        "title": "Tìm Kiếm và Lọc Thông Minh",
+        "description": "Dễ dàng tìm kiếm hội nghị/tạp chí theo tên, từ khóa, lĩnh vực, thời gian, địa điểm và nhiều tiêu chí khác."
+      },
+      "feature6": {
+        "title": "Chatbot AI Hỗ Trợ",
+        "description": "Chatbot tư vấn thông tin hội nghị/tạp chí, hỗ trợ upload file và gợi ý hội nghị phù hợp với bài báo của bạn."
+      }
+    }
+  }
 }

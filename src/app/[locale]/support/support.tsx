@@ -12,27 +12,27 @@ const Support = () => {
   // Define FAQ categories and data
   const faqCategories = [
     {
-      name: t('categoryAboutWebsite') || 'Về trang web', // Translated category names
+      name: t('AboutWebsite') || 'Về trang web', // Translated category names
       value: 'about_website'
     },
     {
-      name: t('categoryAccount') || 'Về tài khoản',
+      name: t('Account') || 'Về tài khoản',
       value: 'account'
     },
     {
-      name: t('categoryConferenceJournal') || 'Về Hội nghị/tạp chí',
+      name: t('ConferenceJournal') || 'Về Hội nghị/tạp chí',
       value: 'conference_journal'
     },
     {
-      name: t('categoryPostConference') || 'Về Đăng tải thông tin Hội nghị',
+      name: t('PostConference') || 'Về Đăng tải thông tin Hội nghị',
       value: 'post_conference'
     },
     {
-      name: t('categoryFavorite') || 'Tính năng "Yêu thích" và thông báo',
+      name: t('Favorite') || 'Tính năng "Yêu thích" và thông báo',
       value: 'favorite_feature'
     },
     {
-      name: t('categoryChatbot') || 'Về Chatbot',
+      name: t('Chatbot') || 'Về Chatbot',
       value: 'chatbot'
     }
   ]
@@ -328,7 +328,7 @@ const Support = () => {
           <div className='flex flex-col items-center md:col-span-3'>
             {/* Title and search bar column */}
             <h2 className='py-8 text-center text-3xl font-bold'>
-              {t('How can we help you?')}
+              {t('How_can_we_help_you')}
             </h2>
             {/* Removed pt-40 */}
           </div>
@@ -362,18 +362,18 @@ const Support = () => {
         <div className='mx-12 flex gap-4'>
           {/* Using grid for 2-column layout */}
           {/* Left Column - Categories */}
-          <div className='w-full rounded-lg  p-4 shadow-lg md:w-1/3'>
+          <div className='w-full rounded-lg  p-4 shadow-lg md:w-1/3 '>
             {/* Adjusted width for smaller screens */}
-            <h3 className='mb-4 text-lg font-semibold'>
-              {t('categoriesTitle') || 'Categories'}
-            </h3>
+            {/* <h3 className='mb-4 text-lg font-semibold'>
+              {t('Title') || 'Categories'}
+            </h3> */}
             <ul className='space-y-2'>
               <li
                 key='all'
                 className={`cursor-pointer py-1  ${selectedCategory === null ? 'font-bold ' : ''}`}
                 onClick={() => handleCategoryClick(null)}
               >
-                {t('categoryAll') || 'All'}
+                {t('All') || 'All'}
               </li>
               {faqCategories.map(category => (
                 <li
