@@ -8,14 +8,13 @@ const About = () => {
 
   return (
     <>
-      <div className='min-h-screen bg-[--background] '>
+      <div className='bg-gradient-to-r from-background to-background-secondary'>
         {/* Hero Section */}
-        <section className='relative bg-gradient-to-r from-[--primary] to-[--secondary] py-20 text-[--button-text]'>
-          {/* Removed the absolute positioning and opacity as it was causing issues with the theme colors.  A solid gradient is often better. */}
+        <section className='relative bg-span-bg py-20 text-[--button-text]'>
           <div className='container relative z-10 mx-auto px-4'>
             <div className='text-center'>
-              <h1 className='mb-4 text-4xl  md:text-6xl'>Về HCMUS</h1>
-              <p className='mx-auto max-w-3xl text-xl leading-relaxed md:text-2xl'>
+              <h1 className='mb-4 text-3xl font-bold md:text-6xl'>Về HCMUS</h1>
+              <p className='mx-auto  text-xl leading-relaxed md:text-2xl'>
                 Nền tảng tổng hợp thông tin hội nghị và tạp chí khoa học toàn
                 diện.
               </p>
@@ -54,7 +53,7 @@ const About = () => {
         </section>
 
         {/* Features/Services Section */}
-        <section className='bg-[--background-secondary] px-4 py-16 md:px-8'>
+        <section className='bg-gradient-to-r from-background to-background-secondary px-4 py-16 md:px-8'>
           <div className='container mx-auto'>
             <h2 className='mb-8 text-center text-3xl font-bold text-[--primary] md:text-4xl'>
               Chúng Tôi Cung Cấp
