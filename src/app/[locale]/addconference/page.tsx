@@ -1,11 +1,12 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Header } from '../utils/Header'
 import Footer from '../utils/Footer'
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation'
 
-const API_ADD_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/user/add-conferences';
+const API_ADD_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/conferences'
+const CSC_API_KEY = process.env.NEXT_PUBLIC_CSC_API_KEY // Get API key from environment variable
 
 interface ConferenceFormData {
   title: string
@@ -33,6 +34,28 @@ interface ImportantDateInput {
   toDate: string
 }
 
+interface Country {
+  name: string
+  iso2: string // ISO2 country code
+}
+
+interface State {
+  name: string
+  iso2: string
+  country_code: string
+  state_code: string
+}
+
+const continentData: { [key: string]: string[] } = {
+  'North America': [],
+  Europe: [],
+  Asia: [],
+  Africa: [],
+  'South America': [],
+  Oceania: [],
+  Antarctica: []
+}
+
 const AddConference = ({ locale }: { locale: string }) => {
   const [title, setTitle] = useState('')
   const [acronym, setAcronym] = useState('')
@@ -48,7 +71,7 @@ const AddConference = ({ locale }: { locale: string }) => {
   })
   const [dates, setDates] = useState<ImportantDateInput[]>([
     {
-      type: 'Conference Date',
+      type: 'conferenceDates',
       name: 'Conference Date',
       fromDate: '',
       toDate: ''
@@ -58,8 +81,146 @@ const AddConference = ({ locale }: { locale: string }) => {
   const [imageUrl, setImageUrl] = useState('')
   const [description, setDescription] = useState('')
 
+  // --- CSC API States ---
+  const [countries, setCountries] = useState<Country[]>([])
+  const [states, setStates] = useState<State[]>([])
+  const [selectedCountry, setSelectedCountry] = useState<string>('') // ISO2 of selected country
+  const [selectedState, setSelectedState] = useState<string>('') // State code of selected state
+  const [selectedContinent, setSelectedContinent] = useState<string>('') // Selected continent
+  const [filteredCountries, setFilteredCountries] = useState<Country[]>([]) // Filtered countries by continent
+
   const router = useRouter()
-  const pathname = usePathname();
+  const pathname = usePathname()
+
+  // --- Fetch Countries (All at once)---
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await fetch(
+          'https://api.countrystatecity.in/v1/countries',
+          {
+            headers: {
+              'X-CSCAPI-KEY': CSC_API_KEY || ''
+            }
+          }
+        )
+        const data = await response.json()
+
+        const mappedCountries: Country[] = data.map((c: any) => ({
+          name: c.name,
+          iso2: c.iso2
+        }))
+        setCountries(mappedCountries)
+
+        // Populate continentData
+        data.forEach((c: any) => {
+          if (c.name === 'United States')
+            continentData['North America'].push(c.iso2)
+          if (c.name === 'Canada') continentData['North America'].push(c.iso2)
+          if (c.name === 'Mexico') continentData['North America'].push(c.iso2)
+          if (c.name === 'Brazil') continentData['South America'].push(c.iso2)
+          if (c.name === 'Argentina')
+            continentData['South America'].push(c.iso2)
+          if (c.name === 'Colombia') continentData['South America'].push(c.iso2)
+          if (c.name === 'United Kingdom') continentData['Europe'].push(c.iso2)
+          if (c.name === 'Germany') continentData['Europe'].push(c.iso2)
+          if (c.name === 'France') continentData['Europe'].push(c.iso2)
+          if (c.name === 'China') continentData['Asia'].push(c.iso2)
+          if (c.name === 'India') continentData['Asia'].push(c.iso2)
+          if (c.name === 'Japan') continentData['Asia'].push(c.iso2)
+          if (c.name === 'South Africa') continentData['Africa'].push(c.iso2)
+          if (c.name === 'Egypt') continentData['Africa'].push(c.iso2)
+          if (c.name === 'Nigeria') continentData['Africa'].push(c.iso2)
+          if (c.name === 'Australia') continentData['Oceania'].push(c.iso2)
+          if (c.name === 'New Zealand') continentData['Oceania'].push(c.iso2)
+          //Antarctica has no countries
+        })
+      } catch (error) {
+        console.error('Error fetching countries:', error)
+      }
+    }
+
+    fetchCountries()
+  }, [])
+
+  // --- Filter Countries by Continent ---
+  useEffect(() => {
+    if (selectedContinent) {
+      const countryCodes = continentData[selectedContinent]
+      const newFilteredCountries = countries.filter(country =>
+        countryCodes.includes(country.iso2)
+      )
+      setFilteredCountries(newFilteredCountries)
+    } else {
+      setFilteredCountries([]) // Clear if no continent selected
+    }
+    // Reset country and state when continent changes
+    setSelectedCountry('')
+    setSelectedState('')
+    setLocation({
+      ...location,
+      country: '',
+      cityStateProvince: '',
+      continent: selectedContinent
+    })
+  }, [selectedContinent, countries])
+
+  // --- Fetch States ---
+  useEffect(() => {
+    const fetchStates = async () => {
+      if (!selectedCountry) {
+        setStates([])
+        return
+      }
+      try {
+        const response = await fetch(
+          `https://api.countrystatecity.in/v1/countries/${selectedCountry}/states`,
+          {
+            headers: {
+              'X-CSCAPI-KEY': CSC_API_KEY || ''
+            }
+          }
+        )
+        const data = await response.json()
+        const mappedStates = data.map((s: any) => ({
+          name: s.name,
+          iso2: s.iso2,
+          country_code: s.country_code,
+          state_code: s.state_code
+        }))
+
+        setStates(mappedStates)
+      } catch (error) {
+        console.error('Error fetching states:', error)
+        setStates([])
+      }
+    }
+
+    fetchStates()
+  }, [selectedCountry])
+
+  const handleContinentChange = (continent: string) => {
+    setSelectedContinent(continent)
+  }
+
+  const handleCountryChange = (countryIso2: string) => {
+    setSelectedCountry(countryIso2)
+    setSelectedState('') // Reset state when country changes
+    setLocation({
+      ...location,
+      country: filteredCountries.find(c => c.iso2 === countryIso2)?.name || '',
+      cityStateProvince: ''
+    }) // find full name country
+  }
+
+  const handleStateChange = (stateCode: string) => {
+    setSelectedState(stateCode)
+    setLocation({
+      ...location,
+      cityStateProvince:
+        states.find(s => s.state_code === stateCode)?.name || ''
+    })
+  }
 
   const handleAddTopic = () => {
     if (newTopic.trim() !== '') {
@@ -70,13 +231,6 @@ const AddConference = ({ locale }: { locale: string }) => {
 
   const handleRemoveTopic = (topicToRemove: string) => {
     setTopics(topics.filter(topic => topic !== topicToRemove))
-  }
-
-  const handleLocationChange = (field: keyof LocationInput, value: string) => {
-    setLocation({
-      ...location,
-      [field]: value
-    })
   }
 
   const handleDateChange = (
@@ -102,21 +256,29 @@ const AddConference = ({ locale }: { locale: string }) => {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => { // Hàm async
-    e.preventDefault();
+  const handleLocationChange = (field: keyof LocationInput, value: string) => {
+    setLocation({
+      ...location,
+      [field]: value
+    })
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    // Hàm async
+    e.preventDefault()
     if (
       !title ||
       !acronym ||
       !link ||
       !type ||
       !location.address ||
-      !location.cityStateProvince ||
-      !location.country ||
-      !location.continent ||
+      // !location.cityStateProvince ||
+      // !location.country ||
+      // !location.continent ||
       dates.some(date => !date.fromDate || !date.toDate || !date.name)
     ) {
-      alert('Please fill in all required fields.');
-      return;
+      alert('Please fill in all required fields.')
+      return
     }
 
     const conferenceData: ConferenceFormData = {
@@ -128,48 +290,63 @@ const AddConference = ({ locale }: { locale: string }) => {
       location,
       dates,
       imageUrl,
-      description,
-    };
-
-    const userData = localStorage.getItem('user');
-    if (!userData) {
-      console.error('User not logged in');
-      alert("Please log in to add new Conference")
-      return; // Kết thúc sớm nếu không có thông tin người dùng
+      description
     }
-    const user = JSON.parse(userData);
-    const userId = user.id; // Lấy userId từ localStorage
-    console.log(conferenceData);
+
+    const userData = localStorage.getItem('user')
+    if (!userData) {
+      console.error('User not logged in')
+      alert('Please log in to add new Conference')
+      return
+    }
+    const user = JSON.parse(userData)
+    const userId = user.id
+    console.log(conferenceData)
     try {
       const response = await fetch(API_ADD_CONFERENCE_ENDPOINT, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          // Thêm Authorization header nếu cần
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ ...conferenceData, userId }), // GỬI userId TRONG BODY
-      });
+        body: JSON.stringify({ ...conferenceData, userId })
+      })
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message}`);
+        const errorData = await response.json()
+        throw new Error(
+          `HTTP error! status: ${response.status}, message: ${errorData.message}`
+        )
       }
 
-      const addedConference = await response.json(); // Lấy conference đã thêm từ response
-      console.log('Conference added:', addedConference);
+      const addedConference = await response.json()
+      console.log('Conference added:', addedConference)
 
-      // --- Prepend Locale Prefix ---
-      const localePrefix = pathname.split('/')[1]; // Extract locale prefix (e.g., "en")
-      const pathWithLocale = `/${localePrefix}/dashboard?tab=myconferences`; // Construct path with locale
+      const localePrefix = pathname.split('/')[1]
+      const pathWithLocale = `/${localePrefix}/dashboard?tab=myconferences`
 
-      router.push(pathWithLocale); // Use path with locale for internal navigation   
-
+      router.push(pathWithLocale)
     } catch (error: any) {
-      console.error('Error adding conference:', error.message);
-      // Xử lý lỗi (hiển thị thông báo, v.v.)
+      console.error('Error adding conference:', error.message)
     }
+  }
 
-  };
+  const continentOptions = [
+    'North America',
+    'Europe',
+    'Asia',
+    'Africa',
+    'South America',
+    'Oceania',
+    'Antarctica'
+  ]
+
+  const dateTypeOptions = [
+    'submissionDate',
+    'conferenceDates',
+    'registrationDate',
+    'notificationDate',
+    'cameraReadyDate'
+  ]
 
   return (
     <>
@@ -180,9 +357,9 @@ const AddConference = ({ locale }: { locale: string }) => {
         <h1 className='mb-4 text-2xl font-bold'>Add New Conference</h1>
 
         <form onSubmit={handleSubmit} className='grid gap-5'>
-          {/* Basic Information -  Grouped Acronym, Link, and Type */}
+          {/* Basic Information */}
           <div className='sm:col-span-2'>
-            <label htmlFor='title' className='block text-sm font-medium '>
+            <label htmlFor='title' className='block text-sm  '>
               * Conference name:
             </label>
             <input
@@ -198,7 +375,7 @@ const AddConference = ({ locale }: { locale: string }) => {
           <div className='grid grid-cols-1 gap-4 sm:col-span-2 sm:grid-cols-3'>
             {/* Acronym */}
             <div>
-              <label htmlFor='acronym' className='block text-sm font-medium '>
+              <label htmlFor='acronym' className='block text-sm  '>
                 * Acronym:
               </label>
               <input
@@ -213,7 +390,7 @@ const AddConference = ({ locale }: { locale: string }) => {
 
             {/* Link */}
             <div>
-              <label htmlFor='link' className='block text-sm font-medium '>
+              <label htmlFor='link' className='block text-sm  '>
                 * Link:
               </label>
               <input
@@ -228,7 +405,7 @@ const AddConference = ({ locale }: { locale: string }) => {
 
             {/* Type */}
             <div>
-              <label htmlFor='type' className='block text-sm font-medium '>
+              <label htmlFor='type' className='block text-sm  '>
                 * Type:
               </label>
               <select
@@ -249,10 +426,10 @@ const AddConference = ({ locale }: { locale: string }) => {
 
           {/* Location Inputs */}
           <div className='sm:col-span-2'>
-            <label className='block text-base font-medium '>* Location:</label>
+            <label className='block text-base  '>* Location:</label>
             <div className='grid grid-cols-1 gap-y-4 sm:grid-cols-4 sm:gap-x-4'>
               <div>
-                <label htmlFor='address' className='block text-sm font-medium '>
+                <label htmlFor='address' className='block text-sm  '>
                   Address:
                 </label>
                 <input
@@ -266,72 +443,81 @@ const AddConference = ({ locale }: { locale: string }) => {
                   required
                 />
               </div>
+
+              {/* --- Continent Dropdown --- */}
               <div>
-                <label
-                  htmlFor='cityStateProvince'
-                  className='block text-sm font-medium '
-                >
-                  City/State/Province:
-                </label>
-                <input
-                  type='text'
-                  id='cityStateProvince'
-                  className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
-                  value={location.cityStateProvince}
-                  onChange={e =>
-                    handleLocationChange('cityStateProvince', e.target.value)
-                  }
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor='country' className='block text-sm font-medium '>
-                  Country:
-                </label>
-                <input
-                  type='text'
-                  id='country'
-                  className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
-                  value={location.country}
-                  onChange={e =>
-                    handleLocationChange('country', e.target.value)
-                  }
-                  required
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor='continent'
-                  className='block text-sm font-medium '
-                >
+                <label htmlFor='continent' className='block text-sm'>
                   Continent:
                 </label>
-                <input
-                  type='text'
+                <select
                   id='continent'
                   className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
-                  value={location.continent}
-                  onChange={e =>
-                    handleLocationChange('continent', e.target.value)
-                  }
+                  value={selectedContinent}
+                  onChange={e => handleContinentChange(e.target.value)}
                   required
-                />
+                >
+                  <option value=''>Select Continent</option>
+                  {continentOptions.map(continent => (
+                    <option key={continent} value={continent}>
+                      {continent}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* --- Country Dropdown --- */}
+              <div>
+                <label htmlFor='country' className='block text-sm'>
+                  Country:
+                </label>
+                <select
+                  id='country'
+                  className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+                  value={selectedCountry}
+                  onChange={e => handleCountryChange(e.target.value)}
+                  required
+                  disabled={!selectedContinent} // Disable if no continent is selected
+                >
+                  <option value=''>Select Country</option>
+                  {filteredCountries.map(country => (
+                    <option key={country.iso2} value={country.iso2}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* --- State Dropdown --- */}
+              <div>
+                <label htmlFor='state' className='block text-sm'>
+                  State/Province:
+                </label>
+                <select
+                  id='state'
+                  className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+                  value={selectedState}
+                  onChange={e => handleStateChange(e.target.value)}
+                  required
+                  disabled={!selectedCountry} // Disable if no country is selected
+                >
+                  <option value=''>Select State/Province</option>
+                  {states.map(state => (
+                    <option key={state.iso2} value={state.state_code}>
+                      {state.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           </div>
 
           {/* Important Dates */}
           <div className='sm:col-span-2'>
-            <label className='block text-sm font-medium text-gray-700'>
-              Important Dates:
-            </label>
+            <label className='block text-sm  '>Important Dates:</label>
             {dates.map((date, index) => (
               <div key={index} className='mt-1 grid grid-cols-4 gap-4'>
                 <div>
-                  <label
-                    htmlFor={`name-${index}`}
-                    className='block text-sm font-medium text-gray-700'
-                  >
+                  <label htmlFor={`name-${index}`} className='block text-sm  '>
                     Name:
                   </label>
                   <input
@@ -348,28 +534,32 @@ const AddConference = ({ locale }: { locale: string }) => {
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor={`type-${index}`}
-                    className='block text-sm font-medium text-gray-700'
-                  >
+                  <label htmlFor={`type-${index}`} className='block text-sm'>
                     Type:
                   </label>
-                  <input
-                    type='text'
+                  <select
                     id={`type-${index}`}
                     value={date.type}
                     onChange={e =>
                       handleDateChange(index, 'type', e.target.value)
                     }
-                    className={`mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm
-                       ${index === 0 ? 'opacity-50' : ''}`}
-                    readOnly={index === 0}
-                  />
+                    className={`mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm ${
+                      index === 0 ? 'pointer-events-none opacity-50' : ''
+                    }`}
+                    disabled={index === 0}
+                  >
+                    <option value=''>Select Type</option>
+                    {dateTypeOptions.map(type => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label
                     htmlFor={`fromDate-${index}`}
-                    className='block text-sm font-medium text-gray-700'
+                    className='block text-sm  '
                   >
                     Start Date:
                   </label>
@@ -387,7 +577,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                 <div>
                   <label
                     htmlFor={`toDate-${index}`}
-                    className='block text-sm font-medium text-gray-700'
+                    className='block text-sm  '
                   >
                     End Date:
                   </label>
@@ -403,7 +593,6 @@ const AddConference = ({ locale }: { locale: string }) => {
                   />
                 </div>
 
-                {/* Hide the remove button for the first date entry */}
                 {index !== 0 && (
                   <button
                     type='button'
@@ -438,10 +627,7 @@ const AddConference = ({ locale }: { locale: string }) => {
 
           {/* Topics */}
           <div className='sm:col-span-2'>
-            <label
-              htmlFor='newTopic'
-              className='block text-sm font-medium text-gray-700'
-            >
+            <label htmlFor='newTopic' className='block text-sm  '>
               Topics:
             </label>
             <div className='mt-1 items-center'>
@@ -449,13 +635,13 @@ const AddConference = ({ locale }: { locale: string }) => {
                 {topics.map((topic, index) => (
                   <span
                     key={index}
-                    className='mb-2 mr-2 inline-block rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold text-gray-700'
+                    className='mb-2 mr-2 inline-block rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold '
                   >
                     {topic}
                     <button
                       type='button'
                       onClick={() => handleRemoveTopic(topic)}
-                      className='ml-1 text-gray-500 hover:text-gray-700 focus:outline-none'
+                      className='hover: ml-1  focus:outline-none'
                     >
                       ×
                     </button>
@@ -482,10 +668,7 @@ const AddConference = ({ locale }: { locale: string }) => {
 
           {/* Image URL */}
           <div className='sm:col-span-2'>
-            <label
-              htmlFor='imageUrl'
-              className='block text-sm font-medium text-gray-700'
-            >
+            <label htmlFor='imageUrl' className='block text-sm  '>
               Image URL:
             </label>
             <input
@@ -498,10 +681,7 @@ const AddConference = ({ locale }: { locale: string }) => {
           </div>
           {/* Description */}
           <div className='sm:col-span-2'>
-            <label
-              htmlFor='description'
-              className='block text-sm font-medium text-gray-700'
-            >
+            <label htmlFor='description' className='block text-sm  '>
               Description:
             </label>
             <textarea
@@ -518,7 +698,7 @@ const AddConference = ({ locale }: { locale: string }) => {
             <button
               type='submit'
               onClick={handleSubmit}
-              className='w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+              className='w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm  text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
             >
               Add Conference
             </button>
@@ -530,4 +710,4 @@ const AddConference = ({ locale }: { locale: string }) => {
   )
 }
 
-export default AddConference;
+export default AddConference
