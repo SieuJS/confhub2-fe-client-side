@@ -109,5 +109,50 @@
   "Follow_us": "Suivez-nous",
   "Quick_link": "Lien rapide",
   "Popular_topics": "Sujets populaires",
-  "Popular_countries": "Pays populaires"
+  "Popular_countries": "Pays populaires",
+  "AboutWebsite": "À propos du site Web",
+  "Account": "Compte",
+  "ConferenceJournal": "Journal de conférence",
+  "PostConference": "Après la conférence",
+  "Favorite": "Favoris",
+  "Title": "Titre",
+  "noResultsFound": "Aucune question trouvée dans cette catégorie ou correspondant à votre recherche.",
+  "All": "Tout",
+  "AboutPage": {
+    "hero": {
+      "title": "À propos de HCMUS",
+      "subtitle": "Une plateforme complète pour les conférences et revues scientifiques."
+    },
+    "mission": {
+      "title": "Notre mission",
+      "description": "HCMUS est conçu dans le but d'aider les chercheurs, les universitaires et les étudiants à trouver et à accéder facilement aux événements et publications scientifiques pertinents pour leurs domaines. Nous pensons que connecter la communauté de la recherche est essentiel à l'avancement de la science."
+    },
+    "features": {
+      "title": "Ce que nous offrons",
+      "feature1": {
+        "title": "Données complètes",
+        "description": "Regroupe des informations provenant de divers domaines scientifiques, notamment les sciences naturelles, les sciences sociales, l'ingénierie, la médecine et les domaines interdisciplinaires."
+      },
+      "feature2": {
+        "title": "Mises à jour quotidiennes",
+        "description": "Les informations sont mises à jour quotidiennement et automatiquement agrégées à partir de sources officielles, garantissant les données les plus récentes et les plus précises."
+      },
+      "feature3": {
+        "title": "Accès gratuit",
+        "description": "Les fonctionnalités de base sont entièrement gratuites.  Des fonctionnalités avancées peuvent nécessiter un compte (des plans d'adhésion futurs peuvent être disponibles)."
+      },
+      "feature4": {
+        "title": "Compte et avantages",
+        "description": "Créez un compte pour publier des informations, enregistrer des conférences, recevoir des notifications, utiliser le chatbot de conseil et profiter de nombreux autres avantages."
+      },
+      "feature5": {
+        "title": "Recherche et filtrage intelligents",
+        "description": "Recherchez facilement des conférences/revues par nom, mots-clés, domaine, heure, lieu et de nombreux autres critères."
+      },
+      "feature6": {
+        "title": "Support de chatbot alimenté par l'IA",
+        "description": "Un chatbot fournit des informations sur les conférences/revues, aide au téléchargement de fichiers et suggère des conférences adaptées à vos articles."
+      }
+    }
+  }
 }

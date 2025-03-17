@@ -109,5 +109,50 @@
   "Follow_us": "Folgen Sie uns",
   "Quick_link": "Schnelllink",
   "Popular_topics": "Beliebte Themen",
-  "Popular_countries": "Beliebte Länder"
+  "Popular_countries": "Beliebte Länder",
+  "AboutWebsite": "Über die Website",
+  "Account": "Konto",
+  "ConferenceJournal": "Konferenzjournal",
+  "PostConference": "Nach der Konferenz",
+  "Favorite": "Favorit",
+  "Title": "Titel",
+  "noResultsFound": "Keine Fragen in dieser Kategorie oder passend zu Ihrer Suche gefunden.",
+  "All": "Alle",
+  "AboutPage": {
+    "hero": {
+      "title": "Über HCMUS",
+      "subtitle": "Eine umfassende Plattform für wissenschaftliche Konferenzen und Zeitschriften."
+    },
+    "mission": {
+      "title": "Unsere Mission",
+      "description": "HCMUS wurde mit dem Ziel entwickelt, Forschern, Wissenschaftlern und Studenten zu helfen, wissenschaftliche Veranstaltungen und Veröffentlichungen, die für ihre Fachgebiete relevant sind, leicht zu finden und darauf zuzugreifen. Wir glauben, dass die Vernetzung der Forschungsgemeinschaft der Schlüssel zum Fortschritt der Wissenschaft ist."
+    },
+    "features": {
+      "title": "Was wir anbieten",
+      "feature1": {
+        "title": "Umfassende Daten",
+        "description": "Aggregiert Informationen aus verschiedenen wissenschaftlichen Bereichen, darunter Naturwissenschaften, Sozialwissenschaften, Ingenieurwesen, Medizin und interdisziplinäre Bereiche."
+      },
+      "feature2": {
+        "title": "Tägliche Updates",
+        "description": "Die Informationen werden täglich aktualisiert und automatisch aus offiziellen Quellen aggregiert, um die neuesten und genauesten Daten zu gewährleisten."
+      },
+      "feature3": {
+        "title": "Kostenloser Zugang",
+        "description": "Grundfunktionen sind völlig kostenlos. Für erweiterte Funktionen ist möglicherweise ein Konto erforderlich (zukünftige Mitgliedschaftspläne sind möglicherweise verfügbar)."
+      },
+      "feature4": {
+        "title": "Konto und Vorteile",
+        "description": "Registrieren Sie sich für ein Konto, um Informationen zu veröffentlichen, Konferenzen zu speichern, Benachrichtigungen zu erhalten, den Beratungs-Chatbot zu nutzen und viele weitere Vorteile zu genießen."
+      },
+      "feature5": {
+        "title": "Intelligente Suche und Filterung",
+        "description": "Suchen Sie ganz einfach nach Konferenzen/Zeitschriften nach Name, Stichwörtern, Fachgebiet, Zeit, Ort und vielen anderen Kriterien."
+      },
+      "feature6": {
+        "title": "KI-gestützter Chatbot-Support",
+        "description": "Ein Chatbot bietet Informationen zu Konferenzen/Zeitschriften, hilft beim Hochladen von Dateien und schlägt Konferenzen vor, die für Ihre Arbeiten geeignet sind."
+      }
+    }
+  }
 }

@@ -109,5 +109,50 @@
   "Follow_us": "Follow Us",
   "Quick_link": "Quick Link",
   "Popular_topics": "Popular Topics",
-  "Popular_countries": "Popular Countries"
+  "Popular_countries": "Popular Countries",
+  "AboutWebsite": "About Website",
+  "Account": "Account",
+  "ConferenceJournal": "Conference Journal",
+  "PostConference": "Post Conference",
+  "Favorite": "Favorite",
+  "Title": "Title",
+  "noResultsFound": "No questions found in this category or matching your search.",
+  "All": "All",
+  "AboutPage": {
+    "hero": {
+      "title": "About HCMUS",
+      "subtitle": "A comprehensive platform for scientific conferences and journals."
+    },
+    "mission": {
+      "title": "Our Mission",
+      "description": "HCMUS is built with the goal of helping researchers, scholars, and students easily find and access scientific events and publications relevant to their fields. We believe that connecting the research community is key to the advancement of science."
+    },
+    "features": {
+      "title": "What We Offer",
+      "feature1": {
+        "title": "Comprehensive Data",
+        "description": "Aggregates information from various scientific fields, including natural sciences, social sciences, engineering, medicine, and interdisciplinary fields."
+      },
+      "feature2": {
+        "title": "Daily Updates",
+        "description": "Information is updated daily and automatically aggregated from official sources, ensuring the latest and most accurate data."
+      },
+      "feature3": {
+        "title": "Free Access",
+        "description": "Basic features are completely free.  Advanced features may require an account (future membership plans may be available)."
+      },
+      "feature4": {
+        "title": "Account and Benefits",
+        "description": "Register for an account to post information, save conferences, receive notifications, use the consulting chatbot, and enjoy many other benefits."
+      },
+      "feature5": {
+        "title": "Smart Search and Filtering",
+        "description": "Easily search for conferences/journals by name, keywords, field, time, location, and many other criteria."
+      },
+      "feature6": {
+        "title": "AI-Powered Chatbot Support",
+        "description": "A chatbot provides conference/journal information, assists with file uploads, and suggests conferences suitable for your papers."
+      }
+    }
+  }
 }
