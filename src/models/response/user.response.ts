@@ -8,6 +8,7 @@ export type UserResponse = {
   dob: string; 
   role: "user" | "admin" | string; 
   followedConferences: string[];
+  calendar: string[];
   createdAt: string; 
   updatedAt: string; 
 }

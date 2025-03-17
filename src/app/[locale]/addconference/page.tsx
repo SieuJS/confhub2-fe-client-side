@@ -4,9 +4,8 @@ import React, { useState } from 'react'
 import { Header } from '../utils/Header'
 import Footer from '../utils/Footer'
 import { useRouter, usePathname } from 'next/navigation';
-import { getPathname } from '@/src/navigation';
 
-const API_ADD_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/conferences';
+const API_ADD_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/user/add-conferences';
 
 interface ConferenceFormData {
   title: string

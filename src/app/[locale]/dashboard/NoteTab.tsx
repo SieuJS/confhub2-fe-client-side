@@ -1,102 +1,255 @@
 // NoteTab.tsx
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
-import Calendar from './Calendar'; // Import the Calendar component
-import { CalendarEvent } from './DayNote'; // Import CalendarEvent from DayNote.tsx
+import Calendar from './Calendar';
+import { CalendarEvent } from './DayNote';
+import { ConferenceResponse } from '../../../models/response/conference.response';
+import { getConference } from '../../../api/getConference/getConferenceDetails';
+import { Link } from '@/src/navigation';
+import Button from '../utils/Button';
 
+interface NoteTabProps { }
 
-interface NoteTabProps {
-  // Định nghĩa props cho component nếu cần
-}
-
+const API_GET_USER_CALENDAR_ENDPOINT = 'http://localhost:3000/api/v1/user';
 
 const NoteTab: React.FC<NoteTabProps> = () => {
-  // Mock data for upcoming notes (replace with actual data fetching later)
-  const upcomingNotes = [
-    {
-      type: 'Conference date',
-      conference: 'ICSoft',
-      location: 'Dijon, France',
-      date: 'Mon, 2024/07/08 - Wed, 2024/07/10',
-      countdown: '4d 14h 26m 8s',
-    },
-    {
-      type: 'Notification of Acceptance',
-      conference: 'CAINE',
-      location: 'Hilton San Diego Airport/Harbor Island, San Diego, California, USA',
-      date: 'Sat, 2024/07/20 - Sat, 2024/07/20',
-      countdown: '16d 14h 26m 8s',
-    },
-  ];
+  const [upcomingNotes, setUpcomingNotes] = useState<any[]>([]);
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock data for calendar events (replace with actual data fetching later)
-  const calendarEvents: CalendarEvent[] = [
-    { day: 30, month: 6, year: 2024, type: 'Submission date', conference: 'CAINE - Full Paper' }, // June is 6 (1-indexed in data)
-    { day: 1, month: 7, year: 2024, type: 'Conference date', conference: 'ED-MEDIA - Conference date' },
-    { day: 1, month: 7, year: 2024, type: 'Submission date', conference: 'SENSYS - Paper Sub' },
-    { day: 4, month: 7, year: 2024, type: 'Notification date', conference: 'SSS - Second Dez' },
-    { day: 8, month: 7, year: 2024, type: 'Conference date', conference: 'ICSoft - Conference date' },
-    { day: 8, month: 7, year: 2024, type: 'Conference date', conference: 'DM - Conference date' },
-    { day: 20, month: 7, year: 2024, type: 'Notification date', conference: 'CAINE - Notificati' },
-    { day: 1, month: 7, year: 2024, type: 'Conference date', conference: 'ICAC - Conference date' },
-    { day: 1, month: 7, year: 2024, type: 'Conference date', conference: 'ISCA - Conference date' },
-    { day: 1, month: 7, year: 2024, type: 'Conference date', conference: 'SSS - Second Dez' }, // Example of overlapping events on the same day
-  ];
+  const typeColors = useMemo(() => ({
+    conferenceDates: 'bg-teal-500',
+    submissionDate: 'bg-red-500',
+    notificationDate: 'bg-blue-500',
+    cameraReadyDate: 'bg-orange-500',
+    registrationDate: 'bg-cyan-500',
+  }), []);
 
+  const getEventTypeColor = (type: string) => typeColors[type as keyof typeof typeColors] || 'bg-gray-400';
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const userData = localStorage.getItem('user');
+        if (!userData) {
+          setLoggedIn(false);
+          setLoading(false);
+          return;
+        }
+
+        const user = JSON.parse(userData);
+        setLoggedIn(true);
+
+        const calendarResponse = await fetch(`${API_GET_USER_CALENDAR_ENDPOINT}/${user.id}/calendar`);
+
+        if (!calendarResponse.ok) {
+          const errorMessage = calendarResponse.status === 404 ? "Calendar not found for this user." : `HTTP error! status: ${calendarResponse.status}`;
+          setError(errorMessage);
+          throw new Error(errorMessage);
+        }
+
+        const calendarData: CalendarEvent[] = await calendarResponse.json();
+        setCalendarEvents(calendarData);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const testToday = new Date(2025, 2, 17); // Keep for consistent testing
+        testToday.setHours(0, 0, 0, 0);
+
+
+        const upcoming = calendarData
+          .filter(event => {
+            const eventDate = new Date(event.year, event.month - 1, event.day);
+            return eventDate >= testToday;
+          })
+          .sort((a, b) => {
+            const dateA = new Date(a.year, a.month - 1, a.day);
+            const dateB = new Date(b.year, b.month - 1, b.day);
+            return dateA.getTime() - dateB.getTime();
+          });
+
+
+
+        const notesWithLocation = await Promise.all(
+          upcoming.map(async (event) => {
+            const eventDate = new Date(event.year, event.month - 1, event.day);
+            const formattedDate = eventDate.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' });
+            const timeDiff = eventDate.getTime() - new Date().getTime();
+            const daysLeft = Math.max(0, Math.floor(timeDiff / (1000 * 60 * 60 * 24)));
+            const hoursLeft = Math.max(0, Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
+            const countdownString = `${daysLeft}d ${hoursLeft}h `;
+
+            try {
+              const conferenceDetails: ConferenceResponse = await getConference(event.conferenceId);
+              return {
+                type: event.type,
+                conference: event.conference,
+                id: event.conferenceId,
+                location: `${conferenceDetails.locations.cityStateProvince}, ${conferenceDetails.locations.country}`,
+                date: formattedDate,
+                countdown: countdownString,
+                year: event.year,
+                month: event.month,
+                day: event.day,
+              };
+            } catch (locationError) {
+              console.error(`Error fetching location for conference ${event.conferenceId}:`, locationError);
+              return {
+                type: event.type,
+                conference: event.conference,
+                id: event.conferenceId,
+                location: 'Location unavailable',
+                date: formattedDate,
+                countdown: countdownString,
+                year: event.year,
+                month: event.month,
+                day: event.day,
+              };
+            }
+          })
+        );
+
+        // Group notes by conference and handle date ranges
+        const groupedNotes: { [key: string]: any } = {};
+        notesWithLocation.forEach(note => {
+          const key = `${note.id}`; // Group by conference ID ONLY
+          if (!groupedNotes[key]) {
+            groupedNotes[key] = {
+              ...note,
+              types: [note.type],
+              dates: [{ year: note.year, month: note.month, day: note.day }], // Store dates as objects
+            };
+          } else {
+            if (!groupedNotes[key].types.includes(note.type)) {
+              groupedNotes[key].types.push(note.type);
+            }
+            // Add date to dates array if it's not already there
+            const dateExists = groupedNotes[key].dates.some((d: any) =>
+              d.year === note.year && d.month === note.month && d.day === note.day
+            );
+            if (!dateExists) {
+              groupedNotes[key].dates.push({ year: note.year, month: note.month, day: note.day });
+            }
+          }
+        });
+
+        // Format dates after grouping
+        const finalUpcomingNotes = Object.values(groupedNotes).map((note: any) => {
+          // Sort dates chronologically
+          note.dates.sort((a: any, b: any) => {
+            const dateA = new Date(a.year, a.month - 1, a.day);
+            const dateB = new Date(b.year, b.month - 1, b.day);
+            return dateA.getTime() - dateB.getTime();
+          });
+
+          // Format date ranges
+          let formattedDateRange = "";
+          if (note.dates.length > 0) {
+            const firstDate = note.dates[0];
+            const lastDate = note.dates[note.dates.length - 1];
+
+            const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric' }; // Options for formatting
+            const firstDateObj = new Date(firstDate.year, firstDate.month - 1, firstDate.day);
+            const lastDateObj = new Date(lastDate.year, lastDate.month - 1, lastDate.day);
+
+
+            if (note.dates.length === 1) {
+              formattedDateRange = firstDateObj.toLocaleDateString('en-US', options);
+            } else if (firstDate.year === lastDate.year && firstDate.month === lastDate.month) {
+              formattedDateRange = `${firstDateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} - ${lastDateObj.toLocaleDateString('en-US', { day: 'numeric' })}`;
+            } else if (firstDate.year === lastDate.year) {
+              formattedDateRange = `${firstDateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} - ${lastDateObj.toLocaleDateString('en-US', options)}`;
+            } else {
+              formattedDateRange = `${firstDateObj.toLocaleDateString('en-US', options)}, ${firstDate.year} - ${lastDateObj.toLocaleDateString('en-US', options)}, ${lastDate.year}`;
+            }
+          }
+          return { ...note, date: formattedDateRange }; // Overwrite the 'date' with the formatted range
+        }).slice(0, 3); // Limit to the first 3 grouped notes
+
+
+        setUpcomingNotes(finalUpcomingNotes);
+
+      } catch (error: any) {
+        console.error("Failed to fetch calendar data:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (!loggedIn) {
+    return <div className="container mx-auto p-4">Please log in to view your calendar.</div>;
+  }
+
+  if (loading) {
+    return <div className="container mx-auto p-4">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="container mx-auto p-4 text-red-500">{error}</div>;
+  }
 
   return (
-    <div className="flex flex-col lg:flex-row h-full p-4 bg-gray-100">
-      {/* Left side - Upcoming Notes and Calendar */}
-      <div className="lg:w-3/4 flex flex-col">
-        {/* Upcoming Notes */}
-        <section className="mb-8 p-4 bg-white rounded-md shadow">
-          <h2 className="text-lg font-semibold mb-4">Upcoming Notes</h2>
-          <p className="text-gray-600 mb-4">Save important dates for the conferences you have followed.</p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            {upcomingNotes.map((note, index) => (
-              <div key={index} className="w-full sm:w-auto p-4 rounded-md shadow border">
-                <h3 className="font-semibold text-gray-800">{note.type}</h3>
-                <p className="text-sm text-gray-700">Conference: {note.conference}</p>
-                <div className="flex items-center text-sm text-gray-700 mt-1">
-                  <Image src="/images/location-pin.svg" alt="Location" width={12} height={12} className="mr-1" />
-                  <span>{note.location}</span>
+    <div className="flex flex-col h-full p-4 bg-gray-100">
+      <div className="flex flex-col lg:flex-row gap-4 mb-4">
+        <section className="lg:w-3/4 bg-white rounded-md shadow p-4">
+          <h2 className="text-lg font-semibold mb-2">Upcoming Notes</h2>
+          <p className="text-gray-600 mb-2">Save important dates for the conferences you have followed.</p>
+          {upcomingNotes.length === 0 ? (
+            <p>You are not following any conferences yet.</p>
+          ) : (
+            <div className="flex flex-row gap-4">
+              {upcomingNotes.map((note, index) => (
+                <div key={index} className={`w-full p-4 rounded-md shadow border ${note.types.map(getEventTypeColor).join(' ')}`}>
+                  <div className="flex flex-col">
+                    <div>
+                      <p className="text-sm text-gray-900">Conference: {note.conference}</p>
+                      <div className="flex items-center text-sm text-gray-900 mt-1">
+                        <Image src="/images/location-pin.svg" alt="Location" width={12} height={12} className="mr-1" />
+                        <span>{note.location}</span>
+                      </div>
+                      <p className="text-sm text-gray-900 mt-1">{note.date}</p>
+
+                    </div>
+
+                    <div>
+                      <div className="flex items-center mt-2">
+                        <div className="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold">{note.countdown}</div>
+                        <Link href={{ pathname: '/conferences/detail', query: { id: note.id } }}>
+                          <Button className="ml-2 text-blue-500 hover:text-blue-700 text-xs">More details </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-700 mt-1">{note.date}</p>
-                <div className="flex items-center mt-2">
-                  <div className="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold">{note.countdown}</div>
-                  <button className="ml-2 text-blue-500 hover:text-blue-700 text-xs">More details </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
-
-        {/* Calendar */}
-        <Calendar calendarEvents={calendarEvents} />
-      </div>
-
-      {/* Right side - Color notes of date and Conference note details */}
-      <div className="lg:w-1/4 lg:ml-8 p-4 bg-white rounded-md shadow h-fit">
-
-
-        <section>
-          <h2 className="text-lg font-semibold mb-3">Conference note details</h2>
+        <section className="lg:w-1/4 bg-white rounded-md shadow pb-6 pt-4 px-4 h-fit">
+          <h2 className="text-lg font-semibold mb-4">Conference note details</h2>
           <ul>
-             <li className="flex items-center mb-2">
+            <li className="flex items-center mb-4">
+              <div className="w-4 h-4 rounded-full bg-teal-500 mr-2"></div>
+              <span className="text-gray-700 text-sm">Conference date</span>
+            </li>
+            <li className="flex items-center mb-4">
               <div className="w-4 h-4 rounded-full bg-red-500 mr-2"></div>
               <span className="text-gray-700 text-sm">Submission date</span>
             </li>
-            <li className="flex items-center mb-2">
+            <li className="flex items-center mb-4">
               <div className="w-4 h-4 rounded-full bg-blue-500 mr-2"></div>
               <span className="text-gray-700 text-sm">Notification date</span>
             </li>
-            <li className="flex items-center mb-2">
+            <li className="flex items-center mb-4">
               <div className="w-4 h-4 rounded-full bg-orange-500 mr-2"></div>
               <span className="text-gray-700 text-sm">Camera ready date</span>
-            </li>
-            <li className="flex items-center mb-2">
-              <div className="w-4 h-4 rounded-full bg-teal-500 mr-2"></div>
-              <span className="text-gray-700 text-sm">Conference date</span>
             </li>
             <li className="flex items-center">
               <div className="w-4 h-4 rounded-full bg-cyan-500 mr-2"></div>
@@ -104,6 +257,9 @@ const NoteTab: React.FC<NoteTabProps> = () => {
             </li>
           </ul>
         </section>
+      </div>
+      <div className="flex-grow">
+        <Calendar calendarEvents={calendarEvents} />
       </div>
     </div>
   );

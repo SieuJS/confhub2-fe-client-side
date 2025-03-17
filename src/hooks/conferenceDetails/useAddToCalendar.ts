@@ -1,28 +1,28 @@
-// hooks/useFollowConference.ts
+// hooks/useAddToCalendar.ts
 import { useState, useEffect } from 'react';
 import { ConferenceResponse } from '../../models/response/conference.response';
-import { UserResponse } from '../../models/response/user.response'; // Import UserResponse
+import { UserResponse } from '../../models/response/user.response';
 
 const API_ENDPOINT = 'http://localhost:3000/api/v1/user';
 
-const useFollowConference = (conferenceData: ConferenceResponse | null) => {
-  const [isFollowing, setIsFollowing] = useState(false);
+const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
+  const [isAddToCalendar, setIsAddToCalendar] = useState(false);
 
   useEffect(() => {
     if (!conferenceData || !conferenceData.conference) return;
 
     const fetchUser = async () => {
-      const userData = localStorage.getItem('user'); // Vẫn cần lấy ID user
+      const userData = localStorage.getItem('user');
       if (userData) {
         const user = JSON.parse(userData);
         try {
-          const response = await fetch(`${API_ENDPOINT}/${user.id}`); // Gọi API
+          const response = await fetch(`${API_ENDPOINT}/${user.id}`);
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
           const userData: UserResponse = await response.json();
           console.log(userData);
-          setIsFollowing(userData.followedConferences.includes(conferenceData.conference.id)); // Check if conferenceData.conference.id exists
+          setIsAddToCalendar(userData.calendar.includes(conferenceData.conference.id)); // Check if conferenceData.conference.id exists
         } catch (error) {
           console.error('Error fetching user data:', error);
           // Xử lý lỗi (ví dụ: hiển thị thông báo)
@@ -32,7 +32,7 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
       fetchUser();
   }, [conferenceData?.conference?.id]); // Chạy lại khi conferenceData.conference.id thay đổi
 
-  const handleFollowClick = async () => {
+  const handleAddToCalendar = async () => {
     if (!conferenceData) return;
 
     const conferenceId = conferenceData.conference.id;
@@ -42,7 +42,7 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
       const user = JSON.parse(userData);
 
       try {
-        const response = await fetch(`${API_ENDPOINT}/${user.id}/follow`, {
+        const response = await fetch(`${API_ENDPOINT}/${user.id}/add-to-calendar`, {
         method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
 
         const updatedUser = await response.json(); // Nhận user đã update từ server
         // Không cần cập nhật localStorage ở đây nữa
-        setIsFollowing(updatedUser.followedConferences.includes(conferenceId)); // Cập nhật state
+        setIsAddToCalendar(updatedUser.calendar.includes(conferenceId)); // Cập nhật state
 
 
       } catch (error: any) {
@@ -69,7 +69,7 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
     }
   };
 
-  return { isFollowing, handleFollowClick };
+  return { isAddToCalendar, handleAddToCalendar };
 };
 
-export default useFollowConference;
+export default useAddToCalendar;
