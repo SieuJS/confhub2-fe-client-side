@@ -24,6 +24,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
       notificationDate: 'bg-blue-500', // Example color
       cameraReadyDate: 'bg-orange-500', // Example color
       registrationDate: 'bg-cyan-500',  // Example color
+
     };
   }, []);
 

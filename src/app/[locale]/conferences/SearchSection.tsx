@@ -1,9 +1,12 @@
+// src/components/SearchSection.tsx
+
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import Button from '../utils/Button';
-import SearchAdvanceSection from './SearchAdvanceSection'; // Import the new component
-import continentList from '../../../models/data/continents-list.json'; // Import continent-list.json
+import SearchAdvanceSection from './SearchAdvanceSection';
+import useSearchForm from '../../../hooks/conferences/useSearchForm'; // Import the hook
+
 
 interface SearchSectionProps {
   onSearch: (searchParams: {
@@ -11,7 +14,7 @@ interface SearchSectionProps {
     startDate?: Date | null;
     endDate?: Date | null;
     location?: string | null;
-    type?: 'online' | 'offline' | 'hybrid' | null;
+    type?: 'Online' | 'Offline' | 'Hybrid' | null;
     submissionDate?: Date | null;
     publisher?: string | null;
     rank?: string | null;
@@ -23,174 +26,56 @@ interface SearchSectionProps {
 }
 
 const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
-  const [confKeyword, setConfKeyword] = React.useState<string>('');
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
-  // Keep selectedType as string | null to be more flexible, or you can refine it based on possible 'type' values in ConferenceResponse
-  const [selectedType, setSelectedType] = useState<'online' | 'offline' | 'hybrid' | null>(null);
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const [locationSearchQuery, setLocationSearchQuery] = useState('');
-  const [typeSearchQuery, setTypeSearchQuery] = useState('');
-  const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
-  const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
-  const locationDropdownRef = useRef<HTMLDivElement>(null);
-  const typeDropdownRef = useRef<HTMLDivElement>(null);
-  const [isAdvancedOptionsVisible, setIsAdvancedOptionsVisible] = useState(false); // State for advanced options visibility
-  const [availableLocations, setAvailableLocations] = useState<string[]>([]); // State to hold locations
+  const {
+    confKeyword,
+    selectedLocation,
+    selectedType,
+    startDate,
+    endDate,
+    locationSearchQuery,
+    typeSearchQuery,
+    isLocationDropdownOpen,
+    isTypeDropdownOpen,
+    locationDropdownRef,
+    typeDropdownRef,
+    isAdvancedOptionsVisible,
+    filteredLocations,
+    filteredTypes,
+    handleKeywordChange,
+    handleSearchClick,
+    handleKeyPress,
+    handleLocationClick,
+    handleTypeClick,
+    handleLocationSearchChange,
+    handleTypeSearchChange,
+    handleStartDateInputChange,
+    handleEndDateInputChange,
+    toggleLocationDropdown,
+    toggleTypeDropdown,
+    toggleAdvancedOptionsVisibility,
+    handleSubmissionDateChange,
+    submissionDate,
+    handleRankChange,
+    selectedRank,
+    handleSourceYearChange,
+    selectedSourceYear,
+    handleAverageScoreChange,
+    selectedAverageScore,
+    handleTopicsChange,
+    selectedTopics,
+    handleFieldsOfResearchChange,
+    selectedFieldsOfResearch,
+    handlePublisherChange,  // Use the corrected handler name
+    selectedPublisher,     // Include selectedPublisher
+  } = useSearchForm({ onSearch });
 
-  const [submissionDate, setSubmissionDate] = useState<Date | null>(null);
-  const [selectedRank, setSelectedRank] = useState<string | null>(null);
-  const [selectedSourceYear, setSelectedSourceYear] = useState<string | null>(null);
-  const [selectedAverageScore, setSelectedAverageScore] = useState<string | null>(null);
-  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  const [selectedFieldsOfResearch, setSelectedFieldsOfResearch] = useState<string[]>([]);
-  const [selectedPublisher, setSelectedPublisher] = useState<string | null>(null);
-
-  const availableTypes = ['online', 'offline', 'hybrid']; // Define available types
-
-  useEffect(() => {
-    // Extract countries from continentList.json
-    const countriesFromContinentList: string[] = continentList.flatMap(continent => continent.countries);
-    setAvailableLocations(countriesFromContinentList);
-  }, []);
-
-
-  const handleKeywordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setConfKeyword(event.target.value);
-  };
-
-  const filteredLocations = availableLocations.filter(location =>
-    location.toLowerCase().includes(locationSearchQuery.toLowerCase())
-  );
-
-  const handleSearchClick = () => {
-    onSearch({
-      keyword: confKeyword,
-      startDate: startDate,
-      endDate: endDate,
-      location: selectedLocation,
-      type: selectedType,
-      submissionDate: submissionDate,
-      publisher: selectedPublisher,
-      rank: selectedRank,
-      sourceYear: selectedSourceYear,
-      averageScore: selectedAverageScore,
-      topics: selectedTopics,
-      fieldOfResearch: selectedFieldsOfResearch,
-    });
-  };
-
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      handleSearchClick();
-    }
-  };
-
-  const filteredTypes = availableTypes.filter(type =>
-    type.toLowerCase().includes(typeSearchQuery.toLowerCase())
-  );
-
-  const handleLocationClick = (location: string) => {
-    setSelectedLocation(location === "" ? null : location);
-    setIsLocationDropdownOpen(!isLocationDropdownOpen);
-    setLocationSearchQuery("");
-  };
-
-  const handleTypeClick = (type: string) => {
-    setSelectedType(type === "" ? null : type as 'online' | 'offline' | 'hybrid' | null);
-  };
-
-  const handleLocationSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setLocationSearchQuery(event.target.value);
-  };
-
-  const handleTypeSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTypeSearchQuery(event.target.value);
-  };
-
-  const handleStartDateInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const date = event.target.value ? new Date(event.target.value) : null;
-    setStartDate(date);
-  };
-
-  const handleEndDateInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const date = event.target.value ? new Date(event.target.value) : null;
-    setEndDate(date);
-  };
-
-  const toggleLocationDropdown = () => {
-    setIsLocationDropdownOpen(!isLocationDropdownOpen);
-  };
-
-  const toggleTypeDropdown = () => {
-    setIsTypeDropdownOpen(!isTypeDropdownOpen);
-  };
-
-  const toggleAdvancedOptionsVisibility = () => {
-    setIsAdvancedOptionsVisible(!isAdvancedOptionsVisible);
-  };
-
-
-  const handleSubmissionDateChange = (date: Date | null) => {
-      setSubmissionDate(date);
-  };
-
-  const handleRankChange = (rank: string | null) => {
-      setSelectedRank(rank);
-  };
-
-  const handleSourceYearChange = (sourceYear: string | null) => {
-      setSelectedSourceYear(sourceYear);
-  };
-
-  const handleAverageScoreChange = (averageScore: string | null) => {
-      setSelectedAverageScore(averageScore);
-  };
-
-  const handleTopicsChange = (topics: string[]) => {
-      setSelectedTopics(topics);
-  };
-
-  const handleFieldsOfResearchChange = (fields: string[]) => {
-      setSelectedFieldsOfResearch(fields);
-  };
-
-  const handlePublisher = (publisher: string | null) => {
-      setSelectedPublisher(publisher);
-  };
-
-  // Close dropdown if clicked outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (locationDropdownRef.current && !locationDropdownRef.current.contains(event.target as Node)) {
-        setIsLocationDropdownOpen(false);
-      }
-      if (typeDropdownRef.current && !typeDropdownRef.current.contains(event.target as Node)) {
-        setIsTypeDropdownOpen(false);
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [locationDropdownRef, typeDropdownRef]);
 
   return (
     <div className="container mx-auto px-4 text-base">
       <div className="rounded-full shadow-md flex border border-black items-center py-8 px-4 space-x-4">
         <div className="flex items-center flex-grow">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-10 w-10 mr-2"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-              clipRule="evenodd"
-            />
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
           </svg>
           <input
             type="text"
@@ -230,31 +115,16 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
 
         <div className="relative" ref={locationDropdownRef}>
           <button className=" flex items-center space-x-2 bg-transparent  outline-none" onClick={toggleLocationDropdown}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
-              />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
             </svg>
             <span>{selectedLocation ? selectedLocation : 'Location'}</span>
           </button>
 
           {isLocationDropdownOpen && (
             <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-              <div className="py-1 max-h-48 overflow-y-scroll" role="menu" aria-orientation="vertical" aria-labelledby="options-menu"> {/* Tailwind classes here */}
+              <div className="py-1 max-h-48 overflow-y-scroll" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                 <input
                   type="text"
                   placeholder="Search location..."
@@ -278,7 +148,6 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
                     {location}
                   </button>
                 ))}
-
               </div>
             </div>
           )}
@@ -288,19 +157,8 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
 
         <div className="relative" ref={typeDropdownRef}>
           <button className=" flex items-center space-x-2 bg-transparent  outline-none" onClick={toggleTypeDropdown}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-              />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
             <span>{selectedType ? selectedType : 'Type'}</span>
           </button>
@@ -349,8 +207,8 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
         selectedTopics={selectedTopics}
         onFieldOfResearchChange={handleFieldsOfResearchChange}
         selectedFieldsOfResearch={selectedFieldsOfResearch}
-        onPublisherChange={handlePublisher}
-        selectedPublisher={selectedPublisher}
+        onPublisherChange={handlePublisherChange} // Pass the corrected handler
+        selectedPublisher={selectedPublisher}   // Pass selectedPublisher
       />
     </div>
   );

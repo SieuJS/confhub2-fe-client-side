@@ -236,16 +236,31 @@ export default function Setting({ locale }: { locale: string }) {
       <div className='relative justify-center'>
         <div className='w-full bg-background py-8'></div>
         <div className='flex'>
+          {/* Sidebar */}
           <aside
-            className={`fixed flex h-full flex-col transition-all duration-300 ${
-              isSidebarOpen ? 'w-60' : 'w-16'
-            }`}
+            className={`
+              fixed
+              flex
+              h-full
+              flex-col
+              transition-all
+              duration-1000
+              ease-in-out
+              ${isSidebarOpen ? 'w-48' : 'w-16'}
+            `}
           >
             <nav
-              className={`w-full flex-grow  ${isSidebarOpen ? '' : 'overflow-hidden'}`}
+              className={`
+                w-full
+                flex-grow
+                ${isSidebarOpen ? '' : 'overflow-hidden'}
+                transition-all
+                duration-1000
+                ease-in-out
+              `}
             >
               <ul className='w-full'>
-                {menuItems.map((item, index) => {
+                {menuItems.map((item) => {
                   const tabValue = item.page.toLowerCase().replace(/ /g, '')
                   return (
                     <React.Fragment key={item.page}>
@@ -255,12 +270,27 @@ export default function Setting({ locale }: { locale: string }) {
                             pathname: '/dashboard',
                             query: { tab: tabValue }
                           }}
-                          // Consistent padding and width for ALL links
-                          className={`focus:secondary flex items-center p-4 hover:bg-button hover:opacity-60 focus:outline-none ${
-                            activePage === item.page
-                              ? 'bg-button text-button-text hover:bg-secondary'
-                              : ''
-                          } ${isSidebarOpen ? 'h-12 w-60 justify-start' : 'h-12 w-16 justify-center'}`} // Apply w-60 and w-16 here
+                          className={`
+                            flex
+                            items-center
+                            p-4
+                            hover:bg-button
+                            hover:opacity-60
+                            focus:outline-none
+                            transition-colors
+                            duration-600
+                            ease-in-out
+                            ${
+                              activePage === item.page
+                                ? 'bg-button text-button-text hover:bg-secondary'
+                                : ''
+                            }
+                            ${
+                              isSidebarOpen
+                                ? 'h-12 w-48 justify-start'
+                                : 'h-12 w-16 justify-center'
+                            }
+                          `}
                         >
                           {item.icon}
                           {isSidebarOpen && (
@@ -269,17 +299,28 @@ export default function Setting({ locale }: { locale: string }) {
                         </Link>
                       </li>
 
-                      {/* Conditionally render the toggle button after 'Setting' */}
+                      {/* Toggle Button */}
                       {item.page === 'Setting' && (
                         <li className='w-full'>
                           <button
                             onClick={toggleSidebar}
-                            //Consistent padding and width for the button
-                            className={`flex items-center  p-3  focus:outline-none  ${
-                              isSidebarOpen
-                                ? 'w-60 justify-start'
-                                : 'w-16 justify-center'
-                            } hover:bg-button hover:opacity-60 active:bg-blue-700`}
+                            className={`
+                              flex
+                              items-center
+                              p-3
+                              focus:outline-none
+                              transition-colors
+                              duration-600
+                              ease-in-out
+                              hover:bg-button
+                              hover:opacity-60
+                              active:bg-blue-700
+                              ${
+                                isSidebarOpen
+                                  ? 'w-48 justify-start'
+                                  : 'w-16 justify-center'
+                              }
+                            `}
                           >
                             {isSidebarOpen ? (
                               <>
@@ -323,10 +364,16 @@ export default function Setting({ locale }: { locale: string }) {
             </nav>
           </aside>
 
+          {/* Main Content */}
           <div
-            className={`ml-0 min-h-screen flex-1 transition-all duration-300 ${
-              isSidebarOpen ? 'ml-60' : 'ml-16'
-            }`}
+            className={`
+              min-h-screen
+              flex-1
+              transition-all
+              duration-50
+              ease-in-out
+              ${isSidebarOpen ? 'ml-48' : 'ml-16'}
+            `}
           >
             {renderPage()}
           </div>

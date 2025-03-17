@@ -91,6 +91,38 @@ export const Header: FC<Props> = ({ locale }) => {
     }
   }, [isNotificationOpen, isMobileMenuOpen, isUserDropdownOpen, headerRef])
 
+
+  const NotificationIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-9 text-button ">
+      <path fill-rule="evenodd" d="M5.25 9a6.75 6.75 0 0 1 13.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 0 1-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 1 1-7.48 0 24.585 24.585 0 0 1-4.831-1.244.75.75 0 0 1-.298-1.205A8.217 8.217 0 0 0 5.25 9.75V9Zm4.502 8.9a2.25 2.25 0 1 0 4.496 0 25.057 25.057 0 0 1-4.496 0Z" clip-rule="evenodd" />
+    </svg>
+  );
+
+  const NotificationDropdown = () => {
+    if (!isNotificationOpen) return null;
+
+    return (
+      <div className="absolute right-0 top-full mt-2 w-80 bg-background-secondary border border-border rounded-md shadow-lg z-50">
+        <div className="py-2">
+          <div className="px-4 py-2 text-sm text-foreground hover:bg-button/10">
+            Notification 1: New message from user A
+          </div>
+          <div className="px-4 py-2 text-sm text-foreground hover:bg-button/10">
+            Notification 2: System update available
+          </div>
+          <div className="px-4 py-2 text-sm text-foreground hover:bg-button/10">
+            Notification 3: Reminder for conference call
+          </div>
+          <div className="px-4 py-2 text-sm text-foreground hover:bg-button/10 text-center border-t border-border">
+            <Link href="/dashboard" lang={locale} onClick={closeNotification} className="text-button hover:underline block">
+              {t('View all notifications')}
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const MobileNavigation = () => {
     if (!isMobileMenuOpen) return null
 
@@ -264,54 +296,48 @@ export const Header: FC<Props> = ({ locale }) => {
             <Link
               lang={locale}
               href={`/conferences`}
-              className={`group relative font-semibold ${
-                pathname.includes('/conferences') ? 'text-selected' : ''
-              }`}
+              className={`group relative font-semibold ${pathname.includes('/conferences') ? 'text-selected' : ''
+                }`}
             >
               <div>
                 {t('Conferences')}
                 <span
-                  className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${
-                    pathname.includes('/conferences')
-                      ? 'scale-x-100'
-                      : 'scale-x-0 group-hover:scale-x-100'
-                  }`}
+                  className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${pathname.includes('/conferences')
+                    ? 'scale-x-100'
+                    : 'scale-x-0 group-hover:scale-x-100'
+                    }`}
                 ></span>
               </div>
             </Link>
             <Link
               lang={locale}
               href={`/journals`}
-              className={`group relative font-semibold ${
-                pathname.includes('/journals') ? 'text-selected' : ''
-              }`}
+              className={`group relative font-semibold ${pathname.includes('/journals') ? 'text-selected' : ''
+                }`}
             >
               <div>
                 {t('Journals')}
                 <span
-                  className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${
-                    pathname.includes('/journals')
-                      ? 'scale-x-100'
-                      : 'scale-x-0 group-hover:scale-x-100'
-                  }`}
+                  className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${pathname.includes('/journals')
+                    ? 'scale-x-100'
+                    : 'scale-x-0 group-hover:scale-x-100'
+                    }`}
                 ></span>
               </div>
             </Link>
             <Link
               lang={locale}
               href={`/chatbot`}
-              className={`group relative font-semibold ${
-                pathname.includes('/chatbot') ? 'text-selected' : ''
-              }`}
+              className={`group relative font-semibold ${pathname.includes('/chatbot') ? 'text-selected' : ''
+                }`}
             >
               <div>
                 {t('Chatbot')}
                 <span
-                  className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${
-                    pathname.includes('/chatbot')
-                      ? 'scale-x-100'
-                      : 'scale-x-0 group-hover:scale-x-100'
-                  }`}
+                  className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${pathname.includes('/chatbot')
+                    ? 'scale-x-100'
+                    : 'scale-x-0 group-hover:scale-x-100'
+                    }`}
                 ></span>
               </div>
             </Link>
@@ -319,18 +345,16 @@ export const Header: FC<Props> = ({ locale }) => {
             <Link
               lang={locale}
               href={`/support`}
-              className={`group relative font-semibold ${
-                pathname.includes('/support') ? 'text-selected' : ''
-              }`}
+              className={`group relative font-semibold ${pathname.includes('/support') ? 'text-selected' : ''
+                }`}
             >
               <div>
                 {t('Support')}
                 <span
-                  className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${
-                    pathname.includes('/support')
-                      ? 'scale-x-100'
-                      : 'scale-x-0 group-hover:scale-x-100'
-                  }`}
+                  className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${pathname.includes('/support')
+                    ? 'scale-x-100'
+                    : 'scale-x-0 group-hover:scale-x-100'
+                    }`}
                 ></span>
               </div>
             </Link>
@@ -338,18 +362,16 @@ export const Header: FC<Props> = ({ locale }) => {
             <Link
               lang={locale}
               href={`/addconference`}
-              className={`group relative font-semibold ${
-                pathname.includes('/addconference') ? 'text-selected' : ''
-              }`}
+              className={`group relative font-semibold ${pathname.includes('/addconference') ? 'text-selected' : ''
+                }`}
             >
               <div>
                 {t('Add_Conference')}
                 <span
-                  className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${
-                    pathname.includes('/addconference')
-                      ? 'scale-x-100'
-                      : 'scale-x-0 group-hover:scale-x-100'
-                  }`}
+                  className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${pathname.includes('/addconference')
+                    ? 'scale-x-100'
+                    : 'scale-x-0 group-hover:scale-x-100'
+                    }`}
                 ></span>
               </div>
             </Link>
@@ -358,9 +380,8 @@ export const Header: FC<Props> = ({ locale }) => {
               <Link
                 lang={locale}
                 href={`/auth/login`}
-                className={`group relative inline-flex items-center rounded-md bg-blue-500 px-4 py-2 font-semibold text-white shadow-md transition-colors duration-200 hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                  pathname.includes('/auth/login') ? 'bg-blue-600' : ''
-                }`}
+                className={`group relative inline-flex items-center rounded-md bg-blue-500 px-4 py-2 font-semibold text-white shadow-md transition-colors duration-200 hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${pathname.includes('/auth/login') ? 'bg-blue-600' : ''
+                  }`}
               >
                 <div className='flex items-center'>
                   {' '}
@@ -390,6 +411,12 @@ export const Header: FC<Props> = ({ locale }) => {
           <button className='block sm:hidden' onClick={toggleMobileMenu}>
             {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
           </button>
+          <button className='' onClick={toggleNotification}>
+            <div className='size-8 items-center justify-center relative'>
+              <NotificationIcon />
+            </div>
+          </button>
+          <NotificationDropdown />
 
           {loginStatus ? (
             <div className='relative'>

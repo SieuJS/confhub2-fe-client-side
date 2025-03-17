@@ -10,10 +10,10 @@ interface EventCardProps {
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
-  const formatDate = (date: string | undefined) => { // Simplified: Only accept string
+  const formatDate = (date: string | undefined) => {
     if (!date) return 'TBD';
     try {
-      const d = new Date(date); //  convert from ISO string to Date object
+      const d = new Date(date);
       if (isNaN(d.getTime())) {
         return 'Invalid Date';
       }
@@ -28,36 +28,53 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
     }
   };
 
-  //  location string
   const locationString = `${event.location.cityStateProvince || ''}, ${event.location.country || ''}`.trim() || 'Location Not Available';
+  // Function to determine the color based on the rank
+  const getRankColor = (rank?: string) => {
+    if (!rank) return 'bg-gray-400 text-gray-700'; // Default color
+
+    switch (rank.toUpperCase()) {
+      case 'A*':
+        return 'bg-yellow-400 text-black';
+      case 'A':
+        return 'bg-green-500 text-white';
+      case 'B':
+        return 'bg-blue-500 text-white';
+      case 'C':
+        return 'bg-orange-500 text-white';
+      default:
+        return 'bg-gray-400 text-gray-700';
+    }
+  };
 
   return (
-    <div className="rounded-lg shadow-md overflow-hidden bg-gradient-to-r from-background to-background-secondary hover:shadow-lg transition duration-300 ease-in-out">
+    <div className="rounded-lg shadow-lg overflow-hidden bg-white hover:shadow-xl transition duration-300 ease-in-out flex flex-col"> {/* Removed h-full */}
+      {/* Image and Rank */}
       <div className="relative">
         <Image
-          src={'/bg-2.jpg'} //  placeholder or a default image
+          src={'/bg-2.jpg'}
           alt={event.title}
           width={400}
-          height={200}
-          style={{ objectFit: 'cover', width: '100%', height: '200px' }} // Explicitly set height
+          height={225}
+          style={{ objectFit: 'cover', width: '100%', height: '180px' }}
           className="w-full"
         />
 
-        {/* Use rankSourceFoRData.rank */}
         {event.rankSourceFoRData && (
-          <div className="absolute top-2 right-2 bg-gray-800 bg-opacity-75 text-white font-bold px-2 py-1 rounded-md text-sm flex items-center space-x-1">
+          <div className={`absolute top-2 right-2 px-3 py-1 rounded-full text-sm font-semibold flex items-center space-x-1 ${getRankColor(event.rankSourceFoRData.rank)}`}>
             <span>{event.rankSourceFoRData.rank}</span>
-            {/*  Favorite icon */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="w-5 h-5 cursor-pointer hover:fill-red-500 transition"
+              className="w-4 h-4 cursor-pointer hover:text-red-500"
               onClick={(e) => {
-                const target = e.currentTarget;
-                target.style.fill = target.style.fill === 'red' ? 'none' : 'red';
+                e.stopPropagation();
+                const target = e.currentTarget as SVGSVGElement;
+                const isFilled = target.getAttribute('fill') === 'red';
+                target.setAttribute('fill', isFilled ? 'none' : 'red');
               }}
             >
               <path
@@ -70,50 +87,57 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
         )}
       </div>
 
-      <div className="flex items-center justify-between pt-2 px-2 bg-background">
-        <p className="text-xs text-gray-600">{locationString}</p>
-        <p className="text-xs">
-          {/* Access fromDate and toDate directly (they are strings) */}
-          <span className="font-semibold">Date:</span> {formatDate(event.dates.fromDate)} - {formatDate(event.dates.toDate)}
-        </p>
-      </div>
-
-      <div className="p-4">
-        <div className="grid grid-cols-3 items-center gap-2">
-          {/* Cột 1: */}
-          <div className='flex flex-col items-start text-left col-span-2'>
-            <h6 className="font-semibold text-base">{event.title}</h6>
-            <p className="text-xs">{event.acronym}</p>
-          </div>
-
-          <div className="justify-self-end self-start col-span-1">
-            <Link href={{ pathname: '/conferences/detail', query: { id: event.id } }}>
-              <Button variant="secondary" size="small" rounded className="w-20">
-                Detail
-              </Button>
-            </Link>
-          </div>
+      {/* Content */}
+      <div className="p-4 flex flex-col flex-grow">
+        {/* Title and Acronym */}
+        <div className="mb-2">
+          <h3 className="font-bold text-sm text-left text-gray-800">
+            {event.title} {event.acronym ? `(${event.acronym})` : ''}
+          </h3>
         </div>
 
-        <div className="flex flex-wrap mt-3 space-x-2 overflow-hidden">
-          {event.topics.slice(0, 3).map((topic, index) => (
-            <span
-              key={index}
-              className="rounded-full px-3 py-1 text-xs text-gray-700 bg-gray-200 mb-2"
+        {/* Location and Date */}
+        <div className="flex items-center justify-between text-xs text-gray-600 mb-3">
+          <div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-4 h-4 inline-block mr-1 -mt-0.5"
             >
-              {topic}
-            </span>
-          ))}
-          {event.topics.length > 3 && <span className="text-xs text-gray-600">...</span>}
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+            </svg>
+            <span>{locationString}</span>
+          </div>
+          <div className="font-semibold">
+            {formatDate(event.dates.fromDate)} - {formatDate(event.dates.toDate)}
+          </div>
         </div>
-        {/* Display research field */}
-        <div className="mt-2">
-            <span className="text-sm font-semibold">Research Field: </span>
-              {event.rankSourceFoRData ? (
-                  <span className="text-sm">{event.rankSourceFoRData.researchFields}</span>
-                ) : (
-                  <span className="text-sm">N/A</span>
-              )}
+
+        {/* Topics */}
+        <div className="mb-3">
+          <div className="flex flex-wrap gap-2">
+            {event.topics.slice(0, 3).map((topic) => (
+              <span key={topic} className="rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs">
+                {topic}
+              </span>
+            ))}
+            {event.topics.length > 3 && (
+              <span className="text-xs text-gray-500">+{event.topics.length - 3} more</span>
+            )}
+          </div>
+        </div>
+
+        {/* Button */}
+        <div className="mt-auto">
+          <Link href={{ pathname: '/conferences/detail', query: { id: event.id } }}>
+            <Button variant="primary" size="medium" className="w-full">
+              View Details
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
