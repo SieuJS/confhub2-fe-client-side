@@ -3,7 +3,8 @@ import Image from 'next/image';
 import Button from '../utils/Button';
 import { ConferenceInfo } from '../../../models/response/conference.list.response';
 import { useRouter, usePathname } from 'next/navigation';
-import { Link } from '@/src/navigation';
+import { Link } from '@/src/navigation'; // Import Link
+
 interface EventCardProps {
   event: ConferenceInfo;
 }
@@ -43,6 +44,17 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
     }
   };
 
+    // --- ADDED FUNCTION FOR ACCESS TYPE COLOR ---
+  const getAccessTypeColor = (accessType?: string) => {
+    accessType = accessType?.toUpperCase();
+    switch (accessType) {
+      case 'ONLINE': return 'bg-green-500 text-white';       // Green for Online
+      case 'OFFLINE': return 'bg-red-500 text-white';      // Red for Offline
+      case 'HYBRID': return 'bg-blue-500 text-white';     // Blue for Hybrid
+      default: return 'bg-gray-400 text-gray-700';      // Default gray
+    }
+  };
+
   const handleTopicClick = (topic: string) => {
     const localePrefix = pathname.split('/')[1];
     router.push(`/${localePrefix}/conferences?topics=${topic}`);
@@ -62,6 +74,11 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
       console.warn("No URL provided for Go to Website");
     }
   };
+
+  const handleTitleClick = () => {
+      const localePrefix = pathname.split('/')[1];
+      router.push(`/${localePrefix}/conferences/detail?id=${event.id}`);
+  }
 
   return (
     <div className="rounded-lg shadow-lg overflow-hidden bg-white hover:shadow-xl transition duration-300 ease-in-out flex flex-col">
@@ -83,13 +100,24 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
             </span>
           </div>
         )}
+        {event.accessType && (
+          <div className="absolute top-8 right-2">
+            {/* --- USE getAccessTypeColor HERE --- */}
+            <span className={`font-semibold ${getAccessTypeColor(event.accessType)} px-2 py-1 rounded text-xs`}>
+              {event.accessType}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Content */}
       <div className="px-2 py-4 flex flex-col flex-grow">
-        {/* Title and Acronym */}
+        {/* Title and Acronym - Make the title clickable */}
         <div className="mb-2">
-          <h3 className="font-bold text-sm text-left text-gray-800 hover:text-blue-600 transition duration-300">
+          <h3
+            className="font-bold text-sm text-left text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer"
+            onClick={handleTitleClick}
+          >
             {event.title} {event.acronym ? `(${event.acronym})` : ''}
           </h3>
         </div>
@@ -141,14 +169,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
         </div>
 
         {/* Buttons and Actions */}
-        <div className="mt-auto flex items-center justify-between">
-          {/* "View Details" Button (Left-aligned) */}
-          <Link href={{ pathname: '/conferences/detail', query: { id: event.id } }}>
-            <Button variant="primary" size="small" className="mx-4 px-4 transition duration-200">
-              View Details
-            </Button>
-          </Link>
-
+        <div className="mt-auto flex items-center justify-end">
           {/* Container for Website and Favorite Buttons (Right-aligned) */}
           <div className="flex space-x-2">
             {/* Go to Website Button */}
