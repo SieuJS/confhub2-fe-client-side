@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Button from '../utils/Button';
 import { ConferenceInfo } from '../../../models/response/conference.list.response';
 import { useRouter, usePathname } from 'next/navigation';
-import { Link } from '@/src/navigation'; // Import Link
+import { Link } from '@/src/navigation';
 
 interface EventCardProps {
   event: ConferenceInfo;
@@ -13,6 +13,8 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
   const router = useRouter();
   const pathname = usePathname();
   const [isFavorite, setIsFavorite] = useState(false);
+  const [showWebsiteTooltip, setShowWebsiteTooltip] = useState(false);
+  const [showFavoriteTooltip, setShowFavoriteTooltip] = useState(false);
 
   const formatDate = (date: string | undefined) => {
     return date ? new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'TBD';
@@ -34,24 +36,23 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
   const locationString = `${event.location.cityStateProvince || ''}, ${event.location.country || ''}`.trim() || 'Location Not Available';
 
   const getRankColor = (rank?: string) => {
-    rank = rank?.toUpperCase(); // Consistent casing
+    rank = rank?.toUpperCase();
     switch (rank) {
-      case 'A*': return 'bg-yellow-400 text-black';
-      case 'A': return 'bg-green-500 text-white';
-      case 'B': return 'bg-blue-500 text-white';
-      case 'C': return 'bg-orange-500 text-white';
-      default: return 'bg-gray-400 text-gray-700';
+      case 'A*': return 'bg-amber-100 text-amber-700';
+      case 'A': return 'bg-green-100 text-green-700';
+      case 'B': return 'bg-sky-100 text-sky-700';
+      case 'C': return 'bg-orange-100 text-orange-700';
+      default: return 'bg-gray-100 text-gray-600';
     }
   };
 
-    // --- ADDED FUNCTION FOR ACCESS TYPE COLOR ---
   const getAccessTypeColor = (accessType?: string) => {
     accessType = accessType?.toUpperCase();
     switch (accessType) {
-      case 'ONLINE': return 'bg-green-500 text-white';       // Green for Online
-      case 'OFFLINE': return 'bg-red-500 text-white';      // Red for Offline
-      case 'HYBRID': return 'bg-blue-500 text-white';     // Blue for Hybrid
-      default: return 'bg-gray-400 text-gray-700';      // Default gray
+      case 'ONLINE': return 'bg-green-100 text-green-700 border border-green-300';
+      case 'OFFLINE': return 'bg-red-100 text-red-700 border border-red-300';
+      case 'HYBRID': return 'bg-blue-100 text-blue-700 border border-blue-300';
+      default: return 'bg-gray-100 text-gray-600';
     }
   };
 
@@ -63,21 +64,23 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
   const handleFavoriteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setIsFavorite(!isFavorite);
+    setShowFavoriteTooltip(false);
   };
 
   const handleGoToWebsite = (e: React.MouseEvent<HTMLButtonElement>, url: string) => {
-    e.preventDefault(); // Keep this!
+    e.preventDefault();
     e.stopPropagation();
     if (url) {
       window.open(url, '_blank');
     } else {
       console.warn("No URL provided for Go to Website");
     }
+    setShowWebsiteTooltip(false);
   };
 
   const handleTitleClick = () => {
-      const localePrefix = pathname.split('/')[1];
-      router.push(`/${localePrefix}/conferences/detail?id=${event.id}`);
+    const localePrefix = pathname.split('/')[1];
+    router.push(`/${localePrefix}/conferences/detail?id=${event.id}`);
   }
 
   return (
@@ -93,16 +96,15 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           className="w-full"
         />
 
-        {event.rankSourceFoRData && (
-          <div className="absolute top-0 right-2">
-            <span className={`font-semibold ${getRankColor(event.rankSourceFoRData.rank)} px-2 py-1 rounded text-xs`}>
-              {`Rank`}: {event.rankSourceFoRData.rank}
-            </span>
-          </div>
-        )}
+        {/* --- Conditional Rank Display --- */}
+        <div className="absolute top-0 right-2">
+          <span className={`font-semibold ${getRankColor(event.rankSourceFoRData?.rank)} px-2 py-1 rounded text-xs`}>
+            {event.rankSourceFoRData?.rank ? `Rank: ${event.rankSourceFoRData.rank}` : 'Unranked'}
+          </span>
+        </div>
+
         {event.accessType && (
           <div className="absolute top-8 right-2">
-            {/* --- USE getAccessTypeColor HERE --- */}
             <span className={`font-semibold ${getAccessTypeColor(event.accessType)} px-2 py-1 rounded text-xs`}>
               {event.accessType}
             </span>
@@ -112,7 +114,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
 
       {/* Content */}
       <div className="px-2 py-4 flex flex-col flex-grow">
-        {/* Title and Acronym - Make the title clickable */}
+        {/* Title and Acronym */}
         <div className="mb-2">
           <h3
             className="font-bold text-sm text-left text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer"
@@ -170,27 +172,44 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
 
         {/* Buttons and Actions */}
         <div className="mt-auto flex items-center justify-end">
-          {/* Container for Website and Favorite Buttons (Right-aligned) */}
           <div className="flex space-x-2">
-            {/* Go to Website Button */}
-            <button
-              onClick={(e) => handleGoToWebsite(e, event.link || '')}
-              className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
-              style={{ minWidth: '36px', minHeight: '36px' }}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b81e1e" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-square-arrow-out-up-right"><path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6" /><path d="m21 3-9 9" /><path d="M15 3h6v6" /></svg>
-            </button>
+            {/* Go to Website Button with Tooltip */}
+            <div className="relative">
+              <button
+                onClick={(e) => handleGoToWebsite(e, event.link || '')}
+                onMouseEnter={() => setShowWebsiteTooltip(true)}
+                onMouseLeave={() => setShowWebsiteTooltip(false)}
+                className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
+                style={{ minWidth: '36px', minHeight: '36px' }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b81e1e" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-square-arrow-out-up-right"><path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6" /><path d="m21 3-9 9" /><path d="M15 3h6v6" /></svg>
+              </button>
+              {showWebsiteTooltip && (
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2  mb-2 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
+                  Go to Website
+                </div>
+              )}
+            </div>
 
-            {/* Favorite Button */}
-            <button
-              onClick={(e) => handleFavoriteClick(e)}
-              className={`p-2 bg-gray-100 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center ${isFavorite ? 'text-red-500' : ''}`}
-              style={{ minWidth: '36px', minHeight: '36px' }}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b81e1e" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"
-                className={`lucide lucide-bell-ring`}>
-                <path d="M10.268 21a2 2 0 0 0 3.464 0" /><path d="M22 8c0-2.3-.8-4.3-2-6" /><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" /><path d="M4 2C2.8 3.7 2 5.7 2 8" /></svg>
-            </button>
+            {/* Favorite Button with Tooltip */}
+            <div className="relative">
+              <button
+                onClick={(e) => handleFavoriteClick(e)}
+                onMouseEnter={() => setShowFavoriteTooltip(true)}
+                onMouseLeave={() => setShowFavoriteTooltip(false)}
+                className={`p-2 bg-gray-100 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center ${isFavorite ? 'text-red-500' : ''}`}
+                style={{ minWidth: '36px', minHeight: '36px' }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b81e1e" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"
+                  className={`lucide lucide-bell-ring`}>
+                  <path d="M10.268 21a2 2 0 0 0 3.464 0" /><path d="M22 8c0-2.3-.8-4.3-2-6" /><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" /><path d="M4 2C2.8 3.7 2 5.7 2 8" /></svg>
+              </button>
+              {showFavoriteTooltip && (
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
+                  {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
