@@ -30,14 +30,13 @@ const Footer = () => {
 
 
   return (
-    <footer className="mx-auto w-full max-w-screen-2xl bg-gradient-to-r from-background to-background-secondary pt-12">
+    <footer className="mx-auto w-full max-w-screen-2xl bg-gradient-to-r from-background to-background-secondary pt-12 relative z-50">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 gap-y-8 gap-x-6 md:grid-cols-2 lg:grid-cols-4">
           {/* Quick Links (Combined with Follow Us) */}
           <div className="md:col-span-1 lg:col-span-1">
             <h4 className="mb-2 text-base font-bold uppercase">{t('Quick Links')}</h4>
             <ul className="space-y-1 text-sm">
-              <li><Link href="/about" className="hover:text-text-secondary">About</Link></li>
               <li><Link href="/conferences" className="hover:text-text-secondary">Conferences</Link></li>
               <li><Link href="/journals" className="hover:text-text-secondary">Journals</Link></li>
               <li><Link href="/support" className="hover:text-text-secondary">Support</Link></li>

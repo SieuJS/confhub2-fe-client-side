@@ -292,7 +292,7 @@ const NoteTab: React.FC<NoteTabProps> = () => {
             </div>
 
             {/* Calendar Section */}
-            <div className="flex-grow">
+            <div className="pb-20">
                 <Calendar calendarEvents={calendarEvents} />
             </div>
         </div>
