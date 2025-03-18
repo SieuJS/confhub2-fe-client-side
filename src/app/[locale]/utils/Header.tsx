@@ -340,6 +340,13 @@ export const Header: FC<Props> = ({ locale }) => {
             </div>
           </Link>
 
+          {!isLogin && 
+            <div className='flex group relative font-semibold'>
+            <ThemeSwitch />
+            <LangSwitcher />
+            </div>
+          }
+
           {isLogin ? null : (
             <Link
               lang={locale}
@@ -371,16 +378,19 @@ export const Header: FC<Props> = ({ locale }) => {
             </Link>
           )}
         </nav>
-
+        
         {/* Mobile Menu Button */}
         <button className='block sm:hidden' onClick={toggleMobileMenu}>
           {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
         </button>
 
         {/* Notification Button and Dropdown */}
-        <button className='' onClick={toggleNotification}>
-            <NotificationIcon />
-        </button>
+        {isLogin && 
+          <button className='' onClick={toggleNotification}>
+          <NotificationIcon />
+          </button>
+        }
+        
         <NotificationDropdown />
 
         {/* User Button and Dropdown */}
