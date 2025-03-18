@@ -83,7 +83,6 @@ const AddConference = ({ locale }: { locale: string }) => {
     'Europe',
     'Asia',
     'Africa',
-    'South America',
     'Oceania',
   ]
 
@@ -168,14 +167,13 @@ const AddConference = ({ locale }: { locale: string }) => {
             }
 
             const statesData = await statesResponse.json();
-            console.log(statesData)
             if (statesData.length > 0) {
               const mappedStates = statesData.map((s: any) => ({
                 name: s.name,
                 iso2: s.iso2,
                 country_code: s.country_code,
                 state_code: s.state_code
-            }));
+            })).sort((a: { name: string }, b: { name: any }) => a.name.localeCompare(b.name));
             setStates(mappedStates);
             setCities([]);
             } else {
@@ -206,8 +204,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                 const uniqueCities = Array.from(new Set(mappedCities.map((city: { name: any }) => city.name)))
                   .map(name => {
                       return mappedCities.find((city: { name: unknown }) => city.name === name);
-                  });
-                  console.log(uniqueCities)
+                  }).sort((a: { name: string }, b: { name: any }) => a.name.localeCompare(b.name));
                 setCities(uniqueCities as City[]); // Cast to City[]
 
 
