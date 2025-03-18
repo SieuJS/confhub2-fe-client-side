@@ -3,8 +3,7 @@ import Image from 'next/image';
 import Button from '../utils/Button';
 import { ConferenceInfo } from '../../../models/response/conference.list.response';
 import { useRouter, usePathname } from 'next/navigation';
-import Link from 'next/link';
-
+import { Link } from '@/src/navigation';
 interface EventCardProps {
   event: ConferenceInfo;
 }
