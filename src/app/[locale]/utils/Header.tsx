@@ -33,8 +33,13 @@ export const Header: FC<Props> = ({ locale }) => {
     'loginStatus',
     null
   );
-  //  console.log('loginStatus:', loginStatus); //  Removed for production
 
+  const [isLogin, setIsLogin] = useState(false);
+
+  useEffect(() => {
+    if (loginStatus)
+      setIsLogin(true);
+  })
   // --- Helper Functions (for cleaner code) ---
 
   const closeAllMenus = () => {
@@ -164,7 +169,7 @@ export const Header: FC<Props> = ({ locale }) => {
             <div className='hover:bg-button/10 py-2'>{t('Add_Conference')}</div>
           </Link>
 
-          {loginStatus ? null : (
+          {isLogin ? null : (
             <>
               <Link
                 lang={locale}
@@ -209,12 +214,12 @@ export const Header: FC<Props> = ({ locale }) => {
             onClick={() => {
               setLoginStatus(null);
               setUser(null); // Clear the user object
-              let pathWithLocale = '/login';
+              let pathWithLocale = '/auth/login';
               if (pathname) {
                 const pathParts = pathname.split('/');
                 if (pathParts.length > 1) {
                   const localePrefix = pathParts[1];
-                  pathWithLocale = `/${localePrefix}/login`;
+                  pathWithLocale = `/${localePrefix}/auth/login`;
                 }
               }
 
@@ -335,7 +340,7 @@ export const Header: FC<Props> = ({ locale }) => {
             </div>
           </Link>
 
-          {loginStatus ? null : (
+          {isLogin ? null : (
             <Link
               lang={locale}
               href={`/auth/login`}
@@ -379,7 +384,7 @@ export const Header: FC<Props> = ({ locale }) => {
         <NotificationDropdown />
 
         {/* User Button and Dropdown */}
-        {loginStatus ? (
+        {isLogin ? (
           <>
             <button onClick={toggleUserDropdown}>
                 <UserIcon />
