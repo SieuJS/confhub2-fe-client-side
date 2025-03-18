@@ -15,19 +15,19 @@ export default function Conferences({ params: { locale } }: { params: { locale: 
   const router = useRouter();
   const searchParams = useSearchParams();
   const [initialSearchParams, setInitialSearchParams] = useState<string>(""); // Store as a string
-  const [isLoading, setIsLoading] = useState(false); // Track loading state
+  const [isLoading, setIsLoading] = useState(true); // Track loading state
   const [conferences, setConferences] = useState([]); // Store fetched conferences
   const [isInitialLoad, setIsInitialLoad] = useState(true); // New state
 
   // Initialize initialSearchParams when the component mounts.
   useEffect(() => {
     setInitialSearchParams(searchParams.toString()); // Convert to string
-     fetchConferences(searchParams.toString()); // Fetch on initial load
+    fetchConferences(searchParams.toString()); // Fetch on initial load
   }, [searchParams]);
 
 
   const fetchConferences = useCallback(async (paramsString: string) => {
-        setIsLoading(true);
+        //setIsLoading(true);
         try {
             const res = await fetch(`/api/conferences?${paramsString}`);
             if (!res.ok) {
@@ -109,7 +109,7 @@ export default function Conferences({ params: { locale } }: { params: { locale: 
         <SearchSection onSearch={handleSearch} onClear={handleClear} />
         <div className="container mx-auto mt-4 px-4">
           {/* Conditionally render Loading or ResultsSection */}
-          {isLoading && isInitialLoad ? (
+          {(isLoading && isInitialLoad) ? (
             <Loading />
           ) : (
             <ResultsSection/>
