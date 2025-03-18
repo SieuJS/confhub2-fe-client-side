@@ -1,7 +1,4 @@
 // hooks/useInteractionHandlers.ts (Corrected)
-import { useLiveAPIContext } from "../contexts/LiveAPIContext";
-import { useLoggerStore } from "../lib/store-logger";
-import { AudioRecorder } from "../lib/audio-recorder"; // If needed within these handlers
 import { ClientContentMessage } from "../multimodal-live-types"; // Import ClientContentMessage
 
 interface InteractionHandlersProps {

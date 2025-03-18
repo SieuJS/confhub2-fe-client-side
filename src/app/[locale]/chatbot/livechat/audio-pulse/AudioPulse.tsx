@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import c from "classnames"; // Bạn vẫn có thể dùng classnames, hoặc dùng template literals.
 
 const lineCount = 3;

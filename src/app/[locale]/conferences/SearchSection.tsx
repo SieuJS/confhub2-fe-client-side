@@ -1,5 +1,4 @@
 // src/components/SearchSection.tsx
-
 "use client";
 
 import React from 'react';
@@ -74,54 +73,57 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
 
   return (
     <div className="container mx-auto px-4 text-base">
-      <div className="rounded-full shadow-md flex border border-black items-center py-8 px-4 space-x-4">
-        <div className="flex items-center flex-grow">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mr-2" viewBox="0 0 20 20" fill="currentColor">
+      {/* Use flex-wrap and justify-center for responsiveness */}
+      <div className="rounded-full shadow-md flex flex-wrap justify-center items-center border border-black py-2 px-3 space-x-4">
+        <div className="flex items-center flex-grow max-w-[500px] basis-full md:basis-auto">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
           </svg>
           <input
             type="text"
             placeholder="Type a command or search..."
-            className="outline-none w-full bg-transparent"
+            className="outline-none w-full bg-transparent text-sm"
             value={confKeyword}
             onChange={handleKeywordChange}
             onKeyDown={handleKeyPress}
           />
         </div>
 
-        <div className="border-l border-gray-300 h-6"></div>
+        {/* Use hidden and block with media queries for dividers */}
+        <div className="border-l border-gray-300 h-6 mx-2 hidden md:block"></div>
 
-        <div className="flex items-center space-x-2">
-          <label htmlFor="startDate">Start Date:</label>
+        <div className="flex items-center space-x-2 px-2">
+          <label htmlFor="startDate" className="text-sm">Start:</label>
           <input
             type="date"
             id="startDate"
-            className="border rounded px-2 py-1 bg-transparent"
+            className="border rounded py-0.5 text-sm bg-transparent w-24"
             onChange={handleStartDateInputChange}
             value={startDate ? startDate.toISOString().split('T')[0] : ''}
           />
         </div>
 
-        <div className="flex items-center space-x-2">
-          <label htmlFor="endDate">End Date:</label>
+        <div className="flex items-center space-x-2 px-2">
+          <label htmlFor="endDate" className="text-sm">End:</label>
           <input
             type="date"
             id="endDate"
-            className="border rounded px-2 py-1 bg-transparent"
+            className="border rounded py-0.5 text-sm bg-transparent w-24"
             onChange={handleEndDateInputChange}
             value={endDate ? endDate.toISOString().split('T')[0] : ''}
           />
         </div>
 
-        <div className="border-l border-gray-300 h-6"></div>
+        {/* Use hidden and block with media queries for dividers */}
+        <div className="border-l border-gray-300 h-6 mx-2 hidden md:block"></div>
 
         <div className="relative" ref={locationDropdownRef}>
-          <button className=" flex items-center space-x-2 bg-transparent  outline-none" onClick={toggleLocationDropdown}>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+          <button className="flex items-center space-x-2 bg-transparent outline-none" onClick={toggleLocationDropdown}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
             </svg>
-            <span>{selectedLocation ? selectedLocation : 'Location'}</span>
+            <span className="text-sm">{selectedLocation ? selectedLocation : 'Location'}</span>
           </button>
 
           {isLocationDropdownOpen && (
@@ -155,14 +157,15 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
           )}
         </div>
 
-        <div className="border-l border-gray-300 h-6"></div>
+        {/* Use hidden and block with media queries for dividers */}
+        <div className="border-l border-gray-300 h-6 mx-2 hidden md:block"></div>
 
         <div className="relative" ref={typeDropdownRef}>
           <button className=" flex items-center space-x-2 bg-transparent  outline-none" onClick={toggleTypeDropdown}>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
-            <span>{selectedType ? selectedType : 'Type'}</span>
+            <span className="text-sm">{selectedType ? selectedType : 'Type'}</span>
           </button>
 
           {isTypeDropdownOpen && (
@@ -188,11 +191,13 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
             </div>
           )}
         </div>
-        <div className="flex space-x-2">
-          <Button variant="primary" size="large" rounded className="" onClick={handleSearchClick}>
+
+        {/* Use margin and padding for spacing on smaller screens */}
+        <div className="flex space-x-4 md:space-x-4 md:pl-4 md:ml-4 mt-2 md:mt-0">
+           <Button variant="primary" size="small" rounded className="" onClick={handleSearchClick}>
             Search
           </Button>
-          <Button variant="secondary" size="large" rounded className="" onClick={handleClear}>
+          <Button variant="secondary" size="small" rounded className="" onClick={handleClear}>
             Clear
           </Button>
         </div>

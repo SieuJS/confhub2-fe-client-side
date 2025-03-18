@@ -1,5 +1,5 @@
 // PlainTextMessage.tsx
-import React from "react";
+// import React from "react";
 import { StreamingLog } from "../multimodal-live-types";
 
 type PlainTextMessageProps = {

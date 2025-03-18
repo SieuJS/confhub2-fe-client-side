@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 
 interface ChatIntroductionProps {
     onFillInput: (fill: (text: string) => void) => void; // Thêm định nghĩa cho prop onFillInput

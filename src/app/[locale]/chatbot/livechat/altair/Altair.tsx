@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, memo, useRef } from "react";
+import { useEffect, memo } from "react";
 import { useLiveAPIContext } from "../contexts/LiveAPIContext"; // Thay đổi đường dẫn import nếu cần
 import { ToolCall } from "../multimodal-live-types";
 

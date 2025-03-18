@@ -48,6 +48,11 @@ export default function Conferences({ params: { locale } }: { params: { locale: 
     if (searchParamsFromComponent.rank) newParams.set('rank', searchParamsFromComponent.rank);
     if (searchParamsFromComponent.sourceYear) newParams.set('sourceYear', searchParamsFromComponent.sourceYear);
     if (searchParamsFromComponent.publisher) newParams.set('publisher', searchParamsFromComponent.publisher);
+    if (searchParamsFromComponent.submissionDate) {
+      newParams.set('submissionDate', searchParamsFromComponent.submissionDate.toISOString().split('T')[0]);
+    }
+    if (searchParamsFromComponent.averageScore) newParams.set('averageScore', searchParamsFromComponent.averageScore);
+
 
     if (searchParamsFromComponent.topics && searchParamsFromComponent.topics.length > 0) {
         searchParamsFromComponent.topics.forEach(topic => newParams.append('topics', topic));
@@ -62,17 +67,19 @@ export default function Conferences({ params: { locale } }: { params: { locale: 
 
 
   const handleClear = useCallback(() => {
-    router.push(`/${locale}/conferences`);
-  }, [locale, router]);
+      // Clear all search-related query parameters
+      const newParams = new URLSearchParams();
+      router.push(`/${locale}/conferences?${newParams.toString()}`);
 
+  }, [locale, router]);
 
   return (
     <>
       <Header locale={locale} />
       <div className="text-center text-2xl">
-        <div className="py-14 bg-background w-full"></div>
+        <div className="py-10 bg-background w-full"></div>
         <SearchSection onSearch={handleSearch} onClear={handleClear} />
-        <div className="container mx-auto mt-8 px-4">
+        <div className="container mx-auto mt-4 px-4">
           <ResultsSection />
         </div>
       </div>

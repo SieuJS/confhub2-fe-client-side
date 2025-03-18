@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import ChatBot from './ChatBot'; // Import ChatBot component
 
 interface ChatBotPageProps {

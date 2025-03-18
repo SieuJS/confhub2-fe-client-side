@@ -1,5 +1,5 @@
 // src/hooks/useSearchForm.ts
-
+// No changes are needed in useSearchForm.  It ALREADY clears all the fields.
 import { useState, useEffect, useRef, ChangeEvent, KeyboardEvent } from 'react';
 import continentList from '../../models/data/locations-list.json'; // Adjust path as necessary
 

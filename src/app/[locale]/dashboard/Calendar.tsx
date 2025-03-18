@@ -91,7 +91,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
         <button onClick={goToToday} className="mx-1 px-3 py-1 text-sm rounded-md bg-gray-200 hover:bg-gray-300">Today</button>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-center">
+      <div className="grid grid-cols-7 text-center">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
           <div key={day} className="py-1 font-medium text-gray-700">{day}</div>
         ))}
@@ -118,7 +118,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
           return (
             <div
               key={dayNumber}
-              className="p-1 border border-gray-200 hover:bg-gray-50 cursor-pointer"
+              className="py-4 border border-gray-200 hover:bg-gray-50 cursor-pointer"
               onClick={() => openDialogForDay(dayNumber)}
             >
               <div className="text-sm text-gray-900">{dayNumber}</div>
@@ -127,7 +127,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                   {events.map((event, index) => (
                     <div
                       key={`${event.conferenceId}-${date}-${index}`}
-                      className={`text-xs py-0.5 rounded ${getEventTypeColor(event.type)} text-white flex-1`}
+                      className={`text-xs py-0.5 ${getEventTypeColor(event.type)} text-white flex-1`}
                       style={{
                         marginRight: index < events.length - 1 ? '1px' : '0',
                       }}
