@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ConferenceInfo } from '@/src/models/response/conference.list.response';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { fetchConferences, FetchConferencesParams } from '../../api/getConference/getFilteredConferences'; // Import
+import { fetchConferences, FetchConferencesParams } from '../../api/conference/getFilteredConferences'; // Import
 
 type SortOption = 'date' | 'rank' | 'name' | 'submissionDate' | 'startDate' | 'endDate';
 type SortOrder = 'asc' | 'desc';
@@ -65,7 +65,6 @@ const useConferenceResults = ({ initialData, initialTotalItems }: UseConferenceR
     fetchData();
   }, [fetchData]);
 
-  // Các hàm paginate, handleSortByChange, handleSortOrderChange giữ nguyên.
   const paginate = (pageNumber: number) => {
       const newParams = new URLSearchParams(searchParams.toString());
       newParams.set('page', String(pageNumber));
@@ -84,7 +83,6 @@ const useConferenceResults = ({ initialData, initialTotalItems }: UseConferenceR
       router.push(`/${localePrefix}/conferences?${newParams.toString()}`);
     };
 
-    // Add handleSortOrderChange
     const handleSortOrderChange = () => {
       const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
       const newParams = new URLSearchParams(searchParams.toString());
