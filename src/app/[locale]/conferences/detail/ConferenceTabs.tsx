@@ -28,6 +28,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
 
   const formatDate = (date: string): string => {
     if (!date) return 'TBD';
+    date = date.slice(0, -1);
     const dateObj = new Date(date);
     return dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   };
