@@ -15,8 +15,11 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
   const [showWebsiteTooltip, setShowWebsiteTooltip] = useState(false);
   const [showFavoriteTooltip, setShowFavoriteTooltip] = useState(false);
 
-  const formatDate = (date: string | undefined) => {
-    return date ? new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'TBD';
+  const formatDate = (date: string): string => {
+    if (!date) return 'TBD';
+    date = date.slice(0, -1);
+    const dateObj = new Date(date);
+    return dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
   const formatDateRange = (fromDate: string | undefined, toDate: string | undefined) => {
