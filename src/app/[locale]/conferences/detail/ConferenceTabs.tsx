@@ -1,5 +1,4 @@
 // ConferenceTabs.tsx
-
 "use client";
 
 import React, { useRef, useEffect, useState } from 'react';
@@ -8,6 +7,9 @@ import Map from './Map';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
+import useSectionNavigation from '../../../../hooks/conferenceDetails/useSectionNavigation'; // Import the hooks
+import useActiveSection from '../../../../hooks/conferenceDetails/useActiveSection';      // Import the hook
+
 
 interface ConferenceTabsProps {
   conference: ConferenceResponse | null;
@@ -15,82 +17,14 @@ interface ConferenceTabsProps {
 
 export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) => {
   const navRef = useRef<HTMLElement>(null);
-  const [activeSection, setActiveSection] = useState<string>(''); // State to track the active tab
 
-  // Define updatedSections *before* the useEffect hook
   const updatedSections = conference
     ? ['overview', 'important-date', 'Call for papers', 'category-topics', ...(conference.rankSourceFoRData && conference.rankSourceFoRData.length > 0 ? ['source'] : []), 'map']
-    : []; // Default to empty array if conference is null
+    : [];
 
+  const { activeSection, setActiveSection } = useActiveSection({ navRef, updatedSections }); // Use the hook
+  useSectionNavigation({ navRef, setActiveSection }); // Use setActiveSection
 
-
-  useEffect(() => {
-    const handleAnchorClick = (event: Event) => {
-      event.preventDefault();
-      const target = event.target as HTMLAnchorElement;
-      const targetId = target.getAttribute('href')?.substring(1); // Get the section ID (e.g., "overview")
-
-      if (targetId) {
-        setActiveSection(targetId); // Update the active section state
-        const targetSection = document.getElementById(targetId);
-
-        if (targetSection) {
-          const targetHeading = targetSection.querySelector('h2');
-
-          if (targetHeading) {
-            const navElement = navRef.current;
-            const navHeight = navElement ? navElement.offsetHeight : 0;
-            const offset = 10;
-            const targetPosition = targetHeading.offsetTop - navHeight - offset;
-
-            window.scrollTo({
-              top: targetPosition,
-              behavior: 'smooth',
-            });
-          }
-        }
-      }
-    };
-
-    const navLinks = navRef.current?.querySelectorAll('a') || [];
-    navLinks.forEach(link => {
-      link.addEventListener('click', handleAnchorClick);
-    });
-
-
-     const handleScroll = () => {
-      if (!navRef.current) return;
-
-      let currentSection = '';
-      // Iterate through sections to find the one currently in view
-      for (const sectionId of updatedSections) {
-        const section = document.getElementById(sectionId);
-        if (section) {
-            const navElement = navRef.current;
-            const navHeight = navElement ? navElement.offsetHeight : 0;
-
-            const rect = section.getBoundingClientRect();
-            // Check if the section is within the viewport, accounting for the nav height
-            //Consider top
-            if (rect.top <= navHeight+10) {  //+10 is a off set to active section
-              currentSection = sectionId;
-            }
-        }
-      }
-      setActiveSection(currentSection); // Set the active section based on scroll position
-    };
-
-
-    window.addEventListener('scroll', handleScroll);
-
-
-    return () => {
-      navLinks.forEach(link => {
-        link.removeEventListener('click', handleAnchorClick);
-      });
-       window.removeEventListener('scroll', handleScroll);
-    };
-  }, [updatedSections]); // Add updatedSections as a dependency
 
   const formatDate = (date: string): string => {
     if (!date) return 'TBD';
@@ -133,7 +67,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
         })}
       </nav>
 
-      {/* Sections (Rest of your component remains the same) */}
+      {/* Sections (Rest of your component remains largely the same) */}
       <section id="overview" className="py-4 px-6 bg-white shadow-md rounded-lg mt-4">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Overview</h2>
         <p className="text-gray-700 leading-relaxed">
@@ -143,33 +77,31 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
 
       <section id="important-date" className="py-4 px-6 bg-white shadow-md rounded-lg mt-6">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6">Important Dates</h2>
-
         {(!dates || dates.length === 0) ? (
             <p className="text-gray-700">No Important Dates Available</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-300 text-sm">
-                <thead className="bg-gray-100 text-gray-700">
-                    <tr>
-                        <th className="py-3 px-4 border-b border-gray-300 text-left">Name</th>
-                        <th className="py-3 px-4 border-b border-gray-300 text-left">From Date</th>
-                        <th className="py-3 px-4 border-b border-gray-300 text-left">To Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {dates.map((dateItem, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
-                          <td className="py-4 px-4 border-b border-gray-300">{dateItem.name}</td>
-                          <td className="py-4 px-4 border-b border-gray-300">{formatDate(dateItem.fromDate)}</td>
-                          <td className="py-4 px-4 border-b border-gray-300">{formatDate(dateItem.toDate)}</td>
-                      </tr>
-                    ))}
-                </tbody>
-            </table>
-          </div>
+            <div className="overflow-x-auto">
+                <table className="min-w-full bg-white border border-gray-300 text-sm">
+                    <thead className="bg-gray-100 text-gray-700">
+                        <tr>
+                            <th className="py-3 px-4 border-b border-gray-300 text-left">Name</th>
+                            <th className="py-3 px-4 border-b border-gray-300 text-left">From Date</th>
+                            <th className="py-3 px-4 border-b border-gray-300 text-left">To Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {dates.map((dateItem, index) => (
+                          <tr key={index} className="hover:bg-gray-50">
+                              <td className="py-4 px-4 border-b border-gray-300">{dateItem.name}</td>
+                              <td className="py-4 px-4 border-b border-gray-300">{formatDate(dateItem.fromDate)}</td>
+                              <td className="py-4 px-4 border-b border-gray-300">{formatDate(dateItem.toDate)}</td>
+                          </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         )}
       </section>
-
       <section id="Call for papers" className="py-4 px-6 bg-white shadow-md rounded-lg mt-6">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Call for Paper</h2>
         <ReactMarkdown

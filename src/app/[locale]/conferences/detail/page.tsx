@@ -166,11 +166,10 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                             <div className="mt-2">
                                 <h2 className="font-semibold text-lg mb-2">Topics:</h2>
                                 <div className="flex flex-wrap">
-                                    {displayedTopics.map((topic, index) => (
-                                        <Link href={{ pathname: `/conferences`, query: { topics: topic } }} >
+                                    {displayedTopics.map((topic) => (
+                                        <Link key={topic} href={{ pathname: `/conferences`, query: { topics: topic } }} >
 
                                             <button
-                                                key={index}
                                                 className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold mr-2"
                                             >
                                                 {topic}

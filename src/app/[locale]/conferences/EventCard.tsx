@@ -152,20 +152,14 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
         <div className="mb-3">
           <div className="flex flex-wrap gap-2">
             {event.topics.slice(0, 3).map((topic) => (
-              <Link href={{ pathname: `/conferences`, query: { topics: topic } }} >
-
-                <span
-                  key={topic}
-                  className="rounded-full bg-gray-100 text-gray-700 px-2 py-1 text-xs hover:bg-gray-200 transition duration-200 cursor-pointer"
-                  onClick={() => handleTopicClick(topic)}
-                >
+              <Link key={topic} href={{ pathname: `/conferences`, query: { topics: topic } }} >
+                <span className="rounded-full bg-gray-100 text-gray-700 px-2 py-1 text-xs hover:bg-gray-200 transition duration-200 cursor-pointer">
                   {topic}
                 </span>
               </Link>
-
             ))}
             {event.topics.length > 3 && (
-              <span className="text-xs px-2 py-1 text-gray-500">+{event.topics.length - 3} more</span>
+              <span key="more-topics" className="text-xs px-2 py-1 text-gray-500">+{event.topics.length - 3} more</span>
             )}
           </div>
         </div>

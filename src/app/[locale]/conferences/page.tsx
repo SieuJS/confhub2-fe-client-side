@@ -29,7 +29,8 @@ export default function Conferences({ params: { locale } }: { params: { locale: 
   const fetchConferences = useCallback(async (paramsString: string) => {
         //setIsLoading(true);
         try {
-            const res = await fetch(`/api/conferences?${paramsString}`);
+        
+            const res = await fetch(`http://localhost:3000/api/v1/filter-conferences?${paramsString}`);
             if (!res.ok) {
               //best practice to throw error
                 throw new Error(`Failed to fetch conferences: ${res.status}`);

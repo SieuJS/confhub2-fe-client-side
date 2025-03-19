@@ -4,7 +4,6 @@ import EventCard from './EventCard';
 import EventTable from './EventTable';
 import useConferenceResults from '@/src/hooks/conferences/useConferenceResults';
 import Pagination from '../utils/Pagination';
-import { ConferenceInfo } from '../../../models/response/conference.list.response';
 
 interface ResultsSectionProps { }
 
@@ -21,68 +20,9 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
     handleSortOrderChange,
     loading,
     error,
-    // allEvents, //  useConferenceResults hook to return this.
   } = useConferenceResults();
 
   const [viewType, setViewType] = useState<'card' | 'table'>('card');
-
-  // --- ADDED: Function to generate CSV data ---
-  const generateCSVData = (events: ConferenceInfo[]): string => {
-    const header = [
-      'Title',
-      'Acronym',
-      'Start Date',
-      'End Date',
-      'Location',
-      'Rank',
-      'Access Type',
-      'Topics',
-      'Link',
-    ];
-    const csvRows = [header.join(',')];
-
-    events.forEach((event) => {
-      const location = `${event.location.cityStateProvince || ''}, ${event.location.country || ''}`;
-      const topics = event.topics.join('; ');
-      const startDate = event.dates.fromDate ? new Date(event.dates.fromDate).toLocaleDateString() : 'TBD';
-      const endDate = event.dates.toDate ? new Date(event.dates.toDate).toLocaleDateString() : 'TBD';
-      const rank = event.rankSourceFoRData?.rank || 'Unranked';
-
-      const row = [
-        `"${event.title.replace(/"/g, '""')}"`,
-        `"${event.acronym?.replace(/"/g, '""') || ''}"`,
-        `"${startDate}"`,
-        `"${endDate}"`,
-        `"${location.replace(/"/g, '""')}"`,
-        `"${rank}"`,
-        `"${event.accessType || ''}"`,
-        `"${topics.replace(/"/g, '""')}"`,
-        `"${event.link?.replace(/"/g, '""') || ''}"`,
-      ];
-      csvRows.push(row.join(','));
-    });
-
-    return csvRows.join('\n');
-  };
-
-  // --- ADDED: Function to handle CSV download ---
-  // const handleDownloadCSV = () => {
-  //   if (!allEvents) {
-  //     console.error("No events available to download.");
-  //     return;
-  //   }
-  //   const csvData = generateCSVData(allEvents);
-  //   const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-  //   const url = URL.createObjectURL(blob);
-  //   const link = document.createElement('a');
-  //   link.href = url;
-  //   link.setAttribute('download', 'conferences.csv');
-  //   document.body.appendChild(link);
-  //   link.click();
-  //   document.body.removeChild(link);
-  //   URL.revokeObjectURL(url);
-  // };
-
 
   if (loading) {
     return <div>Loading conferences...</div>;
@@ -137,9 +77,9 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
             title={viewType === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
           >
             {viewType === 'card' ? (
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#454545" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-sheet"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><line x1="3" x2="21" y1="9" y2="9" /><line x1="3" x2="21" y1="15" y2="15" /><line x1="9" x2="9" y1="9" y2="21" /><line x1="15" x2="15" y1="9" y2="21" /></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#454545" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sheet"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><line x1="3" x2="21" y1="9" y2="9" /><line x1="3" x2="21" y1="15" y2="15" /><line x1="9" x2="9" y1="9" y2="21" /><line x1="15" x2="15" y1="9" y2="21" /></svg>
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#454545" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-layout-grid"><rect width="7" height="7" x="3" y="3" rx="1" /><rect width="7" height="7" x="14" y="3" rx="1" /><rect width="7" height="7" x="14" y="14" rx="1" /><rect width="7" height="7" x="3" y="14" rx="1" /></svg>)}
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#454545" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-layout-grid"><rect width="7" height="7" x="3" y="3" rx="1" /><rect width="7" height="7" x="14" y="3" rx="1" /><rect width="7" height="7" x="14" y="14" rx="1" /><rect width="7" height="7" x="3" y="14" rx="1" /></svg>)}
           </button>
 
           {/* --- ADDED: Download CSV Button --- */}
@@ -148,7 +88,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
             className="px-2 py-1 text-sm rounded bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             title="Download CSV"
           >
-             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#454545" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-file-down"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M12 18v-6" /><path d="m9 15 3 3 3-3" /></svg>
+             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#454545" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-file-down"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M12 18v-6" /><path d="m9 15 3 3 3-3" /></svg>
           </button>
         </div>
       </div>
