@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import ConferenceItem from '../conferences/ConferenceItem';
 import { getListConference } from '../../../api/conference/getListConferences'; // Import getListConference
-import { ConferenceListResponse, ConferenceInfo } from '../../../models/response/conference.list.response'; // Import types
-import { UserResponse } from '../../../models/response/user.response'; // Import UserResponse
+import { ConferenceInfo } from '../../../models/response/conference.list.response'; // Import types
+import { UserResponse, FollowedConference } from '../../../models/response/user.response'; // Import UserResponse and FollowedConference
 
 interface FollowedTabProps { }
 
@@ -12,7 +12,6 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
   const [followedConferences, setFollowedConferences] = useState<ConferenceInfo[]>([]); // Sử dụng ConferenceInfo[]
   const [loading, setLoading] = useState(true);
   const [loggedIn, setLoggedIn] = useState(false);
-  // Không cần allConferences nữa
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,16 +36,17 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
         // 2. Lấy danh sách tất cả conferences (nếu cần hiển thị thông tin chi tiết)
         // Tối ưu hóa: Chỉ fetch nếu có followed conferences
         if (userDetails.followedConferences.length > 0) {
-            const conferencesData = await getListConference();
+          const conferencesData = await getListConference();
 
-            // 3. Lọc danh sách conferences dựa trên followedConferences từ userDetails
-            const followed = conferencesData.payload.filter(conf =>
-              userDetails.followedConferences.includes(conf.id)
-            );
-            setFollowedConferences(followed);
+          // 3. Lọc danh sách conferences dựa trên followedConferences từ userDetails.
+          // Sử dụng some() để kiểm tra xem id của conference có khớp với bất kỳ id nào trong followedConferences không.
+          const followed = conferencesData.payload.filter(conf =>
+            userDetails.followedConferences.some(followedConf => followedConf.id === conf.id)
+          );
+          setFollowedConferences(followed);
 
         } else {
-             setFollowedConferences([]); // Nếu không có conference nào được follow
+          setFollowedConferences([]); // Nếu không có conference nào được follow
         }
 
       } catch (error) {

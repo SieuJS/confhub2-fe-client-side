@@ -9,7 +9,7 @@ import ConferenceFeedback from '../../conferences/detail/ConferenceFeedback';
 import NotFoundPage from "../../utils/NotFoundPage";
 import Loading from "../../utils/Loading";
 import { ConferenceTabs } from '../../conferences/detail/ConferenceTabs';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Header } from '../../utils/Header';
 import Footer from '../../utils/Footer';
 import { Link } from '@/src/navigation';
@@ -31,8 +31,6 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     const t = useTranslations('');
     const searchParams = useSearchParams();
     const id = searchParams.get('id');
-    const router = useRouter();
-    const pathname = usePathname();
 
     const { conferenceData, error, loading } = useConferenceData(id);
     const { isFollowing, handleFollowClick } = useFollowConference(conferenceData);
@@ -101,12 +99,50 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         );
     }
 
-    const handleFeedbackSubmit = (rating: number | null, comment: string) => {
-        console.log('Rating:', rating);
-        console.log('Comment:', comment);
+    const { conference, organization, locations, followedBy } = conferenceData || {};
+
+     // Helper function to calculate overall rating
+    const calculateOverallRating = (feedbacks: any) => { // Replace 'any' with the correct type
+        if (!feedbacks || feedbacks.length === 0) return 0;
+        const totalStars = feedbacks.reduce((sum: number, feedback: any) => sum + feedback.star, 0);
+        return totalStars / feedbacks.length;
     };
 
-    const { conference, organization, locations } = conferenceData || {};
+    // Calculate overall rating and total reviews *before* the return
+    const overallRating = calculateOverallRating(conferenceData?.feedBacks);
+    const totalReviews = conferenceData?.feedBacks?.length || 0;  // Default to 0 if undefined
+
+
+    // Helper function to render follower avatars
+    const renderFollowerAvatars = () => {
+        if (!followedBy || followedBy.length === 0) {
+            return <p className="text-gray-500 text-sm">No followers yet.</p>;
+        }
+
+        const maxVisibleFollowers = 5;
+        const visibleFollowers = followedBy.slice(0, maxVisibleFollowers);
+        const remainingFollowers = followedBy.length - maxVisibleFollowers;
+
+        return (
+            <div className="flex items-center">
+                {visibleFollowers.map((follower) => (
+                    <img
+                        key={follower.id}
+                        src={`https://ui-avatars.com/api/?name=${follower.firstName}+${follower.lastName}&background=random&size=32`} // Use a placeholder or actual avatar URL
+                        alt={`${follower.firstName} ${follower.lastName}`}
+                        width={32}
+                        height={32}
+                        className="rounded-full h-8 w-8 border-2 border-white"
+                        style={{ marginLeft: '-0.25rem' }} // Overlapping effect
+                    />
+                ))}
+                {remainingFollowers > 0 && (
+                    <span className="text-gray-600 text-sm ml-2">+{remainingFollowers}</span>
+                )}
+            </div>
+        );
+    };
+
 
     if (error === "Conference not found") {
         return <NotFoundPage />;
@@ -142,17 +178,22 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                 </div>
                                 <div className="md:w-3/4 md:pl-6">    {/* Text details container */}
                                     <p className="text-red-500 text-sm font-semibold">{dateDisplay}</p>
-                                    <h1 className="font-bold text-3xl md:text-3xl mt-1 mb-2">{conference?.title}</h1>
-                                    <p className="text-gray-600 text-sm">
-                                        4.5 <span className="text-gray-500">(89 Ratings)</span> {/* Add span here */}
+                                    <h1 className="font-bold text-3xl md:text-3xl mt-1">{conference?.title}</h1>
+                                    <p className="text-gray-600 text-sm flex items-center">
+                                        <div className='text-yellow-500 text-xl mr-2'>★</div>
+                                        <strong>{overallRating.toFixed(1)} <span className="ml-1 text-gray-500"> ({totalReviews} Ratings)</span></strong>
                                     </p>
-                                    <a href="#map" className="text-blue-600 text-sm mt-1 flex items-center hover:underline">                                        
+                                    <a href="#map" className="text-blue-600 text-sm mt-1 flex items-center hover:underline">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4 mr-1">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                                    </svg>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                        </svg>
                                         {locations?.cityStateProvince}, {locations?.country}
                                     </a>
+                                     {/* Followers Display */}
+                                    <div className="mt-2">
+                                        {renderFollowerAvatars()}
+                                    </div>
 
                                 </div>
                             </div>

@@ -22,7 +22,8 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
           }
           const userData: UserResponse = await response.json();
           console.log(userData);
-          setIsFollowing(userData.followedConferences.includes(conferenceData.conference.id)); // Check if conferenceData.conference.id exists
+
+          setIsFollowing(userData.followedConferences.some(followedConf => followedConf.id === conferenceData.conference.id)); // Check if conferenceData.conference.id exists
         } catch (error) {
           console.error('Error fetching user data:', error);
           // Xử lý lỗi (ví dụ: hiển thị thông báo)
@@ -55,9 +56,10 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
           throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message}`);
         }
 
-        const updatedUser = await response.json(); // Nhận user đã update từ server
+        const updatedUser: UserResponse = await response.json(); // Nhận user đã update từ server
+        console.log(updatedUser)
         // Không cần cập nhật localStorage ở đây nữa
-        setIsFollowing(updatedUser.followedConferences.includes(conferenceId)); // Cập nhật state
+        setIsFollowing(updatedUser.followedConferences.find(conf => conf.id === conferenceId) !== undefined); // Cập nhật state(conferenceId)); // Cập nhật state
 
 
       } catch (error: any) {
