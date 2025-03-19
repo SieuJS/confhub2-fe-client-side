@@ -20,7 +20,7 @@ export default function Setting({ locale }: { locale: string }) {
   const t = useTranslations('')
   const searchParams = useSearchParams()
   const [activePage, setActivePage] = useState<string>('')
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   useEffect(() => {
     const tab = searchParams.get('tab')
@@ -83,8 +83,6 @@ export default function Setting({ locale }: { locale: string }) {
       detailsLink: '#'
     }
   ]
-  const exampleConferences: Conference[] = []
-
   const renderPage = () => {
     switch (activePage) {
       case 'Setting':
@@ -92,11 +90,11 @@ export default function Setting({ locale }: { locale: string }) {
       case 'Notifications':
         return <NotificationsTab notifications={notifications} />
       case 'Followed':
-        return <FollowedTab conferences={exampleConferences} />
+        return <FollowedTab />
       case 'Note':
         return <NoteTab />
       case 'My Conferences':
-        return <MyConferencesTab conferences={exampleConferences} />
+        return <MyConferencesTab />
       case 'Profile':
         return <ProfileTab />
       default:
@@ -109,122 +107,82 @@ export default function Setting({ locale }: { locale: string }) {
       page: 'Profile',
       label: t('Profile'),
       icon: (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='2'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          className='h-5 w-5'
-        >
-          <path d='M12 22s-8-4.5-8-11a8 8 0 1 1 16 0c0 6.5-8 11-8 11z' />
-          <circle cx='12' cy='10' r='3' />
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-circle-user-round"><path d="M18 20a6 6 0 0 0-12 0" /><circle cx="12" cy="10" r="4" /><circle cx="12" cy="12" r="10" /></svg>
       )
     },
     {
       page: 'Followed',
       label: t('Followed'),
       icon: (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='2'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          className='h-5 w-5'
-        >
-          <path d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z' />
-          <path d='M16.2 7.8l-2 6.3-6.4 2.1 2-6.3 6.4-2.1zm-8.4 0L5.8 14l6.3 2.1 2-6.3L7.8 7.8z' />
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-star"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1 -.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" /></svg>
       )
     },
     {
       page: 'My Conferences',
       label: t('My Conferences'),
       icon: (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='2'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          className='h-5 w-5'
-        >
-          <rect x='3' y='4' width='18' height='18' rx='2' ry='2' />
-          <line x1='16' y1='2' x2='16' y2='6' />
-          <line x1='8' y1='2' x2='8' y2='6' />
-          <line x1='3' y1='10' x2='21' y2='10' />
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-notebook-tabs"><path d="M2 6h4" /><path d="M2 10h4" /><path d="M2 14h4" /><path d="M2 18h4" /><rect width="16" height="20" x="4" y="2" rx="2" /><path d="M15 2v20" /><path d="M15 7h5" /><path d="M15 12h5" /><path d="M15 17h5" /></svg>
       )
     },
     {
       page: 'Note',
       label: t('Note'),
       icon: (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='2'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          className='h-5 w-5'
-        >
-          <path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z' />
-          <path d='M14 2v6h6' />
-          <path d='M16 13H8' />
-          <path d='M16 17H8' />
-          <path d='M10 9H8' />
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-calendar-days"><path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" /><path d="M8 14h.01" /><path d="M12 14h.01" /><path d="M16 14h.01" /><path d="M8 18h.01" /><path d="M12 18h.01" /><path d="M16 18h.01" /></svg>
       )
     },
     {
       page: 'Notifications',
       label: t('Notifications'),
       icon: (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='2'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          className='h-5 w-5'
-        >
-          <path d='M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9' />
-          <path d='M13.73 21a2 2 0 0 1-3.46 0' />
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-bell-ring"><path d="M10.268 21a2 2 0 0 0 3.464 0" /><path d="M22 8c0-2.3-.8-4.3-2-6" /><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" /><path d="M4 2C2.8 3.7 2 5.7 2 8" /></svg>
       )
     },
     {
       page: 'Setting',
       label: t('Setting'),
       icon: (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='2'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          className='h-5 w-5'
-        >
-          <circle cx='12' cy='12' r='3' />
-          <path d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z' />
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>
       )
     }
   ]
+
+  // Toggle icons
+  const openIcon = (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#525252"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="lucide lucide-align-justify"
+    >
+      <path d="M3 12h18" />
+      <path d="M3 18h18" />
+      <path d="M3 6h18" />
+    </svg>
+  )
+  const closeIcon = (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#525252"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="lucide lucide-x"
+    >
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
+  )
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen)
@@ -236,103 +194,112 @@ export default function Setting({ locale }: { locale: string }) {
       <div className='relative justify-center'>
         <div className='w-full bg-background py-8'></div>
         <div className='flex'>
+          {/* Sidebar */}
           <aside
-            className={`fixed flex h-full flex-col transition-all duration-300 ${
-              isSidebarOpen ? 'w-60' : 'w-16'
-            }`}
+            className={`
+              fixed
+              flex
+              flex-col
+              transition-all
+              duration-1000
+              ease-in-out
+              bg-white
+              ${isSidebarOpen ? 'w-50' : 'w-16'}
+            `}
+            style={{
+              height: 'calc(100vh - 72px)', // Adjust 72px if your header height changes.  Crucially *don't* set a fixed height.
+              overflowY: 'auto' // Add this to allow scrolling within the sidebar if content overflows.
+            }}
           >
-            <nav
-              className={`w-full flex-grow  ${isSidebarOpen ? '' : 'overflow-hidden'}`}
-            >
+            <nav className='w-full flex-grow'>
               <ul className='w-full'>
-                {menuItems.map((item, index) => {
+                {/* Toggle Button */}
+                <li className='w-full'>
+                  <button
+                    onClick={toggleSidebar}
+                    className={`
+                      flex
+                      items-center
+                      w-full
+                      px-4  
+                      py-2
+                      focus:outline-none
+                      transition-colors
+                      duration-600
+                      ease-in-out
+                      hover:bg-button
+                      hover:opacity-60
+                      active:bg-blue-700
+                      ${isSidebarOpen ? 'justify-start' : 'justify-center'}
+                    `}
+                  >
+                    {/* Conditional margin on toggle icon */}
+                    <span className={isSidebarOpen ? 'mr-4' : ''}>
+                      {isSidebarOpen ? closeIcon : openIcon}
+                    </span>
+                    {isSidebarOpen && <span>{t('Close')}</span>}
+                  </button>
+                </li>
+
+                {menuItems.map((item) => {
                   const tabValue = item.page.toLowerCase().replace(/ /g, '')
                   return (
-                    <React.Fragment key={item.page}>
-                      <li className='w-full'>
-                        <Link
-                          href={{
-                            pathname: '/dashboard',
-                            query: { tab: tabValue }
-                          }}
-                          // Consistent padding and width for ALL links
-                          className={`focus:secondary flex items-center p-4 hover:bg-button hover:opacity-60 focus:outline-none ${
-                            activePage === item.page
-                              ? 'bg-button text-button-text hover:bg-secondary'
-                              : ''
-                          } ${isSidebarOpen ? 'h-12 w-60 justify-start' : 'h-12 w-16 justify-center'}`} // Apply w-60 and w-16 here
-                        >
+                    <li className='w-full' key={item.page}>
+                      <Link
+                        href={{
+                          pathname: '/dashboard',
+                          query: { tab: tabValue }
+                        }}
+                        className={`
+                          flex
+                          items-center
+                          px-4 
+                          py-2
+                          hover:bg-button
+                          hover:opacity-60
+                          focus:outline-none
+                          transition-colors
+                          duration-600
+                          ease-in-out
+                          ${activePage === item.page
+                            ? 'bg-button text-button-text hover:bg-secondary'
+                            : ''
+                          }
+                          ${isSidebarOpen
+                            ? 'h-12 w-50 justify-start'
+                            : 'h-12 w-16 justify-center'
+                          }
+                        `}
+                      >
+                        {/* Conditional margin on menu item icons */}
+                        <span className={isSidebarOpen ? 'mr-4' : ''}>
                           {item.icon}
-                          {isSidebarOpen && (
-                            <span className='ml-2'>{item.label}</span>
-                          )}
-                        </Link>
-                      </li>
-
-                      {/* Conditionally render the toggle button after 'Setting' */}
-                      {item.page === 'Setting' && (
-                        <li className='w-full'>
-                          <button
-                            onClick={toggleSidebar}
-                            //Consistent padding and width for the button
-                            className={`flex items-center  p-3  focus:outline-none  ${
-                              isSidebarOpen
-                                ? 'w-60 justify-start'
-                                : 'w-16 justify-center'
-                            } hover:bg-button hover:opacity-60 active:bg-blue-700`}
-                          >
-                            {isSidebarOpen ? (
-                              <>
-                                <svg
-                                  xmlns='http://www.w3.org/2000/svg'
-                                  viewBox='0 0 24 24'
-                                  fill='none'
-                                  stroke='currentColor'
-                                  strokeWidth='2'
-                                  strokeLinecap='round'
-                                  strokeLinejoin='round'
-                                  className='mr-2 h-6 w-6 text-gray-700'
-                                >
-                                  <path d='M11 19l-7-7 7-7' />
-                                  <path d='M18 19l-7-7 7-7' />
-                                </svg>
-                                <span className=''>{t('Collapse')}</span>
-                              </>
-                            ) : (
-                              <svg
-                                xmlns='http://www.w3.org/2000/svg'
-                                viewBox='0 0 24 24'
-                                fill='none'
-                                stroke='currentColor'
-                                strokeWidth='2'
-                                strokeLinecap='round'
-                                strokeLinejoin='round'
-                                className='h-6 w-6 text-gray-700'
-                              >
-                                <path d='M13 5l7 7-7 7' />
-                                <path d='M6 5l7 7-7 7' />
-                              </svg>
-                            )}
-                          </button>
-                        </li>
-                      )}
-                    </React.Fragment>
+                        </span>
+                        {isSidebarOpen && <span>{item.label}</span>}
+                      </Link>
+                    </li>
                   )
                 })}
               </ul>
             </nav>
           </aside>
 
+          {/* Main Content */}
           <div
-            className={`ml-0 min-h-screen flex-1 transition-all duration-300 ${
-              isSidebarOpen ? 'ml-60' : 'ml-16'
-            }`}
+            className={`
+              min-h-screen
+              flex-1
+              transition-all
+              duration-50
+              ease-in-out
+              ${isSidebarOpen ? 'ml-48' : 'ml-16'}
+            `}
           >
             {renderPage()}
           </div>
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </>
   )
 }

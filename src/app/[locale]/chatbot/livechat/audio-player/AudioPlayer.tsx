@@ -1,5 +1,5 @@
 // AudioPlayer.tsx (FINAL REVISED with Styling)
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import AudioPulse from '../audio-pulse/AudioPulse';
 import { debounce } from 'lodash';
 

@@ -1,7 +1,9 @@
-// SearchAdvanceSection.tsx
+// src/components/SearchAdvanceSection.tsx
+
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
+import useSearchAdvanceForm from '../../../hooks/conferences/useSearchAdvanceForm';
 
 interface SearchAdvanceSectionProps {
   isAdvancedOptionsVisible: boolean;
@@ -23,139 +25,58 @@ interface SearchAdvanceSectionProps {
 }
 
 const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
-  isAdvancedOptionsVisible, toggleAdvancedOptionsVisibility,
-  onSubmissionDateChange, submissionDate, onRankChange, selectedRank, onSourceYearChange, selectedSourceYear, onAverageScoreChange, selectedAverageScore, onTopicsChange, selectedTopics, onFieldOfResearchChange, selectedFieldsOfResearch, onPublisherChange, selectedPublisher
+  isAdvancedOptionsVisible,
+  toggleAdvancedOptionsVisibility,
+  onSubmissionDateChange,
+  submissionDate,
+  onRankChange,
+  selectedRank,
+  onSourceYearChange,
+  selectedSourceYear,
+  onAverageScoreChange,
+  selectedAverageScore,
+  onTopicsChange,
+  selectedTopics,
+  onFieldOfResearchChange,
+  selectedFieldsOfResearch,
+  onPublisherChange,
+  selectedPublisher,
 }) => {
-  const [topicsInput, setTopicsInput] = useState('');
-  const [topicSuggestions, setTopicSuggestions] = useState<string[]>([]);
-  const [fieldOfResearchInput, setFieldOfResearchInput] = useState('');
-  const [fieldOfResearchSuggestions, setFieldOfResearchSuggestions] = useState<string[]>([]);
-  const [publisher, setPublisher] = useState('')
-
-  // Example lists - replace with your actual lists
-  const availableTopics = [
-    "Artificial Intelligence", "Machine Learning", "Data Science", "Cloud Computing", "Cybersecurity",
-    "Web Development", "Mobile Development", "Database Management", "Software Engineering", "Network Security",
-    "UX/UI Design", "Project Management", "Agile Methodologies", "DevOps", "Blockchain Technology", "Big Data"
-  ];
-  const availableFieldsOfResearch = [
-    "Computer Science", "Information Technology", "Software Engineering", "Data Analytics", "Artificial Intelligence",
-    "Cybersecurity", "Information Systems", "Human-Computer Interaction", "Bioinformatics", "Computational Linguistics"
-  ];
-
-  const handleTopicInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    setTopicsInput(inputValue);
-    if (inputValue.trim()) {
-      const suggestions = availableTopics.filter(topic =>
-        topic.toLowerCase().includes(inputValue.toLowerCase()) && !selectedTopics.includes(topic)
-      );
-      setTopicSuggestions(suggestions);
-    } else {
-      setTopicSuggestions([]);
-    }
-  };
-
-  const handleTopicSuggestionClick = (suggestion: string) => {
-    if (!selectedTopics.includes(suggestion)) {
-      onTopicsChange([...selectedTopics, suggestion]); // Update parent state
-    }
-    setTopicsInput('');
-    setTopicSuggestions([]);
-  };
-
-  const handleTopicInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      if (topicsInput.trim()) {
-        const trimmedInput = topicsInput.trim();
-        if (!selectedTopics.includes(trimmedInput) && availableTopics.includes(trimmedInput)) {
-          onTopicsChange([...selectedTopics, trimmedInput]); // Update parent state
-          setTopicsInput('');
-          setTopicSuggestions([]);
-        } else if (topicSuggestions.length > 0) {
-          handleTopicSuggestionClick(topicSuggestions[0]);
-        } else {
-          setTopicsInput('');
-          setTopicSuggestions([]);
-        }
-      }
-    }
-  };
-
-  const handleRemoveTopic = (topicToRemove: string) => {
-    onTopicsChange(selectedTopics.filter(topic => topic !== topicToRemove)); // Update parent state
-  };
-
-  const handleFieldOfResearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    setFieldOfResearchInput(inputValue);
-    if (inputValue.trim()) {
-      const suggestions = availableFieldsOfResearch.filter(field =>
-        field.toLowerCase().includes(inputValue.toLowerCase()) && !selectedFieldsOfResearch.includes(field)
-      );
-      setFieldOfResearchSuggestions(suggestions);
-    } else {
-      setFieldOfResearchSuggestions([]);
-    }
-  };
-
-  const handleFieldOfResearchSuggestionClick = (suggestion: string) => {
-    if (!selectedFieldsOfResearch.includes(suggestion)) {
-      onFieldOfResearchChange([...selectedFieldsOfResearch, suggestion]); // Update parent state
-    }
-    setFieldOfResearchInput('');
-    setFieldOfResearchSuggestions([]);
-  };
-
-  const handleFieldOfResearchInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      if (fieldOfResearchInput.trim()) {
-        const trimmedInput = fieldOfResearchInput.trim();
-        if (!selectedFieldsOfResearch.includes(trimmedInput) && availableFieldsOfResearch.includes(trimmedInput)) {
-          onFieldOfResearchChange([...selectedFieldsOfResearch, trimmedInput]); // Update parent state
-          setFieldOfResearchInput('');
-          setFieldOfResearchSuggestions([]);
-        } else if (fieldOfResearchSuggestions.length > 0) {
-          handleFieldOfResearchSuggestionClick(fieldOfResearchSuggestions[0]);
-        } else {
-          setFieldOfResearchInput('');
-          setFieldOfResearchSuggestions([]);
-        }
-      }
-    }
-  };
-
-  const handleRemoveFieldOfResearch = (fieldToRemove: string) => {
-    onFieldOfResearchChange(selectedFieldsOfResearch.filter(field => field !== fieldToRemove)); // Update parent state
-  };
-
-  const handleSubmissionDateInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const date = event.target.value ? new Date(event.target.value) : null;
-    onSubmissionDateChange(date);
-  };
-
-  const handleRankChangeInput = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    onRankChange(event.target.value === "" ? null : event.target.value);
-  };
-
-  const handleSourceYearChangeInput = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    onSourceYearChange(event.target.value === "" ? null : event.target.value);
-  };
-
-  const handleAverageScoreChangeInput = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    onAverageScoreChange(event.target.value === "" ? null : event.target.value);
-  };
-
-  const handlePublisherChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPublisher(event.target.value);
-  };
-
-  const handleSearchPublisherClick = () => {
-    onPublisherChange(publisher);
-  };
-
+  const {
+    topicsInput,
+    topicSuggestions,
+    fieldOfResearchInput,
+    fieldOfResearchSuggestions,
+    handleTopicInputChange,
+    handleTopicSuggestionClick,
+    handleTopicInputKeyDown,
+    handleRemoveTopic,
+    handleFieldOfResearchInputChange,
+    handleFieldOfResearchSuggestionClick,
+    handleFieldOfResearchInputKeyDown,
+    handleRemoveFieldOfResearch,
+    handleSubmissionDateInputChange,
+    handleRankChangeInput,
+    handleSourceYearChangeInput,
+    handleAverageScoreChangeInput,
+    handlePublisherInputChange,
+    handlePublisherEnter
+  } = useSearchAdvanceForm({
+    onSubmissionDateChange,
+    submissionDate,
+    onRankChange,
+    selectedRank,
+    onSourceYearChange,
+    selectedSourceYear,
+    onAverageScoreChange,
+    selectedAverageScore,
+    onTopicsChange,
+    selectedTopics,
+    onFieldOfResearchChange,
+    selectedFieldsOfResearch,
+    onPublisherChange,
+    selectedPublisher,
+  });
 
   return (
     <div>
@@ -166,16 +87,15 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
       </div>
 
       {isAdvancedOptionsVisible && (
-        <div className="mt-4 p-4 border rounded shadow-md">
-          {/* Removed title: <p className="text-lg font-semibold mb-4">Advanced Search Options</p> */}
-
-          <div className="grid grid-cols-5 gap-4 mb-4">
-            <div className="sm:col-span-1">
-              <label className="block font-bold mb-2" htmlFor="submissionDate">
+        <div className="mt-2 p-4 border rounded shadow-md">
+          {/* Responsive grid layout */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-2">
+            <div className="col-span-1">
+              <label className="block text-sm font-bold mb-1" htmlFor="submissionDate"> {/* Reduced mb */}
                 Submission Date:
               </label>
               <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline text-sm"
+                className="shadow appearance-none border rounded w-full py-1 px-2 text-sm leading-tight focus:outline-none focus:shadow-outline" // Reduced py and px
                 id="submissionDate"
                 type="date"
                 placeholder="Date"
@@ -184,27 +104,27 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
               />
             </div>
 
-            <div className="sm:col-span-1">
-              <label className="block font-bold mb-2" htmlFor="publisher">
+            <div className="col-span-1">
+              <label className="block text-sm font-bold mb-1" htmlFor="publisher"> {/* Reduced mb */}
                 Publisher:
               </label>
               <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline text-sm"
+                className="shadow appearance-none border rounded w-full py-1 px-2 text-sm leading-tight focus:outline-none focus:shadow-outline" // Reduced py and px
                 id="publisher"
                 type="text"
                 placeholder="Publisher"
                 value={selectedPublisher || ""}
-                onChange={handlePublisherChange}
-                onKeyDown={handleSearchPublisherClick }
+                onChange={handlePublisherInputChange}
+                onKeyDown={handlePublisherEnter}
               />
             </div>
 
-            <div className="sm:col-span-1">
-              <label className="block font-bold mb-2" htmlFor="rank">
+            <div className="col-span-1">
+              <label className="block text-sm font-bold mb-1" htmlFor="rank"> {/* Reduced mb */}
                 Rank:
               </label>
               <select
-                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline text-sm"
+                className="shadow appearance-none border rounded w-full py-1 px-2 text-sm leading-tight focus:outline-none focus:shadow-outline" // Reduced py and px
                 id="rank"
                 value={selectedRank || ''}
                 onChange={handleRankChangeInput}
@@ -216,12 +136,12 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
               </select>
             </div>
 
-            <div className="sm:col-span-1">
-              <label className="block font-bold mb-2" htmlFor="source">
+            <div className="col-span-1">
+              <label className="block text-sm font-bold mb-1" htmlFor="source"> {/* Reduced mb */}
                 Source Year:
               </label>
               <select
-                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline text-sm"
+                className="shadow appearance-none border rounded w-full py-1 px-2 text-sm leading-tight focus:outline-none focus:shadow-outline" // Reduced py and px
                 id="source"
                 value={selectedSourceYear || ''}
                 onChange={handleSourceYearChangeInput}
@@ -234,18 +154,17 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
               </select>
             </div>
 
-            <div className="sm:col-span-1">
-              <label className="block font-bold mb-2" htmlFor="averageScore">
+            <div className="col-span-1">
+              <label className="block text-sm font-bold mb-1" htmlFor="averageScore"> {/* Reduced mb */}
                 Avg. Score (1-5):
               </label>
               <select
-                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline text-sm"
+                className="shadow appearance-none border rounded w-full py-1 px-2 text-sm leading-tight focus:outline-none focus:shadow-outline" // Reduced py and px
                 id="averageScore"
                 value={selectedAverageScore || ''}
                 onChange={handleAverageScoreChangeInput}
               >
                 <option value="">Score</option>
-                <option value="1">1</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -255,9 +174,9 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="col-span-1 relative">
-              <label className="block font-bold mb-2" htmlFor="topics">
+              <label className="block text-sm font-bold mb-1" htmlFor="topics"> {/* Reduced mb */}
                 Topics:
               </label>
               <input
@@ -266,7 +185,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 value={topicsInput}
                 onChange={handleTopicInputChange}
                 onKeyDown={handleTopicInputKeyDown}
-                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline text-sm"
+                className="shadow appearance-none border rounded w-full py-1 px-2 text-sm leading-tight focus:outline-none focus:shadow-outline" // Reduced py and px
                 placeholder="Enter topics"
               />
               {topicSuggestions.length > 0 && (
@@ -274,7 +193,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                   {topicSuggestions.map((suggestion, index) => (
                     <li
                       key={index}
-                      className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                      className="px-3 py-1 text-sm hover:bg-gray-100 cursor-pointer" // Reduced py and px
                       onClick={() => handleTopicSuggestionClick(suggestion)}
                     >
                       {suggestion}
@@ -282,16 +201,16 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                   ))}
                 </ul>
               )}
-              <div className="mt-2 flex flex-wrap gap-2">
+              <div className="mt-2 flex flex-wrap gap-1"> {/* Reduced gap */}
                 {selectedTopics.map((topic, index) => (
-                  <div key={index} className="bg-gray-200 rounded-full px-3 py-1 text-sm flex items-center gap-1">
+                  <div key={index} className="bg-gray-200 rounded-full px-2 py-0.5 text-sm flex items-center gap-1"> {/* Reduced px and py */}
                     <span>{topic}</span>
                     <button
                       type="button"
                       className="hover:text-gray-700 focus:outline-none"
                       onClick={() => handleRemoveTopic(topic)}
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"> {/* Smaller icon */}
                         <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                       </svg>
                     </button>
@@ -301,7 +220,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
             </div>
 
             <div className="col-span-1 relative">
-              <label className="block font-bold mb-2" htmlFor="fieldOfResearch">
+              <label className="block text-sm font-bold mb-1" htmlFor="fieldOfResearch"> {/* Reduced mb */}
                 Field of Research:
               </label>
               <input
@@ -310,7 +229,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 value={fieldOfResearchInput}
                 onChange={handleFieldOfResearchInputChange}
                 onKeyDown={handleFieldOfResearchInputKeyDown}
-                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline text-sm"
+                className="shadow appearance-none border rounded w-full py-1 px-2 text-sm leading-tight focus:outline-none focus:shadow-outline" // Reduced py and px
                 placeholder="Enter fields of research"
               />
               {fieldOfResearchSuggestions.length > 0 && (
@@ -318,7 +237,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                   {fieldOfResearchSuggestions.map((suggestion, index) => (
                     <li
                       key={index}
-                      className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                      className="px-3 py-1 text-sm hover:bg-gray-100 cursor-pointer" // Reduced py and px
                       onClick={() => handleFieldOfResearchSuggestionClick(suggestion)}
                     >
                       {suggestion}
@@ -326,16 +245,16 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                   ))}
                 </ul>
               )}
-              <div className="mt-2 flex flex-wrap gap-2">
+              <div className="mt-2 flex flex-wrap gap-1"> {/* Reduced gap */}
                 {selectedFieldsOfResearch.map((field, index) => (
-                  <div key={index} className="bg-gray-200 rounded-full px-3 py-1 text-sm flex items-center gap-1">
+                  <div key={index} className="bg-gray-200 rounded-full px-2 py-0.5 text-sm flex items-center gap-1"> {/* Reduced px and py */}
                     <span>{field}</span>
                     <button
                       type="button"
                       className="hover:text-gray-700 focus:outline-none"
                       onClick={() => handleRemoveFieldOfResearch(field)}
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"> {/* Smaller icon */}
                         <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                       </svg>
                     </button>
@@ -344,7 +263,6 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
               </div>
             </div>
           </div>
-
         </div>
       )}
     </div>

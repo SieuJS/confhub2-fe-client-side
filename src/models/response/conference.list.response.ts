@@ -1,5 +1,3 @@
-// File ConferenceListResponse:
-
 export type ConferenceListResponse = {
   payload: ConferenceInfo[];
   meta: Meta;
@@ -9,18 +7,17 @@ export type ConferenceInfo = {
   id: string;
   title: string;
   acronym: string;
-  location: Location;  // Defined a separate type for Location
+  location: Location;  // Re-use the Location type
   year: number;
-  rankSourceFoRData: RankSourceFoRData; // Defined a separate type
+  rankSourceFoRData: RankSourceFoRData; // Re-use
   topics: string[];
-  dates: ImportantDates;
+  dates: ImportantDates; // Re-use
   link: string;
-  createdAt: string; // Keep as string (ISO 8601)
-  updatedAt: string; // Keep as string (ISO 8601)
+  createdAt: string;
+  updatedAt: string;
   creatorId: string;
-  accessType: string; //  "Offline" | "Online" | "Hybrid";  //  more specific type
+  accessType: string;
 };
-
 export type Location = {
   cityStateProvince: string;
   country: string;

@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Header } from '../utils/Header'
 import Footer from '../utils/Footer'
 import { useRouter, usePathname } from 'next/navigation'
+import countryData from '../addconference/countries.json'; // Import the JSON data
 
 const API_ADD_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/conferences'
-const CSC_API_KEY = process.env.NEXT_PUBLIC_CSC_API_KEY // Get API key from environment variable
+const CSC_API_KEY = process.env.NEXT_PUBLIC_CSC_API_KEY
 
 interface ConferenceFormData {
   title: string
@@ -36,7 +37,8 @@ interface ImportantDateInput {
 
 interface Country {
   name: string
-  iso2: string // ISO2 country code
+  iso2: string
+  region: string;
 }
 
 interface State {
@@ -46,14 +48,12 @@ interface State {
   state_code: string
 }
 
-const continentData: { [key: string]: string[] } = {
-  'North America': [],
-  Europe: [],
-  Asia: [],
-  Africa: [],
-  'South America': [],
-  Oceania: [],
-  Antarctica: []
+interface City {
+  name: string;
+  country_code: string;
+  state_code: string;
+  latitude: string;
+  longitude: string;
 }
 
 const AddConference = ({ locale }: { locale: string }) => {
@@ -78,126 +78,147 @@ const AddConference = ({ locale }: { locale: string }) => {
     }
   ])
 
+  const continentOptions = [
+    'Americas',
+    'Europe',
+    'Asia',
+    'Africa',
+    'Oceania',
+  ]
+
+  const dateTypeOptions = [
+    'submissionDate',
+    'conferenceDates',
+    'registrationDate',
+    'notificationDate',
+    'cameraReadyDate'
+  ]
+
   const [imageUrl, setImageUrl] = useState('')
   const [description, setDescription] = useState('')
 
-  // --- CSC API States ---
+  // --- Location States ---
   const [countries, setCountries] = useState<Country[]>([])
   const [states, setStates] = useState<State[]>([])
-  const [selectedCountry, setSelectedCountry] = useState<string>('') // ISO2 of selected country
-  const [selectedState, setSelectedState] = useState<string>('') // State code of selected state
-  const [selectedContinent, setSelectedContinent] = useState<string>('') // Selected continent
-  const [filteredCountries, setFilteredCountries] = useState<Country[]>([]) // Filtered countries by continent
+  const [cities, setCities] = useState<City[]>([])
+  const [selectedCountry, setSelectedCountry] = useState<string>('')
+  const [selectedState, setSelectedState] = useState<string>('')
+  const [selectedCity, setSelectedCity] = useState<string>('');
+  const [selectedContinent, setSelectedContinent] = useState<string>('')
+  const [filteredCountries, setFilteredCountries] = useState<Country[]>([])
 
   const router = useRouter()
   const pathname = usePathname()
 
-  // --- Fetch Countries (All at once)---
+  // --- Load Countries from JSON ---
   useEffect(() => {
-    const fetchCountries = async () => {
-      try {
-        const response = await fetch(
-          'https://api.countrystatecity.in/v1/countries',
-          {
-            headers: {
-              'X-CSCAPI-KEY': CSC_API_KEY || ''
-            }
-          }
-        )
-        const data = await response.json()
+    const mappedCountries: Country[] = countryData.map((c: any) => ({
+      name: c.name,
+      iso2: c.iso2,
+      region: c.region,
+    }));
+    setCountries(mappedCountries);
+  }, []);
 
-        const mappedCountries: Country[] = data.map((c: any) => ({
-          name: c.name,
-          iso2: c.iso2
-        }))
-        setCountries(mappedCountries)
-
-        // Populate continentData
-        data.forEach((c: any) => {
-          if (c.name === 'United States')
-            continentData['North America'].push(c.iso2)
-          if (c.name === 'Canada') continentData['North America'].push(c.iso2)
-          if (c.name === 'Mexico') continentData['North America'].push(c.iso2)
-          if (c.name === 'Brazil') continentData['South America'].push(c.iso2)
-          if (c.name === 'Argentina')
-            continentData['South America'].push(c.iso2)
-          if (c.name === 'Colombia') continentData['South America'].push(c.iso2)
-          if (c.name === 'United Kingdom') continentData['Europe'].push(c.iso2)
-          if (c.name === 'Germany') continentData['Europe'].push(c.iso2)
-          if (c.name === 'France') continentData['Europe'].push(c.iso2)
-          if (c.name === 'China') continentData['Asia'].push(c.iso2)
-          if (c.name === 'India') continentData['Asia'].push(c.iso2)
-          if (c.name === 'Japan') continentData['Asia'].push(c.iso2)
-          if (c.name === 'South Africa') continentData['Africa'].push(c.iso2)
-          if (c.name === 'Egypt') continentData['Africa'].push(c.iso2)
-          if (c.name === 'Nigeria') continentData['Africa'].push(c.iso2)
-          if (c.name === 'Australia') continentData['Oceania'].push(c.iso2)
-          if (c.name === 'New Zealand') continentData['Oceania'].push(c.iso2)
-          //Antarctica has no countries
-        })
-      } catch (error) {
-        console.error('Error fetching countries:', error)
-      }
-    }
-
-    fetchCountries()
-  }, [])
 
   // --- Filter Countries by Continent ---
   useEffect(() => {
     if (selectedContinent) {
-      const countryCodes = continentData[selectedContinent]
-      const newFilteredCountries = countries.filter(country =>
-        countryCodes.includes(country.iso2)
-      )
-      setFilteredCountries(newFilteredCountries)
+      const newFilteredCountries = countries.filter(
+        country => country.region === selectedContinent
+      );
+      setFilteredCountries(newFilteredCountries);
     } else {
-      setFilteredCountries([]) // Clear if no continent selected
+      setFilteredCountries([]);
     }
-    // Reset country and state when continent changes
-    setSelectedCountry('')
-    setSelectedState('')
+    setSelectedCountry('');
+    setSelectedState('');
+    setSelectedCity('');
     setLocation({
       ...location,
       country: '',
       cityStateProvince: '',
       continent: selectedContinent
-    })
-  }, [selectedContinent, countries])
+    });
+  }, [selectedContinent, countries]);
 
-  // --- Fetch States ---
-  useEffect(() => {
-    const fetchStates = async () => {
-      if (!selectedCountry) {
-        setStates([])
-        return
-      }
-      try {
-        const response = await fetch(
-          `https://api.countrystatecity.in/v1/countries/${selectedCountry}/states`,
-          {
-            headers: {
-              'X-CSCAPI-KEY': CSC_API_KEY || ''
+  // --- Fetch States or Cities ---
+    useEffect(() => {
+    const fetchStatesOrCities = async () => {
+        if (!selectedCountry) {
+            setStates([]);
+            setCities([]);
+            return;
+        }
+
+        try {
+            // First, try fetching states
+            const statesResponse = await fetch(
+                `https://api.countrystatecity.in/v1/countries/${selectedCountry}/states`,
+                {
+                    headers: {
+                        'X-CSCAPI-KEY': CSC_API_KEY || ''
+                    }
+                }
+            );
+
+            if (!statesResponse.ok) {
+                throw new Error(`State API Error: ${statesResponse.status}`);
             }
-          }
-        )
-        const data = await response.json()
-        const mappedStates = data.map((s: any) => ({
-          name: s.name,
-          iso2: s.iso2,
-          country_code: s.country_code,
-          state_code: s.state_code
-        }))
 
-        setStates(mappedStates)
-      } catch (error) {
-        console.error('Error fetching states:', error)
-        setStates([])
-      }
-    }
+            const statesData = await statesResponse.json();
+            if (statesData.length > 0) {
+              const mappedStates = statesData.map((s: any) => ({
+                name: s.name,
+                iso2: s.iso2,
+                country_code: s.country_code,
+                state_code: s.state_code
+            })).sort((a: { name: string }, b: { name: any }) => a.name.localeCompare(b.name));
+            setStates(mappedStates);
+            setCities([]);
+            } else {
+                setStates([]);
+                // If no states are found, fetch cities
+                const citiesResponse = await fetch(
+                  `https://api.countrystatecity.in/v1/countries/${selectedCountry}/cities`,
+                  {
+                      headers: {
+                          'X-CSCAPI-KEY': CSC_API_KEY || ''
+                      }
+                  }
+                );
 
-    fetchStates()
-  }, [selectedCountry])
+                if (!citiesResponse.ok) {
+                    throw new Error(`City API Error: ${citiesResponse.status}`);
+                }
+
+                const citiesData = await citiesResponse.json();
+                const mappedCities = citiesData.map((c: any) => ({
+                  name: c.name,
+                  country_code: c.country_code,
+                  state_code: c.state_code,
+                  latitude: c.latitude,
+                  longitude: c.longitude
+                }));
+                // Deduplicate cities by name
+                const uniqueCities = Array.from(new Set(mappedCities.map((city: { name: any }) => city.name)))
+                  .map(name => {
+                      return mappedCities.find((city: { name: unknown }) => city.name === name);
+                  }).sort((a: { name: string }, b: { name: any }) => a.name.localeCompare(b.name));
+                setCities(uniqueCities as City[]); // Cast to City[]
+
+
+            }
+        } catch (error) {
+            console.error('Error fetching states or cities:', error);
+            setStates([]);
+            setCities([]);
+        }
+    };
+
+    fetchStatesOrCities();
+}, [selectedCountry]);
+
 
   const handleContinentChange = (continent: string) => {
     setSelectedContinent(continent)
@@ -205,22 +226,30 @@ const AddConference = ({ locale }: { locale: string }) => {
 
   const handleCountryChange = (countryIso2: string) => {
     setSelectedCountry(countryIso2)
-    setSelectedState('') // Reset state when country changes
+    setSelectedState('')
+    setSelectedCity('');
     setLocation({
       ...location,
       country: filteredCountries.find(c => c.iso2 === countryIso2)?.name || '',
       cityStateProvince: ''
-    }) // find full name country
+    })
   }
 
   const handleStateChange = (stateCode: string) => {
     setSelectedState(stateCode)
     setLocation({
       ...location,
-      cityStateProvince:
-        states.find(s => s.state_code === stateCode)?.name || ''
+      cityStateProvince: states.find(s => s.state_code === stateCode)?.name || ''
     })
   }
+
+  const handleCityChange = (cityName: string) => {
+    setSelectedCity(cityName);
+    setLocation({
+        ...location,
+        cityStateProvince: cityName,
+    });
+  };
 
   const handleAddTopic = () => {
     if (newTopic.trim() !== '') {
@@ -264,7 +293,6 @@ const AddConference = ({ locale }: { locale: string }) => {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    // Hàm async
     e.preventDefault()
     if (
       !title ||
@@ -272,9 +300,6 @@ const AddConference = ({ locale }: { locale: string }) => {
       !link ||
       !type ||
       !location.address ||
-      // !location.cityStateProvince ||
-      // !location.country ||
-      // !location.continent ||
       dates.some(date => !date.fromDate || !date.toDate || !date.name)
     ) {
       alert('Please fill in all required fields.')
@@ -330,23 +355,7 @@ const AddConference = ({ locale }: { locale: string }) => {
     }
   }
 
-  const continentOptions = [
-    'North America',
-    'Europe',
-    'Asia',
-    'Africa',
-    'South America',
-    'Oceania',
-    'Antarctica'
-  ]
-
-  const dateTypeOptions = [
-    'submissionDate',
-    'conferenceDates',
-    'registrationDate',
-    'notificationDate',
-    'cameraReadyDate'
-  ]
+  
 
   return (
     <>
@@ -476,7 +485,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                   value={selectedCountry}
                   onChange={e => handleCountryChange(e.target.value)}
                   required
-                  disabled={!selectedContinent} // Disable if no continent is selected
+                  disabled={!selectedContinent}
                 >
                   <option value=''>Select Country</option>
                   {filteredCountries.map(country => (
@@ -487,25 +496,32 @@ const AddConference = ({ locale }: { locale: string }) => {
                 </select>
               </div>
 
-              {/* --- State Dropdown --- */}
+              {/* --- State OR City Dropdown --- */}
               <div>
-                <label htmlFor='state' className='block text-sm'>
-                  State/Province:
+                <label htmlFor='stateOrCity' className='block text-sm'>
+                    {cities.length > 0 ? 'City:' : 'State/Province:'}
                 </label>
                 <select
-                  id='state'
-                  className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
-                  value={selectedState}
-                  onChange={e => handleStateChange(e.target.value)}
-                  required
-                  disabled={!selectedCountry} // Disable if no country is selected
+                    id='stateOrCity'
+                    className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+                    value={states.length > 0 ? selectedState : selectedCity}
+                    onChange={e => states.length > 0 ? handleStateChange(e.target.value): handleCityChange(e.target.value)}
+                    required
+                    disabled={!selectedCountry}
                 >
-                  <option value=''>Select State/Province</option>
-                  {states.map(state => (
-                    <option key={state.iso2} value={state.state_code}>
-                      {state.name}
-                    </option>
-                  ))}
+                    <option value=''>Select {cities.length > 0 ? 'City:' : 'State/Province:'}</option>
+                    {states.length > 0
+                        ? states.map(state => (
+                            <option key={state.iso2} value={state.state_code}>
+                                {state.name}
+                            </option>
+                        ))
+                        : cities.map((city) => (
+                            <option key={city.name} value={city.name}>
+                                {city.name}
+                            </option>
+                        ))
+                    }
                 </select>
               </div>
             </div>

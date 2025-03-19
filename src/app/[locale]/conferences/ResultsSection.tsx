@@ -1,209 +1,181 @@
-// components/conference/ResultsSection.tsx
-import React, { useState, useEffect } from 'react';
+// src/components/conferences/ResultsSection.tsx
+import React, { useState } from 'react';
 import EventCard from './EventCard';
+import EventTable from './EventTable';
+import useConferenceResults from '@/src/hooks/conferences/useConferenceResults';
 import Pagination from '../utils/Pagination';
-import { ConferenceInfo } from '@/src/models/response/conference.list.response';
-import { getListConference } from '@/src/api/getConference/getListConferences';
+import { ConferenceInfo } from '../../../models/response/conference.list.response';
 
-interface ResultsSectionProps {
-  searchQuery: string;
-  selectedLocation: string | null;
-  selectedType: 'online' | 'offline' | 'hybrid' | null;
-  startDate: Date | null;
-  endDate: Date | null;
-  submissionDate: Date | null; // Not used in this example. Keep if you use a submission date filter.
-  selectedRank: string | null;
-  selectedPublisher: string | null;  // Not used directly, kept for completeness
-  selectedSourceYear: string | null;
-  selectedAverageScore: string | null; // Not used directly, kept for completeness
-  selectedTopics: string[];
-  selectedFieldsOfResearch: string[];
-}
-type SortOption = 'date' | 'rank' | 'name' | 'submissionDate' | 'startDate' | 'endDate';
+interface ResultsSectionProps { }
 
+const ResultsSection: React.FC<ResultsSectionProps> = () => {
+  const {
+    sortedEvents,
+    totalItems,
+    eventsPerPage,
+    currentPage,
+    sortBy,
+    sortOrder,
+    paginate,
+    handleSortByChange,
+    handleSortOrderChange,
+    loading,
+    error,
+    // allEvents, //  useConferenceResults hook to return this.
+  } = useConferenceResults();
 
-const ResultsSection: React.FC<ResultsSectionProps> = ({
-  searchQuery, selectedLocation, selectedType, startDate, endDate,
-  submissionDate, selectedRank, selectedTopics, selectedFieldsOfResearch, selectedPublisher, selectedAverageScore, selectedSourceYear
-}) => {
+  const [viewType, setViewType] = useState<'card' | 'table'>('card');
 
-  const [events, setEvents] = useState<ConferenceInfo[]>([]); //  Store the filtered/sorted events directly
-  const [initialEvents, setInitialEvents] = useState<ConferenceInfo[]>([]); // Store *all* events, unfiltered
-  const [currentPage, setCurrentPage] = useState(1);
-  const eventsPerPage = 8;
-  const [sortBy, setSortBy] = useState<SortOption>('date'); // Default sort by date
-  const [totalItems, setTotalItems] = useState(0); //Total number of events
+  // --- ADDED: Function to generate CSV data ---
+  const generateCSVData = (events: ConferenceInfo[]): string => {
+    const header = [
+      'Title',
+      'Acronym',
+      'Start Date',
+      'End Date',
+      'Location',
+      'Rank',
+      'Access Type',
+      'Topics',
+      'Link',
+    ];
+    const csvRows = [header.join(',')];
 
+    events.forEach((event) => {
+      const location = `${event.location.cityStateProvince || ''}, ${event.location.country || ''}`;
+      const topics = event.topics.join('; ');
+      const startDate = event.dates.fromDate ? new Date(event.dates.fromDate).toLocaleDateString() : 'TBD';
+      const endDate = event.dates.toDate ? new Date(event.dates.toDate).toLocaleDateString() : 'TBD';
+      const rank = event.rankSourceFoRData?.rank || 'Unranked';
 
-  useEffect(() => {
-    async function getListConf() {
-      try {
-        const conferenceInfo = await getListConference();
-        setInitialEvents(conferenceInfo.payload); // Store *all* conferences here
-        setEvents(conferenceInfo.payload);  // Initially, filtered events are the same as all events
-        setTotalItems(conferenceInfo.meta.totalItems) // Set initial total item
-      } catch (err: any) {
-        console.error('Error updating conference data:', err);
-      }
-    }
-    getListConf();
-  }, []);
+      const row = [
+        `"${event.title.replace(/"/g, '""')}"`,
+        `"${event.acronym?.replace(/"/g, '""') || ''}"`,
+        `"${startDate}"`,
+        `"${endDate}"`,
+        `"${location.replace(/"/g, '""')}"`,
+        `"${rank}"`,
+        `"${event.accessType || ''}"`,
+        `"${topics.replace(/"/g, '""')}"`,
+        `"${event.link?.replace(/"/g, '""') || ''}"`,
+      ];
+      csvRows.push(row.join(','));
+    });
 
-
-   // Filtering and Sorting logic (inside a useCallback for performance)
-   const filterAndSortEvents = React.useCallback(() => {
-      if (!initialEvents) {
-        return []; // No initial data, return empty array
-      }
-
-      let filteredEvents = [...initialEvents];
-
-    // Apply filters (same as before, but using initialEvents)
-    if (searchQuery) {
-      filteredEvents = filteredEvents.filter(event =>
-        event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.acronym.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    if (selectedLocation) {
-      filteredEvents = filteredEvents.filter(event =>
-        event.location.country.toLowerCase().includes(selectedLocation.toLowerCase())
-      );
-    }
-
-    if (selectedType) {
-      filteredEvents = filteredEvents.filter(event =>
-        event.accessType.toLowerCase() === selectedType.toLowerCase() //convert selected type to lowercase
-      );
-    }
-
-    if (startDate) {
-      filteredEvents = filteredEvents.filter(event =>
-        event.dates.fromDate && new Date(event.dates.fromDate) >= startDate
-      );
-    }
-
-    if (endDate) {
-      filteredEvents = filteredEvents.filter(event =>
-        event.dates.toDate && new Date(event.dates.toDate) <= endDate
-      );
-    }
-    if (selectedRank) {
-      filteredEvents = filteredEvents.filter(event =>
-        event.rankSourceFoRData.rank === selectedRank  //  use rankSourceFoRData.rank
-      );
-    }
-
-    if (selectedSourceYear) {
-      filteredEvents = filteredEvents.filter(event =>
-        event.year === Number(selectedSourceYear)
-      );
-    }
-
-    if (selectedTopics && selectedTopics.length > 0) {
-      filteredEvents = filteredEvents.filter(event =>
-        event.topics.some(topic => selectedTopics.includes(topic))
-      );
-    }
-
-
-     if (selectedFieldsOfResearch && selectedFieldsOfResearch.length > 0) {
-        filteredEvents = filteredEvents.filter(event =>
-        // Check if event.rankSourceFoRData and event.rankSourceFoRData.researchFields exist
-            event.rankSourceFoRData?.researchFields.includes(selectedFieldsOfResearch.join(', '))
-        );
-     }
-
-
-    // Sorting (same as before, but operates on filteredEvents)
-    let sortedEvents = [...filteredEvents];
-    switch (sortBy) {
-      case 'rank':
-        sortedEvents.sort((a, b) => a.rankSourceFoRData.rank.localeCompare(b.rankSourceFoRData.rank)); // Use rankSourceFoRData
-        break;
-      case 'name':
-        sortedEvents.sort((a, b) => a.title.localeCompare(b.title));
-        break;
-      case 'startDate':
-      case 'date':
-        sortedEvents.sort((a, b) => {
-          const dateA = a.dates.fromDate ? new Date(a.dates.fromDate).getTime() : -Infinity;
-          const dateB = b.dates.fromDate ? new Date(b.dates.fromDate).getTime() : -Infinity;
-          return dateA - dateB;
-        });
-        break;
-      case 'endDate':
-        sortedEvents.sort((a, b) => {
-          const dateA = a.dates.toDate ? new Date(a.dates.toDate).getTime() : -Infinity;
-          const dateB = b.dates.toDate ? new Date(b.dates.toDate).getTime() : -Infinity;
-          return dateA - dateB;
-        });
-        break;
-    }
-
-      return sortedEvents;
-
-   }, [initialEvents, searchQuery, selectedLocation, selectedType, startDate, endDate, selectedRank, selectedTopics, selectedFieldsOfResearch, selectedSourceYear, sortBy]); // Dependencies for useCallback
-
-
-  //  Update 'events' and 'currentPage' whenever filters or sorting change
-  useEffect(() => {
-      const newFilteredEvents = filterAndSortEvents();
-      setEvents(newFilteredEvents);
-      setCurrentPage(1); // Reset to page 1 on filter/sort change
-      setTotalItems(newFilteredEvents.length); //update the total items
-  }, [filterAndSortEvents]); //  use the useCallback result as a dependency
-
-
-  const indexOfLastEvent = currentPage * eventsPerPage;
-  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
-  const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent); // Use the 'events' state (filtered/sorted)
-
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-
-  const handleSortByChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSortBy(event.target.value as SortOption);
+    return csvRows.join('\n');
   };
 
+  // --- ADDED: Function to handle CSV download ---
+  // const handleDownloadCSV = () => {
+  //   if (!allEvents) {
+  //     console.error("No events available to download.");
+  //     return;
+  //   }
+  //   const csvData = generateCSVData(allEvents);
+  //   const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+  //   const url = URL.createObjectURL(blob);
+  //   const link = document.createElement('a');
+  //   link.href = url;
+  //   link.setAttribute('download', 'conferences.csv');
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  //   URL.revokeObjectURL(url);
+  // };
 
-  if (!currentEvents || currentEvents.length === 0) {
-    return <p>Không tìm thấy hội nghị nào.</p>;
+
+  if (loading) {
+    return <div>Loading conferences...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">Error: {error}</div>;
   }
 
   return (
-    <div className="w-full pl-8">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-semibold">
-          Recommended for you ({totalItems})
+    <div className="bg-white p-4 rounded-lg shadow w-full">
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold mb-2 sm:mb-0">
+          Conference Results ({totalItems})
         </h2>
-        <div className="flex items-center rounded-md px-2 py-1">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-          </svg>
-          <span className="text-sm mr-1">Sort by:</span>
-          <select className="text-sm border rounded px-2 py-1 bg-transparent focus:outline-none" value={sortBy} onChange={handleSortByChange}>
-            <option value="date">Date</option>
-            <option value="rank">Rank</option>
-            <option value="name">Name</option>
-            <option value="startDate">Start Date</option>
-            <option value="endDate">End Date</option>
-          </select>
+
+        <div className="flex items-center space-x-2">
+          {/* Sort Controls */}
+          <div className="flex items-center space-x-2">
+            <label htmlFor="sort-by" className="mr-2 text-sm">Sort by:</label>
+            <select
+              id="sort-by"
+              className="border rounded px-2 py-1 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={sortBy}
+              onChange={handleSortByChange}
+              title="Select field to sort by"
+            >
+              <option value="date">Date</option>
+              <option value="rank">Rank</option>
+              <option value="name">Name</option>
+              <option value="startDate">Start Date</option>
+              <option value="endDate">End Date</option>
+            </select>
+
+            <button
+              onClick={handleSortOrderChange}
+              className="px-2 py-1 text-sm rounded bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              title={sortOrder === 'asc' ? 'Sort Ascending' : 'Sort Descending'}
+            >
+              {sortOrder === 'asc' ? (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#454545" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-up-narrow-wide"><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/><path d="M11 12h4"/><path d="M11 16h7"/><path d="M11 20h10"/></svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#454545" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-down-wide-narrow"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="M11 4h10"/><path d="M11 8h7"/><path d="M11 12h4"/></svg>
+              )}
+            </button>
+          </div>
+
+          {/* View Type Toggle */}
+          <button
+            onClick={() => setViewType((prev) => prev === 'card' ? 'table' : 'card')}
+            className="px-2 py-1 text-sm rounded bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            title={viewType === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
+          >
+            {viewType === 'card' ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#454545" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-sheet"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><line x1="3" x2="21" y1="9" y2="9" /><line x1="3" x2="21" y1="15" y2="15" /><line x1="9" x2="9" y1="9" y2="21" /><line x1="15" x2="15" y1="9" y2="21" /></svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#454545" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-layout-grid"><rect width="7" height="7" x="3" y="3" rx="1" /><rect width="7" height="7" x="14" y="3" rx="1" /><rect width="7" height="7" x="14" y="14" rx="1" /><rect width="7" height="7" x="3" y="14" rx="1" /></svg>)}
+          </button>
+
+          {/* --- ADDED: Download CSV Button --- */}
+          <button
+            // onClick={handleDownloadCSV}
+            className="px-2 py-1 text-sm rounded bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            title="Download CSV"
+          >
+             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#454545" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-file-down"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M12 18v-6" /><path d="m9 15 3 3 3-3" /></svg>
+          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {currentEvents.map((event) => (
-          <EventCard key={event.id} event={event} />
-        ))}
-      </div>
-
-      <Pagination
-        eventsPerPage={eventsPerPage}
-        totalEvents={totalItems}  // Use the total items
-        paginate={paginate}
-        currentPage={currentPage}
-      />
+      {sortedEvents.length > 0 ? (
+        <>
+          {viewType === 'card' ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {sortedEvents.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+          ) : (
+            <EventTable events={sortedEvents} />
+          )}
+          <div className="mt-4">
+            <Pagination
+              eventsPerPage={eventsPerPage}
+              totalEvents={totalItems}
+              paginate={paginate}
+              currentPage={currentPage}
+            />
+          </div>
+        </>
+      ) : (
+        <p>No conferences found matching your criteria.</p>
+      )}
     </div>
   );
 };

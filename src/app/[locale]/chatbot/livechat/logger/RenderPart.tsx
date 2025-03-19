@@ -1,5 +1,5 @@
 // RenderPart.tsx
-import React from "react";
+// import React from "react";
 import { Part } from "@google/generative-ai";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { vs2015 as dark } from "react-syntax-highlighter/dist/esm/styles/hljs";

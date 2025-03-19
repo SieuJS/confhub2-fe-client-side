@@ -31,7 +31,7 @@
       "Malaysia",
       "Maldives",
       "Mongolia",
-      "Myanmar (Burma)",
+      "Myanmar",
       "Nepal",
       "North Korea",
       "Oman",
@@ -50,7 +50,7 @@
       "Thailand",
       "Turkey",
       "Turkmenistan",
-      "United Arab Emirates (UAE)",
+      "United Arab Emirates",
       "Uzbekistan",
       "Vietnam",
       "Yemen",
@@ -80,7 +80,7 @@
       "Egypt",
       "Equatorial Guinea",
       "Eritrea",
-      "Eswatini (Swaziland)",
+      "Eswatini",
       "Ethiopia",
       "Gabon",
       "Gambia",
@@ -166,7 +166,7 @@
       "Sweden",
       "Switzerland",
       "Ukraine",
-      "United Kingdom (UK)",
+      "United Kingdom",
       "Vatican City"
     ]
   },
@@ -196,7 +196,7 @@
       "Saint Lucia",
       "Saint Vincent and the Grenadines",
       "Trinidad and Tobago",
-      "USA",
+      "United States",
       "Greenland",
       "Bermuda",
       "Cayman Islands",
@@ -262,7 +262,7 @@
       "Uruguay",
       "Venezuela",
       "French Guiana",
-      "Falkland Islands (Malvinas)",
+      "Falkland Islands",
       "South Georgia and the South Sandwich Islands"
     ]
   }
