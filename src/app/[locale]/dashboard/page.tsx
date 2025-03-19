@@ -113,7 +113,7 @@ export default function Setting({ locale }: { locale: string }) {
           strokeWidth='1.5'
           strokeLinecap='round'
           strokeLinejoin='round'
-          className='lucide lucide-circle-user-round'
+          className='lucide lucide-circle-user-round '
         >
           <path d='M18 20a6 6 0 0 0-12 0' />
           <circle cx='12' cy='10' r='4' />
