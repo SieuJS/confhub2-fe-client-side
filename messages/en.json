@@ -241,5 +241,13 @@
   "Login": "Login",
   "Register": "Register",
   "Logout": "Logout",
-  "Dashboard": "Dashboard"
+  "Dashboard": "Dashboard",
+  "Company": "Company",
+  "Copyrights": "Copyrights © 2025. All Rights Reserved.",
+  "Terms_of_Service": "By continuing past this page, you agree to our Terms of Service, Cookie Policy, Privacy Policy and Content Policies. All trademarks are properties of their respective owners",
+  "Australia": "Australia",
+  "Germany": "Germany",
+  "United_States": "United States",
+  "United_Kingdom": "United Kingdom",
+  "India": "India"
 }
