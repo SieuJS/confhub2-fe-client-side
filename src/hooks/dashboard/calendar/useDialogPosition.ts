@@ -1,14 +1,15 @@
 // useDialogPosition.ts
 import { useState, useCallback } from 'react';
-import useViewSwitching from './useViewSwitching'; // Import useViewSwitching
+// import useViewSwitching from './useViewSwitching'; // Import useViewSwitching
 
 const useDialogPosition = (
     calendarRef: React.RefObject<HTMLDivElement>,
     dialogRef: React.RefObject<HTMLDivElement>,
-    defaultDOMRect: DOMRect
+    defaultDOMRect: DOMRect,
+    view: string // Thêm view vào tham số
 ) => {
     const [dialogPosition, setDialogPosition] = useState({ x: 0, y: 0 });
-    const { view } = useViewSwitching(); // Get the current view
+    // const { view } = useViewSwitching(); // Get the current view
 
     const calculateDialogPosition = useCallback((targetRect: DOMRect) => {
         const calendarRect = calendarRef.current?.getBoundingClientRect() ?? defaultDOMRect;
@@ -17,15 +18,29 @@ const useDialogPosition = (
             if (dialogRef.current) {
                 const dialogWidth = dialogRef.current.offsetWidth;
                 const dialogHeight = dialogRef.current.offsetHeight;
-
+                
                 let x;
                 let y;
 
+                // console.log(view); // Log the current view
+
                 if (view === 'day') {
                     // --- DayView Specific Logic ---
-                    x = targetRect.left - calendarRect.left + (targetRect.width - dialogWidth) / 2;
-                    y = targetRect.top - calendarRect.top + (targetRect.height - dialogHeight) / 2;
+                    // Calculate the initial position, centered on the target
+                    x = targetRect.left - calendarRect.left + (targetRect.width / 2) - (dialogWidth / 2);
+                    y = targetRect.top - calendarRect.top + (targetRect.height / 2) - (dialogHeight / 2);
+
+                    // Adjust x-coordinate to ensure the dialog stays within the calendar bounds
+                    x = Math.max(0, x); // Ensure it doesn't go off the left edge
+                    x = Math.min(calendarRect.width - dialogWidth, x); // Ensure it doesn't go off the right edge
+
+                    // Adjust y-coordinate (optional, depends on your needs)
+                    y = Math.max(0, y);       // Keep dialog within top
+                    y = Math.min(calendarRect.height - dialogHeight, y); //Keep dialog with bottom
+                    y += 100; // Offset the dialog slightly from the center
+
                     // --- End DayView Logic ---
+                    
                 } else {
                     // --- Existing Month/Week Logic ---
                     const viewportWidth = window.innerWidth;
@@ -59,6 +74,7 @@ const useDialogPosition = (
                         y = targetRect.bottom - calendarRect.top;
                     }
                     // --- End Existing Logic ---
+                    
                 }
 
 

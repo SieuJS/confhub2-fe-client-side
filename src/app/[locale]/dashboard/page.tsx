@@ -119,7 +119,7 @@ export default function Setting({ locale }: { locale: string }) {
     },
     {
       page: 'My Conferences',
-      label: t('My Conferences'),
+      label: t('My_Conferences'),
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#525252" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-notebook-tabs"><path d="M2 6h4" /><path d="M2 10h4" /><path d="M2 14h4" /><path d="M2 18h4" /><rect width="16" height="20" x="4" y="2" rx="2" /><path d="M15 2v20" /><path d="M15 7h5" /><path d="M15 12h5" /><path d="M15 17h5" /></svg>
       )
@@ -150,37 +150,37 @@ export default function Setting({ locale }: { locale: string }) {
   // Toggle icons
   const openIcon = (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#525252"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="lucide lucide-align-justify"
+      xmlns='http://www.w3.org/2000/svg'
+      width='24'
+      height='24'
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='#525252'
+      strokeWidth='1.5'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      className='lucide lucide-align-justify'
     >
-      <path d="M3 12h18" />
-      <path d="M3 18h18" />
-      <path d="M3 6h18" />
+      <path d='M3 12h18' />
+      <path d='M3 18h18' />
+      <path d='M3 6h18' />
     </svg>
   )
   const closeIcon = (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#525252"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="lucide lucide-x"
+      xmlns='http://www.w3.org/2000/svg'
+      width='24'
+      height='24'
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='#525252'
+      strokeWidth='1.5'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      className='lucide lucide-x'
     >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
+      <path d='M18 6 6 18' />
+      <path d='m6 6 12 12' />
     </svg>
   )
 
@@ -200,10 +200,10 @@ export default function Setting({ locale }: { locale: string }) {
               fixed
               flex
               flex-col
+              bg-white
               transition-all
               duration-1000
               ease-in-out
-              bg-white
               ${isSidebarOpen ? 'w-50' : 'w-16'}
             `}
             style={{
@@ -218,17 +218,17 @@ export default function Setting({ locale }: { locale: string }) {
                   <button
                     onClick={toggleSidebar}
                     className={`
-                      flex
-                      items-center
-                      w-full
-                      px-4  
-                      py-2
-                      focus:outline-none
-                      transition-colors
                       duration-600
+                      flex
+                      w-full
+                      items-center  
+                      px-4
+                      py-2
+                      transition-colors
                       ease-in-out
                       hover:bg-button
                       hover:opacity-60
+                      focus:outline-none
                       active:bg-blue-700
                       ${isSidebarOpen ? 'justify-start' : 'justify-center'}
                     `}
@@ -241,7 +241,7 @@ export default function Setting({ locale }: { locale: string }) {
                   </button>
                 </li>
 
-                {menuItems.map((item) => {
+                {menuItems.map(item => {
                   const tabValue = item.page.toLowerCase().replace(/ /g, '')
                   return (
                     <li className='w-full' key={item.page}>
@@ -251,23 +251,25 @@ export default function Setting({ locale }: { locale: string }) {
                           query: { tab: tabValue }
                         }}
                         className={`
+                          duration-600
                           flex
-                          items-center
-                          px-4 
+                          items-center 
+                          px-4
                           py-2
+                          transition-colors
+                          ease-in-out
                           hover:bg-button
                           hover:opacity-60
                           focus:outline-none
-                          transition-colors
-                          duration-600
-                          ease-in-out
-                          ${activePage === item.page
-                            ? 'bg-button text-button-text hover:bg-secondary'
-                            : ''
+                          ${
+                            activePage === item.page
+                              ? 'bg-button text-button-text hover:bg-secondary'
+                              : ''
                           }
-                          ${isSidebarOpen
-                            ? 'h-12 w-50 justify-start'
-                            : 'h-12 w-16 justify-center'
+                          ${
+                            isSidebarOpen
+                              ? 'w-50 h-12 justify-start'
+                              : 'h-12 w-16 justify-center'
                           }
                         `}
                       >
@@ -287,10 +289,10 @@ export default function Setting({ locale }: { locale: string }) {
           {/* Main Content */}
           <div
             className={`
+              duration-50
               min-h-screen
               flex-1
               transition-all
-              duration-50
               ease-in-out
               ${isSidebarOpen ? 'ml-48' : 'ml-16'}
             `}
