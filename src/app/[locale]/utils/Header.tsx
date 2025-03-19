@@ -244,7 +244,7 @@ export const Header: FC<Props> = ({ locale }) => {
         <div className='flex flex-col gap-1 py-1'>
           <Link href='/dashboard' lang={locale} onClick={closeAllMenus}>
             <div className='block px-4 py-2 text-sm  hover:bg-gray-100 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-700'>
-              Bảng điều khiển
+              {t('Dashboard')}
             </div>
           </Link>
           <div className=' '>
@@ -271,7 +271,7 @@ export const Header: FC<Props> = ({ locale }) => {
               closeAllMenus()
             }}
           >
-            Đăng xuất
+            {t('Logout')}
           </button>
         </div>
       </div>

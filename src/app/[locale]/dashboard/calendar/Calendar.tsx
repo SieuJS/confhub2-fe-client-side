@@ -278,7 +278,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
 
   return (
     <section
-      className='relative rounded-md bg-white px-2 pt-2 shadow'
+      className='relative rounded-md bg-background px-2 pt-2 shadow'
       ref={calendarRef}
     >
       <div className='mb-2 flex items-center justify-between'>
@@ -289,7 +289,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
           >
             <button
               type='button'
-              className='inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+              className='inline-flex items-center justify-center rounded-md border border-background-secondary bg-background px-4 py-2 text-sm font-medium  shadow-sm hover:bg-background-secondary focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
               onClick={toggleViewOptions}
             >
               {view.charAt(0).toUpperCase() + view.slice(1)}
@@ -309,7 +309,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
             </button>
 
             <div
-              className={`absolute left-0 mt-2 w-24 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 ${showViewOptions ? '' : 'hidden'}`}
+              className={`absolute left-0 mt-2 w-24 origin-top-right rounded-md bg-background shadow-lg ring-1 ring-text-secondary ring-opacity-5 ${showViewOptions ? '' : 'hidden'}`}
             >
               <div
                 className='py-1'
@@ -322,7 +322,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                     setView('day')
                     toggleViewOptions()
                   }}
-                  className='block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                  className='block w-full px-4 py-2 text-left text-sm  hover:bg-background-secondary '
                   role='menuitem'
                 >
                   Day
@@ -332,7 +332,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                     setView('week')
                     toggleViewOptions()
                   }}
-                  className='block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                  className='block w-full px-4 py-2 text-left text-sm  hover:bg-background-secondary '
                   role='menuitem'
                 >
                   Week
@@ -342,7 +342,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                     setView('month')
                     toggleViewOptions()
                   }}
-                  className='block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                  className='block w-full px-4 py-2 text-left text-sm  hover:bg-background-secondary '
                   role='menuitem'
                 >
                   Month
@@ -353,10 +353,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
 
           {view === 'month' && (
             <>
-              <button
-                onClick={goToPreviousMonth}
-                className='rounded-full p-1 hover:bg-gray-200'
-              >
+              <button onClick={goToPreviousMonth} className='rounded-full p-1 '>
                 <svg
                   className='svg-inline--fa fa-arrow-left fa-w-14'
                   aria-hidden='true'
@@ -367,7 +364,11 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                   xmlns='http://www.w3.org/2000/svg'
                   viewBox='0 0 448 512'
                   data-fa-i2svg=''
-                  style={{ width: '14px', height: '14px', color: 'black' }}
+                  style={{
+                    width: '14px',
+                    height: '14px',
+                    color: 'var(--text-secondary)'
+                  }}
                 >
                   <path
                     fill='currentColor'
@@ -381,10 +382,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
               >
                 {monthNames[currentMonth]} {currentYear}
               </div>
-              <button
-                onClick={goToNextMonth}
-                className='rounded-full p-1 hover:bg-gray-200'
-              >
+              <button onClick={goToNextMonth} className='rounded-full p-1 '>
                 <svg
                   className='svg-inline--fa fa-arrow-right fa-w-14'
                   aria-hidden='true'
@@ -395,7 +393,11 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                   xmlns='http://www.w3.org/2000/svg'
                   viewBox='0 0 448 512'
                   data-fa-i2svg=''
-                  style={{ width: '14px', height: '14px', color: 'black' }}
+                  style={{
+                    width: '14px',
+                    height: '14px',
+                    color: 'var(--text-secondary)'
+                  }}
                 >
                   <path
                     fill='currentColor'
@@ -408,10 +410,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
 
           {view === 'day' && (
             <>
-              <button
-                onClick={goToPreviousDay}
-                className='rounded-full p-1 hover:bg-gray-200'
-              >
+              <button onClick={goToPreviousDay} className='rounded-full p-1 '>
                 <svg
                   className='svg-inline--fa fa-arrow-left fa-w-14'
                   aria-hidden='true'
@@ -422,7 +421,11 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                   xmlns='http://www.w3.org/2000/svg'
                   viewBox='0 0 448 512'
                   data-fa-i2svg=''
-                  style={{ width: '14px', height: '14px', color: 'black' }}
+                  style={{
+                    width: '14px',
+                    height: '14px',
+                    color: 'var(--text-secondary)'
+                  }}
                 >
                   <path
                     fill='currentColor'
@@ -437,10 +440,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                 {monthNames[currentMonth]} {currentDate.getDate()},{' '}
                 {currentYear}
               </div>
-              <button
-                onClick={goToNextDay}
-                className='rounded-full p-1 hover:bg-gray-200'
-              >
+              <button onClick={goToNextDay} className='rounded-full p-1 '>
                 <svg
                   className='svg-inline--fa fa-arrow-right fa-w-14'
                   aria-hidden='true'
@@ -451,7 +451,11 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                   xmlns='http://www.w3.org/2000/svg'
                   viewBox='0 0 448 512'
                   data-fa-i2svg=''
-                  style={{ width: '14px', height: '14px', color: 'black' }}
+                  style={{
+                    width: '14px',
+                    height: '14px',
+                    color: 'var(--text-secondary)'
+                  }}
                 >
                   <path
                     fill='currentColor'
@@ -464,10 +468,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
 
           {view === 'week' && (
             <>
-              <button
-                onClick={goToPreviousWeek}
-                className='rounded-full p-1 hover:bg-gray-200'
-              >
+              <button onClick={goToPreviousWeek} className='rounded-full p-1 '>
                 <svg
                   className='svg-inline--fa fa-arrow-left fa-w-14'
                   aria-hidden='true'
@@ -478,7 +479,11 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                   xmlns='http://www.w3.org/2000/svg'
                   viewBox='0 0 448 512'
                   data-fa-i2svg=''
-                  style={{ width: '14px', height: '14px', color: 'black' }}
+                  style={{
+                    width: '14px',
+                    height: '14px',
+                    color: 'var(--text-secondary)'
+                  }}
                 >
                   <path
                     fill='currentColor'
@@ -489,10 +494,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
               <div className='w-36 text-center text-lg font-semibold'>
                 Week {getWeek(currentDate)}, {currentYear}
               </div>
-              <button
-                onClick={goToNextWeek}
-                className='rounded-full p-1 hover:bg-gray-200'
-              >
+              <button onClick={goToNextWeek} className='rounded-full p-1 '>
                 <svg
                   className='svg-inline--fa fa-arrow-right fa-w-14'
                   aria-hidden='true'
@@ -503,7 +505,11 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                   xmlns='http://www.w3.org/2000/svg'
                   viewBox='0 0 448 512'
                   data-fa-i2svg=''
-                  style={{ width: '14px', height: '14px', color: 'black' }}
+                  style={{
+                    width: '14px',
+                    height: '14px',
+                    color: 'var(--text-secondary)'
+                  }}
                 >
                   <path
                     fill='currentColor'
@@ -521,13 +527,13 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
             placeholder='Search events...'
             value={searchText}
             onChange={e => setSearchText(e.target.value)}
-            className='rounded border p-2'
+            className='rounded border bg-background p-2'
           />
         </div>
 
         <button
           onClick={goToToday}
-          className='mx-2 rounded-md bg-gray-200 px-3 py-1 text-sm hover:bg-gray-300'
+          className='hover:bg-bakcground-secondary mx-2 rounded-md bg-background px-3 py-1 text-sm hover:bg-background-secondary'
         >
           Today
         </button>
@@ -536,7 +542,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
       {showDatePicker && (
         <div
           ref={datePickerRef}
-          className='absolute z-10 mt-2 rounded-md bg-white p-4 shadow-lg'
+          className='absolute z-10 mt-2 rounded-md bg-background p-4 shadow-lg hover:bg-background-secondary'
           style={{ top: '50px', left: '50px' }}
         >
           <div className='mb-2 flex items-center justify-between'>
@@ -549,10 +555,10 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                   prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1)
                 )
               }
-              className='rounded-full p-1 hover:bg-gray-200'
+              className='rounded-full p-1 '
             >
               <svg
-                className='h-4 w-4 text-gray-500'
+                className='h-4 w-4 '
                 fill='none'
                 stroke='currentColor'
                 viewBox='0 0 24 24'
@@ -572,10 +578,10 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                   prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1)
                 )
               }
-              className='rounded-full p-1 hover:bg-gray-200'
+              className='rounded-full p-1 '
             >
               <svg
-                className='h-4 w-4 text-gray-500'
+                className='0 h-4 w-4'
                 fill='none'
                 stroke='currentColor'
                 viewBox='0 0 24 24'
@@ -593,7 +599,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
 
           <div className='grid grid-cols-7 gap-1 text-center'>
             {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
-              <div key={day} className='text-xs font-medium text-gray-500'>
+              <div key={day} className='0 text-xs font-medium'>
                 {day}
               </div>
             ))}
@@ -618,7 +624,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                 return (
                   <div
                     key={dayNumber}
-                    className={`cursor-pointer rounded-full p-2 hover:bg-blue-200 ${isCurrentDay ? 'bg-blue-500 text-white' : ''}`}
+                    className={`cursor-pointer rounded-full p-2 hover:bg-blue-200 ${isCurrentDay ? 'bg-button ' : ''}`}
                     onClick={() => handleDateSelect(date)}
                   >
                     {dayNumber}

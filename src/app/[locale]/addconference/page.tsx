@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Header } from '../utils/Header'
 import Footer from '../utils/Footer'
 import { useRouter, usePathname } from 'next/navigation'
-import countryData from '../addconference/countries.json'; // Import the JSON data
+import countryData from '../addconference/countries.json' // Import the JSON data
 
 const API_ADD_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/conferences'
 const CSC_API_KEY = process.env.NEXT_PUBLIC_CSC_API_KEY
@@ -38,7 +38,7 @@ interface ImportantDateInput {
 interface Country {
   name: string
   iso2: string
-  region: string;
+  region: string
 }
 
 interface State {
@@ -49,11 +49,11 @@ interface State {
 }
 
 interface City {
-  name: string;
-  country_code: string;
-  state_code: string;
-  latitude: string;
-  longitude: string;
+  name: string
+  country_code: string
+  state_code: string
+  latitude: string
+  longitude: string
 }
 
 const AddConference = ({ locale }: { locale: string }) => {
@@ -78,13 +78,7 @@ const AddConference = ({ locale }: { locale: string }) => {
     }
   ])
 
-  const continentOptions = [
-    'Americas',
-    'Europe',
-    'Asia',
-    'Africa',
-    'Oceania',
-  ]
+  const continentOptions = ['Americas', 'Europe', 'Asia', 'Africa', 'Oceania']
 
   const dateTypeOptions = [
     'submissionDate',
@@ -103,7 +97,7 @@ const AddConference = ({ locale }: { locale: string }) => {
   const [cities, setCities] = useState<City[]>([])
   const [selectedCountry, setSelectedCountry] = useState<string>('')
   const [selectedState, setSelectedState] = useState<string>('')
-  const [selectedCity, setSelectedCity] = useState<string>('');
+  const [selectedCity, setSelectedCity] = useState<string>('')
   const [selectedContinent, setSelectedContinent] = useState<string>('')
   const [filteredCountries, setFilteredCountries] = useState<Country[]>([])
 
@@ -115,110 +109,117 @@ const AddConference = ({ locale }: { locale: string }) => {
     const mappedCountries: Country[] = countryData.map((c: any) => ({
       name: c.name,
       iso2: c.iso2,
-      region: c.region,
-    }));
-    setCountries(mappedCountries);
-  }, []);
-
+      region: c.region
+    }))
+    setCountries(mappedCountries)
+  }, [])
 
   // --- Filter Countries by Continent ---
   useEffect(() => {
     if (selectedContinent) {
       const newFilteredCountries = countries.filter(
         country => country.region === selectedContinent
-      );
-      setFilteredCountries(newFilteredCountries);
+      )
+      setFilteredCountries(newFilteredCountries)
     } else {
-      setFilteredCountries([]);
+      setFilteredCountries([])
     }
-    setSelectedCountry('');
-    setSelectedState('');
-    setSelectedCity('');
+    setSelectedCountry('')
+    setSelectedState('')
+    setSelectedCity('')
     setLocation({
       ...location,
       country: '',
       cityStateProvince: '',
       continent: selectedContinent
-    });
-  }, [selectedContinent, countries]);
+    })
+  }, [selectedContinent, countries])
 
   // --- Fetch States or Cities ---
-    useEffect(() => {
+  useEffect(() => {
     const fetchStatesOrCities = async () => {
-        if (!selectedCountry) {
-            setStates([]);
-            setCities([]);
-            return;
+      if (!selectedCountry) {
+        setStates([])
+        setCities([])
+        return
+      }
+
+      try {
+        // First, try fetching states
+        const statesResponse = await fetch(
+          `https://api.countrystatecity.in/v1/countries/${selectedCountry}/states`,
+          {
+            headers: {
+              'X-CSCAPI-KEY': CSC_API_KEY || ''
+            }
+          }
+        )
+
+        if (!statesResponse.ok) {
+          throw new Error(`State API Error: ${statesResponse.status}`)
         }
 
-        try {
-            // First, try fetching states
-            const statesResponse = await fetch(
-                `https://api.countrystatecity.in/v1/countries/${selectedCountry}/states`,
-                {
-                    headers: {
-                        'X-CSCAPI-KEY': CSC_API_KEY || ''
-                    }
-                }
-            );
-
-            if (!statesResponse.ok) {
-                throw new Error(`State API Error: ${statesResponse.status}`);
+        const statesData = await statesResponse.json()
+        if (statesData.length > 0) {
+          const mappedStates = statesData
+            .map((s: any) => ({
+              name: s.name,
+              iso2: s.iso2,
+              country_code: s.country_code,
+              state_code: s.state_code
+            }))
+            .sort((a: { name: string }, b: { name: any }) =>
+              a.name.localeCompare(b.name)
+            )
+          setStates(mappedStates)
+          setCities([])
+        } else {
+          setStates([])
+          // If no states are found, fetch cities
+          const citiesResponse = await fetch(
+            `https://api.countrystatecity.in/v1/countries/${selectedCountry}/cities`,
+            {
+              headers: {
+                'X-CSCAPI-KEY': CSC_API_KEY || ''
+              }
             }
+          )
 
-            const statesData = await statesResponse.json();
-            if (statesData.length > 0) {
-              const mappedStates = statesData.map((s: any) => ({
-                name: s.name,
-                iso2: s.iso2,
-                country_code: s.country_code,
-                state_code: s.state_code
-            })).sort((a: { name: string }, b: { name: any }) => a.name.localeCompare(b.name));
-            setStates(mappedStates);
-            setCities([]);
-            } else {
-                setStates([]);
-                // If no states are found, fetch cities
-                const citiesResponse = await fetch(
-                  `https://api.countrystatecity.in/v1/countries/${selectedCountry}/cities`,
-                  {
-                      headers: {
-                          'X-CSCAPI-KEY': CSC_API_KEY || ''
-                      }
-                  }
-                );
+          if (!citiesResponse.ok) {
+            throw new Error(`City API Error: ${citiesResponse.status}`)
+          }
 
-                if (!citiesResponse.ok) {
-                    throw new Error(`City API Error: ${citiesResponse.status}`);
-                }
-
-                const citiesData = await citiesResponse.json();
-                const mappedCities = citiesData.map((c: any) => ({
-                  name: c.name,
-                  country_code: c.country_code,
-                  state_code: c.state_code,
-                  latitude: c.latitude,
-                  longitude: c.longitude
-                }));
-                // Deduplicate cities by name
-                const uniqueCities = Array.from(new Set(mappedCities.map((city: { name: any }) => city.name)))
-                  .map(name => {
-                      return mappedCities.find((city: { name: unknown }) => city.name === name);
-                  }).sort((a: { name: string }, b: { name: any }) => a.name.localeCompare(b.name));
-                setCities(uniqueCities as City[]); // Cast to City[]
-
-
-            }
-        } catch (error) {
-            console.error('Error fetching states or cities:', error);
-            setStates([]);
-            setCities([]);
+          const citiesData = await citiesResponse.json()
+          const mappedCities = citiesData.map((c: any) => ({
+            name: c.name,
+            country_code: c.country_code,
+            state_code: c.state_code,
+            latitude: c.latitude,
+            longitude: c.longitude
+          }))
+          // Deduplicate cities by name
+          const uniqueCities = Array.from(
+            new Set(mappedCities.map((city: { name: any }) => city.name))
+          )
+            .map(name => {
+              return mappedCities.find(
+                (city: { name: unknown }) => city.name === name
+              )
+            })
+            .sort((a: { name: string }, b: { name: any }) =>
+              a.name.localeCompare(b.name)
+            )
+          setCities(uniqueCities as City[]) // Cast to City[]
         }
-    };
+      } catch (error) {
+        console.error('Error fetching states or cities:', error)
+        setStates([])
+        setCities([])
+      }
+    }
 
-    fetchStatesOrCities();
-}, [selectedCountry]);
-
+    fetchStatesOrCities()
+  }, [selectedCountry])
 
   const handleContinentChange = (continent: string) => {
     setSelectedContinent(continent)
@@ -227,7 +228,7 @@ const AddConference = ({ locale }: { locale: string }) => {
   const handleCountryChange = (countryIso2: string) => {
     setSelectedCountry(countryIso2)
     setSelectedState('')
-    setSelectedCity('');
+    setSelectedCity('')
     setLocation({
       ...location,
       country: filteredCountries.find(c => c.iso2 === countryIso2)?.name || '',
@@ -239,17 +240,18 @@ const AddConference = ({ locale }: { locale: string }) => {
     setSelectedState(stateCode)
     setLocation({
       ...location,
-      cityStateProvince: states.find(s => s.state_code === stateCode)?.name || ''
+      cityStateProvince:
+        states.find(s => s.state_code === stateCode)?.name || ''
     })
   }
 
   const handleCityChange = (cityName: string) => {
-    setSelectedCity(cityName);
+    setSelectedCity(cityName)
     setLocation({
-        ...location,
-        cityStateProvince: cityName,
-    });
-  };
+      ...location,
+      cityStateProvince: cityName
+    })
+  }
 
   const handleAddTopic = () => {
     if (newTopic.trim() !== '') {
@@ -355,8 +357,6 @@ const AddConference = ({ locale }: { locale: string }) => {
     }
   }
 
-  
-
   return (
     <>
       <Header locale={locale} />
@@ -374,7 +374,7 @@ const AddConference = ({ locale }: { locale: string }) => {
             <input
               type='text'
               id='title'
-              className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+              className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
               value={title}
               onChange={e => setTitle(e.target.value)}
               required
@@ -390,7 +390,7 @@ const AddConference = ({ locale }: { locale: string }) => {
               <input
                 type='text'
                 id='acronym'
-                className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+                className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                 value={acronym}
                 onChange={e => setAcronym(e.target.value)}
                 required
@@ -405,7 +405,7 @@ const AddConference = ({ locale }: { locale: string }) => {
               <input
                 type='url'
                 id='link'
-                className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+                className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                 value={link}
                 onChange={e => setLink(e.target.value)}
                 required
@@ -419,7 +419,7 @@ const AddConference = ({ locale }: { locale: string }) => {
               </label>
               <select
                 id='type'
-                className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+                className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                 value={type}
                 onChange={e =>
                   setType(e.target.value as 'offline' | 'online' | 'hybrid')
@@ -444,7 +444,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                 <input
                   type='text'
                   id='address'
-                  className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+                  className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                   value={location.address}
                   onChange={e =>
                     handleLocationChange('address', e.target.value)
@@ -460,7 +460,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                 </label>
                 <select
                   id='continent'
-                  className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+                  className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                   value={selectedContinent}
                   onChange={e => handleContinentChange(e.target.value)}
                   required
@@ -481,7 +481,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                 </label>
                 <select
                   id='country'
-                  className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+                  className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                   value={selectedCountry}
                   onChange={e => handleCountryChange(e.target.value)}
                   required
@@ -499,29 +499,34 @@ const AddConference = ({ locale }: { locale: string }) => {
               {/* --- State OR City Dropdown --- */}
               <div>
                 <label htmlFor='stateOrCity' className='block text-sm'>
-                    {cities.length > 0 ? 'City:' : 'State/Province:'}
+                  {cities.length > 0 ? 'City:' : 'State/Province:'}
                 </label>
                 <select
-                    id='stateOrCity'
-                    className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
-                    value={states.length > 0 ? selectedState : selectedCity}
-                    onChange={e => states.length > 0 ? handleStateChange(e.target.value): handleCityChange(e.target.value)}
-                    required
-                    disabled={!selectedCountry}
+                  id='stateOrCity'
+                  className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+                  value={states.length > 0 ? selectedState : selectedCity}
+                  onChange={e =>
+                    states.length > 0
+                      ? handleStateChange(e.target.value)
+                      : handleCityChange(e.target.value)
+                  }
+                  required
+                  disabled={!selectedCountry}
                 >
-                    <option value=''>Select {cities.length > 0 ? 'City:' : 'State/Province:'}</option>
-                    {states.length > 0
-                        ? states.map(state => (
-                            <option key={state.iso2} value={state.state_code}>
-                                {state.name}
-                            </option>
-                        ))
-                        : cities.map((city) => (
-                            <option key={city.name} value={city.name}>
-                                {city.name}
-                            </option>
-                        ))
-                    }
+                  <option value=''>
+                    Select {cities.length > 0 ? 'City:' : 'State/Province:'}
+                  </option>
+                  {states.length > 0
+                    ? states.map(state => (
+                        <option key={state.iso2} value={state.state_code}>
+                          {state.name}
+                        </option>
+                      ))
+                    : cities.map(city => (
+                        <option key={city.name} value={city.name}>
+                          {city.name}
+                        </option>
+                      ))}
                 </select>
               </div>
             </div>
@@ -543,7 +548,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                     onChange={e =>
                       handleDateChange(index, 'name', e.target.value)
                     }
-                    className={`mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm
+                    className={`mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm
                       ${index === 0 ? 'opacity-50' : ''}`}
                     required
                     readOnly={index === 0}
@@ -559,7 +564,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                     onChange={e =>
                       handleDateChange(index, 'type', e.target.value)
                     }
-                    className={`mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm ${
+                    className={`mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm ${
                       index === 0 ? 'pointer-events-none opacity-50' : ''
                     }`}
                     disabled={index === 0}
@@ -586,7 +591,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                     onChange={e =>
                       handleDateChange(index, 'fromDate', e.target.value)
                     }
-                    className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+                    className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                     required
                   />
                 </div>
@@ -604,7 +609,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                     onChange={e =>
                       handleDateChange(index, 'toDate', e.target.value)
                     }
-                    className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+                    className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                     required
                   />
                 </div>
@@ -635,18 +640,34 @@ const AddConference = ({ locale }: { locale: string }) => {
             <button
               type='button'
               onClick={addDate}
-              className='mt-2 rounded bg-indigo-500 px-4 py-2 font-bold text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+              className='mt-2 rounded bg-button px-4 py-2 font-bold text-button-text hover:bg-button focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
             >
               Add Date
             </button>
           </div>
 
           {/* Topics */}
-          <div className='sm:col-span-2'>
+          <div className='sm:col-span-1'>
             <label htmlFor='newTopic' className='block text-sm  '>
               Topics:
             </label>
             <div className='mt-1 items-center'>
+              <input
+                type='text'
+                id='newTopic'
+                value={newTopic}
+                onChange={e => setNewTopic(e.target.value)}
+                className='w-5/6 flex-1 rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+                placeholder='Add a topic'
+              />
+              <button
+                type='button'
+                onClick={handleAddTopic}
+                className='ml-3 rounded-md bg-button px-4 py-2 text-button-text hover:bg-button focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
+              >
+                Add
+              </button>
+
               <div className='mt-2'>
                 {topics.map((topic, index) => (
                   <span
@@ -664,26 +685,11 @@ const AddConference = ({ locale }: { locale: string }) => {
                   </span>
                 ))}
               </div>
-              <input
-                type='text'
-                id='newTopic'
-                value={newTopic}
-                onChange={e => setNewTopic(e.target.value)}
-                className='w-80 flex-1 rounded-l-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
-                placeholder='Add a topic'
-              />
-              <button
-                type='button'
-                onClick={handleAddTopic}
-                className='ml-3 rounded-r-md bg-indigo-500 px-4 py-2 text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
-              >
-                Add
-              </button>
             </div>
           </div>
 
           {/* Image URL */}
-          <div className='sm:col-span-2'>
+          <div className='sm:col-span-1'>
             <label htmlFor='imageUrl' className='block text-sm  '>
               Image URL:
             </label>
@@ -692,7 +698,7 @@ const AddConference = ({ locale }: { locale: string }) => {
               id='imageUrl'
               value={imageUrl}
               onChange={e => setImageUrl(e.target.value)}
-              className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+              className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
             />
           </div>
           {/* Description */}
@@ -705,16 +711,16 @@ const AddConference = ({ locale }: { locale: string }) => {
               value={description}
               onChange={e => setDescription(e.target.value)}
               rows={4}
-              className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+              className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
             />
           </div>
 
           {/* Submit Button */}
-          <div className='mt-6 '>
+          <div className='my-6 px-20 sm:col-span-2'>
             <button
               type='submit'
               onClick={handleSubmit}
-              className='w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm  text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+              className=' w-full items-center justify-center rounded-md border border-transparent bg-button px-4 py-2 text-sm text-button-text shadow-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
             >
               Add Conference
             </button>

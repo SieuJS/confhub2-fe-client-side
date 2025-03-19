@@ -94,166 +94,226 @@ const AddNoteDialog: React.FC<AddNoteDialogProps> = ({
       <>
         <h2 className='mb-4 text-lg font-semibold'>
           {event ? 'Edit Event' : ''}
+          {/* Added "Add Event" for clarity */}
         </h2>
 
-        <div className='mb-4'>
+        <div className='relative mb-4 font-bold'>
           <input
             type='text'
             placeholder='Add title'
             value={title}
             onChange={e => setTitle(e.target.value)}
-            className='w-full py-2 placeholder-text-secondary focus:border-b-2 focus:border-background-secondary focus:outline-none'
+            className='w-full bg-background py-2 placeholder-secondary focus:border-b-2 focus:border-background-secondary focus:outline-none'
           />
         </div>
 
-        <div className='mb-4 flex'>
-          <button
-            className={`rounded-l-md px-4 py-2 ${eventType === 'Event' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-            onClick={() => setEventType('Event')}
-          >
-            Event
-          </button>
-          <button
-            className={`px-4 py-2 ${eventType === 'Task' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-            onClick={() => setEventType('Task')}
-          >
-            Task
-          </button>
-          <button
-            className={`rounded-r-md px-4 py-2 ${eventType === 'Appointment' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-            onClick={() => setEventType('Appointment')}
-          >
-            Appointment schedule
-          </button>
-        </div>
-
-        <div className='mb-4'>
-          <div className='mb-2'>{formattedDate}</div>
-          <div className='flex items-center'>
-            <div className='relative' ref={startTimeRef}>
-              <input
-                type='text'
-                placeholder='Start Time'
-                value={startTime}
-                onClick={() => setShowStartTimeDropdown(!showStartTimeDropdown)}
-                readOnly // Important: Prevent keyboard input
-                className='mr-2 w-24 cursor-pointer px-3 py-2 focus:border-b focus:outline-none focus:ring-2 focus:ring-blue-500'
-                disabled={allDay}
-              />
-              {showStartTimeDropdown && (
-                <div className='absolute z-10 max-h-40 w-24 overflow-y-auto rounded border bg-white shadow-md'>
-                  {timeOptions.map(time => (
-                    <div
-                      key={time}
-                      className='cursor-pointer px-3 py-1 hover:bg-gray-100'
-                      onClick={() => {
-                        setStartTime(time)
-                        setShowStartTimeDropdown(false)
-                      }}
-                    >
-                      {time}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <span>to</span>
-            <div className='relative ml-2' ref={endTimeRef}>
-              <input
-                type='text'
-                placeholder='End Time'
-                value={endTime}
-                onClick={() => setShowEndTimeDropdown(!showEndTimeDropdown)}
-                readOnly // Prevent keyboard input
-                className='ml-2 w-24 cursor-pointer px-3 py-2 focus:border-b focus:outline-none focus:ring-2 focus:ring-blue-500'
-                disabled={allDay}
-              />
-              {showEndTimeDropdown && (
-                <div className='absolute z-10 max-h-40 w-24 overflow-y-auto rounded border bg-white shadow-md'>
-                  {timeOptions.map(time => (
-                    <div
-                      key={time}
-                      className='cursor-pointer px-3 py-1 hover:bg-gray-100'
-                      onClick={() => {
-                        setEndTime(time)
-                        setShowEndTimeDropdown(false)
-                      }}
-                    >
-                      {time}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <label className='ml-4 flex items-center'>
-              <input
-                type='checkbox'
-                checked={allDay}
-                onChange={e => setAllDay(e.target.checked)}
-                className='mr-2'
-              />
-              All Day
-            </label>
+        <div className='mb-4 flex items-center text-sm'>
+          <div className='mr-4 '>{formattedDate}</div>
+          {/* <div className='flex items-center'> */}
+          <div className='relative' ref={startTimeRef}>
+            <input
+              type='text'
+              placeholder='Start Time'
+              value={startTime}
+              onClick={() => setShowStartTimeDropdown(!showStartTimeDropdown)}
+              readOnly // Important: Prevent keyboard input
+              className='mr-1 w-16 cursor-pointer bg-background py-2 text-center text-sm  placeholder-text-secondary focus:border-b focus:outline-none focus:ring-2 focus:ring-button'
+              disabled={allDay}
+            />
+            {/* Start Time Icon */}
+            {/* <svg
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 24 24'
+                strokeWidth={1.5}
+                stroke='currentColor'
+                className='absolute left-1 top-2.5 h-5 w-5 '
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  d='M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'
+                />
+              </svg> */}
+            {showStartTimeDropdown && (
+              <div className='absolute z-10 max-h-40 w-20 overflow-y-auto rounded border bg-background text-sm shadow-md scrollbar-none'>
+                {timeOptions.map(time => (
+                  <div
+                    key={time}
+                    className='cursor-pointer px-3 py-1 hover:bg-gray-100'
+                    onClick={() => {
+                      setStartTime(time)
+                      setShowStartTimeDropdown(false)
+                    }}
+                  >
+                    {time}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
+          <span>-</span>
+          <div className='relative ml-2' ref={endTimeRef}>
+            <input
+              type='text'
+              placeholder='End Time'
+              value={endTime}
+              onClick={() => setShowEndTimeDropdown(!showEndTimeDropdown)}
+              readOnly // Prevent keyboard input
+              className='ml-1 w-16 cursor-pointer bg-background py-2 text-center text-sm placeholder-text-secondary focus:border-b focus:outline-none focus:ring-2 focus:ring-button'
+              disabled={allDay}
+            />
 
-        {/* ... (rest of the component remains the same) ... */}
-        <div className='mb-4'>
+            {showEndTimeDropdown && (
+              <div className='absolute z-10 max-h-40 w-20 overflow-y-auto rounded border bg-background shadow-md scrollbar-none'>
+                {timeOptions.map(time => (
+                  <div
+                    key={time}
+                    className=' cursor-pointer px-3 py-1 '
+                    onClick={() => {
+                      setEndTime(time)
+                      setShowEndTimeDropdown(false)
+                    }}
+                  >
+                    {time}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <label className='ml-4 flex items-center'>
+            <input
+              type='checkbox'
+              checked={allDay}
+              onChange={e => setAllDay(e.target.checked)}
+              className='mr-2 h-4 w-4  bg-background' // Added h-4 w-4 for better checkbox size
+            />
+            All Day
+          </label>
+        </div>
+        {/* </div> */}
+
+        {/* Guests */}
+        <div className='relative mb-4 flex items-center text-sm'>
+          {/* Guests Icon */}
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            fill='none'
+            viewBox='0 0 24 24'
+            strokeWidth={1.5}
+            stroke='currentColor'
+            className='mr-2 h-5 w-5 '
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              d='M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z'
+            />
+          </svg>
           {showGuestsInput ? (
             <input
               type='text'
-              placeholder='Enter guest names (comma-separated)'
+              placeholder='Add guests'
               value={guests}
               onChange={e => setGuests(e.target.value)}
-              className='w-full py-2 placeholder-text-secondary focus:border-b-2 focus:border-background-secondary focus:outline-none'
+              className='w-full bg-background py-2 placeholder-text-secondary focus:border-b-2 focus:border-background-secondary focus:outline-none'
               onBlur={() => setShowGuestsInput(false)}
               autoFocus
             />
           ) : (
-            <div onClick={() => setShowGuestsInput(true)}>Add guests</div>
-          )}
-        </div>
-
-        <div className='mb-4'>
-          {showMeetInput ? (
-            <input
-              type='text'
-              placeholder='Enter Google Meet link'
-              value={meetLink}
-              onChange={e => setMeetLink(e.target.value)}
-              className='w-full py-2 placeholder-text-secondary focus:border-b-2 focus:border-background-secondary focus:outline-none'
-              onBlur={() => setShowMeetInput(false)}
-              autoFocus
-            />
-          ) : (
-            <div onClick={() => setShowMeetInput(true)}>
-              Add Google Meet video conferencing
+            <div
+              className='flex cursor-pointer items-center py-2'
+              onClick={() => setShowGuestsInput(true)}
+            >
+              Add guests
             </div>
           )}
         </div>
 
-        <div className='mb-4'>
+        {/* Google Meet */}
+        <div className='relative mb-4 flex items-center text-sm'>
+          {/* Google Meet Icon */}
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            viewBox='0 0 24 24'
+            fill='currentColor'
+            className='mr-2 h-5 w-5 '
+          >
+            <path
+              fillRule='evenodd'
+              d='M1.5 7.125c0-1.036.84-1.875 1.875-1.875h6c1.036 0 1.875.84 1.875 1.875V9h-9.75V7.125ZM4.125 11.25h17.25c1.035 0 1.875.84 1.875 1.875v6c0 1.036-.84 1.875-1.875 1.875h-17.25A1.875 1.875 0 0 1 2.25 19.125v-6c0-1.035.84-1.875 1.875-1.875Zm6 3.75a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75Zm3-.75a.75.75 0 0 0-1.5 0v1.5a.75.75 0 0 0 1.5 0v-1.5Zm4.5.75a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75Zm-9-3a.75.75 0 0 0-1.5 0v1.5a.75.75 0 0 0 1.5 0v-1.5Zm3-.75a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75Zm4.5.75a.75.75 0 0 0-1.5 0v1.5a.75.75 0 0 0 1.5 0v-1.5Z'
+              clipRule='evenodd'
+            />
+          </svg>
+          {showMeetInput ? (
+            <input
+              type='text'
+              placeholder='Add Google Meet '
+              value={meetLink}
+              onChange={e => setMeetLink(e.target.value)}
+              className='w-full bg-background py-2 placeholder-text-secondary focus:border-b-2 focus:border-background-secondary focus:outline-none'
+              onBlur={() => setShowMeetInput(false)}
+              autoFocus
+            />
+          ) : (
+            <div
+              className='flex cursor-pointer items-center py-2'
+              onClick={() => setShowMeetInput(true)}
+            >
+              Add Google Meet
+            </div>
+          )}
+        </div>
+
+        {/* Location */}
+        <div className='relative mb-4 flex items-center text-sm'>
+          {/* Location Icon */}
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            fill='none'
+            viewBox='0 0 24 24'
+            strokeWidth={1.5}
+            stroke='currentColor'
+            className='mr-2 h-5 w-5 '
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              d='M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'
+            />
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              d='M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z'
+            />
+          </svg>
           {showLocationInput ? (
             <input
               type='text'
-              placeholder='Enter location'
+              placeholder='Add location'
               value={location}
               onChange={e => setLocation(e.target.value)}
-              className='w-full py-2 placeholder-text-secondary focus:border-b-2 focus:border-background-secondary focus:outline-none'
+              className='w-full bg-background py-2 placeholder-text-secondary focus:border-b-2 focus:border-background-secondary focus:outline-none'
               onBlur={() => setShowLocationInput(false)}
               autoFocus
             />
           ) : (
-            <div onClick={() => setShowLocationInput(true)}>Add location</div>
+            <div
+              className='flex cursor-pointer items-center py-2'
+              onClick={() => setShowLocationInput(true)}
+            >
+              Add location
+            </div>
           )}
         </div>
 
-        <div className='mb-4'>
+        {/* Description */}
+        <div className='relative mb-4 text-sm'>
           <textarea
             placeholder='Add description'
             value={description}
             onChange={e => setDescription(e.target.value)}
-            className='w-full  py-2 placeholder-text-secondary focus:border-b-2 focus:border-background-secondary focus:outline-none'
+            className='w-full bg-background py-2  placeholder-text-secondary focus:border-b-2 focus:border-background-secondary focus:outline-none'
           />
         </div>
 
@@ -266,14 +326,9 @@ const AddNoteDialog: React.FC<AddNoteDialogProps> = ({
               Delete
             </button>
           )}
+
           <button
-            className='px-4 py-2  hover:underline'
-            //onClick={onMoreOptions}
-          >
-            More options
-          </button>
-          <button
-            className='ml-2 rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600'
+            className='ml-2 rounded-md bg-button px-4 py-2 text-button-text '
             onClick={handleSaveWithTimes} // Use the new save function
             disabled={!title}
           >
@@ -354,11 +409,8 @@ const AddNoteDialog: React.FC<AddNoteDialogProps> = ({
   }
 
   return (
-    <div className='relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl'>
-      <button
-        className='absolute right-2 top-2 text-gray-600 hover:text-gray-800'
-        onClick={onClose}
-      >
+    <div className='relative w-full max-w-md rounded-lg bg-background p-6 shadow-xl'>
+      <button className='absolute right-2 top-2' onClick={onClose}>
         <svg
           className='h-6 w-6'
           fill='none'
