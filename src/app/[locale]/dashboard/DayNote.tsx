@@ -3,30 +3,36 @@ import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { ConferenceResponse } from '../../../models/response/conference.response'; // Adjust path as needed
 import { getConference } from '../../../api/getConference/getConferenceDetails';
+import AddNoteDialog from './calendar/AddNoteDialog'; // Import the new component
+
 
 export interface CalendarEvent {
   day: number;
   month: number;
   year: number;
+  startHour?: number;
+  startMinute?: number;
   type: string;
   conference: string;
   conferenceId: string; // Add conferenceId
+  title?: string; // Add title property
 }
 
 interface DayNoteProps {
   date: Date;
   events: CalendarEvent[];
   onClose: () => void;
+  onAddEvent?: (newEvent: CalendarEvent) => void; // New prop for adding events
 }
 
-const DayNote: React.FC<DayNoteProps> = ({ date, events, onClose }) => {
+const DayNote: React.FC<DayNoteProps> = ({ date, events, onClose, onAddEvent }) => {
   const dayOfWeekNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const dayName = dayOfWeekNames[date.getDay()];
   const dateString = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;
   const dialogRef = useRef<HTMLDivElement>(null);
-  const [isAddingNote, setIsAddingNote] = useState(false);
   const [selectedEventDetail, setSelectedEventDetail] = useState<ConferenceResponse | null>(null);
   const [loadingDetails, setLoadingDetails] = useState(false); // Loading state
+  const [showAddNoteDialog, setShowAddNoteDialog] = useState(false); // State for showing the AddNoteDialog
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -41,13 +47,7 @@ const DayNote: React.FC<DayNoteProps> = ({ date, events, onClose }) => {
     };
   }, [onClose]);
 
-  const handleAddNoteClick = () => {
-    setIsAddingNote(true);
-    setSelectedEventDetail(null);
-  };
-
   const handleBackToList = () => {
-    setIsAddingNote(false);
     setSelectedEventDetail(null);
   };
 
@@ -57,10 +57,8 @@ const DayNote: React.FC<DayNoteProps> = ({ date, events, onClose }) => {
         setLoadingDetails(true); // Start loading
         const conferenceDetails = await getConference(event.conferenceId); // Fetch
         setSelectedEventDetail(conferenceDetails);
-        setIsAddingNote(false);
       } catch (error) {
         console.error("Failed to fetch conference details:", error);
-        // Handle the error, maybe set an error state and display a message.
         setSelectedEventDetail(null);
       } finally {
           setLoadingDetails(false);
@@ -76,6 +74,23 @@ const DayNote: React.FC<DayNoteProps> = ({ date, events, onClose }) => {
     onClose();
   };
 
+  const handleAddNoteClick = () => {
+        setShowAddNoteDialog(true); // Show the AddNoteDialog
+    };
+   const handleSaveNote = (title: string, eventType: 'Event' | 'Task' | 'Appointment') => {
+        const newEvent: CalendarEvent = {
+            day: date.getDate(),
+            month: date.getMonth() + 1, // Month is 0-indexed
+            year: date.getFullYear(),
+            type: eventType, // Or however you categorize notes
+            conference: '', //  conference name for custom notes
+            conferenceId: '', //conferenceId for custom note
+            title: title
+        };
+        onAddEvent && onAddEvent(newEvent);
+        console.log('Saving note:', title); // Placeholder: Replace with actual save logic
+
+    };
   const renderEventList = () => {
     return (
       <>
@@ -90,6 +105,12 @@ const DayNote: React.FC<DayNoteProps> = ({ date, events, onClose }) => {
               onClick={() => handleEventClick(event)}
             >
               <div>
+                {/*Display title, if have*/}
+                {event.title && (
+                    <div className="text-gray-700 text-sm">
+                      <span className="font-medium mr-2">Title:</span> {event.title}
+                    </div>
+                  )}
                 <div className="flex text-gray-700 text-sm">
                   <span className="font-medium mr-2">Date type:</span> {event.type}
                 </div>
@@ -104,14 +125,14 @@ const DayNote: React.FC<DayNoteProps> = ({ date, events, onClose }) => {
               </button>
             </li>
           ))}
-          {events.length === 0 && !isAddingNote && (
+          {events.length === 0 && (
             <li className="py-2 text-center text-gray-500">
               No events for this day.
             </li>
           )}
         </ul>
-        {!isAddingNote && !selectedEventDetail && (
-          <div className="mt-4 flex justify-end">
+        {/*Add button + */}
+         <div className="mt-4 flex justify-end">
             <button
               onClick={handleAddNoteClick}
               className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
@@ -119,7 +140,6 @@ const DayNote: React.FC<DayNoteProps> = ({ date, events, onClose }) => {
               +
             </button>
           </div>
-        )}
       </>
     );
   };
@@ -177,21 +197,6 @@ const DayNote: React.FC<DayNoteProps> = ({ date, events, onClose }) => {
     );
   };
 
-  const renderAddNoteView = () => {
-    // Placeholder for adding custom notes functionality (future implementation)
-    return (
-      <div>
-        <h3 className="text-lg font-semibold mb-2">Add New Note for {dateString}</h3>
-        <textarea className="w-full h-32 border p-2 rounded mb-4" placeholder="Enter your note here"></textarea>
-        <div className="flex justify-end gap-2">
-          <button onClick={handleBackToList} className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
-            Back
-          </button>
-          <button className="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-700">Add</button>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
@@ -205,7 +210,15 @@ const DayNote: React.FC<DayNoteProps> = ({ date, events, onClose }) => {
           </button>
         </div>
 
-        {isAddingNote ? renderAddNoteView() : selectedEventDetail ? renderEventDetail() : renderEventList()}
+         {selectedEventDetail ? renderEventDetail() : renderEventList()}
+        {/* Conditionally render AddNoteDialog */}
+        {showAddNoteDialog && (
+          <AddNoteDialog
+            date={date}
+            onClose={() => setShowAddNoteDialog(false)}
+            onSave={handleSaveNote}
+          />
+        )}
       </div>
     </div>
   );

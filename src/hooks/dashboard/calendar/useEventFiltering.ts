@@ -1,34 +1,50 @@
-// hooks/useEventFiltering.ts
-import { useState, useEffect, useCallback } from 'react';
-import { CalendarEvent } from '../../../app/[locale]/dashboard/DayNote';
+import { useState, useEffect } from 'react';
+import { CalendarEvent } from '../../../app/[locale]/dashboard/DayNote'; // Adjust path
 
-interface EventFilteringResult {
-  searchText: string;
-  setSearchText: (text: string) => void;
-  filteredEvents: CalendarEvent[];
-    getDayEvents: (day: number, month?: number, year?: number) => CalendarEvent[];
-}
-
-const useEventFiltering = (calendarEvents: CalendarEvent[]): EventFilteringResult => {
+const useEventFiltering = (initialDate: Date) => {
   const [searchText, setSearchText] = useState('');
-  const [filteredEvents, setFilteredEvents] = useState<CalendarEvent[]>(calendarEvents);
+  const [currentDate, setCurrentDate] = useState(initialDate);
 
-    const getDayEvents = useCallback((day: number, month: number = new Date().getMonth() + 1, year: number = new  Date().getFullYear()): CalendarEvent[] => {
-        return filteredEvents.filter(
-          event => event.day === day && event.month === month && event.year === year
-        );
-    },[filteredEvents]);
+    useEffect(() => {
+      // This effect ONLY handles jumping to the closest date.
+      // It NO LONGER handles filtering.
+    if (searchText.length > 0) {
+        // The filtering logic now happens OUTSIDE this hook.
+        // This effect needs to run AFTER filtering, so we use a timeout.
+        // This is a workaround, and a better solution might involve
+        // coordinating the search and date jumping more tightly.
+        setTimeout(() => { // Use a timeout
+          const events = JSON.parse(localStorage.getItem('calendarEvents') || '[]')  as CalendarEvent[];
+          const lowerCaseSearchText = searchText.toLowerCase();
+          const filtered: CalendarEvent[] = events.filter(event =>
+            (event.conference && event.conference.toLowerCase().includes(lowerCaseSearchText)) ||
+            (event.type && event.type.toLowerCase().includes(lowerCaseSearchText)) ||
+            (event.title && event.title.toLowerCase().includes(lowerCaseSearchText)) // Include title
+            );
 
-  useEffect(() => {
-    const lowerCaseSearchText = searchText.toLowerCase();
-    const filtered = calendarEvents.filter(event =>
-      event.conference.toLowerCase().includes(lowerCaseSearchText) ||
-      event.type.toLowerCase().includes(lowerCaseSearchText)
-    );
-    setFilteredEvents(filtered);
-  }, [searchText, calendarEvents]);
+            if (filtered.length > 0)
+            {
+                let closestEvent = filtered[0];
+                let closestDiff = Math.abs(new Date(closestEvent.year, closestEvent.month - 1, closestEvent.day).getTime() - currentDate.getTime());
 
-  return { searchText, setSearchText, filteredEvents, getDayEvents };
+                for (let i = 1; i < filtered.length; i++) {
+                    const eventDate = new Date(filtered[i].year, filtered[i].month - 1, filtered[i].day);
+                    const diff = Math.abs(eventDate.getTime() - currentDate.getTime());
+                    if (diff < closestDiff) {
+                        closestDiff = diff;
+                        closestEvent = filtered[i];
+                    }
+                }
+
+                const eventDate = new Date(closestEvent.year, closestEvent.month - 1, closestEvent.day);
+                setCurrentDate(eventDate);
+            }
+        }, 0);
+
+    }
+  }, [searchText, currentDate]); // Keep currentDate here
+
+  return { searchText, setSearchText, currentDate, setCurrentDate };
 };
 
 export default useEventFiltering;

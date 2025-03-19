@@ -1,7 +1,7 @@
 // NoteTab.tsx
 import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
-import Calendar from './Calendar';
+import Calendar from './calendar/Calendar';
 import { CalendarEvent } from './DayNote';
 import { ConferenceResponse } from '../../../models/response/conference.response';
 import { getConference } from '../../../api/getConference/getConferenceDetails';
