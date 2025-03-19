@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Calendar from './calendar/Calendar';
-import { CalendarEvent } from './DayNote';
+import { CalendarEvent } from './calendar/Calendar';
 import { ConferenceResponse } from '../../../models/response/conference.response';
 import { getConference } from '../../../api/getConference/getConferenceDetails';
 import { Link } from '@/src/navigation';
@@ -201,6 +201,7 @@ const NoteTab: React.FC<NoteTabProps> = () => {
 
     return (
         <div className="flex flex-col h-full p-4 bg-gray-100">
+
             <div className="flex flex-col lg:flex-row gap-4 mb-4">
                 <section className="lg:w-5/6 bg-white rounded-md shadow p-4">
                     <h2 className="text-lg font-semibold mb-2">Upcoming Notes</h2>

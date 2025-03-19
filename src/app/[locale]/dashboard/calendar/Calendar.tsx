@@ -1,13 +1,39 @@
-import React, { useMemo, useRef, useEffect, useState } from 'react';
-import DayNote, { CalendarEvent } from '../DayNote';
+import React, { useMemo, useRef, useEffect, useState, useCallback } from 'react';
 import MonthView from './MonthView';
 import WeekView from './WeekView';
 import DayView from './DayView';
 import useDateNavigation from '../../../../hooks/dashboard/calendar/useDateNavigation';
-import useEventFiltering from '../../../../hooks/dashboard/calendar/useEventFiltering'; // Simplified hook
-import useDialogControl from '../../../../hooks/dashboard/calendar/useDialogControl';
+import useEventFiltering from '../../../../hooks/dashboard/calendar/useEventFiltering';
 import useDatePickerControl from '../../../../hooks/dashboard/calendar/useDatePickerControl';
 import useViewSwitching from '../../../../hooks/dashboard/calendar/useViewSwitching';
+import AddNoteDialog from './AddNoteDialog';
+import { ConferenceResponse } from '../../../../models/response/conference.response';
+import { getConference } from '../../../../api/getConference/getConferenceDetails';
+import useDialogPosition from '../../../../hooks/dashboard/calendar/useDialogPosition'; 
+
+const DEFAULT_DOM_RECT: DOMRect = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    toJSON: () => { }
+};
+
+export interface CalendarEvent {
+    day: number;
+    month: number;
+    year: number;
+    startHour?: number;
+    startMinute?: number;
+    type: string;
+    conference: string;
+    conferenceId: string;
+    title?: string;
+}
 
 interface CalendarProps {
     calendarEvents: CalendarEvent[];
@@ -17,9 +43,6 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
     const dateNavigation = useDateNavigation();
     const { currentDate, setCurrentDate, goToPreviousMonth, goToNextMonth, goToPreviousDay, goToNextDay, goToPreviousWeek, goToNextWeek, goToToday, getWeek, getDaysInMonth, getFirstDayOfMonth } = dateNavigation;
 
-    const dialogControl = useDialogControl();
-    const { isDialogOpen, selectedDate, openDialogForDay, closeDialog, setSelectedDate } = dialogControl;
-
     const datePickerControl = useDatePickerControl();
     const { showDatePicker, toggleDatePicker, datePickerRef, setShowDatePicker } = datePickerControl;
 
@@ -27,15 +50,14 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
     const { view, setView, showViewOptions, toggleViewOptions, viewOptionsRef, scrollToDate } = viewSwitching;
 
     const calendarRef = useRef<HTMLDivElement>(null);
+
     const currentMonth = currentDate.getMonth();
     const currentYear = currentDate.getFullYear();
     const [highlightedDate, setHighlightedDate] = useState<Date | null>(null);
     const [allEvents, setAllEvents] = useState<CalendarEvent[]>(calendarEvents);
 
-    // Get searchText and setSearchText from useEventFiltering
-    const { searchText, setSearchText } = useEventFiltering(currentDate); // Simplified usage
+    const { searchText, setSearchText } = useEventFiltering(currentDate);
 
-      // Use useMemo for filtering *inside* Calendar.tsx
     const filteredEvents = useMemo(() => {
         const lowerCaseSearchText = searchText.toLowerCase();
         return allEvents.filter(event =>
@@ -45,59 +67,136 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
         );
     }, [searchText, allEvents]);
 
-
-    // Function to get day events, now using the *correct* filteredEvents
-    const getDayEvents = (day: number, month: number = currentDate.getMonth() + 1, year: number = currentDate.getFullYear()): CalendarEvent[] => {
+    const getDayEvents = useCallback((day: number, month: number = currentDate.getMonth() + 1, year: number = currentDate.getFullYear()): CalendarEvent[] => {
         return filteredEvents.filter(event => event.day === day && event.month === month && event.year === year);
-    };
+    }, [filteredEvents, currentDate]);  // Correct dependencies
 
-    const typeColors = useMemo(() => {
-        return {
-            conferenceDates: 'bg-teal-500',
-            submissionDate: 'bg-red-500',
-            notificationDate: 'bg-blue-500',
-            cameraReadyDate: 'bg-orange-500',
-            registrationDate: 'bg-cyan-500',
-        };
-    }, []);
+    const typeColors = useMemo(() => ({
+        conferenceDates: 'bg-teal-500',
+        submissionDate: 'bg-red-500',
+        notificationDate: 'bg-blue-500',
+        cameraReadyDate: 'bg-orange-500',
+        registrationDate: 'bg-cyan-500',
+    }), []);
 
-    const getEventTypeColor = (type: string) => {
+    const getEventTypeColor = useCallback((type: string) => {
         return typeColors[type as keyof typeof typeColors] || 'bg-gray-400';
-    };
+    }, [typeColors]);
 
-    const handleDateSelect = (date: Date) => {
-      setCurrentDate(date);
-      setView('day');
-      setShowDatePicker(false);
-    };
+    const handleDateSelect = useCallback((date: Date) => {
+        setCurrentDate(date);
+        setView('day');
+        setShowDatePicker(false);
+    }, [setCurrentDate, setView, setShowDatePicker]);
 
     useEffect(() => {
-      scrollToDate(currentDate, view, calendarRef);
+        scrollToDate(currentDate, view, calendarRef);
     }, [currentDate, view, scrollToDate]);
-
-    useEffect(() => {
-        setHighlightedDate(selectedDate);
-    }, [selectedDate]);
 
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const shortMonthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
     const pickerDate = new Date(currentDate);
 
-    const handleAddEvent = (newEvent: CalendarEvent) => {
+
+    // --- DIALOG STATE AND HANDLERS ---
+    const [showDialog, setShowDialog] = useState(false);
+    const [dialogDate, setDialogDate] = useState<Date | null>(null);
+    const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+    const [selectedEventDetail, setSelectedEventDetail] = useState<ConferenceResponse | null>(null);
+    const [loadingDetails, setLoadingDetails] = useState(false);
+    const dialogRef = useRef<HTMLDivElement>(null);
+
+    // Use the new hook
+    const { dialogPosition, calculateDialogPosition } = useDialogPosition(calendarRef, dialogRef, DEFAULT_DOM_RECT);
+
+
+    const openAddNoteDialog = useCallback((date: Date, event: React.MouseEvent) => {
+        const target = event.currentTarget as HTMLElement;
+        const targetRect = target.getBoundingClientRect();
+
+        setDialogDate(date);
+        setSelectedEvent(null);
+        setSelectedEventDetail(null);
+        setShowDialog(true);
+        setHighlightedDate(date);
+        calculateDialogPosition(targetRect); // Call the hook's function
+    }, [calculateDialogPosition, setHighlightedDate]); // Include calculateDialogPosition
+
+    const openEventDetailsDialog = useCallback(async (
+        event: CalendarEvent,
+        clickEvent: React.MouseEvent
+    ) => {
+        const target = clickEvent.currentTarget as HTMLElement;
+        const targetRect = target.getBoundingClientRect();
+
+        setDialogDate(new Date(event.year, event.month - 1, event.day));
+        setSelectedEvent(event);
+        setShowDialog(true);
+        setHighlightedDate(new Date(event.year, event.month - 1, event.day));
+
+        if (event.conferenceId) {
+            try {
+                setLoadingDetails(true);
+                const conferenceDetails = await getConference(event.conferenceId);
+                setSelectedEventDetail(conferenceDetails);
+            } catch (error) {
+                console.error("Failed to fetch conference details:", error);
+                setSelectedEventDetail(null);
+            } finally {
+                setLoadingDetails(false);
+            }
+        } else {
+            setSelectedEventDetail(null);
+        }
+        calculateDialogPosition(targetRect); // Call the hook's function
+    }, [calculateDialogPosition, setHighlightedDate]); // Include calculateDialogPosition
+
+    const closeDialog = useCallback(() => {
+        setShowDialog(false);
+        setSelectedEvent(null);
+        setSelectedEventDetail(null);
+        setHighlightedDate(null);
+    }, [setHighlightedDate]);
+
+    const handleAddEvent = useCallback((title: string, eventType: 'Event' | 'Task' | 'Appointment') => {
+        if (!dialogDate) return;
+        const newEvent: CalendarEvent = {
+            day: dialogDate.getDate(),
+            month: dialogDate.getMonth() + 1,
+            year: dialogDate.getFullYear(),
+            type: eventType,
+            conference: '',
+            conferenceId: '',
+            title: title,
+        };
         setAllEvents(prevEvents => [...prevEvents, newEvent]);
-        closeDialog();
-    };
-    // Save allEvents to local storage when it changes
+        closeDialog(); // Uses useCallback version
+    }, [dialogDate, closeDialog]); //  closeDialog
+
+
     useEffect(() => {
-        localStorage.setItem('calendarEvents', JSON.stringify(allEvents));
-    }, [allEvents]);
+        const handleOpenAddNote = (e: any) => {
+            openAddNoteDialog(e.detail.date, e.detail.event);
+        }
+        const handleOpenEventDetails = (e: any) => {
+            openEventDetailsDialog(e.detail.event, e.detail.clickEvent);
+        }
+        const calendarElement = calendarRef.current;
+
+        calendarElement?.addEventListener('open-add-note', handleOpenAddNote);
+        calendarElement?.addEventListener('open-event-details', handleOpenEventDetails);
+
+        return () => {
+            calendarElement?.removeEventListener('open-add-note', handleOpenAddNote);
+            calendarElement?.removeEventListener('open-event-details', handleOpenEventDetails);
+        }
+    }, [calendarRef, openAddNoteDialog, openEventDetailsDialog]); // Correct dependencies
+
 
     return (
         <section className="pt-2 px-2 bg-white rounded-md shadow relative" ref={calendarRef}>
             <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center gap-2 px-2">
-                    {/* View Switcher - No Changes */}
                     <div className="relative inline-block text-left z-10" ref={viewOptionsRef}>
                         <button
                             type="button"
@@ -119,7 +218,6 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                         </div>
                     </div>
 
-                    {/* Navigation Buttons - No Changes */}
                     {view === 'month' && (
                         <>
                             <button onClick={goToPreviousMonth} className="p-1 hover:bg-gray-200 rounded-full">
@@ -135,7 +233,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                             </div>
                             <button onClick={goToNextMonth} className="p-1 hover:bg-gray-200 rounded-full">
                                 <svg className="svg-inline--fa fa-arrow-right fa-w-14" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="" style={{ width: '14px', height: '14px', color: 'black' }}>
-                                    <path fill="currentColor" d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0-33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"></path>
+                                    <path fill="currentColor" d="M190.5 66.9l22.2-22.2c9.4 9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0-33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"></path>
                                 </svg>
                             </button>
                         </>
@@ -179,7 +277,6 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                     )}
                 </div>
 
-                {/* Search Input - No Changes */}
                 <div className="flex items-center mx-auto">
                     <input
                         type="text"
@@ -193,7 +290,6 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                 <button onClick={goToToday} className="mx-2 px-3 py-1 text-sm rounded-md bg-gray-200 hover:bg-gray-300">Today</button>
             </div>
 
-            {/* Date Picker - No Changes */}
             {showDatePicker && (
                 <div ref={datePickerRef} className="absolute z-10 mt-2 bg-white rounded-md shadow-lg p-4" style={{ top: '50px', left: '50px' }}>
                     <div className="flex justify-between items-center mb-2">
@@ -234,7 +330,6 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                 </div>
             )}
 
-             {/* View Rendering - Pass filteredEvents, openDialogForDay, highlightedDate */}
             {view === 'month' && (
                 <MonthView
                     currentMonth={currentMonth}
@@ -242,12 +337,9 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                     daysInMonth={getDaysInMonth(currentDate)}
                     firstDayOfMonth={getFirstDayOfMonth(currentDate)}
                     getDayEvents={getDayEvents}
-                    openDialogForDay={(day) => {
-                        openDialogForDay(currentYear, currentMonth, day);
-                        setHighlightedDate(new Date(currentYear, currentMonth, day));
-                    }}
                     getEventTypeColor={getEventTypeColor}
                     highlightedDate={highlightedDate}
+                    calendarRef={calendarRef}
                 />
             )}
             {view === 'week' && (
@@ -256,11 +348,9 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                     shortMonthNames={shortMonthNames}
                     getDayEvents={getDayEvents}
                     getEventTypeColor={getEventTypeColor}
-                    openDialogForDay={(year, month, day) => {
-                        openDialogForDay(year, month, day);
-                        setHighlightedDate(new Date(year, month, day));
-                    }}
                     highlightedDate={highlightedDate}
+                    calendarRef={calendarRef}
+
                 />
             )}
             {view === 'day' && (
@@ -268,22 +358,31 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                     currentDate={currentDate}
                     getDayEvents={getDayEvents}
                     getEventTypeColor={getEventTypeColor}
-                    openDialogForDay={(year, month, day) => {
-                        openDialogForDay(year, month, day);
-                        setHighlightedDate(new Date(year, month, day));
-                    }}
                     highlightedDate={highlightedDate}
+                    calendarRef={calendarRef}
+
                 />
             )}
 
-            {/* DayNote Dialog - No Changes */}
-            {isDialogOpen && selectedDate && (
-                <DayNote
-                    date={selectedDate}
-                    events={getDayEvents(selectedDate.getDate(), selectedDate.getMonth() + 1, selectedDate.getFullYear())}
-                    onClose={closeDialog}
-                    onAddEvent={handleAddEvent}
-                />
+            {showDialog && dialogDate && (
+                <div
+                    ref={dialogRef}
+                    style={{
+                        position: 'absolute',
+                        left: dialogPosition.x,
+                        top: dialogPosition.y,
+                        zIndex: 10
+                    }}
+                >
+                    <AddNoteDialog
+                        date={dialogDate}
+                        onClose={closeDialog}
+                        onSave={handleAddEvent}
+                        event={selectedEvent}
+                        eventDetails={selectedEventDetail}
+                        loadingDetails={loadingDetails}
+                    />
+                </div>
             )}
         </section>
     );

@@ -78,11 +78,6 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
     setShowWebsiteTooltip(false);
   };
 
-  const handleTitleClick = () => {
-    const localePrefix = pathname.split('/')[1];
-    router.push(`/${localePrefix}/conferences/detail?id=${event.id}`);
-  }
-
   return (
     <div className="rounded-lg shadow-lg overflow-hidden bg-white hover:shadow-xl transition duration-300 ease-in-out flex flex-col">
       {/* Image and Rank */}
@@ -116,12 +111,13 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
       <div className="px-2 py-4 flex flex-col flex-grow">
         {/* Title and Acronym */}
         <div className="mb-2">
-          <h3
-            className="font-bold text-sm text-left text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer"
-            onClick={handleTitleClick}
-          >
-            {event.title} {event.acronym ? `(${event.acronym})` : ''}
-          </h3>
+          <Link href={{ pathname: `/conferences/detail`, query: { id: event.id } }} >
+            <h3
+              className="font-bold text-sm text-left text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer"
+            >
+              {event.title} {event.acronym ? `(${event.acronym})` : ''}
+            </h3>
+          </Link>
         </div>
 
         {/* Location and Date */}
@@ -156,13 +152,17 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
         <div className="mb-3">
           <div className="flex flex-wrap gap-2">
             {event.topics.slice(0, 3).map((topic) => (
-              <span
-                key={topic}
-                className="rounded-full bg-gray-100 text-gray-700 px-2 py-1 text-xs hover:bg-gray-200 transition duration-200 cursor-pointer"
-                onClick={() => handleTopicClick(topic)}
-              >
-                {topic}
-              </span>
+              <Link href={{ pathname: `/conferences`, query: { topics: topic } }} >
+
+                <span
+                  key={topic}
+                  className="rounded-full bg-gray-100 text-gray-700 px-2 py-1 text-xs hover:bg-gray-200 transition duration-200 cursor-pointer"
+                  onClick={() => handleTopicClick(topic)}
+                >
+                  {topic}
+                </span>
+              </Link>
+
             ))}
             {event.topics.length > 3 && (
               <span className="text-xs px-2 py-1 text-gray-500">+{event.topics.length - 3} more</span>

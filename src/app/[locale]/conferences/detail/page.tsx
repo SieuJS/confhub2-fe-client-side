@@ -12,7 +12,7 @@ import { ConferenceTabs } from '../../conferences/detail/ConferenceTabs';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Header } from '../../utils/Header';
 import Footer from '../../utils/Footer';
-
+import { Link } from '@/src/navigation';
 // Import the custom hooks
 import useConferenceData from '../../../../hooks/conferenceDetails/useConferenceData';
 import useFollowConference from '../../../../hooks/conferenceDetails/useFollowConference';
@@ -167,13 +167,16 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                 <h2 className="font-semibold text-lg mb-2">Topics:</h2>
                                 <div className="flex flex-wrap">
                                     {displayedTopics.map((topic, index) => (
-                                        <button
-                                            key={index}
-                                            className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold mr-2"
-                                            onClick={() => handleTopicClick(topic)}
-                                        >
-                                            {topic}
-                                        </button>
+                                        <Link href={{ pathname: `/conferences`, query: { topics: topic } }} >
+
+                                            <button
+                                                key={index}
+                                                className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold mr-2"
+                                            >
+                                                {topic}
+                                            </button>
+                                        </Link>
+
                                     ))}
                                     {hasMoreTopics && (
                                         <button
