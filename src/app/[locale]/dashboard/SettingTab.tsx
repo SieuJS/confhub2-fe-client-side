@@ -1,6 +1,10 @@
+// SettingTab.tsx
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { useLocalStorage } from 'usehooks-ts'; // Import useLocalStorage
+import { useRouter, usePathname } from 'next/navigation'; // Correct import
+import deleteUser from '../../../api/user/deleteUser'; // Import API function directly
 
 interface SettingTabProps {
     //  props (nếu bạn có truyền props nào từ component cha).
@@ -12,12 +16,57 @@ const SettingTab: React.FC<SettingTabProps> = () => {
     const [changeUpdate, setChangeUpdate] = useState(true);
     const [upcomingEvent, setUpcomingEvent] = useState(false);
     const [deliveryMethod, setDeliveryMethod] = useState<'notification' | 'notification+email'>('notification'); // Thay đổi state
+    const [isDeleting, setIsDeleting] = useState(false); // Add loading state
+    const [deleteError, setDeleteError] = useState<string | null>(null); // Add error state
+    const router = useRouter();
+    const pathname = usePathname();
+
+    // Get user from local storage
+    const [user, setUser] = useLocalStorage<{
+      firstname: string;
+      lastname: string;
+      email: string;
+      id: string;
+  } | null>('user', null);
 
     const toggleAutoAdd = () => setAutoAdd(!autoAdd);
     const toggleChangeUpdate = () => setChangeUpdate(!changeUpdate);
     const toggleUpcomingEvent = () => setUpcomingEvent(!upcomingEvent);
     const handleDeliveryChange = (event: React.ChangeEvent<HTMLSelectElement>) => { // Hàm xử lý thay đổi
         setDeliveryMethod(event.target.value as 'notification' | 'notification+email');
+    };
+
+    const handleDeleteAccount = async () => {
+      if (window.confirm("Are you sure you want to delete your account?  This action cannot be undone.")) {
+        setIsDeleting(true); // Set loading state to true
+        setDeleteError(null); // Clear any previous errors
+
+        try {
+          if (!user) {
+              setDeleteError("User not logged in.");
+              return; // Early return if no user
+          }
+          await deleteUser(user.id); // Call the API function
+          setUser(null);
+
+           // Redirect to login page, correctly handling locale
+           let pathWithLocale = '/auth/login';
+           if (pathname) {
+               const pathParts = pathname.split('/');
+               if (pathParts.length > 1) {
+                   const localePrefix = pathParts[1];
+                   pathWithLocale = `/${localePrefix}/auth/login`;
+               }
+           }
+           router.push(pathWithLocale);
+
+        } catch (error: any) {
+          setDeleteError(error.message || "Failed to delete account."); // Set error message
+          console.error("Failed to delete account:", error); // Log the error for debugging.
+        } finally {
+          setIsDeleting(false); // Reset loading state
+        }
+      }
     };
 
     return (
@@ -120,12 +169,17 @@ const SettingTab: React.FC<SettingTabProps> = () => {
 
                 {/* Delete Account Button */}
                 <section>
-                    <button className="bg-red-500 hover:bg-red-600  font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                        {t('Delete Account')}
-                    </button>
-                     <p className=" text-sm mt-2">
-                        {t('Warning: Deleting your account is irreversible. All your data will be permanently removed.')}
-                    </p>
+                  <button
+                    onClick={handleDeleteAccount}
+                    disabled={isDeleting}
+                    className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  >
+                    {isDeleting ? 'Deleting...' : t('Delete Account')}
+                  </button>
+                  {deleteError && <p className="text-red-500 text-sm mt-2">{deleteError}</p>}
+                  <p className="text-sm mt-2">
+                    {t('Warning: Deleting your account is irreversible. All your data will be permanently removed.')}
+                  </p>
                 </section>
             </main>
         </div>
