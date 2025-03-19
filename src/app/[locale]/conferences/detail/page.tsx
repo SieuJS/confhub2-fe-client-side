@@ -1,4 +1,4 @@
-// page.tsx
+// page.tsx (Conference Details Page)
 "use client";
 
 import { useTranslations } from 'next-intl';
@@ -7,7 +7,7 @@ import { useState, useRef } from 'react';
 import Button from '../../utils/Button';
 import ConferenceFeedback from '../../conferences/detail/ConferenceFeedback';
 import NotFoundPage from "../../utils/NotFoundPage";
-import Loading from "../../utils/Loading"; // Consistent path
+import Loading from "../../utils/Loading";
 import { ConferenceTabs } from '../../conferences/detail/ConferenceTabs';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Header } from '../../utils/Header';
@@ -99,14 +99,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                 </div>
             </div>
         );
-    };
-
-    const handleTopicClick = (topic: string) => {
-        const newParams = new URLSearchParams();
-        newParams.append('topics', topic);
-        const localePrefix = pathname.split('/')[1];
-        router.push(`/${localePrefix}/conferences?${newParams.toString()}`);
-    };
+    }
 
     const handleFeedbackSubmit = (rating: number | null, comment: string) => {
         console.log('Rating:', rating);
@@ -153,7 +146,8 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                     <p className="text-gray-600 text-sm">
                                         4.5 <span className="text-gray-500">(89 Ratings)</span> {/* Add span here */}
                                     </p>
-                                    <a href="#map" className="text-blue-600 text-sm mt-1 flex items-center hover:underline">                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4 mr-1">
+                                    <a href="#map" className="text-blue-600 text-sm mt-1 flex items-center hover:underline">                                        
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4 mr-1">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                                     </svg>
@@ -281,8 +275,9 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                     <ConferenceTabs conference={conferenceData} />
                 </div>
 
-                <div className="mt-8 bg-white rounded-lg shadow-md p-6"> {/* Feedback section */}
-                    <ConferenceFeedback />
+                <div className="mt-8 bg-white rounded-lg shadow-md p-6">
+                    {/* Pass conferenceData to ConferenceFeedback */}
+                    <ConferenceFeedback conferenceData={conferenceData} />
                 </div>
 
             </div>

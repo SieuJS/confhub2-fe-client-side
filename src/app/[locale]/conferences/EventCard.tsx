@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import Button from '../utils/Button';
 import { ConferenceInfo } from '../../../models/response/conference.list.response';
 import { useRouter, usePathname } from 'next/navigation';
 import { Link } from '@/src/navigation';
@@ -89,8 +88,8 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           height={225}
           style={{ objectFit: 'cover', width: '100%', height: '180px' }}
           className="w-full"
+          priority // Add this line
         />
-
         {/* --- Conditional Rank Display --- */}
         <div className="absolute top-0 right-2">
           <span className={`font-semibold ${getRankColor(event.rankSourceFoRData?.rank)} px-2 py-1 rounded text-xs`}>

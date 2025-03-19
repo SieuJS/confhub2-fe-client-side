@@ -6,45 +6,12 @@ import SearchSection from '../conferences/SearchSection';
 import ResultsSection from '../conferences/ResultsSection';
 import { Header } from '../utils/Header';
 import Footer from '../utils/Footer';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useState, useEffect } from 'react';
-import Loading from '../utils/Loading'; // Import the Loading component
+import { useRouter } from 'next/navigation';
+import { useCallback } from 'react';
 
 export default function Conferences({ params: { locale } }: { params: { locale: string } }) {
   const t = useTranslations('');
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [initialSearchParams, setInitialSearchParams] = useState<string>(""); // Store as a string
-  const [isLoading, setIsLoading] = useState(true); // Track loading state
-  const [conferences, setConferences] = useState([]); // Store fetched conferences
-  const [isInitialLoad, setIsInitialLoad] = useState(true); // New state
-
-  // Initialize initialSearchParams when the component mounts.
-  useEffect(() => {
-    setInitialSearchParams(searchParams.toString()); // Convert to string
-    fetchConferences(searchParams.toString()); // Fetch on initial load
-  }, [searchParams]);
-
-
-  const fetchConferences = useCallback(async (paramsString: string) => {
-        //setIsLoading(true);
-        try {
-        
-            const res = await fetch(`http://localhost:3000/api/v1/filter-conferences?${paramsString}`);
-            if (!res.ok) {
-              //best practice to throw error
-                throw new Error(`Failed to fetch conferences: ${res.status}`);
-            }
-            const data = await res.json();
-            setConferences(data);
-        } catch (error) {
-            console.error("Error fetching conferences:", error);
-             // Consider setting an error state to display to the user.
-        } finally {
-            setIsLoading(false);
-            setIsInitialLoad(false); // Set to false after the *first* load
-        }
-    }, []);
 
     const handleSearch = useCallback(async (searchParamsFromComponent: {
     keyword?: string;
@@ -89,17 +56,13 @@ export default function Conferences({ params: { locale } }: { params: { locale: 
 
       const paramsString = newParams.toString();
       router.push(`/${locale}/conferences?${paramsString}`);
-      // Don't fetch here;  useEffect handles it.
   }, [locale, router]);
 
 
   const handleClear = useCallback(() => {
-    // Clear all search-related query parameters
     const newParams = new URLSearchParams();
     const paramsString = newParams.toString();
     router.push(`/${locale}/conferences?${paramsString}`);
-    // Don't fetch here; useEffect handles it
-
   }, [locale, router]);
 
   return (
@@ -109,12 +72,7 @@ export default function Conferences({ params: { locale } }: { params: { locale: 
         <div className="py-10 bg-background w-full"></div>
         <SearchSection onSearch={handleSearch} onClear={handleClear} />
         <div className="container mx-auto mt-4 px-4">
-          {/* Conditionally render Loading or ResultsSection */}
-          {(isLoading && isInitialLoad) ? (
-            <Loading />
-          ) : (
             <ResultsSection/>
-          )}
         </div>
       </div>
       <Footer />

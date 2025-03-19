@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ConferenceItem from '../conferences/ConferenceItem';
-import { getListConference } from '../../../api/getConference/getListConferences'; // Import getListConference
+import { getListConference } from '../../../api/conference/getListConferences'; // Import getListConference
 import { ConferenceListResponse, ConferenceInfo } from '../../../models/response/conference.list.response'; // Import types
 import { UserResponse } from '../../../models/response/user.response'; // Import UserResponse
 

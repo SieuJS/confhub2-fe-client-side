@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Calendar from './calendar/Calendar'
 import { CalendarEvent } from './calendar/Calendar'
 import { ConferenceResponse } from '../../../models/response/conference.response'
-import { getConference } from '../../../api/getConference/getConferenceDetails'
+import { getConference } from '../../../api/conference/getConferenceDetails'
 import { Link } from '@/src/navigation'
 import Button from '../utils/Button'
 
