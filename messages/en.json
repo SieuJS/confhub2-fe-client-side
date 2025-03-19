@@ -237,5 +237,8 @@
   "Chatbot_question7": "Is the data I upload secure? Does the website store my data?",
   "Chatbot_answer7": "We are committed to protecting the personal information and data of users. The data files you upload are only used for the purpose of analysis and answering questions in the current chat session, we do not store them after the chat session ends.",
   "Chatbot_question8": "If the chatbot cannot answer my question, what should I do?",
-  "Chatbot_answer8": "Our chatbot is still under development and may not be able to answer all questions. If the chatbot cannot help you, you can: Search for information on the website using the search bar.  View the FAQ page to find answers to frequently asked questions. Contact our customer support team via email ... for direct assistance."
+  "Chatbot_answer8": "Our chatbot is still under development and may not be able to answer all questions. If the chatbot cannot help you, you can: Search for information on the website using the search bar.  View the FAQ page to find answers to frequently asked questions. Contact our customer support team via email ... for direct assistance.",
+  "Login": "Login",
+  "Register": "Register",
+  "Logout": "Logout"
 }
