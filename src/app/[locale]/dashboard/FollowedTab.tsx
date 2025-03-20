@@ -3,10 +3,7 @@ import React, { useState, useEffect } from 'react'
 import ConferenceItem from '../conferences/ConferenceItem'
 import { getListConference } from '../../../api/conference/getListConferences'
 import { ConferenceInfo } from '../../../models/response/conference.list.response'
-import {
-  UserResponse,
-  FollowedConference
-} from '../../../models/response/user.response'
+import { UserResponse, Follow } from '../../../models/response/user.response'
 import { timeAgo, formatDateFull } from './timeFormat'
 import Tooltip from '../utils/Tooltip'
 
@@ -40,18 +37,18 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
         }
         const userDetails: UserResponse = await userResponse.json()
 
-        if (userDetails.followedConferences.length > 0) {
+        if ((userDetails.followedConferences ?? []).length > 0) {
           const conferencesData = await getListConference()
 
           const followed = conferencesData.payload
             .filter(conf =>
-              userDetails.followedConferences.some(
+              (userDetails.followedConferences ?? []).some(
                 followedConf => followedConf.id === conf.id
               )
             )
             .map(conf => {
-              const followedConfInfo: FollowedConference | undefined =
-                userDetails.followedConferences.find(fc => fc.id === conf.id)
+              const followedConfInfo: Follow | undefined =
+                userDetails.followedConferences?.find(fc => fc.id === conf.id)
               // Use createdAt as followedAt
               return {
                 ...conf,
