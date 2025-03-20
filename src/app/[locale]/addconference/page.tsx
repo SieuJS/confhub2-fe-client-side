@@ -5,13 +5,24 @@ import { Header } from '../utils/Header'
 import Footer from '../utils/Footer'
 import { useRouter, usePathname } from 'next/navigation'
 import countryData from '../addconference/countries.json' // Import the JSON data
+import { useTranslations } from 'next-intl'
 
-const API_ADD_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/user/add-conference'
+const API_ADD_CONFERENCE_ENDPOINT =
+  'http://localhost:3000/api/v1/user/add-conference'
 const CSC_API_KEY = process.env.NEXT_PUBLIC_CSC_API_KEY
 
-import { LocationInput, ImportantDateInput, City, State, Country, ConferenceFormData } from '@/src/models/send/addConference.send'
+import {
+  LocationInput,
+  ImportantDateInput,
+  City,
+  State,
+  Country,
+  ConferenceFormData
+} from '@/src/models/send/addConference.send'
 
 const AddConference = ({ locale }: { locale: string }) => {
+  const t = useTranslations('')
+
   const [title, setTitle] = useState('')
   const [acronym, setAcronym] = useState('')
   const [link, setLink] = useState('')
@@ -318,18 +329,18 @@ const AddConference = ({ locale }: { locale: string }) => {
       <div className='container mx-auto px-16'>
         <div className='w-full bg-background py-14'></div>
 
-        <h1 className='mb-4 text-2xl font-bold'>Add New Conference</h1>
+        <h1 className='mb-4 text-2xl font-bold'>{t('Add_New_Conference')}</h1>
 
         <form onSubmit={handleSubmit} className='grid gap-5'>
           {/* Basic Information */}
           <div className='sm:col-span-2'>
             <label htmlFor='title' className='block text-sm  '>
-              * Conference name:
+              * {t('Conference_Name')}:
             </label>
             <input
               type='text'
               id='title'
-              className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+              className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
               value={title}
               onChange={e => setTitle(e.target.value)}
               required
@@ -340,12 +351,12 @@ const AddConference = ({ locale }: { locale: string }) => {
             {/* Acronym */}
             <div>
               <label htmlFor='acronym' className='block text-sm  '>
-                * Acronym:
+                * {t('Acronym')}:
               </label>
               <input
                 type='text'
                 id='acronym'
-                className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+                className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                 value={acronym}
                 onChange={e => setAcronym(e.target.value)}
                 required
@@ -355,12 +366,12 @@ const AddConference = ({ locale }: { locale: string }) => {
             {/* Link */}
             <div>
               <label htmlFor='link' className='block text-sm  '>
-                * Link:
+                * {t('Link')}:
               </label>
               <input
                 type='url'
                 id='link'
-                className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+                className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                 value={link}
                 onChange={e => setLink(e.target.value)}
                 required
@@ -370,36 +381,36 @@ const AddConference = ({ locale }: { locale: string }) => {
             {/* Type */}
             <div>
               <label htmlFor='type' className='block text-sm  '>
-                * Type:
+                * {t('Type')}:
               </label>
               <select
                 id='type'
-                className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+                className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                 value={type}
                 onChange={e =>
                   setType(e.target.value as 'offline' | 'online' | 'hybrid')
                 }
                 required
               >
-                <option value='offline'>Offline</option>
-                <option value='online'>Online</option>
-                <option value='hybrid'>Hybrid</option>
+                <option value='offline'>{t('Offline')}</option>
+                <option value='online'>{t('Online')}</option>
+                <option value='hybrid'>{t('Hybrid')}</option>
               </select>
             </div>
           </div>
 
           {/* Location Inputs */}
           <div className='sm:col-span-2'>
-            <label className='block text-base  '>* Location:</label>
+            <label className='block text-base  '>* {t('Location')}:</label>
             <div className='grid grid-cols-1 gap-y-4 sm:grid-cols-4 sm:gap-x-4'>
               <div>
                 <label htmlFor='address' className='block text-sm  '>
-                  Address:
+                  {t('Address')}:
                 </label>
                 <input
                   type='text'
                   id='address'
-                  className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+                  className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                   value={location.address}
                   onChange={e =>
                     handleLocationChange('address', e.target.value)
@@ -411,16 +422,16 @@ const AddConference = ({ locale }: { locale: string }) => {
               {/* --- Continent Dropdown --- */}
               <div>
                 <label htmlFor='continent' className='block text-sm'>
-                  Continent:
+                  {t('Continent')}:
                 </label>
                 <select
                   id='continent'
-                  className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+                  className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                   value={selectedContinent}
                   onChange={e => handleContinentChange(e.target.value)}
                   required
                 >
-                  <option value=''>Select Continent</option>
+                  <option value=''>{t('Select_Continent')}</option>
                   {continentOptions.map(continent => (
                     <option key={continent} value={continent}>
                       {continent}
@@ -432,17 +443,17 @@ const AddConference = ({ locale }: { locale: string }) => {
               {/* --- Country Dropdown --- */}
               <div>
                 <label htmlFor='country' className='block text-sm'>
-                  Country:
+                  {t('Country')}:
                 </label>
                 <select
                   id='country'
-                  className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+                  className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                   value={selectedCountry}
                   onChange={e => handleCountryChange(e.target.value)}
                   required
                   disabled={!selectedContinent}
                 >
-                  <option value=''>Select Country</option>
+                  <option value=''>{t('Select_Country')}</option>
                   {filteredCountries.map(country => (
                     <option key={country.iso2} value={country.iso2}>
                       {country.name}
@@ -454,11 +465,13 @@ const AddConference = ({ locale }: { locale: string }) => {
               {/* --- State OR City Dropdown --- */}
               <div>
                 <label htmlFor='stateOrCity' className='block text-sm'>
-                  {cities.length > 0 ? 'City:' : 'State/Province:'}
+                  {cities.length > 0
+                    ? `${t('City')}:`
+                    : `${t('State_Province')}:`}
                 </label>
                 <select
                   id='stateOrCity'
-                  className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+                  className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                   value={states.length > 0 ? selectedState : selectedCity}
                   onChange={e =>
                     states.length > 0
@@ -469,7 +482,10 @@ const AddConference = ({ locale }: { locale: string }) => {
                   disabled={!selectedCountry}
                 >
                   <option value=''>
-                    Select {cities.length > 0 ? 'City:' : 'State/Province:'}
+                    {t('Select')}{' '}
+                    {cities.length > 0
+                      ? `${t('City')}:`
+                      : `${t('State_Province')}:`}
                   </option>
                   {states.length > 0
                     ? states.map(state => (
@@ -489,12 +505,12 @@ const AddConference = ({ locale }: { locale: string }) => {
 
           {/* Important Dates */}
           <div className='sm:col-span-2'>
-            <label className='block text-sm  '>Important Dates:</label>
+            <label className='block text-sm  '>{t('Important_Dates')}:</label>
             {dates.map((date, index) => (
               <div key={index} className='mt-1 grid grid-cols-4 gap-4'>
                 <div>
                   <label htmlFor={`name-${index}`} className='block text-sm  '>
-                    Name:
+                    {t('Name')}:
                   </label>
                   <input
                     type='text'
@@ -503,7 +519,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                     onChange={e =>
                       handleDateChange(index, 'name', e.target.value)
                     }
-                    className={`mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm
+                    className={`mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm
                       ${index === 0 ? 'opacity-50' : ''}`}
                     required
                     readOnly={index === 0}
@@ -511,7 +527,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                 </div>
                 <div>
                   <label htmlFor={`type-${index}`} className='block text-sm'>
-                    Type:
+                    {t('Type')}:
                   </label>
                   <select
                     id={`type-${index}`}
@@ -519,12 +535,12 @@ const AddConference = ({ locale }: { locale: string }) => {
                     onChange={e =>
                       handleDateChange(index, 'type', e.target.value)
                     }
-                    className={`mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm ${
+                    className={`mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm ${
                       index === 0 ? 'pointer-events-none opacity-50' : ''
                     }`}
                     disabled={index === 0}
                   >
-                    <option value=''>Select Type</option>
+                    <option value=''>{t('Select_Type')}</option>
                     {dateTypeOptions.map(type => (
                       <option key={type} value={type}>
                         {type}
@@ -537,7 +553,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                     htmlFor={`fromDate-${index}`}
                     className='block text-sm  '
                   >
-                    Start Date:
+                    {t('Start_Date')}:
                   </label>
                   <input
                     type='date'
@@ -546,7 +562,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                     onChange={e =>
                       handleDateChange(index, 'fromDate', e.target.value)
                     }
-                    className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+                    className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                     required
                   />
                 </div>
@@ -555,7 +571,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                     htmlFor={`toDate-${index}`}
                     className='block text-sm  '
                   >
-                    End Date:
+                    {t('End_Date')}:
                   </label>
                   <input
                     type='date'
@@ -564,7 +580,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                     onChange={e =>
                       handleDateChange(index, 'toDate', e.target.value)
                     }
-                    className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+                    className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                     required
                   />
                 </div>
@@ -597,14 +613,14 @@ const AddConference = ({ locale }: { locale: string }) => {
               onClick={addDate}
               className='mt-2 rounded bg-button px-4 py-2 font-bold text-button-text hover:bg-button focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
             >
-              Add Date
+              {t('Add_Date')}
             </button>
           </div>
 
           {/* Topics */}
           <div className='sm:col-span-1'>
             <label htmlFor='newTopic' className='block text-sm  '>
-              Topics:
+              {t('Topics')}:
             </label>
             <div className='mt-1 items-center'>
               <input
@@ -612,7 +628,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                 id='newTopic'
                 value={newTopic}
                 onChange={e => setNewTopic(e.target.value)}
-                className='w-5/6 flex-1 rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+                className='w-5/6 flex-1 rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                 placeholder='Add a topic'
               />
               <button
@@ -620,7 +636,7 @@ const AddConference = ({ locale }: { locale: string }) => {
                 onClick={handleAddTopic}
                 className='ml-3 rounded-md bg-button px-4 py-2 text-button-text hover:bg-button focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
               >
-                Add
+                {t('Add')}
               </button>
 
               <div className='mt-2'>
@@ -646,27 +662,27 @@ const AddConference = ({ locale }: { locale: string }) => {
           {/* Image URL */}
           <div className='sm:col-span-1'>
             <label htmlFor='imageUrl' className='block text-sm  '>
-              Image URL:
+              {t('Image_URL')}:
             </label>
             <input
               type='url'
               id='imageUrl'
               value={imageUrl}
               onChange={e => setImageUrl(e.target.value)}
-              className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+              className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
             />
           </div>
           {/* Description */}
           <div className='sm:col-span-2'>
             <label htmlFor='description' className='block text-sm  '>
-              Description:
+              {t('Description')}:
             </label>
             <textarea
               id='description'
               value={description}
               onChange={e => setDescription(e.target.value)}
               rows={4}
-              className='mt-1 block w-full rounded-md border border-button bg-white px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+              className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
             />
           </div>
 
@@ -677,7 +693,7 @@ const AddConference = ({ locale }: { locale: string }) => {
               onClick={handleSubmit}
               className=' w-full items-center justify-center rounded-md border border-transparent bg-button px-4 py-2 text-sm text-button-text shadow-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
             >
-              Add Conference
+              {t('Add_Conference')}
             </button>
           </div>
         </form>

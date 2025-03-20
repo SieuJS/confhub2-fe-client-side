@@ -1,28 +1,41 @@
 // components/Header/components/AuthButtons.tsx
-import { FC } from 'react';
-import { Link } from '@/src/navigation';
-import { useTranslations } from 'next-intl';
-import ThemeSwitch from '../ThemeSwitch';
-import LangSwitcher from '../LangSwitcher';
-import { NotificationIcon, UserIcon } from './Icon';
-import { usePathname } from 'next/navigation';
-import LoadingIndicator from './LoadingIndicator';
-
+import { FC, useState, useEffect } from 'react'
+import { Link } from '@/src/navigation'
+import { useTranslations } from 'next-intl'
+import ThemeSwitch from '../ThemeSwitch'
+import LangSwitcher from '../LangSwitcher'
+import { NotificationIcon, UserIcon } from './Icon'
+import { usePathname } from 'next/navigation'
+import LoadingIndicator from './LoadingIndicator'
 
 interface Props {
-  isLogin: boolean;
-  isClient: boolean;
-  locale: string;
-  toggleNotification: () => void;
-  toggleUserDropdown: () => void;
-  notificationEffect: boolean;
+  isLogin: boolean
+  // isClient: boolean; // Loại bỏ prop isClient
+  locale: string
+  toggleNotification: () => void
+  toggleUserDropdown: () => void
+  notificationEffect: boolean
 }
 
-const AuthButtons: FC<Props> = ({ isLogin, isClient, locale, toggleNotification, toggleUserDropdown, notificationEffect }) => {
-  const t = useTranslations('');
-  const pathname = usePathname();
-  if (!isClient) {
-    return <LoadingIndicator />;
+const AuthButtons: FC<Props> = ({
+  isLogin,
+  // isClient, // Loại bỏ isClient
+  locale,
+  toggleNotification,
+  toggleUserDropdown,
+  notificationEffect
+}) => {
+  const t = useTranslations('')
+  const pathname = usePathname()
+  const [isClientRendered, setIsClientRendered] = useState(false) // Thêm state mới
+
+  useEffect(() => {
+    setIsClientRendered(true) // Cập nhật state sau khi component mount
+  }, [])
+
+  if (!isClientRendered) {
+    // Sử dụng state mới
+    return <LoadingIndicator />
   }
 
   if (isLogin) {
@@ -35,7 +48,7 @@ const AuthButtons: FC<Props> = ({ isLogin, isClient, locale, toggleNotification,
           <UserIcon />
         </button>
       </>
-    );
+    )
   }
 
   return (
@@ -47,8 +60,9 @@ const AuthButtons: FC<Props> = ({ isLogin, isClient, locale, toggleNotification,
       <Link
         lang={locale}
         href={`/auth/login`}
-        className={`group relative inline-flex items-center rounded-md bg-button px-4 py-2 font-semibold text-button-text shadow-md transition-colors duration-200 hover:opacity-90 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-button ${pathname.includes('/auth/login') ? 'bg-blue-600' : ''
-          }`}
+        className={`group relative inline-flex items-center rounded-md bg-button px-4 py-2 font-semibold text-button-text shadow-md transition-colors duration-200 hover:opacity-90 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-button ${
+          pathname.includes('/auth/login') ? 'bg-blue-600' : ''
+        }`}
       >
         <div className='flex items-center'>
           <svg
@@ -71,7 +85,7 @@ const AuthButtons: FC<Props> = ({ isLogin, isClient, locale, toggleNotification,
         </div>
       </Link>
     </>
-  );
-};
+  )
+}
 
-export default AuthButtons;
+export default AuthButtons

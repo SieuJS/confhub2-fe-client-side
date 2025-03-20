@@ -93,7 +93,7 @@
   "More_details": "More Details",
   "All_notidications_here": "All Notifications Here",
   "Close": "Close",
-  "Auto_add_events_to_schedule": "Auto-add Events to Schedule",
+  "Auto_add_events_to_schedule": "Auto add Events to Schedule",
   "Change_and_Update": "Change and Update",
   "Your_upcoming_event": "Your Upcoming Event",
   "Customize_notification_delivery": "Customize Notification Delivery",
@@ -276,5 +276,18 @@
   "You_have_no_conference": "You do not have any conferences in this category yet.",
   "Followed_Time": "Followed Time",
   "Created_Time": "Created Time",
-  "Details": "Details"
+  "Details": "Details",
+  "Description": "Description",
+  "Image_URL": "Image URL",
+  "Add": "Add",
+  "Add_Date": "Add Date",
+  "Select_Type": "Select Type",
+  "Select": "Select",
+  "City": "City",
+  "State_Province": "State/Province",
+  "Select_Country": "Select Country",
+  "Country": "Country",
+  "Continent": "Continent",
+  "Add_New_Conference": "Add New Conference",
+  "Select_Continent": "Select Continent"
 }

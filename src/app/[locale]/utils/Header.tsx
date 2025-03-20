@@ -1,46 +1,49 @@
 // components/Header/index.tsx
-import { FC, useRef } from 'react';
-import { Link } from '@/src/navigation';
-import { useTranslations } from 'next-intl';
-import { useLocalStorage } from 'usehooks-ts';
-import LogoIcon from '../../icons/logo';
-import { useSocketConnection } from '../../../hooks/header/useSocketConnection';
-import { useClickOutside } from '../../../hooks/header/useClickOutsideHeader';
-import { useMenuState } from '../../../hooks/header/useMenuState';
-import NotificationDropdown from './header/NotificationDropdown';
-import UserDropdown from './header/UserDropdown';
-import MobileNavigation from './header/MobileNavigation';
-import AuthButtons from './header/AuthButtons';
-import DesktopNavigation from './header/DesktopNavigation';
-import { MenuIcon, CloseIcon } from './header/Icon'; // Import all icon components
-
+import { FC, useRef } from 'react'
+import { Link } from '@/src/navigation'
+import { useTranslations } from 'next-intl'
+import { useLocalStorage } from 'usehooks-ts'
+import LogoIcon from '../../icons/logo'
+import { useSocketConnection } from '../../../hooks/header/useSocketConnection'
+import { useClickOutside } from '../../../hooks/header/useClickOutsideHeader'
+import { useMenuState } from '../../../hooks/header/useMenuState'
+import NotificationDropdown from './header/NotificationDropdown'
+import UserDropdown from './header/UserDropdown'
+import MobileNavigation from './header/MobileNavigation'
+import AuthButtons from './header/AuthButtons'
+import DesktopNavigation from './header/DesktopNavigation'
+import { MenuIcon, CloseIcon } from './header/Icon' // Import all icon components
+import Button from './Button'
 
 interface Props {
-  locale: string;
+  locale: string
 }
 
 export const Header: FC<Props> = ({ locale }) => {
-  const t = useTranslations('');
-  const headerRef = useRef<HTMLDivElement>(null);
+  const t = useTranslations('')
+  const headerRef = useRef<HTMLDivElement>(null)
 
   const [user, setUser] = useLocalStorage<{
-    id: string;
-    firstname: string;
-    lastname: string;
-    email: string;
-  } | null>('user', null);
+    id: string
+    firstname: string
+    lastname: string
+    email: string
+  } | null>('user', null)
 
   console.log(user)
-  const [loginStatus, setLoginStatus] = useLocalStorage<string | null>('loginStatus', null);
-  const isLogin = !!loginStatus;
-  const isClient = !!(typeof window !== 'undefined');
+  const [loginStatus, setLoginStatus] = useLocalStorage<string | null>(
+    'loginStatus',
+    null
+  )
+  const isLogin = !!loginStatus
+  const isClient = !!(typeof window !== 'undefined')
 
-    const {
-        notifications,
-        notificationEffect,
-        markNotificationsAsSeen,
-        socketRef
-    } = useSocketConnection({ loginStatus, user });
+  const {
+    notifications,
+    notificationEffect,
+    markNotificationsAsSeen,
+    socketRef
+  } = useSocketConnection({ loginStatus, user })
 
   const {
     isNotificationOpen,
@@ -49,11 +52,10 @@ export const Header: FC<Props> = ({ locale }) => {
     closeAllMenus,
     toggleNotification,
     toggleMobileMenu,
-    toggleUserDropdown,
-  } = useMenuState();
+    toggleUserDropdown
+  } = useMenuState()
 
-  useClickOutside(headerRef, closeAllMenus);
-
+  useClickOutside(headerRef, closeAllMenus)
 
   return (
     <div
@@ -73,7 +75,7 @@ export const Header: FC<Props> = ({ locale }) => {
         <DesktopNavigation locale={locale} />
         <AuthButtons
           isLogin={isLogin}
-          isClient={isClient}
+          // isClient={isClient}
           locale={locale}
           toggleNotification={toggleNotification}
           toggleUserDropdown={toggleUserDropdown}
@@ -81,11 +83,16 @@ export const Header: FC<Props> = ({ locale }) => {
         />
 
         {/* Mobile Menu Button */}
-        <button className='block sm:hidden' onClick={toggleMobileMenu}>
+        <Button className='block sm:hidden' onClick={toggleMobileMenu}>
           {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
-        </button>
+        </Button>
 
-        <MobileNavigation isMobileMenuOpen={isMobileMenuOpen} closeAllMenus={closeAllMenus} locale={locale} isLogin={isLogin} />
+        <MobileNavigation
+          isMobileMenuOpen={isMobileMenuOpen}
+          closeAllMenus={closeAllMenus}
+          locale={locale}
+          isLogin={isLogin}
+        />
         <NotificationDropdown
           notifications={notifications}
           isNotificationOpen={isNotificationOpen}
@@ -93,16 +100,16 @@ export const Header: FC<Props> = ({ locale }) => {
           locale={locale}
         />
         <UserDropdown
-            isUserDropdownOpen={isUserDropdownOpen}
-            closeAllMenus={closeAllMenus}
-            locale={locale}
-            setLoginStatus={setLoginStatus}
-            setUser={setUser}
-            socketRef={socketRef}
+          isUserDropdownOpen={isUserDropdownOpen}
+          closeAllMenus={closeAllMenus}
+          locale={locale}
+          setLoginStatus={setLoginStatus}
+          setUser={setUser}
+          socketRef={socketRef}
         />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header
