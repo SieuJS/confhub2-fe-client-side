@@ -37,14 +37,13 @@ export default function Dashboard({ locale }: { locale: string }) {
     setActivePage(initialPage)
   }, [searchParams])
 
-  const notifications: any[] = [
-  ]
+
   const renderPage = () => {
     switch (activePage) {
       case 'Setting':
         return <SettingTab />
       case 'Notifications':
-        return <NotificationsTab notifications={notifications} />
+        return <NotificationsTab/>
       case 'Followed':
         return <FollowedTab />
       case 'Note':

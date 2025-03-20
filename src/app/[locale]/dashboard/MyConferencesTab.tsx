@@ -14,21 +14,6 @@ enum ConferenceStatus {
   Rejected = 'Rejected'
 }
 
-// Interface for the simplified conference data
-interface ConferenceDisplayInfo {
-  id: string
-  title: string
-  acronym: string
-  location: string
-  fromDate?: string
-  toDate?: string
-  summary?: string
-  websiteUrl?: string
-  year?: number
-  status: ConferenceStatus
-  createdAt?: string
-}
-
 const MyConferencesTab: React.FC = () => {
   const [displayStatus, setDisplayStatus] = useState<ConferenceStatus>(
     ConferenceStatus.Approve
@@ -56,7 +41,8 @@ const MyConferencesTab: React.FC = () => {
         toDate: conf.dates.find(d => d.type === 'Conference Date')?.toDate,
         websiteUrl: conf.organization.link,
         status: conf.status as ConferenceStatus,
-        createdAt: conf.conference.createdAt
+        createdAt: conf.conference.createdAt,
+        
       }))
       .sort((a, b) => {
         if (!a.createdAt) return 1
