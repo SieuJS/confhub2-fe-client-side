@@ -6,55 +6,10 @@ import Footer from '../utils/Footer'
 import { useRouter, usePathname } from 'next/navigation'
 import countryData from '../addconference/countries.json' // Import the JSON data
 
-const API_ADD_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/conferences'
+const API_ADD_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/user/add-conference'
 const CSC_API_KEY = process.env.NEXT_PUBLIC_CSC_API_KEY
 
-interface ConferenceFormData {
-  title: string
-  acronym: string
-  link: string
-  topics: string[]
-  type: 'offline' | 'online' | 'hybrid'
-  location: LocationInput
-  dates: ImportantDateInput[]
-  imageUrl: string
-  description: string
-}
-
-interface LocationInput {
-  address: string
-  cityStateProvince: string
-  country: string
-  continent: string
-}
-
-interface ImportantDateInput {
-  type: string
-  name: string
-  fromDate: string
-  toDate: string
-}
-
-interface Country {
-  name: string
-  iso2: string
-  region: string
-}
-
-interface State {
-  name: string
-  iso2: string
-  country_code: string
-  state_code: string
-}
-
-interface City {
-  name: string
-  country_code: string
-  state_code: string
-  latitude: string
-  longitude: string
-}
+import { LocationInput, ImportantDateInput, City, State, Country, ConferenceFormData } from '@/src/models/send/addConference.send'
 
 const AddConference = ({ locale }: { locale: string }) => {
   const [title, setTitle] = useState('')

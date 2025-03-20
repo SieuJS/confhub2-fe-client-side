@@ -1,3 +1,4 @@
+// FollowedTab.tsx
 import React, { useState, useEffect } from 'react';
 import ConferenceItem from '../conferences/ConferenceItem';
 import { getListConference } from '../../../api/conference/getListConferences'; // Import getListConference
@@ -69,13 +70,23 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
     return <div className="container mx-auto p-4">Loading...</div>;
   }
 
+    // *** TRANSFORMATION HERE (similar to MyConferencesTab) ***
+    const transformedConferences = followedConferences.map(conf => ({
+        id: conf.id,
+        title: conf.title,
+        acronym: conf.acronym,
+        location: `${conf.location.cityStateProvince}, ${conf.location.country}`, // Combine location
+        fromDate: conf.dates?.fromDate, // Optional chaining
+        toDate: conf.dates?.toDate,     // Optional chaining
+    }));
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-semibold mb-2">Followed Conferences</h1>
       {followedConferences.length === 0 ? (
         <p>You are not following any conferences yet.</p>
       ) : (
-        followedConferences.map((conference) => (
+           transformedConferences.map((conference) => (
           <ConferenceItem key={conference.id} conference={conference} />
         ))
       )}

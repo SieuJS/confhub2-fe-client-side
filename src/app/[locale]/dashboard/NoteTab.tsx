@@ -1,8 +1,8 @@
 // NoteTab.tsx
 import React, { useState, useEffect, useMemo } from 'react'
 import Image from 'next/image'
-import Calendar from './calendar/Calendar'
-import { CalendarEvent } from './calendar/Calendar'
+import Calendar from './noteTab/Calendar'
+import { CalendarEvent } from './noteTab/Calendar'
 import { ConferenceResponse } from '../../../models/response/conference.response'
 import { getConference } from '../../../api/conference/getConferenceDetails'
 import { Link } from '@/src/navigation'
