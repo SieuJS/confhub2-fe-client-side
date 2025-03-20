@@ -16,4 +16,6 @@ export type FollowedConference = {
   id: string;
   createdAt: string;
   updatedAt: string;
+  followedAt?: string; // Thêm dòng này
 }
+

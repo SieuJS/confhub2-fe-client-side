@@ -190,7 +190,7 @@ export const Header: FC<Props> = ({ locale }) => {
               onClick={closeAllMenus}
               className='block text-button hover:underline'
             >
-              {t('View all notifications')}
+              {t('View_all_notifications')}
             </Link>
           </div>
         </div>
