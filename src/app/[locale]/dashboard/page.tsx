@@ -12,7 +12,7 @@ import NoteTab from './NoteTab'
 import MyConferencesTab from './MyConferencesTab'
 import { Header } from '../utils/Header'
 
-export default function Setting({ locale }: { locale: string }) {
+export default function Dashboard({ locale }: { locale: string }) {
   const t = useTranslations('')
   const searchParams = useSearchParams()
   const [activePage, setActivePage] = useState<string>('')
@@ -38,46 +38,6 @@ export default function Setting({ locale }: { locale: string }) {
   }, [searchParams])
 
   const notifications: any[] = [
-    {
-      title:
-        'The conference SIAM Conference on Discrete Mathematics that you are followed has new updated',
-      description:
-        '[UPDATED] Deadline for submission of minisymposium speaker abstracts is changed from 2024/02/15 to 2024/02/15.',
-      updatedAt: '2024/06/19 11:41',
-      detailsLink: '#'
-    },
-    {
-      title:
-        'The conference SIAM Conference on Discrete Mathematics that you are followed has new updated',
-      description:
-        '[UPDATED] Deadline for submission of minisymposium proposals is changed from 2024/02/15 to 2024/02/15.',
-      updatedAt: '2024/06/19 11:41',
-      detailsLink: '#'
-    },
-    {
-      title:
-        'The conference SIAM Conference on Discrete Mathematics that you are followed has new updated',
-      description:
-        '[UPDATED] Conference start from "2024/7/8 to 2024/7/11", location: "Spokane, Washington, U.S", type: "offline".',
-      updatedAt: '2024/06/19 11:41',
-      detailsLink: '#'
-    },
-    {
-      title:
-        'The conference SIAM Conference on Discrete Mathematics that you are followed has new updated',
-      description:
-        '[UPDATED] Conference start from "2024/7/8 to 2024/7/11", location: "Spokane, Washington, U.S", type: "offline".',
-      updatedAt: '2024/06/19 11:41',
-      detailsLink: '#'
-    },
-    {
-      title:
-        'The conference SIAM Conference on Discrete Mathematics that you are followed has new updated',
-      description:
-        '[UPDATED] Conference start from "2024/7/8 to 2024/7/11", location: "Spokane, Washington, U.S", type: "offline".',
-      updatedAt: '2024/06/19 11:41',
-      detailsLink: '#'
-    }
   ]
   const renderPage = () => {
     switch (activePage) {
@@ -358,15 +318,13 @@ export default function Setting({ locale }: { locale: string }) {
                           hover:bg-button
                           hover:opacity-60
                           focus:outline-none
-                          ${
-                            activePage === item.page
-                              ? 'bg-button text-button-text hover:bg-secondary'
-                              : ''
+                          ${activePage === item.page
+                            ? 'bg-button text-button-text hover:bg-secondary'
+                            : ''
                           }
-                          ${
-                            isSidebarOpen
-                              ? 'w-50 h-12 justify-start'
-                              : 'h-12 w-16 justify-center'
+                          ${isSidebarOpen
+                            ? 'w-50 h-12 justify-start'
+                            : 'h-12 w-16 justify-center'
                           }
                         `}
                       >
