@@ -1,5 +1,5 @@
 // components/Header/index.tsx
-import { FC, useRef } from 'react'
+import { FC, useRef, useState, useEffect } from 'react'
 import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
 import { useLocalStorage } from 'usehooks-ts'
@@ -35,7 +35,14 @@ export const Header: FC<Props> = ({ locale }) => {
     'loginStatus',
     null
   )
-  const isLogin = !!loginStatus
+
+  const [isLogin, setIsLogin] = useState(false);
+
+  useEffect(() => {
+    if (loginStatus)
+      setIsLogin(true);
+  }, []);
+
   const isClient = !!(typeof window !== 'undefined')
 
   const {
