@@ -1,13 +1,13 @@
-// src/hooks/useNotifications.ts (The Orchestrator)
-import { useState, useEffect, useCallback } from 'react';
+
+// src/hooks/useNotifications.ts
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import useNotificationData from './useNotificationData';
 import useNotificationState from './useNotificationState';
 import useSelection from './useSelection';
 import useFilteredNotifications from './useFilteredNotifications';
 import useBulkReadActions from './useBulkReadActions';
 import useBulkImportantActions from './useBulkImportantActions';
-import { Notification } from '@/src/models/response/user.response'; // Import Notification
-
+import { Notification } from '@/src/models/response/user.response';
 
 interface UseNotificationsReturn {
     notifications: Notification[];
@@ -31,14 +31,13 @@ interface UseNotificationsReturn {
     handleMarkSelectedAsUnimportant: () => Promise<void>;
     allSelectedAreImportant: boolean;
     setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
-    fetchData: () => Promise<void>; // Add fetchData to the return type
+    fetchData: () => Promise<void>; // Add fetchData
 }
 
 const useNotifications = (): UseNotificationsReturn => {
     const [searchTerm, setSearchTerm] = useState('');
     const [userId, setUserId] = useState<string>('');
 
-    // Get userId from local storage.  This is better than storing it in the hook's state.
     useEffect(() => {
         const userData = localStorage.getItem('user');
         if (userData) {
@@ -54,15 +53,17 @@ const useNotifications = (): UseNotificationsReturn => {
         fetchData
     } = useNotificationData(userId);
 
+
     const {
         notifications,
-        setNotifications,
+        setNotifications, // We won't directly use setNotifications *after* initialization
         handleUpdateSeenAt,
         handleToggleImportant,
         handleDeleteNotification,
         handleMarkUnseen,
         updateNotifications
-    } = useNotificationState(initialNotifications, userId);
+    } = useNotificationState(initialNotifications, userId);  // Initialize with initialNotifications
+
 
     const filteredNotifications = useFilteredNotifications(notifications, searchTerm);
 
@@ -72,8 +73,9 @@ const useNotifications = (): UseNotificationsReturn => {
         selectAllChecked,
         handleCheckboxChange: handleCheckboxChangeSelection,
         handleSelectAllChange
-    } = useSelection(filteredNotifications.map(n => n.id));
-
+    } = useSelection(
+        useMemo(() => filteredNotifications.map(n => n.id), [filteredNotifications]) // <-- Memoize tại đây
+    );
 
     const {
         handleMarkSelectedAsRead,
@@ -87,12 +89,9 @@ const useNotifications = (): UseNotificationsReturn => {
         allSelectedAreImportant
     } = useBulkImportantActions(checkedIndices, notifications, updateNotifications);
 
-
-
-    // Adapt the checkbox change handler for the tab
     const handleCheckboxChangeTab = useCallback(
         (id: string, checked: boolean) => {
-            handleCheckboxChangeSelection(id, checked); // Use the selection hook's handler
+            handleCheckboxChangeSelection(id, checked);
         },
         [handleCheckboxChangeSelection]
     );
@@ -102,15 +101,23 @@ const useNotifications = (): UseNotificationsReturn => {
             checkedIndices.includes(n.id) ? { ...n, deletedAt: new Date().toISOString() } : n
         );
         await updateNotifications(updatedNotifications);
-        setCheckedIndices([]); // Clear after deletion
-    }, [checkedIndices, notifications, updateNotifications, setCheckedIndices]);
+        // setCheckedIndices([]); // REMOVE THIS LINE
+    }, [checkedIndices, notifications, updateNotifications]); // Remove setCheckedIndices from the dependency array
 
 
-    // Keep notifications in sync with initialNotifications.  Important for re-fetching.
+    // UseEffect to initialize the state, ONLY ONCE
     useEffect(() => {
-        setNotifications(initialNotifications);
+        if (initialNotifications.length > 0) {
+            setNotifications(initialNotifications);
+        }
     }, [initialNotifications, setNotifications]);
 
+    // Refetch data when userId changes.
+    useEffect(() => {
+        if (userId) {
+            fetchData();
+        }
+    }, [userId, fetchData]);
 
     return {
         notifications,

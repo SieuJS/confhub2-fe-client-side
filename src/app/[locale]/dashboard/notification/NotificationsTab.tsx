@@ -1,8 +1,8 @@
-// NotificationsTab.tsx
-import React, { useEffect } from 'react';
+// NotificationsTab.tsx  (Minimal Changes)
+import React, { useEffect, useCallback } from 'react';
 import NotificationItem from './NotificationItem';
 import NotificationDetails from './NotificationDetails';
-import useNotifications from '../../../../hooks/dashboard/notification/useNotifications';
+import useNotifications from '../../../../hooks/dashboard/notification/useNotifications';  //Correct path
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 const NotificationsTab: React.FC = () => {
@@ -27,7 +27,7 @@ const NotificationsTab: React.FC = () => {
         handleMarkSelectedAsImportant,    // NEW
         handleMarkSelectedAsUnimportant,  // NEW
         allSelectedAreImportant,          // NEW
-        setSearchTerm
+        setSearchTerm,
     } = useNotifications();
 
     const pathname = usePathname();
@@ -36,6 +36,7 @@ const NotificationsTab: React.FC = () => {
     const selectedNotificationId = searchParams.get('id');
     const tab = searchParams.get('tab');
 
+    // NotificationsTab.tsx
     useEffect(() => {
         if (selectedNotificationId) {
             const notification = notifications.find(n => n.id === selectedNotificationId);
@@ -43,7 +44,7 @@ const NotificationsTab: React.FC = () => {
                 handleUpdateSeenAt(selectedNotificationId);
             }
         }
-    }, [selectedNotificationId, handleUpdateSeenAt, notifications]);
+    }, [selectedNotificationId, handleUpdateSeenAt, notifications]); // Đã ổn định handleUpdateSeenAt
 
     const handleBackToNotifications = () => {
         const newSearchParams = new URLSearchParams(searchParams.toString());
@@ -184,8 +185,10 @@ const NotificationsTab: React.FC = () => {
                             notification={notification}
                             onDelete={() => handleDeleteNotification(notification.id)}
                             isChecked={checkedIndices.includes(notification.id)}
-                            onCheckboxChange={(checked) => handleCheckboxChangeTab(notification.id, checked)}
-                            onToggleImportant={handleToggleImportant}
+                            onCheckboxChange={useCallback(
+                                (checked) => handleCheckboxChangeTab(notification.id, checked),
+                                [notification.id, handleCheckboxChangeTab]
+                            )} onToggleImportant={handleToggleImportant}
                             onMarkUnseen={handleMarkUnseen}
                             notificationId={notification.id}
                         />

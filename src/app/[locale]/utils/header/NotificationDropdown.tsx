@@ -1,5 +1,4 @@
-// components/Header/components/NotificationDropdown.tsx
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useCallback } from 'react';
 import { Link } from '@/src/navigation';
 import { Notification } from '../../../../models/response/user.response';
 import { useTranslations } from 'next-intl';
@@ -26,44 +25,45 @@ const NotificationDropdown: FC<Props> = ({
 }) => {
   const t = useTranslations('');
 
+  const memoizedFetchNotifications = useCallback(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
+
   useEffect(() => {
     if (isNotificationOpen) {
-      fetchNotifications();
+      memoizedFetchNotifications();
     }
-  }, [isNotificationOpen, fetchNotifications]);
+  }, [isNotificationOpen, memoizedFetchNotifications]);
 
-  const groupNotifications = (notifications: Notification[]) => {
+  const groupNotifications = useCallback((notifications: Notification[]) => {
     const now = new Date();
     const oneDayAgo = now.getTime() - (24 * 60 * 60 * 1000);
 
     const newNotifications = notifications.filter(n => new Date(n.createdAt).getTime() >= oneDayAgo);
     const earlierNotifications = notifications.filter(n => new Date(n.createdAt).getTime() < oneDayAgo);
     return { newNotifications, earlierNotifications };
-  };
+  }, []);
 
   const { newNotifications, earlierNotifications } = groupNotifications(notifications);
 
-  const renderNotificationItem = (notification: Notification) => (
+  const renderNotificationItem = useCallback((notification: Notification) => (
+    // Removed legacyBehavior and <a> tag.  Link handles the click now.
     <Link
-      href={{ pathname: `/dashboard`, query: { tab: 'notifications', id: notification.id } }} // Add id to query
+      href={{ pathname: `/dashboard`, query: { tab: 'notifications', id: notification.id } }}
       lang={locale}
       key={notification.id}
-      onClick={closeAllMenus}
-      legacyBehavior
-    >
-      <a
-        className={`flex items-start p-4 border-b border-gray-200 hover:bg-gray-50 ${notification.seenAt ? '' : 'bg-blue-50'  // Corrected condition
-          }`}
+      onClick={closeAllMenus} // Moved onClick to the Link component
+         >
+      <div
+        className={`flex items-start p-4 border-b border-gray-200 hover:bg-gray-50 ${notification.seenAt ? '' : 'bg-blue-50'}`}
       >
         <div className="mr-3 flex-shrink-0">
           <div className="relative w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
             <span className="text-gray-700 font-medium">{notification.type.charAt(0)}</span>
-            {/* Corrected condition:  Show red dot if NOT seen */}
             {notification.seenAt === null && <span className="absolute top-0 right-0 block w-2.5 h-2.5 rounded-full bg-red-500"></span>}
           </div>
         </div>
         <div className="flex-grow">
-          {/* Corrected condition: Bold if SEEN, normal if NOT seen */}
           <p className={`text-sm ${notification.seenAt ? 'text-gray-700' : 'font-bold'}`}>
             {notification.message}
           </p>
@@ -71,9 +71,15 @@ const NotificationDropdown: FC<Props> = ({
             {timeAgo(notification.createdAt)}
           </span>
         </div>
-      </a>
+      </div>
     </Link>
-  );
+  ), [closeAllMenus, locale]);
+
+  const handleMarkAllAsRead = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    await markAllAsRead();
+    fetchNotifications();
+  }, [markAllAsRead, fetchNotifications]);
 
   return (
     <div
@@ -89,10 +95,7 @@ const NotificationDropdown: FC<Props> = ({
           <h6 className="text-lg font-semibold">Notifications</h6>
           <button
             className="text-sm text-blue-600 hover:text-blue-800"
-            onClick={(e) => {
-              e.stopPropagation();
-              markAllAsRead().then(fetchNotifications);
-            }}
+            onClick={handleMarkAllAsRead}
           >
             {t('Mark All As Read')}
           </button>
@@ -125,14 +128,13 @@ const NotificationDropdown: FC<Props> = ({
       </div>
 
       <div className="p-4 border-t border-gray-200 text-center">
-        {/*  "View all" link - keep as-is, goes to list view */}
+        {/* Removed the extra <a> tag.  Link handles the click. */}
         <Link
           href={{ pathname: `/dashboard`, query: { tab: 'notifications' } }}
           lang={locale}
-          onClick={closeAllMenus}
-          legacyBehavior
+          onClick={closeAllMenus}  // Moved onClick to Link
         >
-          <a className="text-sm text-blue-600 hover:text-blue-800 block">View all</a>
+           <div className="text-sm text-blue-600 hover:text-blue-800 block"> View all </div>
         </Link>
       </div>
     </div>

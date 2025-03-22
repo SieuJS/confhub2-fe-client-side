@@ -1,6 +1,8 @@
+
 // src/hooks/useNotificationData.ts
 import { useState, useEffect, useCallback } from 'react';
-import { Notification, UserResponse } from '@/src/models/response/user.response';
+import { getNotifications } from '../../../api/user/getNotifications';
+import { Notification } from '@/src/models/response/user.response';
 
 const useNotificationData = (userId: string) => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -8,35 +10,28 @@ const useNotificationData = (userId: string) => {
     const [loggedIn, setLoggedIn] = useState(false);
 
     const fetchData = useCallback(async () => {
-        setLoading(true);
+      setLoading(true);
         try {
-            if (!userId) {
-                setLoggedIn(false);
-                setLoading(false);
-                return;
+            if (userId) {
+                const data = await getNotifications(userId);
+                setNotifications(data || []); // Ensure data is an array
+                setLoggedIn(true);
             }
-            const userResponse = await fetch(`http://localhost:3000/api/v1/user/${userId}`);
-            if (!userResponse.ok) {
-                throw new Error(`HTTP error! status: ${userResponse.status}`);
-            }
-            const userDetails: UserResponse = await userResponse.json();
-            const initializedNotifications = (userDetails.notifications || []).map((n: Notification) => ({
-                ...n,
-                seenAt: n.seenAt || null,
-            }));
-            setNotifications(initializedNotifications);
-            setLoggedIn(true);
-
         } catch (error) {
-            console.error('Failed to fetch notifications:', error);
+            console.error('Error fetching notifications:', error);
+            setNotifications([]); // Set to empty array on error
         } finally {
-            setLoading(false);
+          setLoading(false);
         }
-    }, [userId]);
+    }, [userId]); // Dependencies for fetchData
 
+
+    // No change in this useEffect, it's correct.
     useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+        if (userId) {
+            fetchData();
+        }
+    }, [userId, fetchData]);
 
     return { notifications, loading, loggedIn, fetchData };
 };

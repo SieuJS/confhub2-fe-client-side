@@ -1,5 +1,5 @@
-// components/Header/index.tsx
-import { FC, useRef, useState, useEffect } from 'react'
+// components/Header/index.tsx (Corrected)
+import { FC, useRef, useCallback } from 'react'
 import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
 import { useLocalStorage } from 'usehooks-ts'
@@ -24,26 +24,14 @@ export const Header: FC<Props> = ({ locale }) => {
   const headerRef = useRef<HTMLDivElement>(null);
 
   const [user, setUser] = useLocalStorage<{
-    id: string
-    firstname: string
-    lastname: string
-    email: string
-  } | null>('user', null)
+    id: string;
+    firstname: string;
+    lastname: string;
+    email: string;
+  } | null>('user', null);
 
-  console.log(user)
-  const [loginStatus, setLoginStatus] = useLocalStorage<string | null>(
-    'loginStatus',
-    null
-  )
-
-  const [isLogin, setIsLogin] = useState(false);
-
-  useEffect(() => {
-    if (loginStatus)
-      setIsLogin(true);
-  }, []);
-
-  const isClient = !!(typeof window !== 'undefined')
+  const [loginStatus, setLoginStatus] = useLocalStorage<string | null>('loginStatus', null);
+  const isLogin = !!loginStatus;
 
   const {
     notifications,
@@ -66,9 +54,9 @@ export const Header: FC<Props> = ({ locale }) => {
 
   useClickOutside(headerRef, closeAllMenus, 'notification-dropdown');
 
-  const unreadCount = () => {
+  const unreadCount = useCallback(() => {
     return notifications.filter(n => (n.seenAt === null) && n.deletedAt === null).length;
-  };
+  }, [notifications]);
 
   return (
     <div
@@ -92,7 +80,7 @@ export const Header: FC<Props> = ({ locale }) => {
           toggleNotification={toggleNotification}
           toggleUserDropdown={toggleUserDropdown}
           notificationEffect={notificationEffect}
-          unreadCount={unreadCount()} 
+          unreadCount={unreadCount()}
         />
 
         {/* Mobile Menu Button */}

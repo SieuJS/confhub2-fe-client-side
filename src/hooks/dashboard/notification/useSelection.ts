@@ -1,9 +1,12 @@
 // src/hooks/useSelection.ts
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 
 const useSelection = (itemIds: string[]) => {
     const [checkedIndices, setCheckedIndices] = useState<string[]>([]);
     const [selectAllChecked, setSelectAllChecked] = useState(false);
+
+    // Memoize để tránh thay đổi reference khi itemIds giống nhau
+    const itemIdsStable = useMemo(() => itemIds, [JSON.stringify(itemIds)]); // <-- Fix here
 
     const handleCheckboxChange = useCallback((id: string, checked: boolean) => {
         setCheckedIndices(prevIndices => {
@@ -19,22 +22,27 @@ const useSelection = (itemIds: string[]) => {
         (event: React.ChangeEvent<HTMLInputElement>) => {
             const checked = event.target.checked;
             setSelectAllChecked(checked);
-            if (checked) {
-                setCheckedIndices(itemIds);
-            } else {
-                setCheckedIndices([]);
-            }
+            setCheckedIndices(checked ? [...itemIdsStable] : []); // <-- Dùng itemIds đã memoize
         },
-        [itemIds]
+        [itemIdsStable] // <-- Dependency ổn định
     );
 
-    // Keep checkedIndices within bounds of itemIds.  Important if items are deleted.
+    // Effect điều chỉnh checkedIndices khi itemIds thay đổi
     useEffect(() => {
-        setCheckedIndices(prevIndices => prevIndices.filter(id => itemIds.includes(id)));
-    }, [itemIds]);
+        setCheckedIndices(prev => 
+            prev.filter(id => itemIdsStable.includes(id)))
+        setSelectAllChecked(prev => 
+            prev && checkedIndices.length === itemIdsStable.length
+        );
+    }, [itemIdsStable]); // <-- Chỉ chạy khi itemIds thực sự thay đổi
 
-
-    return { checkedIndices, setCheckedIndices, selectAllChecked, handleCheckboxChange, handleSelectAllChange };
+    return { 
+        checkedIndices, 
+        setCheckedIndices, 
+        selectAllChecked, 
+        handleCheckboxChange, 
+        handleSelectAllChange 
+    };
 };
 
 export default useSelection;
