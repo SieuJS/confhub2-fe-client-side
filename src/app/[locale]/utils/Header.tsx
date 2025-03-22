@@ -1,4 +1,4 @@
-// components/Header/index.tsx
+// components/Header/index.tsx (Header Component)
 import { FC, useRef, useState, useEffect } from 'react';
 import { Link } from '@/src/navigation';
 import { useTranslations } from 'next-intl';
@@ -30,17 +30,16 @@ export const Header: FC<Props> = ({ locale }) => {
     email: string;
   } | null>('user', null);
 
-  console.log(user)
   const [loginStatus, setLoginStatus] = useLocalStorage<string | null>(
-  'loginStatus',
-  null
+    'loginStatus',
+    null
   )
 
   const [isLogin, setIsLogin] = useState(false);
 
   useEffect(() => {
-  if (loginStatus)
-  setIsLogin(true);
+    if (loginStatus)
+      setIsLogin(true);
   }, []);
   const {
     notifications,
@@ -56,7 +55,7 @@ export const Header: FC<Props> = ({ locale }) => {
     isMobileMenuOpen,
     isUserDropdownOpen,
     closeAllMenus,
-    toggleNotification, 
+    toggleNotification,
     toggleMobileMenu,
     toggleUserDropdown,
     openNotification,
@@ -66,10 +65,14 @@ export const Header: FC<Props> = ({ locale }) => {
   useClickOutside(headerRef, closeAllMenus, 'notification-dropdown');
 
   const unreadCount = () => {
-    return notifications.filter(
+    const unread = notifications.filter(
       (n) => n.seenAt === null && n.deletedAt === null
     ).length;
+    return unread > 20 ? '20+' : unread; // Display "20+" if more than 20 unread
   };
+
+  const displayedNotifications = notifications.slice(0, 20); // Get the latest 20 notifications
+
 
   return (
     <div
@@ -85,7 +88,7 @@ export const Header: FC<Props> = ({ locale }) => {
         </div>
       </Link>
 
-      <div className='relative flex flex-row items-center gap-3'>
+      <div className='relative flex flex-row items-center gap-4'>
         <DesktopNavigation locale={locale} />
         <AuthButtons
           isLogin={isLogin}
@@ -108,7 +111,7 @@ export const Header: FC<Props> = ({ locale }) => {
           isLogin={isLogin}
         />
         <NotificationDropdown
-          notifications={notifications}
+          notifications={displayedNotifications} // Pass the limited notifications
           isNotificationOpen={isNotificationOpen}
           closeAllMenus={closeAllMenus}
           locale={locale}

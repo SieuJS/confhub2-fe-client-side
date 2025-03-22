@@ -1,17 +1,21 @@
-
-// components/Header/components/NotificationIcon.tsx (Added relative positioning)
+// components/Header/components/NotificationIcon.tsx
 import { FC } from 'react';
 
 interface NotificationIconProps {
   notificationEffect: boolean;
-  unreadCount: number; // New prop for unread count
+  unreadCount: number | string;
 }
 
 export const NotificationIcon: FC<NotificationIconProps> = ({ notificationEffect, unreadCount }) => (
-  <div className="relative"> {/* Add relative positioning */}
+  <div className="relative">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`text-button ${notificationEffect ? 'animate-bounce text-yellow-500' : ''}`}><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M22 8c0-2.3-.8-4.3-2-6"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/><path d="M4 2C2.8 3.7 2 5.7 2 8"/></svg>
-    {unreadCount > 0 && (
+    {typeof unreadCount === 'number' && unreadCount > 0 && (
       <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5">
+        {unreadCount}
+      </span>
+    )}
+    {typeof unreadCount === 'string'  && (
+      <span className="absolute -top-1 -right-3 bg-red-500 text-white text-xs rounded-full px-0.5">
         {unreadCount}
       </span>
     )}
@@ -73,4 +77,3 @@ export const UserIcon: FC = () => (
     <polyline points='16 11 18 13 22 9' />
   </svg>
 );
-

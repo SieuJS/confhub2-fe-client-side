@@ -1,4 +1,3 @@
-
 // components/Header/components/AuthButtons.tsx (Corrected LoadingIndicator usage)
 
 import { FC, useState, useEffect } from 'react'
@@ -16,7 +15,7 @@ interface Props {
   toggleNotification: () => void;
   toggleUserDropdown: () => void;
   notificationEffect: boolean;
-  unreadCount: number; // Add unreadCount prop
+  unreadCount: number | string; // Change type to number | string
 }
 
 const AuthButtons: FC<Props> = ({

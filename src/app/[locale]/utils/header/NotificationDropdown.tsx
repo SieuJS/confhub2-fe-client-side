@@ -1,3 +1,6 @@
+
+// components/Header/header/NotificationDropdown.tsx (NotificationDropdown Component)
+
 import { FC, useEffect, useCallback } from 'react';
 import { Link } from '@/src/navigation';
 import { Notification } from '../../../../models/response/user.response';
@@ -44,6 +47,7 @@ const NotificationDropdown: FC<Props> = ({
     return { newNotifications, earlierNotifications };
   }, []);
 
+  // No changes needed here, as we're already working with a limited set of notifications
   const { newNotifications, earlierNotifications } = groupNotifications(notifications);
 
   const renderNotificationItem = useCallback((notification: Notification) => (
@@ -53,7 +57,7 @@ const NotificationDropdown: FC<Props> = ({
       lang={locale}
       key={notification.id}
       onClick={closeAllMenus} // Moved onClick to the Link component
-         >
+    >
       <div
         className={`flex items-start p-4 border-b border-gray-200 hover:bg-gray-50 ${notification.seenAt ? '' : 'bg-blue-50'}`}
       >
@@ -128,13 +132,12 @@ const NotificationDropdown: FC<Props> = ({
       </div>
 
       <div className="p-4 border-t border-gray-200 text-center">
-        {/* Removed the extra <a> tag.  Link handles the click. */}
         <Link
           href={{ pathname: `/dashboard`, query: { tab: 'notifications' } }}
           lang={locale}
-          onClick={closeAllMenus}  // Moved onClick to Link
+          onClick={closeAllMenus}
         >
-           <div className="text-sm text-blue-600 hover:text-blue-800 block"> View all </div>
+          <div className="text-sm text-blue-600 hover:text-blue-800 block"> View all </div>
         </Link>
       </div>
     </div>

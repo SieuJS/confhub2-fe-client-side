@@ -1,8 +1,8 @@
-// NotificationsTab.tsx  (Minimal Changes)
+// NotificationsTab.tsx
 import React, { useEffect, useCallback } from 'react';
 import NotificationItem from './NotificationItem';
 import NotificationDetails from './NotificationDetails';
-import useNotifications from '../../../../hooks/dashboard/notification/useNotifications';  //Correct path
+import useNotifications from '../../../../hooks/dashboard/notification/useNotifications';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 const NotificationsTab: React.FC = () => {
@@ -24,9 +24,9 @@ const NotificationsTab: React.FC = () => {
         handleMarkSelectedAsRead,
         handleMarkSelectedAsUnread,
         allSelectedAreRead,
-        handleMarkSelectedAsImportant,    // NEW
-        handleMarkSelectedAsUnimportant,  // NEW
-        allSelectedAreImportant,          // NEW
+        handleMarkSelectedAsImportant,
+        handleMarkSelectedAsUnimportant,
+        allSelectedAreImportant,
         setSearchTerm,
     } = useNotifications();
 
@@ -44,13 +44,24 @@ const NotificationsTab: React.FC = () => {
                 handleUpdateSeenAt(selectedNotificationId);
             }
         }
-    }, [selectedNotificationId, handleUpdateSeenAt, notifications]); // Đã ổn định handleUpdateSeenAt
+    }, [selectedNotificationId, handleUpdateSeenAt, notifications]);
 
     const handleBackToNotifications = () => {
         const newSearchParams = new URLSearchParams(searchParams.toString());
         newSearchParams.delete('id');
         router.push(`${pathname}?${newSearchParams.toString()}`);
     };
+
+    // Memoize the checkbox change handler *outside* the loop.
+    // This is crucial for performance and avoiding the "Rendered more hooks" error.
+    const handleCheckboxChange = useCallback(
+        (notificationId: string, checked: boolean) => {
+            handleCheckboxChangeTab(notificationId, checked);
+        },
+        [handleCheckboxChangeTab] //  `handleCheckboxChangeTab` is now the only dependency.
+    );
+
+
 
     if (!loggedIn) {
         return (<div className='container mx-auto p-4'>Please log in to view notifications.</div>);
@@ -76,7 +87,7 @@ const NotificationsTab: React.FC = () => {
                 />
             );
         } else {
-            return <div>Notification not found. <button onClick={handleBackToNotifications}>Back</button></div>;
+            return <div>Notification not found.  <button onClick={handleBackToNotifications}>Back</button></div>;
         }
     }
 
@@ -131,7 +142,6 @@ const NotificationsTab: React.FC = () => {
                                 </>
                             )}
                         </button>
-                        {/* NEW: Important/Unimportant Button */}
                         <button
                             onClick={allSelectedAreImportant ? handleMarkSelectedAsUnimportant : handleMarkSelectedAsImportant}
                             className='mr-2 flex items-center rounded bg-yellow-500 px-4 py-1 font-bold text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-400'
@@ -156,7 +166,6 @@ const NotificationsTab: React.FC = () => {
                                 </>
                             )}
                         </button>
-                        {/* END NEW */}
                         <button
                             onClick={handleDeleteSelected}
                             className='flex items-center rounded bg-red-500 px-4 py-1 font-bold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400'
@@ -185,12 +194,10 @@ const NotificationsTab: React.FC = () => {
                             notification={notification}
                             onDelete={() => handleDeleteNotification(notification.id)}
                             isChecked={checkedIndices.includes(notification.id)}
-                            onCheckboxChange={useCallback(
-                                (checked) => handleCheckboxChangeTab(notification.id, checked),
-                                [notification.id, handleCheckboxChangeTab]
-                            )} onToggleImportant={handleToggleImportant}
+                            onCheckboxChange={(checked) => handleCheckboxChange(notification.id, checked)}  // Pass notification.id
+                            onToggleImportant={handleToggleImportant}
                             onMarkUnseen={handleMarkUnseen}
-                            notificationId={notification.id}
+                            notificationId={notification.id} // This prop is redundant, you are already passing notification.
                         />
                     ))
                 )}
