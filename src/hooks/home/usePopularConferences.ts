@@ -77,7 +77,11 @@ const usePopularConferences = (initialVisibleCount: number = 3): UsePopularConfe
             try {
                 setLoading(true);
                 const conferencesData = await getListConference();
-                setListConferences(conferencesData.payload);
+                if (conferencesData.payload.length > 0) {
+                    setListConferences(conferencesData.payload);
+                } else {
+                    setListConferences([]); // Nếu không có conference nào được follow
+                }
             } catch (error) {
                 console.error("Failed to fetch data:", error);
             } finally {
@@ -95,13 +99,16 @@ const usePopularConferences = (initialVisibleCount: number = 3): UsePopularConfe
         return () => {
             stopAutoScroll();
         };
-    }, [listConferences.length, startAutoScroll, stopAutoScroll]);
+    }, [currentIndex, listConferences.length]);
 
     // Calculate displayedCards correctly
-    const displayedCards = [];
-    for (let i = 0; i < visibleCount; i++) {
-        displayedCards.push(listConferences[wrapIndex(currentIndex + i)]);
-    }
+    const displayedCards = [
+        listConferences[wrapIndex(currentIndex - 2)],
+        listConferences[wrapIndex(currentIndex - 1)],
+        listConferences[currentIndex],
+        listConferences[wrapIndex(currentIndex + 1)],
+        listConferences[wrapIndex(currentIndex + 2)],
+    ];
 
 
     return {
