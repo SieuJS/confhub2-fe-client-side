@@ -1,15 +1,15 @@
 // components/NotificationItem.tsx
-import React, { useState, useEffect } from 'react'
-import { Notification } from '../../../models/response/user.response'
+import React, { useState, useEffect, useCallback } from 'react'
+import { Notification } from '../../../../models/response/user.response'
 
 interface NotificationItemProps {
-  notification: Notification
-  onDelete?: () => void
-  isChecked: boolean
-  onCheckboxChange: (checked: boolean) => void
-  onUpdateSeenAt: (id: string) => void
-  onToggleImportant: (id: string) => void
-  onMarkUnseen: (id: string) => void // Add this prop
+  notification: Notification;
+  onDelete: () => void; //  onDelete is required
+  isChecked: boolean;
+  onCheckboxChange: (checked: boolean) => void;
+  onUpdateSeenAt: (id: string) => void;
+  onToggleImportant: (id: string) => void;
+  onMarkUnseen: (id: string) => void;
 }
 
 const NotificationItem: React.FC<NotificationItemProps> = ({
@@ -19,74 +19,79 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   onCheckboxChange,
   onUpdateSeenAt,
   onToggleImportant,
-  onMarkUnseen // Receive the prop
+  onMarkUnseen,
 }) => {
-  const [isStarred, setIsStarred] = useState(false)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
+  const [isStarred, setIsStarred] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
-    setIsStarred(notification.isImportant)
-  }, [notification.isImportant])
+    setIsStarred(notification.isImportant);
+  }, [notification.isImportant]);
 
-  const toggleStar = () => {
-    setIsStarred(!isStarred)
-    onToggleImportant(notification.id)
-  }
+  // Use useCallback for event handlers to prevent unnecessary re-renders
+  const toggleStar = useCallback(() => {
+    setIsStarred((prevIsStarred) => !prevIsStarred);
+    onToggleImportant(notification.id);
+  }, [notification.id, onToggleImportant]);
 
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onCheckboxChange(event.target.checked)
-  }
+  const handleCheckboxChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onCheckboxChange(event.target.checked);
+    },
+    [onCheckboxChange]
+  );
 
-  const openModal = () => {
-    setIsModalOpen(true)
+  const openModal = useCallback(() => {
+    setIsModalOpen(true);
     if (!notification.seenAt) {
-      onUpdateSeenAt(notification.id)
+      onUpdateSeenAt(notification.id);
     }
-  }
+  }, [notification.id, notification.seenAt, onUpdateSeenAt]);
 
-  const closeModal = () => {
-    setIsModalOpen(false)
-  }
+  const closeModal = useCallback(() => {
+    setIsModalOpen(false);
+  }, []);
+
+    const handleMarkUnseenCallback = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onMarkUnseen(notification.id);
+  }, [notification.id, onMarkUnseen]);
 
   const formatDate = (dateString: string | undefined): string => {
-    if (!dateString) return 'Unknown'
+    if (!dateString) return 'Unknown';
 
-    const date = new Date(dateString)
-    const now = new Date()
+    const date = new Date(dateString);
+    const now = new Date();
     const isToday =
       date.getDate() === now.getDate() &&
       date.getMonth() === now.getMonth() &&
-      date.getFullYear() === now.getFullYear()
+      date.getFullYear() === now.getFullYear();
 
     if (isToday) {
       return date.toLocaleTimeString('vi-VN', {
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false
-      })
+        hour12: false,
+      });
     } else {
       return date.toLocaleDateString('vi-VN', {
         day: 'numeric',
-        month: 'short'
-      })
+        month: 'short',
+      });
     }
-  }
+  };
 
-  const isSeen = !!notification.seenAt
+  const isSeen = !!notification.seenAt;
 
-  const handleMarkUnseen = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    onMarkUnseen(notification.id)
-  }
 
   return (
     <div
       className={`flex cursor-pointer items-center  border border-background px-4 py-2  ${
         isStarred || notification.isImportant ? 'bg-yellow-50' : ''
-      } ${isChecked ? 'bg-background-secondary' : ''} ${!isSeen ? 'bg-background' : ''} ${
-        isHovered ? ' border-primary ' : ''
-      }`}
+      } ${isChecked ? 'bg-background-secondary' : ''} ${
+        !isSeen ? 'bg-background' : ''
+      } ${isHovered ? ' border-primary ' : ''}`}
       onClick={openModal}
       role='button'
       tabIndex={0}
@@ -104,8 +109,8 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       />
       <button
         onClick={e => {
-          toggleStar()
-          e.stopPropagation()
+          toggleStar();
+          e.stopPropagation();
         }}
         className='mr-3 focus:outline-none'
         aria-label='Mark as important'
@@ -138,11 +143,11 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           {isHovered && (
             <div className='flex items-center space-x-2'>
               <button
-                onClick={handleMarkUnseen} // Call handleMarkUnseen
+                onClick={handleMarkUnseenCallback} // Use the useCallback version
                 className='hover:text-blue-500 focus:outline-none'
                 aria-label='Mark as unseen'
               >
-                <svg // Corrected: Added closing tag
+                <svg
                   xmlns='http://www.w3.org/2000/svg'
                   fill='none'
                   viewBox='0 0 24 24'
@@ -162,31 +167,29 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
                   />
                 </svg>
               </button>
-              {onDelete && (
-                <button
-                  onClick={e => {
-                    onDelete()
-                    e.stopPropagation()
-                  }}
-                  className=' hover:text-red-500 focus:outline-none'
-                  aria-label='Delete notification'
+              <button
+                onClick={e => {
+                    onDelete(); // Call onDelete directly, it's already a function
+                    e.stopPropagation();
+                }}
+                className=' hover:text-red-500 focus:outline-none'
+                aria-label='Delete notification'
+              >
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  strokeWidth='1.5'
+                  stroke='currentColor'
+                  className='h-5 w-5'
                 >
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    fill='none'
-                    viewBox='0 0 24 24'
-                    strokeWidth='1.5'
-                    stroke='currentColor'
-                    className='h-5 w-5'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      d='M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m-10.013 0c.34.059.68.114 1.02.165m-1.02-.165L5.09 5.79m14.416 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79'
-                    />
-                  </svg>
-                </button>
-              )}
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    d='M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m-10.013 0c.34.059.68.114 1.02.165m-1.02-.165L5.09 5.79m14.416 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79'
+                  />
+                </svg>
+              </button>
             </div>
           )}
         </div>
@@ -222,7 +225,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default NotificationItem
+export default NotificationItem;

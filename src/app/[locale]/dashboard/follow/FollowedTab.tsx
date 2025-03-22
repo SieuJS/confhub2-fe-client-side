@@ -1,11 +1,11 @@
 // FollowedTab.tsx
 import React, { useState, useEffect } from 'react'
-import ConferenceItem from '../conferences/ConferenceItem'
-import { getListConference } from '../../../api/conference/getListConferences'
-import { ConferenceInfo } from '../../../models/response/conference.list.response'
-import { UserResponse, Follow } from '../../../models/response/user.response'
-import { timeAgo, formatDateFull } from './timeFormat'
-import Tooltip from '../utils/Tooltip'
+import ConferenceItem from '../../conferences/ConferenceItem'
+import { getListConference } from '../../../../api/conference/getListConferences'
+import { ConferenceInfo } from '../../../../models/response/conference.list.response'
+import { UserResponse, Follow } from '../../../../models/response/user.response'
+import { timeAgo, formatDateFull } from '../timeFormat'
+import Tooltip from '../../utils/Tooltip'
 
 interface FollowedTabProps {}
 

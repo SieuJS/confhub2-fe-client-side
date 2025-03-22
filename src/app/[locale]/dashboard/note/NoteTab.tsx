@@ -1,12 +1,12 @@
 // NoteTab.tsx
 import React, { useState, useEffect, useMemo } from 'react'
 import Image from 'next/image'
-import Calendar from './noteTab/Calendar'
-import { CalendarEvent } from './noteTab/Calendar'
-import { ConferenceResponse } from '../../../models/response/conference.response'
-import { getConference } from '../../../api/conference/getConferenceDetails'
+import Calendar from './Calendar'
+import { CalendarEvent } from './Calendar'
+import { ConferenceResponse } from '../../../../models/response/conference.response'
+import { getConference } from '../../../../api/conference/getConferenceDetails'
 import { Link } from '@/src/navigation'
-import Button from '../utils/Button'
+import Button from '../../utils/Button'
 
 interface NoteTabProps {}
 
@@ -42,7 +42,6 @@ const NoteTab: React.FC<NoteTabProps> = () => {
   const getEventTypeColor = (type: NoteType) =>
     typeColors[type] || 'bg-background '
 
-  // ... (rest of your useEffect and data fetching logic remains the same) ...
   useEffect(() => {
     const fetchData = async () => {
       try {

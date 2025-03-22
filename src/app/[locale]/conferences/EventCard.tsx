@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// components/conferences/EventCard.tsx
+import React, { useState, useCallback } from 'react'; // Import useCallback
 import Image from 'next/image';
 import { ConferenceInfo } from '../../../models/response/conference.list.response';
 import { useRouter, usePathname } from 'next/navigation';
@@ -6,38 +7,39 @@ import { Link } from '@/src/navigation';
 
 interface EventCardProps {
   event: ConferenceInfo;
+  className?: string; // Add optional className prop
+  style?: React.CSSProperties; // Add optional style prop
 }
 
-const EventCard: React.FC<EventCardProps> = ({ event }) => {
+const EventCard: React.FC<EventCardProps> = ({ event, className }) => { // Destructure className
   const router = useRouter();
   const pathname = usePathname();
   const [isFavorite, setIsFavorite] = useState(false);
   const [showWebsiteTooltip, setShowWebsiteTooltip] = useState(false);
   const [showFavoriteTooltip, setShowFavoriteTooltip] = useState(false);
 
-  const formatDate = (date: string): string => {
+  const formatDate = useCallback((date: Date | undefined): string => { // <--- Change type to Date | undefined
     if (!date) return 'TBD';
-    date = date.slice(0, -1);
-    const dateObj = new Date(date);
-    return dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-  };
+    // Remove the .slice() line.  It's not needed.
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  },[]);
 
-  const formatDateRange = (fromDate: string | undefined, toDate: string | undefined) => {
+  const formatDateRange = useCallback((fromDate: string | undefined, toDate: string | undefined) => {
     if (!fromDate || !toDate) return 'TBD';
-    const startDate = new Date(fromDate);
-    const endDate = new Date(toDate);
+    const startDate = new Date(fromDate); // These are already Date objects
+    const endDate = new Date(toDate);     // These are already Date objects
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
       return 'Invalid Date';
     }
     if (startDate.toDateString() === endDate.toDateString()) {
-      return formatDate(fromDate);
+      return formatDate(startDate); // Pass Date objects directly
     }
-    return `${formatDate(fromDate)} - ${formatDate(toDate)}`;
-  };
+    return `${formatDate(startDate)} - ${formatDate(endDate)}`; // Pass Date objects directly
+  },[formatDate]);
 
   const locationString = `${event.location.cityStateProvince || ''}, ${event.location.country || ''}`.trim() || 'Location Not Available';
 
-  const getRankColor = (rank?: string) => {
+  const getRankColor = useCallback((rank?: string) => {
     rank = rank?.toUpperCase();
     switch (rank) {
       case 'A*': return 'bg-amber-100 text-amber-700';
@@ -46,9 +48,9 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
       case 'C': return 'bg-orange-100 text-orange-700';
       default: return 'bg-gray-100 text-gray-600';
     }
-  };
+  },[]);
 
-  const getAccessTypeColor = (accessType?: string) => {
+  const getAccessTypeColor = useCallback((accessType?: string) => {
     accessType = accessType?.toUpperCase();
     switch (accessType) {
       case 'ONLINE': return 'bg-green-100 text-green-700 border border-green-300';
@@ -56,20 +58,20 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
       case 'HYBRID': return 'bg-blue-100 text-blue-700 border border-blue-300';
       default: return 'bg-gray-100 text-gray-600';
     }
-  };
+  },[]);
 
-  const handleTopicClick = (topic: string) => {
+  const handleTopicClick = useCallback((topic: string) => {
     const localePrefix = pathname.split('/')[1];
     router.push(`/${localePrefix}/conferences?topics=${topic}`);
-  };
+  },[pathname, router]);
 
-  const handleFavoriteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleFavoriteClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setIsFavorite(!isFavorite);
     setShowFavoriteTooltip(false);
-  };
+  },[isFavorite]);
 
-  const handleGoToWebsite = (e: React.MouseEvent<HTMLButtonElement>, url: string) => {
+  const handleGoToWebsite = useCallback((e: React.MouseEvent<HTMLButtonElement>, url: string) => {
     e.preventDefault();
     e.stopPropagation();
     if (url) {
@@ -78,10 +80,10 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
       console.warn("No URL provided for Go to Website");
     }
     setShowWebsiteTooltip(false);
-  };
+  },[]);
 
   return (
-    <div className="rounded-lg shadow-lg overflow-hidden bg-white hover:shadow-xl transition duration-300 ease-in-out flex flex-col">
+    <div className={`rounded-lg shadow-lg overflow-hidden bg-white hover:shadow-xl transition duration-300 ease-in-out flex flex-col ${className}`}>
       {/* Image and Rank */}
       <div className="relative hover:opacity-90">
         <Image

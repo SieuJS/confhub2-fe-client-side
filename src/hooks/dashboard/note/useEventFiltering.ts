@@ -1,6 +1,6 @@
 // useEventFiltering.ts
 import { useState, useEffect } from 'react';
-import { CalendarEvent } from '../../../app/[locale]/dashboard/noteTab/Calendar'; // Adjust path
+import { CalendarEvent } from '../../../app/[locale]/dashboard/note/Calendar'; // Adjust path
 
 const useEventFiltering = (initialDate: Date) => {
   const [searchText, setSearchText] = useState('');

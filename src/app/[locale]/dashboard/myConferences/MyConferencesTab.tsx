@@ -1,11 +1,11 @@
 // frontend/MyConferencesTab.tsx
 import React, { useState, useMemo } from 'react'
-import ConferenceItem from '../conferences/ConferenceItem'
-import Button from '../utils/Button'
+import ConferenceItem from '../../conferences/ConferenceItem'
+import Button from '../../utils/Button'
 import { Link } from '@/src/navigation'
-import useMyConferences from '../../../hooks/dashboard/myConferences/useMyConferences'
-import { formatDateFull, timeAgo } from './timeFormat'
-import Tooltip from '../utils/Tooltip'
+import useMyConferences from '../../../../hooks/dashboard/myConferences/useMyConferences'
+import { formatDateFull, timeAgo } from '../timeFormat'
+import Tooltip from '../../utils/Tooltip'
 
 // Enum for conference status
 enum ConferenceStatus {

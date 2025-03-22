@@ -1,46 +1,42 @@
-import React, { useState, useEffect } from 'react'
+// src/components/ProfileTab.tsx
+import React from 'react'
 import Image from 'next/image'
-import { UserResponse } from '@/src/models/response/user.response'
-import { useLocalStorage } from 'usehooks-ts'
-import Button from '../utils/Button'
-import { getUserById } from '../../../api/user/getUserById'
-import { updateUser } from '../../../api/user/updateUser'
+import Button from '../../utils/Button'
 import { useTranslations } from 'next-intl'
+import { useUserData } from '../../../../hooks/dashboard/profile/useUserData'
+import { useEditProfile } from '../../../../hooks/dashboard/profile/useEditProfile'
+import { useImageSelection } from '../../../../hooks/dashboard/profile/useImageSelection'
 
-interface ProfileTabProps {}
 
-const ProfileTab: React.FC<ProfileTabProps> = () => {
+const ProfileTab: React.FC = () => {
   const t = useTranslations('')
-  const [userData, setUserData] = useState<UserResponse | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [isEditing, setIsEditing] = useState(false)
-  const [editedData, setEditedData] = useState<Partial<UserResponse>>({})
+  const { userData, setUserData, loading, error, setError, setUser } = useUserData()
 
-  const [user, setUser] = useLocalStorage<{
-    firstname: string
-    lastname: string
-    email: string
-    id: string
-  } | null>('user', null)
+  const {
+    isEditing,
+    editedData,
+    setEditedData, // Get setEditedData from the hook
+    handleEditClick,
+    handleSaveClick,
+    handleCancelClick,
+    handleInputChange,
+    handleInterestedTopicsChange
+  } = useEditProfile(userData, setUser, setUserData, setError)
 
-  const [loginStatus, setLoginStatus] = useLocalStorage<string | null>(
-    'loginStatus',
-    null
-  )
+  const {
+    showModal: showAvatarModal,
+    setShowModal: setShowAvatarModal,
+    options: avatarOptions,
+    handleImageSelect: handleAvatarSelect,  // This will now correctly update editedData
+  } = useImageSelection('avatar', setEditedData); // Pass setEditedData
 
-  // Predefined image options
-  const avatarOptions = [
-    '/avatar1.jpg',
-    '/avatar2.jpg',
-    '/avatar3.jpg',
-    '/avatar4.jpg'
-  ] // Add your avatar URLs
-  const backgroundOptions = ['/light.jpg', '/bg-2.jpg'] // Add your background URLs
-  const [showAvatarModal, setShowAvatarModal] = useState(false)
-  const [showBackgroundModal, setShowBackgroundModal] = useState(false)
+  const {
+    showModal: showBackgroundModal,
+    setShowModal: setShowBackgroundModal,
+    options: backgroundOptions,
+    handleImageSelect: handleBackgroundSelect, // This will now correctly update editedData
+  } = useImageSelection('background', setEditedData); // Pass setEditedData
 
-  // Predefined topics
   const predefinedTopics = [
     'Blockchain',
     'Chemical Biology',
@@ -48,117 +44,6 @@ const ProfileTab: React.FC<ProfileTabProps> = () => {
     'Furniture',
     'Home Improvement'
   ]
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (loginStatus !== null && user?.id) {
-        setLoading(true)
-        setError(null)
-        try {
-          const fetchedUser = await getUserById(user.id)
-          setUserData(fetchedUser)
-          setEditedData(fetchedUser) // Initialize editedData
-        } catch (err: any) {
-          setError(err.message || 'Error fetching user data')
-          console.error(err)
-        } finally {
-          setLoading(false)
-        }
-      } else {
-        setLoading(false)
-        setError('User not logged in or user ID not found')
-      }
-    }
-
-    fetchUserData()
-  }, [loginStatus, user])
-
-  const handleEditClick = () => {
-    setIsEditing(true)
-  }
-
-  const handleSaveClick = async () => {
-    try {
-      const updatePayload: Partial<UserResponse> = {}
-
-      for (const key in editedData) {
-        if (editedData.hasOwnProperty(key)) {
-          const typedKey = key as keyof UserResponse
-          if (userData && editedData[typedKey] !== userData[typedKey]) {
-            updatePayload[typedKey] = editedData[
-              typedKey
-            ] as UserResponse[keyof UserResponse]
-          }
-        }
-      }
-
-      const updatedUser = await updateUser(user!.id, updatePayload)
-      setUserData(updatedUser)
-      setIsEditing(false)
-
-      if (user) {
-        const updatedLocalStorageUser = { ...user }
-        if (updatePayload.firstName) {
-          updatedLocalStorageUser.firstname = updatePayload.firstName
-        }
-        if (updatePayload.lastName) {
-          updatedLocalStorageUser.lastname = updatePayload.lastName
-        }
-        // Email is NOT updated in local storage
-
-        localStorage.setItem('user', JSON.stringify(updatedLocalStorageUser))
-        setUser(updatedLocalStorageUser) // Update the 'user' state as well
-      }
-
-      setError(null)
-    } catch (error: any) {
-      console.error('Failed to update user:', error)
-      setError(error.message || 'Update user failed')
-    }
-  }
-
-  const handleCancelClick = () => {
-    setIsEditing(false)
-    setEditedData(userData || {}) // Reset to original data
-  }
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target
-    // Limit aboutme to 100 characters
-    if (name === 'aboutme' && value.length > 100) {
-      return // Stop updating if it exceeds the limit
-    }
-
-    setEditedData({
-      ...editedData,
-      [name]: value
-    })
-  }
-
-  const handleAvatarSelect = (avatarUrl: string) => {
-    setEditedData({ ...editedData, avatar: avatarUrl })
-    setShowAvatarModal(false) // Close modal after selection
-  }
-
-  const handleBackgroundSelect = (backgroundUrl: string) => {
-    setEditedData({ ...editedData, background: backgroundUrl })
-    setShowBackgroundModal(false)
-  }
-
-  const handleInterestedTopicsChange = (topic: string) => {
-    setEditedData(prevData => {
-      const currentTopics = prevData.interestedTopics || []
-      const updatedTopics = currentTopics.includes(topic)
-        ? currentTopics.filter(t => t !== topic)
-        : [...currentTopics, topic]
-
-      // Ensure uniqueness by converting to a Set and back to an array
-      const uniqueTopics = Array.from(new Set(updatedTopics))
-      return { ...prevData, interestedTopics: uniqueTopics }
-    })
-  }
 
   if (loading) {
     return (
@@ -176,7 +61,7 @@ const ProfileTab: React.FC<ProfileTabProps> = () => {
     return <div className='py-4 text-center'>No user data found.</div>
   }
 
-  const displayAvatarUrl = editedData.avatar || userData.avatar || '/s1.png' // Fallback to default if no avatar
+  const displayAvatarUrl = editedData.avatar || userData.avatar || '/s1.png'
   const displayBackgroundUrl =
     editedData.background || userData.background || '/bg-2.jpg'
 
@@ -274,10 +159,10 @@ const ProfileTab: React.FC<ProfileTabProps> = () => {
               {t('Select_an_Avatar')}
             </h2>
             <div className='grid grid-cols-4 gap-4'>
-              {avatarOptions.map(avatarUrl => (
+              {avatarOptions.map((avatarUrl: string) => (
                 <button
                   key={avatarUrl}
-                  onClick={() => handleAvatarSelect(avatarUrl)}
+                  onClick={() => handleAvatarSelect(avatarUrl)} // Call handleAvatarSelect
                   className='aspect-square overflow-hidden rounded-full hover:ring-2 hover:ring-button hover:ring-offset-2'
                 >
                   <Image
@@ -310,10 +195,10 @@ const ProfileTab: React.FC<ProfileTabProps> = () => {
               {t('Select_a_Background')}
             </h2>
             <div className='grid grid-cols-2 gap-4'>
-              {backgroundOptions.map(backgroundUrl => (
+              {backgroundOptions.map((backgroundUrl: string) => (
                 <button
                   key={backgroundUrl}
-                  onClick={() => handleBackgroundSelect(backgroundUrl)}
+                  onClick={() => handleBackgroundSelect(backgroundUrl)} // Call handleBackgroundSelect
                   className='aspect-video overflow-hidden rounded hover:ring-2 hover:ring-button hover:ring-offset-2'
                 >
                   <Image
@@ -391,8 +276,7 @@ const ProfileTab: React.FC<ProfileTabProps> = () => {
               </div>
               <div>
                 <label htmlFor='phone' className='block text-sm font-medium'>
-                  {t('Phone')}
-                </label>
+                  {t('Phone')}</label>
                 <input
                   type='text'
                   id='phone'
@@ -432,9 +316,10 @@ const ProfileTab: React.FC<ProfileTabProps> = () => {
               />
               <p className='text-sm '>
                 {editedData.aboutme ? editedData.aboutme.length : 0}/100
-                {t('characters')}
+                {t(' characters')}
               </p>
             </div>
+
             <div className='mt-4'>
               <label className='block text-sm font-medium '>
                 {t('I_am_also_interested_in_these_topics')}
@@ -448,11 +333,10 @@ const ProfileTab: React.FC<ProfileTabProps> = () => {
                     <span
                       key={topic}
                       onClick={() => handleInterestedTopicsChange(topic)}
-                      className={`cursor-pointer rounded-full px-4 py-2 text-sm transition duration-200  ${
-                        isSelected
+                      className={`cursor-pointer rounded-full px-4 py-2 text-sm transition duration-200  ${isSelected
                           ? 'bg-button text-button-text'
                           : 'bg-background  hover:bg-background-secondary'
-                      }`}
+                        }`}
                     >
                       {topic}
                     </span>

@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useLocalStorage } from 'usehooks-ts' // Import useLocalStorage
 import { useRouter, usePathname } from 'next/navigation' // Correct import
-import deleteUser from '../../../api/user/deleteUser' // Import API function directly
+import deleteUser from '../../../../api/user/deleteUser' // Import API function directly
 
 interface SettingTabProps {
   //  props (nếu bạn có truyền props nào từ component cha).
