@@ -1,5 +1,5 @@
-// components/Header/index.tsx
-import { FC, useRef } from 'react'
+// components/Header/index.tsx (Corrected)
+import { FC, useRef, useCallback } from 'react'
 import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
 import { useLocalStorage } from 'usehooks-ts'
@@ -12,38 +12,35 @@ import UserDropdown from './header/UserDropdown'
 import MobileNavigation from './header/MobileNavigation'
 import AuthButtons from './header/AuthButtons'
 import DesktopNavigation from './header/DesktopNavigation'
-import { MenuIcon, CloseIcon } from './header/Icon' // Import all icon components
+import { MenuIcon, CloseIcon } from './header/Icon'
 import Button from './Button'
 
 interface Props {
-  locale: string
+  locale: string;
 }
 
 export const Header: FC<Props> = ({ locale }) => {
-  const t = useTranslations('')
-  const headerRef = useRef<HTMLDivElement>(null)
+  const t = useTranslations('');
+  const headerRef = useRef<HTMLDivElement>(null);
 
   const [user, setUser] = useLocalStorage<{
-    id: string
-    firstname: string
-    lastname: string
-    email: string
-  } | null>('user', null)
+    id: string;
+    firstname: string;
+    lastname: string;
+    email: string;
+  } | null>('user', null);
 
-  console.log(user)
-  const [loginStatus, setLoginStatus] = useLocalStorage<string | null>(
-    'loginStatus',
-    null
-  )
-  const isLogin = !!loginStatus
-  const isClient = !!(typeof window !== 'undefined')
+  const [loginStatus, setLoginStatus] = useLocalStorage<string | null>('loginStatus', null);
+  const isLogin = !!loginStatus;
 
   const {
     notifications,
     notificationEffect,
-    markNotificationsAsSeen,
+    markAllAsRead,
+    fetchNotifications,
+    isLoadingNotifications,
     socketRef
-  } = useSocketConnection({ loginStatus, user })
+  } = useSocketConnection({ loginStatus, user });
 
   const {
     isNotificationOpen,
@@ -52,10 +49,14 @@ export const Header: FC<Props> = ({ locale }) => {
     closeAllMenus,
     toggleNotification,
     toggleMobileMenu,
-    toggleUserDropdown
-  } = useMenuState()
+    toggleUserDropdown,
+  } = useMenuState();
 
-  useClickOutside(headerRef, closeAllMenus)
+  useClickOutside(headerRef, closeAllMenus, 'notification-dropdown');
+
+  const unreadCount = () => {
+    return notifications.filter(n => (n.seenAt === null) && n.deletedAt === null).length;
+  };
 
   return (
     <div
@@ -75,11 +76,11 @@ export const Header: FC<Props> = ({ locale }) => {
         <DesktopNavigation locale={locale} />
         <AuthButtons
           isLogin={isLogin}
-          // isClient={isClient}
           locale={locale}
           toggleNotification={toggleNotification}
           toggleUserDropdown={toggleUserDropdown}
           notificationEffect={notificationEffect}
+          unreadCount={unreadCount()} 
         />
 
         {/* Mobile Menu Button */}
@@ -98,6 +99,9 @@ export const Header: FC<Props> = ({ locale }) => {
           isNotificationOpen={isNotificationOpen}
           closeAllMenus={closeAllMenus}
           locale={locale}
+          fetchNotifications={fetchNotifications}
+          isLoadingNotifications={isLoadingNotifications}
+          markAllAsRead={markAllAsRead}
         />
         <UserDropdown
           isUserDropdownOpen={isUserDropdownOpen}
@@ -109,7 +113,7 @@ export const Header: FC<Props> = ({ locale }) => {
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

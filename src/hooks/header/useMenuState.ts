@@ -1,4 +1,5 @@
-// components/Header/hooks/useMenuState.ts
+
+// components/Header/hooks/useMenuState.ts (No Changes)
 import { useState, useCallback } from 'react';
 
 export const useMenuState = () => {
@@ -20,10 +21,9 @@ export const useMenuState = () => {
     setIsMobileMenuOpen(isOpen => !isOpen);
   }, []);
 
-  // Corrected toggleUserDropdown: ONLY toggle the state.
   const toggleUserDropdown = useCallback(() => {
     setIsUserDropdownOpen(isOpen => !isOpen);
-  }, [isUserDropdownOpen]);
+  }, []);
 
   return {
     isNotificationOpen,
@@ -35,3 +35,4 @@ export const useMenuState = () => {
     toggleUserDropdown,
   };
 };
+

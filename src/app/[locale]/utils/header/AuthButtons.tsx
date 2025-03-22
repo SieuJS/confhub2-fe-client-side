@@ -1,4 +1,6 @@
-// components/Header/components/AuthButtons.tsx
+
+// components/Header/components/AuthButtons.tsx (Corrected LoadingIndicator usage)
+
 import { FC, useState, useEffect } from 'react'
 import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
@@ -9,24 +11,25 @@ import { usePathname } from 'next/navigation'
 import LoadingIndicator from './LoadingIndicator'
 
 interface Props {
-  isLogin: boolean
-  // isClient: boolean; // Loại bỏ prop isClient
-  locale: string
-  toggleNotification: () => void
-  toggleUserDropdown: () => void
-  notificationEffect: boolean
+  isLogin: boolean;
+  locale: string;
+  toggleNotification: () => void;
+  toggleUserDropdown: () => void;
+  notificationEffect: boolean;
+  unreadCount: number; // Add unreadCount prop
 }
 
 const AuthButtons: FC<Props> = ({
   isLogin,
-  // isClient, // Loại bỏ isClient
   locale,
   toggleNotification,
   toggleUserDropdown,
-  notificationEffect
+  notificationEffect,
+  unreadCount, // Receive unreadCount
 }) => {
-  const t = useTranslations('')
-  const pathname = usePathname()
+  const t = useTranslations('');
+  const pathname = usePathname();
+
   const [isClientRendered, setIsClientRendered] = useState(false) // Thêm state mới
 
   useEffect(() => {
@@ -34,21 +37,22 @@ const AuthButtons: FC<Props> = ({
   }, [])
 
   if (!isClientRendered) {
-    // Sử dụng state mới
-    return <LoadingIndicator />
+    return <LoadingIndicator />; // Simple loading indicator
   }
+
 
   if (isLogin) {
     return (
       <>
         <button className='' onClick={toggleNotification}>
-          <NotificationIcon notificationEffect={notificationEffect} />
+          {/* Pass unreadCount to NotificationIcon */}
+          <NotificationIcon notificationEffect={notificationEffect} unreadCount={unreadCount} />
         </button>
         <button onClick={toggleUserDropdown}>
           <UserIcon />
         </button>
       </>
-    )
+    );
   }
 
   return (
@@ -85,7 +89,7 @@ const AuthButtons: FC<Props> = ({
         </div>
       </Link>
     </>
-  )
-}
+  );
+};
 
-export default AuthButtons
+export default AuthButtons;

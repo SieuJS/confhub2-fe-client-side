@@ -1,7 +1,7 @@
 // ConferenceTabs.tsx
 "use client";
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef } from 'react';
 import { ConferenceResponse } from '../../../../models/response/conference.response';
 import Map from './Map';
 import ReactMarkdown from 'react-markdown';

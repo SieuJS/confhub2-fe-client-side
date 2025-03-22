@@ -45,7 +45,7 @@ export type Notification = {
   id: string;
   createdAt: string;
   isImportant: boolean;
-  seenAt: string;
+  seenAt: string | null;
   deletedAt: string;
   message: string;
   type: string;
