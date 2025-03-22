@@ -1,5 +1,4 @@
-
-// components/Header/hooks/useMenuState.ts (No Changes)
+// components/Header/hooks/useMenuState.ts
 import { useState, useCallback } from 'react';
 
 export const useMenuState = () => {
@@ -13,16 +12,31 @@ export const useMenuState = () => {
     setIsUserDropdownOpen(false);
   }, []);
 
+    // Close other menus when opening notification
+  const openNotification = useCallback(() => {
+    toggleNotification();
+    setIsMobileMenuOpen(false); // Close mobile menu
+    setIsUserDropdownOpen(false); // Close user dropdown
+  }, []);
+
+    // Close other menus when opening UserDropdown
+  const openUserDropdown = useCallback(() => {
+    toggleUserDropdown();
+    setIsNotificationOpen(false);
+    setIsMobileMenuOpen(false)
+  }, []);
+
+    // keep origin toggle
   const toggleNotification = useCallback(() => {
-    setIsNotificationOpen(isOpen => !isOpen);
+    setIsNotificationOpen((isOpen) => !isOpen);
   }, []);
 
   const toggleMobileMenu = useCallback(() => {
-    setIsMobileMenuOpen(isOpen => !isOpen);
+    setIsMobileMenuOpen((isOpen) => !isOpen);
   }, []);
 
   const toggleUserDropdown = useCallback(() => {
-    setIsUserDropdownOpen(isOpen => !isOpen);
+    setIsUserDropdownOpen((isOpen) => !isOpen);
   }, []);
 
   return {
@@ -33,6 +47,7 @@ export const useMenuState = () => {
     toggleNotification,
     toggleMobileMenu,
     toggleUserDropdown,
+    openNotification,
+    openUserDropdown,
   };
 };
-
