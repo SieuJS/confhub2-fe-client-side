@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { UserResponse } from '@/src/models/response/user.response'
 import { updateUser } from '@/src/api/user/updateUser'
 import { useLocalStorage } from 'usehooks-ts'
-import { Follow, MyConference, Calendar, Notification } from '../../../models/response/user.response'
 
 export const useEditProfile = (
   initialUserData: UserResponse | null,

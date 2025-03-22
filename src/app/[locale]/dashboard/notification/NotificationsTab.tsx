@@ -1,5 +1,5 @@
 // NotificationsTab.tsx
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import NotificationItem from './NotificationItem';
 import NotificationDetails from './NotificationDetails';
 import useNotifications from '../../../../hooks/dashboard/notification/useNotifications';
@@ -36,7 +36,10 @@ const NotificationsTab: React.FC = () => {
     const selectedNotificationId = searchParams.get('id');
     const tab = searchParams.get('tab');
 
-    // NotificationsTab.tsx
+    // Add filter state
+    const [filter, setFilter] = useState<'all' | 'unread' | 'read' | 'important'>('all');
+
+
     useEffect(() => {
         if (selectedNotificationId) {
             const notification = notifications.find(n => n.id === selectedNotificationId);
@@ -52,14 +55,26 @@ const NotificationsTab: React.FC = () => {
         router.push(`${pathname}?${newSearchParams.toString()}`);
     };
 
-    // Memoize the checkbox change handler *outside* the loop.
-    // This is crucial for performance and avoiding the "Rendered more hooks" error.
     const handleCheckboxChange = useCallback(
         (notificationId: string, checked: boolean) => {
             handleCheckboxChangeTab(notificationId, checked);
         },
-        [handleCheckboxChangeTab] //  `handleCheckboxChangeTab` is now the only dependency.
+        [handleCheckboxChangeTab]
     );
+
+    // Filter notifications based on the selected filter
+    const displayedNotifications = React.useMemo(() => {
+        let result = filteredNotifications;
+
+        if (filter === 'unread') {
+            result = result.filter(n => !n.seenAt);
+        } else if (filter === 'read') {
+            result = result.filter(n => n.seenAt);
+        } else if (filter === 'important') {
+            result = result.filter(n => n.isImportant);
+        }
+        return result;
+    }, [filteredNotifications, filter]);
 
 
 
@@ -102,6 +117,34 @@ const NotificationsTab: React.FC = () => {
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                 />
+            </div>
+
+            {/* Filter Buttons */}
+            <div className="mb-4 flex space-x-4">
+                <button
+                    onClick={() => setFilter('all')}
+                    className={`px-4 py-2 rounded ${filter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                >
+                    All
+                </button>
+                <button
+                    onClick={() => setFilter('unread')}
+                    className={`px-4 py-2 rounded ${filter === 'unread' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                >
+                    Unread
+                </button>
+                <button
+                    onClick={() => setFilter('read')}
+                    className={`px-4 py-2 rounded ${filter === 'read' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                >
+                    Read
+                </button>
+                <button
+                    onClick={() => setFilter('important')}
+                    className={`px-4 py-2 rounded ${filter === 'important' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                >
+                    Important
+                </button>
             </div>
 
             <div className='mb-4 flex items-center'>
@@ -185,19 +228,19 @@ const NotificationsTab: React.FC = () => {
             </div>
 
             <div className='overflow-hidden bg-white shadow'>
-                {filteredNotifications.length === 0 ? (
+                {displayedNotifications.length === 0 ? (
                     <p className='p-4 text-gray-600'>You have no notifications.</p>
                 ) : (
-                    filteredNotifications.map(notification => (
+                    displayedNotifications.map(notification => (
                         <NotificationItem
                             key={notification.id}
                             notification={notification}
                             onDelete={() => handleDeleteNotification(notification.id)}
                             isChecked={checkedIndices.includes(notification.id)}
-                            onCheckboxChange={(checked) => handleCheckboxChange(notification.id, checked)}  // Pass notification.id
+                            onCheckboxChange={(checked) => handleCheckboxChange(notification.id, checked)}
                             onToggleImportant={handleToggleImportant}
                             onMarkUnseen={handleMarkUnseen}
-                            notificationId={notification.id} // This prop is redundant, you are already passing notification.
+                            notificationId={notification.id}
                         />
                     ))
                 )}

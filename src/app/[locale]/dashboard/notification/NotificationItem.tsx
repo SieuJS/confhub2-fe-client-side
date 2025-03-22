@@ -1,4 +1,3 @@
-
 // components/NotificationItem.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { Notification } from '../../../../models/response/user.response';
@@ -75,15 +74,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 
   const isSeen = !!notification.seenAt;
 
-  const truncateMessage = (message: string | undefined, maxLength: number): string => {
-    if (!message) return '';
-    if (message.length <= maxLength) {
-      return message;
-    }
-    return message.substring(0, maxLength) + '...';
-  };
-
-  const MAX_MESSAGE_LENGTH = 100;
+  // No need for a separate truncateMessage function, we'll use CSS for truncation.
 
   return (
     <div
@@ -120,22 +111,23 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       </button>
 
       {/* Main content area with grid */}
-      <div className='flex-1 grid grid-cols-[1fr_2fr_1fr] items-center'>
+      <div className='flex-1 grid grid-cols-[1fr_3fr_1fr] gap-2 items-center'> {/* Increased message column to 3fr and added gap */}
         {/* Column 1: Type (1fr) */}
-        <div className=''>
+        <div className='whitespace-nowrap overflow-hidden text-ellipsis'>
           <span className={`${!isSeen ? 'font-bold' : ''}`}>
             {notification.type}
           </span>
         </div>
 
-        {/* Column 2: Message (2fr) */}
-        <div className=''>
+        {/* Column 2: Message (3fr) */}
+        <div className='whitespace-nowrap overflow-hidden text-ellipsis'> {/* Added classes for truncation */}
           <Link
             href={{ pathname: '/dashboard', query: { ...Object.fromEntries(searchParams), id: notificationId } }}
             className=''
           >
             <p className={`${!isSeen ? 'font-bold' : ''} text-sm`}>
-              {truncateMessage(notification.message, MAX_MESSAGE_LENGTH)}
+              {/* Removed truncateMessage, relying on CSS */}
+              {notification.message}
             </p>
           </Link>
         </div>
@@ -143,7 +135,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         {/* Column 3: Time and Actions (1fr) */}
         <div className='text-right'>
           {!isHovered && (
-            <span className={`${!isSeen ? 'font-bold' : ''} text-xs`}>
+            <span className={`${!isSeen ? 'font-bold' : ''} text-xs whitespace-nowrap`}>
               {formatDate(notification.createdAt)}
             </span>
           )}
