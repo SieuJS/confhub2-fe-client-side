@@ -53,7 +53,7 @@ const EventTable: React.FC<EventTableProps> = ({ events }) => {
                 {event.title} {event.acronym && `(${event.acronym})`}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-left text-sm text-gray-500">
-                {formatDateRange(event.dates.fromDate, event.dates.toDate)}
+                {formatDateRange(event.dates?.fromDate, event.dates?.toDate)}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-left text-sm text-gray-500">
                 {event.location.cityStateProvince && `${event.location.cityStateProvince}, `}{event.location.country}

@@ -1,6 +1,6 @@
 import { ConferenceInfo } from '@/src/models/response/conference.list.response';
 
-const API_FILTERED_CONFERENCES_ENDPOINT = 'http://localhost:3000/api/v1/filter-conferences';
+const API_FILTERED_CONFERENCES_ENDPOINT = 'http://localhost:3005/api/v1/conference';
 
 export interface FetchConferencesParams {
   keyword?: string;
@@ -19,7 +19,7 @@ export interface FetchConferencesParams {
 }
 
 export interface FetchConferencesResponse {
-  items: ConferenceInfo[];
+  payload: ConferenceInfo[];
   total: number;
 }
 

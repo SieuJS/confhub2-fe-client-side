@@ -48,7 +48,7 @@ const useConferenceResults = ({ initialData, initialTotalItems }: UseConferenceR
 
       const data = await fetchConferences(params); // Gọi API.
 
-      setEvents(data.items);
+      setEvents(data.payload);
       setTotalItems(data.total);
       setCurrentPage(parseInt(params.page!, 10)); // Dùng page từ params (đã là string).
       setSortBy(params.sortBy!);  // Đã được kiểm tra ở trên.

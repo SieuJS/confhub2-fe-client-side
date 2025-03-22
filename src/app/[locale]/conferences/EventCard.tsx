@@ -148,7 +148,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => { // Destr
             <path d="M16 18h.01" />
           </svg>
           <span className="text-left">
-            {formatDateRange(event.dates.fromDate, event.dates.toDate)}
+            {formatDateRange(event.dates?.fromDate, event.dates?.toDate)}
           </span>
         </div>
 
