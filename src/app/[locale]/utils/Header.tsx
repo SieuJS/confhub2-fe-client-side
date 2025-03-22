@@ -1,5 +1,5 @@
-// components/Header/index.tsx (Corrected)
-import { FC, useRef, useCallback } from 'react'
+// components/Header/index.tsx
+import { FC, useRef, useState, useEffect } from 'react'
 import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
 import { useLocalStorage } from 'usehooks-ts'
@@ -24,14 +24,26 @@ export const Header: FC<Props> = ({ locale }) => {
   const headerRef = useRef<HTMLDivElement>(null);
 
   const [user, setUser] = useLocalStorage<{
-    id: string;
-    firstname: string;
-    lastname: string;
-    email: string;
-  } | null>('user', null);
+    id: string
+    firstname: string
+    lastname: string
+    email: string
+  } | null>('user', null)
 
-  const [loginStatus, setLoginStatus] = useLocalStorage<string | null>('loginStatus', null);
-  const isLogin = !!loginStatus;
+  console.log(user)
+  const [loginStatus, setLoginStatus] = useLocalStorage<string | null>(
+    'loginStatus',
+    null
+  )
+
+  const [isLogin, setIsLogin] = useState(false);
+
+  useEffect(() => {
+    if (loginStatus)
+      setIsLogin(true);
+  }, []);
+
+  const isClient = !!(typeof window !== 'undefined')
 
   const {
     notifications,

@@ -6,11 +6,12 @@ import { useTranslations } from 'next-intl'
 import { useUserData } from '../../../../hooks/dashboard/profile/useUserData'
 import { useEditProfile } from '../../../../hooks/dashboard/profile/useEditProfile'
 import { useImageSelection } from '../../../../hooks/dashboard/profile/useImageSelection'
-
+import { Link } from '@/src/navigation'
 
 const ProfileTab: React.FC = () => {
   const t = useTranslations('')
-  const { userData, setUserData, loading, error, setError, setUser } = useUserData()
+  const { userData, setUserData, loading, error, setError, setUser } =
+    useUserData()
 
   const {
     isEditing,
@@ -27,15 +28,15 @@ const ProfileTab: React.FC = () => {
     showModal: showAvatarModal,
     setShowModal: setShowAvatarModal,
     options: avatarOptions,
-    handleImageSelect: handleAvatarSelect,  // This will now correctly update editedData
-  } = useImageSelection('avatar', setEditedData); // Pass setEditedData
+    handleImageSelect: handleAvatarSelect // This will now correctly update editedData
+  } = useImageSelection('avatar', setEditedData) // Pass setEditedData
 
   const {
     showModal: showBackgroundModal,
     setShowModal: setShowBackgroundModal,
     options: backgroundOptions,
-    handleImageSelect: handleBackgroundSelect, // This will now correctly update editedData
-  } = useImageSelection('background', setEditedData); // Pass setEditedData
+    handleImageSelect: handleBackgroundSelect // This will now correctly update editedData
+  } = useImageSelection('background', setEditedData) // Pass setEditedData
 
   const predefinedTopics = [
     'Blockchain',
@@ -276,7 +277,8 @@ const ProfileTab: React.FC = () => {
               </div>
               <div>
                 <label htmlFor='phone' className='block text-sm font-medium'>
-                  {t('Phone')}</label>
+                  {t('Phone')}
+                </label>
                 <input
                   type='text'
                   id='phone'
@@ -333,10 +335,11 @@ const ProfileTab: React.FC = () => {
                     <span
                       key={topic}
                       onClick={() => handleInterestedTopicsChange(topic)}
-                      className={`cursor-pointer rounded-full px-4 py-2 text-sm transition duration-200  ${isSelected
+                      className={`cursor-pointer rounded-full px-4 py-2 text-sm transition duration-200  ${
+                        isSelected
                           ? 'bg-button text-button-text'
                           : 'bg-background  hover:bg-background-secondary'
-                        }`}
+                      }`}
                     >
                       {topic}
                     </span>
@@ -401,12 +404,18 @@ const ProfileTab: React.FC = () => {
                   </span>
                   <div className='flex flex-wrap gap-2'>
                     {userData.interestedTopics.map(topic => (
-                      <span
+                      <Link
                         key={topic}
-                        className='rounded-full bg-button px-4 py-2 text-sm text-button-text'
+                        href={{
+                          pathname: `/conferences`,
+                          query: { topics: topic }
+                        }}
+                        className='hover:text-text-secondary'
                       >
-                        {topic}
-                      </span>
+                        <span className='rounded-full bg-button px-4 py-2 text-sm text-button-text'>
+                          {topic}
+                        </span>
+                      </Link>
                     ))}
                   </div>
                 </div>
