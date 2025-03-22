@@ -5,7 +5,7 @@ const useClickOutside = (ref: RefObject<HTMLElement>, callback: () => void) => {
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (ref.current && !ref.current.contains(event.target as Node) &&
-                !(event.target instanceof Element && event.target.closest('.share-menu-container'))) {
+                !(event.target instanceof Element && event.target.closest('.menu-container'))) {
                 callback();
             }
         };
