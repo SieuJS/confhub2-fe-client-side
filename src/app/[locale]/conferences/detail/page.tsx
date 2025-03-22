@@ -21,7 +21,8 @@ import useClickOutside from '../../../../hooks/conferenceDetails/useClickOutside
 import useTopicsDisplay from '../../../../hooks/conferenceDetails/useTopicsDisplay';
 import useFormatConferenceDates from '../../../../hooks/conferenceDetails/useFormatConferenceDates';
 import useAddToCalendar from '../../../../hooks/conferenceDetails/useAddToCalendar';
-
+import createGoogleCalendarLink from '../../../../hooks/conferenceDetails/useAddToGoogleCalendar';
+import createICalendarEvent from '../../../../hooks/conferenceDetails/useAddToICalendar';
 
 interface EventCardProps {
     locale: string;
@@ -41,24 +42,28 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     const { dateDisplay } = useFormatConferenceDates(conferenceData?.dates);
 
     const [openMenu, setOpenMenu] = useState<"share" | "calendar" | null>(null);
-    const shareButtonRef = useRef<HTMLButtonElement>(null);
+    const menuContainerRef = useRef<HTMLDivElement>(null);
     const [updating, setUpdating] = useState(false);
 
     const toggleShareMenu = () => {
         setOpenMenu(prev => prev === "share" ? null : "share");
     };
 
+    const toggleCalendarMenu = () => {
+        setOpenMenu(prev => prev === "calendar" ? null : "calendar");
+    };
+
     const closeMenu = () => {
         setOpenMenu(null);
     }
 
-    useClickOutside(shareButtonRef, closeMenu);
+    useClickOutside(menuContainerRef, closeMenu);
 
     const renderShareMenu = () => {
         if (openMenu !== "share") return null;
 
         return (
-            <div className="absolute z-20 right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <div className="relative z-20 right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="py-1">
                     <button
                         onClick={() => { handleShareClick('facebook'); closeMenu(); }}
@@ -98,6 +103,64 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
             </div>
         );
     }
+
+
+    const handleAddToExternalCalendar = (type: 'google' | 'ical') => {
+        if (type === 'google') {
+            const googleLink = createGoogleCalendarLink(conferenceData);
+            window.open(googleLink, '_blank');
+        } else if (type === 'ical') {
+            const icalData = createICalendarEvent(conferenceData);
+            if (icalData) {
+                const blob = new Blob([icalData], { type: 'text/calendar;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const conferenceDates = conferenceData?.dates.find(date => date.type === "conferenceDates"); // Find main conference dates
+                const startDate = conferenceDates?.fromDate;
+                const conferenceDate = startDate ? new Date(startDate) : new Date(); // Default to current date if not found
+                a.download = `${conferenceData?.conference?.acronym + conferenceDate.getFullYear()}.ics`; // Use acronym instead of shortName
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url); // Clean up
+            }
+        }
+    };
+
+    const renderCalendarMenu = () => {
+        if (openMenu !== "calendar") { // Kiểm tra state chung
+            return null;
+        }
+        return (
+            <div className="relative z-20 right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div className='py-1'>
+                    <button
+                        onClick={() => { handleAddToExternalCalendar('google'); closeMenu(); }}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                    >
+                        <span className="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6 mr-2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                            Add to Google Calendar
+                        </span>
+                    </button>
+                    <button
+                        onClick={() => { handleAddToExternalCalendar('ical'); closeMenu(); }}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                    >
+                        <span className="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                        </svg>
+                            Download ICal
+                        </span>
+                    </button>
+                </div>
+            </div>
+        );
+    };
 
     const { conference, organization, locations, followedBy } = conferenceData || {};
 
@@ -227,7 +290,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                         {/* Right Column */}
                         <div className="md:w-1/5">
                             <div className="sticky top-4">
-                                <div className="flex flex-col gap-3"> {/* Removed items-stretch */}
+                                <div className="flex flex-col gap-3 relative"> {/* Removed items-stretch */}
                                     <Button
                                         onClick={handleAddToCalendar}
                                         variant={isAddToCalendar ? 'primary' : 'secondary'}
@@ -249,18 +312,45 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                         {isAddToCalendar ? 'Added' : 'Calendar'}
                                     </Button>
 
-                                    <Button
-                                        onClick={toggleShareMenu}
-                                        variant="secondary"
-                                        size="small"
-                                        className="flex items-center justify-start gap-x-4 mx-14" // Added justify-start and gap-x-4 mx-14
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
-                                        </svg>
-                                        Share
-                                    </Button>
-                                    {renderShareMenu()}
+                                    <div className='flex flex-col gap-3 relative menu-container' ref={menuContainerRef}>
+                                        <Button
+                                            onClick={toggleShareMenu}
+                                            variant="secondary"
+                                            size="small"
+                                            className="flex items-center justify-start gap-x-4 mx-14" // Added justify-start and gap-x-4 mx-14
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                                            </svg>
+                                            Share
+                                        </Button>
+                                        {renderShareMenu()}
+                                    </div>
+
+                                    <div className='flex flex-col gap-3 relative menu-container' ref={menuContainerRef}>
+                                        <Button
+                                            onClick={toggleCalendarMenu}
+                                            variant="secondary"
+                                            size="small"
+                                            className="flex items-center justify-start gap-x-4 mx-14" // Added justify-start and gap-x-4 mx-14
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                                                <path d="M8 2v4" />
+                                                <path d="M16 2v4" />
+                                                <rect width="18" height="18" x="3" y="4" rx="2" />
+                                                <path d="M3 10h18" />
+                                                <path d="M8 14h.01" />
+                                                <path d="M12 14h.01" />
+                                                <path d="M16 14h.01" />
+                                                <path d="M8 18h.01" />
+                                                <path d="M12 18h.01" />
+                                                <path d="M16 18h.01" />
+                                            </svg>
+                                            External Calendar
+                                        </Button>
+                                        {renderCalendarMenu()}
+                                    </div>
+
 
                                     <Button
                                         onClick={handleFollowClick}
