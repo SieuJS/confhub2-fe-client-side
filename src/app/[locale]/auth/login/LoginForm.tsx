@@ -51,7 +51,7 @@ const LoginForm: React.FC = () => {
       const data = await response.json()
 
       if (response.ok) {
-        setLoginStatus('Logined')
+        setLoginStatus('true')
         setUser({
           id: data.user.id,
           firstname: data.user.firstName,
