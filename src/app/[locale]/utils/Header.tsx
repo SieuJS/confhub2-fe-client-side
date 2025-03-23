@@ -12,6 +12,7 @@ import UserDropdown from './header/UserDropdown';
 import MobileNavigation from './header/MobileNavigation';
 import AuthButtons from './header/AuthButtons';
 import DesktopNavigation from './header/DesktopNavigation';
+import LoadingIndicator from './header/LoadingIndicator';
 import { MenuIcon, CloseIcon } from './header/Icon';
 import Button from './Button';
 
@@ -36,10 +37,13 @@ export const Header: FC<Props> = ({ locale }) => {
   )
 
   const [isLogin, setIsLogin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Cập nhật trạng thái đăng nhập dựa trên user và loginStatus
     setIsLogin(!!user && !!loginStatus);
+    // Cập nhật trạng thái Header sau khi load xong
+    setIsLoading(false);
   }, [user, loginStatus]);
 
   const {
@@ -91,14 +95,17 @@ export const Header: FC<Props> = ({ locale }) => {
 
       <div className='relative flex flex-row items-center gap-4'>
         <DesktopNavigation locale={locale} />
-        <AuthButtons
-          isLogin={isLogin}
-          locale={locale}
-          toggleNotification={() => openNotification()}
-          toggleUserDropdown={() => openUserDropdown()}
-          notificationEffect={notificationEffect}
-          unreadCount={unreadCount()}
-        />
+        
+        {isLoading ? <LoadingIndicator/> : 
+          <AuthButtons
+            isLogin={isLogin}
+            locale={locale}
+            toggleNotification={() => openNotification()}
+            toggleUserDropdown={() => openUserDropdown()}
+            notificationEffect={notificationEffect}
+            unreadCount={unreadCount()}
+          />
+        }
 
         {/* Mobile Menu Button */}
         <Button className='block sm:hidden' onClick={toggleMobileMenu}>
