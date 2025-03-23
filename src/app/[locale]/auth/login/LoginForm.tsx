@@ -23,6 +23,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
     null
   )
   const [user, setUser] = useLocalStorage<{
+    id: string
     firstname: string
     lastname: string
     email: string
@@ -53,8 +54,9 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         console.log('Đăng nhập thành công!', data)
 
         // Use the setter functions from useLocalStorage
-        setLoginStatus('Logined')
+        setLoginStatus('true')
         setUser({
+          id: data.user.id,
           firstname: data.user.firstName,
           lastname: data.user.lastName,
           email: data.user.email
