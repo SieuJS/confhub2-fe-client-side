@@ -290,5 +290,10 @@
   "Continent": "Continent",
   "Add_New_Conference": "Add New Conference",
   "Select_Continent": "Select Continent",
-  "Mark All As Read": "Mark All As Read"
+  "Mark All As Read": "Mark All As Read",
+  "Notification when add to calendar": "Notification when add to calendar",
+  "Notification when follow": "Notification when follow",
+  "Notification when update profile": "Notification when update profile",
+  "Receive Notifications": "Receive Notifications",
+  "Receive Notifications Description": "Receive notifications about conferences you follow, important dates, and other updates."
 }

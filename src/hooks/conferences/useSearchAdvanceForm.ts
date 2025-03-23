@@ -1,8 +1,9 @@
 // src/hooks/useSearchAdvanceForm.ts
 
-import { useState, ChangeEvent, KeyboardEvent } from 'react';
+import { useState, ChangeEvent, KeyboardEvent, useEffect } from 'react'; // Add useEffect
 
 interface UseSearchAdvanceFormProps {
+  // ... (rest of your props)
   onSubmissionDateChange: (date: Date | null) => void;
   submissionDate: Date | null;
   onRankChange: (rank: string | null) => void;
@@ -39,17 +40,32 @@ const useSearchAdvanceForm = ({
   const [topicSuggestions, setTopicSuggestions] = useState<string[]>([]);
   const [fieldOfResearchInput, setFieldOfResearchInput] = useState('');
   const [fieldOfResearchSuggestions, setFieldOfResearchSuggestions] = useState<string[]>([]);
+  const [availableTopics, setAvailableTopics] = useState<string[]>([]); // State for fetched topics
 
-  // Example lists - replace with your actual lists, ideally fetch from an API or a constants file.
-  const availableTopics = [
-    "Artificial Intelligence", "Machine Learning", "Data Science", "Cloud Computing", "Cybersecurity",
-    "Web Development", "Mobile Development", "Database Management", "Software Engineering", "Network Security",
-    "UX/UI Design", "Project Management", "Agile Methodologies", "DevOps", "Blockchain Technology", "Big Data"
-  ];
   const availableFieldsOfResearch = [
     "Computer Science", "Information Technology", "Software Engineering", "Data Analytics", "Artificial Intelligence",
     "Cybersecurity", "Information Systems", "Human-Computer Interaction", "Bioinformatics", "Computational Linguistics"
-  ];
+    ];
+  // Fetch topics from the backend when the component mounts
+  useEffect(() => {
+    const fetchTopics = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/v1/topics'); // Fetch from backend
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data: string[] = await response.json(); // Type assertion
+        console.log(data);
+        setAvailableTopics(data); // Update state with fetched topics
+      } catch (error) {
+        console.error("Could not fetch topics:", error);
+        // Optionally set an error state to display to the user
+      }
+    };
+
+    fetchTopics();
+  }, []); // Empty dependency array means this runs once on mount
+
 
   const handleTopicInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
@@ -104,8 +120,7 @@ const useSearchAdvanceForm = ({
       setFieldOfResearchSuggestions([]);
     }
   };
-
-  const handleFieldOfResearchSuggestionClick = (suggestion: string) => {
+    const handleFieldOfResearchSuggestionClick = (suggestion: string) => {
     onFieldOfResearchChange([...selectedFieldsOfResearch, suggestion]);
     setFieldOfResearchInput('');
     setFieldOfResearchSuggestions([]);
@@ -126,12 +141,11 @@ const useSearchAdvanceForm = ({
       }
     }
   };
-
   const handleRemoveFieldOfResearch = (fieldToRemove: string) => {
     onFieldOfResearchChange(selectedFieldsOfResearch.filter(field => field !== fieldToRemove));
   };
 
-  const handleSubmissionDateInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const handleSubmissionDateInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const date = event.target.value ? new Date(event.target.value) : null;
     onSubmissionDateChange(date);
   };
@@ -148,7 +162,7 @@ const useSearchAdvanceForm = ({
     onAverageScoreChange(event.target.value === "" ? null : event.target.value);
   };
 
-  const handlePublisherInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const handlePublisherInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     onPublisherChange(event.target.value || null); // Directly update parent state
   };
   const handlePublisherEnter = (event: KeyboardEvent<HTMLInputElement> ) => {
@@ -166,15 +180,15 @@ const useSearchAdvanceForm = ({
     handleTopicSuggestionClick,
     handleTopicInputKeyDown,
     handleRemoveTopic,
-    handleFieldOfResearchInputChange,
+      handleFieldOfResearchInputChange,
     handleFieldOfResearchSuggestionClick,
     handleFieldOfResearchInputKeyDown,
     handleRemoveFieldOfResearch,
-    handleSubmissionDateInputChange,
+      handleSubmissionDateInputChange,
     handleRankChangeInput,
     handleSourceYearChangeInput,
     handleAverageScoreChangeInput,
-    handlePublisherInputChange, // Return the new handler
+      handlePublisherInputChange, // Return the new handler
     handlePublisherEnter
   };
 };
