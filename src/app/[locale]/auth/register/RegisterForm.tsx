@@ -3,6 +3,7 @@
 import { Link } from '@/src/navigation'
 import React, { useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
+import { useLocalStorage } from 'usehooks-ts'
 
 interface RegisterFormProps {
   // Không cần onSignUpSuccess nữa, vì chuyển hướng trực tiếp trong component
@@ -18,7 +19,17 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
-
+  const [loginStatus, setLoginStatus] = useLocalStorage<string | null>(
+      'loginStatus',
+      null
+    )
+  const [user, setUser] = useLocalStorage<{
+    id: string
+    firstname: string
+    lastname: string
+    email: string
+  } | null>('user', null)
+  
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     setError('')
@@ -52,6 +63,13 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
 
       if (response.status === 201) {
         console.log('Registration successful!', data)
+        setLoginStatus('true')
+        setUser({
+          id: data.id,
+          firstname: data.firstName,
+          lastname: data.lastName,
+          email: data.email
+        })
 
         if (typeof window !== 'undefined') {
           const localePrefix = pathname.split('/')[1]
