@@ -51,7 +51,7 @@ export const fetchConferences = async (params: FetchConferencesParams): Promise<
   }
 
   const data: FetchConferencesResponse = await response.json(); // Rõ ràng kiểu dữ liệu trả về.
-
+  console.log(data)
 
   // 2. Send the received data to your backend (3000)
   const saveResponse = await fetch(API_SAVE_CONFERENCE_ENDPOINT, {
