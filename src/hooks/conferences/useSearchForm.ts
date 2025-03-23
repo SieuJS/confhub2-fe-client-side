@@ -12,7 +12,7 @@ interface SearchParams {
   submissionDate?: Date | null;
   publisher?: string | null;
   rank?: string | null;
-  sourceYear?: string | null;
+  source?: string | null;
   averageScore?: string | null;
   topics?: string[];
   fieldOfResearch?: string[];
@@ -40,7 +40,7 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
 
   const [submissionDate, setSubmissionDate] = useState<Date | null>(null);
   const [selectedRank, setSelectedRank] = useState<string | null>(null);
-  const [selectedSourceYear, setSelectedSourceYear] = useState<string | null>(null);
+  const [selectedSource, setSelectedSource] = useState<string | null>(null);
   const [selectedAverageScore, setSelectedAverageScore] = useState<string | null>(null);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedFieldsOfResearch, setSelectedFieldsOfResearch] = useState<string[]>([]);
@@ -89,7 +89,7 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
       submissionDate,
       publisher: selectedPublisher,
       rank: selectedRank,
-      sourceYear: selectedSourceYear,
+      source: selectedSource,
       averageScore: selectedAverageScore,
       topics: selectedTopics,
       fieldOfResearch: selectedFieldsOfResearch,
@@ -158,8 +158,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     setSelectedRank(rank);
   };
 
-  const handleSourceYearChange = (sourceYear: string | null) => {
-    setSelectedSourceYear(sourceYear);
+  const handleSourceChange = (source: string | null) => {
+    setSelectedSource(source);
   };
 
   const handleAverageScoreChange = (averageScore: string | null) => {
@@ -191,7 +191,7 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     setTypeSearchQuery('');
     setSubmissionDate(null);
     setSelectedRank(null);
-    setSelectedSourceYear(null);
+    setSelectedSource(null);
     setSelectedAverageScore(null);
     setSelectedTopics([]);
     setSelectedFieldsOfResearch([]);
@@ -215,7 +215,7 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     availableLocations,
     submissionDate,
     selectedRank,
-    selectedSourceYear,
+    selectedSource,
     selectedAverageScore,
     selectedTopics,
     selectedFieldsOfResearch,
@@ -237,7 +237,7 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     toggleAdvancedOptionsVisibility,
     handleSubmissionDateChange,
     handleRankChange,
-    handleSourceYearChange,
+    handleSourceChange,
     handleAverageScoreChange,
     handleTopicsChange,
     handleFieldsOfResearchChange,

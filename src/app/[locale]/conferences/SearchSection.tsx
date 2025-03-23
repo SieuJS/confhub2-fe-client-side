@@ -97,7 +97,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
           <input
             type="date"
             id="fromDate"
-            className="border rounded py-0.5 text-sm bg-transparent w-24"
+            className="border rounded py-0.5 text-sm bg-transparent w-26"
             onChange={handleStartDateInputChange}
             value={fromDate ? fromDate.toISOString().split('T')[0] : ''}
           />
@@ -108,7 +108,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
           <input
             type="date"
             id="toDate"
-            className="border rounded py-0.5 text-sm bg-transparent w-24"
+            className="border rounded py-0.5 text-sm bg-transparent w-26"
             onChange={handleEndDateInputChange}
             value={toDate ? toDate.toISOString().split('T')[0] : ''}
           />
