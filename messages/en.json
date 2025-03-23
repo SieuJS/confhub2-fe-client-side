@@ -289,5 +289,6 @@
   "Country": "Country",
   "Continent": "Continent",
   "Add_New_Conference": "Add New Conference",
-  "Select_Continent": "Select Continent"
+  "Select_Continent": "Select Continent",
+  "Mark All As Read": "Mark All As Read"
 }
