@@ -1,4 +1,3 @@
-
 // src/hooks/useNotificationData.ts
 import { useState, useEffect, useCallback } from 'react';
 import { getNotifications } from '../../../api/user/getNotifications';
@@ -10,28 +9,31 @@ const useNotificationData = (userId: string) => {
     const [loggedIn, setLoggedIn] = useState(false);
 
     const fetchData = useCallback(async () => {
-      setLoading(true);
+        console.log(`useNotificationData: fetchData called for userId: ${userId}`); // Log when fetchData is called
+        setLoading(true);
         try {
             if (userId) {
                 const data = await getNotifications(userId);
-                setNotifications(data || []); // Ensure data is an array
+                console.log('useNotificationData: Fetched notifications:', data); // Log fetched data
+                setNotifications(data || []);
                 setLoggedIn(true);
             }
         } catch (error) {
-            console.error('Error fetching notifications:', error);
-            setNotifications([]); // Set to empty array on error
+            console.error('useNotificationData: Error fetching notifications:', error);
+            setNotifications([]);
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
-    }, [userId]); // Dependencies for fetchData
+    }, [userId]);
 
-
-    // No change in this useEffect, it's correct.
     useEffect(() => {
+        console.log(`useNotificationData: useEffect triggered. userId: ${userId}`); // Log when useEffect runs
         if (userId) {
             fetchData();
         }
     }, [userId, fetchData]);
+
+    console.log(`useNotificationData: Returning.  notifications:`, notifications, `loading: ${loading}`, `loggedIn: ${loggedIn}`); // Log return values
 
     return { notifications, loading, loggedIn, fetchData };
 };

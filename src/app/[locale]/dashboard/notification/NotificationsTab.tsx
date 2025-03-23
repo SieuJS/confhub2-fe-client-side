@@ -6,6 +6,7 @@ import useNotifications from '../../../../hooks/dashboard/notification/useNotifi
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 const NotificationsTab: React.FC = () => {
+    console.log('NotificationsTab: Rendering'); // Log rendering
     const {
         notifications,
         checkedIndices,
@@ -30,13 +31,23 @@ const NotificationsTab: React.FC = () => {
         setSearchTerm,
     } = useNotifications();
 
+    console.log('NotificationsTab: Received props:', {
+        notifications,
+        checkedIndices,
+        selectAllChecked,
+        loading,
+        loggedIn,
+        searchTerm,
+        filteredNotifications
+    }); // Log received props
+
+
     const pathname = usePathname();
     const router = useRouter();
     const searchParams = useSearchParams();
     const selectedNotificationId = searchParams.get('id');
     const tab = searchParams.get('tab');
 
-    // Add filter state
     const [filter, setFilter] = useState<'all' | 'unread' | 'read' | 'important'>('all');
 
 
@@ -44,12 +55,14 @@ const NotificationsTab: React.FC = () => {
         if (selectedNotificationId) {
             const notification = notifications.find(n => n.id === selectedNotificationId);
             if (notification && !notification.seenAt) {
+                console.log(`NotificationsTab: useEffect - Updating seenAt for id: ${selectedNotificationId}`); // Log
                 handleUpdateSeenAt(selectedNotificationId);
             }
         }
     }, [selectedNotificationId, handleUpdateSeenAt, notifications]);
 
     const handleBackToNotifications = () => {
+        console.log('NotificationsTab: handleBackToNotifications called'); // Log
         const newSearchParams = new URLSearchParams(searchParams.toString());
         newSearchParams.delete('id');
         router.push(`${pathname}?${newSearchParams.toString()}`);
@@ -57,13 +70,13 @@ const NotificationsTab: React.FC = () => {
 
     const handleCheckboxChange = useCallback(
         (notificationId: string, checked: boolean) => {
+            console.log(`NotificationsTab: handleCheckboxChange called for id: ${notificationId}, checked: ${checked}`); // Log
             handleCheckboxChangeTab(notificationId, checked);
         },
         [handleCheckboxChangeTab]
     );
 
-    // Filter notifications based on the selected filter
-    const displayedNotifications = React.useMemo(() => {
+     const displayedNotifications = React.useMemo(() => {
         let result = filteredNotifications;
 
         if (filter === 'unread') {
@@ -73,10 +86,9 @@ const NotificationsTab: React.FC = () => {
         } else if (filter === 'important') {
             result = result.filter(n => n.isImportant);
         }
+        console.log(`NotificationsTab: displayedNotifications after filter =`, result); // Add
         return result;
     }, [filteredNotifications, filter]);
-
-
 
     if (!loggedIn) {
         return (<div className='container mx-auto p-4'>Please log in to view notifications.</div>);
@@ -108,7 +120,6 @@ const NotificationsTab: React.FC = () => {
 
     return (
         <div className='container mx-auto p-6'>
-            {/* Search Bar */}
             <div className='mb-4'>
                 <input
                     type='text'
@@ -119,7 +130,6 @@ const NotificationsTab: React.FC = () => {
                 />
             </div>
 
-            {/* Filter Buttons */}
             <div className="mb-4 flex space-x-4">
                 <button
                     onClick={() => setFilter('all')}

@@ -23,30 +23,46 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   onMarkUnseen,
   notificationId,
 }) => {
+  console.log('NotificationItem: Rendering. Props:', {
+    notification,
+    isChecked,
+    notificationId,
+  }); // Log all props
+
   const [isStarred, setIsStarred] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    console.log(`NotificationItem: useEffect [notification.isImportant].  notification.id: ${notification.id}, isImportant: ${notification.isImportant}`); // Log useEffect
     setIsStarred(notification.isImportant);
-  }, [notification.isImportant]);
+  }, [notification.isImportant, notification.id]); // Add notification.id to dependencies
 
   const toggleStar = useCallback(() => {
+    console.log(`NotificationItem: toggleStar called. notification.id: ${notification.id}`); // Log toggleStar
     setIsStarred((prevIsStarred) => !prevIsStarred);
     onToggleImportant(notification.id);
   }, [notification.id, onToggleImportant]);
 
   const handleCheckboxChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
+      console.log(`NotificationItem: handleCheckboxChange called.  notification.id: ${notification.id}, checked: ${event.target.checked}`); // Log checkbox change
       onCheckboxChange(event.target.checked);
     },
-    [onCheckboxChange]
+    [onCheckboxChange, notification.id] // Add notification.id
   );
 
   const handleMarkUnseenCallback = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
+    console.log(`NotificationItem: handleMarkUnseenCallback called. notification.id: ${notification.id}`); // Log mark unseen
     onMarkUnseen(notification.id);
   }, [notification.id, onMarkUnseen]);
+
+    const handleDeleteClick = useCallback((e: React.MouseEvent) => {
+        e.stopPropagation();
+        console.log(`NotificationItem: handleDeleteClick called for id: ${notificationId}`); // Log
+        onDelete();
+    }, [onDelete, notificationId]); // Correct dependencies
 
   const formatDate = (dateString: string | undefined): string => {
     if (!dateString) return 'Unknown';
@@ -73,16 +89,21 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   };
 
   const isSeen = !!notification.seenAt;
-
-  // No need for a separate truncateMessage function, we'll use CSS for truncation.
+    console.log(`NotificationItem ${notificationId}: isStarred=${isStarred}, notification.isImportant=${notification.isImportant}, isChecked=${isChecked}, !isSeen=${!isSeen}, isHovered = ${isHovered}`)
 
   return (
     <div
       className={`flex cursor-pointer items-center border border-background px-4 py-2 ${isStarred || notification.isImportant ? 'bg-yellow-50' : ''
         } ${isChecked ? 'bg-background-secondary' : ''} ${!isSeen ? 'bg-background' : ''
         } ${isHovered ? 'border-primary' : ''}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => {
+        console.log(`NotificationItem: onMouseEnter. notification.id: ${notification.id}`); // Log mouse enter
+        setIsHovered(true);
+      }}
+      onMouseLeave={() => {
+        console.log(`NotificationItem: onMouseLeave. notification.id: ${notification.id}`); // Log mouse leave
+        setIsHovered(false);
+      }}
     >
       <input
         type='checkbox'
@@ -111,7 +132,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       </button>
 
       {/* Main content area with grid */}
-      <div className='flex-1 grid grid-cols-[1fr_3fr_1fr] gap-2 items-center'> {/* Increased message column to 3fr and added gap */}
+      <div className='flex-1 grid grid-cols-[1fr_3fr_1fr] gap-2 items-center'>
         {/* Column 1: Type (1fr) */}
         <div className='whitespace-nowrap overflow-hidden text-ellipsis'>
           <span className={`${!isSeen ? 'font-bold' : ''}`}>
@@ -120,7 +141,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         </div>
 
         {/* Column 2: Message (3fr) */}
-        <div className='whitespace-nowrap overflow-hidden text-ellipsis'> {/* Added classes for truncation */}
+        <div className='whitespace-nowrap overflow-hidden text-ellipsis'>
           <Link
             href={{ pathname: '/dashboard', query: { ...Object.fromEntries(searchParams), id: notificationId } }}
             className=''
@@ -149,10 +170,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
               <button
-                onClick={e => {
-                  onDelete();
-                  e.stopPropagation();
-                }}
+                onClick={handleDeleteClick}
                 className='hover:text-red-500 focus:outline-none'
                 aria-label='Delete notification'
               >

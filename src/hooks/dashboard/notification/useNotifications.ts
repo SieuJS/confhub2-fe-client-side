@@ -1,4 +1,3 @@
-
 // src/hooks/useNotifications.ts
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import useNotificationData from './useNotificationData';
@@ -35,6 +34,7 @@ interface UseNotificationsReturn {
 }
 
 const useNotifications = (): UseNotificationsReturn => {
+    console.log('useNotifications: Initializing'); // Log initialization
     const [searchTerm, setSearchTerm] = useState('');
     const [userId, setUserId] = useState<string>('');
 
@@ -53,29 +53,35 @@ const useNotifications = (): UseNotificationsReturn => {
         fetchData
     } = useNotificationData(userId);
 
-
     const {
         notifications,
-        setNotifications, // We won't directly use setNotifications *after* initialization
+        setNotifications,
         handleUpdateSeenAt,
         handleToggleImportant,
         handleDeleteNotification,
         handleMarkUnseen,
         updateUserNotifications
-    } = useNotificationState(initialNotifications, userId);  // Initialize with initialNotifications
+    } = useNotificationState(initialNotifications, userId);
 
+    useEffect(() => {
+        console.log('useNotifications: useEffect - initialNotifications changed:', initialNotifications); // Log when initialNotifications change
+        if (initialNotifications.length > 0) {
+            setNotifications(initialNotifications);
+        }
+    }, [initialNotifications, setNotifications]);
 
     const filteredNotifications = useFilteredNotifications(notifications, searchTerm);
 
-    const {
+   const {
         checkedIndices,
         setCheckedIndices,
         selectAllChecked,
         handleCheckboxChange: handleCheckboxChangeSelection,
         handleSelectAllChange
     } = useSelection(
-        useMemo(() => filteredNotifications.map(n => n.id), [filteredNotifications]) // <-- Memoize tại đây
+        useMemo(() => filteredNotifications.map(n => n.id), [filteredNotifications])
     );
+
 
     const {
         handleMarkSelectedAsRead,
@@ -91,33 +97,36 @@ const useNotifications = (): UseNotificationsReturn => {
 
     const handleCheckboxChangeTab = useCallback(
         (id: string, checked: boolean) => {
+            console.log(`useNotifications: handleCheckboxChangeTab called for id: ${id}, checked: ${checked}`);
             handleCheckboxChangeSelection(id, checked);
         },
         [handleCheckboxChangeSelection]
     );
 
     const handleDeleteSelected = useCallback(async () => {
+        console.log('useNotifications: handleDeleteSelected called');
         const updatedNotifications = notifications.map(n =>
             checkedIndices.includes(n.id) ? { ...n, deletedAt: new Date().toISOString() } : n
         );
         await updateUserNotifications(updatedNotifications);
-        // setCheckedIndices([]); // REMOVE THIS LINE
-    }, [checkedIndices, notifications, updateUserNotifications]); // Remove setCheckedIndices from the dependency array
+    }, [checkedIndices, notifications, updateUserNotifications]);
 
-
-    // UseEffect to initialize the state, ONLY ONCE
-    useEffect(() => {
-        if (initialNotifications.length > 0) {
-            setNotifications(initialNotifications);
-        }
-    }, [initialNotifications, setNotifications]);
-
-    // Refetch data when userId changes.
     useEffect(() => {
         if (userId) {
             fetchData();
         }
     }, [userId, fetchData]);
+
+
+    console.log('useNotifications: Returning state:', {
+        notifications,
+        checkedIndices,
+        selectAllChecked,
+        loading,
+        loggedIn,
+        searchTerm,
+        filteredNotifications
+    }); // Log returned state
 
     return {
         notifications,
