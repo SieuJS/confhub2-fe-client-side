@@ -2,12 +2,12 @@
 
 import LoginForm from "./LoginForm";
 
-function App() {
+function LoginPage() {
   return (
-    <div>
+    <div className="min-h-screen bg-gradient-to-br from-background to-background-secondary">
       <LoginForm />
     </div>
   );
 }
 
-export default App;
+export default LoginPage;

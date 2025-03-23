@@ -42,8 +42,12 @@ const spaceGrotesk = localFont({
   display: 'swap', 
 });
 export const metadata: Metadata = {
-  title: 'Next Temp',
-  description: 'create next app By Yahya Parvar!',
+  title: 'ConFHub - Conference Management Platform',
+  description: 'ConFHub is a comprehensive platform for managing and discovering academic conferences and journals.',
+  keywords: 'conferences, academic conferences, conference management, research conferences',
+  authors: [{ name: 'ConFHub Team' }],
+  viewport: 'width=device-width, initial-scale=1',
+  robots: 'index, follow',
 };
 
 export default function RootLayout({
