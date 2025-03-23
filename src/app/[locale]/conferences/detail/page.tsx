@@ -47,8 +47,10 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     const { dateDisplay } = useFormatConferenceDates(conferenceData?.dates);
 
     const [openMenu, setOpenMenu] = useState<"share" | "calendar" | null>(null);
-    const shareButtonRef = useRef<HTMLButtonElement>(null);
     const [updating, setUpdating] = useState(false);
+
+    // Declare menuContainerRef *before* using it
+    const menuContainerRef = useRef<HTMLDivElement>(null); // Correct type for a div
 
     const toggleShareMenu = () => {
         setOpenMenu(prev => prev === "share" ? null : "share");
@@ -84,7 +86,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                 <div className="py-1">
                     <button
                         onClick={() => { checkLoginAndRedirect(() => { handleShareClick('facebook'); closeMenu(); }) }}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                        className="share-menu-container block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                     >
                         <span className="flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-facebook mr-2" viewBox="0 0 16 16">
@@ -95,7 +97,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                     </button>
                     <button
                         onClick={() => { checkLoginAndRedirect(() => { handleShareClick('twitter'); closeMenu(); }) }}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                        className="share-menu-container block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                     >
                         <span className="flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-twitter-x mr-2" viewBox="0 0 16 16">
@@ -106,7 +108,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                     </button>
                     <button
                         onClick={() => { checkLoginAndRedirect(() => { handleShareClick('reddit'); closeMenu(); }) }}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                        className="share-menu-container block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                     >
                         <span className="flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-reddit mr-2" viewBox="0 0 16 16">
@@ -270,12 +272,12 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                         {isAddToCalendar ? 'Added' : 'Calendar'}
                                     </Button>
 
-                                    <div className='flex flex-col gap-3 relative menu-container' ref={menuContainerRef}>
+                                    <div className='flex flex-col gap-3 relative' ref={menuContainerRef}>
                                         <Button
                                             onClick={() => checkLoginAndRedirect(toggleShareMenu)}
                                             variant="secondary"
                                             size="small"
-                                            className="flex items-center justify-start gap-x-4 mx-14" // Added justify-start and gap-x-4 mx-14
+                                            className="share-menu-container flex items-center justify-start gap-x-4 mx-14" // Added justify-start and gap-x-4 mx-14
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
@@ -293,7 +295,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                         className="flex items-center justify-start gap-x-4 mx-14" // Added justify-start and gap-x-4 mx-14
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                                            <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1 -.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+                                            <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.122 2.122 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1 -.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
                                         </svg>
                                         {isFollowing ? 'Followed' : 'Follow'}
                                     </Button>
