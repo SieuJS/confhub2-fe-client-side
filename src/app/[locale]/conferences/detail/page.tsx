@@ -15,7 +15,8 @@ import Footer from '../../utils/Footer';
 import { Link } from '@/src/navigation'; // Import useRouter
 import { useLocalStorage } from 'usehooks-ts';
 import { useRouter, usePathname } from 'next/navigation';
-import { getPathname } from '@/src/navigation';
+import { ImportantDate } from '@/src/models/response/conference.response';
+
 
 // Import the custom hooks
 import useConferenceData from '../../../../hooks/conferenceDetails/useConferenceData';
@@ -25,6 +26,17 @@ import useClickOutside from '../../../../hooks/conferenceDetails/useClickOutside
 import useTopicsDisplay from '../../../../hooks/conferenceDetails/useTopicsDisplay';
 import useFormatConferenceDates from '../../../../hooks/conferenceDetails/useFormatConferenceDates';
 import useAddToCalendar from '../../../../hooks/conferenceDetails/useAddToCalendar';
+
+// Define the Feedback type (or import it)
+export type Feedback = {
+    id: string;
+    organizedId: string | null;
+    creatorId: string | null;
+    description: string | null;
+    star: number | null; // Make star nullable
+    createdAt: string | null;
+    updatedAt: string | null;
+};
 
 interface EventCardProps {
     locale: string;
@@ -42,15 +54,29 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     const { isAddToCalendar, handleAddToCalendar } = useAddToCalendar(conferenceData);
 
     const { handleShareClick } = useShareConference(conferenceData);
-    // Safely access topics using optional chaining and provide a default empty array
     const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } = useTopicsDisplay(conferenceData?.organization?.topics || []);
-    const { dateDisplay } = useFormatConferenceDates(conferenceData?.dates);
+    // Helper function to transform ImportantDate to the expected format
+    const transformDates = (dates: ImportantDate[] | null | undefined) => {
+        if (!dates) {
+            return undefined; // Or return an empty array: []
+        }
+        return dates.map(date => {
+            if (!date) return undefined; // Handle null dates within array
+            return {
+                type: date.type || '', // Provide default values for safety
+                fromDate: date.fromDate || undefined, // Keep as undefined if null
+                toDate: date.toDate || undefined,      // Keep as undefined if null
+            };
+        }).filter(date => date !== undefined); // Filter out any null dates
+    };
+
+    const transformedDates = transformDates(conferenceData?.dates);
+    const { dateDisplay } = useFormatConferenceDates(transformedDates);
 
     const [openMenu, setOpenMenu] = useState<"share" | "calendar" | null>(null);
     const [updating, setUpdating] = useState(false);
 
-    // Declare menuContainerRef *before* using it
-    const menuContainerRef = useRef<HTMLDivElement>(null); // Correct type for a div
+    const menuContainerRef = useRef<HTMLDivElement>(null);
 
     const toggleShareMenu = () => {
         setOpenMenu(prev => prev === "share" ? null : "share");
@@ -67,12 +93,11 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     // --- Helper Function for Authentication Check ---
     const checkLoginAndRedirect = (callback: () => void) => {
         if (!loginStatus) {
-             // --- Prepend Locale Prefix ---
-             const localePrefix = pathname.split('/')[1]; // Extract locale prefix (e.g., "en")
-             const pathWithLocale = `/${localePrefix}/auth/login`; // Construct path with locale
+            // --- Prepend Locale Prefix ---
+            const localePrefix = pathname.split('/')[1];
+            const pathWithLocale = `/${localePrefix}/auth/login`;
 
-             router.push(pathWithLocale); // Use path with locale for internal navigation
-
+            router.push(pathWithLocale);
         } else {
             callback(); // Execute the original action
         }
@@ -123,40 +148,37 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         );
     }
 
-    const { conference, organization, locations, followedBy } = conferenceData || {};
+    const { conference, organization, locations, follower } = conferenceData || {};
 
-    // Helper function to calculate overall rating
-    const calculateOverallRating = (feedbacks: any) => { // Replace 'any' with the correct type
+    const calculateOverallRating = (feedbacks: Feedback[] | null | undefined): number => {
         if (!feedbacks || feedbacks.length === 0) return 0;
-        const totalStars = feedbacks.reduce((sum: number, feedback: any) => sum + feedback.star, 0);
+        const totalStars = feedbacks.reduce((sum: number, feedback: Feedback) => sum + (feedback.star ?? 0), 0);
         return totalStars / feedbacks.length;
     };
 
-    // Calculate overall rating and total reviews *before* the return
     const overallRating = calculateOverallRating(conferenceData?.feedBacks);
-    const totalReviews = conferenceData?.feedBacks?.length || 0;  // Default to 0 if undefined
+    const totalReviews = conferenceData?.feedBacks?.length || 0;
 
-    // Helper function to render follower avatars
     const renderFollowerAvatars = () => {
-        if (!followedBy || followedBy.length === 0) {
+        if (!follower || follower.length === 0) {
             return <p className="text-gray-500 text-sm">No followers yet.</p>;
         }
 
         const maxVisibleFollowers = 5;
-        const visibleFollowers = followedBy.slice(0, maxVisibleFollowers);
-        const remainingFollowers = followedBy.length - maxVisibleFollowers;
+        const visibleFollowers = follower.slice(0, maxVisibleFollowers);
+        const remainingFollowers = follower.length - maxVisibleFollowers;
 
         return (
             <div className="flex items-center">
                 {visibleFollowers.map((follower) => (
                     <img
                         key={follower.id}
-                        src={`https://ui-avatars.com/api/?name=${follower.firstName}+${follower.lastName}&background=random&size=32`} // Use a placeholder or actual avatar URL
+                        src={`https://ui-avatars.com/api/?name=${follower.firstName}+${follower.lastName}&background=random&size=32`}
                         alt={`${follower.firstName} ${follower.lastName}`}
                         width={32}
                         height={32}
                         className="rounded-full h-8 w-8 border-2 border-white"
-                        style={{ marginLeft: '-0.25rem' }} // Overlapping effect
+                        style={{ marginLeft: '-0.25rem' }}
                     />
                 ))}
                 {remainingFollowers > 0 && (
@@ -191,7 +213,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                 <div className="md:w-1/4 mb-4 md:mb-0"> {/* Image container */}
                                     <Image
                                         src={'/bg-2.jpg'}
-                                        alt={`Logo`}
+                                        alt={conference?.title ? `${conference.title} Logo` : 'Conference Logo'}
                                         width={300}
                                         height={300}
                                         className="rounded-lg w-full h-auto"  // Make image responsive
@@ -200,7 +222,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                 </div>
                                 <div className="md:w-3/4 md:pl-6">    {/* Text details container */}
                                     <p className="text-red-500 text-sm font-semibold">{dateDisplay}</p>
-                                    <h1 className="font-bold text-3xl md:text-3xl mt-1">{conference?.title}</h1>
+                                    <h1 className="font-bold text-3xl md:text-3xl mt-1">{conference?.title || "Conference Details"}</h1>
                                     <p className="text-gray-600 text-sm flex items-center">
                                         <div className='text-yellow-500 text-xl mr-2'>★</div>
                                         <strong>{overallRating.toFixed(1)} <span className="ml-1 text-gray-500"> ({totalReviews} Ratings)</span></strong>
@@ -210,7 +232,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                                         </svg>
-                                        {locations?.cityStateProvince}, {locations?.country}
+                                        {locations?.cityStateProvince || "Location Not Available"}, {locations?.country || ""}
                                     </a>
                                     {/* Followers Display */}
                                     <div className="mt-2">

@@ -18,7 +18,6 @@ interface ConferenceTabsProps {
 export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) => {
   const navRef = useRef<HTMLElement>(null);
 
-    // Safely construct updatedSections.  Handles the case where conference is null/undefined.
     const updatedSections = conference
     ? ['overview', 'important-date', 'Call for papers', 'category-topics', ...(conference.rankSourceFoRData && conference.rankSourceFoRData.length > 0 ? ['source'] : []), 'map']
     : [];
@@ -27,10 +26,12 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
   useSectionNavigation({ navRef, setActiveSection });
 
 
-  const formatDate = (date: string): string => {
+  const formatDate = (date: string | null | undefined): string => {
     if (!date) return 'TBD';
-    date = date.slice(0, -1);
     const dateObj = new Date(date);
+     if (isNaN(dateObj.getTime())) {
+        return 'Invalid Date';
+    }
     return dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
@@ -42,11 +43,10 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
     );
   }
 
-    // Use optional chaining to safely access nested properties
-    const organization = conference?.organization;
-    const dates = conference?.dates;
-    const rankSourceFoRData = conference?.rankSourceFoRData;
-    const locations = conference?.locations;
+    const organization = conference.organization;
+    const dates = conference.dates;
+    const rankSourceFoRData = conference.rankSourceFoRData;
+    const locations = conference.locations;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -98,10 +98,11 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
               </thead>
               <tbody>
                 {dates.map((dateItem, index) => (
+                    dateItem &&  // Check if dateItem is not null
                   <tr key={index} className="hover:bg-gray-50">
-                    <td className="py-4 px-4 border-b border-gray-300">{dateItem.name}</td>
-                    <td className="py-4 px-4 border-b border-gray-300">{formatDate(dateItem.fromDate)}</td>
-                    <td className="py-4 px-4 border-b border-gray-300">{formatDate(dateItem.toDate)}</td>
+                    <td className="py-4 px-4 border-b border-gray-300">{dateItem?.name || "N/A"}</td>
+                    <td className="py-4 px-4 border-b border-gray-300">{formatDate(dateItem?.fromDate)}</td>
+                    <td className="py-4 px-4 border-b border-gray-300">{formatDate(dateItem?.toDate)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -151,9 +152,9 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({ conference }) =>
           {rankSourceFoRData.map((rank, rankIndex) => (
             <div key={rankIndex} className="mb-8">
               <h3 className="text-2xl font-medium text-gray-700 mb-3">
-                Rank: {rank.rank} - Source: {rank.source}
+                Rank: {rank.rank} - Source: {rank.source || "N/A"}
               </h3>
-              <p className="text-gray-700">Research Field: {rank.researchFields}</p>
+              <p className="text-gray-700">Research Field: {rank.researchFields || "N/A"}</p>
             </div>
           ))}
         </section>

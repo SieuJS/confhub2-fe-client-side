@@ -6,12 +6,10 @@ export type UserResponse = {
   lastName: string;
   dob?: string; // Optional, as it might not be present in all users
   role: string;
-  address?: string;
-  phone?: string;
   avatar?: string;
-  background?: string;
   aboutme?: string;
   interestedTopics?: string[];
+  background?: string;
   followedConferences?: Follow[]; // Now an array of objects
   myConferences?: MyConference[]; // Now an array of objects
   calendar?: Calendar[]; // Replace 'any' with a more specific type if you have one
@@ -46,7 +44,7 @@ export type Notification = {
   createdAt: string;
   isImportant: boolean;
   seenAt: string | null;
-  deletedAt: string;
+  deletedAt: string | null;
   message: string;
   type: string;
 }
