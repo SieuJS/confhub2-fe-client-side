@@ -18,25 +18,24 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => { // Destr
   const [showWebsiteTooltip, setShowWebsiteTooltip] = useState(false);
   const [showFavoriteTooltip, setShowFavoriteTooltip] = useState(false);
 
-  const formatDate = (date: string): string => {
+  const formatDate = useCallback((date: Date | undefined): string => { // <--- Change type to Date | undefined
     if (!date) return 'TBD';
-    date = date.slice(0, -1);
-    const dateObj = new Date(date);
-    return dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-  };
+    // Remove the .slice() line.  It's not needed.
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  },[]);
 
-  const formatDateRange = (fromDate: string | undefined, toDate: string | undefined) => {
+  const formatDateRange = useCallback((fromDate: string | undefined, toDate: string | undefined) => {
     if (!fromDate || !toDate) return 'TBD';
-    const startDate = new Date(fromDate);
-    const endDate = new Date(toDate);
+    const startDate = new Date(fromDate); // These are already Date objects
+    const endDate = new Date(toDate);     // These are already Date objects
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
       return 'Invalid Date';
     }
     if (startDate.toDateString() === endDate.toDateString()) {
-      return formatDate(fromDate);
+      return formatDate(startDate); // Pass Date objects directly
     }
-    return `${formatDate(fromDate)} - ${formatDate(toDate)}`;
-  };
+    return `${formatDate(startDate)} - ${formatDate(endDate)}`; // Pass Date objects directly
+  },[formatDate]);
 
   const locationString = `${event.location.cityStateProvince || ''}, ${event.location.country || ''}`.trim() || 'Location Not Available';
 

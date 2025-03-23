@@ -47,15 +47,11 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     const { dateDisplay } = useFormatConferenceDates(conferenceData?.dates);
 
     const [openMenu, setOpenMenu] = useState<"share" | "calendar" | null>(null);
-    const menuContainerRef = useRef<HTMLDivElement>(null);
+    const shareButtonRef = useRef<HTMLButtonElement>(null);
     const [updating, setUpdating] = useState(false);
 
     const toggleShareMenu = () => {
         setOpenMenu(prev => prev === "share" ? null : "share");
-    };
-
-    const toggleCalendarMenu = () => {
-        setOpenMenu(prev => prev === "calendar" ? null : "calendar");
     };
 
     const closeMenu = () => {
@@ -84,7 +80,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         if (openMenu !== "share") return null;
 
         return (
-            <div className="relative z-20 right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <div className="absolute z-20 right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="py-1">
                     <button
                         onClick={() => { checkLoginAndRedirect(() => { handleShareClick('facebook'); closeMenu(); }) }}
@@ -252,7 +248,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                         {/* Right Column */}
                         <div className="md:w-1/5">
                             <div className="sticky top-4">
-                                <div className="flex flex-col gap-3 relative"> {/* Removed items-stretch */}
+                                <div className="flex flex-col gap-3"> {/* Removed items-stretch */}
                                     <Button
                                         onClick={() => checkLoginAndRedirect(handleAddToCalendar)}
                                         variant={isAddToCalendar ? 'primary' : 'secondary'}
