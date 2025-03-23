@@ -5,8 +5,8 @@ import continentList from '../../models/data/locations-list.json'; // Adjust pat
 
 interface SearchParams {
   keyword?: string;
-  startDate?: Date | null;
-  endDate?: Date | null;
+  fromDate?: Date | null;
+  toDate?: Date | null;
   location?: string | null;
   type?: 'Online' | 'Offline' | 'Hybrid' | null;
   submissionDate?: Date | null;
@@ -27,8 +27,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   const [confKeyword, setConfKeyword] = useState<string>('');
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<'Online' | 'Offline' | 'Hybrid' | null>(null);
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [fromDate, setStartDate] = useState<Date | null>(null);
+  const [toDate, setEndDate] = useState<Date | null>(null);
   const [locationSearchQuery, setLocationSearchQuery] = useState('');
   const [typeSearchQuery, setTypeSearchQuery] = useState('');
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
@@ -82,8 +82,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   const handleSearchClick = () => {
     onSearch({
       keyword: confKeyword,
-      startDate,
-      endDate,
+      fromDate,
+      toDate,
       location: selectedLocation,
       type: selectedType,
       submissionDate,
@@ -203,8 +203,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     confKeyword,
     selectedLocation,
     selectedType,
-    startDate,
-    endDate,
+    fromDate,
+    toDate,
     locationSearchQuery,
     typeSearchQuery,
     isLocationDropdownOpen,

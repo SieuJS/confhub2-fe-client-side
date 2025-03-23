@@ -15,8 +15,8 @@ export default function Conferences({ params: { locale } }: { params: { locale: 
 
     const handleSearch = useCallback(async (searchParamsFromComponent: {
     keyword?: string;
-    startDate?: Date | null;
-    endDate?: Date | null;
+    fromDate?: Date | null;
+    toDate?: Date | null;
     location?: string | null;
     type?: 'Online' | 'Offline' | 'Hybrid' | null;
     submissionDate?: Date | null;
@@ -32,11 +32,11 @@ export default function Conferences({ params: { locale } }: { params: { locale: 
     if (searchParamsFromComponent.keyword) newParams.set('keyword', searchParamsFromComponent.keyword);
     if (searchParamsFromComponent.location) newParams.set('country', searchParamsFromComponent.location);
     if (searchParamsFromComponent.type) newParams.set('type', searchParamsFromComponent.type);
-    if (searchParamsFromComponent.startDate) {
-      newParams.set('startDate', searchParamsFromComponent.startDate.toISOString().split('T')[0]);
+    if (searchParamsFromComponent.fromDate) {
+      newParams.set('fromDate', searchParamsFromComponent.fromDate.toISOString().split('T')[0]);
     }
-    if (searchParamsFromComponent.endDate) {
-      newParams.set('endDate', searchParamsFromComponent.endDate.toISOString().split('T')[0]);
+    if (searchParamsFromComponent.toDate) {
+      newParams.set('toDate', searchParamsFromComponent.toDate.toISOString().split('T')[0]);
     }
     if (searchParamsFromComponent.rank) newParams.set('rank', searchParamsFromComponent.rank);
     if (searchParamsFromComponent.sourceYear) newParams.set('sourceYear', searchParamsFromComponent.sourceYear);

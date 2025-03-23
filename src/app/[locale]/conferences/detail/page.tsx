@@ -148,7 +148,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         );
     }
 
-    const { conference, organization, locations, follower } = conferenceData || {};
+    const { conference, organization, location, followedBy, ranks } = conferenceData || {};
 
     const calculateOverallRating = (feedbacks: Feedback[] | null | undefined): number => {
         if (!feedbacks || feedbacks.length === 0) return 0;
@@ -160,21 +160,21 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     const totalReviews = conferenceData?.feedBacks?.length || 0;
 
     const renderFollowerAvatars = () => {
-        if (!follower || follower.length === 0) {
+        if (!followedBy || followedBy.length === 0) {
             return <p className="text-gray-500 text-sm">No followers yet.</p>;
         }
 
         const maxVisibleFollowers = 5;
-        const visibleFollowers = follower.slice(0, maxVisibleFollowers);
-        const remainingFollowers = follower.length - maxVisibleFollowers;
+        const visibleFollowers = followedBy.slice(0, maxVisibleFollowers);
+        const remainingFollowers = followedBy.length - maxVisibleFollowers;
 
         return (
             <div className="flex items-center">
-                {visibleFollowers.map((follower) => (
+                {visibleFollowers.map((followedBy: any) => (
                     <img
-                        key={follower.id}
-                        src={`https://ui-avatars.com/api/?name=${follower.firstName}+${follower.lastName}&background=random&size=32`}
-                        alt={`${follower.firstName} ${follower.lastName}`}
+                        key={followedBy.id}
+                        src={`https://ui-avatars.com/api/?name=${followedBy.firstName}+${followedBy.lastName}&background=random&size=32`}
+                        alt={`${followedBy.firstName} ${followedBy.lastName}`}
                         width={32}
                         height={32}
                         className="rounded-full h-8 w-8 border-2 border-white"
@@ -227,13 +227,20 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                         <div className='text-yellow-500 text-xl mr-2'>★</div>
                                         <strong>{overallRating.toFixed(1)} <span className="ml-1 text-gray-500"> ({totalReviews} Ratings)</span></strong>
                                     </p>
-                                    <a href="#map" className="text-blue-600 text-sm mt-1 flex items-center hover:underline">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4 mr-1">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                                        </svg>
-                                        {locations?.cityStateProvince || "Location Not Available"}, {locations?.country || ""}
-                                    </a>
+                                    <div className='flex gap-6'>
+
+                                        <a href="#map" className="text-blue-600 text-sm mt-1 flex items-center hover:underline">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" className="mr-2 lucide lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /><circle cx="12" cy="10" r="3" /></svg>
+
+                                            {location?.address || "Location Not Available"}
+                                        </a>
+                                        <Link className="text-blue-600 text-sm mt-1 flex items-center hover:underline" href={{ pathname: `/conferences`, query: { publisher: organization?.publisher } }} >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" className="mr-2 lucide lucide-book-type"><path d="M10 13h4" /><path d="M12 6v7" /><path d="M16 8V6H8v2" /><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" /></svg>
+
+                                            {organization?.publisher || "Location Not Available"}
+                                        </Link>
+                                    </div>
+
                                     {/* Followers Display */}
                                     <div className="mt-2">
                                         {renderFollowerAvatars()}
@@ -250,7 +257,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                         <Link key={topic} href={{ pathname: `/conferences`, query: { topics: topic } }} >
 
                                             <button
-                                                className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold mr-2"
+                                                className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold mr-2 my-1"
                                             >
                                                 {topic}
                                             </button>
@@ -259,7 +266,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                     ))}
                                     {hasMoreTopics && (
                                         <button
-                                            className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-3 py-1 text-sm font-semibold mr-2"
+                                            className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-3 py-1 text-sm font-semibold mr-2 my-1"
                                             onClick={() => setShowAllTopics(!showAllTopics)}
                                         >
                                             {showAllTopics ? 'View Less' : 'View More'}

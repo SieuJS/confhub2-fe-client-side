@@ -11,6 +11,7 @@
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@google-cloud/local-auth": "^3.0.1",
     "@google/generative-ai": "^0.24.0",
     "@headlessui/react": "^2.2.0",
     "@radix-ui/react-avatar": "^1.0.4",
@@ -30,6 +31,7 @@
     "date-fns": "^3.3.1",
     "echarts": "5.6",
     "fs": "^0.0.1-security",
+    "googleapis": "^148.0.0",
     "ics": "^3.8.1",
     "next": "14.1.0",
     "next-intl": "^3.11.3",

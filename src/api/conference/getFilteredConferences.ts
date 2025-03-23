@@ -1,20 +1,20 @@
 import { ConferenceInfo } from '@/src/models/response/conference.list.response';
 
-const API_FILTERED_CONFERENCES_ENDPOINT = 'http://localhost:3005/api/v1/conference';
+const API_FILTERED_CONFERENCES_ENDPOINT = 'http://178.128.28.130:3000/api/v1/conference';
 const API_SAVE_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/conferences/save'; // Port 3000 (your backend)
 
 export interface FetchConferencesParams {
   keyword?: string;
   country?: string;
   type?: 'Online' | 'Offline' | 'Hybrid';
-  startDate?: string;
-  endDate?: string;
+  fromDate?: string;
+  toDate?: string;
   rank?: string;
   sourceYear?: string;
   topics?: string[];
   publisher?: string;
   page?: string;
-  sortBy?: 'date' | 'rank' | 'name' | 'submissionDate' | 'startDate' | 'endDate';
+  sortBy?: 'date' | 'rank' | 'name' | 'submissionDate' | 'fromDate' | 'toDate';
   sortOrder?: 'asc' | 'desc';
   perPage?: string;
 }

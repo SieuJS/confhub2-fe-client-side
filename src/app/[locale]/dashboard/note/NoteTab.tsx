@@ -116,7 +116,7 @@ const NoteTab: React.FC<NoteTabProps> = () => {
                 type: event.type,
                 conference: event.conference,
                 id: event.conferenceId,
-                location: `${conferenceDetails.locations.cityStateProvince}, ${conferenceDetails.locations.country}`,
+                location: `${conferenceDetails.location?.cityStateProvince}, ${conferenceDetails.location?.country}`,
                 date: formattedDate,
                 countdown: countdownString,
                 year: event.year,

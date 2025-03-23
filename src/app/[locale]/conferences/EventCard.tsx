@@ -1,43 +1,39 @@
 // components/conferences/EventCard.tsx
-import React, { useState, useCallback } from 'react'; // Import useCallback
+import React, { useState, useCallback } from 'react';
 import Image from 'next/image';
 import { ConferenceInfo } from '../../../models/response/conference.list.response';
-import { useRouter, usePathname } from 'next/navigation';
 import { Link } from '@/src/navigation';
 
 interface EventCardProps {
   event: ConferenceInfo;
-  className?: string; // Add optional className prop
-  style?: React.CSSProperties; // Add optional style prop
+  className?: string;
+  style?: React.CSSProperties;
 }
 
-const EventCard: React.FC<EventCardProps> = ({ event, className }) => { // Destructure className
-  const router = useRouter();
-  const pathname = usePathname();
+const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [showWebsiteTooltip, setShowWebsiteTooltip] = useState(false);
   const [showFavoriteTooltip, setShowFavoriteTooltip] = useState(false);
 
-  const formatDate = useCallback((date: Date | undefined): string => { // <--- Change type to Date | undefined
+  const formatDate = useCallback((date: Date | undefined): string => {
     if (!date) return 'TBD';
-    // Remove the .slice() line.  It's not needed.
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-  },[]);
+  }, []);
 
   const formatDateRange = useCallback((fromDate: string | undefined, toDate: string | undefined) => {
     if (!fromDate || !toDate) return 'TBD';
-    const startDate = new Date(fromDate); // These are already Date objects
-    const endDate = new Date(toDate);     // These are already Date objects
+    const startDate = new Date(fromDate);
+    const endDate = new Date(toDate);
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
       return 'Invalid Date';
     }
     if (startDate.toDateString() === endDate.toDateString()) {
-      return formatDate(startDate); // Pass Date objects directly
+      return formatDate(startDate);
     }
-    return `${formatDate(startDate)} - ${formatDate(endDate)}`; // Pass Date objects directly
-  },[formatDate]);
+    return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+  }, [formatDate]);
 
-  const locationString = `${event.location.cityStateProvince || ''}, ${event.location.country || ''}`.trim() || 'Location Not Available';
+  const locationString = `${event.location?.cityStateProvince || ''}, ${event.location?.country || ''}`.trim() || 'Location Not Available';
 
   const getRankColor = useCallback((rank?: string) => {
     rank = rank?.toUpperCase();
@@ -48,7 +44,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => { // Destr
       case 'C': return 'bg-orange-100 text-orange-700';
       default: return 'bg-gray-100 text-gray-600';
     }
-  },[]);
+  }, []);
 
   const getAccessTypeColor = useCallback((accessType?: string) => {
     accessType = accessType?.toUpperCase();
@@ -58,18 +54,13 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => { // Destr
       case 'HYBRID': return 'bg-blue-100 text-blue-700 border border-blue-300';
       default: return 'bg-gray-100 text-gray-600';
     }
-  },[]);
-
-  const handleTopicClick = useCallback((topic: string) => {
-    const localePrefix = pathname.split('/')[1];
-    router.push(`/${localePrefix}/conferences?topics=${topic}`);
-  },[pathname, router]);
+  }, []);
 
   const handleFavoriteClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setIsFavorite(!isFavorite);
     setShowFavoriteTooltip(false);
-  },[isFavorite]);
+  }, [isFavorite]);
 
   const handleGoToWebsite = useCallback((e: React.MouseEvent<HTMLButtonElement>, url: string) => {
     e.preventDefault();
@@ -80,7 +71,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => { // Destr
       console.warn("No URL provided for Go to Website");
     }
     setShowWebsiteTooltip(false);
-  },[]);
+  }, []);
 
   return (
     <div className={`rounded-lg shadow-lg overflow-hidden bg-white hover:shadow-xl transition duration-300 ease-in-out flex flex-col ${className}`}>
@@ -93,12 +84,12 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => { // Destr
           height={225}
           style={{ objectFit: 'cover', width: '100%', height: '180px' }}
           className="w-full"
-          priority // Add this line
+          priority
         />
         {/* --- Conditional Rank Display --- */}
         <div className="absolute top-0 right-2">
-          <span className={`font-semibold ${getRankColor(event.rankSourceFoRData?.rank)} px-2 py-1 rounded text-xs`}>
-            {event.rankSourceFoRData?.rank ? `Rank: ${event.rankSourceFoRData.rank}` : 'Unranked'}
+          <span className={`font-semibold ${getRankColor(event?.rank || 'No info')} px-2 py-1 rounded text-xs`}>
+            {event.rank ? `Rank: ${event.rank}` : 'Unranked'}
           </span>
         </div>
 
@@ -148,6 +139,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => { // Destr
             <path d="M16 18h.01" />
           </svg>
           <span className="text-left">
+            {/* Access the first element of the dates array */}
             {formatDateRange(event.dates?.fromDate, event.dates?.toDate)}
           </span>
         </div>

@@ -354,8 +354,8 @@ const AddNoteDialog: React.FC<AddNoteDialogProps> = ({
           Acronym: {eventDetails.conference.acronym}
         </p>
         <p className='mb-2 text-gray-700'>
-          Location: {eventDetails.locations.cityStateProvince},{' '}
-          {eventDetails.locations.country}
+          Location: {eventDetails.location.cityStateProvince},{' '}
+          {eventDetails.location.country}
         </p>
         {/* Display important dates */}
         {eventDetails.dates && eventDetails.dates.length > 0 && (

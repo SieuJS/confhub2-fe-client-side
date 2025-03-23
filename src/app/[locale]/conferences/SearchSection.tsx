@@ -10,8 +10,8 @@ import useSearchForm from '../../../hooks/conferences/useSearchForm'; // Import 
 interface SearchSectionProps {
   onSearch: (searchParams: {
     keyword?: string;
-    startDate?: Date | null;
-    endDate?: Date | null;
+    fromDate?: Date | null;
+    toDate?: Date | null;
     location?: string | null;
     type?: 'Online' | 'Offline' | 'Hybrid' | null;
     submissionDate?: Date | null;
@@ -30,8 +30,8 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
     confKeyword,
     selectedLocation,
     selectedType,
-    startDate,
-    endDate,
+    fromDate,
+    toDate,
     locationSearchQuery,
     typeSearchQuery,
     isLocationDropdownOpen,
@@ -93,24 +93,24 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
         <div className="border-l border-gray-300 h-6 mx-2 hidden md:block"></div>
 
         <div className="flex items-center space-x-2 px-2">
-          <label htmlFor="startDate" className="text-sm">Start:</label>
+          <label htmlFor="fromDate" className="text-sm">Start:</label>
           <input
             type="date"
-            id="startDate"
+            id="fromDate"
             className="border rounded py-0.5 text-sm bg-transparent w-24"
             onChange={handleStartDateInputChange}
-            value={startDate ? startDate.toISOString().split('T')[0] : ''}
+            value={fromDate ? fromDate.toISOString().split('T')[0] : ''}
           />
         </div>
 
         <div className="flex items-center space-x-2 px-2">
-          <label htmlFor="endDate" className="text-sm">End:</label>
+          <label htmlFor="toDate" className="text-sm">End:</label>
           <input
             type="date"
-            id="endDate"
+            id="toDate"
             className="border rounded py-0.5 text-sm bg-transparent w-24"
             onChange={handleEndDateInputChange}
-            value={endDate ? endDate.toISOString().split('T')[0] : ''}
+            value={toDate ? toDate.toISOString().split('T')[0] : ''}
           />
         </div>
 

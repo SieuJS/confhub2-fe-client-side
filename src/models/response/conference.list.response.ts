@@ -32,13 +32,13 @@ export type Location = {
 // Loại bỏ RankSourceFoRData, vì nó không phản ánh đúng cấu trúc dữ liệu
 // Thay vào đó, 'rank' và 'source' được đưa trực tiếp vào ConferenceInfo
 
+// ImportantDates should be an object, not nullable itself.
 export type ImportantDates = {
   name: string;
   type: string;
-  fromDate: string;
-  toDate: string;
-} | null; // ImportantDates có thể null (mặc dù trong JSON mẫu, dates là null, không phải từng phần tử trong dates)
-//Nếu dates không bao giờ là null, mà là một array có thể chứa các object null, thì ImportantDates[] là đủ
+  fromDate: string | null; // Allow null for individual dates
+  toDate: string | null;   // Allow null for individual dates
+};
 
 export type Meta = {
   curPage: number;

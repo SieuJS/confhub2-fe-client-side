@@ -2,7 +2,7 @@
 // api/get_info/get_info.ts
 import { ConferenceResponse } from '../../models/response/conference.response';
 
-const API_GET_CONFERENCE_ENDPOINT = 'http://localhost:3005/api/v1'; // Keep this for potential future use
+const API_GET_CONFERENCE_ENDPOINT = 'http://178.128.28.130:3000/api/v1'; // Keep this for potential future use
 const API_SAVE_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/conferences/save'; // Port 3000 (your backend)
 
 
@@ -20,6 +20,7 @@ async function getConference(id: string): Promise<ConferenceResponse> {
     }
 
     let responseData = await response.json();
+  
     if (responseData != null) {
       // Check if responseData.dates exist and its properties as well before doing anything.
       if (responseData.dates && responseData.dates.fromDate && responseData.dates.toDate) {
@@ -27,6 +28,8 @@ async function getConference(id: string): Promise<ConferenceResponse> {
         responseData.dates.toDate = new Date(responseData.dates.toDate);
       }
       const conference = responseData;
+      console.log(conference)
+
       return conference; // Return an object with named properties
     } else {
       throw new Error('Invalid API response format or empty data.');

@@ -61,7 +61,7 @@ export interface AddedConference {
         accessType: string;
         isAvailable: boolean;
         conferenceId: string;
-        summary: string;
+        summerize: string;
         callForPaper: string; // Có thể để trống, hoặc thêm logic để tạo tự động
         link: string;
         cfpLink: string;      // Có thể để trống, hoặc thêm logic
@@ -70,7 +70,7 @@ export interface AddedConference {
         createdAt: string;
         updatedAt: string;
     };
-    locations: {
+    location: {
         id: string;
         address: string;
         cityStateProvince: string;

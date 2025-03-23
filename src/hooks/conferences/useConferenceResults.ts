@@ -4,7 +4,7 @@ import { ConferenceInfo } from '@/src/models/response/conference.list.response';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { fetchConferences, FetchConferencesParams } from '../../api/conference/getFilteredConferences'; // Import
 
-type SortOption = 'date' | 'rank' | 'name' | 'submissionDate' | 'startDate' | 'endDate';
+type SortOption = 'date' | 'rank' | 'name' | 'submissionDate' | 'fromDate' | 'toDate';
 type SortOrder = 'asc' | 'desc';
 
 interface UseConferenceResultsProps {
@@ -34,8 +34,8 @@ const useConferenceResults = ({ initialData, initialTotalItems }: UseConferenceR
         keyword: searchParams.get('keyword') || undefined,
         country: searchParams.get('country') || undefined,
         type: searchParams.get('type') as 'Online' | 'Offline' | 'Hybrid' || undefined,
-        startDate: searchParams.get('startDate') || undefined,
-        endDate: searchParams.get('endDate') || undefined,
+        fromDate: searchParams.get('fromDate') || undefined,
+        toDate: searchParams.get('toDate') || undefined,
         rank: searchParams.get('rank') || undefined,
         sourceYear: searchParams.get('sourceYear') || undefined,
         topics: searchParams.getAll('topics'), // Không cần kiểm tra null/undefined ở đây.

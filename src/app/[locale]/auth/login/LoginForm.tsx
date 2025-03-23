@@ -1,86 +1,22 @@
 // LoginForm.tsx
 'use client'
-import React, { useState } from 'react'
+import React from 'react'
 import { Link } from '@/src/navigation'
-import { useRouter, usePathname } from 'next/navigation'
-import { useLocalStorage } from 'usehooks-ts'
+import useLoginForm from '../../../../hooks/auth/useLoginForm';
+
 
 const LoginForm: React.FC = () => {
-  const [password, setPassword] = useState('')
-  const [emailInput, setEmailInput] = useState('')
-  const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
-  const pathname = usePathname()
+  const {
+    email,
+    password,
+    handleEmailChange,
+    handlePasswordChange,
+    handleSubmit,
+    handleGoogleLogin,
+    error,
+        isLoading
+  } = useLoginForm();
 
-  const [loginStatus, setLoginStatus] = useLocalStorage<string | null>(
-    'loginStatus',
-    null
-  )
-  const [user, setUser] = useLocalStorage<{
-    id: string
-    firstname: string
-    lastname: string
-    email: string
-  } | null>('user', null)
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
-    setError('')
-
-    if (!emailInput) {
-      setError('Please enter your email')
-      return
-    }
-
-    if (!password) {
-      setError('Please enter your password')
-      return
-    }
-
-    setIsLoading(true)
-    try {
-      const response = await fetch('http://localhost:3000/api/v1/user/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email: emailInput, password })
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setLoginStatus('true')
-        setUser({
-          id: data.user.id,
-          firstname: data.user.firstName,
-          lastname: data.user.lastName,
-          email: data.user.email
-        })
-
-        const localePrefix = pathname.split('/')[1]
-        const pathWithLocale = `/${localePrefix}`
-        router.push(pathWithLocale)
-      } else {
-        setError(data.message || 'Incorrect email or password')
-      }
-    } catch (error: any) {
-      console.error('Login error:', error)
-      setError('Username or password is incorrect')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleGoogleLogin = async () => {
-    try {
-      window.location.href = 'http://localhost:3000/api/v1/auth/google'
-    } catch (error) {
-      console.error('Google login error:', error)
-      setError('Unable to sign in with Google. Please try again.')
-    }
-  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -141,8 +77,8 @@ const LoginForm: React.FC = () => {
                     type="email"
                     autoComplete="email"
                     required
-                    value={emailInput}
-                    onChange={(e) => setEmailInput(e.target.value)}
+                    value={email}
+                    onChange={handleEmailChange}
                     className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
                     placeholder="you@example.com"
                   />
@@ -168,7 +104,7 @@ const LoginForm: React.FC = () => {
                     autoComplete="current-password"
                     required
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                     className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
                     placeholder="••••••••"
                   />
@@ -237,4 +173,4 @@ const LoginForm: React.FC = () => {
   )
 }
 
-export default LoginForm
+export default LoginForm;

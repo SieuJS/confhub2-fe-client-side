@@ -6,17 +6,16 @@ const useShareConference = (conferenceData: ConferenceResponse | null) => {
   const handleShareClick = (platform: 'facebook' | 'twitter' | 'reddit') => {
     if (!conferenceData) return;
 
-    const { conference, organization, locations, dates } = conferenceData;
+    const { conference, organization, location, dates } = conferenceData;
 
-    const conferenceDate = dates.find(date => date.type === 'conferenceDates');
+    const conferenceDate = dates?.find(date => date?.type === 'conferenceDates');
     const fromDateStr = conferenceDate?.fromDate ?? '';
     const toDateStr = conferenceDate?.toDate ?? '';
 
     const fromDateFormatted = fromDateStr ? new Date(fromDateStr).toLocaleDateString() : 'N/A';
     const toDateFormatted = toDateStr ? new Date(toDateStr).toLocaleDateString() : 'N/A';
 
-    const location = locations;
-    const shareText = `📢 ${conference.title}\n📅 Thời gian: ${fromDateFormatted} - ${toDateFormatted} \n📍 Địa điểm: ${location.cityStateProvince}, ${location.country}\n🔗 Chi tiết: ${organization.link}`;
+    const shareText = `📢 ${conference.title}\n📅 Thời gian: ${fromDateFormatted} - ${toDateFormatted} \n📍 Địa điểm: ${location?.cityStateProvince}, ${location?.country}\n🔗 Chi tiết: ${organization.link}`;
     const shareUrl = encodeURIComponent(organization.link || window.location.href);
     const encodedText = encodeURIComponent(shareText);
 

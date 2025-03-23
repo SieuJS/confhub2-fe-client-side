@@ -53,7 +53,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
               <option value="date">Date</option>
               <option value="rank">Rank</option>
               <option value="name">Name</option>
-              <option value="startDate">Start Date</option>
+              <option value="toDate">Start Date</option>
               <option value="endDate">End Date</option>
             </select>
 

@@ -56,10 +56,10 @@ const EventTable: React.FC<EventTableProps> = ({ events }) => {
                 {formatDateRange(event.dates?.fromDate, event.dates?.toDate)}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-left text-sm text-gray-500">
-                {event.location.cityStateProvince && `${event.location.cityStateProvince}, `}{event.location.country}
+                {event.location?.cityStateProvince && `${event.location.cityStateProvince}, `}{event.location?.country}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-left text-sm text-gray-500">
-               {event.rankSourceFoRData?.rank || 'Unranked'}
+               {event.ra?.rank || 'Unranked'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-left text-sm text-gray-500">
                 {event.accessType}
