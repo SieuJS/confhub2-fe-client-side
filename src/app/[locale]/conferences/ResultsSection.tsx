@@ -18,6 +18,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
     paginate,
     handleSortByChange,
     handleSortOrderChange,
+    handleEventPerPageChange,
     loading,
     error,
   } = useConferenceResults();
@@ -57,6 +58,21 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
               <option value="endDate">End Date</option>
             </select>
 
+            <label htmlFor="event-per-page" className="mr-2 text-sm">Event per page:</label>
+            <select
+              id="event-per-page"
+              className="border rounded px-2 py-1 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={eventsPerPage}
+              onChange={handleEventPerPageChange}
+              title="Select number of event per page"
+            >
+              <option value='5'>5</option>
+              <option value='10'>10</option>
+              <option value='20'>20</option>
+              <option value='50'>50</option>
+              <option value='100'>100</option>
+            </select>
+
             <button
               onClick={handleSortOrderChange}
               className="px-2 py-1 text-sm rounded bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -93,20 +109,21 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
         </div>
       </div>
 
-      {sortedEvents.length > 0 ? (
+      {sortedEvents && sortedEvents?.payload?.length > 0 ? (
         <>
           {viewType === 'card' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {sortedEvents.map((event) => (
+              {sortedEvents.payload.map((event) => (
                 <EventCard key={event.id} event={event} />
               ))}
             </div>
           ) : (
-            <EventTable events={sortedEvents} />
+            <EventTable events={sortedEvents.payload} />
           )}
           <div className="mt-4">
+            {console.log(currentPage)}
             <Pagination
-              eventsPerPage={eventsPerPage}
+              eventsPerPage={Number(eventsPerPage)}
               totalEvents={totalItems}
               paginate={paginate}
               currentPage={currentPage}

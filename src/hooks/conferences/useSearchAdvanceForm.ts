@@ -8,8 +8,8 @@ interface UseSearchAdvanceFormProps {
   submissionDate: Date | null;
   onRankChange: (rank: string | null) => void;
   selectedRank: string | null;
-  onSourceYearChange: (sourceYear: string | null) => void;
-  selectedSourceYear: string | null;
+  onSourceChange: (source: string | null) => void;
+  selectedSource: string | null;
   onAverageScoreChange: (averageScore: string | null) => void;
   selectedAverageScore: string | null;
   onTopicsChange: (topics: string[]) => void;
@@ -25,8 +25,8 @@ const useSearchAdvanceForm = ({
   submissionDate,
   onRankChange,
   selectedRank,
-  onSourceYearChange,
-  selectedSourceYear,
+  onSourceChange,
+  selectedSource,
   onAverageScoreChange,
   selectedAverageScore,
   onTopicsChange,
@@ -154,8 +154,8 @@ const useSearchAdvanceForm = ({
     onRankChange(event.target.value === "" ? null : event.target.value);
   };
 
-  const handleSourceYearChangeInput = (event: ChangeEvent<HTMLSelectElement>) => {
-    onSourceYearChange(event.target.value === "" ? null : event.target.value);
+  const handleSourceChangeInput = (event: ChangeEvent<HTMLSelectElement>) => {
+    onSourceChange(event.target.value === "" ? null : event.target.value);
   };
 
   const handleAverageScoreChangeInput = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -186,7 +186,7 @@ const useSearchAdvanceForm = ({
     handleRemoveFieldOfResearch,
       handleSubmissionDateInputChange,
     handleRankChangeInput,
-    handleSourceYearChangeInput,
+    handleSourceChangeInput,
     handleAverageScoreChangeInput,
       handlePublisherInputChange, // Return the new handler
     handlePublisherEnter

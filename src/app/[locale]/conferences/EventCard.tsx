@@ -37,7 +37,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => { // Destr
     return `${formatDate(startDate)} - ${formatDate(endDate)}`; // Pass Date objects directly
   },[formatDate]);
 
-  const locationString = `${event.location.cityStateProvince || ''}, ${event.location.country || ''}`.trim() || 'Location Not Available';
+  const locationString = `${event?.location?.cityStateProvince || ''}, ${event?.location?.country || ''}`.trim() || 'Location Not Available';
 
   const getRankColor = useCallback((rank?: string) => {
     rank = rank?.toUpperCase();
@@ -97,8 +97,8 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => { // Destr
         />
         {/* --- Conditional Rank Display --- */}
         <div className="absolute top-0 right-2">
-          <span className={`font-semibold ${getRankColor(event.rankSourceFoRData?.rank)} px-2 py-1 rounded text-xs`}>
-            {event.rankSourceFoRData?.rank ? `Rank: ${event.rankSourceFoRData.rank}` : 'Unranked'}
+          <span className={`font-semibold ${getRankColor(event.rank)} px-2 py-1 rounded text-xs`}>
+            {event.rank ? `${event.rank}` : 'Unranked'}
           </span>
         </div>
 
@@ -148,7 +148,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => { // Destr
             <path d="M16 18h.01" />
           </svg>
           <span className="text-left">
-            {formatDateRange(event.dates?.fromDate, event.dates?.toDate)}
+            {formatDateRange(event.dates?.[0]?.fromDate, event.dates?.[0]?.toDate)}
           </span>
         </div>
 
