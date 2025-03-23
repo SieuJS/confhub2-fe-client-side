@@ -38,9 +38,10 @@ export const Header: FC<Props> = ({ locale }) => {
   const [isLogin, setIsLogin] = useState(false);
 
   useEffect(() => {
-    if (loginStatus)
-      setIsLogin(true);
-  }, []);
+    // Cập nhật trạng thái đăng nhập dựa trên user và loginStatus
+    setIsLogin(!!user && !!loginStatus);
+  }, [user, loginStatus]);
+
   const {
     notifications,
     notificationEffect,
@@ -93,8 +94,8 @@ export const Header: FC<Props> = ({ locale }) => {
         <AuthButtons
           isLogin={isLogin}
           locale={locale}
-          toggleNotification={() => openNotification()} // Use openNotification
-          toggleUserDropdown={() => openUserDropdown()} // Use openUserDropdown
+          toggleNotification={() => openNotification()}
+          toggleUserDropdown={() => openUserDropdown()}
           notificationEffect={notificationEffect}
           unreadCount={unreadCount()}
         />
