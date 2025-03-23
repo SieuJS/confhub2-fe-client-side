@@ -15,8 +15,8 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(false) // Thêm trạng thái loading
-  const router = useRouter() // Khởi tạo router
+  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
   const pathname = usePathname()
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -24,19 +24,18 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
     setError('')
 
     if (!firstname || !lastname || !email || !password || !confirmPassword) {
-      setError('Vui lòng điền đầy đủ thông tin.')
+      setError('Please fill in all required fields.')
       return
     }
 
     if (password !== confirmPassword) {
-      setError('Mật khẩu và mật khẩu xác nhận không khớp.')
+      setError('Password and confirm password do not match.')
       return
     }
 
-    setIsLoading(true) // Bắt đầu loading
+    setIsLoading(true)
     try {
       const response = await fetch('http://localhost:3000/api/v1/user/signup', {
-        // Use absolute URL for server-side
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -52,146 +51,196 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
       const data = await response.json()
 
       if (response.status === 201) {
-        // Đăng ký thành công
-        console.log('Đăng ký thành công!', data)
+        console.log('Registration successful!', data)
 
         if (typeof window !== 'undefined') {
-          // --- Prepend Locale Prefix ---
-          const localePrefix = pathname.split('/')[1] // Extract locale prefix (e.g., "en")
-          const pathWithLocale = `/${localePrefix}` // Construct path with locale
-
-          router.push(pathWithLocale) // Use path with locale for internal navigation
+          const localePrefix = pathname.split('/')[1]
+          const pathWithLocale = `/${localePrefix}`
+          router.push(pathWithLocale)
         } else {
           console.error('Error in signin')
         }
 
-        // Reset form
         setFirstName('')
         setLastName('')
         setEmail('')
         setPassword('')
         setConfirmPassword('')
       } else {
-        // Xử lý lỗi đăng ký
         setError(
           data.message ||
-            'Đăng ký không thành công. Vui lòng kiểm tra thông tin.'
+            'Registration failed. Please check your information.'
         )
       }
     } catch (error: any) {
-      console.error('Lỗi đăng ký:', error)
-      setError('Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại sau.')
+      console.error('Registration error:', error)
+      setError('An error occurred during registration. Please try again later.')
     } finally {
-      setIsLoading(false) // Kết thúc loading, bất kể thành công hay thất bại
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className='flex min-h-screen items-center justify-center bg-gray-100'>
-      <div className='mt-4 bg-white px-8 py-6 text-left shadow-lg'>
-        <h3 className='text-center text-2xl font-bold'>Đăng ký tài khoản</h3>
-        <form onSubmit={handleSubmit}>
-          <div className='mt-4'>
-            <div>
-              <label
-                className='mb-2 block text-sm font-bold text-gray-700'
-                htmlFor='firstname'
-              >
-                Tên
-              </label>
-              <input
-                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none'
-                id='firstname'
-                type='text'
-                placeholder='Tên'
-                value={firstname}
-                onChange={e => setFirstName(e.target.value)}
-              />
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-xl">
+        <div className="bg-white px-8 py-10 shadow-xl sm:rounded-lg sm:px-16">
+          <div className="space-y-8">
+            <div className="space-y-2 text-center">
+              <h1 className="text-3xl font-bold tracking-tight whitespace-nowrap mx-auto max-w-fit">Welcome Global Conference Hub</h1>
+              <p className="text-sm text-gray-600">Create your account</p>
             </div>
-            <div>
-              <label
-                className='mb-2 block text-sm font-bold text-gray-700'
-                htmlFor='lastname'
-              >
-                Họ
-              </label>
-              <input
-                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none'
-                id='lastname'
-                type='text'
-                placeholder='Họ'
-                value={lastname}
-                onChange={e => setLastName(e.target.value)}
-              />
-            </div>
-            <div className='mt-4'>
-              <label
-                className='mb-2 block text-sm font-bold text-gray-700'
-                htmlFor='email'
-              >
-                Email
-              </label>
-              <input
-                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none'
-                id='email'
-                type='email'
-                placeholder='Email'
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-              />
-            </div>
-            <div className='mt-4'>
-              <label
-                className='mb-2 block text-sm font-bold text-gray-700'
-                htmlFor='password'
-              >
-                Mật khẩu
-              </label>
-              <input
-                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none'
-                id='password'
-                type='password'
-                placeholder='Mật khẩu'
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-              />
-            </div>
-            <div className='mt-4'>
-              <label
-                className='mb-2 block text-sm font-bold text-gray-700'
-                htmlFor='confirmPassword'
-              >
-                Xác nhận mật khẩu
-              </label>
-              <input
-                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none'
-                id='confirmPassword'
-                type='password'
-                placeholder='Xác nhận mật khẩu'
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-              />
-            </div>
-            {error && (
-              <p className='mt-2 text-sm italic text-red-500'>{error}</p>
-            )}
-            <div className='mt-8 flex items-center justify-between'>
-              <button
-                className='focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none'
-                type='submit'
-                disabled={isLoading} // Vô hiệu hóa nút khi đang tải
-              >
-                {isLoading ? 'Đang đăng ký...' : 'Đăng ký'}
-              </button>
-              <Link
-                href='/auth/login'
-                className='inline-block align-baseline text-sm font-bold text-blue-500 hover:text-blue-800'
-              >
-                Đã có tài khoản? Đăng nhập
-              </Link>
+
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="firstname" className="block text-sm font-medium text-gray-700">
+                    First Name
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      id="firstname"
+                      name="firstname"
+                      type="text"
+                      required
+                      value={firstname}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
+                      placeholder="First name"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="lastname" className="block text-sm font-medium text-gray-700">
+                    Last Name
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      id="lastname"
+                      name="lastname"
+                      type="text"
+                      required
+                      value={lastname}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
+                      placeholder="Last name"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Email
+                </label>
+                <div className="mt-1">
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
+                    placeholder="you@example.com"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <div className="mt-1">
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                  Confirm Password
+                </label>
+                <div className="mt-1">
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+
+              {error && (
+                <div className="rounded-md bg-red-50 p-4">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-red-700">{error}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="flex w-full justify-center rounded-md border border-transparent bg-button px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-button/90 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Creating account...
+                    </div>
+                  ) : (
+                    'Create account'
+                  )}
+                </button>
+              </div>
+            </form>
+
+            <div className="text-center text-sm">
+              <div className="flex items-center justify-center space-x-1">
+                <span className="text-gray-600">Already have an account?</span>
+                <Link href="/auth/login" className="font-medium text-button hover:text-button/80">
+                  Sign In
+                </Link>
+              </div>
             </div>
           </div>
-        </form>
+        </div>
+
+        <div className="mt-4 text-center text-xs text-gray-500">
+          By continuing, you agree to our{' '}
+          <Link href="/terms" className="text-button hover:text-button/80">
+            Terms of Service
+          </Link>{' '}
+          and{' '}
+          <Link href="/privacy" className="text-button hover:text-button/80">
+            Privacy Policy
+          </Link>
+        </div>
       </div>
     </div>
   )

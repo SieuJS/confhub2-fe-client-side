@@ -28,7 +28,10 @@ const PopularConferences: React.FC = () => {
   const containerWidth = cardWidth * visibleCount + gap * (visibleCount - 1); // Correct total width
   const transitionDuration = 500;
 
+
   return (
+    <>
+    {listConferences && listConferences.length > 0 && 
     <section id="organizers" className="m-6 px-8 pt-10 ">
       <style jsx>{`
         .card {
@@ -51,7 +54,7 @@ const PopularConferences: React.FC = () => {
         }
       `}</style>
       <h1 className="text-2xl font-bold text-center mb-6">{t('Popular_Conferences')}</h1>
-      {!loading && <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
         <button
           onClick={() => scroll('left')}
           className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white bg-opacity-50 rounded-full p-2 hover:bg-opacity-75 focus:outline-none"
@@ -86,7 +89,7 @@ const PopularConferences: React.FC = () => {
                   {isActive && (
                     <div className="flex flex-col w-full h-full justify-start items-stretch grid grid-cols-1">
                       <EventCard
-                        key={conference.id}
+                        key={conference?.id}
                         event={conference}
                         className={`flex-shrink-0 mr-[${gap}px]`} // Add flex-shrink-0 and margin
                         style={{ width: `${cardWidth}px`, height: '1000px' }} // Set consistent width
@@ -99,9 +102,10 @@ const PopularConferences: React.FC = () => {
             })}
           </div>
         </div>
-      </div>}
-      {loading && <div className='text-center'>Loading...</div>}
+      </div>
     </section>
+    }
+    </>
   );
 };
 

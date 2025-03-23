@@ -1,13 +1,12 @@
 // components/Header/components/AuthButtons.tsx (Corrected LoadingIndicator usage)
 
-import { FC, useState, useEffect } from 'react'
+import { FC } from 'react'
 import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
 import ThemeSwitch from '../ThemeSwitch'
 import LangSwitcher from '../LangSwitcher'
 import { NotificationIcon, UserIcon } from './Icon'
 import { usePathname } from 'next/navigation'
-import LoadingIndicator from './LoadingIndicator'
 
 interface Props {
   isLogin: boolean;
@@ -15,7 +14,7 @@ interface Props {
   toggleNotification: () => void;
   toggleUserDropdown: () => void;
   notificationEffect: boolean;
-  unreadCount: number | string; // Change type to number | string
+  unreadCount: number | string;
 }
 
 const AuthButtons: FC<Props> = ({
@@ -24,27 +23,16 @@ const AuthButtons: FC<Props> = ({
   toggleNotification,
   toggleUserDropdown,
   notificationEffect,
-  unreadCount, // Receive unreadCount
+  unreadCount,
 }) => {
   const t = useTranslations('');
   const pathname = usePathname();
 
-  const [isClientRendered, setIsClientRendered] = useState(false) // Thêm state mới
-
-  useEffect(() => {
-    setIsClientRendered(true) // Cập nhật state sau khi component mount
-  }, [])
-
-  if (!isClientRendered) {
-    return <LoadingIndicator />; // Simple loading indicator
-  }
-
-
+  // Render UI cho trạng thái đã đăng nhập
   if (isLogin) {
     return (
       <>
         <button className='' onClick={toggleNotification}>
-          {/* Pass unreadCount to NotificationIcon */}
           <NotificationIcon notificationEffect={notificationEffect} unreadCount={unreadCount} />
         </button>
         <button onClick={toggleUserDropdown}>
@@ -54,6 +42,7 @@ const AuthButtons: FC<Props> = ({
     );
   }
 
+  // Render UI cho trạng thái chưa đăng nhập
   return (
     <>
       <div className='flex pt-1 font-bold'>
