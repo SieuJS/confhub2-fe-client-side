@@ -2,7 +2,7 @@
 // src/hooks/useNotificationState.ts
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Notification } from '@/src/models/response/user.response';
-import { updateUser } from '@/src/api/user/updateUser';
+import { updateNotifications } from '@/src/api/user/updateNotifications';
 
 const useNotificationState = (initialNotifications: Notification[], userId: string) => {
     const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
@@ -12,10 +12,10 @@ const useNotificationState = (initialNotifications: Notification[], userId: stri
         notificationsRef.current = notifications;
     }, [notifications]);
 
-    const updateNotifications = useCallback(
+    const updateUserNotifications = useCallback(
         async (updatedNotifications: Notification[]) => {
             const updatedData = { notifications: updatedNotifications };
-            await updateUser(userId, updatedData);
+            await updateNotifications(userId, updatedData);
             setNotifications(updatedNotifications);
         },
         [userId]
@@ -31,10 +31,10 @@ const useNotificationState = (initialNotifications: Notification[], userId: stri
                 const updatedNotifications = currentNotifications.map(n =>
                     n.id === id ? { ...n, seenAt: new Date().toISOString() } : n
                 );
-                await updateNotifications(updatedNotifications);
+                await updateUserNotifications(updatedNotifications);
             }
         },
-        [updateNotifications] // Loại bỏ notifications khỏi dependencies
+        [updateUserNotifications] // Loại bỏ notifications khỏi dependencies
     );
 
     const handleToggleImportant = useCallback(
@@ -42,9 +42,9 @@ const useNotificationState = (initialNotifications: Notification[], userId: stri
             const updatedNotifications = notifications.map(n =>
                 n.id === id ? { ...n, isImportant: !n.isImportant } : n
             );
-            await updateNotifications(updatedNotifications);
+            await updateUserNotifications(updatedNotifications);
         },
-        [notifications, updateNotifications]
+        [notifications, updateUserNotifications]
     );
 
     const handleDeleteNotification = useCallback(
@@ -52,9 +52,9 @@ const useNotificationState = (initialNotifications: Notification[], userId: stri
             const updatedNotifications = notifications.map(n =>
                 n.id === id ? { ...n, deletedAt: new Date().toISOString() } : n
             );
-            await updateNotifications(updatedNotifications);
+            await updateUserNotifications(updatedNotifications);
         },
-        [notifications, updateNotifications]
+        [notifications, updateUserNotifications]
     );
 
     const handleMarkUnseen = useCallback(
@@ -62,12 +62,12 @@ const useNotificationState = (initialNotifications: Notification[], userId: stri
             const updatedNotifications = notifications.map(n =>
                 n.id === id ? { ...n, seenAt: null } : n
             );
-            await updateNotifications(updatedNotifications);
+            await updateUserNotifications(updatedNotifications);
         },
-        [notifications, updateNotifications]
+        [notifications, updateUserNotifications]
     );
 
-    return { notifications, setNotifications, handleUpdateSeenAt, handleToggleImportant, handleDeleteNotification, handleMarkUnseen, updateNotifications };
+    return { notifications, setNotifications, handleUpdateSeenAt, handleToggleImportant, handleDeleteNotification, handleMarkUnseen, updateUserNotifications };
 };
 
 export default useNotificationState;

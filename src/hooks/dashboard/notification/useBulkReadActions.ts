@@ -5,21 +5,21 @@ import { Notification } from '@/src/models/response/user.response';
 const useBulkReadActions = (
     selectedIds: string[],
     notifications: Notification[],
-    updateNotifications: (updatedNotifications: Notification[]) => void
+    updateUserNotifications: (updatedUserNotifications: Notification[]) => void
 ) => {
     const handleMarkSelectedAsRead = useCallback(async () => {
-        const updatedNotifications = notifications.map(n =>
+        const updatedUserNotifications = notifications.map(n =>
             selectedIds.includes(n.id) && n.seenAt === null ? { ...n, seenAt: new Date().toISOString() } : n
         );
-        updateNotifications(updatedNotifications);
-    }, [selectedIds, notifications, updateNotifications]);
+        updateUserNotifications(updatedUserNotifications);
+    }, [selectedIds, notifications, updateUserNotifications]);
 
     const handleMarkSelectedAsUnread = useCallback(async () => {
-        const updatedNotifications = notifications.map(n =>
+        const updatedUserNotifications = notifications.map(n =>
             selectedIds.includes(n.id) && n.seenAt !== null ? { ...n, seenAt: null } : n
         );
-        updateNotifications(updatedNotifications);
-    }, [selectedIds, notifications, updateNotifications]);
+        updateUserNotifications(updatedUserNotifications);
+    }, [selectedIds, notifications, updateUserNotifications]);
 
     const allSelectedAreRead = selectedIds.length > 0 && selectedIds.every(id => {
         const notification = notifications.find(n => n.id === id);

@@ -3,7 +3,7 @@
 
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Button from '../../utils/Button';
 import ConferenceFeedback from '../../conferences/detail/ConferenceFeedback';
 import NotFoundPage from "../../utils/NotFoundPage";
@@ -12,7 +12,11 @@ import { ConferenceTabs } from '../../conferences/detail/ConferenceTabs';
 import { useSearchParams } from 'next/navigation';
 import { Header } from '../../utils/Header';
 import Footer from '../../utils/Footer';
-import { Link } from '@/src/navigation';
+import { Link } from '@/src/navigation'; // Import useRouter
+import { useLocalStorage } from 'usehooks-ts';
+import { useRouter, usePathname } from 'next/navigation';
+import { getPathname } from '@/src/navigation';
+
 // Import the custom hooks
 import useConferenceData from '../../../../hooks/conferenceDetails/useConferenceData';
 import useFollowConference from '../../../../hooks/conferenceDetails/useFollowConference';
@@ -21,8 +25,6 @@ import useClickOutside from '../../../../hooks/conferenceDetails/useClickOutside
 import useTopicsDisplay from '../../../../hooks/conferenceDetails/useTopicsDisplay';
 import useFormatConferenceDates from '../../../../hooks/conferenceDetails/useFormatConferenceDates';
 import useAddToCalendar from '../../../../hooks/conferenceDetails/useAddToCalendar';
-import createGoogleCalendarLink from '../../../../hooks/conferenceDetails/useAddToGoogleCalendar';
-import createICalendarEvent from '../../../../hooks/conferenceDetails/useAddToICalendar';
 
 interface EventCardProps {
     locale: string;
@@ -32,13 +34,16 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     const t = useTranslations('');
     const searchParams = useSearchParams();
     const id = searchParams.get('id');
+    const router = useRouter();
+    const pathname = usePathname();
 
     const { conferenceData, error, loading } = useConferenceData(id);
     const { isFollowing, handleFollowClick } = useFollowConference(conferenceData);
     const { isAddToCalendar, handleAddToCalendar } = useAddToCalendar(conferenceData);
 
     const { handleShareClick } = useShareConference(conferenceData);
-    const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } = useTopicsDisplay(conferenceData?.organization.topics);
+    // Safely access topics using optional chaining and provide a default empty array
+    const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } = useTopicsDisplay(conferenceData?.organization?.topics || []);
     const { dateDisplay } = useFormatConferenceDates(conferenceData?.dates);
 
     const [openMenu, setOpenMenu] = useState<"share" | "calendar" | null>(null);
@@ -59,6 +64,22 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
     useClickOutside(menuContainerRef, closeMenu);
 
+    const [loginStatus] = useLocalStorage<string | null>('loginStatus', null); // Get login status
+
+    // --- Helper Function for Authentication Check ---
+    const checkLoginAndRedirect = (callback: () => void) => {
+        if (!loginStatus) {
+             // --- Prepend Locale Prefix ---
+             const localePrefix = pathname.split('/')[1]; // Extract locale prefix (e.g., "en")
+             const pathWithLocale = `/${localePrefix}/auth/login`; // Construct path with locale
+
+             router.push(pathWithLocale); // Use path with locale for internal navigation
+
+        } else {
+            callback(); // Execute the original action
+        }
+    };
+
     const renderShareMenu = () => {
         if (openMenu !== "share") return null;
 
@@ -66,7 +87,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
             <div className="relative z-20 right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="py-1">
                     <button
-                        onClick={() => { handleShareClick('facebook'); closeMenu(); }}
+                        onClick={() => { checkLoginAndRedirect(() => { handleShareClick('facebook'); closeMenu(); }) }}
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                     >
                         <span className="flex items-center">
@@ -77,7 +98,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                         </span>
                     </button>
                     <button
-                        onClick={() => { handleShareClick('twitter'); closeMenu(); }}
+                        onClick={() => { checkLoginAndRedirect(() => { handleShareClick('twitter'); closeMenu(); }) }}
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                     >
                         <span className="flex items-center">
@@ -88,7 +109,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                         </span>
                     </button>
                     <button
-                        onClick={() => { handleShareClick('reddit'); closeMenu(); }}
+                        onClick={() => { checkLoginAndRedirect(() => { handleShareClick('reddit'); closeMenu(); }) }}
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                     >
                         <span className="flex items-center">
@@ -104,67 +125,9 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         );
     }
 
-
-    const handleAddToExternalCalendar = (type: 'google' | 'ical') => {
-        if (type === 'google') {
-            const googleLink = createGoogleCalendarLink(conferenceData);
-            window.open(googleLink, '_blank');
-        } else if (type === 'ical') {
-            const icalData = createICalendarEvent(conferenceData);
-            if (icalData) {
-                const blob = new Blob([icalData], { type: 'text/calendar;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                const conferenceDates = conferenceData?.dates.find(date => date.type === "conferenceDates"); // Find main conference dates
-                const startDate = conferenceDates?.fromDate;
-                const conferenceDate = startDate ? new Date(startDate) : new Date(); // Default to current date if not found
-                a.download = `${conferenceData?.conference?.acronym + conferenceDate.getFullYear()}.ics`; // Use acronym instead of shortName
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url); // Clean up
-            }
-        }
-    };
-
-    const renderCalendarMenu = () => {
-        if (openMenu !== "calendar") { // Kiểm tra state chung
-            return null;
-        }
-        return (
-            <div className="relative z-20 right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                <div className='py-1'>
-                    <button
-                        onClick={() => { handleAddToExternalCalendar('google'); closeMenu(); }}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                    >
-                        <span className="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6 mr-2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                            </svg>
-                            Add to Google Calendar
-                        </span>
-                    </button>
-                    <button
-                        onClick={() => { handleAddToExternalCalendar('ical'); closeMenu(); }}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                    >
-                        <span className="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6 mr-2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                        </svg>
-                            Download ICal
-                        </span>
-                    </button>
-                </div>
-            </div>
-        );
-    };
-
     const { conference, organization, locations, followedBy } = conferenceData || {};
 
-     // Helper function to calculate overall rating
+    // Helper function to calculate overall rating
     const calculateOverallRating = (feedbacks: any) => { // Replace 'any' with the correct type
         if (!feedbacks || feedbacks.length === 0) return 0;
         const totalStars = feedbacks.reduce((sum: number, feedback: any) => sum + feedback.star, 0);
@@ -174,7 +137,6 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     // Calculate overall rating and total reviews *before* the return
     const overallRating = calculateOverallRating(conferenceData?.feedBacks);
     const totalReviews = conferenceData?.feedBacks?.length || 0;  // Default to 0 if undefined
-
 
     // Helper function to render follower avatars
     const renderFollowerAvatars = () => {
@@ -205,7 +167,6 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
             </div>
         );
     };
-
 
     if (error === "Conference not found") {
         return <NotFoundPage />;
@@ -253,7 +214,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                         </svg>
                                         {locations?.cityStateProvince}, {locations?.country}
                                     </a>
-                                     {/* Followers Display */}
+                                    {/* Followers Display */}
                                     <div className="mt-2">
                                         {renderFollowerAvatars()}
                                     </div>
@@ -264,7 +225,8 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                             <div className="mt-2">
                                 <h2 className="font-semibold text-lg mb-2">Topics:</h2>
                                 <div className="flex flex-wrap">
-                                    {displayedTopics.map((topic) => (
+                                    {/* Use optional chaining and nullish coalescing here */}
+                                    {(displayedTopics || []).map((topic) => (
                                         <Link key={topic} href={{ pathname: `/conferences`, query: { topics: topic } }} >
 
                                             <button
@@ -292,7 +254,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                             <div className="sticky top-4">
                                 <div className="flex flex-col gap-3 relative"> {/* Removed items-stretch */}
                                     <Button
-                                        onClick={handleAddToCalendar}
+                                        onClick={() => checkLoginAndRedirect(handleAddToCalendar)}
                                         variant={isAddToCalendar ? 'primary' : 'secondary'}
                                         size="small"
                                         className="flex items-center justify-start gap-x-4 mx-14" // Added justify-start and gap-x-4 mx-14
@@ -314,7 +276,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
                                     <div className='flex flex-col gap-3 relative menu-container' ref={menuContainerRef}>
                                         <Button
-                                            onClick={toggleShareMenu}
+                                            onClick={() => checkLoginAndRedirect(toggleShareMenu)}
                                             variant="secondary"
                                             size="small"
                                             className="flex items-center justify-start gap-x-4 mx-14" // Added justify-start and gap-x-4 mx-14
@@ -327,39 +289,15 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                         {renderShareMenu()}
                                     </div>
 
-                                    <div className='flex flex-col gap-3 relative menu-container' ref={menuContainerRef}>
-                                        <Button
-                                            onClick={toggleCalendarMenu}
-                                            variant="secondary"
-                                            size="small"
-                                            className="flex items-center justify-start gap-x-4 mx-14" // Added justify-start and gap-x-4 mx-14
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                                                <path d="M8 2v4" />
-                                                <path d="M16 2v4" />
-                                                <rect width="18" height="18" x="3" y="4" rx="2" />
-                                                <path d="M3 10h18" />
-                                                <path d="M8 14h.01" />
-                                                <path d="M12 14h.01" />
-                                                <path d="M16 14h.01" />
-                                                <path d="M8 18h.01" />
-                                                <path d="M12 18h.01" />
-                                                <path d="M16 18h.01" />
-                                            </svg>
-                                            External Calendar
-                                        </Button>
-                                        {renderCalendarMenu()}
-                                    </div>
-
 
                                     <Button
-                                        onClick={handleFollowClick}
+                                        onClick={() => checkLoginAndRedirect(handleFollowClick)}
                                         variant={isFollowing ? 'primary' : 'secondary'}
                                         size="small"
                                         className="flex items-center justify-start gap-x-4 mx-14" // Added justify-start and gap-x-4 mx-14
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                                            <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+                                            <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1 -.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
                                         </svg>
                                         {isFollowing ? 'Followed' : 'Follow'}
                                     </Button>
@@ -367,6 +305,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                     <Button
                                         variant={'secondary'}
                                         size="small"
+                                        onClick={() => checkLoginAndRedirect(() => setUpdating(true))}
                                         className={`flex items-center justify-start gap-x-4 mx-14 ${updating ? 'opacity-50 cursor-not-allowed' : ''}`} // Added justify-start and gap-x-4 mx-14, kept opacity
                                         disabled={updating}
                                     >

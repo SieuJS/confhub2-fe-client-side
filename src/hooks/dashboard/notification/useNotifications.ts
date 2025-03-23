@@ -61,7 +61,7 @@ const useNotifications = (): UseNotificationsReturn => {
         handleToggleImportant,
         handleDeleteNotification,
         handleMarkUnseen,
-        updateNotifications
+        updateUserNotifications
     } = useNotificationState(initialNotifications, userId);  // Initialize with initialNotifications
 
 
@@ -81,13 +81,13 @@ const useNotifications = (): UseNotificationsReturn => {
         handleMarkSelectedAsRead,
         handleMarkSelectedAsUnread,
         allSelectedAreRead
-    } = useBulkReadActions(checkedIndices, notifications, updateNotifications);
+    } = useBulkReadActions(checkedIndices, notifications, updateUserNotifications);
 
     const {
         handleMarkSelectedAsImportant,
         handleMarkSelectedAsUnimportant,
         allSelectedAreImportant
-    } = useBulkImportantActions(checkedIndices, notifications, updateNotifications);
+    } = useBulkImportantActions(checkedIndices, notifications, updateUserNotifications);
 
     const handleCheckboxChangeTab = useCallback(
         (id: string, checked: boolean) => {
@@ -100,9 +100,9 @@ const useNotifications = (): UseNotificationsReturn => {
         const updatedNotifications = notifications.map(n =>
             checkedIndices.includes(n.id) ? { ...n, deletedAt: new Date().toISOString() } : n
         );
-        await updateNotifications(updatedNotifications);
+        await updateUserNotifications(updatedNotifications);
         // setCheckedIndices([]); // REMOVE THIS LINE
-    }, [checkedIndices, notifications, updateNotifications]); // Remove setCheckedIndices from the dependency array
+    }, [checkedIndices, notifications, updateUserNotifications]); // Remove setCheckedIndices from the dependency array
 
 
     // UseEffect to initialize the state, ONLY ONCE

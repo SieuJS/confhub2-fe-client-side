@@ -10,7 +10,7 @@ const useFilteredNotifications = (notifications: Notification[], searchTerm: str
                     notification.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     notification.message.toLowerCase().includes(searchTerm.toLowerCase())
             )
-            .filter((n) => !n.deletedAt);
+            .filter((n) => n.deletedAt);
     }, [notifications, searchTerm]);
 
     return filteredNotifications;

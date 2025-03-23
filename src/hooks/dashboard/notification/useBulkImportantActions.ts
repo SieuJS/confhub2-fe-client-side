@@ -5,21 +5,21 @@ import { Notification } from '@/src/models/response/user.response';
 const useBulkImportantActions = (
     selectedIds: string[],
     notifications: Notification[],
-    updateNotifications: (updatedNotifications: Notification[]) => void
+    updateUserNotifications: (updatedUserNotifications: Notification[]) => void
 ) => {
     const handleMarkSelectedAsImportant = useCallback(async () => {
-        const updatedNotifications = notifications.map(n =>
+        const updatedUserNotifications = notifications.map(n =>
             selectedIds.includes(n.id) && !n.isImportant ? { ...n, isImportant: true } : n
         );
-        updateNotifications(updatedNotifications);
-    }, [selectedIds, notifications, updateNotifications]);
+        updateUserNotifications(updatedUserNotifications);
+    }, [selectedIds, notifications, updateUserNotifications]);
 
     const handleMarkSelectedAsUnimportant = useCallback(async () => {
-        const updatedNotifications = notifications.map(n =>
+        const updatedUserNotifications = notifications.map(n =>
             selectedIds.includes(n.id) && n.isImportant ? { ...n, isImportant: false } : n
         );
-        updateNotifications(updatedNotifications);
-    }, [selectedIds, notifications, updateNotifications]);
+        updateUserNotifications(updatedUserNotifications);
+    }, [selectedIds, notifications, updateUserNotifications]);
 
     const allSelectedAreImportant = selectedIds.length > 0 && selectedIds.every(id => {
         const notification = notifications.find(n => n.id === id);

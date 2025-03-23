@@ -2,7 +2,8 @@
 // api/get_info/get_info.ts
 import { ConferenceResponse } from '../../models/response/conference.response';
 
-const API_GET_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1'; // Keep this for potential future use
+const API_GET_CONFERENCE_ENDPOINT = 'http://localhost:3005/api/v1'; // Keep this for potential future use
+const API_SAVE_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/conferences/save'; // Port 3000 (your backend)
 
 
 async function getConference(id: string): Promise<ConferenceResponse> {
