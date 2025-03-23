@@ -2,7 +2,7 @@
 "use_client";
 import { ConferenceListResponse } from '../../models/response/conference.list.response';
 
-const API_GET_CONFERENCE_ENDPOINT = 'http://localhost:3005/api/v1'; // Port 3005 (original)
+const API_GET_CONFERENCE_ENDPOINT = 'http://confhub.engineer:3000/api/v1'; // Port 3005 (original)
 
 async function getListConference(): Promise<ConferenceListResponse> {
   try {

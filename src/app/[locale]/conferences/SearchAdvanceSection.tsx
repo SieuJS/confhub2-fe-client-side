@@ -12,8 +12,8 @@ interface SearchAdvanceSectionProps {
   submissionDate: Date | null
   onRankChange: (rank: string | null) => void
   selectedRank: string | null
-  onSourceYearChange: (sourceYear: string | null) => void
-  selectedSourceYear: string | null
+  onSourceChange: (source: string | null) => void
+  selectedSource: string | null
   onAverageScoreChange: (averageScore: string | null) => void
   selectedAverageScore: string | null
   onTopicsChange: (topics: string[]) => void
@@ -31,8 +31,8 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
   submissionDate,
   onRankChange,
   selectedRank,
-  onSourceYearChange,
-  selectedSourceYear,
+  onSourceChange,
+  selectedSource,
   onAverageScoreChange,
   selectedAverageScore,
   onTopicsChange,
@@ -57,7 +57,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
     handleRemoveFieldOfResearch,
     handleSubmissionDateInputChange,
     handleRankChangeInput,
-    handleSourceYearChangeInput,
+    handleSourceChangeInput,
     handleAverageScoreChangeInput,
     handlePublisherInputChange,
     handlePublisherEnter
@@ -66,8 +66,8 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
     submissionDate,
     onRankChange,
     selectedRank,
-    onSourceYearChange,
-    selectedSourceYear,
+    onSourceChange,
+    selectedSource,
     onAverageScoreChange,
     selectedAverageScore,
     onTopicsChange,
@@ -170,8 +170,8 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
               <select
                 className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none' // Reduced py and px
                 id='source'
-                value={selectedSourceYear || ''}
-                onChange={handleSourceYearChangeInput}
+                value={selectedSource || ''}
+                onChange={handleSourceChangeInput}
               >
                 <option value=''>Source</option>
                 <option value='CORE2023'>CORE2023</option>

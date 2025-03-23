@@ -17,7 +17,7 @@ interface SearchSectionProps {
     submissionDate?: Date | null;
     publisher?: string | null;
     rank?: string | null;
-    sourceYear?: string | null;
+    source?: string | null;
     averageScore?: string | null;
     topics?: string[];
     fieldOfResearch?: string[];
@@ -57,8 +57,8 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
     submissionDate,
     handleRankChange,
     selectedRank,
-    handleSourceYearChange,
-    selectedSourceYear,
+    handleSourceChange,
+    selectedSource,
     handleAverageScoreChange,
     selectedAverageScore,
     handleTopicsChange,
@@ -210,8 +210,8 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
         submissionDate={submissionDate}
         onRankChange={handleRankChange}
         selectedRank={selectedRank}
-        onSourceYearChange={handleSourceYearChange}
-        selectedSourceYear={selectedSourceYear}
+        onSourceChange={handleSourceChange}
+        selectedSource={selectedSource}
         onAverageScoreChange={handleAverageScoreChange}
         selectedAverageScore={selectedAverageScore}
         onTopicsChange={handleTopicsChange}

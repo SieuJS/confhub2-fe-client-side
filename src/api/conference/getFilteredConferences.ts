@@ -1,6 +1,6 @@
-import { ConferenceInfo } from '@/src/models/response/conference.list.response';
+import { ConferenceListResponse } from '@/src/models/response/conference.list.response';
 
-const API_FILTERED_CONFERENCES_ENDPOINT = 'http://178.128.28.130:3000/api/v1/conference';
+const API_FILTERED_CONFERENCES_ENDPOINT = 'http://confhub.engineer:3000/api/v1/conference';
 const API_SAVE_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/conferences/save'; // Port 3000 (your backend)
 
 export interface FetchConferencesParams {
@@ -10,7 +10,7 @@ export interface FetchConferencesParams {
   fromDate?: string;
   toDate?: string;
   rank?: string;
-  sourceYear?: string;
+  source?: string;
   topics?: string[];
   publisher?: string;
   page?: string;
@@ -19,12 +19,8 @@ export interface FetchConferencesParams {
   perPage?: string;
 }
 
-export interface FetchConferencesResponse {
-  payload: ConferenceInfo[];
-  total: number;
-}
 
-export const fetchConferences = async (params: FetchConferencesParams): Promise<FetchConferencesResponse> => {
+export const fetchConferences = async (params: FetchConferencesParams): Promise<ConferenceListResponse> => {
   const queryParams = new URLSearchParams();
 
   // Thêm tất cả tham số vào query string,  kiểm tra undefined/null
@@ -50,8 +46,7 @@ export const fetchConferences = async (params: FetchConferencesParams): Promise<
     throw new Error(`HTTP error! status: ${response.status}`); // Giữ lại thông tin lỗi chung.
   }
 
-  const data: FetchConferencesResponse = await response.json(); // Rõ ràng kiểu dữ liệu trả về.
-  console.log(data)
+  const data: ConferenceListResponse = await response.json(); // Rõ ràng kiểu dữ liệu trả về.
 
   // 2. Send the received data to your backend (3000)
   const saveResponse = await fetch(API_SAVE_CONFERENCE_ENDPOINT, {

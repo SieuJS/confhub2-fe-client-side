@@ -1,6 +1,6 @@
 // src/hooks/useConferenceResults.ts
 import { useState, useEffect, useCallback } from 'react';
-import { ConferenceInfo } from '@/src/models/response/conference.list.response';
+import { ConferenceListResponse } from '@/src/models/response/conference.list.response';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { fetchConferences, FetchConferencesParams } from '../../api/conference/getFilteredConferences'; // Import
 
@@ -8,17 +8,17 @@ type SortOption = 'date' | 'rank' | 'name' | 'submissionDate' | 'fromDate' | 'to
 type SortOrder = 'asc' | 'desc';
 
 interface UseConferenceResultsProps {
-  initialData?: ConferenceInfo[];
-  initialTotalItems?: number;
+  initialData?: ConferenceListResponse;
 }
 
-const useConferenceResults = ({ initialData, initialTotalItems }: UseConferenceResultsProps = {}) => {
-  const [events, setEvents] = useState<ConferenceInfo[]>(initialData || []);
+const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) => {
+  const [events, setEvents] = useState<ConferenceListResponse | undefined>(initialData);
   const [currentPage, setCurrentPage] = useState(1);
-  const eventsPerPage = 50;
+  const [eventsPerPage, setEventPerPage] = useState<string>('5');
+  //const eventsPerPage = 10;
   const [sortBy, setSortBy] = useState<SortOption>('date');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
-  const [totalItems, setTotalItems] = useState(initialTotalItems || 0);
+  const [totalItems, setTotalItems] = useState(initialData?.meta.totalItems || 0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -37,22 +37,24 @@ const useConferenceResults = ({ initialData, initialTotalItems }: UseConferenceR
         fromDate: searchParams.get('fromDate') || undefined,
         toDate: searchParams.get('toDate') || undefined,
         rank: searchParams.get('rank') || undefined,
-        sourceYear: searchParams.get('sourceYear') || undefined,
+        source: searchParams.get('source') || undefined,
         topics: searchParams.getAll('topics'), // Không cần kiểm tra null/undefined ở đây.
         publisher: searchParams.get('publisher') || undefined,
         page: searchParams.get('page') || '1',
         sortBy: searchParams.get('sortBy') as SortOption || 'date',
         sortOrder: searchParams.get('sortOrder') as SortOrder || 'asc',
-        perPage: String(eventsPerPage),
+        perPage: searchParams.get('perPage') || '5',
       };
 
       const data = await fetchConferences(params); // Gọi API.
 
-      setEvents(data.payload);
-      setTotalItems(data.total);
-      setCurrentPage(parseInt(params.page!, 10)); // Dùng page từ params (đã là string).
+      console.log(data)
+      setEvents(data);
+      setTotalItems(data.meta.totalItems);
+      setCurrentPage(data.meta.curPage); // Dùng page từ params (đã là string).
       setSortBy(params.sortBy!);  // Đã được kiểm tra ở trên.
       setSortOrder(params.sortOrder!); // Đã được kiểm tra ở trên
+      setEventPerPage(params.perPage!);
     } catch (error: any) {
       console.error("Failed to fetch conferences:", error);
       setError(error.message); // Lấy message từ error object.
@@ -83,6 +85,16 @@ const useConferenceResults = ({ initialData, initialTotalItems }: UseConferenceR
       router.push(`/${localePrefix}/conferences?${newParams.toString()}`);
     };
 
+    const handleEventPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+      const newPerPage = event.target.value as string;
+      const newParams = new URLSearchParams(searchParams.toString());
+      newParams.set('perPage', newPerPage);
+      newParams.delete('page'); // Reset to page 1 when sorting changes
+
+      const localePrefix = pathname.split('/')[1];
+      router.push(`/${localePrefix}/conferences?${newParams.toString()}`);
+    }
+
     const handleSortOrderChange = () => {
       const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
       const newParams = new URLSearchParams(searchParams.toString());
@@ -105,6 +117,7 @@ const useConferenceResults = ({ initialData, initialTotalItems }: UseConferenceR
     paginate,
     handleSortByChange,
     handleSortOrderChange,
+    handleEventPerPageChange,
     loading,
     error,
   };

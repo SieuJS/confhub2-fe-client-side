@@ -22,7 +22,7 @@ export default function Conferences({ params: { locale } }: { params: { locale: 
     submissionDate?: Date | null;
     publisher?: string | null;
     rank?: string | null;
-    sourceYear?: string | null;
+    source?: string | null;
     averageScore?: string | null;
     topics?: string[];
     fieldOfResearch?: string[];
@@ -39,7 +39,7 @@ export default function Conferences({ params: { locale } }: { params: { locale: 
       newParams.set('toDate', searchParamsFromComponent.toDate.toISOString().split('T')[0]);
     }
     if (searchParamsFromComponent.rank) newParams.set('rank', searchParamsFromComponent.rank);
-    if (searchParamsFromComponent.sourceYear) newParams.set('sourceYear', searchParamsFromComponent.sourceYear);
+    if (searchParamsFromComponent.source) newParams.set('source', searchParamsFromComponent.source);
     if (searchParamsFromComponent.publisher) newParams.set('publisher', searchParamsFromComponent.publisher);
     if (searchParamsFromComponent.submissionDate) {
       newParams.set('submissionDate', searchParamsFromComponent.submissionDate.toISOString().split('T')[0]);
