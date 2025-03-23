@@ -3,7 +3,7 @@
 
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import Button from '../../utils/Button';
 import ConferenceFeedback from '../../conferences/detail/ConferenceFeedback';
 import NotFoundPage from "../../utils/NotFoundPage";
