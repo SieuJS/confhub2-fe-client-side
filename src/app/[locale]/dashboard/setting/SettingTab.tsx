@@ -1,46 +1,94 @@
 // SettingTab.tsx
-import React, { useState } from 'react'
-import { useTranslations } from 'next-intl'
-import { useLocalStorage } from 'usehooks-ts' // Import useLocalStorage
-import { useRouter, usePathname } from 'next/navigation' // Correct import
-import deleteUser from '../../../../api/user/deleteUser' // Import API function directly
+import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
+import { useLocalStorage } from 'usehooks-ts';
+import { useRouter, usePathname } from 'next/navigation';
+import deleteUser from '../../../../api/user/deleteUser';
+import { useUpdateUser } from '../../../../hooks/dashboard/setting/useUpdateSettings';
+import { useGetUser } from '../../../../hooks/dashboard/setting/useGetUser';
+import { Setting } from '@/src/models/response/user.response';
 
-interface SettingTabProps {
-  //  props (nếu bạn có truyền props nào từ component cha).
-}
+const SettingTab: React.FC = () => {
+  const t = useTranslations('');
+  const [localUser, setLocalUser] = useLocalStorage<{ id: string } | null>('user', null);
+  const { user, loading: userLoading, error: userError, refetch } = useGetUser(localUser?.id || null);
+  const [setting, setSetting] = useState<Setting | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const { updateUserSetting, loading: updateLoading, error: updateError } = useUpdateUser();
 
-const SettingTab: React.FC<SettingTabProps> = () => {
-  const t = useTranslations('')
-  const [autoAdd, setAutoAdd] = useState(true)
-  const [changeUpdate, setChangeUpdate] = useState(true)
-  const [upcomingEvent, setUpcomingEvent] = useState(false)
-  const [deliveryMethod, setDeliveryMethod] = useState<
-    'notification' | 'notification+email'
-  >('notification') // Thay đổi state
-  const [isDeleting, setIsDeleting] = useState(false) // Add loading state
-  const [deleteError, setDeleteError] = useState<string | null>(null) // Add error state
-  const router = useRouter()
-  const pathname = usePathname()
+  useEffect(() => {
+    if (user?.setting) {
+      setSetting(user.setting);
+    }
+  }, [user]);
 
-  // Get user from local storage
-  const [user, setUser] = useLocalStorage<{
-    firstname: string
-    lastname: string
-    email: string
-    id: string
-  } | null>('user', null)
+  const toggleAutoAdd = async () => {
+    if (user && setting) {
+      await updateUserSetting(user.id, { autoAddFollowToCalendar: !setting.autoAddFollowToCalendar });
+      setSetting(prev => prev ? ({ ...prev, autoAddFollowToCalendar: !prev.autoAddFollowToCalendar }) : null);
+      refetch();
+    }
+  };
 
-  const toggleAutoAdd = () => setAutoAdd(!autoAdd)
-  const toggleChangeUpdate = () => setChangeUpdate(!changeUpdate)
-  const toggleUpcomingEvent = () => setUpcomingEvent(!upcomingEvent)
-  const handleDeliveryChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    // Hàm xử lý thay đổi
-    setDeliveryMethod(
-      event.target.value as 'notification' | 'notification+email'
-    )
+  const toggleChangeUpdate = async () => {
+    if (user && setting) {
+      await updateUserSetting(user.id, { notificationWhenConferencesChanges: !setting.notificationWhenConferencesChanges });
+      setSetting(prev => prev ? ({ ...prev, notificationWhenConferencesChanges: !prev.notificationWhenConferencesChanges }) : null);
+      refetch();
+    }
+  };
+
+  const toggleUpcomingEvent = async () => {
+    if (user && setting) {
+      await updateUserSetting(user.id, { upComingEvent: !setting.upComingEvent });
+      setSetting(prev => prev ? ({ ...prev, upComingEvent: !prev.upComingEvent }) : null);
+      refetch();
+    }
+  };
+
+  const handleDeliveryChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+    if (user && setting) {
+      const newDeliveryMethod = event.target.value as "System" | "Email" | "All";
+      await updateUserSetting(user.id, { notificationThrough: newDeliveryMethod });
+      setSetting(prev => prev ? ({ ...prev, notificationThrough: newDeliveryMethod }) : null);
+      refetch();
+    }
+  };
+
+  const toggleReceiveNotifications = async () => {
+    if(user && setting) {
+        await updateUserSetting(user.id, {receiveNotifications: !setting.receiveNotifications});
+        setSetting(prev => prev? ({...prev, receiveNotifications: !prev.receiveNotifications}): null);
+        refetch();
+    }
   }
+
+    const toggleNotificationWhenUpdateProfile = async () => {
+        if(user && setting) {
+            await updateUserSetting(user.id, {notificationWhenUpdateProfile: !setting.notificationWhenUpdateProfile});
+            setSetting(prev => prev? ({...prev, notificationWhenUpdateProfile: !prev.notificationWhenUpdateProfile}): null);
+            refetch();
+        }
+    }
+
+    const toggleNotificationWhenFollow = async () => {
+        if(user && setting){
+            await updateUserSetting(user.id, {notificationWhenFollow: !setting.notificationWhenFollow});
+            setSetting(prev => prev? ({...prev, notificationWhenFollow: !prev.notificationWhenFollow}): null);
+            refetch();
+        }
+    }
+
+    const toggleNotificationWhenAddToCalendar = async () => {
+        if(user && setting){
+            await updateUserSetting(user.id, {notificationWhenAddTocalendar: !setting.notificationWhenAddTocalendar});
+            setSetting(prev => prev? ({...prev, notificationWhenAddTocalendar: !prev.notificationWhenAddTocalendar}): null);
+            refetch();
+        }
+    }
 
   const handleDeleteAccount = async () => {
     if (
@@ -48,71 +96,98 @@ const SettingTab: React.FC<SettingTabProps> = () => {
         'Are you sure you want to delete your account?  This action cannot be undone.'
       )
     ) {
-      setIsDeleting(true) // Set loading state to true
-      setDeleteError(null) // Clear any previous errors
+      setIsDeleting(true);
+      setDeleteError(null);
 
       try {
-        if (!user) {
-          setDeleteError('User not logged in.')
-          return // Early return if no user
+        if (!localUser) {
+          setDeleteError('User not logged in.');
+          return;
         }
-        await deleteUser(user.id) // Call the API function
-        setUser(null)
+        await deleteUser(localUser.id);
+        // setUser(null); // Remove useLocalStorage is not needed
 
         // Redirect to login page, correctly handling locale
-        let pathWithLocale = '/auth/login'
+        let pathWithLocale = '/auth/login';
         if (pathname) {
-          const pathParts = pathname.split('/')
+          const pathParts = pathname.split('/');
           if (pathParts.length > 1) {
-            const localePrefix = pathParts[1]
-            pathWithLocale = `/${localePrefix}/auth/login`
+            const localePrefix = pathParts[1];
+            pathWithLocale = `/${localePrefix}/auth/login`;
           }
         }
-        router.push(pathWithLocale)
+        router.push(pathWithLocale);
       } catch (error: any) {
-        setDeleteError(error.message || 'Failed to delete account.') // Set error message
-        console.error('Failed to delete account:', error) // Log the error for debugging.
+        setDeleteError(error.message || 'Failed to delete account.');
+        console.error('Failed to delete account:', error);
       } finally {
-        setIsDeleting(false) // Reset loading state
+        setIsDeleting(false);
       }
     }
+  };
+
+  if (userLoading) {
+    return <div>Loading settings...</div>;
+  }
+
+  if (userError) {
+    return <div>Error: {userError}</div>;
+  }
+
+  if (!user || !setting) {
+    return <div>No user data available.</div>;
   }
 
   return (
     <div className='flex'>
-      {/* Main Content */}
       <main className='flex-1 p-8'>
         <header className='mb-4 flex items-center justify-between'>
           <h2 className='text-2xl font-semibold'>{t('Setting')}</h2>
         </header>
 
-        {/* Setting Options */}
         <section className='mb-8'>
-          {/* Option 1: Auto add events to schedule */}
+          {/* Option 1: Receive Notifications */}
           <div className='mb-4 flex items-center justify-between'>
             <div>
-              <h4 className='font-semibold'>
-                {t('Auto_add_events_to_schedule')}
-              </h4>
-              <p className=' text-sm'>
-                {t('Auto_add_events_to_schedule_describe')}.
-              </p>
+              <h4 className='font-semibold'>{t('Receive Notifications')}</h4>
+              <p className=' text-sm'>{t('Receive Notifications Description')}.</p>
             </div>
             <button
               className={`h-6 w-12 rounded-full transition-colors duration-200 focus:outline-none ${
-                autoAdd ? 'bg-button' : 'bg-background-secondary'
+                setting.receiveNotifications ? 'bg-button' : 'bg-background-secondary'
               }`}
-              onClick={toggleAutoAdd}
+              onClick={toggleReceiveNotifications}
+              disabled={updateLoading}
             >
               <div
                 className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
-                  autoAdd ? 'translate-x-6' : 'translate-x-1'
+                  setting.receiveNotifications ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              ></div>
+            </button>
+          </div>
+          {/* Option 2: Auto add events to schedule */}
+          <div className='mb-4 flex items-center justify-between'>
+            <div>
+              <h4 className='font-semibold'>{t('Auto_add_events_to_schedule')}</h4>
+              <p className=' text-sm'>{t('Auto_add_events_to_schedule_describe')}.</p>
+            </div>
+            <button
+              className={`h-6 w-12 rounded-full transition-colors duration-200 focus:outline-none ${
+                setting.autoAddFollowToCalendar ? 'bg-button' : 'bg-background-secondary'
+              }`}
+              onClick={toggleAutoAdd}
+              disabled={updateLoading}
+            >
+              <div
+                className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
+                  setting.autoAddFollowToCalendar ? 'translate-x-6' : 'translate-x-1'
                 }`}
               ></div>
             </button>
           </div>
 
-          {/* Option 2: Change and Update */}
+          {/* Option 3: Change and Update */}
           <div className='mb-4 flex items-center justify-between'>
             <div>
               <h4 className='font-semibold'>{t('Change_and_Update')}</h4>
@@ -120,19 +195,20 @@ const SettingTab: React.FC<SettingTabProps> = () => {
             </div>
             <button
               className={`h-6 w-12 rounded-full transition-colors duration-200 focus:outline-none ${
-                changeUpdate ? 'bg-button' : 'bg-background-secondary'
+                setting.notificationWhenConferencesChanges ? 'bg-button' : 'bg-background-secondary'
               }`}
               onClick={toggleChangeUpdate}
+              disabled={updateLoading}
             >
               <div
                 className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
-                  changeUpdate ? 'translate-x-6' : 'translate-x-1'
+                  setting.notificationWhenConferencesChanges ? 'translate-x-6' : 'translate-x-1'
                 }`}
               ></div>
             </button>
           </div>
 
-          {/* Option 3: Your upcoming event */}
+          {/* Option 4: Your upcoming event */}
           <div className='mb-4 flex items-center justify-between'>
             <div>
               <h4 className='font-semibold'>{t('Your_upcoming_event')}</h4>
@@ -140,42 +216,103 @@ const SettingTab: React.FC<SettingTabProps> = () => {
             </div>
             <button
               className={`h-6 w-12 rounded-full transition-colors duration-200 focus:outline-none ${
-                upcomingEvent ? 'bg-button' : 'bg-background-secondary'
+                setting.upComingEvent ? 'bg-button' : 'bg-background-secondary'
               }`}
               onClick={toggleUpcomingEvent}
+              disabled={updateLoading}
             >
               <div
                 className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
-                  upcomingEvent ? 'translate-x-6' : 'translate-x-1'
+                  setting.upComingEvent ? 'translate-x-6' : 'translate-x-1'
                 }`}
               ></div>
             </button>
           </div>
 
-          {/* Option 4: Customize notification delivery (Combobox) */}
-          <div className='mb-8 flex items-center justify-between'>
+          {/* Option 5: Customize notification delivery (Combobox) */}
+          <div className='mb-4 flex items-center justify-between'>
             <div>
-              <h4 className='font-semibold'>
-                {t('Customize_notification_delivery')}
-              </h4>
-              <p className=' text-sm'>
-                {t('Customize_notification_delivery_describe')}
-              </p>
+              <h4 className='font-semibold'>{t('Customize_notification_delivery')}</h4>
+              <p className=' text-sm'>{t('Customize_notification_delivery_describe')}</p>
             </div>
             <select
-              className='rounded border border-button bg-background-secondary px-2 py-1  focus:border-2 focus:outline-none'
-              value={deliveryMethod}
+              className='rounded border border-button bg-background-secondary px-2 py-1 focus:border-2 focus:outline-none'
+              value={setting.notificationThrough}
               onChange={handleDeliveryChange}
+              disabled={updateLoading}
             >
-              <option value='notification'>{t('Notification_only')}</option>
-              <option value='notification+email'>
-                {t('NOtification_email')}
-              </option>
+              <option value='System'>{t('Notification_only')}</option>
+              <option value='Email'>{t('NOtification_email')}</option>
+              <option value='All'>{t('All')}</option>
             </select>
           </div>
+
+            {/* Option 6: Notification when update profile */}
+            <div className='mb-4 flex items-center justify-between'>
+                <div>
+                <h4 className='font-semibold'>{t('Notification when update profile')}</h4>
+                <p className=' text-sm'>{t('Notification when update profile')}</p>
+                </div>
+                <button
+                className={`h-6 w-12 rounded-full transition-colors duration-200 focus:outline-none ${
+                    setting.notificationWhenUpdateProfile ? 'bg-button' : 'bg-background-secondary'
+                }`}
+                onClick={toggleNotificationWhenUpdateProfile}
+                disabled={updateLoading}
+                >
+                <div
+                    className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
+                    setting.notificationWhenUpdateProfile ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                ></div>
+                </button>
+            </div>
+
+            {/* Option 7: Notification when follow */}
+            <div className='mb-4 flex items-center justify-between'>
+                <div>
+                <h4 className='font-semibold'>{t('Notification when follow')}</h4>
+                <p className=' text-sm'>{t('Notification when follow')}</p>
+                </div>
+                <button
+                className={`h-6 w-12 rounded-full transition-colors duration-200 focus:outline-none ${
+                    setting.notificationWhenFollow ? 'bg-button' : 'bg-background-secondary'
+                }`}
+                onClick={toggleNotificationWhenFollow}
+                disabled={updateLoading}
+                >
+                <div
+                    className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
+                    setting.notificationWhenFollow ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                ></div>
+                </button>
+            </div>
+
+            {/* Option 8: Notification when add to calendar */}
+            <div className='mb-4 flex items-center justify-between'>
+                <div>
+                <h4 className='font-semibold'>{t('Notification when add to calendar')}</h4>
+                <p className=' text-sm'>{t('Notification when add to calendar')}</p>
+                </div>
+                <button
+                className={`h-6 w-12 rounded-full transition-colors duration-200 focus:outline-none ${
+                    setting.notificationWhenAddTocalendar ? 'bg-button' : 'bg-background-secondary'
+                }`}
+                onClick={toggleNotificationWhenAddToCalendar}
+                disabled={updateLoading}
+                >
+                <div
+                    className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
+                    setting.notificationWhenAddTocalendar ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                ></div>
+                </button>
+            </div>
+
         </section>
 
-        {/* Delete Account Button */}
+        {/* Delete Account */}
         <section>
           <button
             onClick={handleDeleteAccount}
@@ -189,9 +326,10 @@ const SettingTab: React.FC<SettingTabProps> = () => {
           )}
           <p className='mt-2 text-sm'>{t('Delete_Account_describe')}</p>
         </section>
+        {updateError && <p className="text-red-500">{updateError}</p>}
       </main>
     </div>
-  )
-}
+  );
+};
 
-export default SettingTab
+export default SettingTab;

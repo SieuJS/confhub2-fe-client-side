@@ -15,6 +15,7 @@ export type UserResponse = {
   calendar?: Calendar[]; // Replace 'any' with a more specific type if you have one
   feedBacks?: string[];
   notifications?: Notification[];
+  setting? : Setting;
   createdAt: string;
   updatedAt: string;
 }
@@ -47,4 +48,16 @@ export type Notification = {
   deletedAt: string | null;
   message: string;
   type: string;
+}
+
+
+export type Setting = {
+  receiveNotifications?: boolean;
+  autoAddFollowToCalendar?: boolean;
+  notificationWhenConferencesChanges?: boolean;
+  upComingEvent?: boolean;
+  notificationThrough?: "System" | "Email" | "All";
+  notificationWhenUpdateProfile?: boolean;
+  notificationWhenFollow?: boolean;
+  notificationWhenAddTocalendar?: boolean;
 }

@@ -23,23 +23,17 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   onMarkUnseen,
   notificationId,
 }) => {
-  console.log('NotificationItem: Rendering. Props:', {
-    notification,
-    isChecked,
-    notificationId,
-  }); // Log all props
+
 
   const [isStarred, setIsStarred] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    console.log(`NotificationItem: useEffect [notification.isImportant].  notification.id: ${notification.id}, isImportant: ${notification.isImportant}`); // Log useEffect
     setIsStarred(notification.isImportant);
   }, [notification.isImportant, notification.id]); // Add notification.id to dependencies
 
   const toggleStar = useCallback(() => {
-    console.log(`NotificationItem: toggleStar called. notification.id: ${notification.id}`); // Log toggleStar
     setIsStarred((prevIsStarred) => !prevIsStarred);
     onToggleImportant(notification.id);
   }, [notification.id, onToggleImportant]);
@@ -89,7 +83,6 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   };
 
   const isSeen = !!notification.seenAt;
-    console.log(`NotificationItem ${notificationId}: isStarred=${isStarred}, notification.isImportant=${notification.isImportant}, isChecked=${isChecked}, !isSeen=${!isSeen}, isHovered = ${isHovered}`)
 
   return (
     <div
@@ -97,11 +90,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         } ${isChecked ? 'bg-background-secondary' : ''} ${!isSeen ? 'bg-background' : ''
         } ${isHovered ? 'border-primary' : ''}`}
       onMouseEnter={() => {
-        console.log(`NotificationItem: onMouseEnter. notification.id: ${notification.id}`); // Log mouse enter
         setIsHovered(true);
       }}
       onMouseLeave={() => {
-        console.log(`NotificationItem: onMouseLeave. notification.id: ${notification.id}`); // Log mouse leave
         setIsHovered(false);
       }}
     >

@@ -6,7 +6,7 @@ import useNotifications from '../../../../hooks/dashboard/notification/useNotifi
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 const NotificationsTab: React.FC = () => {
-    console.log('NotificationsTab: Rendering'); // Log rendering
+    // console.log('NotificationsTab: Rendering'); // Log rendering
     const {
         notifications,
         checkedIndices,
@@ -31,15 +31,15 @@ const NotificationsTab: React.FC = () => {
         setSearchTerm,
     } = useNotifications();
 
-    console.log('NotificationsTab: Received props:', {
-        notifications,
-        checkedIndices,
-        selectAllChecked,
-        loading,
-        loggedIn,
-        searchTerm,
-        filteredNotifications
-    }); // Log received props
+    // console.log('NotificationsTab: Received props:', {
+    //     notifications,
+    //     checkedIndices,
+    //     selectAllChecked,
+    //     loading,
+    //     loggedIn,
+    //     searchTerm,
+    //     filteredNotifications
+    // }); // Log received props
 
 
     const pathname = usePathname();
@@ -55,14 +55,14 @@ const NotificationsTab: React.FC = () => {
         if (selectedNotificationId) {
             const notification = notifications.find(n => n.id === selectedNotificationId);
             if (notification && !notification.seenAt) {
-                console.log(`NotificationsTab: useEffect - Updating seenAt for id: ${selectedNotificationId}`); // Log
+                // console.log(`NotificationsTab: useEffect - Updating seenAt for id: ${selectedNotificationId}`); // Log
                 handleUpdateSeenAt(selectedNotificationId);
             }
         }
     }, [selectedNotificationId, handleUpdateSeenAt, notifications]);
 
     const handleBackToNotifications = () => {
-        console.log('NotificationsTab: handleBackToNotifications called'); // Log
+        // console.log('NotificationsTab: handleBackToNotifications called'); // Log
         const newSearchParams = new URLSearchParams(searchParams.toString());
         newSearchParams.delete('id');
         router.push(`${pathname}?${newSearchParams.toString()}`);
@@ -70,7 +70,7 @@ const NotificationsTab: React.FC = () => {
 
     const handleCheckboxChange = useCallback(
         (notificationId: string, checked: boolean) => {
-            console.log(`NotificationsTab: handleCheckboxChange called for id: ${notificationId}, checked: ${checked}`); // Log
+            // console.log(`NotificationsTab: handleCheckboxChange called for id: ${notificationId}, checked: ${checked}`); // Log
             handleCheckboxChangeTab(notificationId, checked);
         },
         [handleCheckboxChangeTab]
@@ -86,7 +86,7 @@ const NotificationsTab: React.FC = () => {
         } else if (filter === 'important') {
             result = result.filter(n => n.isImportant);
         }
-        console.log(`NotificationsTab: displayedNotifications after filter =`, result); // Add
+        // console.log(`NotificationsTab: displayedNotifications after filter =`, result); // Add
         return result;
     }, [filteredNotifications, filter]);
 

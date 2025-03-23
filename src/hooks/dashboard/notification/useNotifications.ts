@@ -34,7 +34,7 @@ interface UseNotificationsReturn {
 }
 
 const useNotifications = (): UseNotificationsReturn => {
-    console.log('useNotifications: Initializing'); // Log initialization
+    // console.log('useNotifications: Initializing'); // Log initialization
     const [searchTerm, setSearchTerm] = useState('');
     const [userId, setUserId] = useState<string>('');
 
@@ -42,6 +42,8 @@ const useNotifications = (): UseNotificationsReturn => {
         const userData = localStorage.getItem('user');
         if (userData) {
             const user = JSON.parse(userData);
+            console.log("User ID from localStorage:", user.id); // Add this line
+
             setUserId(user.id);
         }
     }, []);
@@ -64,7 +66,7 @@ const useNotifications = (): UseNotificationsReturn => {
     } = useNotificationState(initialNotifications, userId);
 
     useEffect(() => {
-        console.log('useNotifications: useEffect - initialNotifications changed:', initialNotifications); // Log when initialNotifications change
+        // console.log('useNotifications: useEffect - initialNotifications changed:', initialNotifications); // Log when initialNotifications change
         if (initialNotifications.length > 0) {
             setNotifications(initialNotifications);
         }
@@ -97,14 +99,14 @@ const useNotifications = (): UseNotificationsReturn => {
 
     const handleCheckboxChangeTab = useCallback(
         (id: string, checked: boolean) => {
-            console.log(`useNotifications: handleCheckboxChangeTab called for id: ${id}, checked: ${checked}`);
+            // console.log(`useNotifications: handleCheckboxChangeTab called for id: ${id}, checked: ${checked}`);
             handleCheckboxChangeSelection(id, checked);
         },
         [handleCheckboxChangeSelection]
     );
 
     const handleDeleteSelected = useCallback(async () => {
-        console.log('useNotifications: handleDeleteSelected called');
+        // console.log('useNotifications: handleDeleteSelected called');
         const updatedNotifications = notifications.map(n =>
             checkedIndices.includes(n.id) ? { ...n, deletedAt: new Date().toISOString() } : n
         );
@@ -118,15 +120,15 @@ const useNotifications = (): UseNotificationsReturn => {
     }, [userId, fetchData]);
 
 
-    console.log('useNotifications: Returning state:', {
-        notifications,
-        checkedIndices,
-        selectAllChecked,
-        loading,
-        loggedIn,
-        searchTerm,
-        filteredNotifications
-    }); // Log returned state
+    // console.log('useNotifications: Returning state:', {
+    //     notifications,
+    //     checkedIndices,
+    //     selectAllChecked,
+    //     loading,
+    //     loggedIn,
+    //     searchTerm,
+    //     filteredNotifications
+    // }); // Log returned state
 
     return {
         notifications,

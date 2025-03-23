@@ -15,7 +15,7 @@ interface UseConferenceResultsProps {
 const useConferenceResults = ({ initialData, initialTotalItems }: UseConferenceResultsProps = {}) => {
   const [events, setEvents] = useState<ConferenceInfo[]>(initialData || []);
   const [currentPage, setCurrentPage] = useState(1);
-  const eventsPerPage = 8;
+  const eventsPerPage = 50;
   const [sortBy, setSortBy] = useState<SortOption>('date');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [totalItems, setTotalItems] = useState(initialTotalItems || 0);
@@ -43,7 +43,7 @@ const useConferenceResults = ({ initialData, initialTotalItems }: UseConferenceR
         page: searchParams.get('page') || '1',
         sortBy: searchParams.get('sortBy') as SortOption || 'date',
         sortOrder: searchParams.get('sortOrder') as SortOrder || 'asc',
-        limit: String(eventsPerPage),
+        perPage: String(eventsPerPage),
       };
 
       const data = await fetchConferences(params); // Gọi API.

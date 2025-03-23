@@ -16,7 +16,7 @@ export interface FetchConferencesParams {
   page?: string;
   sortBy?: 'date' | 'rank' | 'name' | 'submissionDate' | 'startDate' | 'endDate';
   sortOrder?: 'asc' | 'desc';
-  limit?: string;
+  perPage?: string;
 }
 
 export interface FetchConferencesResponse {
