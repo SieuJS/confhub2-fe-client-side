@@ -48,7 +48,6 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
 
       const data = await fetchConferences(params); // Gọi API.
 
-      console.log(data)
       setEvents(data);
       setTotalItems(data.meta.totalItems);
       setCurrentPage(data.meta.curPage); // Dùng page từ params (đã là string).
@@ -61,7 +60,7 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
     } finally {
       setLoading(false);
     }
-  }, [searchParams, eventsPerPage]);
+  }, [searchParams]);
 
   useEffect(() => {
     fetchData();
