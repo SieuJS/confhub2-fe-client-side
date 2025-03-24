@@ -6,7 +6,7 @@ import ChatHistory from './ChatHistory';
 import ChatInput from './ChatInput';
 import LoadingIndicator from './LoadingIndicator';
 import Introduction from './ChatIntroduction';
-import { sendNonStreamChatRequest, ChatResponse, ChatHistoryType, HistoryItem, ErrorResponse, TextMessageResponse, ChartMessageResponse, InternalNavigationResponse, ExternalNavigationResponse } from '../../../../api/chatbot/chatbotApi';
+import { sendNonStreamChatRequest, ChatResponse, ChatHistoryType, HistoryItem, ErrorResponse, TextMessageResponse, ChartMessageResponse, InternalNavigationResponse, ExternalNavigationResponse } from '../../../../app/api/chatbot/chatbotApi';
 import { useRouter, usePathname } from 'next/navigation';
 import { getPathname } from '@/src/navigation';
 
