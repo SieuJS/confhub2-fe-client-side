@@ -295,5 +295,20 @@
   "Notification when follow": "Notification when follow",
   "Notification when update profile": "Notification when update profile",
   "Receive Notifications": "Receive Notifications",
-  "Receive Notifications Description": "Receive notifications about conferences you follow, important dates, and other updates."
+  "Receive Notifications Description": "Receive notifications about conferences you follow, important dates, and other updates.",
+  "Update_Conference": "Update Conference",
+  "Back": "Back",
+  "I_agree_to_the_terms_and_conditions": "I agree to the terms and conditions",
+  "Terms_and_Conditions": "Terms and Conditions",
+  "Review_Information": "Review Information",
+  "seconds_ago": "{value} seconds ago",
+  "minutes_ago": "{value} minutes ago",
+  "hours_ago": "{value} hours ago",
+  "days_ago": "{value} days ago",
+  "weeks_ago": "{value} weeks ago",
+  "months_ago": "{value} months ago",
+  "years_ago": "{value} years ago",
+  "unknown": "Unknown",
+  "invalid_date": "Invalid Date",
+  "full_date_unknown": "Unknown date"
 }

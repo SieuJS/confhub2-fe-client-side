@@ -1,5 +1,7 @@
 // utils/timeFormat.ts (unchanged, but included for completeness)
+
 export function timeAgo(dateParam: string | Date | undefined): string {
+  
   if (!dateParam) {
       return "Unknown";
   }

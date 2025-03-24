@@ -41,8 +41,7 @@ const MyConferencesTab: React.FC = () => {
         toDate: conf.dates.find(d => d.type === 'Conference Date')?.toDate,
         websiteUrl: conf.organization.link,
         status: conf.status as ConferenceStatus,
-        createdAt: conf.conference.createdAt,
-        
+        createdAt: conf.conference.createdAt
       }))
       .sort((a, b) => {
         if (!a.createdAt) return 1
