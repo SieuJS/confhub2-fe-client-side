@@ -93,13 +93,10 @@ const ProfileTab: React.FC = () => {
       <div className='relative flex flex-col items-start gap-5 px-6 py-5 md:flex-row md:items-center'>
         {/* Avatar */}
         <div className='relative -mt-40 h-40 w-40 overflow-hidden rounded-full border-4 border-button-text bg-background'>
-          <Image
+          <img
             src={displayAvatarUrl}
             alt={`Avatar of ${userData.firstName} ${userData.lastName}`}
-            fill
-            style={{ objectFit: 'cover' }}
-            sizes='(max-width: 768px) 100vw, 25vw'
-            priority
+            style={{ width: '100vw', height: '', objectFit: 'cover' }} // Quan trọng: Đặt kích thước và objectFit
           />
           {isEditing && (
             <button
