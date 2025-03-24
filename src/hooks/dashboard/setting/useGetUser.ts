@@ -1,7 +1,7 @@
 // src/hooks/useGetUser.ts
 import { useState, useEffect } from 'react';
 import { UserResponse } from '@/src/models/response/user.response';
-import { getUserById } from '../../../api/user/getUserById'; // Adjust the path if necessary
+import { getUserById } from '../../../app/api/user/getUserById'; // Adjust the path if necessary
 
 interface GetUserResult {
   user: UserResponse | null;

@@ -1,7 +1,7 @@
 // hooks/useConferenceData.ts
 import { useState, useEffect } from 'react';
 import { ConferenceResponse } from '../../models/response/conference.response'; // Adjust path as needed
-import { getConference } from '../../api/conference/getConferenceDetails'; // Adjust path as needed
+import { getConference } from '../../app/api/conference/getConferenceDetails'; // Adjust path as needed
 
 const useConferenceData = (id: string | null) => {
     const [conferenceData, setConferenceData] = useState<ConferenceResponse | null>(null);

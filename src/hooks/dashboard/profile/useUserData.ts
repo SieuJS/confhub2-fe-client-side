@@ -1,8 +1,7 @@
 // src/hooks/useUserData.ts
 import { useState, useEffect } from 'react'
 import { UserResponse } from '@/src/models/response/user.response'
-import { getUserById } from '@/src/api/user/getUserById'
-import { updateUser } from '@/src/api/user/updateUser'
+import { getUserById } from '../../../app/api/user/getUserById'
 import { useLocalStorage } from 'usehooks-ts'
 
 export const useUserData = () => {

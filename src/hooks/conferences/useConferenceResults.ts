@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ConferenceListResponse } from '@/src/models/response/conference.list.response';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { fetchConferences, FetchConferencesParams } from '../../api/conference/getFilteredConferences'; // Import
+import { fetchConferences, FetchConferencesParams } from '../../app/api/conference/getFilteredConferences'; // Import
 
 type SortOption = 'date' | 'rank' | 'name' | 'submissionDate' | 'fromDate' | 'toDate';
 type SortOrder = 'asc' | 'desc';
