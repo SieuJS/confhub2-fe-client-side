@@ -1,3 +1,5 @@
+'use client'
+
 // frontend/MyConferencesTab.tsx
 import React, { useState, useMemo } from 'react'
 import ConferenceItem from '../../conferences/ConferenceItem'
@@ -71,7 +73,7 @@ const MyConferencesTab: React.FC = () => {
   const getStatusTitle = (status: ConferenceStatus) => {
     switch (status) {
       case ConferenceStatus.Approve:
-        return 'My Conferences'
+        return 'My Conferences are Approved'
       case ConferenceStatus.Pending:
         return 'My Conferences are Pending'
       case ConferenceStatus.Rejected:
@@ -98,7 +100,7 @@ const MyConferencesTab: React.FC = () => {
           size='small'
           onClick={() => setDisplayStatus(ConferenceStatus.Approve)}
         >
-          Approve
+          Approved
         </Button>
         <Button
           variant={

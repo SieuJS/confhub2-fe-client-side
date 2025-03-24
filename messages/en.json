@@ -301,14 +301,8 @@
   "I_agree_to_the_terms_and_conditions": "I agree to the terms and conditions",
   "Terms_and_Conditions": "Terms and Conditions",
   "Review_Information": "Review Information",
-  "seconds_ago": "{value} seconds ago",
-  "minutes_ago": "{value} minutes ago",
-  "hours_ago": "{value} hours ago",
-  "days_ago": "{value} days ago",
-  "weeks_ago": "{value} weeks ago",
-  "months_ago": "{value} months ago",
-  "years_ago": "{value} years ago",
-  "unknown": "Unknown",
-  "invalid_date": "Invalid Date",
-  "full_date_unknown": "Unknown date"
+  "Edit_Conference": "Edit Conference",
+  "Edit_conference_step": "Edit conference step 1",
+  "Review_step": "Review step 1",
+  "Confirmation_step": "Confirmation step 1"
 }

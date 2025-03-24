@@ -1,5 +1,6 @@
 // components/conferences/ConferenceItem.tsx
-import React, { useState } from 'react'
+
+import React from 'react'
 import Image from 'next/image'
 import Button from '../utils/Button'
 import { Link } from '@/src/navigation'
@@ -57,31 +58,42 @@ const ConferenceItem: React.FC<ConferenceItemProps> = ({ conference }) => {
         </p>
       </div>
       <div className='col-span-2 flex items-center justify-center'>
-        {conference.status !== 'Pending' &&
-          conference.status !== 'Rejected' && (
-            <Link
-              href={{
-                pathname: '/conferences/detail',
-                query: { id: conference.id }
-              }}
+        {/* Show Details button for Approved and Rejected conferences */}
+        {(conference.status === 'Approved' ||
+          conference.status === 'Rejected') && (
+          <Link
+            href={{
+              pathname: '/conferences/detail',
+              query: { id: conference.id }
+            }}
+          >
+            <Button
+              variant='primary'
+              size='medium'
+              rounded
+              className='mr-2 w-24'
             >
-              <Button
-                variant='primary'
-                size='medium'
-                rounded
-                className='mr-2 w-24'
-              >
-                Details
-              </Button>
-            </Link>
-          )}
+              Details
+            </Button>
+          </Link>
+        )}
+        {/* Show Edit button for Pending and Approved conferences */}
+        {(conference.status === 'Pending' ||
+          conference.status === 'Approved') && (
+          <Link
+            href={{
+              pathname: '/updateconference', //  Correct path to your edit page
+              query: { id: conference.id } // Pass the conference ID
+            }}
+          >
+            <Button variant='secondary' size='medium' rounded className='w-24'>
+              Edit
+            </Button>
+          </Link>
+        )}
       </div>
     </div>
   )
 }
 
 export default ConferenceItem
-
-
-
-
