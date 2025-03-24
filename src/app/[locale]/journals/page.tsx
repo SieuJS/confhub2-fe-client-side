@@ -7,32 +7,15 @@ import ResultsJournalSection from './ResultsJournalSection';   // Import Results
 import { useState } from 'react';
 import { Header } from '../utils/Header';
 import Footer from '../utils/Footer';
+import { useRouter } from 'next/navigation';
+import { useCallback } from 'react';
 
 
-export default function Journals({ locale }: { locale: string }) {
+export default function Journals({ params: { locale } }: { params: { locale: string } }) {
     const t = useTranslations('');
-    const [searchQuery, setSearchQuery] = useState<string>('');
-    // Removed journalsData and loading states
-    // const [journalsData, setJournalsData] = useState<JournalResponse[] | null>(null);
-    const [loading, setLoading] = useState<boolean>(false); // Keep loading state if you want to use it for other purposes, otherwise remove it
+    const router = useRouter();
 
-    // State for search parameters - extract from searchParams in handleSearch for ResultsSection props
-    const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
-    const [selectedPublicationType, setSelectedPublicationType] = useState<string | null>(null);
-    const [selectedSubjectAreas, setSelectedSubjectAreas] = useState<string[]>([]);
-    const [selectedQuartile, setSelectedQuartile] = useState<string | null>(null);
-    const [selectedOpenAccessTypes, setSelectedOpenAccessTypes] = useState<string[]>([]);
-    const [selectedPublisher, setSelectedPublisher] = useState<string | null>(null);
-    const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
-    const [selectedImpactFactor, setSelectedImpactFactor] = useState<string | null>(null);
-    const [selectedHIndex, setSelectedHIndex] = useState<string | null>(null);
-    const [selectedCiteScore, setSelectedCiteScore] = useState<string | null>(null);
-    const [selectedSJR, setSelectedSJR] = useState<string | null>(null);
-    const [selectedOverallRank, setSelectedOverallRank] = useState<string | null>(null);
-    const [selectedISSN, setSelectedISSN] = useState<string | null>(null);
-
-
-    const handleSearch = async (searchParams: {
+    const handleSearch = useCallback(async (searchParamsFromComponent: {
         keyword?: string;
         country?: string | null;
         publicationType?: string | null;
@@ -48,54 +31,48 @@ export default function Journals({ locale }: { locale: string }) {
         overallRank?: string | null;
         issn?: string | null;
     }) => {
-        console.log("Thông số tìm kiếm nhận được từ SearchJournalSection:", searchParams);
-        setSearchQuery(searchParams.keyword || '');
 
-        // Update state variables for ResultsJournalSection props
-        setSelectedCountry(searchParams.country || null);
-        setSelectedPublicationType(searchParams.publicationType || null);
-        setSelectedSubjectAreas(searchParams.subjectAreas || []);
-        setSelectedQuartile(searchParams.quartile || null);
-        setSelectedOpenAccessTypes(searchParams.openAccessTypes || []);
-        setSelectedPublisher(searchParams.publisher || null);
-        setSelectedLanguage(searchParams.language || null);
-        setSelectedImpactFactor(searchParams.impactFactor || null);
-        setSelectedHIndex(searchParams.hIndex || null);
-        setSelectedCiteScore(searchParams.citeScore || null);
-        setSelectedSJR(searchParams.sjr || null);
-        setSelectedOverallRank(searchParams.overallRank || null);
-        setSelectedISSN(searchParams.issn || null);
+        const newParams = new URLSearchParams();
+        if (searchParamsFromComponent.keyword) newParams.set('keyword', searchParamsFromComponent.keyword);
+        if (searchParamsFromComponent.country) newParams.set('country', searchParamsFromComponent.country);
+        if (searchParamsFromComponent.publicationType) newParams.set('publicationType', searchParamsFromComponent.publicationType);
+        if (searchParamsFromComponent.subjectAreas && searchParamsFromComponent.subjectAreas.length > 0) {
+            searchParamsFromComponent.subjectAreas.forEach(subject => newParams.append('subjectAreas', subject));
+        }
+        if (searchParamsFromComponent.quartile) newParams.set('quartile', searchParamsFromComponent.quartile);
+        if (searchParamsFromComponent.openAccessTypes && searchParamsFromComponent.openAccessTypes.length > 0) {
+            searchParamsFromComponent.openAccessTypes.forEach(openAccessType => newParams.append('openAccessTypes', openAccessType));
+        }
+        if (searchParamsFromComponent.publisher) newParams.set('publisher', searchParamsFromComponent.publisher);
+        if (searchParamsFromComponent.language) newParams.set('language', searchParamsFromComponent.language);
+        if (searchParamsFromComponent.impactFactor) newParams.set('impactFactor', searchParamsFromComponent.impactFactor);
+        if (searchParamsFromComponent.hIndex) newParams.set('hIndex', searchParamsFromComponent.hIndex);
+        if (searchParamsFromComponent.citeScore) newParams.set('citeScore', searchParamsFromComponent.citeScore);
+        if (searchParamsFromComponent.sjr) newParams.set('sjr', searchParamsFromComponent.sjr);
+        if (searchParamsFromComponent.overallRank) newParams.set('overallRank', searchParamsFromComponent.overallRank);
+        if (searchParamsFromComponent.issn) newParams.set('issn', searchParamsFromComponent.issn);
 
+        const paramsString = newParams.toString();
+        router.push(`/${locale}/journals?${paramsString}`);
+        }, [locale, router]);
 
-    };
-
+        const handleClear = useCallback(() => {
+            const newParams = new URLSearchParams();
+            const paramsString = newParams.toString();
+            router.push(`/${locale}/journals?${paramsString}`);
+      }, [locale, router]);
 
     return (
         <>  
             <Header locale={locale} />
             <div className="text-center text-2xl">
-                <div className="py-14 bg-background w-full"></div>
+                <div className="py-10 bg-background w-full"></div>
                 <SearchJournalSection
                     onSearch={handleSearch}
+                    onClear={handleClear}
                 />
-                <div className="container mx-auto mt-8 px-4 ">
-                    <ResultsJournalSection
-                        loading={loading}
-                        searchQuery={searchQuery}
-                        selectedCountry={selectedCountry}
-                        selectedPublicationType={selectedPublicationType}
-                        selectedSubjectAreas={selectedSubjectAreas}
-                        selectedQuartile={selectedQuartile}
-                        selectedOpenAccessTypes={selectedOpenAccessTypes}
-                        selectedPublisher={selectedPublisher}
-                        selectedLanguage={selectedLanguage}
-                        selectedImpactFactor={selectedImpactFactor}
-                        selectedHIndex={selectedHIndex}
-                        selectedCiteScore={selectedCiteScore}
-                        selectedSJR={selectedSJR}
-                        selectedOverallRank={selectedOverallRank}
-                        selectedISSN={selectedISSN}
-                    />
+                <div className="container mx-auto mt-4 px-4 ">
+                    <ResultsJournalSection/>
                 </div>
             </div>
             <Footer />

@@ -54,8 +54,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
               <option value="date">Date</option>
               <option value="rank">Rank</option>
               <option value="name">Name</option>
-              <option value="toDate">Start Date</option>
-              <option value="endDate">End Date</option>
+              <option value="fromDate">Start Date</option>
+              <option value="toDate">End Date</option>
             </select>
 
             <label htmlFor="event-per-page" className="mr-2 text-sm">Event per page:</label>
