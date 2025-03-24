@@ -5,7 +5,6 @@ import Image from 'next/image'
 import Button from '../utils/Button'
 import { Link } from '@/src/navigation'
 
-// Define the *exact* data ConferenceItem needs.  This is the key change.
 interface ConferenceItemProps {
   conference: {
     id: string
@@ -14,8 +13,8 @@ interface ConferenceItemProps {
     location: string
     fromDate?: string
     toDate?: string
-    followedAt?: string // Thêm followedAt vào đây
-    status?: string // Thêm status vào đây
+    followedAt?: string
+    status?: string
   }
 }
 
@@ -30,14 +29,20 @@ const ConferenceItem: React.FC<ConferenceItemProps> = ({ conference }) => {
     })
   }
 
+  const showDetailButton = !(
+    conference.status === 'Pending' || conference.status === 'Rejected'
+  )
+  const showEditButton =
+    conference.status === 'Pending' || conference.status === 'Approved'
+
   return (
     <div className='mb-4 grid grid-cols-9 gap-4 rounded-md bg-background p-4 shadow-md'>
       <div className='relative col-span-1 flex items-center justify-center'>
         <Image
           src={'/bg-2.jpg'}
           alt={conference.title}
-          width={500} //  Ví dụ: Chiều rộng mong muốn (px)
-          height={300} // Ví dụ: Chiều cao tương ứng (px)
+          width={500}
+          height={300}
           className='rounded-md object-cover'
         />
       </div>
@@ -58,9 +63,8 @@ const ConferenceItem: React.FC<ConferenceItemProps> = ({ conference }) => {
         </p>
       </div>
       <div className='col-span-2 flex items-center justify-center'>
-        {/* Show Details button for Approved and Rejected conferences */}
-        {(conference.status === 'Approved' ||
-          conference.status === 'Rejected') && (
+        {/* Show Detail button based on showDetailButton */}
+        {showDetailButton && (
           <Link
             href={{
               pathname: '/conferences/detail',
@@ -77,13 +81,13 @@ const ConferenceItem: React.FC<ConferenceItemProps> = ({ conference }) => {
             </Button>
           </Link>
         )}
-        {/* Show Edit button for Pending and Approved conferences */}
-        {(conference.status === 'Pending' ||
-          conference.status === 'Approved') && (
+
+        {/* Show Edit button based on showEditButton */}
+        {showEditButton && (
           <Link
             href={{
-              pathname: '/updateconference', //  Correct path to your edit page
-              query: { id: conference.id } // Pass the conference ID
+              pathname: '/updateconference',
+              query: { id: conference.id }
             }}
           >
             <Button variant='secondary' size='medium' rounded className='w-24'>

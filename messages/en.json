@@ -304,5 +304,10 @@
   "Edit_Conference": "Edit Conference",
   "Edit_conference_step": "Edit conference step 1",
   "Review_step": "Review step 1",
-  "Confirmation_step": "Confirmation step 1"
+  "Confirmation_step": "Confirmation step 1",
+  "Refetch_Data": "Refetch Data",
+  "Please_log_in_to_view_your_conferences.": "Please log in to view your conferences.",
+  "Loading...": "Loading...",
+  "Error": "Error",
+  "language": "en"
 }

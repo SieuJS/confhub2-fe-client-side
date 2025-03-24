@@ -8,6 +8,7 @@ import { Link } from '@/src/navigation'
 import useMyConferences from '../../../../hooks/dashboard/myConferences/useMyConferences'
 import { formatDateFull, timeAgo } from '../timeFormat'
 import Tooltip from '../../utils/Tooltip'
+import { useTranslations } from 'next-intl'
 
 // Enum for conference status
 enum ConferenceStatus {
@@ -17,8 +18,11 @@ enum ConferenceStatus {
 }
 
 const MyConferencesTab: React.FC = () => {
+  const t = useTranslations('')
+  const languge = t('language')
+
   const [displayStatus, setDisplayStatus] = useState<ConferenceStatus>(
-    ConferenceStatus.Approve
+    ConferenceStatus.Pending
   )
   const userData = localStorage.getItem('user')
   const user = userData ? JSON.parse(userData) : null
@@ -59,27 +63,31 @@ const MyConferencesTab: React.FC = () => {
   }, [transformedConferences, displayStatus])
 
   if (!user) {
-    return <div>Please log in to view your conferences.</div>
+    return <div>{t('Please_log_in_to_view_your_conferences')}</div>
   }
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <div>{t('Loading...')}</div>
   }
 
   if (error) {
-    return <div>Error: {error}</div>
+    return (
+      <div>
+        {t('Error')}: {error}
+      </div>
+    )
   }
 
   const getStatusTitle = (status: ConferenceStatus) => {
     switch (status) {
       case ConferenceStatus.Approve:
-        return 'My Conferences are Approved'
+        return t('My_conferences_are_approved')
       case ConferenceStatus.Pending:
-        return 'My Conferences are Pending'
+        return t('My_conferences_are_pending')
       case ConferenceStatus.Rejected:
-        return 'My Conferences are cancel'
+        return t('My_conferences_are_rejected')
       default:
-        return 'My Conferences'
+        return t('My_conferences_are_pending')
     }
   }
 
@@ -87,7 +95,7 @@ const MyConferencesTab: React.FC = () => {
     <div className='container mx-auto p-4'>
       <Link href={`/addconference`}>
         <Button variant='primary' size='medium' rounded className='w-fill mr-2'>
-          Add Conference
+          {t('Add_Conference')}
         </Button>
       </Link>
 
@@ -95,22 +103,24 @@ const MyConferencesTab: React.FC = () => {
       <div className='my-4 flex space-x-4'>
         <Button
           variant={
-            displayStatus === ConferenceStatus.Approve ? 'primary' : 'secondary'
-          }
-          size='small'
-          onClick={() => setDisplayStatus(ConferenceStatus.Approve)}
-        >
-          Approved
-        </Button>
-        <Button
-          variant={
             displayStatus === ConferenceStatus.Pending ? 'primary' : 'secondary'
           }
           size='small'
           onClick={() => setDisplayStatus(ConferenceStatus.Pending)}
         >
-          Pending
+          {t('Pending')}
         </Button>
+
+        <Button
+          variant={
+            displayStatus === ConferenceStatus.Approve ? 'primary' : 'secondary'
+          }
+          size='small'
+          onClick={() => setDisplayStatus(ConferenceStatus.Approve)}
+        >
+          {t('Approved')}
+        </Button>
+
         <Button
           variant={
             displayStatus === ConferenceStatus.Rejected
@@ -120,7 +130,7 @@ const MyConferencesTab: React.FC = () => {
           size='small'
           onClick={() => setDisplayStatus(ConferenceStatus.Rejected)}
         >
-          Rejected
+          {t('Rejected')}
         </Button>
       </div>
 
@@ -129,9 +139,7 @@ const MyConferencesTab: React.FC = () => {
       </h1>
 
       {filteredConferences.length === 0 ? (
-        <p className=''>
-          You do not have any conferences in this category yet.
-        </p>
+        <p className=''>{t('You_have_no_conference')}</p>
       ) : (
         filteredConferences.map(conference => (
           <div
@@ -139,9 +147,9 @@ const MyConferencesTab: React.FC = () => {
             key={conference.id}
           >
             <div className='flex'>
-              <span className='mr-1'>Created Time: </span>
-              <Tooltip text={formatDateFull(conference.createdAt)}>
-                <span>{timeAgo(conference.createdAt)}</span>
+              <span className='mr-1'>{t('Created_Time')}: </span>
+              <Tooltip text={formatDateFull(conference.createdAt, languge)}>
+                <span>{timeAgo(conference.createdAt, languge)}</span>
               </Tooltip>
             </div>
             <ConferenceItem
@@ -159,7 +167,7 @@ const MyConferencesTab: React.FC = () => {
           </div>
         ))
       )}
-      <button onClick={refetch}>Refetch Data</button>
+      <button onClick={refetch}>{t('Refetch_Data')}</button>
     </div>
   )
 }
