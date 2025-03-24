@@ -1,7 +1,7 @@
 // src/hooks/usePopularConferences.ts
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { ConferenceInfo } from '@/src/models/response/conference.list.response';
-import { getListConference } from '@/src/api/conference/getListConferences';
+import { getListConference } from '../../app/api/conference/getListConferences';
 
 type Conference = ConferenceInfo;
 

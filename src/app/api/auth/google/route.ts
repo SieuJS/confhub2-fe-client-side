@@ -14,13 +14,15 @@ const scopes = [
     'profile',
     'email',
 ];
-
 export async function GET(request: Request) {
+    console.log("[Server - /api/v1/auth/google] Generating Google Auth URL"); // Log 2
+
     const url = oauth2Client.generateAuthUrl({
-        access_type: 'offline', // Lấy refresh token
+        access_type: 'offline',
         scope: scopes,
-        prompt: 'consent', // Luôn hiển thị consent screen (cho lần đầu)
+        prompt: 'consent',
     });
 
+    console.log("[Server - /api/v1/auth/google] Redirecting to Google:", url); // Log 3
     return NextResponse.redirect(url);
 }

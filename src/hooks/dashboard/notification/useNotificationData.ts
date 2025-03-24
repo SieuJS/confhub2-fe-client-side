@@ -1,6 +1,6 @@
 // src/hooks/useNotificationData.ts
 import { useState, useEffect, useCallback } from 'react';
-import { getNotifications } from '../../../api/user/getNotifications';
+import { getNotifications } from '../../../app/api/user/getNotifications';
 import { Notification } from '@/src/models/response/user.response';
 
 const useNotificationData = (userId: string) => {

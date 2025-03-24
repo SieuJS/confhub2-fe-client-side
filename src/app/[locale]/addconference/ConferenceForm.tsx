@@ -64,11 +64,11 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({ locale }) => {
 
   const continentOptions = ['Americas', 'Europe', 'Asia', 'Africa', 'Oceania']
   const dateTypeOptions = [
-    'submissionDate',
-    'conferenceDates',
-    'registrationDate',
-    'notificationDate',
-    'cameraReadyDate'
+    { value: 'submissionDate', name: 'Submission Date' },
+    { value: 'conferenceDates', name: 'Conference Dates' },
+    { value: 'registrationDate', name: 'Registration Date' },
+    { value: 'notificationDate', name: 'Notification Date' },
+    { value: 'cameraReadyDate', name: 'Camera Ready Date' }
   ]
 
   useEffect(() => {
@@ -527,8 +527,8 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({ locale }) => {
               >
                 <option value=''>{t('Select_Type')}</option>
                 {dateTypeOptions.map(type => (
-                  <option key={type} value={type}>
-                    {type}
+                  <option key={type.value} value={type.value}>
+                    {type.name}
                   </option>
                 ))}
               </select>
@@ -835,7 +835,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({ locale }) => {
         {currentStep === 2 && renderStepTwo()}
         {currentStep === 3 && renderStepThree()}
 
-        <div className='my-6 flex justify-center gap-4'>
+        <div className='my-6 flex justify-start gap-4'>
           {currentStep > 1 && (
             <button
               type='button'

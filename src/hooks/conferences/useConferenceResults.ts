@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ConferenceListResponse } from '@/src/models/response/conference.list.response';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { fetchConferences, FetchConferencesParams } from '../../api/conference/getFilteredConferences'; // Import
+import { fetchConferences, FetchConferencesParams } from '../../app/api/conference/getFilteredConferences'; // Import
 
 type SortOption = 'date' | 'rank' | 'name' | 'submissionDate' | 'fromDate' | 'toDate';
 type SortOrder = 'asc' | 'desc';
@@ -48,7 +48,6 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
 
       const data = await fetchConferences(params); // Gọi API.
 
-      console.log(data)
       setEvents(data);
       setTotalItems(data.meta.totalItems);
       setCurrentPage(data.meta.curPage); // Dùng page từ params (đã là string).
@@ -61,7 +60,7 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
     } finally {
       setLoading(false);
     }
-  }, [searchParams, eventsPerPage]);
+  }, [searchParams]);
 
   useEffect(() => {
     fetchData();
