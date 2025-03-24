@@ -8,7 +8,7 @@ import useDatePickerControl from '../../../../hooks/dashboard/note/useDatePicker
 import useViewSwitching from '../../../../hooks/dashboard/note/useViewSwitching'
 import AddNoteDialog from './AddNoteDialog'
 import { ConferenceResponse } from '../../../../models/response/conference.response'
-import { getConference } from '../../../../api/conference/getConferenceDetails'
+import { getConference } from '../../../../app/api/conference/getConferenceDetails'
 import useDialogPosition from '../../../../hooks/dashboard/note/useDialogPosition'
 
 const DEFAULT_DOM_RECT: DOMRect = {

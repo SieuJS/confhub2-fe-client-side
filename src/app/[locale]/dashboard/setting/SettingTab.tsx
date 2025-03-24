@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useLocalStorage } from 'usehooks-ts';
 import { useRouter, usePathname } from 'next/navigation';
-import deleteUser from '../../../../api/user/deleteUser';
+import deleteUser from '../../../../app/api/user/deleteUser';
 import { useUpdateUser } from '../../../../hooks/dashboard/setting/useUpdateSettings';
 import { useGetUser } from '../../../../hooks/dashboard/setting/useGetUser';
 import { Setting } from '@/src/models/response/user.response';

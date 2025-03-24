@@ -1,7 +1,7 @@
 // FollowedTab.tsx
 import React, { useState, useEffect, useCallback } from 'react'
 import ConferenceItem from '../../conferences/ConferenceItem'
-import { getListConference } from '../../../../api/conference/getListConferences'
+import { getListConference } from '../../../../app/api/conference/getListConferences'
 import { ConferenceInfo } from '../../../../models/response/conference.list.response'
 import { UserResponse, Follow } from '../../../../models/response/user.response'
 import { timeAgo, formatDateFull } from '../timeFormat'
