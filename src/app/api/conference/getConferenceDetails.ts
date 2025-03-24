@@ -1,17 +1,17 @@
-"use_client";
-// api/get_info/get_info.ts
-import { ConferenceResponse } from '../../models/response/conference.response';
+"use client";
+// api/getConferenceDetails/getConferenceDetails.ts
+import { ConferenceResponse } from '../../../models/response/conference.response';
 
-const API_GET_CONFERENCE_ENDPOINT = 'http://178.128.28.130:3000/api/v1'; // Keep this for potential future use
-const API_SAVE_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/conferences/save'; // Port 3000 (your backend)
+const API_GET_CONFERENCE_ENDPOINT = 'http://178.128.28.130:3000/api/v1/conference'; //  3005 for details
+const API_SAVE_CONFERENCE_DETAILS_ENDPOINT = 'http://localhost:3000/api/v1/conferences/details/save'; // Port 3000 (your backend), new endpoint
 
 
 async function getConference(id: string): Promise<ConferenceResponse> {
   try {
-    const response = await fetch(`${API_GET_CONFERENCE_ENDPOINT}/conference/${id}`, {
-      method: 'GET', // Specify the method
+    const response = await fetch(`${API_GET_CONFERENCE_ENDPOINT}/${id}`, {  // Removed /api/v1/conference
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/json', // Set the content type
+        'Content-Type': 'application/json',
       },
     });
 
@@ -19,27 +19,47 @@ async function getConference(id: string): Promise<ConferenceResponse> {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    let responseData = await response.json();
-  
-    if (responseData != null) {
-      // Check if responseData.dates exist and its properties as well before doing anything.
-      if (responseData.dates && responseData.dates.fromDate && responseData.dates.toDate) {
-        responseData.dates.fromDate = new Date(responseData.dates.fromDate);
-        responseData.dates.toDate = new Date(responseData.dates.toDate);
-      }
-      const conference = responseData;
-      console.log(conference)
+    const responseData: ConferenceResponse = await response.json();
 
-      return conference; // Return an object with named properties
-    } else {
-      throw new Error('Invalid API response format or empty data.');
+    // Date handling (important: check for null/undefined for each date)
+    if (responseData.dates) {
+      responseData.dates = responseData.dates.map(date => {
+          if (date && date.fromDate) {
+              date.fromDate = new Date(date.fromDate).toISOString(); //convert to ISO string before passing in request body
+          }
+          if(date && date.toDate) {
+              date.toDate = new Date(date.toDate).toISOString(); //convert to ISO string before passing in request body
+          }
+          return date;
+      })
     }
+
+
+    // Send to backend (3000) for saving
+    const saveResponse = await fetch(API_SAVE_CONFERENCE_DETAILS_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(responseData), // Send the entire ConferenceResponse
+    });
+
+    if (!saveResponse.ok) {
+      const errorText = await saveResponse.text(); // Get error message as text
+      throw new Error(`Save operation failed! Status: ${saveResponse.status}, Message: ${errorText}`);
+    }
+
+    const saveResult = await saveResponse.json();
+    console.log(saveResult.message);  // Log save success/already exists message.
+
+    return responseData;
+
   } catch (error: any) {
-    console.error('Error fetching conferences:', error.message);
+    console.error('Error fetching and saving conference details:', error.message);
     if (error instanceof TypeError) {
       console.error('Network error:', error.message);
     }
-    throw error; // Re-throw the error so the caller can handle it
+    throw error; // Re-throw for the caller
   }
 }
 

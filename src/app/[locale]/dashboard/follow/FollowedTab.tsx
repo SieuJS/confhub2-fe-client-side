@@ -87,7 +87,7 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
     id: conf.id,
     title: conf.title,
     acronym: conf.acronym,
-    location: `${conf.location.cityStateProvince}, ${conf.location.country}`,
+    location: `${conf.location?.cityStateProvince}, ${conf.location?.country}`,
     fromDate: conf.dates?.fromDate,
     toDate: conf.dates?.toDate,
     followedAt: conf.followedAt,
