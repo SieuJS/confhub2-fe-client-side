@@ -92,7 +92,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
             onChange={handleKeywordChange}
             onKeyDown={handleKeyPress}
           />
-          <div className="relative">
+          <div className="px-5 relative">
             <button
               className="flex items-center space-x-2 bg-transparent outline-none"
               onClick={toggleSearchTypeDropdown}
