@@ -5,6 +5,8 @@ import continentList from '../../models/data/locations-list.json'; // Adjust pat
 
 interface SearchParams {
   keyword?: string;
+  title?: string;
+  acronym?: string;
   fromDate?: Date | null;
   toDate?: Date | null;
   location?: string | null;
@@ -25,6 +27,9 @@ interface UseSearchFormProps {
 
 const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   const [confKeyword, setConfKeyword] = useState<string>('');
+  const [selectSearchType, setSelectSearchType] = useState<'keyword' | 'title' | 'acronym'>('keyword'); // Thêm state cho kiểu tìm kiếm
+  const [isSearchTypeDropdownOpen, setIsSearchTypeDropdownOpen] = useState(false);
+  const searchTypeDropdownRef = useRef<HTMLDivElement>(null);
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<'Online' | 'Offline' | 'Hybrid' | null>(null);
   const [fromDate, setStartDate] = useState<Date | null>(null);
@@ -54,23 +59,35 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     setAvailableLocations(countriesFromContinentList);
   }, []);
 
-    // Close dropdown if clicked outside
-    useEffect(() => {
-      function handleClickOutside(event: MouseEvent) {
-        if (locationDropdownRef.current && !locationDropdownRef.current.contains(event.target as Node)) {
-          setIsLocationDropdownOpen(false);
-        }
-        if (typeDropdownRef.current && !typeDropdownRef.current.contains(event.target as Node)) {
-          setIsTypeDropdownOpen(false);
-        }
+  // Close dropdown if clicked outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (locationDropdownRef.current && !locationDropdownRef.current.contains(event.target as Node)) {
+        setIsLocationDropdownOpen(false);
       }
+      if (typeDropdownRef.current && !typeDropdownRef.current.contains(event.target as Node)) {
+        setIsTypeDropdownOpen(false);
+      }
+      if (searchTypeDropdownRef.current && !searchTypeDropdownRef.current.contains(event.target as Node)) {
+        setIsSearchTypeDropdownOpen(false);
+      }
+    }
 
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }, [locationDropdownRef, typeDropdownRef]);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [locationDropdownRef, typeDropdownRef, searchTypeDropdownRef]);
 
+  const handleSearchTypeChange = (type: 'keyword' | 'title' | 'acronym') => {
+    setSelectSearchType(type);
+    setIsSearchTypeDropdownOpen(false); // Close dropdown after selection
+  };
+    
+  const toggleSearchTypeDropdown = () => {
+    setIsSearchTypeDropdownOpen(!isSearchTypeDropdownOpen);
+  };
+  
   const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => {
     setConfKeyword(event.target.value);
   };
@@ -80,8 +97,7 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   );
 
   const handleSearchClick = () => {
-    onSearch({
-      keyword: confKeyword,
+    const searchParams: SearchParams = {
       fromDate,
       toDate,
       location: selectedLocation,
@@ -93,8 +109,20 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
       averageScore: selectedAverageScore,
       topics: selectedTopics,
       fieldOfResearch: selectedFieldsOfResearch,
-    });
+    };
+
+    // Thêm param dựa trên searchType
+    if (selectSearchType === 'keyword') {
+      searchParams.keyword = confKeyword;
+    } else if (selectSearchType === 'title') {
+      searchParams.title = confKeyword;
+    } else if (selectSearchType === 'acronym') {
+      searchParams.acronym = confKeyword;
+    }
+
+    onSearch(searchParams);
   };
+
 
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
@@ -183,6 +211,7 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
       onClear();
     }
     setConfKeyword('');
+    setSelectSearchType('keyword');
     setSelectedLocation(null);
     setSelectedType(null);
     setStartDate(null);
@@ -201,6 +230,9 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
 
   return {
     confKeyword,
+    selectSearchType,
+    isSearchTypeDropdownOpen,
+    searchTypeDropdownRef,
     selectedLocation,
     selectedType,
     fromDate,
@@ -224,6 +256,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     filteredLocations,
     filteredTypes,
     handleKeywordChange,
+    handleSearchTypeChange,
+    toggleSearchTypeDropdown,
     handleSearchClick,
     handleKeyPress,
     handleLocationClick,

@@ -32,6 +32,8 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
       // Tạo object params từ searchParams.
       const params: FetchConferencesParams = {
         keyword: searchParams.get('keyword') || undefined,
+        title: searchParams.get('title') || undefined,
+        acronym: searchParams.get('acronym') || undefined,
         country: searchParams.get('country') || undefined,
         type: searchParams.get('type') as 'Online' | 'Offline' | 'Hybrid' || undefined,
         fromDate: searchParams.get('fromDate') || undefined,

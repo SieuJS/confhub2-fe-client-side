@@ -5,6 +5,8 @@ const API_SAVE_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/conferences/s
 
 export interface FetchConferencesParams {
   keyword?: string;
+  title?: string;
+  acronym?: string;
   country?: string;
   type?: 'Online' | 'Offline' | 'Hybrid';
   fromDate?: string;

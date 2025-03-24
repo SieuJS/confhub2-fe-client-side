@@ -15,6 +15,8 @@ export default function Conferences({ params: { locale } }: { params: { locale: 
 
     const handleSearch = useCallback(async (searchParamsFromComponent: {
     keyword?: string;
+    title?: string;
+    acronym?: string;
     fromDate?: Date | null;
     toDate?: Date | null;
     location?: string | null;
@@ -30,6 +32,8 @@ export default function Conferences({ params: { locale } }: { params: { locale: 
 
     const newParams = new URLSearchParams();
     if (searchParamsFromComponent.keyword) newParams.set('keyword', searchParamsFromComponent.keyword);
+    if (searchParamsFromComponent.title) newParams.set('title', searchParamsFromComponent.title);
+    if (searchParamsFromComponent.acronym) newParams.set('acronym', searchParamsFromComponent.acronym);
     if (searchParamsFromComponent.location) newParams.set('country', searchParamsFromComponent.location);
     if (searchParamsFromComponent.type) newParams.set('type', searchParamsFromComponent.type);
     if (searchParamsFromComponent.fromDate) {
