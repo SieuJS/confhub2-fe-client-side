@@ -18,11 +18,9 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-  const pathname = usePathname();
-
   // Use useAuthApi for authentication
   const { signIn } = useAuthApi();
+
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -38,7 +36,13 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
       return;
     }
 
-    setIsLoading(true);
+    if (password.length < 8) {
+      setError('New password must be at least 8 characters long');
+      return;
+    }
+
+    setIsLoading(true)
+
     try {
       const response = await fetch('/api/v1/user/signup', { // Use relative path
         method: 'POST',
