@@ -11,6 +11,7 @@ import UserDropdown from './header/UserDropdown';
 import MobileNavigation from './header/MobileNavigation';
 import AuthButtons from './header/AuthButtons';
 import DesktopNavigation from './header/DesktopNavigation';
+import LoadingIndicator from './header/LoadingIndicator';
 import { MenuIcon, CloseIcon } from './header/Icon';
 import Button from './Button';
 import useAuthApi from '../../../hooks/auth/useAuthApi'; // Import your hook
@@ -24,8 +25,13 @@ export const Header: FC<Props> = ({ locale }) => {
   const headerRef = useRef<HTMLDivElement>(null);
 
   // Use the useAuthApi hook
-  const { user, isLoggedIn, logout, isLoading: authLoading } = useAuthApi(); // Get isLoading
+  const { user, isLoggedIn, logout } = useAuthApi();
+  const [isLoading, setIsLoading] = useState(true);
 
+
+  useEffect(() => {
+    setIsLoading(false); // The hook handles loading now.
+  }, []);
 
   const {
     notifications,
@@ -79,12 +85,12 @@ export const Header: FC<Props> = ({ locale }) => {
 
         {isLoading ? <LoadingIndicator/> : 
           <AuthButtons
-            isLogin={isLoggedIn} 
-            locale={locale}
-            toggleNotification={() => openNotification()}
-            toggleUserDropdown={() => openUserDropdown()}
-            notificationEffect={notificationEffect}
-            unreadCount={unreadCount()}
+          isLogin={isLoggedIn} 
+          locale={locale}
+          toggleNotification={() => openNotification()}
+          toggleUserDropdown={() => openUserDropdown()}
+          notificationEffect={notificationEffect}
+          unreadCount={unreadCount()}
         />
         }
           
