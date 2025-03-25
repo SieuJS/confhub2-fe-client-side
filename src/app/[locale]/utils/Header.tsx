@@ -83,6 +83,7 @@ export const Header: FC<Props> = ({ locale }) => {
       <div className='relative flex flex-row items-center gap-4'>
         <DesktopNavigation locale={locale} />
 
+        {isLoading ? <LoadingIndicator/> : 
           <AuthButtons
             isLogin={isLoggedIn} 
             locale={locale}
@@ -90,7 +91,9 @@ export const Header: FC<Props> = ({ locale }) => {
             toggleUserDropdown={() => openUserDropdown()}
             notificationEffect={notificationEffect}
             unreadCount={unreadCount()}
-          />
+        />
+        }
+          
         {/* } */}
 
         {/* Mobile Menu Button */}
