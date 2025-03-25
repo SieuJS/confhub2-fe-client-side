@@ -55,8 +55,8 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     const { conferenceDataFromDB, error, loading } = useConferenceDataFromDB(id);
     const { conferenceDataFromJSON } = useConferenceDataFromJSON(id);
 
-    const { isFollowing, handleFollowClick } = useFollowConference(conferenceDataFromDB);
-    const { isAddToCalendar, handleAddToCalendar } = useAddToCalendar(conferenceDataFromDB);
+    const { isFollowing, handleFollowClick } = useFollowConference(conferenceDataFromJSON);
+    const { isAddToCalendar, handleAddToCalendar } = useAddToCalendar(conferenceDataFromJSON);
 
     const { handleShareClick } = useShareConference(conferenceDataFromDB);
     const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } = useTopicsDisplay(conferenceDataFromDB?.organization?.topics || []);
@@ -154,7 +154,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         );
     }
 
-    const { conference, organization, location, followedBy, ranks } = conferenceDataFromDB || {};
+    const { conference, organization, location, followedBy } = conferenceDataFromDB || {};
 
     const calculateOverallRating = (feedbacks: Feedback[] | null | undefined): number => {
         if (!feedbacks || feedbacks.length === 0) return 0;
@@ -162,8 +162,8 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         return totalStars / feedbacks.length;
     };
 
-    const overallRating = calculateOverallRating(conferenceDataFromDB?.feedBacks);
-    const totalReviews = conferenceDataFromDB?.feedBacks?.length || 0;
+    const overallRating = calculateOverallRating(conferenceDataFromJSON?.feedBacks);
+    const totalReviews = conferenceDataFromJSON?.feedBacks?.length || 0;
 
     const renderFollowerAvatars = () => {
         if (!followedBy || followedBy.length === 0) {
