@@ -3,16 +3,16 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Button from '../../utils/Button';
 import { useTranslations } from 'next-intl';
-import { useUserData } from '@/src/hooks/dashboard/profile/useUserData'; // Corrected path
-import { useEditProfile } from '@/src/hooks/dashboard/profile/useEditProfile'; // Corrected path
-import { useImageSelection } from '@/src/hooks/dashboard/profile/useImageSelection'; // Corrected path
+import { useUserData } from '@/src/hooks/dashboard/profile/useUserData';
+import { useEditProfile } from '@/src/hooks/dashboard/profile/useEditProfile';
+import { useImageSelection } from '@/src/hooks/dashboard/profile/useImageSelection';
 import { Link } from '@/src/navigation';
-import ChangePasswordForm from './ChangePasswordForm'; // Import
+import ChangePasswordForm from './ChangePasswordForm';
 
 
 const ProfileTab: React.FC = () => {
   const t = useTranslations('');
-  const { userData, loading, error } = useUserData(); // Simplified: Only get what you need
+  const { userData, loading, error } = useUserData();
 
   const {
     isEditing,
@@ -23,7 +23,7 @@ const ProfileTab: React.FC = () => {
     handleCancelClick,
     handleInputChange,
     handleInterestedTopicsChange,
-  } = useEditProfile(userData); // Pass only userData
+  } = useEditProfile(userData);
 
   const {
     showModal: showAvatarModal,

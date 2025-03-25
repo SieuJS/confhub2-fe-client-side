@@ -21,13 +21,10 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
 
 
   const fetchData = useCallback(async () => {
-    console.log('fetchData called');
     try {
       const userData = localStorage.getItem('user');
-      console.log('userData:', userData);
 
       if (!userData) {
-        console.log('User not logged in');
         setLoggedIn(false);
         if (initialLoad) {
           setLoading(false);
@@ -38,22 +35,18 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
       }
 
       const user = JSON.parse(userData);
-      console.log('user:', user);
       setLoggedIn(true);
 
       const userResponse = await fetch(`${API_GET_USER_ENDPOINT}/${user.id}`);
-      console.log('userResponse:', userResponse);
 
       if (!userResponse.ok) {
         throw new Error(`HTTP error! status: ${userResponse.status}`);
       }
 
       const userDetails: UserResponse = await userResponse.json();
-      console.log('userDetails:', userDetails);
 
       if ((userDetails.followedConferences ?? []).length > 0) {
         const conferencesData = await getListConferenceFromJSON();
-        console.log('conferencesData:', conferencesData);
 
         const followed = conferencesData.payload
           .filter((conf: ConferenceInfo) => conf.id !== null)
@@ -65,16 +58,13 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
           .map((conf: ConferenceInfo) => {
             const followedConfInfo: Follow | undefined =
               userDetails.followedConferences?.find((fc: Follow) => fc.id === conf.id);
-            console.log('followedConfInfo', followedConfInfo)
             return {
               ...conf,
               followedAt: followedConfInfo?.createdAt,
             };
           });
-        console.log('followed:', followed);
         setFollowedConferences(followed);
       } else {
-        console.log('User is not following any conferences');
         setFollowedConferences([]);
       }
     } catch (error) {
@@ -84,13 +74,11 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
         setLoading(false); //set loading to false only one time
         setInitialLoad(false);
       }
-      console.log('fetchData completed');
     }
   }, [initialLoad]); // Include initialLoad in dependency array
 
 
   useEffect(() => {
-    console.log('useEffect called');
     fetchData();
   }, [fetchData]);
 
@@ -101,8 +89,6 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
   }, [followedConferences, initialLoad])
 
 
-  console.log('loggedIn:', loggedIn);
-  console.log('loading:', loading);
 
   if (!loggedIn) {
     if (loading) {

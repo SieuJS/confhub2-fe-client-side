@@ -1,73 +1,79 @@
 'use client'
 
 // frontend/MyConferencesTab.tsx
-import React, { useState, useMemo } from 'react'
-import ConferenceItem from '../../conferences/ConferenceItem'
-import Button from '../../utils/Button'
-import { Link } from '@/src/navigation'
-import useMyConferences from '../../../../hooks/dashboard/myConferences/useMyConferences'
-import { formatDateFull, timeAgo } from '../timeFormat'
-import Tooltip from '../../utils/Tooltip'
-import { useTranslations } from 'next-intl'
+import React, { useState, useMemo } from 'react';
+import ConferenceItem from '../../conferences/ConferenceItem';
+import Button from '../../utils/Button';
+import { Link } from '@/src/navigation';
+import useMyConferences from '@/src/hooks/dashboard/myConferences/useMyConferences'; // Absolute import
+import { formatDateFull, timeAgo } from '../timeFormat';
+import Tooltip from '../../utils/Tooltip';
+import { useTranslations } from 'next-intl';
+import useAuthApi from '@/src/hooks/auth/useAuthApi'; // Import useAuthApi
 
 // Enum for conference status
 enum ConferenceStatus {
   Approve = 'Approved',
   Pending = 'Pending',
-  Rejected = 'Rejected'
+  Rejected = 'Rejected',
 }
 
 const MyConferencesTab: React.FC = () => {
-  const t = useTranslations('')
-  const languge = t('language')
+  const t = useTranslations('');
+  const language = t('language'); // Corrected variable name
 
   const [displayStatus, setDisplayStatus] = useState<ConferenceStatus>(
     ConferenceStatus.Pending
-  )
-  const userData = localStorage.getItem('user')
-  const user = userData ? JSON.parse(userData) : null
-  const { conferences, isLoading, error, refetch } = useMyConferences(
-    user?.id || ''
-  )
+  );
+
+  // Use useAuthApi to get the user
+  const { user, isLoading: isAuthLoading } = useAuthApi();
+
+  const {
+    conferences,
+    isLoading,
+    error,
+    refetch,
+  } = useMyConferences(user?.id || '');
 
   // useMemo calls *must* be at the top level, before any conditional returns.
   const transformedConferences = useMemo(() => {
     if (!conferences) {
-      return [] // Return an empty array if conferences is null/undefined
+      return []; // Return an empty array if conferences is null/undefined
     }
     return conferences
-      .map(conf => ({
+      .map((conf) => ({
         id: conf.conference.id,
         title: conf.conference.title,
         acronym: conf.conference.acronym,
         location: `${conf.location.cityStateProvince}, ${conf.location.country}`,
         year: conf.organization.year,
         summerize: conf.organization.summerize,
-        fromDate: conf.dates.find(d => d.type === 'Conference Date')?.fromDate,
-        toDate: conf.dates.find(d => d.type === 'Conference Date')?.toDate,
+        fromDate: conf.dates.find((d) => d.type === 'conferenceDates')
+          ?.fromDate,
+        toDate: conf.dates.find((d) => d.type === 'conferenceDates')?.toDate,
         websiteUrl: conf.organization.link,
         status: conf.status as ConferenceStatus,
-        createdAt: conf.conference.createdAt
+        createdAt: conf.conference.createdAt,
       }))
       .sort((a, b) => {
-        if (!a.createdAt) return 1
-        if (!b.createdAt) return -1
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      })
-  }, [conferences])
+        if (!a.createdAt) return 1;
+        if (!b.createdAt) return -1;
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      });
+  }, [conferences]);
 
   const filteredConferences = useMemo(() => {
     return transformedConferences.filter(
-      conference => conference.status === displayStatus
-    )
-  }, [transformedConferences, displayStatus])
+      (conference) => conference.status === displayStatus
+    );
+  }, [transformedConferences, displayStatus]);
 
-  if (!user) {
-    return <div>{t('Please_log_in_to_view_your_conferences')}</div>
-  }
-
-  if (isLoading) {
-    return <div>{t('Loading')}</div>
+    // Wait for both authentication and conference data to load
+  if (isAuthLoading || isLoading) {
+    return <div>{t('Loading')}</div>;
   }
 
   if (error) {
@@ -75,21 +81,25 @@ const MyConferencesTab: React.FC = () => {
       <div>
         {t('Error')}: {error}
       </div>
-    )
+    );
+  }
+    // Display a message if the user is not logged in
+  if (!user) {
+    return <div>{t('Please_log_in_to_view_your_conferences')}</div>;
   }
 
   const getStatusTitle = (status: ConferenceStatus) => {
     switch (status) {
       case ConferenceStatus.Approve:
-        return t('My_conferences_are_approved')
+        return t('My_conferences_are_approved');
       case ConferenceStatus.Pending:
-        return t('My_conferences_are_pending')
+        return t('My_conferences_are_pending');
       case ConferenceStatus.Rejected:
-        return t('My_conferences_are_rejected')
+        return t('My_conferences_are_rejected');
       default:
-        return t('My_conferences_are_pending')
+        return t('My_conferences_are_pending');
     }
-  }
+  };
 
   return (
     <div className='container mx-auto p-4'>
@@ -141,15 +151,15 @@ const MyConferencesTab: React.FC = () => {
       {filteredConferences.length === 0 ? (
         <p className=''>{t('You_have_no_conference')}</p>
       ) : (
-        filteredConferences.map(conference => (
+        filteredConferences.map((conference) => (
           <div
             className='mb-4 rounded-xl border-2 px-4 py-2 shadow-xl'
             key={conference.id}
           >
             <div className='flex'>
               <span className='mr-1'>{t('Created_Time')}: </span>
-              <Tooltip text={formatDateFull(conference.createdAt, languge)}>
-                <span>{timeAgo(conference.createdAt, languge)}</span>
+              <Tooltip text={formatDateFull(conference.createdAt, language)}>
+                <span>{timeAgo(conference.createdAt, language)}</span>
               </Tooltip>
             </div>
             <ConferenceItem
@@ -161,7 +171,7 @@ const MyConferencesTab: React.FC = () => {
                 location: conference.location,
                 fromDate: conference.fromDate,
                 toDate: conference.toDate,
-                status: conference.status // Pass the status
+                status: conference.status, // Pass the status
               }}
             />
           </div>
@@ -169,7 +179,7 @@ const MyConferencesTab: React.FC = () => {
       )}
       <button onClick={refetch}>{t('Refetch_Data')}</button>
     </div>
-  )
-}
+  );
+};
 
-export default MyConferencesTab
+export default MyConferencesTab;

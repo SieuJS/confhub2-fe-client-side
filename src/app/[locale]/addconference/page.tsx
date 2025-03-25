@@ -27,7 +27,7 @@ const AddConference = ({
   }, [isLoggedIn, isLoading, router, locale]); // Add isLoading and locale to dependencies
 
   // Render loading state while isLoading is true
-  if (!isLoading) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 

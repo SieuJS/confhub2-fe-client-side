@@ -14,7 +14,7 @@ import DesktopNavigation from './header/DesktopNavigation';
 import { MenuIcon, CloseIcon } from './header/Icon';
 import Button from './Button';
 import useAuthApi from '../../../hooks/auth/useAuthApi'; // Import your hook
-
+import LoadingIndicator from './header/LoadingIndicator';
 interface Props {
   locale: string;
 }
@@ -24,7 +24,7 @@ export const Header: FC<Props> = ({ locale }) => {
   const headerRef = useRef<HTMLDivElement>(null);
 
   // Use the useAuthApi hook
-  const { user, isLoggedIn, logout, isLoading: authLoading } = useAuthApi(); // Get isLoading
+  const { user, isLoggedIn, logout, isLoading } = useAuthApi(); // Get isLoading
 
 
   const {
