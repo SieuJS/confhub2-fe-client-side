@@ -44,6 +44,11 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
       return
     }
 
+    if (password.length < 8) {
+      setError('New password must be at least 8 characters long');
+      return;
+    }
+    
     setIsLoading(true)
     try {
       const response = await fetch('http://localhost:3000/api/v1/user/signup', {
