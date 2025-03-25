@@ -20,7 +20,7 @@ const DEFAULT_DOM_RECT: DOMRect = {
   left: 0,
   right: 0,
   bottom: 0,
-  toJSON: () => { }
+  toJSON: () => {}
 }
 
 export interface CalendarEvent {
@@ -33,6 +33,7 @@ export interface CalendarEvent {
   conference: string
   conferenceId: string
   title?: string
+  name?: string
 }
 
 interface CalendarProps {
@@ -111,7 +112,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
       submissionDate: 'bg-red-500',
       notificationDate: 'bg-blue-500',
       cameraReadyDate: 'bg-orange-500',
-      registrationDate: 'bg-cyan-500',
+      registrationDate: 'bg-cyan-500'
     }),
     []
   )
@@ -211,7 +212,9 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
       if (event.conferenceId) {
         try {
           setLoadingDetails(true)
-          const conferenceDetails = await getConferenceFromJSON(event.conferenceId)
+          const conferenceDetails = await getConferenceFromJSON(
+            event.conferenceId
+          )
           setSelectedEventDetail(conferenceDetails)
         } catch (error) {
           console.error('Failed to fetch conference details:', error)
