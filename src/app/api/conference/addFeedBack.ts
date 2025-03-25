@@ -1,5 +1,5 @@
 // api/feedback/addFeedback.ts
-import { Feedback } from "../../models/send/feedback.send"; // Create this model
+import { Feedback } from "../../../models/send/feedback.send"; // Create this model
 
 export const addFeedback = async (feedbackData: {
     conferenceId: string; // Change to conferenceId

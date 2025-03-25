@@ -4,11 +4,11 @@ import Image from 'next/image'
 import Calendar from './Calendar'
 import { CalendarEvent } from './Calendar'
 import { ConferenceResponse } from '../../../../models/response/conference.response'
-import { getConference } from '../../../../app/api/conference/getConferenceDetails'
+import { getConferenceFromJSON } from '../../../../app/api/conference/getConferenceDetails'
 import { Link } from '@/src/navigation'
 import Button from '../../utils/Button'
 
-interface NoteTabProps {}
+interface NoteTabProps { }
 
 const API_GET_USER_CALENDAR_ENDPOINT = 'http://localhost:3000/api/v1/user'
 
@@ -33,8 +33,8 @@ const NoteTab: React.FC<NoteTabProps> = () => {
       submissionDate: 'bg-red-100 text-red-700',
       notificationDate: 'bg-blue-100 text-blue-700',
       cameraReadyDate: 'bg-orange-100 text-orange-700',
-      registrationDate: 'bg-background ',
-      yourNote: 'bg-cyan-100 text-cyan-700'
+      registrationDate: 'bg-cyan-100 text-cyan-700',
+      yourNote: 'bg-yellow-100 text-yellow-700'
     }),
     []
   )
@@ -73,14 +73,13 @@ const NoteTab: React.FC<NoteTabProps> = () => {
 
         const today = new Date()
         today.setHours(0, 0, 0, 0)
+        console.log(today)
 
-        const testToday = new Date(2025, 2, 17) // Keep for consistent testing
-        testToday.setHours(0, 0, 0, 0)
 
         const upcoming = calendarData
           .filter(event => {
             const eventDate = new Date(event.year, event.month - 1, event.day)
-            return eventDate >= testToday
+            return eventDate >= today
           })
           .sort((a, b) => {
             const dateA = new Date(a.year, a.month - 1, a.day)
@@ -109,7 +108,7 @@ const NoteTab: React.FC<NoteTabProps> = () => {
             const countdownString = `${daysLeft}d ${hoursLeft}h `
 
             try {
-              const conferenceDetails: ConferenceResponse = await getConference(
+              const conferenceDetails: ConferenceResponse = await getConferenceFromJSON(
                 event.conferenceId
               )
               return {
@@ -259,7 +258,7 @@ const NoteTab: React.FC<NoteTabProps> = () => {
         <section className='rounded-md bg-background p-4 shadow lg:w-5/6'>
           <h2 className='mb-2 text-lg font-semibold'>Upcoming Notes</h2>
           {upcomingNotes.length === 0 ? (
-            <p>You are not following any conferences yet.</p>
+            <p>Nothing important dates coming up.</p>
           ) : (
             <div className='flex flex-row flex-wrap gap-4'>
               {upcomingNotes.map((note, index) => (
@@ -375,11 +374,15 @@ const NoteTab: React.FC<NoteTabProps> = () => {
               <span className='text-sm '>Camera ready date</span>
             </li>
             <li className='mb-4 flex items-center'>
-              <div className='mr-2 h-4 w-4 rounded-full bg-gray-500'></div>
+              <div className='mr-2 h-4 w-4 rounded-full bg-cyan-500'></div>
               <span className='text-sm '>Registration date</span>
             </li>
+            <li className='mb-4 flex items-center'>
+              <div className='mr-2 h-4 w-4 rounded-full bg-gray-500'></div>
+              <span className='text-sm '>Other date</span>
+            </li>
             <li className='flex items-center'>
-              <div className='mr-2 h-4 w-4 rounded-full bg-cyan-500'></div>
+              <div className='mr-2 h-4 w-4 rounded-full bg-yellow-500'></div>
               <span className='text-sm '>Your note</span>
             </li>
           </ul>

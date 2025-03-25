@@ -67,7 +67,7 @@ const MyConferencesTab: React.FC = () => {
   }
 
   if (isLoading) {
-    return <div>{t('Loading...')}</div>
+    return <div>{t('Loading')}</div>
   }
 
   if (error) {

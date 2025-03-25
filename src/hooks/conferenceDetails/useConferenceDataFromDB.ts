@@ -1,10 +1,10 @@
 // hooks/useConferenceData.ts
 import { useState, useEffect } from 'react';
 import { ConferenceResponse } from '../../models/response/conference.response'; // Adjust path as needed
-import { getConference } from '../../app/api/conference/getConferenceDetails'; // Adjust path as needed
+import { getConferenceFromDB } from '../../app/api/conference/getConferenceDetails'; // Adjust path as needed
 
-const useConferenceData = (id: string | null) => {
-    const [conferenceData, setConferenceData] = useState<ConferenceResponse | null>(null);
+const useConferenceDataFromDB = (id: string | null) => {
+    const [conferenceDataFromDB, setConferenceData] = useState<ConferenceResponse | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
@@ -14,7 +14,7 @@ const useConferenceData = (id: string | null) => {
             setError(null);
             try {
                 if (id) {
-                    const conferenceInfo = await getConference(id);
+                    const conferenceInfo = await getConferenceFromDB(id);
                     setConferenceData(conferenceInfo);
                 }
             } catch (err: any) {
@@ -36,7 +36,7 @@ const useConferenceData = (id: string | null) => {
         }
     }, [id]);
 
-    return { conferenceData, error, loading };
+    return { conferenceDataFromDB, error, loading };
 };
 
-export default useConferenceData;
+export default useConferenceDataFromDB;

@@ -87,6 +87,7 @@
   "Update_profile": "Update Profile",
   "Followed_Conferences": "Followed Conferences",
   "You_are_not_following_any_conferences_yet": "You are not following any conferences yet.",
+  "Nothing_important_coming_up": "Nothing important dates coming up.",
   "View_all_notifications": "View All Notifications",
   "Select_all": "Select All",
   "Delete_selected": "Delete Selected",
@@ -306,8 +307,8 @@
   "Review_step": "Review step 1",
   "Confirmation_step": "Confirmation step 1",
   "Refetch_Data": "Refetch Data",
-  "Please_log_in_to_view_your_conferences.": "Please log in to view your conferences.",
-  "Loading...": "Loading...",
+  "Please_log_in_to_view_your_conferences": "Please log in to view your conferences.",
+  "Loading": "Loading...",
   "Error": "Error",
   "language": "en"
 }

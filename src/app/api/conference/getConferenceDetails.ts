@@ -6,7 +6,7 @@ const API_GET_CONFERENCE_ENDPOINT = 'http://178.128.28.130:3000/api/v1/conferenc
 const API_SAVE_CONFERENCE_DETAILS_ENDPOINT = 'http://localhost:3000/api/v1/conferences/details/save'; // Port 3000 (your backend), new endpoint
 
 
-async function getConference(id: string): Promise<ConferenceResponse> {
+async function getConferenceFromDB(id: string): Promise<ConferenceResponse> {
   try {
     const response = await fetch(`${API_GET_CONFERENCE_ENDPOINT}/${id}`, {  // Removed /api/v1/conference
       method: 'GET',
@@ -63,4 +63,45 @@ async function getConference(id: string): Promise<ConferenceResponse> {
   }
 }
 
-export { getConference };
+const API_GET_JSON_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1/conference'; //  3005 for details
+
+async function getConferenceFromJSON(id: string): Promise<ConferenceResponse> {
+  try {
+    const response = await fetch(`${API_GET_JSON_CONFERENCE_ENDPOINT}/${id}`, {  // Removed /api/v1/conference
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const responseData: ConferenceResponse = await response.json();
+
+    // Date handling (important: check for null/undefined for each date)
+    if (responseData.dates) {
+      responseData.dates = responseData.dates.map(date => {
+          if (date && date.fromDate) {
+              date.fromDate = new Date(date.fromDate).toISOString(); //convert to ISO string before passing in request body
+          }
+          if(date && date.toDate) {
+              date.toDate = new Date(date.toDate).toISOString(); //convert to ISO string before passing in request body
+          }
+          return date;
+      })
+    }
+
+    return responseData;
+
+  } catch (error: any) {
+    console.error('Error fetching and saving conference details:', error.message);
+    if (error instanceof TypeError) {
+      console.error('Network error:', error.message);
+    }
+    throw error; // Re-throw for the caller
+  }
+}
+
+export { getConferenceFromDB, getConferenceFromJSON };

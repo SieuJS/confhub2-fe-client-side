@@ -1,9 +1,8 @@
-// page.tsx (Conference Details Page)
 "use client";
 
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react'; // Import useEffect
 import Button from '../../utils/Button';
 import ConferenceFeedback from '../../conferences/detail/ConferenceFeedback';
 import NotFoundPage from "../../utils/NotFoundPage";
@@ -19,13 +18,16 @@ import { ImportantDate } from '@/src/models/response/conference.response';
 
 
 // Import the custom hooks
-import useConferenceData from '../../../../hooks/conferenceDetails/useConferenceData';
+import useConferenceDataFromDB from '../../../../hooks/conferenceDetails/useConferenceDataFromDB';
+import useConferenceDataFromJSON from '../../../../hooks/conferenceDetails/useConferenceDataFromJSON';
 import useFollowConference from '../../../../hooks/conferenceDetails/useFollowConference';
 import useShareConference from '../../../../hooks/conferenceDetails/useShareConference';
 import useClickOutside from '../../../../hooks/conferenceDetails/useClickOutside';
 import useTopicsDisplay from '../../../../hooks/conferenceDetails/useTopicsDisplay';
 import useFormatConferenceDates from '../../../../hooks/conferenceDetails/useFormatConferenceDates';
 import useAddToCalendar from '../../../../hooks/conferenceDetails/useAddToCalendar';
+import useUpdateConference from '../../../../hooks/conferenceDetails/useUpdateConference'; // Import the hook
+
 
 // Define the Feedback type (or import it)
 export type Feedback = {
@@ -49,12 +51,14 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     const router = useRouter();
     const pathname = usePathname();
 
-    const { conferenceData, error, loading } = useConferenceData(id);
-    const { isFollowing, handleFollowClick } = useFollowConference(conferenceData);
-    const { isAddToCalendar, handleAddToCalendar } = useAddToCalendar(conferenceData);
+    const { conferenceDataFromDB, error, loading } = useConferenceDataFromDB(id);
+    const { conferenceDataFromJSON } = useConferenceDataFromJSON(id);
 
-    const { handleShareClick } = useShareConference(conferenceData);
-    const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } = useTopicsDisplay(conferenceData?.organization?.topics || []);
+    const { isFollowing, handleFollowClick } = useFollowConference(conferenceDataFromDB);
+    const { isAddToCalendar, handleAddToCalendar } = useAddToCalendar(conferenceDataFromDB);
+
+    const { handleShareClick } = useShareConference(conferenceDataFromDB);
+    const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } = useTopicsDisplay(conferenceDataFromDB?.organization?.topics || []);
     // Helper function to transform ImportantDate to the expected format
     const transformDates = (dates: ImportantDate[] | null | undefined) => {
         if (!dates) {
@@ -70,11 +74,11 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         }).filter(date => date !== undefined); // Filter out any null dates
     };
 
-    const transformedDates = transformDates(conferenceData?.dates);
+    const transformedDates = transformDates(conferenceDataFromDB?.dates);
     const { dateDisplay } = useFormatConferenceDates(transformedDates);
 
     const [openMenu, setOpenMenu] = useState<"share" | "calendar" | null>(null);
-    const [updating, setUpdating] = useState(false);
+    //const [updating, setUpdating] = useState(false); // Remove this line
 
     const menuContainerRef = useRef<HTMLDivElement>(null);
 
@@ -148,7 +152,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         );
     }
 
-    const { conference, organization, location, followedBy, ranks } = conferenceData || {};
+    const { conference, organization, location, followedBy, ranks } = conferenceDataFromDB || {};
 
     const calculateOverallRating = (feedbacks: Feedback[] | null | undefined): number => {
         if (!feedbacks || feedbacks.length === 0) return 0;
@@ -156,8 +160,8 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         return totalStars / feedbacks.length;
     };
 
-    const overallRating = calculateOverallRating(conferenceData?.feedBacks);
-    const totalReviews = conferenceData?.feedBacks?.length || 0;
+    const overallRating = calculateOverallRating(conferenceDataFromDB?.feedBacks);
+    const totalReviews = conferenceDataFromDB?.feedBacks?.length || 0;
 
     const renderFollowerAvatars = () => {
         if (!followedBy || followedBy.length === 0) {
@@ -188,6 +192,20 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         );
     };
 
+    const { isUpdating, updateResult, updateConference } = useUpdateConference(); // Use the hook
+
+
+    useEffect(() => {
+        if (updateResult) {
+            // Display a notification (consider using a library like react-toastify)
+            if (updateResult.success) {
+                alert(updateResult.message); // Or use a toast notification
+            } else {
+                alert(`Error: ${updateResult.error}`);
+            }
+        }
+    }, [updateResult]);
+
     if (error === "Conference not found") {
         return <NotFoundPage />;
     }
@@ -199,7 +217,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
             <div className="pt-20 flex-grow container mx-auto px-4 py-8">
                 {/* px and py on container */}
-                {updating && (
+                {isUpdating && (  // Use isUpdating from the hook
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                         <Loading />
                     </div>
@@ -329,12 +347,12 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                         {isFollowing ? 'Followed' : 'Follow'}
                                     </Button>
 
-                                    <Button
+                                     <Button
                                         variant={'secondary'}
                                         size="small"
-                                        onClick={() => checkLoginAndRedirect(() => setUpdating(true))}
-                                        className={`flex items-center justify-start gap-x-4 mx-14 ${updating ? 'opacity-50 cursor-not-allowed' : ''}`} // Added justify-start and gap-x-4 mx-14, kept opacity
-                                        disabled={updating}
+                                         onClick={() => checkLoginAndRedirect(() => updateConference(id))} // Call updateConference
+                                        className={`flex items-center justify-start gap-x-4 mx-14 ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        disabled={isUpdating}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
                                             <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
@@ -342,7 +360,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                             <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
                                             <path d="M16 16h5v5" />
                                         </svg>
-                                        {updating ? 'Updating...' : 'Update'}
+                                        {isUpdating ? 'Updating...' : 'Update'}
                                     </Button>
 
                                     <Button
@@ -369,12 +387,12 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                         </div>
                     </div>
 
-                    <ConferenceTabs conference={conferenceData} />
+                    <ConferenceTabs conference={conferenceDataFromDB} />
                 </div>
 
                 <div className="mt-8 bg-white rounded-lg shadow-md p-6">
                     {/* Pass conferenceData to ConferenceFeedback */}
-                    <ConferenceFeedback conferenceData={conferenceData} />
+                    <ConferenceFeedback conferenceData={conferenceDataFromJSON} />
                 </div>
 
             </div>

@@ -1,9 +1,10 @@
 // ConferenceFeedback.tsx
 import React, { useState } from 'react';
-import { ConferenceResponse } from '../../../../models/response/conference.response'; // Correct path
+import { ConferenceResponse } from '../../../../models/response/conference.response';
 import Image from 'next/image';
-import useAddFeedback from '../../../../hooks/conferenceDetails/useAddFeedBack'; // Import the hook
-
+import useAddFeedback from '../../../../hooks/conferenceDetails/useAddFeedBack';
+import { useLocalStorage } from 'usehooks-ts';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'; // Import useSearchParams
 
 interface ConferenceFeedbackProps {
     conferenceData: ConferenceResponse | null;
@@ -12,52 +13,68 @@ interface ConferenceFeedbackProps {
 const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({ conferenceData }) => {
     const [sortBy, setSortBy] = useState<'all' | 'recent'>('all');
     const [description, setDescription] = useState('');
-    const [star, setStar] = useState<number | null>(null); // Use null for initial unselected state
+    const [star, setStar] = useState<number | null>(null);
     const { submitFeedback, loading, error, newFeedback } = useAddFeedback();
+    const [loginStatus] = useLocalStorage<string | null>('loginStatus', null);
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams(); // Get search parameters
 
-    //  const organizedId = conferenceData?.organization.id; // No longer needed here
-    const conferenceId = conferenceData?.conference.id; // Get conferenceId
+    const conferenceId = conferenceData?.conference.id;
     const feedbacks = conferenceData?.feedBacks ?? [];
 
-    // Sorting logic
     let sortedFeedbacks = [...feedbacks];
     if (sortBy === 'recent') {
-        sortedFeedbacks.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        sortedFeedbacks.sort((a, b) => {
+            const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+            const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+            return dateB.getTime() - dateA.getTime();
+        });
     }
 
-    // Add new feedback to the sorted list
     if (newFeedback) {
-        // Find the correct position to insert based on sorting.
         let insertIndex = 0;
         if (sortBy === 'recent') {
-            while (insertIndex < sortedFeedbacks.length && new Date(newFeedback.createdAt) < new Date(sortedFeedbacks[insertIndex].createdAt)) {
+            const newFeedbackDate = newFeedback.createdAt ? new Date(newFeedback.createdAt) : new Date(0);
+            while (insertIndex < sortedFeedbacks.length) {
+                const existingFeedback = sortedFeedbacks[insertIndex];
+                if (existingFeedback && existingFeedback.createdAt) {
+                    const existingFeedbackDate = new Date(existingFeedback.createdAt);
+                    if (newFeedbackDate.getTime() > existingFeedbackDate.getTime()) {
+                        break;
+                    }
+                } else {
+                    break;
+                }
                 insertIndex++;
             }
         }
         sortedFeedbacks.splice(insertIndex, 0, newFeedback);
     }
 
-    // Calculate overall rating
     const calculateOverallRating = () => {
         if (feedbacks.length === 0) return 0;
-        const totalStars = feedbacks.reduce((sum, feedback) => sum + feedback.star, 0);
-        return totalStars / feedbacks.length; // Return a number
+        const totalStars = feedbacks.reduce((sum, feedback) => sum + (feedback.star ?? 0), 0);
+        return totalStars / feedbacks.length;
     };
 
-    // Calculate rating distribution
     const calculateRatingDistribution = () => {
-        const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+        const distribution: { [key: number]: number } = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
         feedbacks.forEach(feedback => {
-            distribution[feedback.star as keyof typeof distribution]++;
+            const star = feedback.star ?? 0;
+            if (star >= 1 && star <= 5) {
+                distribution[star]++;
+            } else {
+                console.warn(`Invalid star rating: ${star}`);
+            }
         });
         return distribution;
     };
 
-    const overallRating = calculateOverallRating(); // overallRating is now a number
+    const overallRating = calculateOverallRating();
     const ratingDistribution = calculateRatingDistribution();
     const totalReviews = feedbacks.length;
 
-    // Function to get stars display
     const getStars = (starCount: number) => {
         const stars = [];
         for (let i = 0; i < 5; i++) {
@@ -65,35 +82,48 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({ conferenceData 
         }
         return stars;
     };
+
     const handleStarClick = (selectedStar: number) => {
         setStar(selectedStar);
     };
 
     const handleSubmit = async () => {
-        // if (!organizedId) { // No longer check organizedId
         if (!conferenceId) {
-
-            console.error("conferenceId is missing"); // Handle this case appropriately
+            console.error("conferenceId is missing");
             return;
         }
         if (star === null || description.trim() === "") {
-            alert("Please select a rating and write a review."); // Or use a better UI for errors
+            alert("Please select a rating and write a review.");
             return;
         }
 
-        const addedFeedback = await submitFeedback(conferenceId, description, star); //Pass ConferenceId
+        const addedFeedback = await submitFeedback(conferenceId, description, star);
         if (addedFeedback) {
             setDescription('');
             setStar(null);
         }
-
     };
 
+    const handleSignInClick = () => {
+        // Construct the full URL with query parameters
+
+        const localePrefix = pathname.split('/')[1]; // Extract locale prefix (e.g., "en")
+
+        const fullUrl = `${pathname}?${searchParams.toString()}`;
+        localStorage.setItem('returnUrl', fullUrl);
+
+        
+        const pathWithLocale = `/${localePrefix}/auth/login`; // Construct path with locale
+
+        router.push(pathWithLocale); // Use path with locale for internal navigation
+
+        
+    };
 
 
     return (
         <div className="container mx-auto py-6 rounded-lg">
-            {/* Header */}
+            {/* ... (rest of the component remains the same) ... */}
             <div className="flex justify-between items-center mb-6">
                 <div>
                     <h2 className="text-2xl font-semibold ">Conference Feedback</h2>
@@ -140,12 +170,12 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({ conferenceData 
                                         <div
                                             className="absolute bg-yellow-500 h-4 rounded-sm"
                                             style={{
-                                                width: `${totalReviews > 0 ? (ratingDistribution[star as keyof typeof ratingDistribution] / totalReviews) * 100 : 0}%`,
+                                                width: `${totalReviews > 0 ? (ratingDistribution[star] / totalReviews) * 100 : 0}%`,
                                                 backgroundColor: star >= 4 ? 'green' : star == 3 ? 'yellow' : star == 2 ? "orange" : 'red' // More concise color logic.
                                             }}
                                         ></div>
                                     </div>
-                                    <div className="w-16 text-right text-sm ">{ratingDistribution[star as keyof typeof ratingDistribution]} reviews</div>
+                                    <div className="w-16 text-right text-sm ">{ratingDistribution[star]} reviews</div>
                                 </div>
                             ))}
                         </div>
@@ -178,16 +208,21 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({ conferenceData 
                                                 className="rounded-full w-8 h-8 mr-2"
                                             />
 
-                                            <div className="font-medium ">User ID: {feedback.creatorId.substring(0, 8)}</div>  {/* Show part of creatorId */}
+                                            <div className="font-medium ">
+                                                {/* Use optional chaining and nullish coalescing */}
+                                                User ID: {feedback.creatorId?.substring(0, 8) ?? "Unknown"}
+                                            </div>
                                         </div>
                                         <div className="flex text-yellow-500">
-                                            {getStars(feedback.star).map((star, index) => (
+                                            {/* Handle potentially null feedback.star using nullish coalescing */}
+                                            {getStars(feedback.star ?? 0).map((star, index) => (
                                                 <span key={index}>{star}</span>
                                             ))}
                                         </div>
                                     </div>
                                     <div className="text-sm  mb-2">
-                                        {new Date(feedback.createdAt).toLocaleDateString()} {new Date(feedback.createdAt).toLocaleTimeString()}
+                                        {/* Handle potentially null/undefined createdAt */}
+                                        {feedback.createdAt ? `${new Date(feedback.createdAt).toLocaleDateString()} ${new Date(feedback.createdAt).toLocaleTimeString()}` : 'Date Unavailable'}
                                     </div>
                                     <div className=" mb-3">
                                         {feedback.description}
@@ -202,45 +237,59 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({ conferenceData 
                             ))
                         )}
                     </div>
+                    {loginStatus ? (
+                        <div className="border-t border-gray-200 pt-6">
+                            <div className="mb-3 font-medium ">Rating:</div>
+                            <div className="flex text-3xl text-yellow-500 mb-4">
+                                {[1, 2, 3, 4, 5].map((starValue) => (
+                                    <span
+                                        key={starValue}
+                                        onClick={() => handleStarClick(starValue)}
+                                        className={`cursor-pointer ${star !== null && starValue <= star ? 'text-yellow-500' : 'text-gray-300'}`}
 
-                    {/* Feedback Input */}
-                    <div className="border-t border-gray-200 pt-6">
-                        <div className="mb-3 font-medium ">Rating:</div>
-                        <div className="flex text-3xl text-yellow-500 mb-4">
-                            {/* Clickable stars */}
-                            {[1, 2, 3, 4, 5].map((starValue) => (
-                                <span
-                                    key={starValue}
-                                    onClick={() => handleStarClick(starValue)}
-                                    className={`cursor-pointer ${star !== null && starValue <= star ? 'text-yellow-500' : 'text-gray-300'}`}
+                                    >
+                                        {starValue <= (star || 0) ? '★' : '☆'}
+                                    </span>
+                                ))}
+                            </div>
+                            <textarea
+                                placeholder="Write your feedback..."
+                                className="w-full p-3 border border-gray-300 rounded-md text-sm  focus:ring-blue-500 focus:border-blue-500 mb-4"
+                                rows={3}
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                            />
+                            <div className="flex justify-between items-center">
+                                <div className="flex space-x-2">
 
+                                </div>
+                                <button
+                                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md"
+                                    onClick={handleSubmit}
+                                    disabled={loading}
                                 >
-                                    {starValue <= (star || 0) ? '★' : '☆'}
-                                </span>
-                            ))}
-                        </div>
-                        <textarea
-                            placeholder="Write your feedback..."
-                            className="w-full p-3 border border-gray-300 rounded-md text-sm  focus:ring-blue-500 focus:border-blue-500 mb-4"
-                            rows={3}
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                        />
-                        <div className="flex justify-between items-center">
-                            <div className="flex space-x-2">
+                                    {loading ? 'Posting...' : 'Post Feedback'}
+                                </button>
 
                             </div>
+                            {error && <p className="text-red-500 mt-2">{error}</p>}
+                        </div>
+                    ) : (
+                        <div className="border-t border-gray-200 pt-6">
+                            <p className="text-gray-600 mb-4">
+                                Want to share your feedback?
+                            </p>
+                            <p className="text-gray-600 mb-4">
+                                Please sign in to post your feedback.
+                            </p>
                             <button
                                 className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md"
-                                onClick={handleSubmit}
-                                disabled={loading} // Disable button during loading
+                                onClick={handleSignInClick}
                             >
-                                {loading ? 'Posting...' : 'Post Feedback'}
+                                Sign In
                             </button>
-
                         </div>
-                        {error && <p className="text-red-500 mt-2">{error}</p>} {/* Display error */}
-                    </div>
+                    )}
                 </div>
             </div>
         </div>

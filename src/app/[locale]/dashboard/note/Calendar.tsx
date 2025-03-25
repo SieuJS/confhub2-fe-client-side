@@ -8,7 +8,7 @@ import useDatePickerControl from '../../../../hooks/dashboard/note/useDatePicker
 import useViewSwitching from '../../../../hooks/dashboard/note/useViewSwitching'
 import AddNoteDialog from './AddNoteDialog'
 import { ConferenceResponse } from '../../../../models/response/conference.response'
-import { getConference } from '../../../../app/api/conference/getConferenceDetails'
+import { getConferenceFromJSON } from '../../../../app/api/conference/getConferenceDetails'
 import useDialogPosition from '../../../../hooks/dashboard/note/useDialogPosition'
 
 const DEFAULT_DOM_RECT: DOMRect = {
@@ -20,7 +20,7 @@ const DEFAULT_DOM_RECT: DOMRect = {
   left: 0,
   right: 0,
   bottom: 0,
-  toJSON: () => {}
+  toJSON: () => { }
 }
 
 export interface CalendarEvent {
@@ -111,7 +111,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
       submissionDate: 'bg-red-500',
       notificationDate: 'bg-blue-500',
       cameraReadyDate: 'bg-orange-500',
-      registrationDate: 'bg-cyan-500'
+      registrationDate: 'bg-cyan-500',
     }),
     []
   )
@@ -211,7 +211,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
       if (event.conferenceId) {
         try {
           setLoadingDetails(true)
-          const conferenceDetails = await getConference(event.conferenceId)
+          const conferenceDetails = await getConferenceFromJSON(event.conferenceId)
           setSelectedEventDetail(conferenceDetails)
         } catch (error) {
           console.error('Failed to fetch conference details:', error)
