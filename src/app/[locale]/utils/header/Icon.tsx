@@ -1,33 +1,52 @@
 // components/Header/components/NotificationIcon.tsx
-import { FC } from 'react';
+import { FC } from 'react'
 
 interface NotificationIconProps {
-  notificationEffect: boolean;
-  unreadCount: number | string;
+  notificationEffect: boolean
+  unreadCount: number | string
 }
 
-export const NotificationIcon: FC<NotificationIconProps> = ({ notificationEffect, unreadCount }) => (
-  <div className="relative">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`text-button ${notificationEffect ? 'animate-bounce text-yellow-500' : ''}`}><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M22 8c0-2.3-.8-4.3-2-6"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/><path d="M4 2C2.8 3.7 2 5.7 2 8"/></svg>
+export const NotificationIcon: FC<NotificationIconProps> = ({
+  notificationEffect,
+  unreadCount
+}) => (
+  <div className='relative'>
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      width='24'
+      height='24'
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      className={`text-button ${notificationEffect ? 'animate-bounce text-yellow-500' : ''}`}
+    >
+      <path d='M10.268 21a2 2 0 0 0 3.464 0' />
+      <path d='M22 8c0-2.3-.8-4.3-2-6' />
+      <path d='M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326' />
+      <path d='M4 2C2.8 3.7 2 5.7 2 8' />
+    </svg>
     {typeof unreadCount === 'number' && unreadCount > 0 && (
-      <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5">
+      <span className='absolute -right-2 -top-1 rounded-full bg-red-500 px-1.5 text-xs text-white'>
         {unreadCount}
       </span>
     )}
-    {typeof unreadCount === 'string'  && (
-      <span className="absolute -top-1 -right-3 bg-red-500 text-white text-xs rounded-full px-0.5">
+    {typeof unreadCount === 'string' && (
+      <span className='absolute -right-3 -top-1 rounded-full bg-red-500 px-0.5 text-xs text-white'>
         {unreadCount}
       </span>
     )}
   </div>
-);
+)
 
 // Other icon components (No changes needed)
 export const MenuIcon: FC = () => (
   <svg
     xmlns='http://www.w3.org/2000/svg'
-    width='24'
-    height='24'
+    width='20'
+    height='20'
     viewBox='0 0 24 24'
     fill='none'
     stroke='currentColor'
@@ -40,7 +59,7 @@ export const MenuIcon: FC = () => (
     <line x1='3' x2='21' y1='6' y2='6' />
     <line x1='3' x2='21' y1='18' y2='18' />
   </svg>
-);
+)
 
 export const CloseIcon: FC = () => (
   <svg
@@ -49,7 +68,7 @@ export const CloseIcon: FC = () => (
     viewBox='0 0 24 24'
     strokeWidth={1.5}
     stroke='currentColor'
-    className='text-foreground h-8 w-8'
+    className='text-foreground h-5 w-5'
   >
     <path
       strokeLinecap='round'
@@ -57,7 +76,7 @@ export const CloseIcon: FC = () => (
       d='M6 18L18 6M6 6l12 12'
     />
   </svg>
-);
+)
 
 export const UserIcon: FC = () => (
   <svg
@@ -76,4 +95,4 @@ export const UserIcon: FC = () => (
     <circle cx='9' cy='7' r='4' />
     <polyline points='16 11 18 13 22 9' />
   </svg>
-);
+)
