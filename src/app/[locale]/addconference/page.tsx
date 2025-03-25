@@ -1,13 +1,13 @@
-// src/app/[locale]/addconference/page.tsx
+// src/app/[locale]/addconference/page.tsx (No changes needed here)
 'use client'
 
 import React, { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { Header } from '../utils/Header';  // Header component
-import Footer from '../utils/Footer';      // Footer component
+import { Header } from '../utils/Header';
+import Footer from '../utils/Footer';
 import ConferenceForm from './ConferenceForm';
 import { useRouter } from 'next/navigation';
-import useAuthApi from '@/src/hooks/auth/useAuthApi'; // Import useAuthApi
+import useAuthApi from '@/src/hooks/auth/useAuthApi';
 
 const AddConference = ({
   params: { locale }
@@ -17,28 +17,28 @@ const AddConference = ({
   const t = useTranslations('');
   const router = useRouter();
 
-  // Use useAuthApi for authentication status
-  const { isLoggedIn } = useAuthApi();
+  const { isLoggedIn, isLoading } = useAuthApi(); // Get isLoading
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      // Redirect to the login page using router.push
+    // Only redirect if NOT logged in AND loading is complete
+    if (!isLoggedIn && !isLoading) {
       router.push(`/${locale}/auth/login`);
     }
-  }, [isLoggedIn, router, locale]); // Depend on isLoggedIn, router, and locale
+  }, [isLoggedIn, isLoading, router, locale]); // Add isLoading and locale to dependencies
 
-  // Render a loading state while checking authentication
-  if (!isLoggedIn) {
-    return <div>Loading...</div>; // Or a more elaborate loading indicator
+  // Render loading state while isLoading is true
+  if (!isLoading) {
+    return <div>Loading...</div>;
   }
 
+  // Render main content only when NOT loading and isLoggedIn
   return (
     <>
       <Header locale={locale} />
       <div className='container mx-auto px-16'>
         <div className='w-full bg-background py-14'></div>
         <h1 className='mb-4 text-2xl font-bold'>{t('Add_New_Conference')}</h1>
-        <ConferenceForm locale={locale} />
+        <ConferenceForm />
       </div>
       <Footer />
     </>

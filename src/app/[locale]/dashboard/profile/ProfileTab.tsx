@@ -1,78 +1,77 @@
 // src/components/ProfileTab.tsx
-import React, {useState} from 'react'
-import Image from 'next/image'
-import Button from '../../utils/Button'
-import { useTranslations } from 'next-intl'
-import { useUserData } from '../../../../hooks/dashboard/profile/useUserData'
-import { useEditProfile } from '../../../../hooks/dashboard/profile/useEditProfile'
-import { useImageSelection } from '../../../../hooks/dashboard/profile/useImageSelection'
-import { Link } from '@/src/navigation'
-import ChangePasswordForm from './ChangePasswordForm' // Import
+import React, { useState } from 'react';
+import Image from 'next/image';
+import Button from '../../utils/Button';
+import { useTranslations } from 'next-intl';
+import { useUserData } from '@/src/hooks/dashboard/profile/useUserData'; // Corrected path
+import { useEditProfile } from '@/src/hooks/dashboard/profile/useEditProfile'; // Corrected path
+import { useImageSelection } from '@/src/hooks/dashboard/profile/useImageSelection'; // Corrected path
+import { Link } from '@/src/navigation';
+import ChangePasswordForm from './ChangePasswordForm'; // Import
 
 
 const ProfileTab: React.FC = () => {
-  const t = useTranslations('')
-  const { userData, setUserData, loading, error, setError, setUser } =
-    useUserData()
+  const t = useTranslations('');
+  const { userData, loading, error } = useUserData(); // Simplified: Only get what you need
 
   const {
     isEditing,
     editedData,
-    setEditedData, // Get setEditedData from the hook
+    setEditedData,
     handleEditClick,
     handleSaveClick,
     handleCancelClick,
     handleInputChange,
-    handleInterestedTopicsChange
-  } = useEditProfile(userData, setUser, setUserData, setError)
+    handleInterestedTopicsChange,
+  } = useEditProfile(userData); // Pass only userData
 
   const {
     showModal: showAvatarModal,
     setShowModal: setShowAvatarModal,
     options: avatarOptions,
-    handleImageSelect: handleAvatarSelect // This will now correctly update editedData
-  } = useImageSelection('avatar', setEditedData) // Pass setEditedData
+    handleImageSelect: handleAvatarSelect,
+  } = useImageSelection('avatar', setEditedData);
 
   const {
     showModal: showBackgroundModal,
     setShowModal: setShowBackgroundModal,
     options: backgroundOptions,
-    handleImageSelect: handleBackgroundSelect // This will now correctly update editedData
-  } = useImageSelection('background', setEditedData) // Pass setEditedData
+    handleImageSelect: handleBackgroundSelect,
+  } = useImageSelection('background', setEditedData);
 
   const predefinedTopics = [
     'Blockchain',
     'Chemical Biology',
     'AI',
     'Furniture',
-    'Home Improvement'
-  ]
+    'Home Improvement',
+  ];
 
-    const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
+  const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
 
   if (loading) {
     return (
       <div className='flex h-screen items-center justify-center'>
         <div className='h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900'></div>
       </div>
-    )
+    );
   }
 
   if (error) {
-    return <div className='py-4 text-center text-red-500'>{error}</div>
+    return <div className='py-4 text-center text-red-500'>{error}</div>;
   }
 
   if (!userData) {
-    return <div className='py-4 text-center'>No user data found.</div>
+    return <div className='py-4 text-center'>No user data found.</div>;
   }
 
-  const displayAvatarUrl = editedData.avatar || userData.avatar || '/s1.png'
+  const displayAvatarUrl = editedData.avatar || userData.avatar || '/s1.png';
   const displayBackgroundUrl =
-    editedData.background || userData.background || '/bg-2.jpg'
+    editedData.background || userData.background || '/bg-2.jpg';
 
-    const handleChangePasswordClick = () => {
-      setShowChangePasswordForm(true);
-    }
+  const handleChangePasswordClick = () => {
+    setShowChangePasswordForm(true);
+  };
 
   return (
     <div className='mx-auto max-w-7xl overflow-hidden rounded-lg bg-background px-12 py-8 shadow-md'>
@@ -340,15 +339,14 @@ const ProfileTab: React.FC = () => {
                     <span
                       key={topic}
                       onClick={() => handleInterestedTopicsChange(topic)}
-                      className={`cursor-pointer rounded-full px-4 py-2 text-sm transition duration-200  ${
-                        isSelected
-                          ? 'bg-button text-button-text'
-                          : 'bg-background  hover:bg-background-secondary'
-                      }`}
+                      className={`cursor-pointer rounded-full px-4 py-2 text-sm transition duration-200  ${isSelected
+                        ? 'bg-button text-button-text'
+                        : 'bg-background  hover:bg-background-secondary'
+                        }`}
                     >
                       {topic}
                     </span>
-                  )
+                  );
                 })}
               </div>
             </div>
@@ -421,7 +419,7 @@ const ProfileTab: React.FC = () => {
                         key={topic}
                         href={{
                           pathname: `/conferences`,
-                          query: { topics: topic }
+                          query: { topics: topic },
                         }}
                         className='hover:text-text-secondary'
                       >
@@ -441,7 +439,7 @@ const ProfileTab: React.FC = () => {
         <ChangePasswordForm userId={userData.id} onClose={() => setShowChangePasswordForm(false)} />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ProfileTab
+export default ProfileTab;

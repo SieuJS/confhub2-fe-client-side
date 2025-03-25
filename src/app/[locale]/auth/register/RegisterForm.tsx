@@ -2,8 +2,6 @@
 
 import { Link } from '@/src/navigation';
 import React, { useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-// import { useLocalStorage } from 'usehooks-ts'; // REMOVE: No direct localStorage access
 import useAuthApi from '@/src/hooks/auth/useAuthApi'; // Import useAuthApi
 
 interface RegisterFormProps {
@@ -44,7 +42,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/v1/user/signup', { // Use relative path
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/signup`, { // Use relative path
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

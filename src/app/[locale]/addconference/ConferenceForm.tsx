@@ -18,11 +18,8 @@ const API_ADD_CONFERENCE_ENDPOINT =
   'http://localhost:3000/api/v1/user/add-conference'
 const CSC_API_KEY = process.env.NEXT_PUBLIC_CSC_API_KEY
 
-interface ConferenceFormProps {
-  locale: string
-}
 
-const ConferenceForm: React.FC<ConferenceFormProps> = ({ locale }) => {
+const ConferenceForm: React.FC = () => {
   const t = useTranslations('')
   const router = useRouter()
   const pathname = usePathname()

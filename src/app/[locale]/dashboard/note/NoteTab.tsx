@@ -37,13 +37,13 @@ const NoteTab: React.FC<NoteTabProps> = () => {
 
   const typeColors = useMemo(
     () => ({
-      conferenceDates: 'bg-teal-100 text-teal-700',
-      submissionDate: 'bg-red-100 text-red-700',
-      notificationDate: 'bg-blue-100 text-blue-700',
-      cameraReadyDate: 'bg-orange-100 text-orange-700',
-      registrationDate: 'bg-cyan-100 text-cyan-700',
-      yourNote: 'bg-yellow-100 text-yellow-700',
-      other: 'bg-gray-100 text-gray-700'
+      conferenceDates: 'bg-teal-200',
+      submissionDate: 'bg-red-200',
+      notificationDate: 'bg-blue-200',
+      cameraReadyDate: 'bg-orange-200',
+      registrationDate: 'bg-cyan-200',
+      yourNote: 'bg-yellow-200',
+      other: 'bg-gray-200'
     }),
     []
   )
@@ -418,31 +418,31 @@ const NoteTab: React.FC<NoteTabProps> = () => {
         <h2 className='mb-4 text-lg font-semibold'>Dates details</h2>
         <ul className='flex flex-row gap-4'>
           <li className='flex items-center'>
-            <div className='mr-2 h-4 w-4 rounded-full bg-teal-100'></div>
+            <div className='mr-2 h-4 w-4 rounded-full bg-teal-400'></div>
             <span className='text-sm '>Conference</span>
           </li>
           <li className='flex items-center'>
-            <div className='mr-2 h-4 w-4 rounded-full bg-red-100'></div>
+            <div className='mr-2 h-4 w-4 rounded-full bg-red-400'></div>
             <span className='text-sm '>Submission</span>
           </li>
           <li className='flex items-center'>
-            <div className='mr-2 h-4 w-4 rounded-full bg-blue-100'></div>
+            <div className='mr-2 h-4 w-4 rounded-full bg-blue-400'></div>
             <span className='text-sm '>Notification</span>
           </li>
           <li className='flex items-center'>
-            <div className='mr-2 h-4 w-4 rounded-full bg-orange-100'></div>
+            <div className='mr-2 h-4 w-4 rounded-full bg-orange-400'></div>
             <span className='text-sm '>Camera</span>
           </li>
           <li className='flex items-center'>
-            <div className='mr-2 h-4 w-4 rounded-full bg-cyan-100'></div>
+            <div className='mr-2 h-4 w-4 rounded-full bg-cyan-400'></div>
             <span className='text-sm '>Registration</span>
           </li>
           <li className='flex items-center'>
-            <div className='mr-2 h-4 w-4 rounded-full bg-gray-100'></div>
+            <div className='mr-2 h-4 w-4 rounded-full bg-gray-400'></div>
             <span className='text-sm '>Other</span>
           </li>
           <li className='flex items-center'>
-            <div className='mr-2 h-4 w-4 rounded-full bg-yellow-100'></div>
+            <div className='mr-2 h-4 w-4 rounded-full bg-yellow-400'></div>
             <span className='text-sm '>Your note</span>
           </li>
         </ul>

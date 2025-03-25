@@ -15,7 +15,7 @@ interface AuthApiResult {
 }
 
 const useAuthApi = (): AuthApiResult => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Initialize to true
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const [user, setUser] = useState<UserResponse | null>(null);
@@ -80,22 +80,27 @@ const useAuthApi = (): AuthApiResult => {
     }
   }, []);
 
-  useEffect(() => {
-    loadFromStorage(); // Initial load
+    useEffect(() => {
+        loadFromStorage(); // Initial load
 
-    const handleCookieChange = () => {
-      console.log("[useAuthApi - handleCookieChange] Cookie changed, reloading...");
-      loadFromStorage(); // Reload from storage (localStorage OR cookies)
-    };
+        const handleCookieChange = () => {
+          console.log("[useAuthApi - handleCookieChange] Cookie changed, reloading...");
+          loadFromStorage(); // Reload from storage (localStorage OR cookies)
+        };
 
-    window.addEventListener('focus', loadFromStorage);
-    document.addEventListener('cookiechange', handleCookieChange);
+        window.addEventListener('focus', loadFromStorage);
+        document.addEventListener('cookiechange', handleCookieChange);
 
-    return () => {
-      window.removeEventListener('focus', loadFromStorage);
-      document.removeEventListener('cookiechange', handleCookieChange);
-    };
-  }, [loadFromStorage]);
+        return () => {
+          window.removeEventListener('focus', loadFromStorage);
+          document.removeEventListener('cookiechange', handleCookieChange);
+        };
+    }, [loadFromStorage]);
+
+  // Set loading to false after initial load
+    useEffect(() => {
+        setIsLoading(false)
+    }, [user, isLoggedIn])
 
 
   // Update localStorage whenever user or isLoggedIn changes
