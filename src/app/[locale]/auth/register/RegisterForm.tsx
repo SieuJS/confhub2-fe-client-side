@@ -1,104 +1,90 @@
 'use client'
 
-import { Link } from '@/src/navigation'
-import React, { useState } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
-import { useLocalStorage } from 'usehooks-ts'
+import { Link } from '@/src/navigation';
+import React, { useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+// import { useLocalStorage } from 'usehooks-ts'; // REMOVE: No direct localStorage access
+import useAuthApi from '@/src/hooks/auth/useAuthApi'; // Import useAuthApi
 
 interface RegisterFormProps {
-  // Không cần onSignUpSuccess nữa, vì chuyển hướng trực tiếp trong component
+  // No props needed
 }
 
 const RegisterForm: React.FC<RegisterFormProps> = () => {
-  const [firstname, setFirstName] = useState('')
-  const [lastname, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
-  const pathname = usePathname()
-  const [loginStatus, setLoginStatus] = useLocalStorage<string | null>(
-      'loginStatus',
-      null
-    )
-  const [user, setUser] = useLocalStorage<{
-    id: string
-    firstname: string
-    lastname: string
-    email: string
-  } | null>('user', null)
-  
+  const [firstname, setFirstName] = useState('');
+  const [lastname, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Use useAuthApi for authentication
+  const { signIn } = useAuthApi();
+
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
-    setError('')
+    event.preventDefault();
+    setError('');
 
     if (!firstname || !lastname || !email || !password || !confirmPassword) {
-      setError('Please fill in all required fields.')
-      return
+      setError('Please fill in all required fields.');
+      return;
     }
 
     if (password !== confirmPassword) {
-      setError('Password and confirm password do not match.')
-      return
+      setError('Password and confirm password do not match.');
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/api/v1/user/signup', {
+      const response = await fetch('/api/v1/user/signup', { // Use relative path
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          firstname: firstname,
-          lastname: lastname,
+          firstName: firstname, // Corrected property names
+          lastName: lastname,  // Corrected property names
           email: email,
-          password: password
-        })
-      })
+          password: password,
+        }),
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (response.status === 201) {
-        console.log('Registration successful!', data)
-        setLoginStatus('true')
-        setUser({
-          id: data.id,
-          firstname: data.firstName,
-          lastname: data.lastName,
-          email: data.email
-        })
+        console.log('Registration successful!', data);
 
-        if (typeof window !== 'undefined') {
-          const localePrefix = pathname.split('/')[1]
-          const pathWithLocale = `/${localePrefix}`
-          router.push(pathWithLocale)
-        } else {
-          console.error('Error in signin')
-        }
+        // Use signIn from useAuthApi to handle login after registration
+        await signIn({ email, password });
 
-        setFirstName('')
-        setLastName('')
-        setEmail('')
-        setPassword('')
-        setConfirmPassword('')
+        // No need to manually set localStorage or redirect here.
+        // signIn handles that.
+
+        setFirstName('');
+        setLastName('');
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+
       } else {
         setError(
-          data.message ||
-            'Registration failed. Please check your information.'
-        )
+          data.message || 'Registration failed. Please check your information.'
+        );
       }
     } catch (error: any) {
-      console.error('Registration error:', error)
-      setError('An error occurred during registration. Please try again later.')
+      console.error('Registration error:', error);
+      setError('An error occurred during registration. Please try again later.');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
+    // ... (rest of your JSX remains the same) ...
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-xl">
         <div className="bg-white px-8 py-10 shadow-xl sm:rounded-lg sm:px-16">
@@ -261,7 +247,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default RegisterForm
+export default RegisterForm;

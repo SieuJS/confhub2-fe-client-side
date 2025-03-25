@@ -3,10 +3,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import io, { Socket } from 'socket.io-client';
 import { Notification } from '../../models/response/user.response'; // Adjust path
-
+import { UserResponse } from '../../models/response/user.response';
 interface UseSocketConnectionProps {
   loginStatus: string | null;
-  user: { id: string; firstname: string; lastname: string; email: string } | null;
+  user: UserResponse  | null;
 }
 
 const socketInitializer = () => {
