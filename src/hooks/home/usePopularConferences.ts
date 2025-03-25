@@ -1,7 +1,7 @@
 // src/hooks/usePopularConferences.ts
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { ConferenceInfo } from '@/src/models/response/conference.list.response';
-import { getListConference } from '../../app/api/conference/getListConferences';
+import { getListConferenceFromDB, getListConferenceFromJSON } from '../../app/api/conference/getListConferences';
 
 type Conference = ConferenceInfo;
 
@@ -76,7 +76,7 @@ const usePopularConferences = (initialVisibleCount: number = 3): UsePopularConfe
         const fetchListConference = async () => {
             try {
                 setLoading(true);
-                const conferencesData = await getListConference();
+                const conferencesData = await getListConferenceFromDB();
                 if (conferencesData.payload.length > 0) {
                     setListConferences(conferencesData.payload);
                 } else {
