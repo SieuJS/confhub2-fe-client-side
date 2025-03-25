@@ -12,7 +12,7 @@ async function sendLogToBackend(log: StreamingLog) {
       count: log.count || null,
     };
 
-    const response = await fetch('http://localhost:3000/log', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/log`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

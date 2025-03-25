@@ -15,7 +15,7 @@ import {
 } from '@/src/models/send/addConference.send'
 
 const API_ADD_CONFERENCE_ENDPOINT =
-  'http://localhost:3000/api/v1/user/add-conference'
+  `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/add-conference`
 const CSC_API_KEY = process.env.NEXT_PUBLIC_CSC_API_KEY
 
 

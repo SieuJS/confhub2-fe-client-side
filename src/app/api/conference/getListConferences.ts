@@ -44,7 +44,7 @@ async function getListConferenceFromDB(): Promise<ConferenceListResponse> {
   }
 }
 
-const API_GET_JSON_CONFERENCE_ENDPOINT = 'http://localhost:3000/api/v1'; 
+const API_GET_JSON_CONFERENCE_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1`; 
 
 async function getListConferenceFromJSON(): Promise<ConferenceListResponse> {
   try {

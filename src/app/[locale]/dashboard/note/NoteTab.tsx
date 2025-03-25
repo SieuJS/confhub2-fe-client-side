@@ -12,7 +12,7 @@ import Button from '../../utils/Button'
 
 interface NoteTabProps {}
 
-const API_GET_USER_CALENDAR_ENDPOINT = 'http://localhost:3000/api/v1/user'
+const API_GET_USER_CALENDAR_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user`
 
 const NoteTab: React.FC<NoteTabProps> = () => {
   const [upcomingNotes, setUpcomingNotes] = useState<any[]>([])

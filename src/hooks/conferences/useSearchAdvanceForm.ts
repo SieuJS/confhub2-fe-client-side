@@ -50,7 +50,7 @@ const useSearchAdvanceForm = ({
   useEffect(() => {
     const fetchTopics = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/v1/topics'); // Fetch from backend
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/topics`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

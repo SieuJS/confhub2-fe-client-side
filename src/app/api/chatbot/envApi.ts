@@ -1,6 +1,6 @@
 // src/api/envApi.ts
 
-const API_BASE_URL = 'http://localhost:3000/api'; // Keep your API URL
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
 
 interface EnvResponse {
     success: boolean;

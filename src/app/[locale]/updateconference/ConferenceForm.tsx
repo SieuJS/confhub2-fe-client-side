@@ -14,7 +14,7 @@ import {
   ConferenceFormData
 } from '@/src/models/send/addConference.send' //  paths might need adjusting
 
-const API_BASE_URL = 'http://localhost:3000/api/v1' //  Base URL
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1`
 const API_ADD_CONFERENCE_ENDPOINT = `${API_BASE_URL}/user/add-conference`
 const API_UPDATE_CONFERENCE_ENDPOINT = `${API_BASE_URL}/conferences` // No [id] here
 const CSC_API_KEY = process.env.NEXT_PUBLIC_CSC_API_KEY

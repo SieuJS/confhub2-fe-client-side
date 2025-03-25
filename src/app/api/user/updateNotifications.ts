@@ -5,7 +5,7 @@ interface UpdateNotificationsData {
   notifications: Notification[];
 }
 
-const API_UPDATE_NOTIFICATIONS_ENDPOINT = 'http://localhost:3000/api/v1/user'; // Adjust the port if necessary
+const API_UPDATE_NOTIFICATIONS_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user`;
 
 async function updateNotifications(userId: string, data: UpdateNotificationsData): Promise<void> {
   try {

@@ -38,7 +38,7 @@ function AltairComponent() {
       console.log(`got toolcall`, toolCall);
 
 
-      const BASE_URL = "http://localhost:3000";
+      const BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}`;
       console.log(BASE_URL);
       // Không cần tìm kiếm function call cụ thể nữa, xử lý tất cả
       for (const fc of toolCall.functionCalls) {

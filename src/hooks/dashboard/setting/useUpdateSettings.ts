@@ -19,7 +19,7 @@ export const useUpdateUser = (): UpdateUserResult => {
     setError(null);
     try {
       // Fetch the current user data
-      const response =  await fetch(`http://localhost:3000/api/v1/user/${userId}`);
+      const response =  await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/${userId}`);
 
       if (!response.ok) {
           throw new Error(`Failed to fetch user data. Status: ${response.status}`);

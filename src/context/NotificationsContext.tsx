@@ -55,7 +55,7 @@ export const NotificationsProvider: React.FC<NotificationsProviderProps> = ({
 
       const user = JSON.parse(userData)
       const userResponse = await fetch(
-        `http://localhost:3000/api/v1/user/${user.id}`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/${user.id}`
       )
       if (!userResponse.ok) {
         throw new Error(`HTTP error! status: ${userResponse.status}`)

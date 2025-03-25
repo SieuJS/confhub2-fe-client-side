@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { ConferenceResponse } from '../../models/response/conference.response';
 import { UserResponse } from '../../models/response/user.response';
 
-const API_ENDPOINT = 'http://localhost:3000/api/v1/user';
+const API_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user`;
 
 const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
   const [isAddToCalendar, setIsAddToCalendar] = useState(false);

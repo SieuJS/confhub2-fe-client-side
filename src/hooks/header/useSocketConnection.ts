@@ -10,7 +10,7 @@ interface UseSocketConnectionProps {
 }
 
 const socketInitializer = () => {
-  return io('http://localhost:3000'); // Your backend URL
+  return io(`${process.env.NEXT_PUBLIC_BACKEND_URL}`); // Your backend URL
 };
 
 export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionProps) => {
@@ -24,7 +24,7 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
     if (user?.id) {
       setIsLoadingNotifications(true);
       try {
-        const response = await fetch(`http://localhost:3000/api/v1/user/${user.id}/notifications`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/${user.id}/notifications`);
         if (response.ok) {
           const data: Notification[] = await response.json();
           const filteredNotifications = data.filter(n => n.deletedAt === null);
@@ -45,7 +45,7 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
     if (!user?.id) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/api/v1/user/${user.id}/notifications/mark-all-as-read`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/${user.id}/notifications/mark-all-as-read`, {
         method: 'PUT', // Use PUT or POST, depending on your API design
         headers: {
           'Content-Type': 'application/json',
