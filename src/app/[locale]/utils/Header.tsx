@@ -15,7 +15,6 @@ import LoadingIndicator from './header/LoadingIndicator';
 import { MenuIcon, CloseIcon } from './header/Icon';
 import Button from './Button';
 import useAuthApi from '../../../hooks/auth/useAuthApi'; // Import your hook
-import LoadingIndicator from './header/LoadingIndicator';
 interface Props {
   locale: string;
 }
