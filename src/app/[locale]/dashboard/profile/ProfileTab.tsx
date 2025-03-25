@@ -1,5 +1,5 @@
 // src/components/ProfileTab.tsx
-import React from 'react'
+import React, {useState} from 'react'
 import Image from 'next/image'
 import Button from '../../utils/Button'
 import { useTranslations } from 'next-intl'
@@ -7,6 +7,8 @@ import { useUserData } from '../../../../hooks/dashboard/profile/useUserData'
 import { useEditProfile } from '../../../../hooks/dashboard/profile/useEditProfile'
 import { useImageSelection } from '../../../../hooks/dashboard/profile/useImageSelection'
 import { Link } from '@/src/navigation'
+import ChangePasswordForm from './ChangePasswordForm' // Import
+
 
 const ProfileTab: React.FC = () => {
   const t = useTranslations('')
@@ -46,6 +48,8 @@ const ProfileTab: React.FC = () => {
     'Home Improvement'
   ]
 
+    const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
+
   if (loading) {
     return (
       <div className='flex h-screen items-center justify-center'>
@@ -65,6 +69,10 @@ const ProfileTab: React.FC = () => {
   const displayAvatarUrl = editedData.avatar || userData.avatar || '/s1.png'
   const displayBackgroundUrl =
     editedData.background || userData.background || '/bg-2.jpg'
+
+    const handleChangePasswordClick = () => {
+      setShowChangePasswordForm(true);
+    }
 
   return (
     <div className='mx-auto max-w-7xl overflow-hidden rounded-lg bg-background px-12 py-8 shadow-md'>
@@ -365,7 +373,7 @@ const ProfileTab: React.FC = () => {
         ) : (
           // Display Information
           <>
-            <div className='flex justify-end'>
+            <div className='flex justify-end space-x-4'>
               <Button
                 variant='primary'
                 onClick={handleEditClick}
@@ -373,7 +381,15 @@ const ProfileTab: React.FC = () => {
               >
                 {t('Edit_Profile')}
               </Button>
+              <Button
+                variant='primary'
+                onClick={handleChangePasswordClick} // Gọi hàm mở form đổi mật khẩu
+                className='rounded-md px-6 py-2 focus:outline-none focus:ring-2'
+              >
+                {t('Change_Password')}
+              </Button>
             </div>
+
             <div className='mt-4 space-y-2'>
               <p>
                 <span className='font-semibold'>Email:</span>{' '}
@@ -421,6 +437,9 @@ const ProfileTab: React.FC = () => {
           </>
         )}
       </div>
+      {showChangePasswordForm && (
+        <ChangePasswordForm userId={userData.id} onClose={() => setShowChangePasswordForm(false)} />
+      )}
     </div>
   )
 }
