@@ -12,9 +12,10 @@ import { useSearchParams } from 'next/navigation';
 import { Header } from '../../utils/Header';
 import Footer from '../../utils/Footer';
 import { Link } from '@/src/navigation'; // Import useRouter
-import { useLocalStorage } from 'usehooks-ts';
+// import { useLocalStorage } from 'usehooks-ts'; // REMOVE: No direct localStorage
 import { useRouter, usePathname } from 'next/navigation';
 import { ImportantDate } from '@/src/models/response/conference.response';
+import useAuthApi from '@/src/hooks/auth/useAuthApi'; // Import useAuthApi
 
 
 // Import the custom hooks
@@ -92,11 +93,12 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
     useClickOutside(menuContainerRef, closeMenu);
 
-    const [loginStatus] = useLocalStorage<string | null>('loginStatus', null); // Get login status
+    const { isLoggedIn } = useAuthApi();
+
 
     // --- Helper Function for Authentication Check ---
     const checkLoginAndRedirect = (callback: () => void) => {
-        if (!loginStatus) {
+        if(!isLoggedIn) {
             // --- Prepend Locale Prefix ---
             const localePrefix = pathname.split('/')[1];
             const pathWithLocale = `/${localePrefix}/auth/login`;

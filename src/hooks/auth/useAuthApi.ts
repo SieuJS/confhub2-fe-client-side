@@ -1,79 +1,120 @@
 // src/hooks/useAuthApi.ts
-import { useState, useEffect } from 'react';
-import { useLocalStorage } from 'usehooks-ts';
-import { useRouter, usePathname } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { UserResponse } from '@/src/models/response/user.response';
 import { useSearchParams } from 'next/navigation';
 
 interface AuthApiResult {
-    signIn: (credentials: Record<string, string>) => Promise<void>;
-    isLoading: boolean;
-    error: string | null;
-    user: UserResponse | null;
-    googleSignIn: () => Promise<void>;
+  signIn: (credentials: Record<string, string>) => Promise<void>;
+  isLoading: boolean;
+  error: string | null;
+  user: UserResponse | null;
+  googleSignIn: () => Promise<void>;
+  logout: () => Promise<void>;
+  isLoggedIn: boolean;
 }
 
 const useAuthApi = (): AuthApiResult => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const router = useRouter();
-    const [loginStatus, setLoginStatus] = useLocalStorage<string | null>('loginStatus', null);
-    const [user, setUser] = useLocalStorage<UserResponse | null>('user', null);
-    const searchParams = useSearchParams();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const [user, setUser] = useState<UserResponse | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const searchParams = useSearchParams();
+
+  // Helper function to get cookies
+  const getCookieValue = (name: string) => {
+    const cookieValue = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith(`${name}=`))
+      ?.split('=')[1];
+    return cookieValue ? decodeURIComponent(cookieValue) : null;
+  };
+
+  // Load user and login status (from localStorage OR cookies)
+  const loadFromStorage = useCallback(() => {
+    console.log("[useAuthApi - loadFromStorage] Loading from storage...");
+
+    // Try localStorage FIRST
+    const storedUser = localStorage.getItem('user');
+    const storedLoginStatus = localStorage.getItem('loginStatus');
+
+    if (storedLoginStatus === 'true' && storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        setIsLoggedIn(true);
+        console.log("[useAuthApi - loadFromStorage] User loaded from localStorage:", parsedUser);
+        return; // Important: Exit early if loaded from localStorage
+      } catch (e) {
+        console.error("[useAuthApi - loadFromStorage] Error parsing user from localStorage", e);
+        localStorage.removeItem('user');
+        localStorage.removeItem('loginStatus');
+      }
+    }
+
+    // Fallback to cookies if not found in localStorage
+    const cookieUser = getCookieValue('user');
+    const cookieLoginStatus = getCookieValue('loginStatus');
+
+    if (cookieLoginStatus === 'true' && cookieUser) {
+      try {
+        const parsedUser = JSON.parse(cookieUser);
+        setUser(parsedUser);
+        setIsLoggedIn(true);
+        console.log("[useAuthApi - loadFromStorage] User loaded from cookie:", parsedUser);
+
+        // **Sync to localStorage**
+        localStorage.setItem('user', JSON.stringify(parsedUser));
+        localStorage.setItem('loginStatus', 'true');
+
+      } catch (e) {
+        console.error("[useAuthApi - loadFromStorage] Error parsing user cookie", e);
+        document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "loginStatus=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      }
+    } else {
+      setUser(null);
+      setIsLoggedIn(false);
+      console.log("[useAuthApi - loadFromStorage] No valid user/loginStatus found.");
+    }
+  }, []);
+
+  useEffect(() => {
+    loadFromStorage(); // Initial load
+
+    const handleCookieChange = () => {
+      console.log("[useAuthApi - handleCookieChange] Cookie changed, reloading...");
+      loadFromStorage(); // Reload from storage (localStorage OR cookies)
+    };
+
+    window.addEventListener('focus', loadFromStorage);
+    document.addEventListener('cookiechange', handleCookieChange);
+
+    return () => {
+      window.removeEventListener('focus', loadFromStorage);
+      document.removeEventListener('cookiechange', handleCookieChange);
+    };
+  }, [loadFromStorage]);
 
 
+  // Update localStorage whenever user or isLoggedIn changes
     useEffect(() => {
-        console.log("[useAuthApi - useEffect] Checking cookies...");
-        const cookieUser = document.cookie.split('; ').find(row => row.startsWith('user='))?.split('=')[1];
-        const cookieLoginStatus = document.cookie.split('; ').find(row => row.startsWith('loginStatus='))?.split('=')[1];
-
-        let userNeedsUpdate = false;
-
-        if (cookieUser) {
-            try {
-                console.log("[useAuthApi - useEffect] Found user cookie:", cookieUser);
-                const decodedCookieUser = decodeURIComponent(cookieUser);
-                const parsedCookieUser = JSON.parse(decodedCookieUser);
-
-                if (JSON.stringify(user) !== JSON.stringify(parsedCookieUser)) {
-                    userNeedsUpdate = true;
-                }
-            } catch (e) {
-                console.error("[useAuthApi - useEffect] Error parsing user cookie", e);
-                document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            }
-        }
-
-        if (cookieLoginStatus) {
-            console.log("[useAuthApi - useEffect] Found loginStatus cookie:", cookieLoginStatus);
-            if (loginStatus !== cookieLoginStatus) {
-                setLoginStatus(cookieLoginStatus);
-                console.log("[useAuthApi - useEffect] Login status synced from cookie:", cookieLoginStatus);
-            }
+        if (user) {
+            localStorage.setItem('user', JSON.stringify(user));
         } else {
-            console.log("[useAuthApi - useEffect] No loginStatus cookie found.");
+            localStorage.removeItem('user');
         }
 
-        if (userNeedsUpdate) {
-            try {
-                console.log("[useAuthApi - useEffect] User needs update.  Fetching from cookie...");
-                const decodedCookieUser = decodeURIComponent(cookieUser!);
-                const parsedUser = JSON.parse(decodedCookieUser);
-                setUser(parsedUser);
-                console.log("[useAuthApi - useEffect] User synced from cookie:", parsedUser);
-            }
-
-            catch (e) {
-                console.error("[useAuthApi - useEffect] Error parsing user cookie", e);
-                document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            }
+        if (isLoggedIn) {
+            localStorage.setItem('loginStatus', 'true');
         } else {
-            console.log("[useAuthApi - useEffect] User is up to date.");
+            localStorage.removeItem('loginStatus');
         }
-    }, [user, loginStatus, setUser, setLoginStatus]);
+    }, [user, isLoggedIn]);
 
 
-    const signIn = async (credentials: Record<string, string>): Promise<void> => {
+  const signIn = async (credentials: Record<string, string>): Promise<void> => {
         setIsLoading(true);
         setError(null);
         console.log("[useAuthApi - signIn] Starting sign-in process...");
@@ -91,8 +132,11 @@ const useAuthApi = (): AuthApiResult => {
 
             if (response.ok) {
                 console.log("[useAuthApi - signIn] Sign-in successful. Setting loginStatus and user...");
-                setLoginStatus('true');
-                setUser(data.user);
+                // Set cookies directly (for immediate effect)
+                document.cookie = `loginStatus=true; path=/;`;
+                document.cookie = `user=${encodeURIComponent(JSON.stringify(data.user))}; path=/;`;
+
+              // Set localStorage (now handled in the useEffect)
 
                 // Get returnUrl *right before* redirect, not from initial state
                 const currentReturnUrl = localStorage.getItem('returnUrl');
@@ -125,16 +169,32 @@ const useAuthApi = (): AuthApiResult => {
     };
 
 
-    const googleSignIn = async () => {
-        const fullUrl = `${window.location.pathname}?${searchParams.toString()}`;
-        console.log("[useAuthApi - googleSignIn] Storing return URL:", fullUrl);
-        localStorage.setItem('returnUrl', fullUrl);
-        console.log("[useAuthApi - googleSignIn] Redirecting to /api/auth/google");
-        window.location.href = `/api/auth/google`;
-    };
+  const googleSignIn = async () => {
+    const fullUrl = `${window.location.pathname}?${searchParams.toString()}`;
+    console.log("[useAuthApi - googleSignIn] Storing return URL:", fullUrl);
+    localStorage.setItem('returnUrl', fullUrl); // Keep this for return URL
+    console.log("[useAuthApi - googleSignIn] Redirecting to /api/auth/google");
+    window.location.href = `/api/auth/google`;
+  };
 
-    return { signIn, isLoading, error, user, googleSignIn };
+  const logout = useCallback(async () => {
+    console.log("[useAuthApi - logout] Initiating logout...");
+    setIsLoading(true);
+    try {
+      await fetch('/api/auth/logout');
+      setUser(null);
+      setIsLoggedIn(false);
+      // localStorage clearing now handled in the useEffect
+      console.log("[useAuthApi - logout] Logout successful.");
+      router.push("/");
+    } catch (error) {
+      console.error("[useAuthApi - logout] Logout failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [router]);
+
+  return { signIn, isLoading, error, user, googleSignIn, logout, isLoggedIn };
 };
-
 
 export default useAuthApi;

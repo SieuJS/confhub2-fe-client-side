@@ -3,6 +3,10 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { Notification } from '../../../../models/response/user.response'
 import { formatDateFull } from '../timeFormat'
 import { useSearchParams } from 'next/navigation'
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+
 
 interface NotificationDetailProps {
   notification: Notification
@@ -50,11 +54,10 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
           aria-label='Mark as important'
         >
           <span
-            className={`${
-              isStarred || notification.isImportant
+            className={`${isStarred || notification.isImportant
                 ? 'text-yellow-500'
                 : 'text-gray-400'
-            } text-lg`}
+              } text-lg`}
           >
             ★
           </span>
@@ -65,7 +68,28 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
         {formatDateFull(notification.createdAt)}
       </div>
       <div className='rounded-lg bg-white p-4 shadow'>
-        <p>{notification.message}</p>
+        {/* Use ReactMarkdown to render the message */}
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeRaw]}
+
+          components={{
+            // Customize components (optional, for more control)
+            p: ({ node, ...props }) => <p className="mb-2" {...props} />, // Add margin to paragraphs
+            a: ({ node, ...props }) => <a className="text-blue-600 hover:underline" {...props} />, // Style links
+            // Add more component overrides as needed (ul, ol, li, code, etc.)
+            pre: ({ node, ...props }) => <pre className="bg-gray-100 p-2 rounded-md overflow-x-auto" {...props} />,
+            code: ({ node, ...props }) => <code className="bg-gray-100 px-1 rounded" {...props} />,
+            h1: ({ node, ...props }) => <h1 className='text-2xl font-bold my-4' {...props} />,
+            h2: ({ node, ...props }) => <h2 className='text-xl font-semibold my-3' {...props} />,
+            h3: ({ node, ...props }) => <h3 className='text-lg font-medium my-2' {...props} />,
+            ul: ({ node, ...props }) => <ul className='list-disc list-inside my-2' {...props} />,
+            ol: ({ node, ...props }) => <ol className='list-decimal list-inside my-2' {...props} />,
+            li: ({ node, ...props }) => <li className='my-1' {...props} />,
+          }}
+        >
+          {notification.message}
+        </ReactMarkdown>
         {/* Display seenAt.  It will now ALWAYS be the initial seenAt value. */}
         {seenAt ? (
           <p className='mt-2 text-sm text-gray-500'>

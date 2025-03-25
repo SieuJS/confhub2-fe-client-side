@@ -1,42 +1,35 @@
 // src/app/[locale]/addconference/page.tsx
 'use client'
 
-import React, { useEffect } from 'react'
-import { useTranslations } from 'next-intl'
-import { Header } from '../utils/Header'  //  Header component
-import Footer from '../utils/Footer'      //  Footer component
-import ConferenceForm from './ConferenceForm'
-import { useLocalStorage } from 'usehooks-ts'
-import { useRouter, usePathname } from 'next/navigation';
-import { getPathname } from '@/src/navigation';
+import React, { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
+import { Header } from '../utils/Header';  // Header component
+import Footer from '../utils/Footer';      // Footer component
+import ConferenceForm from './ConferenceForm';
+import { useRouter } from 'next/navigation';
+import useAuthApi from '@/src/hooks/auth/useAuthApi'; // Import useAuthApi
 
 const AddConference = ({
   params: { locale }
 }: {
   params: { locale: string }
 }) => {
-  const t = useTranslations('')
+  const t = useTranslations('');
   const router = useRouter();
 
-  const [loginStatus] = useLocalStorage<string | null>(
-    'loginStatus',
-    null
-  );
+  // Use useAuthApi for authentication status
+  const { isLoggedIn } = useAuthApi();
 
   useEffect(() => {
-    if (!loginStatus) {
-      // Redirect to the login page.  Crucially, use `router.push` for client-side
-      // navigation, *not* `redirect`.  `redirect` is for server-side redirects
-      // and will cause hydration errors here.
+    if (!isLoggedIn) {
+      // Redirect to the login page using router.push
       router.push(`/${locale}/auth/login`);
     }
-  }, [loginStatus, router, locale]); // Include router and locale in the dependency array
+  }, [isLoggedIn, router, locale]); // Depend on isLoggedIn, router, and locale
 
-  //  Render a loading state (or nothing) while the redirect is happening.
-  //  This prevents the ConferenceForm from flashing before the redirect.
-  if (!loginStatus) {
-     return <div>Loading...</div>; // Or return null, or a loading spinner, etc.
-    //return null;
+  // Render a loading state while checking authentication
+  if (!isLoggedIn) {
+    return <div>Loading...</div>; // Or a more elaborate loading indicator
   }
 
   return (
@@ -49,7 +42,7 @@ const AddConference = ({
       </div>
       <Footer />
     </>
-  )
-}
+  );
+};
 
-export default AddConference
+export default AddConference;

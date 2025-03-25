@@ -2,7 +2,6 @@
 import { FC, useRef, useState, useEffect } from 'react';
 import { Link } from '@/src/navigation';
 import { useTranslations } from 'next-intl';
-import { useLocalStorage } from 'usehooks-ts';
 import LogoIcon from '../../icons/logo';
 import { useSocketConnection } from '../../../hooks/header/useSocketConnection';
 import { useClickOutside } from '../../../hooks/header/useClickOutsideHeader';
@@ -15,6 +14,7 @@ import DesktopNavigation from './header/DesktopNavigation';
 import LoadingIndicator from './header/LoadingIndicator';
 import { MenuIcon, CloseIcon } from './header/Icon';
 import Button from './Button';
+import useAuthApi from '../../../hooks/auth/useAuthApi'; // Import your hook
 
 interface Props {
   locale: string;
@@ -24,27 +24,14 @@ export const Header: FC<Props> = ({ locale }) => {
   const t = useTranslations('');
   const headerRef = useRef<HTMLDivElement>(null);
 
-  const [user, setUser] = useLocalStorage<{
-    id: string;
-    firstname: string;
-    lastname: string;
-    email: string;
-  } | null>('user', null);
-
-  const [loginStatus, setLoginStatus] = useLocalStorage<string | null>(
-    'loginStatus',
-    null
-  )
-
-  const [isLogin, setIsLogin] = useState(false);
+  // Use the useAuthApi hook
+  const { user, isLoggedIn, logout } = useAuthApi();
   const [isLoading, setIsLoading] = useState(true);
 
+
   useEffect(() => {
-    // Cập nhật trạng thái đăng nhập dựa trên user và loginStatus
-    setIsLogin(!!user && !!loginStatus);
-    // Cập nhật trạng thái Header sau khi load xong
-    setIsLoading(false);
-  }, [user, loginStatus]);
+    setIsLoading(false); // The hook handles loading now.
+  }, []);
 
   const {
     notifications,
@@ -53,7 +40,7 @@ export const Header: FC<Props> = ({ locale }) => {
     fetchNotifications,
     isLoadingNotifications,
     socketRef,
-  } = useSocketConnection({ loginStatus, user });
+  } = useSocketConnection({ loginStatus: isLoggedIn ? "true" : null, user }); // Pass isLoggedIn
 
   const {
     isNotificationOpen,
@@ -95,17 +82,16 @@ export const Header: FC<Props> = ({ locale }) => {
 
       <div className='relative flex flex-row items-center gap-4'>
         <DesktopNavigation locale={locale} />
-        
-        {isLoading ? <LoadingIndicator/> : 
+
           <AuthButtons
-            isLogin={isLogin}
+            isLogin={isLoggedIn} 
             locale={locale}
             toggleNotification={() => openNotification()}
             toggleUserDropdown={() => openUserDropdown()}
             notificationEffect={notificationEffect}
             unreadCount={unreadCount()}
           />
-        }
+        {/* } */}
 
         {/* Mobile Menu Button */}
         <Button className='block sm:hidden' onClick={toggleMobileMenu}>
@@ -116,7 +102,7 @@ export const Header: FC<Props> = ({ locale }) => {
           isMobileMenuOpen={isMobileMenuOpen}
           closeAllMenus={closeAllMenus}
           locale={locale}
-          isLogin={isLogin}
+          isLogin={isLoggedIn}  
         />
         <NotificationDropdown
           notifications={displayedNotifications} // Pass the limited notifications
@@ -131,8 +117,7 @@ export const Header: FC<Props> = ({ locale }) => {
           isUserDropdownOpen={isUserDropdownOpen}
           closeAllMenus={closeAllMenus}
           locale={locale}
-          setLoginStatus={setLoginStatus}
-          setUser={setUser}
+          logout={logout} // Pass the logout function
           socketRef={socketRef}
         />
       </div>

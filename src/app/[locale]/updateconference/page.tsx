@@ -1,37 +1,40 @@
 // src/app/[locale]/UpdateConference/page.tsx
 'use client'
 
-import React, { useEffect } from 'react'
-import { useTranslations } from 'next-intl'
-import { Header } from '../utils/Header' //  Header component
-import Footer from '../utils/Footer' //  Footer component
-import ConferenceForm from './ConferenceForm'
-import { useLocalStorage } from 'usehooks-ts'
-import { useRouter, useSearchParams } from 'next/navigation'
+import React, { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
+import { Header } from '../utils/Header'; //  Header component
+import Footer from '../utils/Footer'; //  Footer component
+import ConferenceForm from './ConferenceForm';
+// import { useLocalStorage } from 'usehooks-ts'; // REMOVE
+import { useRouter, useSearchParams } from 'next/navigation';
+import useAuthApi from '@/src/hooks/auth/useAuthApi'; // Import useAuthApi
 
 const UpdateConference = ({
   params: { locale }
 }: {
   params: { locale: string }
 }) => {
-  const t = useTranslations('')
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const conferenceId = searchParams.get('id')
+  const t = useTranslations('');
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const conferenceId = searchParams.get('id');
 
-  const [loginStatus] = useLocalStorage<string | null>('loginStatus', null)
+  // Use useAuthApi for authentication status
+  const { isLoggedIn } = useAuthApi();
 
   useEffect(() => {
-    if (!loginStatus) {
-      router.push(`/${locale}/auth/login`)
+    if (!isLoggedIn) {
+      router.push(`/${locale}/auth/login`);
     }
-  }, [loginStatus, router, locale])
+  }, [isLoggedIn, router, locale]);
 
-  if (!loginStatus) {
-    return <div>Loading...</div> // Or return null
+  if (!isLoggedIn) {
+    return <div>Loading...</div>; // Or return null, or a loading spinner, etc.
   }
+
   if (!conferenceId) {
-    return <div>Error: Conference ID is missing.</div> // Handle missing ID
+    return <div>Error: Conference ID is missing.</div>; // Handle missing ID
   }
 
   return (
@@ -45,7 +48,7 @@ const UpdateConference = ({
       </div>
       <Footer />
     </>
-  )
-}
+  );
+};
 
-export default UpdateConference
+export default UpdateConference;
