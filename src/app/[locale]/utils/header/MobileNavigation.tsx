@@ -1,7 +1,8 @@
-// components/Header/components/MobileNavigation.tsx
 import { FC } from 'react'
 import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
+import ThemeSwitch from '../ThemeSwitch'
+import LangSwitcher from '../LangSwitcher'
 
 interface Props {
   isMobileMenuOpen: boolean
@@ -17,75 +18,44 @@ const MobileNavigation: FC<Props> = ({
   isLogin
 }) => {
   const t = useTranslations('')
+
   return (
     <div
-      className={`border-border absolute left-0 right-0 top-full z-40 border-b bg-background-secondary shadow-md sm:hidden ${
+      className={`mobile-navigation border-border absolute  right-0 top-full z-40 w-40 border-b bg-background-secondary shadow-md sm:hidden ${
         isMobileMenuOpen ? '' : 'hidden'
       }`}
     >
-      <div className='flex flex-col p-4'>
-        <Link
-          lang={locale}
-          href={`/conferences`}
-          onClick={closeAllMenus}
-          className='hover:bg-button/10 py-2'
-        >
+      <div className='flex flex-col gap-4 px-4 py-2 text-sm'>
+        <Link href={`/conferences`} locale={locale}>
           {t('Conferences')}
         </Link>
-        <Link
-          lang={locale}
-          href={`/journals`}
-          onClick={closeAllMenus}
-          className='hover:bg-button/10 py-2'
-        >
+        <Link href={`/journals`} locale={locale}>
           {t('Journals')}
         </Link>
-        <Link
-          lang={locale}
-          href={`/chatbot`}
-          onClick={closeAllMenus}
-          className='hover:bg-button/10 py-2'
-        >
+        <Link href={`/chatbot`} locale={locale}>
           {t('Chatbot')}
         </Link>
-        <Link
-          lang={locale}
-          href={`/support`}
-          onClick={closeAllMenus}
-          className='hover:bg-button/10 py-2'
-        >
+        <Link href={`/support`} locale={locale}>
           {t('Support')}
         </Link>
-        <Link
-          lang={locale}
-          href={`/addconference`}
-          onClick={closeAllMenus}
-          className='hover:bg-button/10 py-2'
-        >
+
+        <Link href={`/addconference`} locale={locale}>
           {t('Add_Conference')}
         </Link>
 
         {isLogin ? null : (
           <>
-            <Link
-              lang={locale}
-              href={`/auth/login`}
-              onClick={closeAllMenus}
-              className='hover:bg-button/10 py-2'
-            >
+            <Link href={`/auth/login`} locale={locale}>
               {t('Login')}
             </Link>
-            <Link
-              lang={locale}
-              href={`/auth/register`}
-              onClick={closeAllMenus}
-              className='hover:bg-button/10 py-2'
-            >
+            <Link href={`/auth/register`} locale={locale}>
               {t('Register')}
             </Link>
           </>
         )}
       </div>
+      {/* <ThemeSwitch />
+      <LangSwitcher /> */}
     </div>
   )
 }

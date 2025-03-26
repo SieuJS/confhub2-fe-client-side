@@ -5,11 +5,10 @@ import { Link } from '@/src/navigation'
 import { Notification } from '../../../../models/response/user.response'
 import { useTranslations } from 'next-intl'
 import { timeAgo } from '../../dashboard/timeFormat'
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import DOMPurify from 'dompurify';
-
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
+import DOMPurify from 'dompurify'
 
 interface Props {
   notifications: Notification[]
@@ -61,7 +60,7 @@ const NotificationDropdown: FC<Props> = ({
 
   const renderNotificationItem = useCallback(
     (notification: Notification) => {
-      const sanitizedMessage = DOMPurify.sanitize(notification.message);
+      const sanitizedMessage = DOMPurify.sanitize(notification.message)
 
       return (
         // Removed legacyBehavior and <a> tag.  Link handles the click now.
@@ -79,7 +78,7 @@ const NotificationDropdown: FC<Props> = ({
           >
             <div className='mr-3 flex-shrink-0'>
               <div className='relative flex h-10 w-10 items-center justify-center rounded-full bg-gray-200'>
-                <span className='font-medium text-gray-700'>
+                <span className='font-medium '>
                   {notification.type.charAt(0)}
                 </span>
                 {notification.seenAt === null && (
@@ -93,22 +92,56 @@ const NotificationDropdown: FC<Props> = ({
                 rehypePlugins={[rehypeRaw]}
                 components={{
                   // Apply the className to the *outermost* element rendered by the custom components.
-                  p: ({ node, ...props }) => <p className={`mb-0.5 text-sm ${notification.seenAt ? 'text-gray-700' : 'font-bold'}`} {...props} />, // Remove bottom margin
-                  a: ({ node, ...props }) => <a className="text-blue-600 hover:underline" {...props} />,
-                  pre: ({ node, ...props }) => <pre className="bg-gray-100 p-2 rounded-md overflow-x-auto" {...props} />,
-                  code: ({ node, ...props }) => <code className="bg-gray-100 px-1 rounded" {...props} />,
-                  h1: ({node, ...props}) => <h1 className='text-base font-bold' {...props} />, // Reduce size
-                  h2: ({node, ...props}) => <h2 className='text-sm font-semibold' {...props} />,  // Reduce size
-                  h3: ({node, ...props}) => <h3 className='text-sm font-medium' {...props} />,    // Reduce size
-                  ul: ({node, ...props}) => <ul className='list-disc list-inside text-sm' {...props} />, // Reduce size
-                  ol: ({node, ...props}) => <ol className='list-decimal list-inside text-sm' {...props} />, // Reduce size
-                  li: ({node, ...props}) => <li className='text-sm' {...props} />,                // Reduce size
+                  p: ({ node, ...props }) => (
+                    <p
+                      className={`mb-0.5 text-sm ${notification.seenAt ? '' : 'font-bold'}`}
+                      {...props}
+                    />
+                  ), // Remove bottom margin
+                  a: ({ node, ...props }) => (
+                    <a className='text-button hover:underline' {...props} />
+                  ),
+                  pre: ({ node, ...props }) => (
+                    <pre
+                      className='overflow-x-auto rounded-md bg-gray-100 p-2'
+                      {...props}
+                    />
+                  ),
+                  code: ({ node, ...props }) => (
+                    <code className='rounded bg-gray-100 px-1' {...props} />
+                  ),
+                  h1: ({ node, ...props }) => (
+                    <h1 className='text-base font-bold' {...props} />
+                  ), // Reduce size
+                  h2: ({ node, ...props }) => (
+                    <h2 className='text-sm font-semibold' {...props} />
+                  ), // Reduce size
+                  h3: ({ node, ...props }) => (
+                    <h3 className='text-sm font-medium' {...props} />
+                  ), // Reduce size
+                  ul: ({ node, ...props }) => (
+                    <ul className='list-inside list-disc text-sm' {...props} />
+                  ), // Reduce size
+                  ol: ({ node, ...props }) => (
+                    <ol
+                      className='list-inside list-decimal text-sm'
+                      {...props}
+                    />
+                  ), // Reduce size
+                  li: ({ node, ...props }) => (
+                    <li className='text-sm' {...props} />
+                  ), // Reduce size
 
                   // Add a default wrapper (div) to apply the className
                   // if none of the above components match. This isn't strictly needed
                   // if you're *sure* you've covered all possible Markdown elements,
                   // but it's a good safety net.
-                  div: ({node, ...props}) => <div className={`text-sm ${notification.seenAt ? 'text-gray-700' : 'font-bold'}`} {...props} />
+                  div: ({ node, ...props }) => (
+                    <div
+                      className={`text-sm ${notification.seenAt ? '' : 'font-bold'}`}
+                      {...props}
+                    />
+                  )
                 }}
               >
                 {sanitizedMessage}
@@ -119,10 +152,10 @@ const NotificationDropdown: FC<Props> = ({
             </div>
           </div>
         </Link>
-      );
+      )
     },
     [closeAllMenus, locale, notifications] // Corrected dependency array
-  );
+  )
 
   const handleMarkAllAsRead = useCallback(
     async (e: React.MouseEvent) => {
@@ -135,7 +168,7 @@ const NotificationDropdown: FC<Props> = ({
 
   return (
     <div
-      className={`absolute right-0 z-50 mr-8 mt-10 w-[400px] overflow-hidden rounded-lg bg-white shadow-xl transition-all duration-300 ease-in-out ${
+      className={`absolute right-0 z-50 mr-8 mt-10 w-80 overflow-hidden rounded-lg bg-white shadow-xl transition-all duration-300 ease-in-out md:w-[400px] ${
         isNotificationOpen
           ? 'visible translate-y-0 opacity-100'
           : 'invisible translate-y-1 opacity-0'
@@ -147,9 +180,9 @@ const NotificationDropdown: FC<Props> = ({
     >
       <div className='border-b border-gray-200 p-4'>
         <div className='flex items-center justify-between'>
-          <h6 className='text-lg font-semibold'>Notifications</h6>
+          <h6 className='text-sm font-semibold md:text-lg'>Notifications</h6>
           <button
-            className='text-sm text-blue-600 hover:text-blue-800'
+            className=' text-sm text-button hover:text-blue-800'
             onClick={handleMarkAllAsRead}
           >
             {t('Mark All As Read')}
@@ -164,7 +197,7 @@ const NotificationDropdown: FC<Props> = ({
           <>
             {newNotifications.length > 0 && (
               <>
-                <div className='border-b border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600'>
+                <div className='border-b border-gray-200 px-4 py-2 text-sm font-semibold '>
                   NEW
                 </div>
                 {newNotifications.map(renderNotificationItem)}
@@ -172,7 +205,7 @@ const NotificationDropdown: FC<Props> = ({
             )}
             {earlierNotifications.length > 0 && (
               <>
-                <div className='border-b border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600'>
+                <div className='border-b border-gray-200 px-4 py-2 text-sm font-semibold '>
                   EARLIER
                 </div>
                 {earlierNotifications.map(renderNotificationItem)}
@@ -192,7 +225,7 @@ const NotificationDropdown: FC<Props> = ({
           lang={locale}
           onClick={closeAllMenus}
         >
-          <div className='block text-sm text-blue-600 hover:text-blue-800'>
+          <div className='block text-sm text-button hover:text-blue-800'>
             {' '}
             View all{' '}
           </div>

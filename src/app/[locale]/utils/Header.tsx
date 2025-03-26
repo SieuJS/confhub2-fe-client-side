@@ -1,36 +1,35 @@
-// components/Header/index.tsx (Header Component)
-import { FC, useRef, useState, useEffect } from 'react';
-import { Link } from '@/src/navigation';
-import { useTranslations } from 'next-intl';
-import LogoIcon from '../../icons/logo';
-import { useSocketConnection } from '../../../hooks/header/useSocketConnection';
-import { useClickOutside } from '../../../hooks/header/useClickOutsideHeader';
-import { useMenuState } from '../../../hooks/header/useMenuState';
-import NotificationDropdown from './header/NotificationDropdown';
-import UserDropdown from './header/UserDropdown';
-import MobileNavigation from './header/MobileNavigation';
-import AuthButtons from './header/AuthButtons';
-import DesktopNavigation from './header/DesktopNavigation';
-import LoadingIndicator from './header/LoadingIndicator';
-import { MenuIcon, CloseIcon } from './header/Icon';
-import Button from './Button';
-import useAuthApi from '../../../hooks/auth/useAuthApi'; // Import your hook
+import { FC, useRef, useState, useEffect } from 'react'
+import { Link } from '@/src/navigation'
+import LogoIcon from '../../icons/logo'
+import { useSocketConnection } from '../../../hooks/header/useSocketConnection'
+import { useClickOutside } from '../../../hooks/header/useClickOutsideHeader'
+import { useMenuState } from '../../../hooks/header/useMenuState'
+import NotificationDropdown from './header/NotificationDropdown'
+import UserDropdown from './header/UserDropdown'
+import MobileNavigation from './header/MobileNavigation'
+import AuthButtons from './header/AuthButtons'
+import DesktopNavigation from './header/DesktopNavigation'
+import LoadingIndicator from './header/LoadingIndicator'
+import { MenuIcon, CloseIcon } from './header/Icon'
+import Button from './Button'
+import useAuthApi from '../../../hooks/auth/useAuthApi'
+
+import { useMediaQuery } from 'react-responsive'
+
 interface Props {
-  locale: string;
+  locale: string
 }
 
 export const Header: FC<Props> = ({ locale }) => {
-  const t = useTranslations('');
-  const headerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null)
+  const isMobile = useMediaQuery({ maxWidth: 768 })
 
-  // Use the useAuthApi hook
-  const { user, isLoggedIn, logout } = useAuthApi();
-  const [isLoading, setIsLoading] = useState(true);
-
+  const { user, isLoggedIn, logout } = useAuthApi()
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    setIsLoading(false); // The hook handles loading now.
-  }, []);
+    setIsLoading(false)
+  }, [])
 
   const {
     notifications,
@@ -38,32 +37,31 @@ export const Header: FC<Props> = ({ locale }) => {
     markAllAsRead,
     fetchNotifications,
     isLoadingNotifications,
-    socketRef,
-  } = useSocketConnection({ loginStatus: isLoggedIn ? "true" : null, user }); // Pass isLoggedIn
+    socketRef
+  } = useSocketConnection({ loginStatus: isLoggedIn ? 'true' : null, user })
 
   const {
     isNotificationOpen,
     isMobileMenuOpen,
     isUserDropdownOpen,
+    closeDropdowns, // Changed name
     closeAllMenus,
-    toggleNotification,
     toggleMobileMenu,
-    toggleUserDropdown,
     openNotification,
     openUserDropdown,
-  } = useMenuState();
+    openMobileMenu // Added for mobile menu
+  } = useMenuState()
 
-  useClickOutside(headerRef, closeAllMenus, 'notification-dropdown');
+  useClickOutside(headerRef, closeDropdowns, 'notification-dropdown') // Changed function
 
   const unreadCount = () => {
     const unread = notifications.filter(
-      (n) => n.seenAt === null && n.deletedAt === null
-    ).length;
-    return unread > 20 ? '20+' : unread; // Display "20+" if more than 20 unread
-  };
+      n => n.seenAt === null && n.deletedAt === null
+    ).length
+    return unread > 20 ? '20+' : unread
+  }
 
-  const displayedNotifications = notifications.slice(0, 20); // Get the latest 20 notifications
-
+  const displayedNotifications = notifications.slice(0, 20)
 
   return (
     <div
@@ -75,39 +73,44 @@ export const Header: FC<Props> = ({ locale }) => {
           <div className='mb-2 h-10 w-10'>
             <LogoIcon />
           </div>
-          <strong className='mx-2 select-none'>ConFHub</strong>
+          <strong className='mx-2 hidden select-none sm:block'>ConFHub</strong>
         </div>
       </Link>
 
       <div className='relative flex flex-row items-center gap-4'>
         <DesktopNavigation locale={locale} />
 
-        {isLoading ? <LoadingIndicator/> : 
+        {isLoading ? (
+          <LoadingIndicator />
+        ) : (
           <AuthButtons
-          isLogin={isLoggedIn} 
-          locale={locale}
-          toggleNotification={() => openNotification()}
-          toggleUserDropdown={() => openUserDropdown()}
-          notificationEffect={notificationEffect}
-          unreadCount={unreadCount()}
-        />
-        }
-          
-        {/* } */}
+            isLogin={isLoggedIn}
+            locale={locale}
+            toggleNotification={() => openNotification()}
+            toggleUserDropdown={() => openUserDropdown()}
+            notificationEffect={notificationEffect}
+            unreadCount={unreadCount()}
+          />
+        )}
 
-        {/* Mobile Menu Button */}
-        <Button className='block sm:hidden' onClick={toggleMobileMenu}>
+        <Button
+          className='block sm:hidden'
+          onClick={e => {
+            e.stopPropagation()
+            openMobileMenu()
+          }}
+        >
           {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
         </Button>
 
         <MobileNavigation
           isMobileMenuOpen={isMobileMenuOpen}
-          closeAllMenus={closeAllMenus}
+          closeAllMenus={closeAllMenus} // Keep closing all
           locale={locale}
-          isLogin={isLoggedIn}  
+          isLogin={isLoggedIn}
         />
         <NotificationDropdown
-          notifications={displayedNotifications} // Pass the limited notifications
+          notifications={displayedNotifications}
           isNotificationOpen={isNotificationOpen}
           closeAllMenus={closeAllMenus}
           locale={locale}
@@ -119,12 +122,12 @@ export const Header: FC<Props> = ({ locale }) => {
           isUserDropdownOpen={isUserDropdownOpen}
           closeAllMenus={closeAllMenus}
           locale={locale}
-          logout={logout} // Pass the logout function
+          logout={logout}
           socketRef={socketRef}
         />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header
