@@ -14,10 +14,8 @@ import {
   ConferenceFormData
 } from '@/src/models/send/addConference.send'
 
-const API_ADD_CONFERENCE_ENDPOINT =
-  `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/add-conference`
+const API_ADD_CONFERENCE_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/add-conference`
 const CSC_API_KEY = process.env.NEXT_PUBLIC_CSC_API_KEY
-
 
 const ConferenceForm: React.FC = () => {
   const t = useTranslations('')
@@ -532,7 +530,7 @@ const ConferenceForm: React.FC = () => {
             </div>
             <div>
               <label htmlFor={`fromDate-${index}`} className='block text-sm  '>
-                {t('Start_Date')}:
+                {t('Start')}:
               </label>
               <input
                 type='date'
@@ -547,7 +545,7 @@ const ConferenceForm: React.FC = () => {
             </div>
             <div>
               <label htmlFor={`toDate-${index}`} className='block text-sm  '>
-                {t('End_Date')}:
+                {t('End')}:
               </label>
               <input
                 type='date'

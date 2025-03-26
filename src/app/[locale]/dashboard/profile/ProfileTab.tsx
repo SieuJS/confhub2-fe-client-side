@@ -1,18 +1,17 @@
 // src/components/ProfileTab.tsx
-import React, { useState } from 'react';
-import Image from 'next/image';
-import Button from '../../utils/Button';
-import { useTranslations } from 'next-intl';
-import { useUserData } from '@/src/hooks/dashboard/profile/useUserData';
-import { useEditProfile } from '@/src/hooks/dashboard/profile/useEditProfile';
-import { useImageSelection } from '@/src/hooks/dashboard/profile/useImageSelection';
-import { Link } from '@/src/navigation';
-import ChangePasswordForm from './ChangePasswordForm';
-
+import React, { useState } from 'react'
+import Image from 'next/image'
+import Button from '../../utils/Button'
+import { useTranslations } from 'next-intl'
+import { useUserData } from '@/src/hooks/dashboard/profile/useUserData'
+import { useEditProfile } from '@/src/hooks/dashboard/profile/useEditProfile'
+import { useImageSelection } from '@/src/hooks/dashboard/profile/useImageSelection'
+import { Link } from '@/src/navigation'
+import ChangePasswordForm from './ChangePasswordForm'
 
 const ProfileTab: React.FC = () => {
-  const t = useTranslations('');
-  const { userData, loading, error } = useUserData();
+  const t = useTranslations('')
+  const { userData, loading, error } = useUserData()
 
   const {
     isEditing,
@@ -22,59 +21,59 @@ const ProfileTab: React.FC = () => {
     handleSaveClick,
     handleCancelClick,
     handleInputChange,
-    handleInterestedTopicsChange,
-  } = useEditProfile(userData);
+    handleInterestedTopicsChange
+  } = useEditProfile(userData)
 
   const {
     showModal: showAvatarModal,
     setShowModal: setShowAvatarModal,
     options: avatarOptions,
-    handleImageSelect: handleAvatarSelect,
-  } = useImageSelection('avatar', setEditedData);
+    handleImageSelect: handleAvatarSelect
+  } = useImageSelection('avatar', setEditedData)
 
   const {
     showModal: showBackgroundModal,
     setShowModal: setShowBackgroundModal,
     options: backgroundOptions,
-    handleImageSelect: handleBackgroundSelect,
-  } = useImageSelection('background', setEditedData);
+    handleImageSelect: handleBackgroundSelect
+  } = useImageSelection('background', setEditedData)
 
   const predefinedTopics = [
     'Blockchain',
     'Chemical Biology',
     'AI',
     'Furniture',
-    'Home Improvement',
-  ];
+    'Home Improvement'
+  ]
 
-  const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
+  const [showChangePasswordForm, setShowChangePasswordForm] = useState(false)
 
   if (loading) {
     return (
       <div className='flex h-screen items-center justify-center'>
         <div className='h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900'></div>
       </div>
-    );
+    )
   }
 
   if (error) {
-    return <div className='py-4 text-center text-red-500'>{error}</div>;
+    return <div className='py-4 text-center text-red-500'>{error}</div>
   }
 
   if (!userData) {
-    return <div className='py-4 text-center'>No user data found.</div>;
+    return <div className='py-4 text-center'>No user data found.</div>
   }
 
-  const displayAvatarUrl = editedData.avatar || userData.avatar || '/s1.png';
+  const displayAvatarUrl = editedData.avatar || userData.avatar || '/s1.png'
   const displayBackgroundUrl =
-    editedData.background || userData.background || '/bg-2.jpg';
+    editedData.background || userData.background || '/bg-2.jpg'
 
   const handleChangePasswordClick = () => {
-    setShowChangePasswordForm(true);
-  };
+    setShowChangePasswordForm(true)
+  }
 
   return (
-    <div className='mx-auto max-w-7xl overflow-hidden rounded-lg bg-background px-12 py-8 shadow-md'>
+    <div className='h-screen w-full overflow-hidden rounded-lg bg-background  shadow-md md:px-12 md:py-8'>
       {/* Cover Photo */}
       <div className='relative h-80 overflow-hidden rounded-lg'>
         <Image
@@ -82,7 +81,7 @@ const ProfileTab: React.FC = () => {
           alt='Cover Photo'
           fill
           style={{ objectFit: 'cover' }}
-          sizes='(max-width: 768px) 100vw, 100vw'
+          sizes=' 100vw, 100vw'
           priority
         />
         {isEditing && (
@@ -97,13 +96,13 @@ const ProfileTab: React.FC = () => {
       </div>
 
       {/* Profile Info Section */}
-      <div className='relative flex flex-col items-start gap-5 px-6 py-5 md:flex-row md:items-center'>
+      <div className='relative flex flex-col items-center gap-5 py-5 md:flex-row md:items-center md:px-6'>
         {/* Avatar */}
         <div className='relative -mt-40 h-40 w-40 overflow-hidden rounded-full border-4 border-button-text bg-background'>
           <img
             src={displayAvatarUrl}
             alt={`Avatar of ${userData.firstName} ${userData.lastName}`}
-            style={{ width: '100vw', height: '', objectFit: 'cover' }} // Quan trọng: Đặt kích thước và objectFit
+            style={{ width: '100vw', height: '', objectFit: 'cover' }}
           />
           {isEditing && (
             <button
@@ -118,7 +117,7 @@ const ProfileTab: React.FC = () => {
 
         {/* Name and Title */}
         <div className='flex-grow'>
-          <h1 className='text-3xl font-bold '>
+          <h1 className='text-center text-3xl font-bold md:text-left'>
             {userData.firstName} {userData.lastName}
           </h1>
           {userData.aboutme && (
@@ -147,12 +146,6 @@ const ProfileTab: React.FC = () => {
               Message
             </button>
           </div>
-        </div>
-
-        {/* Followers and Company Logos */}
-        <div className='flex items-center gap-4 md:ml-auto'>
-          <div className='text-sm '>See followers (330)</div>
-          <div className='flex gap-2'>{/* Company Logos */}</div>
         </div>
       </div>
 
@@ -339,14 +332,15 @@ const ProfileTab: React.FC = () => {
                     <span
                       key={topic}
                       onClick={() => handleInterestedTopicsChange(topic)}
-                      className={`cursor-pointer rounded-full px-4 py-2 text-sm transition duration-200  ${isSelected
-                        ? 'bg-button text-button-text'
-                        : 'bg-background  hover:bg-background-secondary'
-                        }`}
+                      className={`cursor-pointer rounded-full px-4 py-2 text-sm transition duration-200  ${
+                        isSelected
+                          ? 'bg-button text-button-text'
+                          : 'bg-background  hover:bg-background-secondary'
+                      }`}
                     >
                       {topic}
                     </span>
-                  );
+                  )
                 })}
               </div>
             </div>
@@ -371,18 +365,18 @@ const ProfileTab: React.FC = () => {
         ) : (
           // Display Information
           <>
-            <div className='flex justify-end space-x-4'>
+            <div className='flex justify-center space-x-4 md:justify-end'>
               <Button
                 variant='primary'
                 onClick={handleEditClick}
-                className='rounded-md px-6 py-2 focus:outline-none focus:ring-2'
+                className='rounded-md px-4 py-2 focus:outline-none focus:ring-2'
               >
                 {t('Edit_Profile')}
               </Button>
               <Button
                 variant='primary'
                 onClick={handleChangePasswordClick} // Gọi hàm mở form đổi mật khẩu
-                className='rounded-md px-6 py-2 focus:outline-none focus:ring-2'
+                className='rounded-md px-4 py-2 focus:outline-none focus:ring-2'
               >
                 {t('Change_Password')}
               </Button>
@@ -419,7 +413,7 @@ const ProfileTab: React.FC = () => {
                         key={topic}
                         href={{
                           pathname: `/conferences`,
-                          query: { topics: topic },
+                          query: { topics: topic }
                         }}
                         className='hover:text-text-secondary'
                       >
@@ -436,10 +430,13 @@ const ProfileTab: React.FC = () => {
         )}
       </div>
       {showChangePasswordForm && (
-        <ChangePasswordForm userId={userData.id} onClose={() => setShowChangePasswordForm(false)} />
+        <ChangePasswordForm
+          userId={userData.id}
+          onClose={() => setShowChangePasswordForm(false)}
+        />
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ProfileTab;
+export default ProfileTab

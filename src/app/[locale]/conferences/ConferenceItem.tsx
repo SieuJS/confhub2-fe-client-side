@@ -4,6 +4,7 @@ import React from 'react'
 import Image from 'next/image'
 import Button from '../utils/Button'
 import { Link } from '@/src/navigation'
+import { useMediaQuery } from 'react-responsive'
 
 interface ConferenceItemProps {
   conference: {
@@ -19,6 +20,8 @@ interface ConferenceItemProps {
 }
 
 const ConferenceItem: React.FC<ConferenceItemProps> = ({ conference }) => {
+  const isMobile = useMediaQuery({ maxWidth: 768 })
+  const sizeButton = isMobile ? 'small' : 'medium'
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'Unknown'
     const date = new Date(dateString)
@@ -37,7 +40,7 @@ const ConferenceItem: React.FC<ConferenceItemProps> = ({ conference }) => {
 
   return (
     <div className='mb-4 grid grid-cols-9 gap-4 rounded-md bg-background p-4 shadow-md'>
-      <div className='relative col-span-1 flex items-center justify-center'>
+      <div className='relative col-span-1 flex  items-center justify-center '>
         <Image
           src={'/bg-2.jpg'}
           alt={conference.title}
@@ -46,8 +49,8 @@ const ConferenceItem: React.FC<ConferenceItemProps> = ({ conference }) => {
           className='rounded-md object-cover'
         />
       </div>
-      <div className='col-span-6 text-left'>
-        <h3 className='text-lg font-semibold text-button'>
+      <div className='col-span-6 text-left text-sm md:text-base'>
+        <h3 className='text-sm font-semibold text-button md:text-lg'>
           {conference.title} ({conference.acronym})
         </h3>
         <p>
@@ -73,9 +76,9 @@ const ConferenceItem: React.FC<ConferenceItemProps> = ({ conference }) => {
           >
             <Button
               variant='primary'
-              size='medium'
+              size={sizeButton}
               rounded
-              className='mr-2 w-24'
+              className='mr-2'
             >
               Details
             </Button>
@@ -90,7 +93,7 @@ const ConferenceItem: React.FC<ConferenceItemProps> = ({ conference }) => {
               query: { id: conference.id }
             }}
           >
-            <Button variant='secondary' size='medium' rounded className='w-24'>
+            <Button variant='secondary' size={sizeButton} rounded className=''>
               Edit
             </Button>
           </Link>
