@@ -53,7 +53,13 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     const pathname = usePathname()
 
     const { conferenceDataFromDB, error: dbError, loading: dbLoading } = useConferenceDataFromDB(id);
-    const { conferenceDataFromJSON } = useConferenceDataFromJSON(id)
+
+    // Điều kiện để fetch JSON: DB fetch xong, không lỗi, và có data
+    const shouldFetchJson = !dbLoading && !dbError && !!conferenceDataFromDB;
+
+    // Fetch JSON data chỉ khi điều kiện được thỏa mãn
+    const { conferenceDataFromJSON, error: jsonError, loading: jsonLoading } = useConferenceDataFromJSON(id, shouldFetchJson);
+
 
     const { isFollowing, handleFollowClick, loading: followLoading, error: followError } = useFollowConference(conferenceDataFromJSON); // Use conferenceDataFromJSON if it has .conference.id
     const { isAddToCalendar, handleAddToCalendar, loading: calendarLoading, error: calendarError } = useAddToCalendar(conferenceDataFromJSON); // Use conferenceDataFromJSON
@@ -249,10 +255,13 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
     // --- Loading & Error States ---
     // Combine loading states if needed for a general overlay
-    const isLoading = dbLoading || isUpdating;
+    const isLoading = dbLoading || jsonLoading || isUpdating;
     // Combine errors or display them separately
     if (dbError === "Conference not found") return <NotFoundPage />;
-    if (dbLoading) return <Loading />; // Show initial loading
+    if (jsonError === "Conference not found") return <NotFoundPage />;
+
+
+    if (isLoading) return <Loading />; // Show initial loading
 
 
     return (
@@ -261,7 +270,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
             <div className='container mx-auto flex-grow px-4 py-8 pt-20'>
                 {/* Optional: General loading overlay */}
-                {isLoading && !dbLoading && ( // Show overlay for actions, not initial load
+                {isLoading && !dbLoading && !jsonLoading && ( // Show overlay for actions, not initial load
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                         <Loading />
                     </div>
