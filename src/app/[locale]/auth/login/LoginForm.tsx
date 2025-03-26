@@ -2,8 +2,7 @@
 'use client'
 import React from 'react'
 import { Link } from '@/src/navigation'
-import useLoginForm from '../../../../hooks/auth/useLoginForm';
-
+import useLoginForm from '../../../../hooks/auth/useLoginForm'
 
 const LoginForm: React.FC = () => {
   const {
@@ -14,113 +13,128 @@ const LoginForm: React.FC = () => {
     handleSubmit,
     handleGoogleLogin,
     error,
-        isLoading
-  } = useLoginForm();
-
+    isLoading
+  } = useLoginForm()
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-xl">
-        <div className="bg-white px-8 py-10 shadow-xl sm:rounded-lg sm:px-16">
-          <div className="space-y-8">
-            <div className="space-y-2 text-center">
-              <h1 className="text-3xl font-bold tracking-tight whitespace-nowrap mx-auto max-w-fit">Welcome Global Conference Hub</h1>
-              <p className="text-sm text-gray-600">Sign in to your account</p>
+    <div className='flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8'>
+      <div className='w-full max-w-xl'>
+        <div className='bg-white px-8 py-10 shadow-xl sm:rounded-lg sm:px-16'>
+          <div className='space-y-8'>
+            <div className='space-y-2 text-center'>
+              <h1 className='mx-auto max-w-fit whitespace-nowrap text-2xl font-bold tracking-tight md:text-3xl'>
+                Welcome Global Conference Hub
+              </h1>
+              <p className='text-sm '>Sign in to your account</p>
             </div>
 
-            <div className="space-y-4">
+            <div className='space-y-4'>
               <button
-                type="button"
+                type='button'
                 onClick={handleGoogleLogin}
-                className="flex w-full items-center justify-center space-x-2 rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                className='flex w-full items-center justify-center space-x-2 rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium  shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
               >
-                <svg className="h-5 w-5" viewBox="0 0 24 24">
+                <svg className='h-5 w-5' viewBox='0 0 24 24'>
                   <path
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    fill="#4285F4"
+                    d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z'
+                    fill='#4285F4'
                   />
                   <path
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    fill="#34A853"
+                    d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z'
+                    fill='#34A853'
                   />
                   <path
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    fill="#FBBC05"
+                    d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z'
+                    fill='#FBBC05'
                   />
                   <path
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    fill="#EA4335"
+                    d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z'
+                    fill='#EA4335'
                   />
                 </svg>
                 <span>Continue with Google</span>
               </button>
             </div>
 
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+            <div className='relative'>
+              <div className='absolute inset-0 flex items-center'>
+                <div className='w-full border-t border-gray-300' />
               </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="bg-white px-2 text-gray-500">or</span>
+              <div className='relative flex justify-center text-sm'>
+                <span className='bg-white px-2 '>or</span>
               </div>
             </div>
 
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <form className='space-y-4' onSubmit={handleSubmit}>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label htmlFor='email' className='block text-sm font-medium '>
                   Email
                 </label>
-                <div className="mt-1">
+                <div className='mt-1'>
                   <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
+                    id='email'
+                    name='email'
+                    type='email'
+                    autoComplete='email'
                     required
                     value={email}
                     onChange={handleEmailChange}
-                    className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
-                    placeholder="you@example.com"
+                    className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm'
+                    placeholder='you@example.com'
                   />
                 </div>
               </div>
 
               <div>
-                <div className="flex items-center justify-between">
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <div className='flex items-center justify-between'>
+                  <label
+                    htmlFor='password'
+                    className='block text-sm font-medium '
+                  >
                     Password
                   </label>
-                  <div className="text-sm">
-                    <Link href="/auth/forgot-password" className="font-medium text-button hover:text-button/80">
+                  <div className='text-sm'>
+                    <Link
+                      href='/auth/forgot-password'
+                      className='hover:text-button/80 font-medium text-button'
+                    >
                       Forgot password?
                     </Link>
                   </div>
                 </div>
-                <div className="mt-1">
+                <div className='mt-1'>
                   <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
+                    id='password'
+                    name='password'
+                    type='password'
+                    autoComplete='current-password'
                     required
                     value={password}
                     onChange={handlePasswordChange}
-                    className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
-                    placeholder="••••••••"
+                    className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm'
+                    placeholder='••••••••'
                   />
                 </div>
               </div>
 
               {error && (
-                <div className="rounded-md bg-red-50 p-4">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                <div className='rounded-md bg-red-50 p-4'>
+                  <div className='flex'>
+                    <div className='flex-shrink-0'>
+                      <svg
+                        className='h-5 w-5 text-red-400'
+                        viewBox='0 0 20 20'
+                        fill='currentColor'
+                      >
+                        <path
+                          fillRule='evenodd'
+                          d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'
+                          clipRule='evenodd'
+                        />
                       </svg>
                     </div>
-                    <div className="ml-3">
-                      <p className="text-sm text-red-700">{error}</p>
+                    <div className='ml-3'>
+                      <p className='text-sm text-red-700'>{error}</p>
                     </div>
                   </div>
                 </div>
@@ -128,15 +142,31 @@ const LoginForm: React.FC = () => {
 
               <div>
                 <button
-                  type="submit"
+                  type='submit'
                   disabled={isLoading}
-                  className="flex w-full justify-center rounded-md border border-transparent bg-button px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-button/90 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2"
+                  className='hover:bg-button/90 flex w-full justify-center rounded-md border border-transparent bg-button px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
                 >
                   {isLoading ? (
-                    <div className="flex items-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <div className='flex items-center'>
+                      <svg
+                        className='-ml-1 mr-3 h-5 w-5 animate-spin text-white'
+                        xmlns='http://www.w3.org/2000/svg'
+                        fill='none'
+                        viewBox='0 0 24 24'
+                      >
+                        <circle
+                          className='opacity-25'
+                          cx='12'
+                          cy='12'
+                          r='10'
+                          stroke='currentColor'
+                          strokeWidth='4'
+                        ></circle>
+                        <path
+                          className='opacity-75'
+                          fill='currentColor'
+                          d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                        ></path>
                       </svg>
                       Signing in...
                     </div>
@@ -147,10 +177,13 @@ const LoginForm: React.FC = () => {
               </div>
             </form>
 
-            <div className="text-center text-sm">
-              <div className="flex items-center justify-center space-x-1">
-                <span className="text-gray-600">Don't have an account?</span>
-                <Link href="/auth/register" className="font-medium text-button hover:text-button/80">
+            <div className='text-center text-sm'>
+              <div className='flex items-center justify-center space-x-1'>
+                <span className=''>Don't have an account?</span>
+                <Link
+                  href='/auth/register'
+                  className='hover:text-button/80 font-medium text-button'
+                >
                   Sign Up Now
                 </Link>
               </div>
@@ -158,13 +191,13 @@ const LoginForm: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-4 text-center text-xs text-gray-500">
+        <div className='mt-4 text-center text-xs '>
           By continuing, you agree to our{' '}
-          <Link href="/terms" className="text-button hover:text-button/80">
+          <Link href='/terms' className='hover:text-button/80 text-button'>
             Terms of Service
           </Link>{' '}
           and{' '}
-          <Link href="/privacy" className="text-button hover:text-button/80">
+          <Link href='/privacy' className='hover:text-button/80 text-button'>
             Privacy Policy
           </Link>
         </div>
@@ -173,4 +206,4 @@ const LoginForm: React.FC = () => {
   )
 }
 
-export default LoginForm;
+export default LoginForm
