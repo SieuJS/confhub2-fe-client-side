@@ -23,7 +23,7 @@ const LoginForm: React.FC = () => {
         <div className='bg-white px-8 py-10 shadow-xl sm:rounded-lg sm:px-16'>
           <div className='space-y-8'>
             <div className='space-y-2 text-center'>
-              <h1 className='mx-auto max-w-fit whitespace-nowrap text-2xl font-bold tracking-tight md:text-3xl'>
+              <h1 className='mx-auto max-w-fit text-xl font-bold tracking-tight sm:text-2xl md:text-3xl'>
                 Welcome Global Conference Hub
               </h1>
               <p className='text-sm '>Sign in to your account</p>
