@@ -100,7 +100,7 @@ const ProfileTab: React.FC = () => {
   return (
     <div className='w-full overflow-hidden rounded-lg bg-background shadow-md md:px-12 md:py-8'>
       {/* Cover Photo */}
-      <div className='relative h-80 overflow-hidden rounded-lg'>
+      <div className='relative h-60 overflow-hidden rounded-lg md:h-80'>
         <Image
           src={displayBackgroundUrl}
           alt='Cover Photo'

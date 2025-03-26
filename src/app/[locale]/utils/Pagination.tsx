@@ -1,68 +1,77 @@
 // Pagination.tsx
-import React from 'react';
-import { useTranslations } from 'next-intl';
+import React from 'react'
+import { useTranslations } from 'next-intl'
 
 interface PaginationProps {
-  eventsPerPage: number;
-  totalEvents: number;
-  paginate: (pageNumber: number) => void;
-  currentPage: number;
+  eventsPerPage: number
+  totalEvents: number
+  paginate: (pageNumber: number) => void
+  currentPage: number
 }
 
-const Pagination: React.FC<PaginationProps> = ({ eventsPerPage, totalEvents, paginate, currentPage }) => {
-  const t = useTranslations();
+const Pagination: React.FC<PaginationProps> = ({
+  eventsPerPage,
+  totalEvents,
+  paginate,
+  currentPage
+}) => {
+  const t = useTranslations()
 
-  const totalPages = Math.ceil(totalEvents / eventsPerPage);
+  const totalPages = Math.ceil(totalEvents / eventsPerPage)
   // Don't render pagination if there's only one page or no events.
   if (totalPages <= 1 || totalEvents === 0) {
-    return null;
+    return null
   }
 
   // Generate an array of page numbers.  More efficient than a loop.
-  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1)
 
   return (
-    <div className="flex items-center justify-center mt-8 text-xs pb-4">
+    <div className='mt-8 flex items-center justify-center pb-4 text-xs'>
       <button
         onClick={() => paginate(currentPage - 1)}
         disabled={currentPage === 1}
-        className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md px-4 py-2 mr-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        className='mr-2 rounded-md bg-gray-200 px-2 py-1  hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50'
       >
         {t('Previous')}
       </button>
 
       {/*  Show a limited range of page numbers with ellipses  */}
       {pageNumbers.map(number => {
-          const isCurrent = number === currentPage;
-          const isNearCurrent = Math.abs(number - currentPage) <= 2; // Show 2 pages on either side
-          const isFirstOrLast = number === 1 || number === totalPages;
+        const isCurrent = number === currentPage
+        const isNearCurrent = Math.abs(number - currentPage) <= 2 // Show 2 pages on either side
+        const isFirstOrLast = number === 1 || number === totalPages
 
-          if (isFirstOrLast || isNearCurrent) {
-            return (
-              <button
-                key={number}
-                onClick={() => paginate(number)}
-                className={`bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md px-4 py-2 mr-1 ${isCurrent ? 'font-bold bg-gray-400' : ''}`}
-              >
-                {number}
-              </button>
-            );
-          } else if (Math.abs(number - currentPage) === 3) {
-             return <span key={number} className="px-4 py-2">...</span>
-          } else {
-            return null; // Don't render anything for pages far from the current page
-          }
+        if (isFirstOrLast || isNearCurrent) {
+          return (
+            <button
+              key={number}
+              onClick={() => paginate(number)}
+              className={`mr-1 rounded-md bg-gray-200 px-2 py-1  hover:bg-gray-300 ${isCurrent ? 'bg-gray-400 font-bold' : ''}`}
+            >
+              {number}
+            </button>
+          )
+        } else if (Math.abs(number - currentPage) === 3) {
+          return (
+            <span key={number} className='px-4 py-2'>
+              ...
+            </span>
+          )
+        } else {
+          return null // Don't render anything for pages far from the current page
+        }
       })}
 
       <button
         onClick={() => paginate(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        className='rounded-md bg-gray-200 px-2 py-1  hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50'
       >
         {t('Next')}
       </button>
     </div>
-  );
-};
+  )
+}
 
-export default Pagination;
+export default Pagination

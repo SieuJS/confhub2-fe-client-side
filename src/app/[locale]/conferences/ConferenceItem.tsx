@@ -39,14 +39,14 @@ const ConferenceItem: React.FC<ConferenceItemProps> = ({ conference }) => {
     conference.status === 'Pending' || conference.status === 'Approved'
 
   return (
-    <div className='mb-4 grid grid-cols-9 gap-4 rounded-md bg-background p-4 shadow-md'>
-      <div className='relative col-span-1 flex  items-center justify-center '>
+    <div className='mb-4 grid grid-cols-9 gap-4 rounded-md bg-background p-2 shadow-md md:p-4'>
+      <div className='relative col-span-1 hidden  items-center justify-center md:flex '>
         <Image
           src={'/bg-2.jpg'}
           alt={conference.title}
           width={500}
           height={300}
-          className='rounded-md object-cover'
+          className=' rounded-md object-cover '
         />
       </div>
       <div className='col-span-6 text-left text-sm md:text-base'>

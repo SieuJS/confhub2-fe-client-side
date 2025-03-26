@@ -1,6 +1,6 @@
 // LoginForm.tsx
 'use client'
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import { Link } from '@/src/navigation'
 import useLoginForm from '../../../../hooks/auth/useLoginForm'
 
@@ -16,6 +16,11 @@ const LoginForm: React.FC = () => {
     isLoading
   } = useLoginForm();
 
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  })
 
   return (
     <div className='flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8'>
@@ -23,7 +28,7 @@ const LoginForm: React.FC = () => {
         <div className='bg-white px-8 py-10 shadow-xl sm:rounded-lg sm:px-16'>
           <div className='space-y-8'>
             <div className='space-y-2 text-center'>
-              <h1 className='mx-auto max-w-fit whitespace-nowrap text-2xl font-bold tracking-tight md:text-3xl'>
+              <h1 className='mx-auto max-w-fit text-xl font-bold tracking-tight sm:text-2xl md:text-3xl'>
                 Welcome Global Conference Hub
               </h1>
               <p className='text-sm '>Sign in to your account</p>
@@ -147,7 +152,7 @@ const LoginForm: React.FC = () => {
                   disabled={isLoading}
                   className='hover:bg-button/90 flex w-full justify-center rounded-md border border-transparent bg-button px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
                 >
-                  {isLoading ? (
+                  {(isLoading && isClient) ? (
                     <div className='flex items-center'>
                       <svg
                         className='-ml-1 mr-3 h-5 w-5 animate-spin text-white'

@@ -82,7 +82,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
             <a
               key={section}
               href={href}
-              className={`rounded-lg px-6 py-2 font-medium transition-colors duration-200 ${
+              className={`rounded-lg px-4 py-2 font-medium transition-colors duration-200 ${
                 activeSection === section
                   ? 'bg-gray-100 text-blue-600'
                   : 'text-gray-600 hover:bg-gray-100 hover:text-blue-600'
@@ -103,27 +103,25 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       {/* Sections */}
       <section
         id='overview'
-        className='mt-4 rounded-lg bg-white px-6 py-4 shadow-md'
+        className='mt-4 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
-        <h2 className='mb-4 text-2xl font-semibold text-gray-800'>Overview</h2>
-        <p className='leading-relaxed text-gray-700'>
+        <h2 className='mb-4 text-2xl font-semibold '>Overview</h2>
+        <p className='leading-relaxed '>
           {organization?.summerize || 'No summerize available.'}
         </p>
       </section>
 
       <section
         id='important-date'
-        className='mt-6 rounded-lg bg-white px-6 py-4 shadow-md'
+        className='mt-6 rounded-lg bg-white px-4 py-4 shadow-md'
       >
-        <h2 className='mb-6 text-2xl font-semibold text-gray-800'>
-          Important Dates
-        </h2>
+        <h2 className='mb-6 text-2xl font-semibold '>Important Dates</h2>
         {!dates || dates.length === 0 ? (
-          <p className='text-gray-700'>No Important Dates Available</p>
+          <p className=''>No Important Dates Available</p>
         ) : (
           <div className='overflow-x-auto'>
             <table className='min-w-full border border-gray-300 bg-white text-sm'>
-              <thead className='bg-gray-100 text-gray-700'>
+              <thead className='bg-gray-100 '>
                 <tr>
                   <th className='border-b border-gray-300 px-4 py-3 text-left'>
                     Name
@@ -161,11 +159,9 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
 
       <section
         id='Call for papers'
-        className='mt-6 rounded-lg bg-white px-6 py-4 shadow-md'
+        className='mt-6 rounded-lg bg-white px-4 py-4 shadow-md'
       >
-        <h2 className='mb-4 text-2xl font-semibold text-gray-800'>
-          Call for Papers
-        </h2>
+        <h2 className='mb-4 text-2xl font-semibold '>Call for Papers</h2>
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkBreaks]} // Added remarkBreaks
         >
@@ -175,29 +171,27 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
 
       <section
         id='category-topics'
-        className='mt-6 rounded-lg bg-white px-6 py-4 shadow-md'
+        className='mt-6 rounded-lg bg-white px-4 py-4 shadow-md'
       >
-        <h2 className='mb-6 text-2xl font-semibold text-gray-800'>
-          Category and Topics
-        </h2>
+        <h2 className='mb-6 text-2xl font-semibold '>Category and Topics</h2>
         <div className='mb-6'>
-          <h3 className='mb-2 text-xl font-medium text-gray-700'>Category</h3>
+          <h3 className='mb-2 text-xl font-medium '>Category</h3>
           {/* Optional Chaining for accessType */}
-          <p className='text-gray-700'>
+          <p className=''>
             {organization?.accessType || 'Category not available.'}
           </p>
         </div>
 
         <div>
-          <h3 className='mb-2 text-xl font-medium text-gray-700'>Topics</h3>
+          <h3 className='mb-2 text-xl font-medium '>Topics</h3>
           {organization?.topics && organization.topics.length > 0 ? (
-            <ul className='grid list-disc grid-cols-1 gap-2 pl-5 text-gray-700 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
+            <ul className='grid list-disc grid-cols-1 gap-2 pl-5  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
               {organization.topics.map((topic, index) => (
                 <li key={index}>{topic}</li>
               ))}
             </ul>
           ) : (
-            <p className='text-gray-700'>No topics available.</p>
+            <p className=''>No topics available.</p>
           )}
         </div>
       </section>
@@ -206,16 +200,12 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       {ranks && ranks.length > 0 && (
         <section
           id='source-rank'
-          className='mt-6 rounded-lg bg-white px-6 py-4 shadow-md'
+          className='mt-6 rounded-lg bg-white px-4 py-4 shadow-md'
         >
-          <h2 className='mb-6 text-2xl font-semibold text-gray-800'>
-            Source Rank
-          </h2>
+          <h2 className='mb-6 text-2xl font-semibold '>Source Rank</h2>
           {ranks.map((rank, index) => (
             <div key={index} className='mb-4 border-b border-gray-200 pb-4'>
-              <h3 className='mb-2 text-xl font-medium text-gray-700'>
-                {rank.source}
-              </h3>
+              <h3 className='mb-2 text-xl font-medium '>{rank.source}</h3>
               <p className='text-gray-600'>
                 <strong>Rank:</strong> {rank.rank}
               </p>
@@ -229,16 +219,14 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
 
       <section
         id='map'
-        className='mt-6 rounded-lg bg-white px-6 py-4 shadow-md'
+        className='mt-6 rounded-lg bg-white px-4 py-4 shadow-md'
       >
-        <h2 className='mb-4 text-2xl font-semibold text-gray-800'>Map</h2>
+        <h2 className='mb-4 text-2xl font-semibold '>Map</h2>
         {/* Conditionally render Map based on location?.address */}
         {location?.address ? (
           <Map location={location.address} />
         ) : (
-          <p className='text-gray-700'>
-            Location information is not available.
-          </p>
+          <p className=''>Location information is not available.</p>
         )}
       </section>
     </div>

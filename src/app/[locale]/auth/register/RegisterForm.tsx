@@ -110,7 +110,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
             // Form đăng ký (như cũ)
             <div className="space-y-8">
                 <div className="space-y-2 text-center">
-                <h1 className="text-3xl font-bold tracking-tight whitespace-nowrap mx-auto max-w-fit">Welcome Global Conference Hub</h1>
+                <h1 className="text-xl font-bold tracking-tight sm:text-2xl md:text-3xl mx-auto max-w-fit">Welcome Global Conference Hub</h1>
                 <p className="text-sm text-gray-600">Create your account</p>
                 </div>
 
