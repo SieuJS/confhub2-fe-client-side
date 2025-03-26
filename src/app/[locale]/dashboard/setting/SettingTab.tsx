@@ -159,6 +159,23 @@ const SettingTab: React.FC = () => {
     }
   }
 
+  const toggleNotificationWhenAddToBlacklist = async () => {
+    if (user && setting) {
+      await updateUserSetting(user.id, {
+        notificationWhenAddToBlacklist: !setting.notificationWhenAddToBlacklist
+      })
+      setSetting(prev =>
+        prev
+          ? {
+              ...prev,
+              notificationWhenAddToBlacklist: !prev.notificationWhenAddToBlacklist
+            }
+          : null
+      )
+      refetch()
+    }
+  }
+
   const handleDeleteAccount = async () => {
     if (
       window.confirm(
@@ -420,6 +437,36 @@ const SettingTab: React.FC = () => {
               ></div>
             </button>
           </div>
+
+          {/* Option 8: Notification when add to blacklist */}
+          <div className='mb-4 flex items-center justify-between'>
+            <div>
+              <h4 className='font-semibold'>
+                {t('Notification when add to blacklist')}
+              </h4>
+              <p className=' text-sm'>
+                {t('Notification when add to blacklist')}
+              </p>
+            </div>
+            <button
+              className={`h-6 min-w-12 rounded-full transition-colors duration-200 focus:outline-none ${
+                setting.notificationWhenAddToBlacklist
+                  ? 'bg-button'
+                  : 'bg-background-secondary'
+              }`}
+              onClick={toggleNotificationWhenAddToBlacklist}
+              disabled={updateLoading}
+            >
+              <div
+                className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
+                  setting.notificationWhenAddToBlacklist
+                    ? 'translate-x-6'
+                    : 'translate-x-1'
+                }`}
+              ></div>
+            </button>
+          </div>
+
         </section>
 
         {/* Delete Account */}

@@ -31,7 +31,9 @@ const UserDropdown: FC<Props> = ({
   }, [])
 
   return (
-    <div
+    <>
+    {isClient &&
+      <div
       className={`absolute right-0 top-full z-50 mt-2 w-36 rounded-md border border-gray-200 bg-white shadow-lg focus:outline-none dark:border-gray-700 dark:bg-gray-800 ${
         isUserDropdownOpen ? '' : 'hidden'
       }`}
@@ -125,6 +127,8 @@ const UserDropdown: FC<Props> = ({
         </Link>
       </div>
     </div>
+    }
+    </>
   )
 }
 

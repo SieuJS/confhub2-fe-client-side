@@ -5,10 +5,6 @@ export const useMenuState = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
 
-  const closeDropdowns = useCallback(() => {  // Rename from closeAllMenus
-    setIsNotificationOpen(false);
-    setIsUserDropdownOpen(false);
-  }, []);
 
   const closeAllMenus = useCallback(() => { // Function to close all including mobile
       setIsNotificationOpen(false);
@@ -51,7 +47,6 @@ export const useMenuState = () => {
     isNotificationOpen,
     isMobileMenuOpen,
     isUserDropdownOpen,
-    closeDropdowns, // Changed name
     closeAllMenus, // Added for closing all
     toggleNotification,
     toggleMobileMenu,

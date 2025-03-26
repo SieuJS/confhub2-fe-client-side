@@ -2,7 +2,7 @@ import React from 'react'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode
-  variant?: 'primary' | 'secondary'
+  variant?: 'primary' | 'secondary' | 'danger'
   size?: 'small' | 'medium' | 'large'
   rounded?: boolean
   advanced?: boolean
@@ -30,6 +30,7 @@ const Button: React.FC<ButtonProps> = ({
   const variantStyles = {
     primary: 'bg-button text-button-text ring-secondary ring-2',
     secondary: 'bg-button-secondary text-secondary ring-secondary ring-2',
+    danger: 'bg-danger text-danger ring-danger ring-2'
   }
 
   const advancedStyles = advanced ? 'relative hover:shadow-lg transition-shadow duration-300 group' : ''; // group class still needed for button hover effect if you keep it
