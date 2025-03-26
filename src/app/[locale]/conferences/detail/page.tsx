@@ -27,7 +27,7 @@ import useTopicsDisplay from '../../../../hooks/conferenceDetails/useTopicsDispl
 import useFormatConferenceDates from '../../../../hooks/conferenceDetails/useFormatConferenceDates'
 import useAddToCalendar from '../../../../hooks/conferenceDetails/useAddToCalendar'
 import useUpdateConference from '../../../../hooks/conferenceDetails/useUpdateConference' // Import the hook
-import useBlacklistConference from '../../../../hooks/conferenceDetails/useBlacklistConference' // Import the new hook
+import useBlacklistConference from '../../../../hooks/conferenceDetails/useBlacklistConference'; // Import the new hook
 import { add } from 'lodash'
 
 // Define the Feedback type (or import it)
@@ -52,11 +52,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     const router = useRouter()
     const pathname = usePathname()
 
-    const {
-        conferenceDataFromDB,
-        error: dbError,
-        loading: dbLoading
-    } = useConferenceDataFromDB(id)
+    const { conferenceDataFromDB, error: dbError, loading: dbLoading } = useConferenceDataFromDB(id);
 
     // Điều kiện để fetch JSON: DB fetch xong, không lỗi, và có data
     const shouldFetchJson = !dbLoading && !dbError && !!conferenceDataFromDB;
@@ -65,28 +61,12 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     const { conferenceDataFromJSON, error: jsonError, loading: jsonLoading } = useConferenceDataFromJSON(id, shouldFetchJson);
 
 
-    const {
-        isFollowing,
-        handleFollowClick,
-        loading: followLoading,
-        error: followError
-    } = useFollowConference(conferenceDataFromJSON) // Use conferenceDataFromJSON if it has .conference.id
-    const {
-        isAddToCalendar,
-        handleAddToCalendar,
-        loading: calendarLoading,
-        error: calendarError
-    } = useAddToCalendar(conferenceDataFromJSON) // Use conferenceDataFromJSON
-    const { isUpdating, updateResult, updateConference } = useUpdateConference() // Assuming update hook provides loading/error
-    const {
-        isBlacklisted,
-        handleBlacklistClick,
-        loading: blacklistLoading,
-        error: blacklistError
-    } = useBlacklistConference(conferenceDataFromJSON)
+    const { isFollowing, handleFollowClick, loading: followLoading, error: followError } = useFollowConference(conferenceDataFromJSON); // Use conferenceDataFromJSON if it has .conference.id
+    const { isAddToCalendar, handleAddToCalendar, loading: calendarLoading, error: calendarError } = useAddToCalendar(conferenceDataFromJSON); // Use conferenceDataFromJSON
+    const { isUpdating, updateResult, updateConference } = useUpdateConference(); // Assuming update hook provides loading/error
+    const { isBlacklisted, handleBlacklistClick, loading: blacklistLoading, error: blacklistError } = useBlacklistConference(conferenceDataFromJSON);
     const { handleShareClick } = useShareConference(conferenceDataFromDB)
-    const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } =
-        useTopicsDisplay(conferenceDataFromDB?.organization?.topics || [])
+    const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } = useTopicsDisplay(conferenceDataFromDB?.organization?.topics || [])
 
     const transformDates = (dates: ImportantDate[] | null | undefined) => {
         if (!dates) {
@@ -218,25 +198,17 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         )
     }
 
-    const { conference, organization, location, followedBy } =
-        conferenceDataFromDB || {}
-    const isLessReputable = conferenceDataFromJSON?.isLessReputable
+    const { conference, organization, location, followedBy } = conferenceDataFromDB || {};
+    const isLessReputable = conferenceDataFromJSON?.isLessReputable;
 
-    const calculateOverallRating = (
-        feedbacks: Feedback[] | null | undefined
-    ): number => {
-        if (!feedbacks || feedbacks.length === 0) return 0
-        const totalStars = feedbacks.reduce(
-            (sum: number, feedback: Feedback) => sum + (feedback.star ?? 0),
-            0
-        )
-        return totalStars / feedbacks.length
-    }
+    const calculateOverallRating = (feedbacks: Feedback[] | null | undefined): number => {
+        if (!feedbacks || feedbacks.length === 0) return 0;
+        const totalStars = feedbacks.reduce((sum: number, feedback: Feedback) => sum + (feedback.star ?? 0), 0);
+        return totalStars / feedbacks.length;
+    };
 
-    const overallRating = calculateOverallRating(
-        conferenceDataFromJSON?.feedBacks
-    )
-    const totalReviews = conferenceDataFromJSON?.feedBacks?.length || 0
+    const overallRating = calculateOverallRating(conferenceDataFromJSON?.feedBacks);
+    const totalReviews = conferenceDataFromJSON?.feedBacks?.length || 0;
 
     const renderFollowerAvatars = () => {
         if (!followedBy || followedBy.length === 0) {
@@ -269,6 +241,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         )
     }
 
+
     useEffect(() => {
         if (updateResult) {
             // Display a notification (consider using a library like react-toastify)
@@ -282,13 +255,14 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
     // --- Loading & Error States ---
     // Combine loading states if needed for a general overlay
-    const isLoading = dbLoading || jsonLoading || isUpdating
+    const isLoading = dbLoading || jsonLoading || isUpdating;
     // Combine errors or display them separately
-    if (dbError === 'Conference not found') return <NotFoundPage />
+    if (dbError === "Conference not found") return <NotFoundPage />;
     if (jsonError === "Conference not found") return <NotFoundPage />;
 
 
-    if (isLoading) return <Loading /> // Show initial loading
+    if (isLoading) return <Loading />; // Show initial loading
+
 
     return (
         <div className='flex min-h-screen flex-col bg-gray-50'>
@@ -296,12 +270,11 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
             <div className='container mx-auto flex-grow px-4 py-8 pt-20'>
                 {/* Optional: General loading overlay */}
-                {isLoading &&
-                    !dbLoading && !jsonLoading && ( // Show overlay for actions, not initial load
-                        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
-                            <Loading />
-                        </div>
-                    )}
+                {isLoading && !dbLoading && !jsonLoading && ( // Show overlay for actions, not initial load
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                        <Loading />
+                    </div>
+                )}
 
                 {/* Display specific errors (e.g., using toasts) */}
                 {/* {followError && <Toast type="error" message={followError} />} */}
@@ -341,38 +314,20 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                     {/* Text details container */}
                                     {/* ====================== WARNING SECTION ====================== */}
                                     {isLessReputable && (
-                                        <div
-                                            className='mb-4 rounded-md border-l-4 border-yellow-500 bg-yellow-100 p-4 text-yellow-700 shadow-sm'
-                                            role='alert'
-                                        >
-                                            <div className='flex items-center'>
-                                                <svg
-                                                    xmlns='http://www.w3.org/2000/svg'
-                                                    className='mr-3 h-6 w-6 flex-shrink-0'
-                                                    fill='none'
-                                                    viewBox='0 0 24 24'
-                                                    stroke='currentColor'
-                                                    strokeWidth='2'
-                                                >
-                                                    <path
-                                                        strokeLinecap='round'
-                                                        strokeLinejoin='round'
-                                                        d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
-                                                    />
+                                        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 rounded-md shadow-sm" role="alert">
+                                            <div className="flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                                 </svg>
                                                 <div>
-                                                    <p className='font-bold'>
-                                                        Potential Reputation Concern
-                                                    </p>
-                                                    <p className='text-sm'>
-                                                        This conference has been flagged. Please review its
-                                                        details and credibility carefully.
-                                                    </p>
+                                                    <p className="font-bold">Potential Reputation Concern</p>
+                                                    <p className="text-sm">This conference has been flagged. Please review its details and credibility carefully.</p>
                                                 </div>
                                             </div>
                                         </div>
                                     )}
                                     {/* ============================================================ */}
+
                                     <p className='text-sm font-semibold text-red-500'>
                                         {dateDisplay}
                                     </p>
@@ -439,6 +394,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
                                             {organization?.publisher || 'Location Not Available'}
                                         </Link>
+
                                     </div>
                                     {/* Followers Display */}
                                     <div className='mt-2'>{renderFollowerAvatars()}</div>
@@ -486,12 +442,9 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                         variant={isAddToCalendar ? 'primary' : 'secondary'}
                                         size='small'
                                         className='mx-12 flex items-center justify-start gap-x-4' // Added justify-start and gap-x-4 mx-12
-                                        title={
-                                            isAddToCalendar
-                                                ? 'Remove this conference from your personal calendar'
-                                                : 'Add this conference to your personal calendar'
-                                        } // Tooltip
+                                        title={isAddToCalendar ? "Remove this conference from your personal calendar" : "Add this conference to your personal calendar"} // Tooltip
                                         disabled={calendarLoading}
+
                                     >
                                         <svg
                                             xmlns='http://www.w3.org/2000/svg'
@@ -551,12 +504,9 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                         variant={isFollowing ? 'primary' : 'secondary'}
                                         size='small'
                                         className='mx-12 flex items-center justify-start gap-x-4' // Added justify-start and gap-x-4 mx-12
-                                        title={
-                                            isFollowing
-                                                ? 'Remove this conference from your personal follow list'
-                                                : 'Add this conference to your personal follow list'
-                                        } // Tooltip
+                                        title={isFollowing ? "Remove this conference from your personal follow list" : "Add this conference to your personal follow list"} // Tooltip
                                         disabled={followLoading}
+
                                     >
                                         <svg
                                             xmlns='http://www.w3.org/2000/svg'
@@ -582,7 +532,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                         } // Call updateConference
                                         className={`mx-12 flex items-center justify-start gap-x-4 ${isUpdating ? 'cursor-not-allowed opacity-50' : ''}`}
                                         disabled={isUpdating}
-                                        title={'Update latest conference information'}
+                                        title={"Update latest conference information"}
                                     >
                                         <svg
                                             xmlns='http://www.w3.org/2000/svg'
@@ -614,7 +564,8 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                         variant={'secondary'}
                                         size='small'
                                         className='mx-12 flex items-center justify-start gap-x-4' // Added justify-start and gap-x-4 mx-12
-                                        title={'Go to conference website'}
+                                        title={"Go to conference website"}
+
                                     >
                                         <svg
                                             xmlns='http://www.w3.org/2000/svg'
@@ -638,44 +589,18 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                     <Button
                                         onClick={() => checkLoginAndRedirect(handleBlacklistClick)}
                                         variant={isBlacklisted ? 'primary' : 'secondary'} // Use danger variant when blacklisted
-                                        size='small'
-                                        className={`mx-12  flex items-center justify-start gap-x-4 ${blacklistLoading ? 'cursor-not-allowed opacity-50' : ''}`}
+                                        size="small"
+                                        className={`mx-12  flex items-center justify-start gap-x-4 ${blacklistLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         disabled={blacklistLoading}
-                                        title={
-                                            isBlacklisted
-                                                ? 'Remove this conference from your personal blacklist'
-                                                : 'Add this conference to your personal blacklist'
-                                        } // Tooltip
+                                        title={isBlacklisted ? "Remove this conference from your personal blacklist" : "Add this conference to your personal blacklist"} // Tooltip
                                     >
-                                        <svg
-                                            xmlns='http://www.w3.org/2000/svg'
-                                            width='20'
-                                            height='20'
-                                            viewBox='0 0 24 24'
-                                            fill='none'
-                                            stroke='currentColor'
-                                            stroke-width='1.5'
-                                            stroke-linecap='round'
-                                            stroke-linejoin='round'
-                                            className='h-5 w-5'
-                                        >
-                                            <path d='m2 2 20 20' />
-                                            <path d='M8.35 2.69A10 10 0 0 1 21.3 15.65' />
-                                            <path d='M19.08 19.08A10 10 0 1 1 4.92 4.92' />
-                                        </svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" className='h-5 w-5'><path d="m2 2 20 20" /><path d="M8.35 2.69A10 10 0 0 1 21.3 15.65" /><path d="M19.08 19.08A10 10 0 1 1 4.92 4.92" /></svg>
                                         {/* Text changes based on state */}
-                                        {blacklistLoading
-                                            ? 'Processing...'
-                                            : isBlacklisted
-                                                ? 'Blacklisted'
-                                                : 'Blacklist'}
+                                        {blacklistLoading ? 'Processing...' : (isBlacklisted ? 'Blacklisted' : 'Blacklist')}
                                     </Button>
                                     {/* Display blacklist error if needed */}
-                                    {blacklistError && (
-                                        <p className='mt-1 text-center text-xs text-red-500'>
-                                            Error: {blacklistError}
-                                        </p>
-                                    )}
+                                    {blacklistError && <p className="text-red-500 text-xs mt-1 text-center">Error: {blacklistError}</p>}
+
                                 </div>
                             </div>
                         </div>
