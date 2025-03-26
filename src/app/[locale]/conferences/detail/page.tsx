@@ -55,8 +55,8 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     const { conferenceDataFromDB, error: dbError, loading: dbLoading } = useConferenceDataFromDB(id);
     const { conferenceDataFromJSON } = useConferenceDataFromJSON(id)
 
-    const { isFollowing, handleFollowClick, loading: followLoading, error: followError } = useFollowConference(conferenceDataFromDB); // Use conferenceDataFromDB if it has .conference.id
-    const { isAddToCalendar, handleAddToCalendar, loading: calendarLoading, error: calendarError } = useAddToCalendar(conferenceDataFromDB); // Use conferenceDataFromDB
+    const { isFollowing, handleFollowClick, loading: followLoading, error: followError } = useFollowConference(conferenceDataFromJSON); // Use conferenceDataFromJSON if it has .conference.id
+    const { isAddToCalendar, handleAddToCalendar, loading: calendarLoading, error: calendarError } = useAddToCalendar(conferenceDataFromJSON); // Use conferenceDataFromJSON
     const { isUpdating, updateResult, updateConference } = useUpdateConference(); // Assuming update hook provides loading/error
     const { isBlacklisted, handleBlacklistClick, loading: blacklistLoading, error: blacklistError } = useBlacklistConference(conferenceDataFromJSON);
     const { handleShareClick } = useShareConference(conferenceDataFromDB)
@@ -249,7 +249,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
     // --- Loading & Error States ---
     // Combine loading states if needed for a general overlay
-    const isLoading = dbLoading;
+    const isLoading = dbLoading || isUpdating;
     // Combine errors or display them separately
     if (dbError === "Conference not found") return <NotFoundPage />;
     if (dbLoading) return <Loading />; // Show initial loading
