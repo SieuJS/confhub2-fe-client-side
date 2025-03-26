@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Link, pathnames } from '@/src/navigation'
+import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
 import ThemeSwitch from '../ThemeSwitch'
 import LangSwitcher from '../LangSwitcher'
@@ -44,44 +44,7 @@ const MobileNavigation: FC<Props> = ({
         </Link>
 
         {isLogin ? (
-          <>
-            <Link
-              href={{ pathname: `/dashboard`, query: { tab: 'profile' } }}
-              locale={locale}
-            >
-              {t('Profile')}
-            </Link>
-            <Link
-              href={{ pathname: `/dashboard`, query: { tab: 'myconferences' } }}
-              locale={locale}
-            >
-              {t('My_Conferences')}
-            </Link>
-            <Link
-              href={{ pathname: `/dashboard`, query: { tab: 'followed' } }}
-              locale={locale}
-            >
-              {t('Followed')}
-            </Link>
-            <Link
-              href={{ pathname: `/dashboard`, query: { tab: 'note' } }}
-              locale={locale}
-            >
-              {t('Note')}
-            </Link>
-            <Link
-              href={{ pathname: `/dashboard`, query: { tab: 'notifications' } }}
-              locale={locale}
-            >
-              {t('Notifications')}
-            </Link>
-            <Link
-              href={{ pathname: `/dashboard`, query: { tab: 'setting' } }}
-              locale={locale}
-            >
-              {t('Setting')}
-            </Link>
-          </>
+          <></>
         ) : (
           <>
             <Link href={`/auth/login`} locale={locale}>

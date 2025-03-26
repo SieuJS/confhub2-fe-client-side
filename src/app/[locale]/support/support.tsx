@@ -264,104 +264,137 @@ const Support = () => {
   }
   return (
     <>
-      <div className='w-full bg-gradient-to-r from-background to-background-secondary p-8'>
-        {/* Added padding */}
-        <div className='container relative grid grid-cols-1 items-center gap-4 md:grid-cols-3'>
-          <div className='flex flex-col items-center md:col-span-3'>
-            {/* Title and search bar column */}
-            <h2 className='py-8 text-center text-3xl font-bold'>
+      {/* Use mobile-first padding: p-4 default, md:p-8 for medium screens and up */}
+      <div className='w-full bg-gradient-to-r from-background to-background-secondary p-4 md:p-8'>
+        <div className='container mx-auto'>
+          {' '}
+          {/* Added mx-auto for centering container content */}
+          <div className='flex flex-col items-center'>
+            <h2 className='py-6 text-center text-2xl font-bold md:py-8 md:text-3xl'>
               {t('How_can_we_help_you')}
             </h2>
-            {/* Removed pt-40 */}
           </div>
-        </div>
-        {/* Search Bar */}
-        <div className='relative mx-20 mb-12 md:mx-40 lg:mx-60 '>
-          {/* Increased mb for spacing */}
-          <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3'>
-            <svg
-              className='h-5 w-5 '
-              viewBox='0 0 20 20'
-              fill='currentColor'
-              aria-hidden='true'
-            >
-              <path
-                fillRule='evenodd'
-                d='M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z'
-                clipRule='evenodd'
-              />
-            </svg>
-          </div>
-          <input
-            type='text'
-            className='block w-full rounded-full border border-background-secondary bg-background py-6 pl-10 pr-3 shadow-sm focus:border-background-secondary focus:outline-none focus:ring-1 focus:ring-background-secondary sm:text-sm' // Increased py-3 for taller search bar
-            placeholder={t('searchPlaceholder')}
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
-        </div>
-        {/* Two-Column Layout */}
-        <div className='mx-12 flex gap-4'>
-          {/* Using grid for 2-column layout */}
-          {/* Left Column - Categories */}
-          <div className='w-full rounded-lg  p-4 shadow-lg md:w-1/3 '>
-            {/* Adjusted width for smaller screens */}
-
-            <ul className='space-y-2'>
-              <li
-                key='all'
-                className={`cursor-pointer py-1  ${selectedCategory === null ? 'font-bold ' : ''}`}
-                onClick={() => handleCategoryClick(null)}
+          {/* Search Bar */}
+          {/* Adjusted margins for better responsiveness */}
+          <div className='relative mx-auto mb-8 max-w-2xl md:mb-12'>
+            {' '}
+            {/* Use max-width and mx-auto */}
+            <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3'>
+              <svg
+                className='h-5 w-5 ' // Added text color
+                viewBox='0 0 20 20'
+                fill='currentColor'
+                aria-hidden='true'
               >
-                {t('All')}
-              </li>
-              {faqCategories.map(category => (
-                <li
-                  key={category.value}
-                  className={`cursor-pointer py-1  ${selectedCategory === category.value ? 'font-bold ' : ''}`}
-                  onClick={() => handleCategoryClick(category.value)}
-                >
-                  {category.name}
-                </li>
-              ))}
-            </ul>
+                <path
+                  fillRule='evenodd'
+                  d='M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z'
+                  clipRule='evenodd'
+                />
+              </svg>
+            </div>
+            <input
+              type='text'
+              // Consistent padding, maybe slightly less tall than py-6? py-3 or py-4 might be better
+              className='block w-full rounded-full border border-gray-300  py-3 pl-10 pr-3  shadow-sm focus:border-button focus:outline-none focus:ring-1 focus:ring-button sm:text-sm'
+              placeholder={t('searchPlaceholder')}
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
           </div>
-          {/* Right Column - Questions and Answers */}
-          <div className='w-full rounded-lg  p-4 shadow-xl md:w-2/3'>
-            {/* Adjusted width for smaller screens */}
-            <div className='space-y-4'>
-              {filteredFaqData.map((item, index) => (
-                <div key={index} className='rounded-lg border shadow-sm'>
-                  <div
-                    className='flex cursor-pointer items-center justify-between px-4 py-3'
-                    onClick={() => toggleAccordion(index)}
+          {/* Layout: Stack vertically on mobile, horizontally on medium screens+ */}
+          {/* Adjusted gap and margins */}
+          <div className='flex flex-col gap-6 md:flex-row md:gap-8'>
+            {/* Left Column - Categories */}
+            {/* Takes full width on mobile, 1/3 on md+. Added bottom margin for mobile stacking */}
+            <div className='w-full rounded-lg  p-4 shadow-lg  md:mb-0 md:w-1/4 lg:w-1/5'>
+              {' '}
+              {/* Adjusted desktop width */}
+              <h3 className='mb-3 text-lg font-semibold  '>
+                {t('Categories')}
+              </h3>
+              <ul className='space-y-1'>
+                <li
+                  key='all'
+                  className={`cursor-pointer rounded px-2 py-1.5 transition-colors duration-150  ${
+                    selectedCategory === null ? 'font-bold text-button ' : ' '
+                  }`}
+                  onClick={() => handleCategoryClick(null)}
+                >
+                  {t('All')}
+                </li>
+                {faqCategories.map(category => (
+                  <li
+                    key={category.value}
+                    className={`cursor-pointer rounded px-2 py-1.5 transition-colors duration-150  ${
+                      selectedCategory === category.value
+                        ? 'font-bold text-button '
+                        : ' '
+                    }`}
+                    onClick={() => handleCategoryClick(category.value)}
                   >
-                    <h3 className='text-lg font-semibold'>{item.question}</h3>
-                    <svg
-                      className={`h-5 w-5 transition-transform duration-200 ${expandedIndex === index ? 'rotate-180' : ''}`}
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                      xmlns='http://www.w3.org/2000/svg'
+                    {category.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Right Column - Questions and Answers */}
+            {/* Takes full width on mobile, remaining width on md+ */}
+            <div className='w-full rounded-lg p-2 shadow-lg md:w-3/4 lg:w-4/5'>
+              <div className='space-y-4 '>
+                {filteredFaqData.length > 0 ? (
+                  filteredFaqData.map((item, index) => (
+                    <div
+                      key={index}
+                      className='overflow-hidden rounded-lg border border-gray-200  '
                     >
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth='2'
-                        d='M19 9l-7 7-7-7'
-                      ></path>
-                    </svg>
-                  </div>
-                  {expandedIndex === index && (
-                    <div className='px-4 pb-4 pt-0'>
-                      <p>{item.answer}</p>
+                      <div
+                        className='flex cursor-pointer items-center justify-between px-4 py-3 transition-colors duration-150 '
+                        onClick={() => toggleAccordion(index)}
+                        aria-expanded={expandedIndex === index}
+                        aria-controls={`faq-content-${index}`}
+                        id={`faq-header-${index}`}
+                      >
+                        <h3 className='text-base font-semibold   md:text-lg'>
+                          {item.question}
+                        </h3>
+                        <svg
+                          className={`h-5 w-5 text-gray-500 transition-transform duration-200  ${
+                            expandedIndex === index ? 'rotate-180' : ''
+                          }`}
+                          fill='none'
+                          stroke='currentColor'
+                          viewBox='0 0 24 24'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <path
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                            strokeWidth='2'
+                            d='M19 9l-7 7-7-7'
+                          ></path>
+                        </svg>
+                      </div>
+                      {/* Smooth transition for accordion */}
+                      <div
+                        id={`faq-content-${index}`}
+                        role='region'
+                        aria-labelledby={`faq-header-${index}`}
+                        className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedIndex === index ? 'max-h-screen' : 'max-h-0'}`}
+                      >
+                        <div className='px-4 pb-4 pt-2  '>
+                          <p>{item.answer}</p>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </div>
-              ))}
-              {filteredFaqData.length === 0 && (
-                <p className='text-gray-500'>{t('noResultsFound')}</p>
-              )}
+                  ))
+                ) : (
+                  <div className='rounded-lg border border-gray-200  p-4 text-center shadow-sm  '>
+                    <p className=''>{t('noResultsFound')}</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 // src/components/ProfileTab.tsx
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react' // <--- Thêm useEffect
 import Image from 'next/image'
 import Button from '../../utils/Button'
 import { useTranslations } from 'next-intl'
@@ -47,6 +47,31 @@ const ProfileTab: React.FC = () => {
   ]
 
   const [showChangePasswordForm, setShowChangePasswordForm] = useState(false)
+  // --- START: Sửa lỗi Hydration cho Date of Birth ---
+  const [formattedDob, setFormattedDob] = useState<string | null>(null) // State để lưu ngày sinh đã định dạng
+
+  useEffect(() => {
+    // Chỉ chạy ở client sau khi component đã mount
+    if (userData?.dob) {
+      try {
+        // Định dạng ngày tháng ở client
+        const date = new Date(userData.dob)
+        // Kiểm tra xem date có hợp lệ không trước khi định dạng
+        if (!isNaN(date.getTime())) {
+          setFormattedDob(date.toLocaleDateString())
+        } else {
+          console.error('Invalid date format received for dob:', userData.dob)
+          setFormattedDob(t('Invalid_Date')) // Hoặc hiển thị thông báo lỗi
+        }
+      } catch (e) {
+        console.error('Error formatting date:', e)
+        setFormattedDob(t('Invalid_Date')) // Xử lý lỗi nếu có
+      }
+    } else {
+      setFormattedDob(null) // Reset nếu không có dob
+    }
+  }, [userData?.dob, t]) // Thêm dependency t nếu bạn dùng trong chuỗi lỗi
+  // --- END: Sửa lỗi Hydration ---
 
   if (loading) {
     return (
@@ -73,7 +98,7 @@ const ProfileTab: React.FC = () => {
   }
 
   return (
-    <div className='h-screen w-full overflow-hidden rounded-lg bg-background  shadow-md md:px-12 md:py-8'>
+    <div className='w-full overflow-hidden rounded-lg bg-background shadow-md md:px-12 md:py-8'>
       {/* Cover Photo */}
       <div className='relative h-80 overflow-hidden rounded-lg'>
         <Image
@@ -81,14 +106,14 @@ const ProfileTab: React.FC = () => {
           alt='Cover Photo'
           fill
           style={{ objectFit: 'cover' }}
-          sizes=' 100vw, 100vw'
+          sizes='100vw, 100vw' // Sửa sizes cho hợp lệ hơn
           priority
         />
         {isEditing && (
           <button
             type='button'
             onClick={() => setShowBackgroundModal(true)}
-            className='absolute bottom-2 right-2 rounded bg-background  px-4 py-2 text-sm font-medium opacity-80 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
+            className='absolute bottom-2 right-2 rounded bg-background px-4 py-2 text-sm font-medium opacity-80 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
           >
             {t('Change_Background')}
           </button>
@@ -97,18 +122,17 @@ const ProfileTab: React.FC = () => {
 
       {/* Profile Info Section */}
       <div className='relative flex flex-col items-center gap-5 py-5 md:flex-row md:items-center md:px-6'>
-        {/* Avatar */}
         <div className='relative -mt-40 h-40 w-40 overflow-hidden rounded-full border-4 border-button-text bg-background'>
           <img
             src={displayAvatarUrl}
             alt={`Avatar of ${userData.firstName} ${userData.lastName}`}
-            style={{ width: '100vw', height: '', objectFit: 'cover' }}
+            className='h-full w-full object-cover' // Dùng className thay vì style inline nếu có thể
           />
           {isEditing && (
             <button
               type='button'
               onClick={() => setShowAvatarModal(true)}
-              className='absolute bottom-2 left-2 rounded bg-background bg-opacity-70 px-4 py-2 text-sm font-medium  hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
+              className='absolute bottom-2 left-2 rounded bg-background bg-opacity-70 px-4 py-2 text-sm font-medium hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
             >
               {t('Change_Avatar')}
             </button>
@@ -117,41 +141,30 @@ const ProfileTab: React.FC = () => {
 
         {/* Name and Title */}
         <div className='flex-grow'>
-          <h1 className='text-center text-3xl font-bold md:text-left'>
+          <h1 className='text-center text-xl font-bold md:text-left md:text-3xl'>
             {userData.firstName} {userData.lastName}
           </h1>
           {userData.aboutme && (
-            <p className='text-sm'>
+            <p className='text-center text-sm md:text-left'>
               <span className='text-base font-semibold'>{t('About_me')}:</span>{' '}
               {userData.aboutme.split(' ').map((word, index) => (
-                <React.Fragment key={index}>
-                  {word} {index % 10 === 5 && <br />}{' '}
-                  {/* Add a line break every 10 words */}
-                </React.Fragment>
+                <React.Fragment key={index}>{word} </React.Fragment>
               ))}
             </p>
           )}
           {userData.address && (
-            <p className='text-sm'>
+            <p className='text-center text-sm md:text-left'>
               <span className='text-base font-semibold'>{t('Address')}:</span>{' '}
               {userData.address}
             </p>
           )}
-
-          <div className='mt-3 space-x-3'>
-            <button className='rounded-full bg-button px-5 py-2 font-semibold text-white transition duration-300 ease-in-out hover:bg-button'>
-              {t('Following')}
-            </button>
-            <button className='rounded-full bg-background px-5 py-2 font-semibold  transition duration-300 ease-in-out hover:bg-background'>
-              Message
-            </button>
-          </div>
         </div>
       </div>
 
       {/* Avatar Modal */}
       {showAvatarModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
+          {/* Nội dung Modal không thay đổi */}
           <div className='w-full max-w-md rounded-lg bg-background p-6 shadow-lg'>
             <h2 className='mb-4 text-lg font-semibold'>
               {t('Select_an_Avatar')}
@@ -160,7 +173,7 @@ const ProfileTab: React.FC = () => {
               {avatarOptions.map((avatarUrl: string) => (
                 <button
                   key={avatarUrl}
-                  onClick={() => handleAvatarSelect(avatarUrl)} // Call handleAvatarSelect
+                  onClick={() => handleAvatarSelect(avatarUrl)}
                   className='aspect-square overflow-hidden rounded-full hover:ring-2 hover:ring-button hover:ring-offset-2'
                 >
                   <Image
@@ -169,7 +182,7 @@ const ProfileTab: React.FC = () => {
                     width={100}
                     height={100}
                     className='h-full w-full object-cover'
-                    priority
+                    priority // Chỉ dùng priority cho ảnh quan trọng nhất, LCP
                   />
                 </button>
               ))}
@@ -177,7 +190,7 @@ const ProfileTab: React.FC = () => {
             <button
               type='button'
               onClick={() => setShowAvatarModal(false)}
-              className='mt-4 w-full rounded-md bg-background-secondary px-4  py-2 text-sm font-medium opacity-80  hover:bg-background-secondary hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
+              className='mt-4 w-full rounded-md bg-background-secondary px-4 py-2 text-sm font-medium opacity-80 hover:bg-background-secondary hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
             >
               {t('Cancel')}
             </button>
@@ -188,6 +201,7 @@ const ProfileTab: React.FC = () => {
       {/* Background Modal */}
       {showBackgroundModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
+          {/* Nội dung Modal không thay đổi */}
           <div className='w-full max-w-lg rounded-lg bg-background p-6 shadow-lg'>
             <h2 className='mb-4 text-lg font-semibold'>
               {t('Select_a_Background')}
@@ -196,16 +210,16 @@ const ProfileTab: React.FC = () => {
               {backgroundOptions.map((backgroundUrl: string) => (
                 <button
                   key={backgroundUrl}
-                  onClick={() => handleBackgroundSelect(backgroundUrl)} // Call handleBackgroundSelect
+                  onClick={() => handleBackgroundSelect(backgroundUrl)}
                   className='aspect-video overflow-hidden rounded hover:ring-2 hover:ring-button hover:ring-offset-2'
                 >
                   <Image
                     src={backgroundUrl}
                     alt='Background Option'
                     width={300}
-                    height={200}
+                    height={200} // Đảm bảo tỷ lệ khung hình nếu dùng width/height
                     className='h-full w-full object-cover'
-                    priority
+                    priority // Chỉ dùng priority cho ảnh quan trọng nhất, LCP
                   />
                 </button>
               ))}
@@ -213,7 +227,7 @@ const ProfileTab: React.FC = () => {
             <button
               type='button'
               onClick={() => setShowBackgroundModal(false)}
-              className='mt-4 w-full rounded-md bg-background-secondary px-4  py-2 text-sm font-medium opacity-80  hover:bg-background-secondary hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
+              className='mt-4 w-full rounded-md bg-background-secondary px-4 py-2 text-sm font-medium opacity-80 hover:bg-background-secondary hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
             >
               {t('Cancel')}
             </button>
@@ -224,8 +238,9 @@ const ProfileTab: React.FC = () => {
       {/* Edit/Display Section */}
       <div className='border-t border-background p-6'>
         {isEditing ? (
-          // Edit Form
+          // Edit Form (Nội dung không thay đổi)
           <div className='space-y-6 py-2'>
+            {/* Các input fields giữ nguyên */}
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
               <div>
                 <label
@@ -264,10 +279,11 @@ const ProfileTab: React.FC = () => {
                   {t('Date_of_Birth')}
                 </label>
                 <input
-                  type='date'
+                  type='date' // input type date thường trả về YYYY-MM-DD
                   id='dob'
                   name='dob'
-                  value={editedData.dob || ''}
+                  // Lấy phần date nếu dob từ server có dạng ISO string
+                  value={editedData.dob?.split('T')[0] || ''}
                   onChange={handleInputChange}
                   className='focus:ring-none mt-1 block w-full rounded-md border-button bg-opacity-70 p-2 shadow-md focus:border-2 focus:outline-none focus:ring-button'
                 />
@@ -375,7 +391,7 @@ const ProfileTab: React.FC = () => {
               </Button>
               <Button
                 variant='primary'
-                onClick={handleChangePasswordClick} // Gọi hàm mở form đổi mật khẩu
+                onClick={handleChangePasswordClick}
                 className='rounded-md px-4 py-2 focus:outline-none focus:ring-2'
               >
                 {t('Change_Password')}
@@ -387,14 +403,17 @@ const ProfileTab: React.FC = () => {
                 <span className='font-semibold'>Email:</span>{' '}
                 <a className='text-button hover:underline'>{userData.email}</a>
               </p>
-              {/* Display dob if it exists */}
-              {userData.dob && (
+
+              {/* --- START: Sử dụng state đã định dạng --- */}
+              {/* Chỉ hiển thị khi formattedDob không phải null (tức là có dob và đã định dạng) */}
+              {formattedDob && (
                 <p>
                   <span className='font-semibold'>{t('Date_of_Birth')}:</span>{' '}
-                  {new Date(userData.dob).toLocaleDateString()}
+                  {formattedDob} {/* <--- Thay thế ở đây */}
                 </p>
               )}
-              {/* Display other fields here */}
+              {/* --- END: Sử dụng state đã định dạng --- */}
+
               {userData.phone && (
                 <p>
                   <span className='font-semibold'>{t('Phone')}:</span>{' '}
@@ -402,33 +421,39 @@ const ProfileTab: React.FC = () => {
                 </p>
               )}
 
-              {userData.interestedTopics && (
-                <div>
-                  <span className='mb-4 font-semibold'>
-                    {t('Interested_Topics')}:
-                  </span>
-                  <div className='flex flex-wrap gap-2'>
-                    {userData.interestedTopics.map(topic => (
-                      <Link
-                        key={topic}
-                        href={{
-                          pathname: `/conferences`,
-                          query: { topics: topic }
-                        }}
-                        className='hover:text-text-secondary'
-                      >
-                        <span className='rounded-full bg-button px-4 py-2 text-sm text-button-text'>
-                          {topic}
-                        </span>
-                      </Link>
-                    ))}
+              {userData.interestedTopics &&
+                userData.interestedTopics.length > 0 && ( // Kiểm tra mảng không rỗng
+                  <div className='pt-2'>
+                    {' '}
+                    {/* Thêm padding top */}
+                    <span className='mb-2 block font-semibold'>
+                      {' '}
+                      {/* Dùng block và margin bottom */}
+                      {t('Interested_Topics')}:
+                    </span>
+                    <div className='flex flex-wrap gap-2'>
+                      {userData.interestedTopics.map(topic => (
+                        <Link
+                          key={topic}
+                          href={{
+                            pathname: `/conferences`,
+                            query: { topics: topic }
+                          }}
+                          className='hover:text-text-secondary'
+                        >
+                          <span className='rounded-full bg-button px-4 py-2 text-sm text-button-text'>
+                            {topic}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </div>
           </>
         )}
       </div>
+
       {showChangePasswordForm && (
         <ChangePasswordForm
           userId={userData.id}
