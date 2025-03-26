@@ -312,5 +312,7 @@
   "Error": "Error",
   "language": "en",
   "Change_Password": "Change Password",
-  "View_all": "View all"
+  "View_all": "View all",
+  "Start": "Start",
+  "End": "End"
 }

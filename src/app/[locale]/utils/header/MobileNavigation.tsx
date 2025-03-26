@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Link } from '@/src/navigation'
+import { Link, pathnames } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
 import ThemeSwitch from '../ThemeSwitch'
 import LangSwitcher from '../LangSwitcher'
@@ -43,7 +43,46 @@ const MobileNavigation: FC<Props> = ({
           {t('Add_Conference')}
         </Link>
 
-        {isLogin ? null : (
+        {isLogin ? (
+          <>
+            <Link
+              href={{ pathname: `/dashboard`, query: { tab: 'profile' } }}
+              locale={locale}
+            >
+              {t('Profile')}
+            </Link>
+            <Link
+              href={{ pathname: `/dashboard`, query: { tab: 'myconferences' } }}
+              locale={locale}
+            >
+              {t('My_Conferences')}
+            </Link>
+            <Link
+              href={{ pathname: `/dashboard`, query: { tab: 'followed' } }}
+              locale={locale}
+            >
+              {t('Followed')}
+            </Link>
+            <Link
+              href={{ pathname: `/dashboard`, query: { tab: 'note' } }}
+              locale={locale}
+            >
+              {t('Note')}
+            </Link>
+            <Link
+              href={{ pathname: `/dashboard`, query: { tab: 'notifications' } }}
+              locale={locale}
+            >
+              {t('Notifications')}
+            </Link>
+            <Link
+              href={{ pathname: `/dashboard`, query: { tab: 'setting' } }}
+              locale={locale}
+            >
+              {t('Setting')}
+            </Link>
+          </>
+        ) : (
           <>
             <Link href={`/auth/login`} locale={locale}>
               {t('Login')}
@@ -54,8 +93,12 @@ const MobileNavigation: FC<Props> = ({
           </>
         )}
       </div>
-      {/* <ThemeSwitch />
-      <LangSwitcher /> */}
+      {isLogin ? null : (
+        <>
+          <ThemeSwitch />
+          <LangSwitcher />
+        </>
+      )}
     </div>
   )
 }

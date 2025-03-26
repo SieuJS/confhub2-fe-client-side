@@ -73,7 +73,7 @@ export const Header: FC<Props> = ({ locale }) => {
           <div className='mb-2 h-10 w-10'>
             <LogoIcon />
           </div>
-          <strong className='mx-2 hidden select-none sm:block'>ConFHub</strong>
+          <strong className='mx-2  select-none'>ConFHub</strong>
         </div>
       </Link>
 

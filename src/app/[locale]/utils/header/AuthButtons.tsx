@@ -9,12 +9,12 @@ import { NotificationIcon, UserIcon } from './Icon'
 import { usePathname } from 'next/navigation'
 
 interface Props {
-  isLogin: boolean;
-  locale: string;
-  toggleNotification: () => void;
-  toggleUserDropdown: () => void;
-  notificationEffect: boolean;
-  unreadCount: number | string;
+  isLogin: boolean
+  locale: string
+  toggleNotification: () => void
+  toggleUserDropdown: () => void
+  notificationEffect: boolean
+  unreadCount: number | string
 }
 
 const AuthButtons: FC<Props> = ({
@@ -23,31 +23,34 @@ const AuthButtons: FC<Props> = ({
   toggleNotification,
   toggleUserDropdown,
   notificationEffect,
-  unreadCount,
+  unreadCount
 }) => {
-  const t = useTranslations('');
-  const pathname = usePathname();
+  const t = useTranslations('')
+  const pathname = usePathname()
 
   // Render UI cho trạng thái đã đăng nhập
   if (isLogin) {
     return (
       <>
         <button className='' onClick={toggleNotification}>
-          <NotificationIcon notificationEffect={notificationEffect} unreadCount={unreadCount} />
+          <NotificationIcon
+            notificationEffect={notificationEffect}
+            unreadCount={unreadCount}
+          />
         </button>
         <button onClick={toggleUserDropdown}>
           <UserIcon />
         </button>
       </>
-    );
+    )
   }
 
   // Render UI cho trạng thái chưa đăng nhập
   return (
     <>
       <div className='flex pt-1 font-bold'>
-        <ThemeSwitch />
-        <LangSwitcher />
+        {/* <ThemeSwitch /> */}
+        {/* <LangSwitcher /> */}
       </div>
       <Link
         lang={locale}
@@ -77,7 +80,7 @@ const AuthButtons: FC<Props> = ({
         </div>
       </Link>
     </>
-  );
-};
+  )
+}
 
-export default AuthButtons;
+export default AuthButtons

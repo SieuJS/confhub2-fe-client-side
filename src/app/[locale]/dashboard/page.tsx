@@ -11,12 +11,14 @@ import ProfileTab from './profile/ProfileTab'
 import NoteTab from './note/NoteTab'
 import MyConferencesTab from './myConferences/MyConferencesTab'
 import { Header } from '../utils/Header'
+import { useMediaQuery } from 'react-responsive'
 
 export default function Dashboard({ locale }: { locale: string }) {
   const t = useTranslations('')
   const searchParams = useSearchParams()
   const [activePage, setActivePage] = useState<string>('')
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const isMobile = useMediaQuery({ maxWidth: 768 })
 
   useEffect(() => {
     const tab = searchParams.get('tab')
@@ -37,13 +39,12 @@ export default function Dashboard({ locale }: { locale: string }) {
     setActivePage(initialPage)
   }, [searchParams])
 
-
   const renderPage = () => {
     switch (activePage) {
       case 'Setting':
         return <SettingTab />
       case 'Notifications':
-        return <NotificationsTab/>
+        return <NotificationsTab />
       case 'Followed':
         return <FollowedTab />
       case 'Note':
@@ -251,8 +252,9 @@ export default function Dashboard({ locale }: { locale: string }) {
         <div className='w-full bg-background py-8'></div>
         <div className='flex'>
           {/* Sidebar */}
-          <aside
-            className={`
+          {isMobile ? null : (
+            <aside
+              className={`
               fixed
               flex
               flex-col
@@ -262,18 +264,18 @@ export default function Dashboard({ locale }: { locale: string }) {
               ease-in-out
               ${isSidebarOpen ? 'w-50' : 'w-16'}
             `}
-            style={{
-              height: 'calc(100vh - 72px)', // Adjust 72px if your header height changes.  Crucially *don't* set a fixed height.
-              overflowY: 'auto' // Add this to allow scrolling within the sidebar if content overflows.
-            }}
-          >
-            <nav className='w-full flex-grow'>
-              <ul className='w-full'>
-                {/* Toggle Button */}
-                <li className='w-full'>
-                  <button
-                    onClick={toggleSidebar}
-                    className={`
+              style={{
+                height: 'calc(100vh - 72px)', // Adjust 72px if your header height changes.  Crucially *don't* set a fixed height.
+                overflowY: 'auto' // Add this to allow scrolling within the sidebar if content overflows.
+              }}
+            >
+              <nav className='w-full flex-grow'>
+                <ul className='w-full'>
+                  {/* Toggle Button */}
+                  <li className='w-full'>
+                    <button
+                      onClick={toggleSidebar}
+                      className={`
                       duration-600
                       flex
                       w-full
@@ -288,25 +290,25 @@ export default function Dashboard({ locale }: { locale: string }) {
                       active:bg-blue-700
                       ${isSidebarOpen ? 'justify-start' : 'justify-center'}
                     `}
-                  >
-                    {/* Conditional margin on toggle icon */}
-                    <span className={isSidebarOpen ? 'mr-4' : ''}>
-                      {isSidebarOpen ? closeIcon : openIcon}
-                    </span>
-                    {isSidebarOpen && <span>{t('Close')}</span>}
-                  </button>
-                </li>
+                    >
+                      {/* Conditional margin on toggle icon */}
+                      <span className={isSidebarOpen ? 'mr-4' : ''}>
+                        {isSidebarOpen ? closeIcon : openIcon}
+                      </span>
+                      {isSidebarOpen && <span>{t('Close')}</span>}
+                    </button>
+                  </li>
 
-                {menuItems.map(item => {
-                  const tabValue = item.page.toLowerCase().replace(/ /g, '')
-                  return (
-                    <li className='w-full' key={item.page}>
-                      <Link
-                        href={{
-                          pathname: '/dashboard',
-                          query: { tab: tabValue }
-                        }}
-                        className={`
+                  {menuItems.map(item => {
+                    const tabValue = item.page.toLowerCase().replace(/ /g, '')
+                    return (
+                      <li className='w-full' key={item.page}>
+                        <Link
+                          href={{
+                            pathname: '/dashboard',
+                            query: { tab: tabValue }
+                          }}
+                          className={`
                           duration-600
                           flex
                           items-center 
@@ -317,32 +319,47 @@ export default function Dashboard({ locale }: { locale: string }) {
                           hover:bg-button
                           hover:opacity-60
                           focus:outline-none
-                          ${activePage === item.page
-                            ? 'bg-button text-button-text hover:bg-secondary'
-                            : ''
+                          ${
+                            activePage === item.page
+                              ? 'bg-button text-button-text hover:bg-secondary'
+                              : ''
                           }
-                          ${isSidebarOpen
-                            ? 'w-50 h-12 justify-start'
-                            : 'h-12 w-16 justify-center'
+                          ${
+                            isSidebarOpen
+                              ? 'w-50 h-12 justify-start'
+                              : 'h-12 w-16 justify-center'
                           }
                         `}
-                      >
-                        {/* Conditional margin on menu item icons */}
-                        <span className={isSidebarOpen ? 'mr-4' : ''}>
-                          {item.icon}
-                        </span>
-                        {isSidebarOpen && <span>{item.label}</span>}
-                      </Link>
-                    </li>
-                  )
-                })}
-              </ul>
-            </nav>
-          </aside>
+                        >
+                          {/* Conditional margin on menu item icons */}
+                          <span className={isSidebarOpen ? 'mr-4' : ''}>
+                            {item.icon}
+                          </span>
+                          {isSidebarOpen && <span>{item.label}</span>}
+                        </Link>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </nav>
+            </aside>
+          )}
 
           {/* Main Content */}
-          <div
-            className={`
+          {isMobile ? (
+            <div
+              className='
+              duration-50
+              min-h-screen
+              flex-1
+              transition-all
+              ease-in-out'
+            >
+              {renderPage()}
+            </div>
+          ) : (
+            <div
+              className={`
               duration-50
               min-h-screen
               flex-1
@@ -350,9 +367,10 @@ export default function Dashboard({ locale }: { locale: string }) {
               ease-in-out
               ${isSidebarOpen ? 'ml-48' : 'ml-16'}
             `}
-          >
-            {renderPage()}
-          </div>
+            >
+              {renderPage()}
+            </div>
+          )}
         </div>
       </div>
       {/* <Footer /> */}
