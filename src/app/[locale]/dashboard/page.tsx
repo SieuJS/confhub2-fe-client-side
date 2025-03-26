@@ -347,16 +347,7 @@ export default function Dashboard({ locale }: { locale: string }) {
 
           {/* Main Content */}
           {isMobile ? (
-            <div
-              className='
-              duration-50
-              min-h-screen
-              flex-1
-              transition-all
-              ease-in-out'
-            >
-              {renderPage()}
-            </div>
+            <div className='flex-1'>{renderPage()}</div>
           ) : (
             <div
               className={`
