@@ -53,7 +53,7 @@ export const MenuIcon: FC = () => (
     strokeWidth='2'
     strokeLinecap='round'
     strokeLinejoin='round'
-    className='lucide lucide-menu'
+    className='lucide lucide-menu pointer-events-none'
   >
     <line x1='3' x2='21' y1='12' y2='12' />
     <line x1='3' x2='21' y1='6' y2='6' />
@@ -68,7 +68,7 @@ export const CloseIcon: FC = () => (
     viewBox='0 0 24 24'
     strokeWidth={1.5}
     stroke='currentColor'
-    className='text-foreground h-5 w-5'
+    className='text-foreground h-5 w-5 pointer-events-none'
   >
     <path
       strokeLinecap='round'

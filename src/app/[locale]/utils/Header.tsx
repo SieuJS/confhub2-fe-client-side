@@ -44,7 +44,6 @@ export const Header: FC<Props> = ({ locale }) => {
     isNotificationOpen,
     isMobileMenuOpen,
     isUserDropdownOpen,
-    closeDropdowns, // Changed name
     closeAllMenus,
     toggleMobileMenu,
     openNotification,
@@ -52,7 +51,7 @@ export const Header: FC<Props> = ({ locale }) => {
     openMobileMenu // Added for mobile menu
   } = useMenuState()
 
-  useClickOutside(headerRef, closeDropdowns, 'notification-dropdown') // Changed function
+  useClickOutside(headerRef, closeAllMenus, 'notification-dropdown') // Changed function
 
   const unreadCount = () => {
     const unread = notifications.filter(
