@@ -4,18 +4,23 @@ export type UserResponse = {
   email: string;
   firstName: string;
   lastName: string;
-  dob?: string; // Optional, as it might not be present in all users
+  dob?: string;
+  password?: string;
   role: string;
   avatar?: string;
   aboutme?: string;
   interestedTopics?: string[];
   background?: string;
-  followedConferences?: Follow[]; // Now an array of objects
-  myConferences?: MyConference[]; // Now an array of objects
-  calendar?: Calendar[]; // Replace 'any' with a more specific type if you have one
+  followedConferences?: Follow[];
+  myConferences?: MyConference[];
+  calendar?: Calendar[];
   feedBacks?: string[];
   notifications?: Notification[];
-  setting? : Setting;
+  blacklist?: BlackList[]; // <-- ADD THIS LINE
+  setting?: Setting;
+  isVerified?: boolean;
+  verificationToken?: string | null;
+  verificationTokenExpires?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -50,6 +55,10 @@ export type Notification = {
   type: string;
 }
 
+export type BlackList = {
+  id: string;
+  addedAt: string;
+}
 
 export type Setting = {
   receiveNotifications?: boolean;
@@ -60,4 +69,5 @@ export type Setting = {
   notificationWhenUpdateProfile?: boolean;
   notificationWhenFollow?: boolean;
   notificationWhenAddTocalendar?: boolean;
+  notificationWhenAddToBlacklist?: boolean;
 }

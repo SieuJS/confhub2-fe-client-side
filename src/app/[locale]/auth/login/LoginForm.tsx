@@ -14,7 +14,7 @@ const LoginForm: React.FC = () => {
     handleSubmit,
     handleGoogleLogin,
     error,
-        isLoading
+    isLoading
   } = useLoginForm();
 
 

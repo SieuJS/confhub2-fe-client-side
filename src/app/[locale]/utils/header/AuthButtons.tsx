@@ -3,8 +3,6 @@
 import { FC } from 'react'
 import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
-import ThemeSwitch from '../ThemeSwitch'
-import LangSwitcher from '../LangSwitcher'
 import { NotificationIcon, UserIcon } from './Icon'
 import { usePathname } from 'next/navigation'
 
