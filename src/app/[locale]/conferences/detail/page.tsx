@@ -98,7 +98,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
     // --- Helper Function for Authentication Check ---
     const checkLoginAndRedirect = (callback: () => void) => {
-        if(!isLoggedIn) {
+        if (!isLoggedIn) {
             // --- Prepend Locale Prefix ---
             const localePrefix = pathname.split('/')[1];
             const pathWithLocale = `/${localePrefix}/auth/login`;
@@ -155,6 +155,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     }
 
     const { conference, organization, location, followedBy } = conferenceDataFromDB || {};
+    const isLessReputable = conferenceDataFromJSON?.isLessReputable;
 
     const calculateOverallRating = (feedbacks: Feedback[] | null | undefined): number => {
         if (!feedbacks || feedbacks.length === 0) return 0;
@@ -241,6 +242,22 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                     />
                                 </div>
                                 <div className="md:w-3/4 md:pl-6">    {/* Text details container */}
+                                    {/* ====================== WARNING SECTION ====================== */}
+                                    {isLessReputable && (
+                                        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 rounded-md shadow-sm" role="alert">
+                                            <div className="flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                </svg>
+                                                <div>
+                                                    <p className="font-bold">Potential Reputation Concern</p>
+                                                    <p className="text-sm">This conference has been flagged. Please review its details and credibility carefully.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {/* ============================================================ */}
+
                                     <p className="text-red-500 text-sm font-semibold">{dateDisplay}</p>
                                     <h1 className="font-bold text-3xl md:text-3xl mt-1">{conference?.title || "Conference Details"}</h1>
                                     <p className="text-gray-600 text-sm flex items-center">
@@ -259,6 +276,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
                                             {organization?.publisher || "Location Not Available"}
                                         </Link>
+
                                     </div>
 
                                     {/* Followers Display */}
@@ -349,10 +367,10 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                         {isFollowing ? 'Followed' : 'Follow'}
                                     </Button>
 
-                                     <Button
+                                    <Button
                                         variant={'secondary'}
                                         size="small"
-                                         onClick={() => checkLoginAndRedirect(() => updateConference(id))} // Call updateConference
+                                        onClick={() => checkLoginAndRedirect(() => updateConference(id))} // Call updateConference
                                         className={`flex items-center justify-start gap-x-4 mx-14 ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         disabled={isUpdating}
                                     >
