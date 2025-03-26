@@ -7,19 +7,22 @@ export type ConferenceInfo = {
   id: string;
   title: string;
   acronym: string;
-  location: Location | null; // Location có thể null
-  rank: string | null;       // Thêm rank trực tiếp, và có thể null
-  source: string | null;     // Thêm source trực tiếp, có thể null
-  year: number | null;        // year có thể null
-  researchFields: string[];   // researchFields là một mảng string (có thể rỗng)
-  topics: string[];           // topics là một mảng string (có thể rỗng)
-  dates: ImportantDates[] | null; // dates là một mảng ImportantDates, hoặc null
-  link: string | null;         // link có thể null
+  location: Location | null;
+  rank: string | null;
+  source: string | null;
+  year: number | null;
+  researchFields: string;
+  topics: string[];
+  dates: ImportantDates | null;
+  link: string | null;
+  publisher: string | null;
   createdAt: string;
   updatedAt: string;
   creatorId: string;
-  accessType: string | null;  // accessType có thể null
+  accessType: string | null;
   status: string;
+  isLessReputable?: boolean; // <-- ADD THIS LINE
+
 };
 
 export type Location = {
@@ -29,16 +32,16 @@ export type Location = {
   continent: string | null;
 };
 
-// Loại bỏ RankSourceFoRData, vì nó không phản ánh đúng cấu trúc dữ liệu
-// Thay vào đó, 'rank' và 'source' được đưa trực tiếp vào ConferenceInfo
 
-// ImportantDates should be an object, not nullable itself.
+
+
 export type ImportantDates = {
   name: string;
   type: string;
-  fromDate: string | null; // Allow null for individual dates
-  toDate: string | null;   // Allow null for individual dates
-};
+  fromDate: string;
+  toDate: string;
+} | null;
+//Nếu dates không bao giờ là null, mà là một array có thể chứa các object null, thì ImportantDates[] là đủ
 
 export type Meta = {
   curPage: number;

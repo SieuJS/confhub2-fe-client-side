@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import EventCard from './EventCard';
 import EventTable from './EventTable';
 import useConferenceResults from '@/src/hooks/conferences/useConferenceResults';
+
 import Pagination from '../utils/Pagination';
 
 interface ResultsSectionProps { }

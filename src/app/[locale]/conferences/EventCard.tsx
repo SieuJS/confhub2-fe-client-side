@@ -100,6 +100,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
             </span>
           </div>
         )}
+       
       </div>
 
       {/* Content */}

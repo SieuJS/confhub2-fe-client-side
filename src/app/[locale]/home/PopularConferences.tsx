@@ -1,111 +1,92 @@
 // PopularConferences.tsx
 "use client";
 
-import React, { useRef } from 'react';
-// import Image from 'next/image'; // No longer needed, EventCard handles it
-import { useTranslations } from 'next-intl'
-import usePopularConferences from '../../../hooks/home/usePopularConferences'; // Import hook
-import EventCard from '../conferences/EventCard'; // Import EventCard
+import React from 'react';
+import { useTranslations } from 'next-intl';
+import usePopularConferences from '../../../hooks/home/usePopularConferences';
+import EventCard from '../conferences/EventCard';
 
 
+const cardWidthDesktop = 320;
+const gap = 16;
+const desktopContainerWidth = cardWidthDesktop * 3 + gap * 2;
 
 const PopularConferences: React.FC = () => {
   const t = useTranslations('');
   const {
     listConferences,
-    isHovered,
-    displayedCards,
     loading,
+    error,
+    scrollerRef,
     scroll,
-    handleMouseEnter,
-    handleMouseLeave,
-    visibleCount,
-  } = usePopularConferences(3);
+    isAtStart, // Lấy state từ hook
+    isAtEnd,   // Lấy state từ hook
+    setIsHovering, // Lấy hàm set state từ hook
+  } = usePopularConferences();
 
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const cardWidth = 250;  // Width of the card itself
-  const gap = 16;        // Gap between cards
-  const containerWidth = cardWidth * visibleCount + gap * (visibleCount - 1); // Correct total width
-  const transitionDuration = 500;
-
+  // Không hiển thị nếu không có hoặc chỉ có 1 conference (vì không cuộn được)
+  if (!listConferences || listConferences.length < 1 || error) return null;
+  // Xác định xem có cần căn giữa trên desktop không
+  const shouldCenterDesktop = listConferences && listConferences.length < 3;
 
   return (
-    <>
-    {listConferences && listConferences.length > 0 && 
-    <section id="organizers" className="m-6 px-8 pt-10 ">
-      <style jsx>{`
-        .card {
-          transition: transform ${transitionDuration}ms ease-in-out, opacity ${transitionDuration}ms ease-in-out;
-          position: absolute;
-          opacity: 0;
-          transform: translateX(100%);
-        }
-
-        .card-active {
-          transform: translateX(0);
-          opacity: 1;
-          position: relative;
-          z-index: 10;
-        }
-        .card-leaving {
-          opacity: 0;
-          transform: translateX(${scroll.name === 'left' ? '-100%' : '100%'});
-          z-index: 5;
-        }
-      `}</style>
-      <h1 className="text-2xl font-bold text-center mb-6">{t('Popular_Conferences')}</h1>
-      <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+    <section id="popular-conferences" className="m-4 px-4 pt-10 sm:m-6 sm:px-0">
+      <h1 className="mb-6 text-center text-2xl font-bold">{t('Popular_Conferences')}</h1>
+      <div className="relative">
+        {/* Nút Trái - Thêm disabled và styling */}
         <button
           onClick={() => scroll('left')}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white bg-opacity-50 rounded-full p-2 hover:bg-opacity-75 focus:outline-none"
+          aria-label="Scroll Left"
+          disabled={isAtStart || listConferences.length === 1} // Vô hiệu hóa nút
+          className={`absolute -left-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/60 p-2 shadow-md hover:bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:-left-7 sm:p-3 md:-left-0 ${
+            isAtStart || listConferences.length === 1 ? 'cursor-not-allowed opacity-30' : '' // Style khi bị vô hiệu hóa
+          }`}
         >
-          <img src="https://cdn-icons-png.flaticon.com/512/271/271220.png" alt="Left" className="w-4 h-4" />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-4 w-4 sm:h-5 sm:w-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+          </svg>
         </button>
+        {/* Nút Phải - Thêm disabled và styling */}
         <button
           onClick={() => scroll('right')}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white bg-opacity-50 rounded-full p-2 hover:bg-opacity-75 focus:outline-none"
+          aria-label="Scroll Right"
+          disabled={isAtEnd || listConferences.length === 1} // Vô hiệu hóa nút
+          className={`absolute -right-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/60 p-2 shadow-md hover:bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:-right-7 sm:p-3 md:-right-0 ${
+            isAtEnd || listConferences.length === 1 ? 'cursor-not-allowed opacity-30' : '' // Style khi bị vô hiệu hóa
+          }`}
         >
-          <img src="https://cdn-icons-png.flaticon.com/512/271/271228.png" alt="Right" className="w-4 h-4" />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-4 w-4 sm:h-5 sm:w-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+          </svg>
         </button>
 
-        <div id="organizer" className="flex overflow-x-hidden w-full justify-center" ref={scrollerRef} >
-          <div className="flex relative">
-            {displayedCards.map((conference, index) => {
-              const isActive = index >= 1 && index <= 3;
-              const relativeIndex = index - 2;
-              const position = `calc(${relativeIndex * (80 + 8)}px)`;
-
-
-              return (
-                <div
-                  key={conference?.id ? conference.id : `empty-${index}`}  // Use a unique key
-                  className={`scroller-item snap-start w-80 h-100 transition-all duration-200
-                                      ${isActive ? 'card-active' : 'card'}
-                                      card-index-${index}
-                                    `}
-                  style={{ left: position }}
-                 //  Call handleClick with the ID
-                >
-                  {isActive && (
-                    <div className="flex flex-col w-full h-full justify-start items-stretch grid grid-cols-1">
-                      <EventCard
-                        key={conference?.id}
-                        event={conference}
-                        className={`flex-shrink-0 mr-[${gap}px]`} // Add flex-shrink-0 and margin
-                        style={{ width: `${cardWidth}px`, height: '1000px' }} // Set consistent width
-
-                      />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+        {/* Container cuộn - Thêm sự kiện hover */}
+        <div
+          id="conference-scroller"
+          ref={scrollerRef}
+          onMouseEnter={() => setIsHovering(true)} // Set hover khi chuột vào
+          onMouseLeave={() => setIsHovering(false)} // Bỏ hover khi chuột ra
+          className={
+            `flex snap-x snap-mandatory space-x-4 overflow-x-scroll scroll-smooth scrollbar-hide ` +
+            `px-[calc((100%-theme(width.72))/2)] py-4 ` + // Mobile padding
+            // Desktop: Chiều rộng cố định, căn giữa container, và căn giữa nội dung nếu ít hơn 3 card
+            `sm:mx-auto sm:w-[${desktopContainerWidth}px] sm:px-0 ${shouldCenterDesktop ? 'sm:justify-center' : ''}` // <-- THÊM sm:justify-center có điều kiện
+            // Sử dụng giá trị pixel nếu cần:
+            // `px-[calc((100%-288px)/2)] py-4 ` +
+            // `sm:mx-auto sm:w-[992px] sm:px-0`
+          }
+        >
+          {listConferences.map((conference) => (
+            <div key={conference.id} className="snap-center flex-shrink-0">
+              <EventCard
+                event={conference}
+                className="h-full w-72 sm:w-80"
+              />
+            </div>
+          ))}
         </div>
       </div>
     </section>
-    }
-    </>
   );
 };
 
