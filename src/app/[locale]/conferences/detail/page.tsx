@@ -102,7 +102,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
   // --- Helper Function for Authentication Check ---
   const checkLoginAndRedirect = (callback: () => void) => {
-    if  (!isLoggedIn) {
+    if (!isLoggedIn) {
       // --- Prepend Locale Prefix ---
       const localePrefix = pathname.split('/')[1]
       const pathWithLocale = `/${localePrefix}/auth/login`
@@ -194,17 +194,25 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     )
   }
 
-    const { conference, organization, location, followedBy } = conferenceDataFromDB || {};
-    const isLessReputable = conferenceDataFromJSON?.isLessReputable;
+  const { conference, organization, location, followedBy } =
+    conferenceDataFromDB || {}
+  const isLessReputable = conferenceDataFromJSON?.isLessReputable
 
-    const calculateOverallRating = (feedbacks: Feedback[] | null | undefined): number => {
-        if (!feedbacks || feedbacks.length === 0) return 0;
-        const totalStars = feedbacks.reduce((sum: number, feedback: Feedback) => sum + (feedback.star ?? 0), 0);
-        return totalStars / feedbacks.length;
-    };
+  const calculateOverallRating = (
+    feedbacks: Feedback[] | null | undefined
+  ): number => {
+    if (!feedbacks || feedbacks.length === 0) return 0
+    const totalStars = feedbacks.reduce(
+      (sum: number, feedback: Feedback) => sum + (feedback.star ?? 0),
+      0
+    )
+    return totalStars / feedbacks.length
+  }
 
-    const overallRating = calculateOverallRating(conferenceDataFromJSON?.feedBacks);
-    const totalReviews = conferenceDataFromJSON?.feedBacks?.length || 0;
+  const overallRating = calculateOverallRating(
+    conferenceDataFromJSON?.feedBacks
+  )
+  const totalReviews = conferenceDataFromJSON?.feedBacks?.length || 0
 
   const renderFollowerAvatars = () => {
     if (!followedBy || followedBy.length === 0) {
@@ -259,7 +267,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     <div className='flex min-h-screen flex-col bg-gray-50'>
       <Header locale={locale} />
 
-      <div className='container mx-auto flex-grow px-4 py-8 pt-20'>
+      <div className='container mx-auto flex-grow px-0 py-8 pt-20 md:px-4'>
         {/* px and py on container */}
         {isUpdating && ( // Use isUpdating from the hook
           <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
@@ -267,7 +275,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
           </div>
         )}
 
-        <div className='rounded-lg bg-white p-6 shadow-md'>
+        <div className='rounded-lg bg-white p-2 shadow-md md:p-6'>
           {' '}
           {/* Main content wrapper */}
           <div className='flex flex-col gap-6 md:flex-row'>
@@ -290,29 +298,47 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                     }
                     width={300}
                     height={300}
-                    className='h-auto w-full rounded-lg' // Make image responsive
+                    className='hidden h-auto w-full rounded-lg md:block' // Make image responsive
                     style={{ objectFit: 'contain' }}
                   />
                 </div>
                 <div className='md:w-3/4 md:pl-6'>
                   {' '}
                   {/* Text details container */}
-                                    {/* ====================== WARNING SECTION ====================== */}
-                                    {isLessReputable && (
-                                        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 rounded-md shadow-sm" role="alert">
-                                            <div className="flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                                </svg>
-                                                <div>
-                                                    <p className="font-bold">Potential Reputation Concern</p>
-                                                    <p className="text-sm">This conference has been flagged. Please review its details and credibility carefully.</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                    {/* ============================================================ */}
-
+                  {/* ====================== WARNING SECTION ====================== */}
+                  {isLessReputable && (
+                    <div
+                      className='mb-4 rounded-md border-l-4 border-yellow-500 bg-yellow-100 p-4 text-yellow-700 shadow-sm'
+                      role='alert'
+                    >
+                      <div className='flex items-center'>
+                        <svg
+                          xmlns='http://www.w3.org/2000/svg'
+                          className='mr-3 h-6 w-6 flex-shrink-0'
+                          fill='none'
+                          viewBox='0 0 24 24'
+                          stroke='currentColor'
+                          strokeWidth='2'
+                        >
+                          <path
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                            d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
+                          />
+                        </svg>
+                        <div>
+                          <p className='font-bold'>
+                            Potential Reputation Concern
+                          </p>
+                          <p className='text-sm'>
+                            This conference has been flagged. Please review its
+                            details and credibility carefully.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {/* ============================================================ */}
                   <p className='text-sm font-semibold text-red-500'>
                     {dateDisplay}
                   </p>
@@ -379,7 +405,6 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
                       {organization?.publisher || 'Location Not Available'}
                     </Link>
-
                   </div>
                   {/* Followers Display */}
                   <div className='mt-2'>{renderFollowerAvatars()}</div>
