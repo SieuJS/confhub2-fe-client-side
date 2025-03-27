@@ -52,6 +52,23 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
 
       <Link
         lang={locale}
+        href={`/visualization`}
+        className={`group relative pt-2 font-semibold ${isActive('/visualization') ? 'text-selected' : ''}`}
+      >
+        {/* Loại bỏ div */}
+        {t('Visualization')}
+        <span
+          className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ${
+            isActive('/visualization')
+              ? 'scale-x-100'
+              : 'scale-x-0 group-hover:scale-x-100'
+          }`}
+        ></span>
+      </Link>
+
+
+      <Link
+        lang={locale}
         href={`/chatbot`}
         className={`group relative  pt-2 font-semibold ${isActive('/chatbot') ? 'text-selected' : ''}`}
       >
