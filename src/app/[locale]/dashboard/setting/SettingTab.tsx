@@ -367,7 +367,7 @@ const SettingTab: React.FC = () => {
                 {t('Notification_when_update_profile')}
               </h4>
               <p className=' text-sm'>
-                {t('Notification_when_update_profile')}
+                {t('Notification_when_update_profile_description')}
               </p>
             </div>
             <button
@@ -393,7 +393,9 @@ const SettingTab: React.FC = () => {
           <div className='mb-4 flex items-center justify-between'>
             <div>
               <h4 className='font-semibold'>{t('Notification_when_follow')}</h4>
-              <p className=' text-sm'>{t('Notification_when_follow')}</p>
+              <p className=' text-sm'>
+                {t('Notification_when_follow_description')}
+              </p>
             </div>
             <button
               className={`h-6 min-w-12 rounded-full transition-colors duration-200 focus:outline-none ${
@@ -421,7 +423,7 @@ const SettingTab: React.FC = () => {
                 {t('Notification_when_add_to_calendar')}
               </h4>
               <p className=' text-sm'>
-                {t('Notification_when_add_to_calendar')}
+                {t('Notification_when_add_to_calendar_description')}
               </p>
             </div>
             <button
@@ -450,7 +452,7 @@ const SettingTab: React.FC = () => {
                 {t('Notification_when_add_to_blacklist')}
               </h4>
               <p className=' text-sm'>
-                {t('Notification_when_add_to_blacklist')}
+                {t('Notification_when_add_to_blacklist_description')}
               </p>
             </div>
             <button

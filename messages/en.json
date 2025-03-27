@@ -294,6 +294,7 @@
   "Mark All As Read": "Mark All As Read",
   "Notification_when_add_to_calendar": "Notification when add to calendar",
   "Notification_when_follow": "Notification when follow",
+  "Notification_when_follow_description": "Receive notifications when there are new updates about the conference.",
   "Notification_when_update_profile": "Notification when update profile",
   "Receive_Notifications": "Receive Notifications",
   "Receive_Notifications_Description": "Receive notifications about conferences you follow, important dates, and other updates.",
@@ -513,5 +514,8 @@
   "Categories": "Categories",
   "FAQ": "FAQ",
   "Blacklisted": "Blacklisted",
-  "Notification_when_add_to_blacklist": "Notification when add to blacklist"
+  "Notification_when_add_to_blacklist": "Notification when add to blacklist",
+  "Notification_when_add_to_blacklist_description": "Receive notifications when a conference is added to the blacklist.",
+  "Notification_when_add_to_calendar_description": "Receive notifications when a conference is added to the calendar.",
+  "Notification_when_update_profile_description": "Receive notifications when your profile is updated."
 }
