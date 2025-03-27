@@ -139,7 +139,7 @@ const NotificationsTab: React.FC = () => {
       <div className='mb-4 '>
         <input
           type='text'
-          placeholder='Search notifications...'
+          placeholder={t('Search_notifications')}
           className='w-full rounded-full border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-button'
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}

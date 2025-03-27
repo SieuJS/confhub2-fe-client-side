@@ -226,7 +226,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 onChange={handleTopicInputChange}
                 onKeyDown={handleTopicInputKeyDown}
                 className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none' // Reduced py and px
-                placeholder='Enter topics'
+                placeholder={t('Enter_topics')}
               />
               {topicSuggestions.length > 0 && (
                 <ul className='absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded border border-gray-300 bg-white shadow-md'>

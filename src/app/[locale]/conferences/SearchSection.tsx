@@ -100,7 +100,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
           </svg>
           <input
             type='text'
-            placeholder='Type a command or search...'
+            placeholder={t('Type_a_command_or_search')}
             className='w-full bg-transparent text-sm outline-none'
             value={confKeyword}
             onChange={handleKeywordChange}
@@ -114,10 +114,10 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
             >
               <span className='text-sm'>
                 {selectSearchType === 'keyword'
-                  ? 'Keyword'
+                  ? t('Keyword')
                   : selectSearchType === 'title'
-                    ? 'Title'
-                    : 'Acronym'}
+                    ? t('Title')
+                    : t('Acronym')}
               </span>
               {/* Hiển thị searchType hiện tại */}
               <svg
@@ -147,19 +147,19 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
                     onClick={() => handleSearchTypeChange('keyword')}
                     className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                   >
-                    Keyword
+                    {t('Keyword')}
                   </button>
                   <button
                     onClick={() => handleSearchTypeChange('title')}
                     className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                   >
-                    Title
+                    {t('Title')}
                   </button>
                   <button
                     onClick={() => handleSearchTypeChange('acronym')}
                     className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                   >
-                    Acronym
+                    {t('Acronym')}
                   </button>
                 </div>
               </div>
@@ -224,7 +224,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
               />
             </svg>
             <span className='text-sm'>
-              {selectedLocation ? selectedLocation : 'Location'}
+              {selectedLocation ? selectedLocation : t('Location')}
             </span>
           </button>
 
@@ -238,7 +238,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
               >
                 <input
                   type='text'
-                  placeholder='Search location...'
+                  placeholder={t('Search_location')}
                   className='block w-full px-4 py-2 text-sm text-gray-700 focus:outline-none'
                   onChange={handleLocationSearchChange}
                   onClick={e => e.stopPropagation()}
@@ -287,7 +287,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
               />
             </svg>
             <span className='text-sm'>
-              {selectedType ? selectedType : 'Type'}
+              {selectedType ? selectedType : t('Type')}
             </span>
           </button>
 

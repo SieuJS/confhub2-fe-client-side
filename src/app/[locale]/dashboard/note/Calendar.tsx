@@ -498,7 +498,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                 </svg>
               </button>
               <div className='w-36 text-center text-lg font-semibold'>
-                Week {getWeek(currentDate)}, {currentYear}
+                {t('Week')} {getWeek(currentDate)}, {currentYear}
               </div>
               <button onClick={goToNextWeek} className='rounded-full p-1 '>
                 <svg
@@ -530,7 +530,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
         <div className='mx-auto flex items-center'>
           <input
             type='text'
-            placeholder='Search events...'
+            placeholder={t('Search_events')}
             value={searchText}
             onChange={e => setSearchText(e.target.value)}
             className='rounded border bg-background p-2'

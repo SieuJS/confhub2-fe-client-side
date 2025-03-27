@@ -596,5 +596,22 @@
       "Scientific Disciplines"
     ],
     "buttonText": "Explore"
-  }
+  },
+  "Current_Password": "Current Password",
+  "Confirm": "Confirm",
+  "Verifying": "Verifying...",
+  "New_Password": "New Password",
+  "Confirm_New_Password": "Confirm New Password",
+  "Changing": "Changing...",
+  "Please_log_in_to_view_blacklisted_conferences": "Please log in to view blacklisted conferences.",
+  "Blacklisted_Conferences": "Blacklisted Conferences",
+  "You_have_not_blacklisted_any_conferences_yet": "You have not blacklisted any conferences yet.",
+  "Blacklisted_Time": "Blacklisted Time",
+  "Search_notifications": "Search notifications...",
+  "Search_events": "Search events...",
+  "Search_location": "Search location...",
+  "Type_a_command_or_search": "Type a command or search...",
+  "Keyword": "Keyword",
+  "Enter_topics": "Enter topics",
+  "or": "or"
 }
