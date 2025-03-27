@@ -314,5 +314,103 @@
   "Change_Password": "Change Password",
   "View_all": "View all",
   "Start": "Start",
-  "End": "End"
+  "End": "End",
+  "AIAbilities": {
+    "easeOfUse": {
+      "category": "EASE OF USE",
+      "headline": "Natural Conversations, Simple Management",
+      "description": "Provides an intuitive interface for both customers and support agents. Customers get quick answers through natural, multi-language conversations. Businesses can easily set up, customize scenarios, and track effectiveness without complex technical skills.",
+      "exampleTexts": [
+        "User-friendly chat interface.",
+        "Quick setup, no coding required.",
+        "Multi-language support.",
+        "Centralized conversation management."
+      ]
+    },
+    "efficiency": {
+      "category": "EFFICIENCY",
+      "headline": "Instant Response, 24/7 Support",
+      "description": "Answers customer inquiries instantly, day or night, reducing wait times and increasing satisfaction. Chatbots handle frequently asked questions, allowing agents to focus on more complex issues. Optimize resources and support costs.",
+      "exampleTitle": "Optimize Time & Costs",
+      "exampleDescription": "Reduced average response time.\nLower support cost per interaction."
+    },
+    "quality": {
+      "category": "QUALITY",
+      "headline": "Consistent & Reliable",
+      "description": "Ensures every answer is consistent, matches the brand voice, and is based on an approved knowledge base. Easily escalate complex or sensitive conversations to human agents for a seamless and professional experience.",
+      "quote": "Combining intelligent automation with the human touch."
+    },
+    "innovation": {
+      "category": "INNOVATION & INTELLIGENCE",
+      "headline": "Personalized & Smart Automation",
+      "description": "Leverages AI to understand context, predict needs, and personalize customer interactions. Automatically collect information, categorize requests, and seamlessly integrate with CRM and Helpdesk systems. Continuously learns to improve performance.",
+      "buttons": [
+        "Natural Language Processing (NLP)",
+        "API & Webhook Integration",
+        "Sentiment Analysis",
+        "Workflow Automation"
+      ]
+    }
+  },
+  "AIFAQ": {
+    "title": "FAQ",
+    "headline": "Your Chatbot & Live Chat Questions Answered",
+    "categories": {
+      "getting-started": {
+        "title": "Getting Started",
+        "questions": [
+          {
+            "q": "How easy is it to set up the chatbot/live chat?",
+            "a": "Setup is designed to be simple! Use our visual builder to create conversation flows without coding. Integration typically involves adding a small code snippet to your website or using our plugins for platforms like WordPress."
+          },
+          {
+            "q": "Can I integrate this with my existing website/CRM?",
+            "a": "Absolutely. We offer easy integration via JavaScript snippet for websites, plus APIs and webhooks to connect with most popular CRMs and helpdesks like Salesforce, HubSpot, Zendesk, and more."
+          },
+          {
+            "q": "What customization options are available for the chat widget?",
+            "a": "You can customize colors, logos, welcome messages, agent avatars, and widget positioning to perfectly match your brand identity and website design."
+          }
+        ]
+      },
+      "functionality-features": {
+        "title": "Functionality & Features",
+        "questions": [
+          {
+            "q": "How does the chatbot understand customer questions?",
+            "a": "Our chatbot uses advanced Natural Language Processing (NLP) and machine learning to understand user intent, recognize keywords, and handle typos or variations in phrasing to provide relevant answers."
+          },
+          {
+            "q": "Can conversations be transferred from chatbot to a human agent?",
+            "a": "Yes, seamlessly. You can set rules for automatic handover (e.g., based on keywords, sentiment, or failed attempts) or allow users to request a human agent at any time during the chat."
+          },
+          {
+            "q": "What analytics and reporting features are included?",
+            "a": "Gain insights with detailed reports on conversation volume, chatbot resolution rates, agent performance, customer satisfaction scores (CSAT), frequently asked questions, and more."
+          },
+          {
+            "q": "Does it support automated responses or canned messages?",
+            "a": "Yes, both chatbot and live chat support pre-defined responses (canned messages) for common queries, ensuring faster and consistent replies from both AI and human agents."
+          }
+        ]
+      },
+      "general": {
+        "title": "General",
+        "questions": [
+          {
+            "q": "What languages does the chatbot support?",
+            "a": "Our platform supports multiple languages. The chatbot can auto-detect the user's language or be configured for specific language preferences."
+          },
+          {
+            "q": "How is customer data and privacy handled?",
+            "a": "We prioritize security and privacy. All data is encrypted in transit and at rest. We are compliant with major regulations like GDPR and CCPA. Specific data handling policies are detailed in our privacy documentation."
+          },
+          {
+            "q": "What kind of customer support do you offer?",
+            "a": "We provide comprehensive support including detailed documentation, a knowledge base, email support, and live chat support during business hours for higher-tier plans."
+          }
+        ]
+      }
+    }
+  }
 }
