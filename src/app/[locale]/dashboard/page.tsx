@@ -1,64 +1,71 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
-import { Link } from '@/src/navigation';
-import SettingTab from './setting/SettingTab';
-import NotificationsTab from './notification/NotificationsTab';
-import FollowedTab from './follow/FollowedTab';
-import BlacklistTab from './blacklist/BlacklistTab';
-import ProfileTab from './profile/ProfileTab';
-import NoteTab from './note/NoteTab';
-import MyConferencesTab from './myConferences/MyConferencesTab';
-import { Header } from '../utils/Header';
-import { useMediaQuery } from 'react-responsive';
+import React, { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
+import { useSearchParams } from 'next/navigation'
+import { Link } from '@/src/navigation'
+import SettingTab from './setting/SettingTab'
+import NotificationsTab from './notification/NotificationsTab'
+import FollowedTab from './follow/FollowedTab'
+import BlacklistTab from './blacklist/BlacklistTab'
+import ProfileTab from './profile/ProfileTab'
+import NoteTab from './note/NoteTab'
+import MyConferencesTab from './myConferences/MyConferencesTab'
+import { Header } from '../utils/Header'
+import { useMediaQuery } from 'react-responsive'
 
 export default function Dashboard({ locale }: { locale: string }) {
-  const t = useTranslations('');
-  const searchParams = useSearchParams();
-  const [activePage, setActivePage] = useState<string>('');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Giữ nguyên init là false
+  const t = useTranslations('')
+  const searchParams = useSearchParams()
+  const [activePage, setActivePage] = useState<string>('')
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false) // Giữ nguyên init là false
 
   // --- Thêm state để kiểm tra client ---
-  const [isClient, setIsClient] = useState(false);
-  const isMobile = useMediaQuery({ maxWidth: 768 }); // Vẫn gọi hook
+  const [isClient, setIsClient] = useState(false)
+  const isMobile = useMediaQuery({ maxWidth: 768 }) // Vẫn gọi hook
 
   useEffect(() => {
     // Chỉ chạy ở client sau khi mount
-    setIsClient(true);
-  }, []);
+    setIsClient(true)
+  }, [])
   // --------------------------------------
 
   useEffect(() => {
     // Logic cập nhật activePage dựa trên searchParams (giữ nguyên)
-    const tab = searchParams.get('tab');
-    let initialPage = 'Profile'; // Mặc định là Profile nếu không có tab hợp lệ
-    if (tab === 'followed') initialPage = 'Followed';
-    else if (tab === 'myconferences') initialPage = 'My Conferences';
-    else if (tab === 'note') initialPage = 'Note';
-    else if (tab === 'notifications') initialPage = 'Notifications';
-    else if (tab === 'blacklisted') initialPage = 'Blacklisted';
-    else if (tab === 'setting') initialPage = 'Setting';
+    const tab = searchParams.get('tab')
+    let initialPage = 'Profile' // Mặc định là Profile nếu không có tab hợp lệ
+    if (tab === 'followed') initialPage = 'Followed'
+    else if (tab === 'myconferences') initialPage = 'My Conferences'
+    else if (tab === 'note') initialPage = 'Note'
+    else if (tab === 'notifications') initialPage = 'Notifications'
+    else if (tab === 'blacklisted') initialPage = 'Blacklisted'
+    else if (tab === 'setting') initialPage = 'Setting'
     // Không cần else if (tab === 'profile') vì đã là mặc định
-    setActivePage(initialPage);
-  }, [searchParams]); // Phụ thuộc vào searchParams
+    setActivePage(initialPage)
+  }, [searchParams]) // Phụ thuộc vào searchParams
 
   const renderPage = () => {
     // Chỉ render nội dung tab KHI activePage đã được set (hoặc dùng giá trị mặc định)
     // Không cần thay đổi nhiều ở đây, vì activePage được set trong useEffect
     switch (activePage) {
-      case 'Setting': return <SettingTab />;
-      case 'Notifications': return <NotificationsTab />;
-      case 'Followed': return <FollowedTab />;
-      case 'Blacklisted': return <BlacklistTab />;
-      case 'Note': return <NoteTab />;
-      case 'My Conferences': return <MyConferencesTab />;
-      case 'Profile': return <ProfileTab />;
+      case 'Setting':
+        return <SettingTab />
+      case 'Notifications':
+        return <NotificationsTab />
+      case 'Followed':
+        return <FollowedTab />
+      case 'Blacklisted':
+        return <BlacklistTab />
+      case 'Note':
+        return <NoteTab />
+      case 'My Conferences':
+        return <MyConferencesTab />
+      case 'Profile':
+        return <ProfileTab />
       default: // Render ProfileTab trong lần đầu hoặc nếu activePage không hợp lệ
-        return <ProfileTab />;
+        return <ProfileTab />
     }
-  };
+  }
 
   const menuItems = [
     {
@@ -187,8 +194,21 @@ export default function Dashboard({ locale }: { locale: string }) {
       page: 'Blacklisted',
       label: t('Blacklisted'),
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 2 20 20" /><path d="M8.35 2.69A10 10 0 0 1 21.3 15.65" /><path d="M19.08 19.08A10 10 0 1 1 4.92 4.92" /></svg>
-
+        <svg
+          xmlns='http://www.w3.org/2000/svg'
+          width='20'
+          height='20'
+          viewBox='0 0 24 24'
+          fill='none'
+          stroke='currentColor'
+          strokeWidth='1.5'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+        >
+          <path d='m2 2 20 20' />
+          <path d='M8.35 2.69A10 10 0 0 1 21.3 15.65' />
+          <path d='M19.08 19.08A10 10 0 1 1 4.92 4.92' />
+        </svg>
       )
     },
     {
@@ -254,10 +274,9 @@ export default function Dashboard({ locale }: { locale: string }) {
   const toggleSidebar = () => {
     // Chỉ toggle khi đã ở client (an toàn hơn)
     if (isClient) {
-      setIsSidebarOpen(!isSidebarOpen);
+      setIsSidebarOpen(!isSidebarOpen)
     }
-  };
-
+  }
 
   // --- Điều chỉnh phần return ---
 
@@ -272,13 +291,15 @@ export default function Dashboard({ locale }: { locale: string }) {
           <div className='w-full bg-background py-8'></div>
           <div className='flex'>
             {/* Render trống hoặc skeleton cho sidebar và content */}
-            <div className="flex-1 min-h-screen"> {/* Div placeholder */}
+            <div className='min-h-screen flex-1'>
+              {' '}
+              {/* Div placeholder */}
               {/* Loading indicator or skeleton */}
             </div>
           </div>
         </div>
       </>
-    );
+    )
   }
 
   // --- Khi đã ở client (isClient = true) ---
@@ -380,7 +401,7 @@ export default function Dashboard({ locale }: { locale: string }) {
           {/* Main Content: Render div và áp dụng margin nếu cần (ở client và không mobile) */}
           <div
             className={`
-              min-h-screen flex-1 transition-all ease-in-out duration-100
+              min-h-screen flex-1 transition-all duration-100 ease-in-out
               ${!isMobile && (isSidebarOpen ? 'ml-48' : 'ml-16')} 
             `}
           >
@@ -391,5 +412,5 @@ export default function Dashboard({ locale }: { locale: string }) {
       </div>
       {/* <Footer /> */}
     </>
-  );
+  )
 }

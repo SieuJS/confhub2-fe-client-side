@@ -1,27 +1,28 @@
 // src/components/Feedback/SignInPrompt.tsx
-import React from 'react';
+import React from 'react'
+import { useTranslations } from 'next-intl'
 
 interface SignInPromptProps {
-    onSignInClick: () => void;
+  onSignInClick: () => void
 }
 
 const SignInPrompt: React.FC<SignInPromptProps> = ({ onSignInClick }) => {
-    return (
-        <div className='border-t border-gray-200 pt-6 text-center sm:text-left'>
-            <p className='mb-2 text-gray-600'>
-                Want to share your feedback?
-            </p>
-            <p className='mb-4 text-gray-600'>
-                Please sign in to post your feedback.
-            </p>
-            <button
-                className='rounded-md bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600'
-                onClick={onSignInClick}
-            >
-                Sign In
-            </button>
-        </div>
-    );
-};
+  const t = useTranslations('')
 
-export default SignInPrompt;
+  return (
+    <div className='border-t border-gray-200 pt-6 text-center sm:text-left'>
+      <p className='mb-2 text-gray-600'>{t('Want_to_share_your_feedback')}</p>
+      <p className='mb-4 text-gray-600'>
+        {t('Please_sign_in_to_post_your_feedback')}
+      </p>
+      <button
+        className='rounded-md bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600'
+        onClick={onSignInClick}
+      >
+        {t('Sign_In')}
+      </button>
+    </div>
+  )
+}
+
+export default SignInPrompt

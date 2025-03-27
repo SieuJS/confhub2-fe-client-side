@@ -9,6 +9,7 @@ import remarkGfm from 'remark-gfm'
 import remarkBreaks from 'remark-breaks'
 import useSectionNavigation from '../../../../hooks/conferenceDetails/useSectionNavigation'
 import useActiveSection from '../../../../hooks/conferenceDetails/useActiveSection'
+import { useTranslations } from 'next-intl'
 
 interface ConferenceTabsProps {
   conference: ConferenceResponse | null
@@ -18,6 +19,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
   conference
 }) => {
   const navRef = useRef<HTMLElement>(null)
+  const t = useTranslations('')
 
   // Dynamically create the sections array.  Include 'source-rank' only if ranks exist.
   const updatedSections = conference
@@ -40,7 +42,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
   useSectionNavigation({ navRef, setActiveSection })
 
   const formatDate = (date: string | null | undefined): string => {
-    if (!date) return 'TBD'
+    if (!date) return t('TBD')
     const dateObj = new Date(date)
     if (isNaN(dateObj.getTime())) {
       return 'Invalid Date'
@@ -55,7 +57,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
   if (!conference) {
     return (
       <div className='flex h-40 items-center justify-center'>
-        <p className='text-lg text-gray-500'>Loading conference details...</p>
+        <p className='text-lg '>{t('Loading_conference_details')}</p>
       </div>
     )
   }
@@ -82,7 +84,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
             <a
               key={section}
               href={href}
-              className={`rounded-lg px-4 py-2 font-medium transition-colors duration-200 ${
+              className={`rounded-lg px-2 py-2 font-medium transition-colors duration-200 md:px-4 ${
                 activeSection === section
                   ? 'bg-gray-100 text-blue-600'
                   : 'text-gray-600 hover:bg-gray-100 hover:text-blue-600'
@@ -90,7 +92,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
             >
               {/* Display section name.  Convert kebab-case to title case. */}
               {section === 'Call for papers'
-                ? 'Call for papers'
+                ? t('Call_for_papers')
                 : section
                     .split('-')
                     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -105,32 +107,36 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         id='overview'
         className='mt-4 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
-        <h2 className='mb-4 text-2xl font-semibold '>Overview</h2>
+        <h2 className='mb-4 text-xl font-semibold md:text-2xl '>
+          {t('Overview')}
+        </h2>
         <p className='leading-relaxed '>
-          {organization?.summerize || 'No summerize available.'}
+          {organization?.summerize || t('No_summerize_available')}
         </p>
       </section>
 
       <section
         id='important-date'
-        className='mt-6 rounded-lg bg-white px-4 py-4 shadow-md'
+        className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
-        <h2 className='mb-6 text-2xl font-semibold '>Important Dates</h2>
+        <h2 className='mb-6 text-xl font-semibold md:text-2xl '>
+          {t('Important_Dates')}
+        </h2>
         {!dates || dates.length === 0 ? (
-          <p className=''>No Important Dates Available</p>
+          <p className=''>{t('No_Important_Dates_Available')}</p>
         ) : (
           <div className='overflow-x-auto'>
             <table className='min-w-full border border-gray-300 bg-white text-sm'>
               <thead className='bg-gray-100 '>
                 <tr>
-                  <th className='border-b border-gray-300 px-4 py-3 text-left'>
-                    Name
+                  <th className='border-b border-gray-300 px-2 py-3 text-left md:px-4'>
+                    {t('Name')}
                   </th>
-                  <th className='border-b border-gray-300 px-4 py-3 text-left'>
-                    From Date
+                  <th className='border-b border-gray-300 px-2 py-3 text-left md:px-4'>
+                    {t('From_Date')}
                   </th>
-                  <th className='border-b border-gray-300 px-4 py-3 text-left'>
-                    To Date
+                  <th className='border-b border-gray-300 px-2 py-3 text-left md:px-4'>
+                    {t('To_Date')}
                   </th>
                 </tr>
               </thead>
@@ -139,13 +145,13 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
                   (dateItem, index) =>
                     dateItem && ( // Check if dateItem is not null
                       <tr key={index} className='hover:bg-gray-50'>
-                        <td className='border-b border-gray-300 px-4 py-4'>
+                        <td className='border-b border-gray-300 px-2 py-4 md:px-4'>
                           {dateItem?.name || 'N/A'}
                         </td>
-                        <td className='border-b border-gray-300 px-4 py-4'>
+                        <td className='border-b border-gray-300 px-2 py-4 md:px-4'>
                           {formatDate(dateItem?.fromDate)}
                         </td>
-                        <td className='border-b border-gray-300 px-4 py-4'>
+                        <td className='border-b border-gray-300 px-2 py-4 md:px-4'>
                           {formatDate(dateItem?.toDate)}
                         </td>
                       </tr>
@@ -159,31 +165,35 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
 
       <section
         id='Call for papers'
-        className='mt-6 rounded-lg bg-white px-4 py-4 shadow-md'
+        className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
-        <h2 className='mb-4 text-2xl font-semibold '>Call for Papers</h2>
+        <h2 className='mb-4 text-xl font-semibold md:text-2xl '>
+          {t('Call_for_papers')}
+        </h2>
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkBreaks]} // Added remarkBreaks
         >
-          {organization?.callForPaper || 'No call for papers available.'}
+          {organization?.callForPaper || t('No_call_for_papers_available')}
         </ReactMarkdown>
       </section>
 
       <section
         id='category-topics'
-        className='mt-6 rounded-lg bg-white px-4 py-4 shadow-md'
+        className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
-        <h2 className='mb-6 text-2xl font-semibold '>Category and Topics</h2>
+        <h2 className='mb-6 text-xl font-semibold md:text-2xl '>
+          {t('Category_and_Topics')}
+        </h2>
         <div className='mb-6'>
-          <h3 className='mb-2 text-xl font-medium '>Category</h3>
+          <h3 className='mb-2 text-xl font-medium '>{t('Category')}</h3>
           {/* Optional Chaining for accessType */}
           <p className=''>
-            {organization?.accessType || 'Category not available.'}
+            {organization?.accessType || t('Category_not_available')}
           </p>
         </div>
 
         <div>
-          <h3 className='mb-2 text-xl font-medium '>Topics</h3>
+          <h3 className='mb-2 text-xl font-medium '>{t('Topics')}</h3>
           {organization?.topics && organization.topics.length > 0 ? (
             <ul className='grid list-disc grid-cols-1 gap-2 pl-5  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
               {organization.topics.map((topic, index) => (
@@ -191,7 +201,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
               ))}
             </ul>
           ) : (
-            <p className=''>No topics available.</p>
+            <p className=''>{t('No_topics_available')}</p>
           )}
         </div>
       </section>
@@ -200,17 +210,20 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       {ranks && ranks.length > 0 && (
         <section
           id='source-rank'
-          className='mt-6 rounded-lg bg-white px-4 py-4 shadow-md'
+          className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
         >
-          <h2 className='mb-6 text-2xl font-semibold '>Source Rank</h2>
+          <h2 className='mb-6 text-xl font-semibold md:text-2xl '>
+            {t('Source_Rank')}
+          </h2>
           {ranks.map((rank, index) => (
             <div key={index} className='mb-4 border-b border-gray-200 pb-4'>
               <h3 className='mb-2 text-xl font-medium '>{rank.source}</h3>
               <p className='text-gray-600'>
-                <strong>Rank:</strong> {rank.rank}
+                <strong>{t('Rank')}:</strong> {rank.rank}
               </p>
               <p className='text-gray-600'>
-                <strong>Field of Research:</strong> {rank.fieldOfResearch}
+                <strong>{t('Field_of_Research')}:</strong>{' '}
+                {rank.fieldOfResearch}
               </p>
             </div>
           ))}
@@ -219,14 +232,14 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
 
       <section
         id='map'
-        className='mt-6 rounded-lg bg-white px-4 py-4 shadow-md'
+        className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
-        <h2 className='mb-4 text-2xl font-semibold '>Map</h2>
+        <h2 className='mb-4 text-xl font-semibold md:text-2xl '>{t('Map')}</h2>
         {/* Conditionally render Map based on location?.address */}
         {location?.address ? (
           <Map location={location.address} />
         ) : (
-          <p className=''>Location information is not available.</p>
+          <p className=''>{t('Location_information_is_not_available')}</p>
         )}
       </section>
     </div>

@@ -58,9 +58,8 @@ const ConferenceForm: React.FC = () => {
   const [selectedContinent, setSelectedContinent] = useState<string>('')
   const [filteredCountries, setFilteredCountries] = useState<Country[]>([])
 
-
   // ... (useEffect hooks and handlers - giữ nguyên) ...
-    const continentOptions = ['Americas', 'Europe', 'Asia', 'Africa', 'Oceania']
+  const continentOptions = ['Americas', 'Europe', 'Asia', 'Africa', 'Oceania']
   const dateTypeOptions = [
     { value: 'submissionDate', name: 'Submission Date' },
     { value: 'conferenceDates', name: 'Conference Dates' },
@@ -200,8 +199,7 @@ const ConferenceForm: React.FC = () => {
     console.log(states)
     setLocation({
       ...location,
-      cityStateProvince:
-        states.find(s => s.iso2 === stateIso2)?.name || ''
+      cityStateProvince: states.find(s => s.iso2 === stateIso2)?.name || ''
     })
   }
 
@@ -299,7 +297,7 @@ const ConferenceForm: React.FC = () => {
     const userData = localStorage.getItem('user')
     if (!userData) {
       console.error('User not logged in')
-      alert('Please log in to add new Conference')
+      alert(t('Please_log_in_to_add_new_Conference'))
       return
     }
     const user = JSON.parse(userData)
@@ -336,7 +334,7 @@ const ConferenceForm: React.FC = () => {
   const renderStepOne = () => (
     <>
       {/* Step 1 Form Fields (giữ nguyên nội dung) */}
-       <div className='sm:col-span-2'>
+      <div className='sm:col-span-2'>
         <label htmlFor='title' className='block text-sm  '>
           * {t('Conference_Name')}:
         </label>
@@ -401,7 +399,9 @@ const ConferenceForm: React.FC = () => {
 
       <div className='sm:col-span-2'>
         <label className='block text-base  '>* {t('Location')}:</label>
-        <div className='grid grid-cols-1 gap-y-4 sm:grid-cols-2 md:grid-cols-4 sm:gap-x-4'> {/* Responsive Grid */}
+        <div className='grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-4 md:grid-cols-4'>
+          {' '}
+          {/* Responsive Grid */}
           <div>
             <label htmlFor='address' className='block text-sm  '>
               {t('Address')}:
@@ -415,7 +415,6 @@ const ConferenceForm: React.FC = () => {
               required
             />
           </div>
-
           <div>
             <label htmlFor='continent' className='block text-sm'>
               {t('Continent')}:
@@ -496,7 +495,10 @@ const ConferenceForm: React.FC = () => {
         <label className='block text-sm  '>{t('Important_Dates')}:</label>
         {dates.map((date, index) => (
           // Grid cho Dates: 1 cột mặc định, 2 cột trên sm, 4 cột trên lg
-          <div key={index} className='mt-1 grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-4 lg:gap-x-4'>
+          <div
+            key={index}
+            className='mt-1 grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-4 lg:gap-x-4'
+          >
             <div>
               <label htmlFor={`name-${index}`} className='block text-sm  '>
                 {t('Name')}:
@@ -548,7 +550,9 @@ const ConferenceForm: React.FC = () => {
                 required
               />
             </div>
-            <div className="relative"> {/* Container cho nút xóa */}
+            <div className='relative'>
+              {' '}
+              {/* Container cho nút xóa */}
               <label htmlFor={`toDate-${index}`} className='block text-sm  '>
                 {t('End')}: {/* Đổi label */}
               </label>
@@ -570,8 +574,17 @@ const ConferenceForm: React.FC = () => {
                   className='absolute -right-6 top-1/2 mt-2 -translate-y-1/2 text-red-500 hover:text-red-700 focus:outline-none sm:-right-8' // Điều chỉnh vị trí nút xóa
                   aria-label='Remove date'
                 >
-                  <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5' viewBox='0 0 20 20' fill='currentColor'>
-                    <path fillRule='evenodd' d='M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 111.414 1.414L11.414 10l2.293 2.293a1 1 0 01-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 01-1.414-1.414L8.586 10 6.293 7.707a1 1 0 010-1.414z' clipRule='evenodd' />
+                  <svg
+                    xmlns='http://www.w3.org/2000/svg'
+                    className='h-5 w-5'
+                    viewBox='0 0 20 20'
+                    fill='currentColor'
+                  >
+                    <path
+                      fillRule='evenodd'
+                      d='M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 111.414 1.414L11.414 10l2.293 2.293a1 1 0 01-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 01-1.414-1.414L8.586 10 6.293 7.707a1 1 0 010-1.414z'
+                      clipRule='evenodd'
+                    />
                   </svg>
                 </button>
               )}
@@ -587,7 +600,9 @@ const ConferenceForm: React.FC = () => {
         </button>
       </div>
       {/* Topics Section: Sắp xếp lại input và button */}
-      <div className='sm:col-span-2'> {/* Để chiếm toàn bộ chiều rộng trên mobile */}
+      <div className='sm:col-span-2'>
+        {' '}
+        {/* Để chiếm toàn bộ chiều rộng trên mobile */}
         <label htmlFor='newTopic' className='block text-sm  '>
           {t('Topics')}:
         </label>
@@ -608,28 +623,41 @@ const ConferenceForm: React.FC = () => {
             {t('Add')}
           </button>
         </div>
-         {/* Hiển thị topics đã chọn */}
-         <div className='mt-3 flex flex-wrap gap-2'>
-            {topics.map((topic, index) => (
-              <span
-                key={index}
-                className='inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold '
+        {/* Hiển thị topics đã chọn */}
+        <div className='mt-3 flex flex-wrap gap-2'>
+          {topics.map((topic, index) => (
+            <span
+              key={index}
+              className='inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold '
+            >
+              {topic}
+              <button
+                type='button'
+                onClick={() => handleRemoveTopic(topic)}
+                className='hover: ml-1.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-gray-300 focus:bg-gray-400 focus:text-white focus:outline-none'
+                aria-label={`Remove ${topic}`}
               >
-                {topic}
-                <button
-                  type='button'
-                  onClick={() => handleRemoveTopic(topic)}
-                  className='ml-1.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-gray-300 hover: focus:bg-gray-400 focus:text-white focus:outline-none'
-                  aria-label={`Remove ${topic}`}
+                <svg
+                  className='h-2 w-2'
+                  stroke='currentColor'
+                  fill='none'
+                  viewBox='0 0 8 8'
                 >
-                 <svg className="h-2 w-2" stroke="currentColor" fill="none" viewBox="0 0 8 8"><path strokeLinecap="round" strokeWidth="1.5" d="M1 1l6 6m0-6L1 7" /></svg>
-                </button>
-              </span>
-            ))}
-          </div>
+                  <path
+                    strokeLinecap='round'
+                    strokeWidth='1.5'
+                    d='M1 1l6 6m0-6L1 7'
+                  />
+                </svg>
+              </button>
+            </span>
+          ))}
+        </div>
       </div>
       {/* Image URL và Description (giữ nguyên hoặc điều chỉnh grid nếu cần) */}
-      <div className='sm:col-span-2'> {/* Có thể cho Image URL chiếm 1 cột trên md+ */}
+      <div className='sm:col-span-2'>
+        {' '}
+        {/* Có thể cho Image URL chiếm 1 cột trên md+ */}
         <label htmlFor='imageUrl' className='block text-sm  '>
           {t('Image_URL')}:
         </label>
@@ -658,8 +686,12 @@ const ConferenceForm: React.FC = () => {
 
   const renderStepTwo = () => (
     // Step 2 Content (giữ nguyên nội dung, Tailwind sẽ tự xuống dòng)
-     <div className='space-y-3 sm:col-span-2'> {/* Thêm space-y để tạo khoảng cách giữa các dòng */}
-      <h2 className='mb-4 text-lg font-semibold sm:text-xl'>{t('Review_Information')}</h2>
+    <div className='space-y-3 sm:col-span-2'>
+      {' '}
+      {/* Thêm space-y để tạo khoảng cách giữa các dòng */}
+      <h2 className='mb-4 text-lg font-semibold sm:text-xl'>
+        {t('Review_Information')}
+      </h2>
       <p>
         <strong>{t('Conference_Name')}:</strong> {title}
       </p>
@@ -668,7 +700,14 @@ const ConferenceForm: React.FC = () => {
       </p>
       <p>
         <strong>{t('Link')}:</strong>{' '}
-        <a href={link} target='_blank' rel='noopener noreferrer' className='break-all text-button hover:underline'> {/* break-all để xuống dòng nếu link quá dài */}
+        <a
+          href={link}
+          target='_blank'
+          rel='noopener noreferrer'
+          className='break-all text-button hover:underline'
+        >
+          {' '}
+          {/* break-all để xuống dòng nếu link quá dài */}
           {link}
         </a>
       </p>
@@ -686,39 +725,54 @@ const ConferenceForm: React.FC = () => {
       </p>
       <p>
         <strong>
-          {states.length > 0 ? t('State_Province') : t('City')}: {/* Sửa logic hiển thị label */}
+          {states.length > 0 ? t('State_Province') : t('City')}:{' '}
+          {/* Sửa logic hiển thị label */}
         </strong>{' '}
         {location.cityStateProvince}
       </p>
-
-      <div> {/* Bọc list dates trong div để dễ quản lý */}
+      <div>
+        {' '}
+        {/* Bọc list dates trong div để dễ quản lý */}
         <strong>{t('Important_Dates')}:</strong>
-        <ul className="list-disc pl-5 mt-1 space-y-1"> {/* Thêm style cho list */}
+        <ul className='mt-1 list-disc space-y-1 pl-5'>
+          {' '}
+          {/* Thêm style cho list */}
           {dates.map((date, index) => (
             <li key={index}>
-              {date.name || 'Unnamed Date'}: {date.fromDate || 'N/A'} - {date.toDate || 'N/A'} ({date.type || 'N/A'})
+              {date.name || 'Unnamed Date'}: {date.fromDate || 'N/A'} -{' '}
+              {date.toDate || 'N/A'} ({date.type || 'N/A'})
             </li>
           ))}
         </ul>
       </div>
-      <div> {/* Bọc list topics */}
+      <div>
+        {' '}
+        {/* Bọc list topics */}
         <strong>{t('Topics')}:</strong>
         {topics.length > 0 ? (
-            <span className="ml-2">{topics.join(', ')}</span>
-         ) : (
-            <span className="ml-2 italic text-gray-500">No topics added</span>
-         )}
+          <span className='ml-2'>{topics.join(', ')}</span>
+        ) : (
+          <span className='ml-2 italic text-gray-500'>No topics added</span>
+        )}
       </div>
       {imageUrl && (
         <p>
           <strong>{t('Image_URL')}:</strong>{' '}
-          <a href={imageUrl} target='_blank' rel='noopener noreferrer' className='break-all text-button hover:underline'>
+          <a
+            href={imageUrl}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='break-all text-button hover:underline'
+          >
             {imageUrl}
           </a>
         </p>
       )}
       <p>
-        <strong>{t('Description')}:</strong> {description || <span className="italic text-gray-500">No description provided</span>}
+        <strong>{t('Description')}:</strong>{' '}
+        {description || (
+          <span className='italic text-gray-500'>No description provided</span>
+        )}
       </p>
     </div>
   )
@@ -729,13 +783,10 @@ const ConferenceForm: React.FC = () => {
       <h2 className='mb-4 text-lg font-semibold sm:text-xl'>
         {t('Terms_and_Conditions')}
       </h2>
-      <div className='mb-4 max-h-60 overflow-y-auto rounded border p-4'> {/* Giới hạn chiều cao và cho phép cuộn */}
-        <p>
-          Bằng cách nhấp vào nút Đăng hội nghị, tôi xác nhận rằng tôi đã đọc,
-          hiểu và đồng ý tuân thủ tất cả các điều khoản và điều kiện dành cho
-          người tổ chức/đăng tải hội nghị trên nền tảng này. Tôi cũng đồng ý với
-          chính sách bảo mật của nền tảng.
-        </p>
+      <div className='mb-4 max-h-60 overflow-y-auto rounded border p-4'>
+        {' '}
+        {/* Giới hạn chiều cao và cho phép cuộn */}
+        <p>{t('Terms_and_Conditions_Description')}</p>
         {/* Thêm nội dung điều khoản dài hơn nếu cần */}
       </div>
       <label className='flex items-center'>
@@ -745,66 +796,116 @@ const ConferenceForm: React.FC = () => {
           onChange={e => setAgreedToTerms(e.target.checked)}
           className='mr-2 h-4 w-4 rounded border-gray-300 text-button focus:ring-button' // Style checkbox
         />
-        <span className='text-sm'>{t('I_agree_to_the_terms_and_conditions')}</span>
+        <span className='text-sm'>
+          {t('I_agree_to_the_terms_and_conditions')}
+        </span>
       </label>
     </div>
   )
 
   return (
-    <div className="mx-auto  px-4 py-8 sm:px-6 lg:px-8"> {/* Container chính */}
+    <div className='mx-auto  px-4 py-8 sm:px-6 lg:px-8'>
+      {' '}
+      {/* Container chính */}
       {/* Stepper */}
       <div className='mb-8 sm:mb-10'>
         {/* Luôn hiển thị div chứa stepper */}
-        <div className="flex items-center justify-center sm:justify-start">
+        <div className='flex items-center justify-center sm:justify-start'>
           {/* Step 1 */}
-          <div className={`flex w-full items-center ${currentStep === 1 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 1 ? 'text-button' : ''}`}>
-            <span className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 1 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}>
+          <div
+            className={`flex w-full items-center ${currentStep === 1 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 1 ? 'text-button' : ''}`}
+          >
+            <span
+              className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 1 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}
+            >
               {/* SVG Icon 1 */}
-              <svg className='h-3.5 w-3.5' aria-hidden='true' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 12'><path stroke='currentColor' strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M1 5.917 5.724 10.5 15 1.5'/></svg>
+              <svg
+                className='h-3.5 w-3.5'
+                aria-hidden='true'
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 16 12'
+              >
+                <path
+                  stroke='currentColor'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  d='M1 5.917 5.724 10.5 15 1.5'
+                />
+              </svg>
             </span>
             <div className='ml-2 w-full'>
-              <h3 className='font-medium leading-tight'>{t('Add_Conference')}</h3>
-              <p className='text-xs sm:text-sm'>Step add conference here</p>
+              <h3 className='font-medium leading-tight'>
+                {t('Add_Conference')}
+              </h3>
+              {/* <p className='text-xs sm:text-sm'>Step add conference here</p> */}
             </div>
             {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
-            <div className="hidden lg:block h-0.5 w-full bg-gray-300 mx-2"></div>
+            <div className='mx-2 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
           </div>
 
           {/* Step 2 */}
-           <div className={`flex w-full items-center ${currentStep === 2 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 2 ? 'text-button' : ''}`}>
-             {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
-             <div className="hidden lg:block h-0.5 w-full bg-gray-300 mx-2"></div>
-            <span className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 2 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}>
+          <div
+            className={`flex w-full items-center ${currentStep === 2 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 2 ? 'text-button' : ''}`}
+          >
+            {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
+            <div className='mx-2 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
+            <span
+              className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 2 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}
+            >
               {/* SVG Icon 2 */}
-               <svg className='h-3.5 w-3.5' aria-hidden='true' xmlns='http://www.w3.org/2000/svg' fill='currentColor' viewBox='0 0 18 20'><path d='M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2Zm-3 14H5a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2Zm0-4H5a1 1 0 0 1 0-2h8a1 1 0 1 1 0 2Zm0-5H5a1 1 0 0 1 0-2h2V2h4v2h2a1 1 0 1 1 0 2Z'/></svg>
+              <svg
+                className='h-3.5 w-3.5'
+                aria-hidden='true'
+                xmlns='http://www.w3.org/2000/svg'
+                fill='currentColor'
+                viewBox='0 0 18 20'
+              >
+                <path d='M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2Zm-3 14H5a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2Zm0-4H5a1 1 0 0 1 0-2h8a1 1 0 1 1 0 2Zm0-5H5a1 1 0 0 1 0-2h2V2h4v2h2a1 1 0 1 1 0 2Z' />
+              </svg>
             </span>
             <div className='ml-2 w-full'>
               <h3 className='font-medium leading-tight'>{t('Review')}</h3>
-              <p className='text-xs sm:text-sm'>Step review here</p>
+              {/* <p className='text-xs sm:text-sm'>Step review here</p> */}
             </div>
-             {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
-             <div className="hidden lg:block h-0.5 w-full bg-gray-300 mx-2"></div>
+            {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
+            <div className='mx-2 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
           </div>
 
           {/* Step 3 */}
-          <div className={`flex w-full items-center ${currentStep === 3 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 3 ? 'text-button' : ''}`}>
+          <div
+            className={`flex w-full items-center ${currentStep === 3 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 3 ? 'text-button' : ''}`}
+          >
             {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
-            <div className="hidden lg:block h-0.5 w-full bg-gray-300 mx-2"></div>
-            <span className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 3 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}>
-             {/* SVG Icon 3 */}
-              <svg className='h-3.5 w-3.5' aria-hidden='true' xmlns='http://www.w3.org/2000/svg' fill='currentColor' viewBox='0 0 18 20'><path d='M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2ZM7 2h4v3H7V2Zm5.7 8.289-3.975 3.857a1 1 0 0 1-1.393 0L5.3 12.182a1.002 1.002 0 1 1 1.4-1.436l1.328 1.289 3.28-3.181a1 1 0 1 1 1.392 1.435Z'/></svg>
+            <div className='mx-2 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
+            <span
+              className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 3 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}
+            >
+              {/* SVG Icon 3 */}
+              <svg
+                className='h-3.5 w-3.5'
+                aria-hidden='true'
+                xmlns='http://www.w3.org/2000/svg'
+                fill='currentColor'
+                viewBox='0 0 18 20'
+              >
+                <path d='M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2ZM7 2h4v3H7V2Zm5.7 8.289-3.975 3.857a1 1 0 0 1-1.393 0L5.3 12.182a1.002 1.002 0 1 1 1.4-1.436l1.328 1.289 3.28-3.181a1 1 0 1 1 1.392 1.435Z' />
+              </svg>
             </span>
             <div className='ml-2 w-full'>
               <h3 className='font-medium leading-tight'>{t('Confirmation')}</h3>
-              <p className='text-xs sm:text-sm'>Step confirmation here</p>
+              {/* <p className='text-xs sm:text-sm'>Step confirmation here</p> */}
             </div>
           </div>
         </div>
       </div>
-
       {/* Form Content */}
       {/* Grid cho nội dung form: 1 cột mặc định, 2 cột trên sm+ */}
-      <form onSubmit={handleSubmit} className='grid grid-cols-1 gap-y-5 sm:grid-cols-2 sm:gap-x-6'>
+      <form
+        onSubmit={handleSubmit}
+        className='grid grid-cols-1 gap-y-5 sm:grid-cols-2 sm:gap-x-6'
+      >
         {currentStep === 1 && renderStepOne()}
         {currentStep === 2 && renderStepTwo()}
         {currentStep === 3 && renderStepThree()}
@@ -825,7 +926,7 @@ const ConferenceForm: React.FC = () => {
             <button
               type='button'
               onClick={goToNextStep}
-              className='w-full rounded bg-button px-4 py-2 text-sm text-button-text hover:bg-button-hover focus:outline-none sm:w-auto' // w-full trên mobile, w-auto trên sm+
+              className='hover:bg-button-hover w-full rounded bg-button px-4 py-2 text-sm text-button-text focus:outline-none sm:w-auto' // w-full trên mobile, w-auto trên sm+
             >
               {t('Next')}
             </button>
@@ -835,7 +936,7 @@ const ConferenceForm: React.FC = () => {
             <button
               type='submit'
               // onClick={handleSubmit} // onSubmit của form đã xử lý
-              className='w-full rounded bg-button px-4 py-2 text-sm text-button-text hover:bg-button-hover focus:outline-none sm:w-auto' // w-full trên mobile, w-auto trên sm+
+              className='hover:bg-button-hover w-full rounded bg-button px-4 py-2 text-sm text-button-text focus:outline-none sm:w-auto' // w-full trên mobile, w-auto trên sm+
               disabled={!agreedToTerms}
             >
               {t('Add_Conference')}
@@ -846,4 +947,4 @@ const ConferenceForm: React.FC = () => {
     </div>
   )
 }
-export default ConferenceForm 
+export default ConferenceForm

@@ -180,7 +180,9 @@ const NotificationDropdown: FC<Props> = ({
     >
       <div className='border-b border-gray-200 p-4'>
         <div className='flex items-center justify-between'>
-          <h6 className='text-sm font-semibold md:text-lg'>Notifications</h6>
+          <h6 className='text-sm font-semibold md:text-lg'>
+            {t('Notifications')}
+          </h6>
           <button
             className=' text-sm text-button hover:text-blue-800'
             onClick={handleMarkAllAsRead}
@@ -192,13 +194,13 @@ const NotificationDropdown: FC<Props> = ({
 
       <div className='overflow-y-auto' style={{ maxHeight: '25rem' }}>
         {isLoadingNotifications ? (
-          <div className='p-4 text-center text-gray-500'>Loading...</div>
+          <div className='p-4 text-center text-gray-500'>{t('Loading')}</div>
         ) : notifications.length > 0 ? (
           <>
             {newNotifications.length > 0 && (
               <>
                 <div className='border-b border-gray-200 px-4 py-2 text-sm font-semibold '>
-                  NEW
+                  {t('NEW')}
                 </div>
                 {newNotifications.map(renderNotificationItem)}
               </>
@@ -206,7 +208,7 @@ const NotificationDropdown: FC<Props> = ({
             {earlierNotifications.length > 0 && (
               <>
                 <div className='border-b border-gray-200 px-4 py-2 text-sm font-semibold '>
-                  EARLIER
+                  {t('EARLIER')}
                 </div>
                 {earlierNotifications.map(renderNotificationItem)}
               </>
@@ -214,7 +216,7 @@ const NotificationDropdown: FC<Props> = ({
           </>
         ) : (
           <div className='p-4 text-center text-gray-500'>
-            No new notifications
+            {t('No_new_notifications')}
           </div>
         )}
       </div>
@@ -227,7 +229,7 @@ const NotificationDropdown: FC<Props> = ({
         >
           <div className='block text-sm text-button hover:text-blue-800'>
             {' '}
-            View all{' '}
+            {t('View_all')}{' '}
           </div>
         </Link>
       </div>
