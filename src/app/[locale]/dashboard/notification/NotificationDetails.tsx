@@ -6,7 +6,8 @@ import { useSearchParams } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
-import { useTranslations } from 'next-intl'import { Link } from '@/src/navigation';
+import { useTranslations } from 'next-intl'
+import { Link } from '@/src/navigation';
 import Button from '../../utils/Button';
 
 interface NotificationDetailProps {
