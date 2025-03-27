@@ -70,7 +70,7 @@ const LoginForm: React.FC = () => {
                 <div className='w-full border-t border-gray-300' />
               </div>
               <div className='relative flex justify-center text-sm'>
-                <span className='bg-white px-2 '>or</span>
+                <span className='bg-white px-2 '>{t('or')}</span>
               </div>
             </div>
 

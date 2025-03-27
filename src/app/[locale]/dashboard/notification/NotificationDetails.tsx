@@ -24,7 +24,7 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
   onToggleImportant
 }) => {
   const t = useTranslations('')
-
+  const language = t('language')
   const [isStarred, setIsStarred] = useState(false)
   const searchParams = useSearchParams()
   const notificationId = searchParams.get('id')
@@ -70,7 +70,7 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
         <h2 className='text-lg font-semibold'>{notification.type}</h2>
       </div>
       <div className='mb-4 border-b border-gray-300 pb-2 text-sm '>
-        {formatDateFull(notification.createdAt)}
+        {formatDateFull(notification.createdAt, language)}
       </div>
       <div className='rounded-lg bg-white p-4 shadow'>
         {/* Use ReactMarkdown to render the message */}
@@ -128,7 +128,7 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
         {/* Display seenAt.  It will now ALWAYS be the initial seenAt value. */}
         {seenAt ? (
           <p className='mt-2 text-sm '>
-            {t('Seen_at')}: {formatDateFull(seenAt)}
+            {t('Seen_at')}: {formatDateFull(seenAt, language)}
           </p>
         ) : (
           <p className='mt-2 text-sm '>{t('Not_yet_seen')}</p>

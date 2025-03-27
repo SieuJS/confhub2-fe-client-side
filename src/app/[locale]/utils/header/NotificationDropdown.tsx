@@ -30,7 +30,7 @@ const NotificationDropdown: FC<Props> = ({
   markAllAsRead
 }) => {
   const t = useTranslations('')
-
+  const language = t('language')
   const memoizedFetchNotifications = useCallback(() => {
     fetchNotifications()
   }, [fetchNotifications])
@@ -147,7 +147,7 @@ const NotificationDropdown: FC<Props> = ({
                 {sanitizedMessage}
               </ReactMarkdown>
               <span className='text-xs text-gray-500'>
-                {timeAgo(notification.createdAt)}
+                {timeAgo(notification.createdAt, language)}
               </span>
             </div>
           </div>

@@ -64,7 +64,7 @@ const FeedbackControls: React.FC<FeedbackControlsProps> = ({
             aria-expanded={isFilterOpen}
           >
             {filterStar === null
-              ? 'All Feedback'
+              ? t('All_Feedback')
               : `${filterStar} Star${filterStar > 1 ? 's' : ''}`}
             {/* SVG Arrow Icon */}
             <svg
@@ -118,7 +118,7 @@ const FeedbackControls: React.FC<FeedbackControlsProps> = ({
             aria-haspopup='true'
             aria-expanded={isSortOpen}
           >
-            {sortOption === 'time' ? 'Recently Added' : 'Highest Rated'}
+            {sortOption === 'time' ? t('Recently_Added') : t('Highest_Rated')}
             {/* SVG Arrow Icon */}
             <svg
               className='-mr-1 ml-2 h-5 w-5'

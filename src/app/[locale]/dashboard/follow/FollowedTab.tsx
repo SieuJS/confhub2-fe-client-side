@@ -14,6 +14,7 @@ const API_GET_USER_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/use
 
 const FollowedTab: React.FC<FollowedTabProps> = () => {
   const t = useTranslations('')
+  const language = t('language')
 
   const [followedConferences, setFollowedConferences] = useState<
     (ConferenceInfo & { followedAt?: string })[]
@@ -170,8 +171,8 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
             >
               <div className='flex text-xs md:text-base'>
                 <span className='mr-1 '>{t('Followed_Time')}: </span>
-                <Tooltip text={formatDateFull(conference.followedAt)}>
-                  <span>{timeAgo(conference.followedAt)}</span>
+                <Tooltip text={formatDateFull(conference.followedAt, language)}>
+                  <span>{timeAgo(conference.followedAt, language)}</span>
                 </Tooltip>
               </div>
               <ConferenceItem
