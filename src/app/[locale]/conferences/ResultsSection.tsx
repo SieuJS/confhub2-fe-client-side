@@ -30,11 +30,15 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
   const [viewType, setViewType] = useState<'card' | 'table'>('card')
 
   if (loading) {
-    return <div>Loading conferences...</div>
+    return <div>{t('Loading_conferences')}</div>
   }
 
   if (error) {
-    return <div className='text-red-500'>Error: {error}</div>
+    return (
+      <div className='text-red-500'>
+        {t('Error')}: {error}
+      </div>
+    )
   }
 
   return (

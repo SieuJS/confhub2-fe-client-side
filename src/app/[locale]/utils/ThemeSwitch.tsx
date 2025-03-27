@@ -37,7 +37,7 @@ export default function ThemeSwitch() {
     <div ref={ref} className='w-full'>
       <div className='relative'>
         <button
-          className='text-destructive inline-flex w-full items-center justify-between gap-3 rounded px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700'
+          className='text-destructive inline-flex w-full items-center justify-between gap-1 rounded px-2 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 md:px-4'
           onClick={toggleDropdown}
           aria-expanded={isOpen}
         >
@@ -72,7 +72,7 @@ export default function ThemeSwitch() {
                     setTheme(themeItem)
                     setIsOpen(false)
                   }}
-                  className={`block w-full whitespace-nowrap px-4 py-2 text-left text-sm hover:bg-dropdownHover ${
+                  className={`block w-full whitespace-nowrap px-2 py-2 text-left text-sm hover:bg-dropdownHover md:px-4 ${
                     themeItem === resolvedTheme
                       ? 'bg-selected text-primary hover:bg-selected'
                       : 'text-secondary'

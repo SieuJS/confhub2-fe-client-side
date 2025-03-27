@@ -3,6 +3,9 @@ import { FC } from 'react'
 import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
+import { ThemeProvider } from '../ThemeProvider'
+import ThemeSwitch from '../ThemeSwitch'
+import LangSwitcher from '../LangSwitcher'
 
 interface Props {
   locale: string
@@ -17,11 +20,11 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
   }
 
   return (
-    <nav className='mr-10 hidden gap-5 sm:inline-flex'>
+    <nav className='mr-4 hidden gap-0 sm:inline-flex'>
       <Link
         lang={locale}
         href={`/conferences`}
-        className={`group relative pt-2 font-semibold ${isActive('/conferences') ? 'text-selected' : ''}`}
+        className={`group relative mx-2 pt-2 font-semibold md:mx-4 ${isActive('/conferences') ? 'text-selected' : ''}`}
       >
         {/* Loại bỏ div */}
         {t('Conferences')}
@@ -37,7 +40,7 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
       <Link
         lang={locale}
         href={`/journals`}
-        className={`group relative pt-2 font-semibold ${isActive('/journals') ? 'text-selected' : ''}`}
+        className={`group relative mx-2 pt-2 font-semibold md:mx-4 ${isActive('/journals') ? 'text-selected' : ''}`}
       >
         {/* Loại bỏ div */}
         {t('Journals')}
@@ -53,7 +56,7 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
       <Link
         lang={locale}
         href={`/visualization`}
-        className={`group relative pt-2 font-semibold ${isActive('/visualization') ? 'text-selected' : ''}`}
+        className={`group relative mx-2 pt-2 font-semibold md:mx-4 ${isActive('/visualization') ? 'text-selected' : ''}`}
       >
         {/* Loại bỏ div */}
         {t('Visualization')}
@@ -66,11 +69,10 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
         ></span>
       </Link>
 
-
       <Link
         lang={locale}
         href={`/chatbot`}
-        className={`group relative  pt-2 font-semibold ${isActive('/chatbot') ? 'text-selected' : ''}`}
+        className={`group relative mx-2 pt-2 font-semibold md:mx-4 ${isActive('/chatbot') ? 'text-selected' : ''}`}
       >
         {/* Loại bỏ div */}
         {t('Chatbot')}
@@ -86,7 +88,7 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
       <Link
         lang={locale}
         href={`/support`}
-        className={`group relative pt-2 font-semibold ${isActive('/support') ? 'text-selected' : ''}`}
+        className={`group relative mx-2 pt-2 font-semibold md:mx-4 ${isActive('/support') ? 'text-selected' : ''}`}
       >
         {/* Loại bỏ div */}
         {t('Support')}
@@ -101,7 +103,7 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
       <Link
         lang={locale}
         href={`/addconference`}
-        className={`group relative pt-2 font-semibold ${isActive('/addconference') ? 'text-selected' : ''}`}
+        className={`group relative mx-2 pt-2 font-semibold md:mx-4 ${isActive('/addconference') ? 'text-selected' : ''}`}
       >
         {/* Loại bỏ div */}
         {t('Add_Conference')}
@@ -113,6 +115,13 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
           }`}
         ></span>
       </Link>
+
+      <div className='pt-1 font-semibold'>
+        <ThemeSwitch />
+      </div>
+      <div className='pt-1 font-semibold'>
+        <LangSwitcher />
+      </div>
     </nav>
   )
 }

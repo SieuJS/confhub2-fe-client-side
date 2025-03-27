@@ -20,13 +20,14 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
 }) => {
   const navRef = useRef<HTMLElement>(null)
   const t = useTranslations('')
-
-  // Dynamically create the sections array.  Include 'source-rank' only if ranks exist.
-  const updatedSections = conference
+  const language = t('language')
+  // Dynamically create the sections array. Include 'source-rank' only if ranks exist.
+  // Use keys that can map directly to translation keys (or keep original if needed for IDs)
+  const sectionKeys = conference
     ? [
         'overview',
         'important-date',
-        'Call for papers',
+        'Call for papers', // Keep space for ID matching if necessary, handle href separately
         'category-topics',
         ...(conference.ranks && conference.ranks.length > 0
           ? ['source-rank']
@@ -35,9 +36,19 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       ]
     : []
 
+  // Map section keys to translation keys
+  const sectionTranslationMap: { [key: string]: string } = {
+    overview: 'Overview',
+    'important-date': 'Important_Dates', // Reuse existing key
+    'Call for papers': 'Call_for_papers',
+    'category-topics': 'Category_and_Topics', // Reuse existing key
+    'source-rank': 'Source_Rank',
+    map: 'Map'
+  }
+
   const { activeSection, setActiveSection } = useActiveSection({
     navRef,
-    updatedSections
+    updatedSections: sectionKeys // Use sectionKeys for tracking active section by ID
   })
   useSectionNavigation({ navRef, setActiveSection })
 
@@ -45,9 +56,12 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
     if (!date) return t('TBD')
     const dateObj = new Date(date)
     if (isNaN(dateObj.getTime())) {
-      return 'Invalid Date'
+      // Use translated string for invalid date
+      return t('Invalid_Date')
     }
-    return dateObj.toLocaleDateString('en-US', {
+    // Consider using locale from next-intl if available for formatting consistency
+    return dateObj.toLocaleDateString(language, {
+      // Keep 'en-US' or make it dynamic based on locale
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -73,38 +87,33 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         ref={navRef}
         className='sticky top-14 z-30 flex overflow-x-auto whitespace-nowrap border-b border-gray-200 bg-white bg-opacity-95 py-2'
       >
-        {updatedSections.map(section => {
-          let href = `#${section}`
-          //Special handling for "Call for papers", because the space isn't allowed in URL fragments.
-          if (section === 'Call for papers') {
-            href = '#Call for papers' // Correct href
-          }
+        {sectionKeys.map(sectionKey => {
+          // Use the original sectionKey (or a sanitized version) for the href ID
+          const hrefId = sectionKey.replace(/\s+/g, '-') // Example: Ensure IDs are valid
+          const href = `#${hrefId}`
+          const translationKey = sectionTranslationMap[sectionKey] || sectionKey // Fallback to key if map missing
 
           return (
             <a
-              key={section}
+              key={sectionKey}
               href={href}
               className={`rounded-lg px-2 py-2 font-medium transition-colors duration-200 md:px-4 ${
-                activeSection === section
+                // Compare activeSection (which should match the sectionKey/ID)
+                activeSection === sectionKey
                   ? 'bg-gray-100 text-blue-600'
                   : 'text-gray-600 hover:bg-gray-100 hover:text-blue-600'
               }`}
             >
-              {/* Display section name.  Convert kebab-case to title case. */}
-              {section === 'Call for papers'
-                ? t('Call_for_papers')
-                : section
-                    .split('-')
-                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(' ')}
+              {/* Use translated name for display */}
+              {t(translationKey)}
             </a>
           )
         })}
       </nav>
 
-      {/* Sections */}
+      {/* Sections - Ensure IDs match the hrefs generated above */}
       <section
-        id='overview'
+        id='overview' // Keep original or sanitized ID
         className='mt-4 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
         <h2 className='mb-4 text-xl font-semibold md:text-2xl '>
@@ -116,7 +125,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       </section>
 
       <section
-        id='important-date'
+        id='important-date' // Keep original or sanitized ID
         className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
         <h2 className='mb-6 text-xl font-semibold md:text-2xl '>
@@ -146,7 +155,8 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
                     dateItem && ( // Check if dateItem is not null
                       <tr key={index} className='hover:bg-gray-50'>
                         <td className='border-b border-gray-300 px-2 py-4 md:px-4'>
-                          {dateItem?.name || 'N/A'}
+                          {/* Use translated 'Not_Available' instead of 'N/A' */}
+                          {dateItem?.name || t('Not_Available')}
                         </td>
                         <td className='border-b border-gray-300 px-2 py-4 md:px-4'>
                           {formatDate(dateItem?.fromDate)}
@@ -163,8 +173,9 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         )}
       </section>
 
+      {/* Ensure section ID matches href */}
       <section
-        id='Call for papers'
+        id='Call-for-papers' // Example sanitized ID
         className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
         <h2 className='mb-4 text-xl font-semibold md:text-2xl '>
@@ -177,8 +188,9 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         </ReactMarkdown>
       </section>
 
+      {/* Ensure section ID matches href */}
       <section
-        id='category-topics'
+        id='category-topics' // Keep original or sanitized ID
         className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
         <h2 className='mb-6 text-xl font-semibold md:text-2xl '>
@@ -186,7 +198,6 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         </h2>
         <div className='mb-6'>
           <h3 className='mb-2 text-xl font-medium '>{t('Category')}</h3>
-          {/* Optional Chaining for accessType */}
           <p className=''>
             {organization?.accessType || t('Category_not_available')}
           </p>
@@ -209,7 +220,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       {/* Source Rank Section (Conditional) */}
       {ranks && ranks.length > 0 && (
         <section
-          id='source-rank'
+          id='source-rank' // Keep original or sanitized ID
           className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
         >
           <h2 className='mb-6 text-xl font-semibold md:text-2xl '>
@@ -230,12 +241,12 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         </section>
       )}
 
+      {/* Ensure section ID matches href */}
       <section
-        id='map'
+        id='map' // Keep original or sanitized ID
         className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
         <h2 className='mb-4 text-xl font-semibold md:text-2xl '>{t('Map')}</h2>
-        {/* Conditionally render Map based on location?.address */}
         {location?.address ? (
           <Map location={location.address} />
         ) : (

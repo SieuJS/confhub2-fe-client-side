@@ -61,11 +61,11 @@ const ConferenceForm: React.FC = () => {
   // ... (useEffect hooks and handlers - giữ nguyên) ...
   const continentOptions = ['Americas', 'Europe', 'Asia', 'Africa', 'Oceania']
   const dateTypeOptions = [
-    { value: 'submissionDate', name: 'Submission Date' },
-    { value: 'conferenceDates', name: 'Conference Dates' },
-    { value: 'registrationDate', name: 'Registration Date' },
-    { value: 'notificationDate', name: 'Notification Date' },
-    { value: 'cameraReadyDate', name: 'Camera Ready Date' }
+    { value: 'submissionDate', name: t('Submission_Date') },
+    { value: 'conferenceDates', name: t('Conference_Dates') },
+    { value: 'registrationDate', name: t('Registration_Date') },
+    { value: 'notificationDate', name: t('Notification_Date') },
+    { value: 'cameraReadyDate', name: t('Camera_Ready_Date') }
   ]
 
   useEffect(() => {
@@ -344,6 +344,7 @@ const ConferenceForm: React.FC = () => {
           className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
           value={title}
           onChange={e => setTitle(e.target.value)}
+          title={t('Enter_the_name_of_the_conference')}
           required
         />
       </div>
@@ -359,6 +360,7 @@ const ConferenceForm: React.FC = () => {
             className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
             value={acronym}
             onChange={e => setAcronym(e.target.value)}
+            title={t('Enter_the_acronym_of_the_conference')}
             required
           />
         </div>
@@ -373,6 +375,7 @@ const ConferenceForm: React.FC = () => {
             className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
             value={link}
             onChange={e => setLink(e.target.value)}
+            title={t('Enter_the_link_of_the_conference')}
             required
           />
         </div>
@@ -412,6 +415,7 @@ const ConferenceForm: React.FC = () => {
               className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
               value={location.address}
               onChange={e => handleLocationChange('address', e.target.value)}
+              title={t('Enter_the_address_of_the_conference')}
               required
             />
           </div>
@@ -424,6 +428,7 @@ const ConferenceForm: React.FC = () => {
               className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
               value={selectedContinent}
               onChange={e => handleContinentChange(e.target.value)}
+              title={t('Select_the_continent_where_the_conference_is_located')}
               required
             >
               <option value=''>{t('Select_Continent')}</option>
@@ -443,6 +448,7 @@ const ConferenceForm: React.FC = () => {
               className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
               value={selectedCountry}
               onChange={e => handleCountryChange(e.target.value)}
+              title={t('Select_the_country_where_the_conference_is_located')}
               required
               disabled={!selectedContinent}
             >
@@ -468,6 +474,9 @@ const ConferenceForm: React.FC = () => {
                   : handleCityChange(e.target.value)
               }
               required
+              title={t(
+                'Select_the_state_province_or_city_where_the_conference_is_located'
+              )}
               disabled={!selectedCountry}
             >
               <option value=''>
@@ -548,6 +557,7 @@ const ConferenceForm: React.FC = () => {
                 }
                 className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                 required
+                title={t('Select_the_start_date')}
               />
             </div>
             <div className='relative'>
@@ -565,6 +575,7 @@ const ConferenceForm: React.FC = () => {
                 }
                 className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                 required
+                title={t('Select_the_end_date')}
               />
               {/* Nút xóa: Đặt cạnh input cuối cùng */}
               {index !== 0 && (
@@ -613,7 +624,7 @@ const ConferenceForm: React.FC = () => {
             value={newTopic}
             onChange={e => setNewTopic(e.target.value)}
             className='flex-grow rounded-md border border-button px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm' // flex-grow để chiếm không gian còn lại
-            placeholder='Add a topic'
+            placeholder={t('Add_a_topic')}
           />
           <button
             type='button'

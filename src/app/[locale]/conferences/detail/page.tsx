@@ -94,13 +94,13 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     loading: blacklistLoading,
     error: blacklistError
   } = useBlacklistConference(conferenceDataFromJSON)
-
+  const language = t('language') // Get the language from translations
   const { isUpdating, updateResult, updateConference } = useUpdateConference()
   const { handleShareClick } = useShareConference(conferenceDataFromDB)
   const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } =
     useTopicsDisplay(conferenceDataFromDB?.organization?.topics || [])
   const transformedDates = transformDates(conferenceDataFromDB?.dates)
-  const { dateDisplay } = useFormatConferenceDates(transformedDates)
+  const { dateDisplay } = useFormatConferenceDates(transformedDates, language)
   const { isLoggedIn } = useAuthApi()
 
   const [openMenu, setOpenMenu] = useState<'share' | 'calendar' | null>(null)

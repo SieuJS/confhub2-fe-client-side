@@ -7,8 +7,18 @@ interface NotificationIconProps {
   unreadCount: number | string
 }
 
-const localUser = localStorage.getItem('user') || null;
-const user = localUser ? JSON.parse(localUser) : null;
+let user: { avatar?: string | null } | null = null // Khởi tạo là null
+try {
+  const localUser = localStorage.getItem('user')
+  if (localUser) {
+    user = JSON.parse(localUser) // Parse dữ liệu
+  }
+} catch (error) {
+  console.error('Error parsing user from localStorage:', error)
+  // Xử lý lỗi nếu cần, ví dụ: xóa dữ liệu hỏng
+  // localStorage.removeItem('user');
+  user = null // Đảm bảo user là null nếu có lỗi
+}
 
 export const NotificationIcon: FC<NotificationIconProps> = ({
   notificationEffect,
@@ -72,7 +82,7 @@ export const CloseIcon: FC = () => (
     viewBox='0 0 24 24'
     strokeWidth={1.5}
     stroke='currentColor'
-    className='text-foreground h-5 w-5 pointer-events-none'
+    className='text-foreground pointer-events-none h-5 w-5'
   >
     <path
       strokeLinecap='round'
@@ -83,10 +93,10 @@ export const CloseIcon: FC = () => (
 )
 
 export const UserIcon: FC = () => (
-
   <img
-    src={user.avatar ? user.avatar : `/avatar1.jpg`}
-    alt={`Default avatar`}
+    // Kiểm tra xem 'user' và 'user.avatar' có tồn tại không
+    src={user?.avatar ? user.avatar : `/avatar1.jpg`}
+    alt='User avatar' // Nên dùng alt text mô tả rõ hơn nếu có thể
     width={32}
     height={32}
     className='h-8 w-8 rounded-full border-2 border-white'

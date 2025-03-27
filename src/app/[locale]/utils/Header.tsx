@@ -22,7 +22,7 @@ interface Props {
 
 export const Header: FC<Props> = ({ locale }) => {
   const headerRef = useRef<HTMLDivElement>(null)
-  const isMobile = useMediaQuery({ maxWidth: 768 })
+  // const isMobile = useMediaQuery({ maxWidth: 768 })
 
   const { user, isLoggedIn, logout } = useAuthApi()
   const [isLoading, setIsLoading] = useState(true)
@@ -72,7 +72,7 @@ export const Header: FC<Props> = ({ locale }) => {
           <div className='mb-2 h-10 w-10'>
             <LogoIcon />
           </div>
-          <strong className='mx-2  select-none'>ConFHub</strong>
+          <strong className='mx-2 select-none'>Global Conference Hub</strong>
         </div>
       </Link>
 
@@ -93,7 +93,7 @@ export const Header: FC<Props> = ({ locale }) => {
         )}
 
         <Button
-          className='block sm:hidden'
+          className='block md:hidden'
           onClick={e => {
             e.stopPropagation()
             openMobileMenu()

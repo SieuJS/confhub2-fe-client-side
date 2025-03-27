@@ -1,80 +1,111 @@
-import { FC, useState, useEffect } from 'react';
-import { Link } from '@/src/navigation';
-import { useTranslations } from 'next-intl';
-import ThemeSwitch from '../ThemeSwitch';
-import LangSwitcher from '../LangSwitcher';
+import { FC, useState, useEffect } from 'react'
+import { Link } from '@/src/navigation'
+import { useTranslations } from 'next-intl'
+import ThemeSwitch from '../ThemeSwitch'
+import LangSwitcher from '../LangSwitcher'
 
 interface Props {
-  isMobileMenuOpen: boolean;
-  closeAllMenus: () => void;
-  locale: string;
-  isLogin: boolean;
+  isMobileMenuOpen: boolean
+  closeAllMenus: () => void
+  locale: string
+  isLogin: boolean
 }
 
 const MobileNavigation: FC<Props> = ({
   isMobileMenuOpen,
   closeAllMenus,
   locale,
-  isLogin,
+  isLogin
 }) => {
-  const t = useTranslations('');
-  const [isClient, setIsClient] = useState(false);
+  const t = useTranslations('')
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
+    setIsClient(true)
+  }, [])
 
   // ---- Đảm bảo không có gì ở giữa đây ----
 
   return (
     <div
-      className={`mobile-navigation border-border absolute right-0 top-full z-40 w-40 border-b bg-background-secondary shadow-md sm:hidden ${isMobileMenuOpen ? '' : 'hidden'
-        }`}
-    // suppressHydrationWarning // Nếu cần, đặt nó làm prop của div
+      className={`mobile-navigation border-border absolute right-0 top-full z-40 w-40 border-b bg-background-secondary shadow-md sm:hidden ${
+        isMobileMenuOpen ? '' : 'hidden'
+      }`}
+      // suppressHydrationWarning // Nếu cần, đặt nó làm prop của div
     >
       {/* Render ThemeSwitch/LangSwitcher ở client */}
       {/* Bọc chúng trong một div để layout tốt hơn nếu cần */}
       {isClient && (
-        <div> {/* Optional wrapper */}
-          <ThemeSwitch />
-          <LangSwitcher />
-        </div>
+        <>
+          <div className='px-2 hover:bg-gray-100 dark:hover:bg-gray-700'>
+            <ThemeSwitch />
+          </div>
+          <div className='px-2 hover:bg-gray-100 dark:hover:bg-gray-700'>
+            <LangSwitcher />
+          </div>
+        </>
       )}
 
-      <div className='flex flex-col gap-4 px-4 py-2 text-sm'>
+      <div className='flex flex-col text-sm '>
         {/* Các link này không phụ thuộc isLogin, nên giữ nguyên */}
-        <Link href={`/conferences`} locale={locale}>
+        <Link
+          href={`/conferences`}
+          locale={locale}
+          className='px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700'
+        >
           {t('Conferences')}
         </Link>
-        <Link href={`/journals`} locale={locale}>
+        <Link
+          href={`/journals`}
+          locale={locale}
+          className='px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700'
+        >
           {t('Journals')}
         </Link>
-        <Link href={`/chatbot`} locale={locale}>
+        <Link
+          href={`/chatbot`}
+          locale={locale}
+          className='px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700'
+        >
           {t('Chatbot')}
         </Link>
-        <Link href={`/support`} locale={locale}>
+        <Link
+          href={`/support`}
+          locale={locale}
+          className='px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700'
+        >
           {t('Support')}
         </Link>
-        <Link href={`/addconference`} locale={locale}>
+        <Link
+          href={`/addconference`}
+          locale={locale}
+          className='px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700'
+        >
           {t('Add_Conference')}
         </Link>
 
         {/* Chỉ render phần này sau khi đã chắc chắn ở client */}
         {isClient && !isLogin && (
           <>
-            <Link href={`/auth/login`} locale={locale}>
+            <Link
+              href={`/auth/login`}
+              locale={locale}
+              className='px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700'
+            >
               {t('Login')}
             </Link>
-            <Link href={`/auth/register`} locale={locale}>
+            <Link
+              href={`/auth/register`}
+              locale={locale}
+              className='px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700'
+            >
               {t('Register')}
             </Link>
           </>
         )}
       </div>
-
-
     </div>
-  );
-};
+  )
+}
 
-export default MobileNavigation;
+export default MobileNavigation
