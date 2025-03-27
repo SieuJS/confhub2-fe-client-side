@@ -6,7 +6,8 @@ import { useSearchParams } from 'next/navigation'
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-
+import { Link } from '@/src/navigation';
+import Button from '../../utils/Button';
 
 interface NotificationDetailProps {
   notification: Notification
@@ -55,8 +56,8 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
         >
           <span
             className={`${isStarred || notification.isImportant
-                ? 'text-yellow-500'
-                : 'text-gray-400'
+              ? 'text-yellow-500'
+              : 'text-gray-400'
               } text-lg`}
           >
             ★
@@ -89,7 +90,27 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
           }}
         >
           {notification.message}
+
+
+
         </ReactMarkdown>
+          <div className='text-left text-sm md:text-base'>
+            <Link
+              href={{
+                pathname: '/conferences/detail',
+                query: { id: notification.conferenceId }
+              }}
+            >
+              <Button
+                variant='primary'
+                size={'small'}
+                rounded
+                className='m-2'
+              >
+                 Details about conference
+              </Button>
+            </Link>
+          </div>
         {/* Display seenAt.  It will now ALWAYS be the initial seenAt value. */}
         {seenAt ? (
           <p className='mt-2 text-sm text-gray-500'>
