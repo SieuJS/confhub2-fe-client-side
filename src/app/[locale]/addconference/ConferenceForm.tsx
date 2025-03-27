@@ -729,7 +729,7 @@ const ConferenceForm: React.FC = () => {
       <h2 className='mb-4 text-lg font-semibold sm:text-xl'>
         {t('Terms_and_Conditions')}
       </h2>
-      <div className='mb-4 max-h-60 overflow-y-auto rounded border p-4 text-sm'> {/* Giới hạn chiều cao và cho phép cuộn */}
+      <div className='mb-4 max-h-60 overflow-y-auto rounded border p-4'> {/* Giới hạn chiều cao và cho phép cuộn */}
         <p>
           Bằng cách nhấp vào nút Đăng hội nghị, tôi xác nhận rằng tôi đã đọc,
           hiểu và đồng ý tuân thủ tất cả các điều khoản và điều kiện dành cho
