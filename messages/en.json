@@ -650,5 +650,33 @@
       "africa": "Africa",
       "oceania": "Oceania"
     }
+  },
+  "SupportForm": {
+    "headerTitle": "Contact Us",
+    "headerSubtitle": "We use an agile approach to test assumptions and connect with the needs of your audience early and often.",
+    "backgroundImageAlt": "Person working on a laptop",
+    "subjectLabel": "Subject",
+    "subjectPlaceholder": "Let us know how we can help you",
+    "typeLabel": "Request type",
+    "typeDefaultOption": "-- Select request type --",
+    "typeOptionReport": "Report",
+    "typeOptionContact": "Contact",
+    "messageLabel": "Your message",
+    "messagePlaceholder": "Leave a comment...",
+    "termsLabel": "I agree to the <termsLink>Terms & Conditions</termsLink> and <privacyLink>Privacy Policy</privacyLink>.",
+    "submitButton": "Send message",
+    "termsRequiredAlert": "You need to agree with the terms and privacy policy to continue."
+  },
+  "ContactMethods": {
+    "emailTitle": "Email us:",
+    "emailDescription": "Email us for general queries, including marketing and partnership opportunities.",
+    "callTitle": "Call us:",
+    "callDescription": "Call us to speak to a member of our team. We are always happy to help.",
+    "supportTitle": "Support",
+    "supportDescription": "Contact technical support or check our help resources.",
+    "supportLinkText": "Support center",
+    "emailIconLabel": "Email icon",
+    "phoneIconLabel": "Phone icon",
+    "supportIconLabel": "Support icon"
   }
 }

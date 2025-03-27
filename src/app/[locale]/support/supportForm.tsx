@@ -1,37 +1,41 @@
+import { useTranslations } from 'next-intl'
 import React, { useState } from 'react' // Import useState
 import Image from 'next/image'
+import Link from 'next/link' // Import Link để tạo liên kết đúng chuẩn Next.js
 
 const SupportForm: React.FC = () => {
+  // --- next-intl integration ---
+  // Chọn namespace là 'SupportForm'. Các key sẽ nằm trong đối tượng SupportForm trong file JSON
+  const t = useTranslations('SupportForm')
+  // --------------------------
+
   // State để quản lý trạng thái checkbox đồng ý điều khoản
   const [agreedToTerms, setAgreedToTerms] = useState(false)
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    // Kiểm tra lại lần nữa nếu chưa đồng ý thì không submit (dù nút đã disabled)
     if (!agreedToTerms) {
-      alert('Bạn cần đồng ý với điều khoản và chính sách bảo mật để tiếp tục.')
+      // Sử dụng key từ file dịch cho thông báo alert
+      alert(t('termsRequiredAlert'))
       return
     }
 
     console.log('Form submitted!')
     const formData = new FormData(event.currentTarget)
     const data = Object.fromEntries(formData.entries())
-    // Lưu ý: Giá trị của checkbox (nếu name="termsAgreement") sẽ là 'on' nếu được tích,
-    // hoặc không có trong data nếu không được tích.
     console.log(data)
-    // Thêm logic xử lý submit ở đây (gửi API, etc.)
+    // Thêm logic gửi form ở đây (ví dụ: gọi API)
   }
 
   return (
     <>
       {/* Phần Header với thẻ Image nền - Tăng chiều cao */}
       <section className='relative h-96 md:h-[500px] lg:h-[550px]'>
-        {' '}
-        {/* Tăng chiều cao ở đây */}
         <Image
-          src='/bg-2.jpg' // Đã đổi thành /bg-2.jpg (đảm bảo ảnh này có trong thư mục public)
-          alt='Person working on a laptop'
+          src='/bg-2.jpg'
+          // Sử dụng key từ file dịch cho alt text
+          alt={t('backgroundImageAlt')}
           layout='fill'
           objectFit='cover'
           quality={75}
@@ -40,21 +44,20 @@ const SupportForm: React.FC = () => {
         />
         <div className='absolute inset-0 bg-gradient-to-b from-gray-900/50 to-gray-900/80'></div>
         <div className='absolute inset-0 z-10 flex flex-col items-center px-4 pt-32 text-center'>
+          {/* Sử dụng key từ file dịch */}
           <h1 className='mb-4 text-4xl font-extrabold leading-tight tracking-tight text-white md:text-5xl'>
-            Contact Us
+            {t('headerTitle')}
           </h1>
+          {/* Sử dụng key từ file dịch */}
           <p className='mb-8 max-w-screen-md font-light text-gray-300 sm:text-xl'>
-            We use an agile approach to test assumptions and connect with the
-            needs of your audience early and often.
+            {t('headerSubtitle')}
           </p>
         </div>
       </section>
 
       {/* Phần Form */}
       <div className='bg-gray-50 pb-8 dark:bg-gray-900 lg:pb-16'>
-        <div
-          className='relative z-20 mx-auto -mt-24 max-w-screen-md rounded-lg bg-white p-6 px-4 shadow-xl dark:bg-gray-800 sm:p-8 md:-mt-56 lg:p-10' // Điều chỉnh margin âm nếu cần sau khi tăng chiều cao header
-        >
+        <div className='relative z-20 mx-auto -mt-24 max-w-screen-md rounded-lg bg-white p-6 px-4 shadow-xl dark:bg-gray-800 sm:p-8 md:-mt-56 lg:p-10'>
           <form onSubmit={handleSubmit} className='space-y-6'>
             {/* Trường Chủ đề */}
             <div>
@@ -62,14 +65,16 @@ const SupportForm: React.FC = () => {
                 htmlFor='subject'
                 className='mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300'
               >
-                Chủ đề <span className='text-red-500'>*</span>
+                {/* Sử dụng key từ file dịch */}
+                {t('subjectLabel')} <span className='text-red-500'>*</span>
               </label>
               <input
                 type='text'
                 id='subject'
                 name='subject'
                 className='dark:shadow-sm-light block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500'
-                placeholder='Hãy cho chúng tôi biết chúng tôi có thể giúp gì cho bạn'
+                // Sử dụng key từ file dịch
+                placeholder={t('subjectPlaceholder')}
                 required
               />
             </div>
@@ -80,7 +85,8 @@ const SupportForm: React.FC = () => {
                 htmlFor='type'
                 className='mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300'
               >
-                Loại yêu cầu <span className='text-red-500'>*</span>
+                {/* Sử dụng key từ file dịch */}
+                {t('typeLabel')} <span className='text-red-500'>*</span>
               </label>
               <select
                 id='type'
@@ -89,11 +95,14 @@ const SupportForm: React.FC = () => {
                 required
                 defaultValue=''
               >
+                {/* Sử dụng key từ file dịch */}
                 <option value='' disabled>
-                  -- Chọn loại yêu cầu --
+                  {t('typeDefaultOption')}
                 </option>
-                <option value='report'>Report</option>
-                <option value='contact'>Contact</option>
+                {/* Sử dụng key từ file dịch */}
+                <option value='report'>{t('typeOptionReport')}</option>
+                {/* Sử dụng key từ file dịch */}
+                <option value='contact'>{t('typeOptionContact')}</option>
               </select>
             </div>
 
@@ -103,82 +112,79 @@ const SupportForm: React.FC = () => {
                 htmlFor='message'
                 className='mb-2 block text-sm font-medium text-gray-900 dark:text-gray-400'
               >
-                Nội dung tin nhắn <span className='text-red-500'>*</span>
+                {/* Sử dụng key từ file dịch */}
+                {t('messageLabel')} <span className='text-red-500'>*</span>
               </label>
               <textarea
                 id='message'
                 name='message'
                 rows={6}
                 className='block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500'
-                placeholder='Nhập nội dung chi tiết...'
+                // Sử dụng key từ file dịch
+                placeholder={t('messagePlaceholder')}
                 required
               ></textarea>
             </div>
 
-            {/* Checkbox Đồng ý điều khoản */}
+            {/* Checkbox Đồng ý điều khoản - Sử dụng t.rich */}
             <div className='flex items-start'>
               <div className='flex h-5 items-center'>
                 <input
                   id='terms'
                   aria-describedby='terms-description'
-                  name='termsAgreement' // Thêm name nếu muốn gửi giá trị 'on' khi submit
+                  name='termsAgreement'
                   type='checkbox'
                   checked={agreedToTerms}
                   onChange={e => setAgreedToTerms(e.target.checked)}
-                  required // Trình duyệt sẽ báo lỗi nếu chưa check khi submit
+                  required
                   className='focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600'
                 />
               </div>
               <div className='ml-3 text-sm'>
                 <label
                   htmlFor='terms'
+                  id='terms-description' // Thêm id để aria-describedby hoạt động đúng
                   className='font-light text-gray-500 dark:text-gray-300'
                 >
-                  Tôi đồng ý với{' '}
-                  <a
-                    href='#'
-                    className='font-medium text-blue-600 hover:underline dark:text-blue-500'
-                  >
-                    Điều khoản sử dụng
-                  </a>{' '}
-                  và{' '}
-                  <a
-                    href='#'
-                    className='font-medium text-blue-600 hover:underline dark:text-blue-500'
-                  >
-                    Chính sách bảo mật
-                  </a>
-                  .
+                  {/* Sử dụng t.rich để nhúng Link vào text */}
+                  {t.rich('termsLabel', {
+                    // Định nghĩa cách render thẻ <termsLink> trong file JSON
+                    termsLink: chunks => (
+                      <Link
+                        href='/terms-and-conditions' // Thay bằng đường dẫn thực tế
+                        className='font-medium text-blue-600 hover:underline dark:text-blue-500'
+                        target='_blank' // Mở tab mới nếu cần
+                        rel='noopener noreferrer'
+                      >
+                        {chunks}
+                      </Link>
+                    ),
+                    // Định nghĩa cách render thẻ <privacyLink> trong file JSON
+                    privacyLink: chunks => (
+                      <Link
+                        href='/privacy-policy' // Thay bằng đường dẫn thực tế
+                        className='font-medium text-blue-600 hover:underline dark:text-blue-500'
+                        target='_blank' // Mở tab mới nếu cần
+                        rel='noopener noreferrer'
+                      >
+                        {chunks}
+                      </Link>
+                    )
+                  })}
                 </label>
-                {/* Mô tả thêm nếu cần */}
-                {/* <p id="terms-description" className="text-xs font-light text-gray-500 dark:text-gray-400">We need your agreement to proceed.</p> */}
               </div>
             </div>
 
-            {/* Disclaimer cũ - Có thể giữ lại hoặc xóa nếu checkbox đã đủ rõ ràng */}
-            {/*
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              By submitting this form you agree to our{' '}
-              <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                terms and conditions
-              </a>{' '}
-              and our{' '}
-              <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                privacy policy
-              </a>{' '}
-              which explains how we may collect, use and disclose your personal information including to third parties.
-            </p>
-             */}
-
-            {/* Nút Submit - Thêm disabled và styling khi disabled */}
+            {/* Nút Submit */}
             <button
               type='submit'
-              disabled={!agreedToTerms} // Vô hiệu hóa nút nếu chưa đồng ý
+              disabled={!agreedToTerms}
               className={`rounded-lg bg-blue-700 px-5 py-3 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 sm:w-auto ${
-                !agreedToTerms ? 'cursor-not-allowed opacity-50' : '' // Thêm class khi disabled
+                !agreedToTerms ? 'cursor-not-allowed opacity-50' : ''
               }`}
             >
-              Send message
+              {/* Sử dụng key từ file dịch */}
+              {t('submitButton')}
             </button>
           </form>
         </div>

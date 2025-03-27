@@ -316,8 +316,8 @@ const Support = () => {
               <ul className='space-y-1'>
                 <li
                   key='all'
-                  className={`cursor-pointer rounded px-2 py-1.5 transition-colors duration-150  ${
-                    selectedCategory === null ? 'font-bold text-button ' : ' '
+                  className={`cursor-pointer rounded px-2 py-1 font-bold transition-colors duration-150  ${
+                    selectedCategory === null ? ' text-button ' : ' '
                   }`}
                   onClick={() => handleCategoryClick(null)}
                 >
@@ -326,9 +326,9 @@ const Support = () => {
                 {faqCategories.map(category => (
                   <li
                     key={category.value}
-                    className={`cursor-pointer rounded px-2 py-1.5 transition-colors duration-150  ${
+                    className={`cursor-pointer rounded px-2 py-1 font-bold transition-colors duration-150 ${
                       selectedCategory === category.value
-                        ? 'font-bold text-button '
+                        ? ' text-button '
                         : ' '
                     }`}
                     onClick={() => handleCategoryClick(category.value)}
@@ -342,7 +342,7 @@ const Support = () => {
             {/* Right Column - Questions and Answers */}
             {/* Takes full width on mobile, remaining width on md+ */}
             <div className='w-full rounded-lg p-2 shadow-lg md:w-3/4 lg:w-4/5'>
-              <div className='space-y-4 '>
+              <div className='space-y-2 '>
                 {filteredFaqData.length > 0 ? (
                   filteredFaqData.map((item, index) => (
                     <div
@@ -350,7 +350,7 @@ const Support = () => {
                       className='overflow-hidden rounded-lg border border-gray-200  '
                     >
                       <div
-                        className='flex cursor-pointer items-center justify-between px-4 py-3 transition-colors duration-150 '
+                        className='flex cursor-pointer items-center justify-between px-4 py-1 transition-colors duration-150 '
                         onClick={() => toggleAccordion(index)}
                         aria-expanded={expandedIndex === index}
                         aria-controls={`faq-content-${index}`}
@@ -383,7 +383,7 @@ const Support = () => {
                         aria-labelledby={`faq-header-${index}`}
                         className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedIndex === index ? 'max-h-screen' : 'max-h-0'}`}
                       >
-                        <div className='px-4 pb-4 pt-2  '>
+                        <div className='px-4 pb-2 pt-1  '>
                           <p>{item.answer}</p>
                         </div>
                       </div>
