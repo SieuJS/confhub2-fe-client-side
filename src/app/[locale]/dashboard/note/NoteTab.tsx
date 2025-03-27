@@ -9,12 +9,15 @@ import {
 import { getConferenceFromJSON } from '../../../../app/api/conference/getConferenceDetails'
 import { Link } from '@/src/navigation'
 import Button from '../../utils/Button'
+import { useTranslations } from 'next-intl'
 
 interface NoteTabProps {}
 
 const API_GET_USER_CALENDAR_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user`
 
 const NoteTab: React.FC<NoteTabProps> = () => {
+  const t = useTranslations('')
+
   const [upcomingNotes, setUpcomingNotes] = useState<any[]>([])
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([])
   const [loading, setLoading] = useState(true)
@@ -394,13 +397,13 @@ const NoteTab: React.FC<NoteTabProps> = () => {
   if (!loggedIn) {
     return (
       <div className='container mx-auto p-4'>
-        Please log in to view your calendar.
+        {t('Please_log_in_to_view_your_calendar')}
       </div>
     )
   }
 
   if (loading) {
-    return <div className='container mx-auto p-4'>Loading...</div>
+    return <div className='container mx-auto p-4'>{t('Loading')}</div>
   }
 
   if (error) {
@@ -412,38 +415,38 @@ const NoteTab: React.FC<NoteTabProps> = () => {
   }
 
   return (
-    <div className='flex h-full flex-col bg-background p-4'>
+    <div className='flex h-full flex-col bg-background p-2 md:p-4'>
       {/* Dates Details Section */}
       <section className='mb-4 rounded-md bg-background px-4 pb-6 pt-4 shadow'>
-        <h2 className='mb-4 text-lg font-semibold'>Dates details</h2>
+        <h2 className='mb-4 text-lg font-semibold'>{t('Dates_details')}</h2>
         <ul className='flex flex-row gap-4'>
           <li className='flex items-center'>
             <div className='mr-2 h-4 w-4 rounded-full bg-teal-400'></div>
-            <span className='text-sm '>Conference</span>
+            <span className='text-sm '>{t('Conference')}</span>
           </li>
           <li className='flex items-center'>
             <div className='mr-2 h-4 w-4 rounded-full bg-red-400'></div>
-            <span className='text-sm '>Submission</span>
+            <span className='text-sm '>{t('Submission')}</span>
           </li>
           <li className='flex items-center'>
             <div className='mr-2 h-4 w-4 rounded-full bg-blue-400'></div>
-            <span className='text-sm '>Notification</span>
+            <span className='text-sm '>{t('Notification')}</span>
           </li>
           <li className='flex items-center'>
             <div className='mr-2 h-4 w-4 rounded-full bg-orange-400'></div>
-            <span className='text-sm '>Camera</span>
+            <span className='text-sm '>{t('Camera_Ready')}</span>
           </li>
           <li className='flex items-center'>
             <div className='mr-2 h-4 w-4 rounded-full bg-cyan-400'></div>
-            <span className='text-sm '>Registration</span>
+            <span className='text-sm '>{t('Registration')}</span>
           </li>
           <li className='flex items-center'>
             <div className='mr-2 h-4 w-4 rounded-full bg-gray-400'></div>
-            <span className='text-sm '>Other</span>
+            <span className='text-sm '>{t('Other')}</span>
           </li>
           <li className='flex items-center'>
             <div className='mr-2 h-4 w-4 rounded-full bg-yellow-400'></div>
-            <span className='text-sm '>Your note</span>
+            <span className='text-sm '>{t('Your_notes')}</span>
           </li>
         </ul>
       </section>
@@ -451,13 +454,15 @@ const NoteTab: React.FC<NoteTabProps> = () => {
         <div
           ref={leftSectionRef}
           style={{ width: `${leftWidth}%` }}
-          className='overflow-auto p-4'
+          className='overflow-auto p-2 md:p-4'
         >
           {/* Upcoming Notes Section */}
-          <section className='mb-4 rounded-md bg-background p-4 shadow'>
-            <h2 className='mb-2 text-lg font-semibold'>Upcoming Notes</h2>
+          <section className='mb-4 rounded-md bg-background p-2 shadow md:p-4'>
+            <h2 className='mb-2 text-lg font-semibold'>
+              {t('Upcoming_Notes')}
+            </h2>
             {upcomingNotes.length === 0 ? (
-              <p>Nothing important dates coming up.</p>
+              <p>{t('Nothing_important_dates_coming_up')}</p>
             ) : (
               <div
                 ref={notesContainerRef}
@@ -498,7 +503,7 @@ const NoteTab: React.FC<NoteTabProps> = () => {
                             }}
                           >
                             <Button className='hover: text-xs text-button'>
-                              More details
+                              {t('More_details')}
                             </Button>
                           </Link>
                         </div>

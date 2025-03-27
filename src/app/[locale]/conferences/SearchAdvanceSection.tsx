@@ -4,6 +4,7 @@
 
 import React from 'react'
 import useSearchAdvanceForm from '../../../hooks/conferences/useSearchAdvanceForm'
+import { useTranslations } from 'next-intl'
 
 interface SearchAdvanceSectionProps {
   isAdvancedOptionsVisible: boolean
@@ -77,6 +78,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
     onPublisherChange,
     selectedPublisher
   })
+  const t = useTranslations('')
 
   return (
     <div>
@@ -86,8 +88,8 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
           className='text-sm hover:text-gray-800 focus:outline-none'
         >
           {isAdvancedOptionsVisible
-            ? 'Hide advanced search options'
-            : 'Show more advanced search options'}
+            ? t('Hide_advanced_search_options')
+            : t('Show_more_advanced_search_options')}
         </button>
       </div>
 
@@ -102,13 +104,13 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
               >
                 {' '}
                 {/* Reduced mb */}
-                Submission Date:
+                {t('Submission_Date')}:
               </label>
               <input
                 className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none' // Reduced py and px
                 id='submissionDate'
                 type='date'
-                placeholder='Date'
+                placeholder={t('Date')}
                 onChange={handleSubmissionDateInputChange}
                 value={
                   submissionDate
@@ -125,13 +127,13 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
               >
                 {' '}
                 {/* Reduced mb */}
-                Publisher:
+                {t('Publisher')}:
               </label>
               <input
                 className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none' // Reduced py and px
                 id='publisher'
                 type='text'
-                placeholder='Publisher'
+                placeholder={t('Publisher')}
                 value={selectedPublisher || ''}
                 onChange={handlePublisherInputChange}
                 onKeyDown={handlePublisherEnter}
@@ -142,7 +144,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
               <label className='mb-1 block text-sm font-bold' htmlFor='rank'>
                 {' '}
                 {/* Reduced mb */}
-                Rank:
+                {t('Rank')}:
               </label>
               <select
                 className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none' // Reduced py and px
@@ -150,7 +152,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 value={selectedRank || ''}
                 onChange={handleRankChangeInput}
               >
-                <option value=''>Rank</option>
+                <option value=''>{t('Rank')}</option>
                 <option value='A*'>A*</option>
                 <option value='A'>A</option>
                 <option value='B'>B</option>
@@ -165,7 +167,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
               <label className='mb-1 block text-sm font-bold' htmlFor='source'>
                 {' '}
                 {/* Reduced mb */}
-                Source:
+                {t('Source')}:
               </label>
               <select
                 className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none' // Reduced py and px
@@ -173,7 +175,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 value={selectedSource || ''}
                 onChange={handleSourceChangeInput}
               >
-                <option value=''>Source</option>
+                <option value=''>{t('Source')}</option>
                 <option value='CORE2023'>CORE2023</option>
                 <option value='CORE2021'>CORE2021</option>
                 <option value='CORE2020'>CORE2020</option>
@@ -215,7 +217,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
               <label className='mb-1 block text-sm font-bold' htmlFor='topics'>
                 {' '}
                 {/* Reduced mb */}
-                Topics:
+                {t('Topics')}:
               </label>
               <input
                 type='text'
@@ -282,7 +284,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
               >
                 {' '}
                 {/* Reduced mb */}
-                Field of Research:
+                {t('Field_of_Research')}:
               </label>
               <input
                 type='text'

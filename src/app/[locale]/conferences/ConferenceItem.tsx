@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Button from '../utils/Button'
 import { Link } from '@/src/navigation'
 import { useMediaQuery } from 'react-responsive'
+import { useTranslations } from 'next-intl'
 
 interface ConferenceItemProps {
   conference: {
@@ -20,8 +21,11 @@ interface ConferenceItemProps {
 }
 
 const ConferenceItem: React.FC<ConferenceItemProps> = ({ conference }) => {
+  const t = useTranslations('')
+
   const isMobile = useMediaQuery({ maxWidth: 768 })
   const sizeButton = isMobile ? 'small' : 'medium'
+
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'Unknown'
     const date = new Date(dateString)
@@ -38,66 +42,74 @@ const ConferenceItem: React.FC<ConferenceItemProps> = ({ conference }) => {
   const showEditButton =
     conference.status === 'Pending' || conference.status === 'Approved'
 
+  // Helper function/component to render buttons to avoid repetition
+  const renderButtons = () => (
+    <>
+      {showDetailButton && (
+        <Link
+          href={{
+            pathname: '/conferences/detail',
+            query: { id: conference.id }
+          }}
+        >
+          <Button variant='primary' size={sizeButton} rounded>
+            {t('Detail')}
+          </Button>
+        </Link>
+      )}
+
+      {showEditButton && (
+        <Link
+          href={{
+            pathname: '/updateconference',
+            query: { id: conference.id }
+          }}
+        >
+          <Button variant='secondary' size={sizeButton} rounded>
+            {t('Edit')}
+          </Button>
+        </Link>
+      )}
+    </>
+  )
+
   return (
-    <div className='mb-4 grid grid-cols-9 gap-4 rounded-md bg-background p-2 shadow-md md:p-4'>
-      <div className='relative col-span-1 hidden  items-center justify-center md:flex '>
+    <div className='mb-4 grid grid-cols-1 items-start gap-4 rounded-md bg-background p-2 shadow-md md:grid-cols-9 md:items-center md:p-4'>
+      {/* Image Column (Hidden on Mobile) */}
+      <div className='relative col-span-1 hidden items-center justify-center md:flex'>
         <Image
-          src={'/bg-2.jpg'}
+          src={'/bg-2.jpg'} // Consider using a dynamic or placeholder image if available
           alt={conference.title}
-          width={500}
+          width={500} // These might be too large for the container, consider smaller fixed size or aspect ratio
           height={300}
-          className=' rounded-md object-cover '
+          className='h-auto w-full rounded-md object-cover' // Make image responsive within its container
         />
       </div>
-      <div className='col-span-6 text-left text-sm md:text-base'>
+
+      {/* Info Column (Spans full width on mobile, 6 cols on desktop) */}
+      <div className='col-span-1 text-left text-sm md:col-span-6 md:text-base'>
         <h3 className='text-sm font-semibold text-button md:text-lg'>
           {conference.title} ({conference.acronym})
         </h3>
         <p>
-          <strong>Dates:</strong>{' '}
+          <strong>{t('Date')}:</strong>{' '}
           {conference.fromDate
-            ? formatDate(conference.fromDate) +
-              ' - ' +
-              formatDate(conference.toDate)
+            ? `${formatDate(conference.fromDate)} - ${formatDate(conference.toDate)}`
             : 'Dates not available'}
         </p>
         <p>
-          <strong>Location:</strong> {conference.location}
+          <strong>{t('Location')}:</strong> {conference.location}
         </p>
-      </div>
-      <div className='col-span-2 flex items-center justify-center'>
-        {/* Show Detail button based on showDetailButton */}
-        {showDetailButton && (
-          <Link
-            href={{
-              pathname: '/conferences/detail',
-              query: { id: conference.id }
-            }}
-          >
-            <Button
-              variant='primary'
-              size={sizeButton}
-              rounded
-              className='mr-2'
-            >
-              Details
-            </Button>
-          </Link>
-        )}
 
-        {/* Show Edit button based on showEditButton */}
-        {showEditButton && (
-          <Link
-            href={{
-              pathname: '/updateconference',
-              query: { id: conference.id }
-            }}
-          >
-            <Button variant='secondary' size={sizeButton} rounded className=''>
-              Edit
-            </Button>
-          </Link>
+        {/* Buttons Container (Only visible on Mobile, below Location) */}
+        {isMobile && (
+          <div className='mt-3 flex flex-wrap gap-2'>{renderButtons()}</div>
         )}
+      </div>
+
+      {/* Buttons Column (Only visible on Desktop) */}
+      <div className='col-span-1 hidden items-center justify-center gap-2 md:col-span-2 md:flex md:flex-col lg:flex-row'>
+        {!isMobile && renderButtons()}
       </div>
     </div>
   )

@@ -1,6 +1,7 @@
 // MonthView.tsx
 import React from 'react'
 import { CalendarEvent } from './Calendar'
+import { useTranslations } from 'next-intl'
 
 interface MonthViewProps {
   currentMonth: number
@@ -23,9 +24,21 @@ const MonthView: React.FC<MonthViewProps> = ({
   highlightedDate,
   calendarRef // Receive calendarRef
 }) => {
+  const t = useTranslations('')
+
+  const daysInWeek = [
+    t('Sun'),
+    t('Mon'),
+    t('Tue'),
+    t('Wed'),
+    t('Thu'),
+    t('Fri'),
+    t('Sat')
+  ]
+
   return (
     <div className='grid grid-cols-7 text-center'>
-      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+      {daysInWeek.map(day => (
         <div key={day} className='font-medium '>
           {day}
         </div>

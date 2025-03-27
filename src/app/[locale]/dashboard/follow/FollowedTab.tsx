@@ -1,52 +1,54 @@
 // FollowedTab.tsx
-import React, { useState, useEffect, useCallback } from 'react';
-import ConferenceItem from '../../conferences/ConferenceItem';
-import { getListConferenceFromJSON } from '../../../../app/api/conference/getListConferences';
-import { ConferenceInfo } from '../../../../models/response/conference.list.response';
-import { UserResponse, Follow } from '../../../../models/response/user.response';
-import { timeAgo, formatDateFull } from '../timeFormat';
-import Tooltip from '../../utils/Tooltip';
+import React, { useState, useEffect, useCallback } from 'react'
+import ConferenceItem from '../../conferences/ConferenceItem'
+import { getListConferenceFromJSON } from '../../../../app/api/conference/getListConferences'
+import { ConferenceInfo } from '../../../../models/response/conference.list.response'
+import { UserResponse, Follow } from '../../../../models/response/user.response'
+import { timeAgo, formatDateFull } from '../timeFormat'
+import Tooltip from '../../utils/Tooltip'
+import { useTranslations } from 'next-intl'
 
-interface FollowedTabProps { }
+interface FollowedTabProps {}
 
-const API_GET_USER_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user`;
+const API_GET_USER_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user`
 
 const FollowedTab: React.FC<FollowedTabProps> = () => {
+  const t = useTranslations('')
+
   const [followedConferences, setFollowedConferences] = useState<
     (ConferenceInfo & { followedAt?: string })[]
-  >([]);
-  const [loading, setLoading] = useState(true);
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [initialLoad, setInitialLoad] = useState(true); // Add initial load state
-
+  >([])
+  const [loading, setLoading] = useState(true)
+  const [loggedIn, setLoggedIn] = useState(false)
+  const [initialLoad, setInitialLoad] = useState(true) // Add initial load state
 
   const fetchData = useCallback(async () => {
     try {
-      const userData = localStorage.getItem('user');
+      const userData = localStorage.getItem('user')
 
       if (!userData) {
-        setLoggedIn(false);
+        setLoggedIn(false)
         if (initialLoad) {
-          setLoading(false);
-          setInitialLoad(false);
+          setLoading(false)
+          setInitialLoad(false)
         }
 
-        return;
+        return
       }
 
-      const user = JSON.parse(userData);
-      setLoggedIn(true);
+      const user = JSON.parse(userData)
+      setLoggedIn(true)
 
-      const userResponse = await fetch(`${API_GET_USER_ENDPOINT}/${user.id}`);
+      const userResponse = await fetch(`${API_GET_USER_ENDPOINT}/${user.id}`)
 
       if (!userResponse.ok) {
-        throw new Error(`HTTP error! status: ${userResponse.status}`);
+        throw new Error(`HTTP error! status: ${userResponse.status}`)
       }
 
-      const userDetails: UserResponse = await userResponse.json();
+      const userDetails: UserResponse = await userResponse.json()
 
       if ((userDetails.followedConferences ?? []).length > 0) {
-        const conferencesData = await getListConferenceFromJSON();
+        const conferencesData = await getListConferenceFromJSON()
 
         const followed = conferencesData.payload
           .filter((conf: ConferenceInfo) => conf.id !== null)
@@ -57,58 +59,57 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
           )
           .map((conf: ConferenceInfo) => {
             const followedConfInfo: Follow | undefined =
-              userDetails.followedConferences?.find((fc: Follow) => fc.id === conf.id);
+              userDetails.followedConferences?.find(
+                (fc: Follow) => fc.id === conf.id
+              )
             return {
               ...conf,
-              followedAt: followedConfInfo?.createdAt,
-            };
-          });
-        setFollowedConferences(followed);
+              followedAt: followedConfInfo?.createdAt
+            }
+          })
+        setFollowedConferences(followed)
       } else {
-        setFollowedConferences([]);
+        setFollowedConferences([])
       }
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error('Failed to fetch data:', error)
     } finally {
       if (initialLoad) {
-        setLoading(false); //set loading to false only one time
-        setInitialLoad(false);
+        setLoading(false) //set loading to false only one time
+        setInitialLoad(false)
       }
     }
-  }, [initialLoad]); // Include initialLoad in dependency array
-
+  }, [initialLoad]) // Include initialLoad in dependency array
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    fetchData()
+  }, [fetchData])
 
   useEffect(() => {
     if (!initialLoad) {
-      setLoading(false);
+      setLoading(false)
     }
   }, [followedConferences, initialLoad])
 
-
-
   if (!loggedIn) {
     if (loading) {
-      return <div className="container mx-auto p-4">Loading...</div>;  // Show loading initially
+      return <div className='container mx-auto p-4'>{t('Loading')}</div> // Show loading initially
     }
     return (
-      <div className="container mx-auto p-4">
-        Please log in to view followed conferences.
+      <div className='container mx-auto p-4'>
+        {t('Please_log_in_to_view_followed_conferences')}
       </div>
-    );
+    )
   }
 
   if (loading) {
-    return <div className="container mx-auto p-4">Loading...</div>;
+    return <div className='container mx-auto p-4'>{t('Loading')}</div>
   }
 
   // Trong FollowedTab.tsx, trong transformedConferences
-  const transformedConferences = followedConferences.map((conf) => {
+  const transformedConferences = followedConferences.map(conf => {
     // Truy cập trực tiếp phần tử đầu tiên của mảng dates
-    const conferenceDates = conf.dates;
+    const conferenceDates = conf.dates
 
     return {
       id: conf.id!,
@@ -120,51 +121,55 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
       fromDate: conferenceDates?.fromDate || undefined,
       toDate: conferenceDates?.toDate || undefined,
       followedAt: conf.followedAt,
-      status: conf.status,
-    };
-  });
-  console.log('transformedConferences:', transformedConferences);
-
+      status: conf.status
+    }
+  })
+  console.log('transformedConferences:', transformedConferences)
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="mb-2 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Followed Conferences</h1>
+    <div className='container mx-auto p-2 md:p-4'>
+      <div className='mb-2 flex items-center justify-between'>
+        <h1 className='text-xl font-semibold md:text-2xl'>
+          {t('Followed_Conferences')}
+        </h1>
         <button
           onClick={() => {
-            console.log('Refresh button clicked');
-            fetchData();
+            console.log('Refresh button clicked')
+            fetchData()
           }}
-          className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          aria-label="Refresh"
+          className='rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400'
+          aria-label='Refresh'
         >
           <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="lucide lucide-refresh-cw"
+            xmlns='http://www.w3.org/2000/svg'
+            width='20'
+            height='20'
+            viewBox='0 0 24 24'
+            fill='none'
+            stroke='currentColor'
+            strokeWidth='2'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+            className='lucide lucide-refresh-cw'
           >
-            <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.67 2.62" />
-            <path d="M22 4v4h-4" />
+            <path d='M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.67 2.62' />
+            <path d='M22 4v4h-4' />
           </svg>
         </button>
       </div>
 
       {followedConferences.length === 0 ? (
-        <p>You are not following any conferences yet.</p>
+        <p>{t('You_are_not_following_any_conferences_yet')}</p>
       ) : (
-        transformedConferences.map((conference) => {
-          console.log('Rendering ConferenceItem with conference:', conference);
+        transformedConferences.map(conference => {
+          console.log('Rendering ConferenceItem with conference:', conference)
           return (
-            <div className="mb-4 rounded-xl border-2 px-4 py-2 shadow-xl" key={conference.id}>
-              <div className="flex">
-                <span className="mr-1">Followed Time: </span>
+            <div
+              className='mb-4 rounded-xl md:border-2 md:px-4 md:py-2 md:shadow-xl'
+              key={conference.id}
+            >
+              <div className='flex text-xs md:text-base'>
+                <span className='mr-1 '>{t('Followed_Time')}: </span>
                 <Tooltip text={formatDateFull(conference.followedAt)}>
                   <span>{timeAgo(conference.followedAt)}</span>
                 </Tooltip>
@@ -177,7 +182,7 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
                   acronym: conference.acronym,
                   location: conference.location,
                   fromDate: conference.fromDate,
-                  toDate: conference.toDate,
+                  toDate: conference.toDate
                 }}
               />
             </div>
@@ -185,7 +190,7 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
         })
       )}
     </div>
-  );
-};
+  )
+}
 
-export default FollowedTab;
+export default FollowedTab

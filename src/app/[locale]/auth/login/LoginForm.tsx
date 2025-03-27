@@ -1,10 +1,13 @@
 // LoginForm.tsx
 'use client'
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from '@/src/navigation'
 import useLoginForm from '../../../../hooks/auth/useLoginForm'
+import { useTranslations } from 'next-intl'
 
 const LoginForm: React.FC = () => {
+  const t = useTranslations('')
+
   const {
     email,
     password,
@@ -14,12 +17,12 @@ const LoginForm: React.FC = () => {
     handleGoogleLogin,
     error,
     isLoading
-  } = useLoginForm();
+  } = useLoginForm()
 
-  const [isClient, setIsClient] = useState(false);
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
-    setIsClient(true);
+    setIsClient(true)
   })
 
   return (
@@ -29,9 +32,9 @@ const LoginForm: React.FC = () => {
           <div className='space-y-8'>
             <div className='space-y-2 text-center'>
               <h1 className='mx-auto max-w-fit text-xl font-bold tracking-tight sm:text-2xl md:text-3xl'>
-                Welcome Global Conference Hub
+                {t('Welcome_Global_Conference_Hub')}
               </h1>
-              <p className='text-sm '>Sign in to your account</p>
+              <p className='text-sm '>{t('Sign_in_to_your_account')}</p>
             </div>
 
             <div className='space-y-4'>
@@ -58,7 +61,7 @@ const LoginForm: React.FC = () => {
                     fill='#EA4335'
                   />
                 </svg>
-                <span>Continue with Google</span>
+                <span>{t('Continue_with_Google')}</span>
               </button>
             </div>
 
@@ -74,7 +77,7 @@ const LoginForm: React.FC = () => {
             <form className='space-y-4' onSubmit={handleSubmit}>
               <div>
                 <label htmlFor='email' className='block text-sm font-medium '>
-                  Email
+                  {t('Email')}
                 </label>
                 <div className='mt-1'>
                   <input
@@ -97,14 +100,14 @@ const LoginForm: React.FC = () => {
                     htmlFor='password'
                     className='block text-sm font-medium '
                   >
-                    Password
+                    {t('Password')}
                   </label>
                   <div className='text-sm'>
                     <Link
                       href='/auth/forgot-password'
                       className='hover:text-button/80 font-medium text-button'
                     >
-                      Forgot password?
+                      {t('Forgot_Password')}
                     </Link>
                   </div>
                 </div>
@@ -152,7 +155,7 @@ const LoginForm: React.FC = () => {
                   disabled={isLoading}
                   className='hover:bg-button/90 flex w-full justify-center rounded-md border border-transparent bg-button px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
                 >
-                  {(isLoading && isClient) ? (
+                  {isLoading && isClient ? (
                     <div className='flex items-center'>
                       <svg
                         className='-ml-1 mr-3 h-5 w-5 animate-spin text-white'
@@ -174,10 +177,10 @@ const LoginForm: React.FC = () => {
                           d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
                         ></path>
                       </svg>
-                      Signing in...
+                      {t('Signing_in')}
                     </div>
                   ) : (
-                    'Sign In'
+                    t('Sign_In')
                   )}
                 </button>
               </div>
@@ -185,12 +188,12 @@ const LoginForm: React.FC = () => {
 
             <div className='text-center text-sm'>
               <div className='flex items-center justify-center space-x-1'>
-                <span className=''>Don't have an account?</span>
+                <span className=''>{t('Dont_have_an_account')}</span>
                 <Link
                   href='/auth/register'
                   className='hover:text-button/80 font-medium text-button'
                 >
-                  Sign Up Now
+                  {t('Sign_Up_Now')}
                 </Link>
               </div>
             </div>
@@ -198,14 +201,9 @@ const LoginForm: React.FC = () => {
         </div>
 
         <div className='mt-4 text-center text-xs '>
-          By continuing, you agree to our{' '}
-          <Link href='/terms' className='hover:text-button/80 text-button'>
-            Terms of Service
-          </Link>{' '}
-          and{' '}
-          <Link href='/privacy' className='hover:text-button/80 text-button'>
-            Privacy Policy
-          </Link>
+          {t(
+            'By_continuing_you_agree_to_our_Terms_of_Service_and_Privacy_Policy'
+          )}
         </div>
       </div>
     </div>

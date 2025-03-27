@@ -3,12 +3,15 @@ import React, { useState } from 'react'
 import EventCard from './EventCard'
 import EventTable from './EventTable'
 import useConferenceResults from '@/src/hooks/conferences/useConferenceResults'
+import { useTranslations } from 'next-intl'
 
 import Pagination from '../utils/Pagination'
 
 interface ResultsSectionProps {}
 
 const ResultsSection: React.FC<ResultsSectionProps> = () => {
+  const t = useTranslations('')
+
   const {
     sortedEvents,
     totalItems,
@@ -38,14 +41,14 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
     <div className='w-full rounded-lg bg-white p-4 shadow'>
       <div className='mb-4 flex flex-col items-center justify-between sm:flex-row'>
         <h2 className='mb-2 text-xl font-semibold sm:mb-0'>
-          Conference Results ({totalItems})
+          {t('Conference_Results')} ({totalItems})
         </h2>
 
         <div className='flex items-center space-x-2'>
           {/* Sort Controls */}
           <div className='flex items-center space-x-2'>
             <label htmlFor='sort-by' className=' text-sm'>
-              Sort by:
+              {t('Sort_by')}:
             </label>
             <select
               id='sort-by'
@@ -54,15 +57,15 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
               onChange={handleSortByChange}
               title='Select field to sort by'
             >
-              <option value='date'>Date</option>
-              <option value='rank'>Rank</option>
-              <option value='name'>Name</option>
-              <option value='fromDate'>Start Date</option>
-              <option value='toDate'>End Date</option>
+              <option value='date'>{t('Date')}</option>
+              <option value='rank'>{t('Rank')}</option>
+              <option value='name'>{t('Name')}</option>
+              <option value='fromDate'>{t('Start_Date')}</option>
+              <option value='toDate'>{t('End_Date')}</option>
             </select>
 
             <label htmlFor='event-per-page' className=' text-sm'>
-              Event per page:
+              {t('Events_per_page')}:
             </label>
             <select
               id='event-per-page'
@@ -225,7 +228,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
           </div>
         </>
       ) : (
-        <p>No conferences found matching your criteria.</p>
+        <p>{t('No_conferences_found_matching_your_criteria')}</p>
       )}
     </div>
   )

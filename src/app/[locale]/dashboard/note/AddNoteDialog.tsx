@@ -120,21 +120,7 @@ const AddNoteDialog: React.FC<AddNoteDialogProps> = ({
               className='mr-1 w-16 cursor-pointer bg-background py-2 text-center text-sm  placeholder-text-secondary focus:border-b focus:outline-none focus:ring-2 focus:ring-button'
               disabled={allDay}
             />
-            {/* Start Time Icon */}
-            {/* <svg
-                xmlns='http://www.w3.org/2000/svg'
-                fill='none'
-                viewBox='0 0 24 24'
-                strokeWidth={1.5}
-                stroke='currentColor'
-                className='absolute left-1 top-2.5 h-5 w-5 '
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  d='M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'
-                />
-              </svg> */}
+
             {showStartTimeDropdown && (
               <div className='absolute z-10 max-h-40 w-20 overflow-y-auto rounded border bg-background text-sm shadow-md scrollbar-none'>
                 {timeOptions.map(time => (
