@@ -7,7 +7,7 @@ import { Link } from '@/src/navigation';
 import SettingTab from './setting/SettingTab';
 import NotificationsTab from './notification/NotificationsTab';
 import FollowedTab from './follow/FollowedTab';
-import BlacklistTab from './blacklist/Blacklisttab';
+import BlacklistTab from './blacklist/BlacklistTab';
 import ProfileTab from './profile/ProfileTab';
 import NoteTab from './note/NoteTab';
 import MyConferencesTab from './myConferences/MyConferencesTab';
