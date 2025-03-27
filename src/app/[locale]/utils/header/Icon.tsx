@@ -1,10 +1,14 @@
 // components/Header/components/NotificationIcon.tsx
 import { FC } from 'react'
+import { useLocalStorage } from 'usehooks-ts'
 
 interface NotificationIconProps {
   notificationEffect: boolean
   unreadCount: number | string
 }
+
+const localUser = localStorage.getItem('user') || null;
+const user = localUser ? JSON.parse(localUser) : null;
 
 export const NotificationIcon: FC<NotificationIconProps> = ({
   notificationEffect,
@@ -79,20 +83,12 @@ export const CloseIcon: FC = () => (
 )
 
 export const UserIcon: FC = () => (
-  <svg
-    xmlns='http://www.w3.org/2000/svg'
-    width='24'
-    height='24'
-    viewBox='0 0 24 24'
-    fill='none'
-    stroke='currentColor'
-    strokeWidth='2'
-    strokeLinecap='round'
-    strokeLinejoin='round'
-    className='lucide lucide-user-check'
-  >
-    <path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2' />
-    <circle cx='9' cy='7' r='4' />
-    <polyline points='16 11 18 13 22 9' />
-  </svg>
+
+  <img
+    src={user.avatar ? user.avatar : `/avatar1.jpg`}
+    alt={`Default avatar`}
+    width={32}
+    height={32}
+    className='h-8 w-8 rounded-full border-2 border-white'
+  />
 )

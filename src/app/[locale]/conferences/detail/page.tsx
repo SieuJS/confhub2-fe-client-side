@@ -52,22 +52,13 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     const router = useRouter()
     const pathname = usePathname()
 
-    // const { conferenceDataFromDB, error: dbError, loading: dbLoading } = useConferenceDataFromDB(id);
 
-    // // Điều kiện để fetch JSON: DB fetch xong, không lỗi, và có data
-    // const shouldFetchJson = !dbLoading && !dbError;
-
-    // // Fetch JSON data chỉ khi điều kiện được thỏa mãn
-    // const { conferenceDataFromJSON, error: jsonError, loading: jsonLoading } = useConferenceDataFromJSON(id, shouldFetchJson);
-    // console.log("JSON", conferenceDataFromJSON)
-
-    // Sử dụng hook mới
     const {
         conferenceDataFromDB,
         conferenceDataFromJSON,
         dbError,
         jsonError,
-        loading
+        loading: sequentialLoading // Đổi tên để tránh trùng lặp
     } = useSequentialConferenceData(id);
 
     const transformDates = (dates: ImportantDate[] | null | undefined) => {
@@ -86,24 +77,19 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
             .filter(date => date !== undefined) // Filter out any null dates
     }
 
-
-
     const { isFollowing, handleFollowClick, loading: followLoading, error: followError } = useFollowConference(conferenceDataFromJSON);
     const { isAddToCalendar, handleAddToCalendar, loading: calendarLoading, error: calendarError } = useAddToCalendar(conferenceDataFromJSON);
-    const { isUpdating, updateResult, updateConference } = useUpdateConference(); // Assuming update hook provides loading/error
     const { isBlacklisted, handleBlacklistClick, loading: blacklistLoading, error: blacklistError } = useBlacklistConference(conferenceDataFromJSON);
+
+    const { isUpdating, updateResult, updateConference } = useUpdateConference();
     const { handleShareClick } = useShareConference(conferenceDataFromDB)
     const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } = useTopicsDisplay(conferenceDataFromDB?.organization?.topics || [])
-
-
-
-
     const transformedDates = transformDates(conferenceDataFromDB?.dates)
     const { dateDisplay } = useFormatConferenceDates(transformedDates)
+    const { isLoggedIn } = useAuthApi()
+
 
     const [openMenu, setOpenMenu] = useState<'share' | 'calendar' | null>(null)
-    //const [updating, setUpdating] = useState(false); // Remove this line
-
     const menuContainerRef = useRef<HTMLDivElement>(null)
 
     const toggleShareMenu = () => {
@@ -116,7 +102,6 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
     useClickOutside(menuContainerRef, closeMenu)
 
-    const { isLoggedIn } = useAuthApi()
 
     // --- Helper Function for Authentication Check ---
     const checkLoginAndRedirect = (callback: () => void) => {
@@ -213,8 +198,6 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         )
     }
 
-    const { conference, organization, location, followedBy } = conferenceDataFromDB || {};
-    const isLessReputable = conferenceDataFromJSON?.isLessReputable;
 
     const calculateOverallRating = (feedbacks: Feedback[] | null | undefined): number => {
         if (!feedbacks || feedbacks.length === 0) return 0;
@@ -222,8 +205,6 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         return totalStars / feedbacks.length;
     };
 
-    const overallRating = calculateOverallRating(conferenceDataFromJSON?.feedBacks);
-    const totalReviews = conferenceDataFromJSON?.feedBacks?.length || 0;
 
     const renderFollowerAvatars = () => {
         if (!followedBy || followedBy.length === 0) {
@@ -239,7 +220,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                 {visibleFollowers.map((followedBy: any) => (
                     <img
                         key={followedBy.id}
-                        src={`https://ui-avatars.com/api/?name=${followedBy.firstName}+${followedBy.lastName}&background=random&size=32`}
+                        src={followedBy.avatar ? followedBy.avatar : `https://ui-avatars.com/api/?name=${followedBy.firstName}+${followedBy.lastName}&background=random&size=32`}
                         alt={`${followedBy.firstName} ${followedBy.lastName}`}
                         width={32}
                         height={32}
@@ -268,9 +249,14 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         }
     }, [updateResult])
 
+    // --- Define Combined Loading State ---
+    // Trang đang tải nếu:
+    // 1. Dữ liệu chính đang được tải (sequentialLoading).
+    // 2. HOẶC dữ liệu chính chưa có sẵn (sau khi sequentialLoading xong nhưng data là null/undefined).
+    // 3. HOẶC một trong các hook phụ thuộc (follow, calendar, blacklist) đang tải *trạng thái ban đầu* của chúng.
     // --- Loading & Error States ---
     // Combine loading states if needed for a general overlay
-    const isLoading = loading || isUpdating;
+    const isLoading = sequentialLoading || isUpdating;
     // Combine errors or display them separately
     if (dbError === "Conference not found") return <NotFoundPage />;
     if (jsonError === "Conference not found") return <NotFoundPage />;
@@ -279,13 +265,20 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     if (isLoading) return <Loading />; // Show initial loading
 
 
+    const { conference, organization, location } = conferenceDataFromDB || {};
+    const { followedBy, isLessReputable } = conferenceDataFromJSON || {};
+
+    const overallRating = calculateOverallRating(conferenceDataFromJSON?.feedBacks);
+    const totalReviews = conferenceDataFromJSON?.feedBacks?.length || 0;
+
+
     return (
         <div className='flex min-h-screen flex-col bg-gray-50'>
             <Header locale={locale} />
 
             <div className='container mx-auto flex-grow px-4 py-8 pt-20'>
                 {/* Optional: General loading overlay */}
-                {isLoading && ( // Show overlay for actions, not initial load
+                {isUpdating && ( // Show overlay for actions, not initial load
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                         <Loading />
                     </div>
@@ -605,13 +598,13 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                                         onClick={() => checkLoginAndRedirect(handleBlacklistClick)}
                                         variant={isBlacklisted ? 'primary' : 'secondary'} // Use danger variant when blacklisted
                                         size="small"
-                                        className={`mx-12  flex items-center justify-start gap-x-4 ${blacklistLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        className={`mx-12  flex items-center justify-start gap-x-4 `}
                                         disabled={blacklistLoading}
                                         title={isBlacklisted ? "Remove this conference from your personal blacklist" : "Add this conference to your personal blacklist"} // Tooltip
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" className='h-5 w-5'><path d="m2 2 20 20" /><path d="M8.35 2.69A10 10 0 0 1 21.3 15.65" /><path d="M19.08 19.08A10 10 0 1 1 4.92 4.92" /></svg>
                                         {/* Text changes based on state */}
-                                        {blacklistLoading ? 'Processing...' : (isBlacklisted ? 'Blacklisted' : 'Blacklist')}
+                                        {isBlacklisted ? 'Blacklisted' : 'Blacklist'}
                                     </Button>
                                     {/* Display blacklist error if needed */}
                                     {blacklistError && <p className="text-red-500 text-xs mt-1 text-center">Error: {blacklistError}</p>}

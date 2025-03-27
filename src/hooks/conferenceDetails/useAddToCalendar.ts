@@ -69,7 +69,7 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
       setError(null);
   
       try {
-        const response = await fetch(`${API_ENDPOINT}/${user.id}/add-to-calendar`, {
+        const response = await fetch(`${API_ENDPOINT}/add-to-calendar`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -296,31 +296,70 @@ export default function Dashboard({ locale }: { locale: string }) {
                   <li className='w-full'>
                     <button
                       onClick={toggleSidebar}
-                      className={`... ${isSidebarOpen ? 'justify-start' : 'justify-center'}`}
+                      className={`
+                      duration-600
+                      flex
+                      w-full
+                      items-center  
+                      px-4
+                      py-2
+                      transition-colors
+                      ease-in-out
+                      hover:bg-button
+                      hover:opacity-60
+                      focus:outline-none
+                      active:bg-blue-700
+                      ${isSidebarOpen ? 'justify-start' : 'justify-center'}
+                    `}
                     >
+                      {/* Conditional margin on toggle icon */}
                       <span className={isSidebarOpen ? 'mr-4' : ''}>
                         {isSidebarOpen ? closeIcon : openIcon}
                       </span>
                       {isSidebarOpen && <span>{t('Close')}</span>}
                     </button>
                   </li>
-                  {/* Menu Items */}
+
                   {menuItems.map(item => {
-                    const tabValue = item.page.toLowerCase().replace(/ /g, '');
+                    const tabValue = item.page.toLowerCase().replace(/ /g, '')
                     return (
                       <li className='w-full' key={item.page}>
                         <Link
-                          href={{ pathname: '/dashboard', query: { tab: tabValue } }}
-                          onClick={() => isMobile && setIsSidebarOpen(false)} // Optional: close mobile menu on click
-                          className={`... ${activePage === item.page ? 'bg-button ...' : ''} ${isSidebarOpen ? 'w-50 ...' : 'w-16 ...'}`}
+                          href={{
+                            pathname: '/dashboard',
+                            query: { tab: tabValue }
+                          }}
+                          className={`
+                          duration-600
+                          flex
+                          items-center 
+                          px-4
+                          py-2
+                          transition-colors
+                          ease-in-out
+                          hover:bg-button
+                          hover:opacity-60
+                          focus:outline-none
+                          ${
+                            activePage === item.page
+                              ? 'bg-button text-button-text hover:bg-secondary'
+                              : ''
+                          }
+                          ${
+                            isSidebarOpen
+                              ? 'w-50 h-12 justify-start'
+                              : 'h-12 w-16 justify-center'
+                          }
+                        `}
                         >
+                          {/* Conditional margin on menu item icons */}
                           <span className={isSidebarOpen ? 'mr-4' : ''}>
                             {item.icon}
                           </span>
                           {isSidebarOpen && <span>{item.label}</span>}
                         </Link>
                       </li>
-                    );
+                    )
                   })}
                 </ul>
               </nav>
@@ -330,8 +369,8 @@ export default function Dashboard({ locale }: { locale: string }) {
           {/* Main Content: Render div và áp dụng margin nếu cần (ở client và không mobile) */}
           <div
             className={`
-              min-h-screen flex-1 transition-all ease-in-out duration-100 // Tăng duration lên 100ms hoặc hơn
-              ${!isMobile && (isSidebarOpen ? 'ml-48' : 'ml-16')} // Áp dụng margin chỉ khi không mobile
+              min-h-screen flex-1 transition-all ease-in-out duration-100
+              ${!isMobile && (isSidebarOpen ? 'ml-48' : 'ml-16')} 
             `}
           >
             {/* Render page dựa trên activePage */}

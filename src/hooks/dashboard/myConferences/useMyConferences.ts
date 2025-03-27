@@ -19,7 +19,16 @@ const useMyConferences = (userId: string): UseMyConferencesResult => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/${userId}/conferences`);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/my-conferences`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Add Authorization header if you use token-based auth:
+                    // 'Authorization': `Bearer ${your_auth_token}`
+                },
+                body: JSON.stringify({ userId })
+            });
+
             if (!response.ok) {
                 throw new Error(`Failed to fetch conferences: ${response.status} ${response.statusText}`);
             }
@@ -35,7 +44,7 @@ const useMyConferences = (userId: string): UseMyConferencesResult => {
 
     useEffect(() => {
         if (userId) {
-           fetchData();
+            fetchData();
         }
     }, [userId]); // Only refetch if userId changes
 
