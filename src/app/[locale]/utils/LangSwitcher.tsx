@@ -33,7 +33,7 @@ const LangSwitcher: React.FC = () => {
     { country: 'Русский', code: 'ru', flagCode: 'ru' },
     { country: '中文', code: 'zh', flagCode: 'cn' },
     { country: '日本語', code: 'ja', flagCode: 'jp' },
-    { country: '한국어', code: 'ko', flagCode: 'kr' }, // <-- Added Korean
+    { country: '한국어', code: 'ko', flagCode: 'kr' },
     { country: 'العربية', code: 'ar', flagCode: 'sa' },
     { country: 'فارسی', code: 'fa', flagCode: 'ir' }
   ]

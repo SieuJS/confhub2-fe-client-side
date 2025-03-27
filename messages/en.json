@@ -631,5 +631,24 @@
   "Notification_Date": "Notification Date",
   "Camera_Ready_Date": "Camera Ready Date",
   "Invalid_Date": "Invalid Date",
-  "Not_Available": "Not Available"
+  "Not_Available": "Not Available",
+  "IntroduceVisualization": {
+    "heading": "Explore Conference Insights through Visualization",
+    "description": "Data visualization helps you easily grasp key trends, and compare the effectiveness of sessions, speakers, and topics. Discover the big picture of the conference in a vivid and intuitive way.",
+    "buttonText": "Explore Now",
+    "buttonAriaLabel": "Go to the Visualization page",
+    "chartExampleLabel": "Example: Conference count by continent ({chartType})",
+    "chartTypeBar": "Bar Chart",
+    "chartTypePie": "Pie Chart",
+    "chartTypeLine": "Line Chart",
+    "valueLabel": "Count",
+    "continent": {
+      "asia": "Asia",
+      "europe": "Europe",
+      "northAmerica": "North America",
+      "southAmerica": "South America",
+      "africa": "Africa",
+      "oceania": "Oceania"
+    }
+  }
 }
