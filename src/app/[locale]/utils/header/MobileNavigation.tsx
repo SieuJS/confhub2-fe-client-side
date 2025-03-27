@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react'; // <--- Import thêm useState, useEffect
+import { FC, useState, useEffect } from 'react';
 import { Link } from '@/src/navigation';
 import { useTranslations } from 'next-intl';
 import ThemeSwitch from '../ThemeSwitch';
@@ -15,24 +15,32 @@ const MobileNavigation: FC<Props> = ({
   isMobileMenuOpen,
   closeAllMenus,
   locale,
-  isLogin, // Giá trị này có thể không nhất quán ban đầu
+  isLogin,
 }) => {
   const t = useTranslations('');
-  const [isClient, setIsClient] = useState(false); // <--- Thêm state để biết đã ở client chưa
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // Effect này chỉ chạy ở client sau khi component mount lần đầu
     setIsClient(true);
-  }, []); // Mảng dependency rỗng đảm bảo chỉ chạy 1 lần sau mount
+  }, []);
+
+  // ---- Đảm bảo không có gì ở giữa đây ----
 
   return (
     <div
-      className={`mobile-navigation border-border absolute right-0 top-full z-40 w-40 border-b bg-background-secondary shadow-md sm:hidden ${
-        isMobileMenuOpen ? '' : 'hidden'
-      }`}
-      // Có thể thêm suppressHydrationWarning ở đây nếu muốn, nhưng giải pháp useEffect tốt hơn
-      // suppressHydrationWarning={true}
+      className={`mobile-navigation border-border absolute right-0 top-full z-40 w-40 border-b bg-background-secondary shadow-md sm:hidden ${isMobileMenuOpen ? '' : 'hidden'
+        }`}
+    // suppressHydrationWarning // Nếu cần, đặt nó làm prop của div
     >
+      {/* Render ThemeSwitch/LangSwitcher ở client */}
+      {/* Bọc chúng trong một div để layout tốt hơn nếu cần */}
+      {isClient && (
+        <div> {/* Optional wrapper */}
+          <ThemeSwitch />
+          <LangSwitcher />
+        </div>
+      )}
+
       <div className='flex flex-col gap-4 px-4 py-2 text-sm'>
         {/* Các link này không phụ thuộc isLogin, nên giữ nguyên */}
         <Link href={`/conferences`} locale={locale}>
@@ -62,27 +70,9 @@ const MobileNavigation: FC<Props> = ({
             </Link>
           </>
         )}
-        {/* Nếu bạn có link cho người đã login, cũng bọc trong isClient */}
-        {/* {isClient && isLogin && ( <Link href="/profile">Profile</Link> )} */}
-
       </div>
 
-      {/* Tương tự, chỉ render ThemeSwitch/LangSwitcher ở client nếu chúng chỉ dành cho người chưa login */}
-      {isClient && (
-        <div className='flex items-center justify-around border-t border-border px-4 py-2'> {/* Bọc lại cho đẹp */}
-          <ThemeSwitch />
-          <LangSwitcher />
-        </div>
-      )}
-       {/* Nếu ThemeSwitch/LangSwitcher luôn hiển thị bất kể login, bỏ isClient && !isLogin đi */}
-       {/* Ví dụ:
-       {isClient && (
-         <div className='flex items-center justify-around border-t border-border px-4 py-2'>
-           <ThemeSwitch />
-           <LangSwitcher />
-         </div>
-       )}
-       */}
+
     </div>
   );
 };
