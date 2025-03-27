@@ -10,6 +10,7 @@ import AddNoteDialog from './AddNoteDialog'
 import { ConferenceResponse } from '../../../../models/response/conference.response'
 import { getConferenceFromJSON } from '../../../../app/api/conference/getConferenceDetails'
 import useDialogPosition from '../../../../hooks/dashboard/note/useDialogPosition'
+import { useTranslations } from 'next-intl'
 
 const DEFAULT_DOM_RECT: DOMRect = {
   x: 0,
@@ -41,6 +42,8 @@ interface CalendarProps {
 }
 
 const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
+  const t = useTranslations('')
+
   const dateNavigation = useDateNavigation()
   const {
     currentDate,
@@ -138,32 +141,32 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
   }, [currentDate, view, scrollToDate])
 
   const monthNames = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
+    t('January'),
+    t('February'),
+    t('March'),
+    t('April'),
+    t('May'),
+    t('June'),
+    t('July'),
+    t('August'),
+    t('September'),
+    t('October'),
+    t('November'),
+    t('December')
   ]
   const shortMonthNames = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec'
+    t('January_acronym'),
+    t('February_acronym'),
+    t('March_acronym'),
+    t('April_acronym'),
+    t('May_acronym'),
+    t('June_acronym'),
+    t('July_acronym'),
+    t('August_acronym'),
+    t('September_acronym'),
+    t('October_acronym'),
+    t('November_acronym'),
+    t('December_acronym')
   ]
   const pickerDate = new Date(currentDate)
 
@@ -328,7 +331,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                   className='block w-full px-4 py-2 text-left text-sm  hover:bg-background-secondary '
                   role='menuitem'
                 >
-                  Day
+                  {t('Day')}
                 </button>
                 <button
                   onClick={() => {
@@ -338,7 +341,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                   className='block w-full px-4 py-2 text-left text-sm  hover:bg-background-secondary '
                   role='menuitem'
                 >
-                  Week
+                  {t('Week')}
                 </button>
                 <button
                   onClick={() => {
@@ -348,7 +351,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
                   className='block w-full px-4 py-2 text-left text-sm  hover:bg-background-secondary '
                   role='menuitem'
                 >
-                  Month
+                  {t('Month')}
                 </button>
               </div>
             </div>
@@ -538,7 +541,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
           onClick={goToToday}
           className='hover:bg-bakcground-secondary mx-2 rounded-md bg-background px-3 py-1 text-sm hover:bg-background-secondary'
         >
-          Today
+          {t('Today')}
         </button>
       </div>
 

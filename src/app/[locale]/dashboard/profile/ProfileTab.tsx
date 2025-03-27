@@ -89,7 +89,8 @@ const ProfileTab: React.FC = () => {
     return <div className='py-4 text-center'>No user data found.</div>
   }
 
-  const displayAvatarUrl = editedData.avatar || userData.avatar || '/avatar1.jpg'
+  const displayAvatarUrl =
+    editedData.avatar || userData.avatar || '/avatar1.jpg'
   const displayBackgroundUrl =
     editedData.background || userData.background || '/bg-2.jpg'
 
@@ -330,8 +331,8 @@ const ProfileTab: React.FC = () => {
                 className='focus:ring-none mt-1 block h-32 w-full rounded-md border-button bg-opacity-70 p-2 shadow-md focus:border-2 focus:outline-none focus:ring-button'
               />
               <p className='text-sm '>
-                {editedData.aboutme ? editedData.aboutme.length : 0}/100
-                {t(' characters')}
+                {editedData.aboutme ? editedData.aboutme.length : 0}/100{' '}
+                {t('characters')}
               </p>
             </div>
 

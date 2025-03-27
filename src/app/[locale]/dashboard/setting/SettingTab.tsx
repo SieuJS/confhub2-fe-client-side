@@ -168,7 +168,8 @@ const SettingTab: React.FC = () => {
         prev
           ? {
               ...prev,
-              notificationWhenAddToBlacklist: !prev.notificationWhenAddToBlacklist
+              notificationWhenAddToBlacklist:
+                !prev.notificationWhenAddToBlacklist
             }
           : null
       )
@@ -213,31 +214,35 @@ const SettingTab: React.FC = () => {
   }
 
   if (userLoading) {
-    return <div>Loading settings...</div>
+    return <div>{t('Loading_settings')}</div>
   }
 
   if (userError) {
-    return <div>Error: {userError}</div>
+    return (
+      <div>
+        {t('Error')}: {userError}
+      </div>
+    )
   }
 
   if (!user || !setting) {
-    return <div>No user data available.</div>
+    return <div>{t('No_user_data_available')}</div>
   }
 
   return (
     <div className='flex'>
       <main className='flex-1 p-8'>
         <header className='mb-4 flex items-center justify-between'>
-          <h2 className='text-2xl font-semibold'>{t('Setting')}</h2>
+          <h2 className='text-xl font-semibold md:text-2xl'>{t('Setting')}</h2>
         </header>
 
         <section className='mb-8'>
           {/* Option 1: Receive Notifications */}
           <div className='mb-4 flex items-center justify-between'>
             <div>
-              <h4 className='font-semibold'>{t('Receive Notifications')}</h4>
+              <h4 className='font-semibold'>{t('Receive_Notifications')}</h4>
               <p className=' text-sm'>
-                {t('Receive Notifications Description')}.
+                {t('Receive_Notifications_Description')}.
               </p>
             </div>
             <button
@@ -334,7 +339,7 @@ const SettingTab: React.FC = () => {
           </div>
 
           {/* Option 5: Customize notification delivery (Combobox) */}
-          <div className='mb-4 flex items-center justify-between'>
+          <div className='mb-4 items-center justify-between md:flex'>
             <div>
               <h4 className='font-semibold'>
                 {t('Customize_notification_delivery')}
@@ -359,10 +364,10 @@ const SettingTab: React.FC = () => {
           <div className='mb-4 flex items-center justify-between'>
             <div>
               <h4 className='font-semibold'>
-                {t('Notification when update profile')}
+                {t('Notification_when_update_profile')}
               </h4>
               <p className=' text-sm'>
-                {t('Notification when update profile')}
+                {t('Notification_when_update_profile')}
               </p>
             </div>
             <button
@@ -387,8 +392,8 @@ const SettingTab: React.FC = () => {
           {/* Option 7: Notification when follow */}
           <div className='mb-4 flex items-center justify-between'>
             <div>
-              <h4 className='font-semibold'>{t('Notification when follow')}</h4>
-              <p className=' text-sm'>{t('Notification when follow')}</p>
+              <h4 className='font-semibold'>{t('Notification_when_follow')}</h4>
+              <p className=' text-sm'>{t('Notification_when_follow')}</p>
             </div>
             <button
               className={`h-6 min-w-12 rounded-full transition-colors duration-200 focus:outline-none ${
@@ -413,10 +418,10 @@ const SettingTab: React.FC = () => {
           <div className='mb-4 flex items-center justify-between'>
             <div>
               <h4 className='font-semibold'>
-                {t('Notification when add to calendar')}
+                {t('Notification_when_add_to_calendar')}
               </h4>
               <p className=' text-sm'>
-                {t('Notification when add to calendar')}
+                {t('Notification_when_add_to_calendar')}
               </p>
             </div>
             <button
@@ -442,10 +447,10 @@ const SettingTab: React.FC = () => {
           <div className='mb-4 flex items-center justify-between'>
             <div>
               <h4 className='font-semibold'>
-                {t('Notification when add to blacklist')}
+                {t('Notification_when_add_to_blacklist')}
               </h4>
               <p className=' text-sm'>
-                {t('Notification when add to blacklist')}
+                {t('Notification_when_add_to_blacklist')}
               </p>
             </div>
             <button
@@ -466,7 +471,6 @@ const SettingTab: React.FC = () => {
               ></div>
             </button>
           </div>
-
         </section>
 
         {/* Delete Account */}

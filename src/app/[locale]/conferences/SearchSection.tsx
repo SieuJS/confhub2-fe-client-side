@@ -5,6 +5,7 @@ import React from 'react'
 import Button from '../utils/Button'
 import SearchAdvanceSection from './SearchAdvanceSection'
 import useSearchForm from '../../../hooks/conferences/useSearchForm' // Import the hook
+import { useTranslations } from 'next-intl'
 
 interface SearchSectionProps {
   onSearch: (searchParams: {
@@ -25,6 +26,8 @@ interface SearchSectionProps {
 }
 
 const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
+  const t = useTranslations('')
+
   // Destructure onClear
   const {
     confKeyword,
@@ -169,7 +172,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
 
         <div className='flex items-center space-x-2 px-2'>
           <label htmlFor='fromDate' className='text-sm'>
-            Start:
+            {t('Start')}:
           </label>
           <input
             type='date'
@@ -182,7 +185,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
 
         <div className='flex items-center space-x-2 px-2'>
           <label htmlFor='toDate' className='text-sm'>
-            End:
+            {t('End')}:
           </label>
           <input
             type='date'
@@ -245,7 +248,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
                   onClick={() => handleLocationClick('')}
                   className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                 >
-                  All Locations
+                  {t('All_Locations')}
                 </button>
                 {[...new Set(filteredLocations)].map(location => (
                   <button
@@ -304,7 +307,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
                   onClick={() => handleTypeClick('')}
                   className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                 >
-                  All Types
+                  {t('All_Types')}
                 </button>
                 {filteredTypes.map(type => (
                   <button
@@ -329,7 +332,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
             className=''
             onClick={handleSearchClick}
           >
-            Search
+            {t('Search')}
           </Button>
           <Button
             variant='secondary'
@@ -338,7 +341,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
             className=''
             onClick={handleClear}
           >
-            Clear
+            {t('Clear')}
           </Button>
         </div>
       </div>

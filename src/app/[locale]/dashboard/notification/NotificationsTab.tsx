@@ -4,8 +4,11 @@ import NotificationItem from './NotificationItem'
 import NotificationDetails from './NotificationDetails'
 import useNotifications from '../../../../hooks/dashboard/notification/useNotifications'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 const NotificationsTab: React.FC = () => {
+  const t = useTranslations('')
+
   // console.log('NotificationsTab: Rendering'); // Log rendering
   const {
     notifications,
@@ -95,7 +98,7 @@ const NotificationsTab: React.FC = () => {
   if (!loggedIn) {
     return (
       <div className='container mx-auto p-4'>
-        Please log in to view notifications.
+        {t('Please_log_in_to_view_notifications')}
       </div>
     )
   }
@@ -105,7 +108,7 @@ const NotificationsTab: React.FC = () => {
   }
 
   if (loading) {
-    return <div className='container mx-auto p-4'>Loading...</div>
+    return <div className='container mx-auto p-4'>{t('Loading')}</div>
   }
 
   if (selectedNotificationId) {
@@ -124,20 +127,20 @@ const NotificationsTab: React.FC = () => {
     } else {
       return (
         <div>
-          Notification not found.{' '}
-          <button onClick={handleBackToNotifications}>Back</button>
+          {t('Notification_not_found')}{' '}
+          <button onClick={handleBackToNotifications}>{t('Back')}</button>
         </div>
       )
     }
   }
 
   return (
-    <div className='container mx-auto p-6'>
+    <div className='container mx-auto p-2 md:p-6'>
       <div className='mb-4 '>
         <input
           type='text'
           placeholder='Search notifications...'
-          className='w-full rounded-full border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
+          className='w-full rounded-full border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-button'
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
         />
@@ -146,27 +149,27 @@ const NotificationsTab: React.FC = () => {
       <div className='mb-4 flex space-x-4'>
         <button
           onClick={() => setFilter('all')}
-          className={`rounded px-4 py-2 ${filter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 '}`}
+          className={`rounded px-4 py-2 ${filter === 'all' ? 'bg-button text-white' : 'bg-gray-200 '}`}
         >
-          All
+          {t('All')}
         </button>
         <button
           onClick={() => setFilter('unread')}
-          className={`rounded px-4 py-2 ${filter === 'unread' ? 'bg-blue-500 text-white' : 'bg-gray-200 '}`}
+          className={`rounded px-4 py-2 ${filter === 'unread' ? 'bg-button text-white' : 'bg-gray-200 '}`}
         >
-          Unread
+          {t('Unread')}
         </button>
         <button
           onClick={() => setFilter('read')}
-          className={`rounded px-4 py-2 ${filter === 'read' ? 'bg-blue-500 text-white' : 'bg-gray-200 '}`}
+          className={`rounded px-4 py-2 ${filter === 'read' ? 'bg-button text-white' : 'bg-gray-200 '}`}
         >
-          Read
+          {t('Read')}
         </button>
         <button
           onClick={() => setFilter('important')}
-          className={`rounded px-4 py-2 ${filter === 'important' ? 'bg-blue-500 text-white' : 'bg-gray-200 '}`}
+          className={`rounded px-4 py-2 ${filter === 'important' ? 'bg-button text-white' : 'bg-gray-200 '}`}
         >
-          Important
+          {t('Important')}
         </button>
       </div>
 
@@ -174,13 +177,13 @@ const NotificationsTab: React.FC = () => {
         <input
           type='checkbox'
           id='select-all'
-          className='ml-4 mr-2 h-4 w-4 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-blue-500'
+          className='ml-4 mr-2 h-4 w-4 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-button'
           checked={selectAllChecked}
           onChange={handleSelectAllChange}
           aria-label='Select all notifications'
         />
         <label htmlFor='select-all' className='mr-4 cursor-pointer text-sm '>
-          Select All
+          {t('Select_All')}
         </label>
         {checkedIndices.length > 0 && (
           <>
@@ -190,7 +193,7 @@ const NotificationsTab: React.FC = () => {
                   ? handleMarkSelectedAsUnread
                   : handleMarkSelectedAsRead
               }
-              className='mr-2 flex min-w-24 items-center rounded bg-blue-500 px-4 py-1 text-sm font-bold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 md:text-base'
+              className='mr-2 flex min-w-24 items-center rounded bg-button px-2 py-1 text-sm font-bold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 md:px-4 md:text-base'
               aria-label={
                 allSelectedAreRead
                   ? 'Mark Selected as Unread'
@@ -214,7 +217,7 @@ const NotificationsTab: React.FC = () => {
                     <rect width='20' height='16' x='2' y='4' rx='2' />
                     <path d='m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7' />
                   </svg>
-                  Mark As Unread
+                  {t('Mark_As_Unread')}
                 </>
               ) : (
                 <>
@@ -233,7 +236,7 @@ const NotificationsTab: React.FC = () => {
                     <path d='M21.2 8.4c.5.38.8.97.8 1.6v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10a2 2 0 0 1 .8-1.6l8-6a2 2 0 0 1 2.4 0l8 6Z' />
                     <path d='m22 10-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 10' />
                   </svg>
-                  Mark As Read
+                  {t('Mark_As_Read')}
                 </>
               )}
             </button>
@@ -243,7 +246,7 @@ const NotificationsTab: React.FC = () => {
                   ? handleMarkSelectedAsUnimportant
                   : handleMarkSelectedAsImportant
               }
-              className='mr-2 flex min-w-24 items-center rounded bg-yellow-500 px-4 py-1 text-sm font-bold text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-400 md:text-base'
+              className='mr-2 flex min-w-24 items-center rounded bg-yellow-500 px-2 py-1 text-sm font-bold text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-400 md:px-4 md:text-base'
               aria-label={
                 allSelectedAreImportant
                   ? 'Mark Selected as Unimportant'
@@ -267,7 +270,7 @@ const NotificationsTab: React.FC = () => {
                   >
                     <polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2' />
                   </svg>
-                  Mark As Unimportant
+                  {t('Mark_As_Unimportant')}
                 </>
               ) : (
                 <>
@@ -286,13 +289,13 @@ const NotificationsTab: React.FC = () => {
                   >
                     <polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2' />
                   </svg>
-                  Mark As Important
+                  {t('Mark_As_Important')}
                 </>
               )}
             </button>
             <button
               onClick={handleDeleteSelected}
-              className='flex min-w-24 items-center rounded bg-red-500 px-4 py-1 text-sm font-bold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 md:text-base'
+              className='flex min-w-24 items-center rounded bg-red-500 px-2 py-1 text-sm font-bold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 md:px-4 md:text-base'
               aria-label='Delete Selected'
             >
               <svg
@@ -313,7 +316,7 @@ const NotificationsTab: React.FC = () => {
                 <line x1='10' x2='10' y1='11' y2='17' />
                 <line x1='14' x2='14' y1='11' y2='17' />
               </svg>
-              Delete Selected
+              {t('Delete_Selected')}
             </button>
           </>
         )}
@@ -321,7 +324,7 @@ const NotificationsTab: React.FC = () => {
 
       <div className='overflow-hidden bg-white shadow'>
         {displayedNotifications.length === 0 ? (
-          <p className='p-4 '>You have no notifications.</p>
+          <p className='p-4 '>{t('You_have_no_notifications')}</p>
         ) : (
           displayedNotifications.map(notification => (
             <NotificationItem

@@ -3,10 +3,10 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { Notification } from '../../../../models/response/user.response'
 import { formatDateFull } from '../timeFormat'
 import { useSearchParams } from 'next/navigation'
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import { Link } from '@/src/navigation';
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
+import { useTranslations } from 'next-intl'import { Link } from '@/src/navigation';
 import Button from '../../utils/Button';
 
 interface NotificationDetailProps {
@@ -22,6 +22,8 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
   onDelete,
   onToggleImportant
 }) => {
+  const t = useTranslations('')
+
   const [isStarred, setIsStarred] = useState(false)
   const searchParams = useSearchParams()
   const notificationId = searchParams.get('id')
@@ -44,7 +46,7 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
           onClick={onBack}
           className='mr-2 text-blue-500 hover:text-blue-700 focus:outline-none'
         >
-          ← Back
+          ← {t('Back')}
         </button>
         <button
           onClick={e => {
@@ -55,10 +57,11 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
           aria-label='Mark as important'
         >
           <span
-            className={`${isStarred || notification.isImportant
+            className={`${
+              isStarred || notification.isImportant
               ? 'text-yellow-500'
               : 'text-gray-400'
-              } text-lg`}
+            } text-lg`}
           >
             ★
           </span>
@@ -73,20 +76,38 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeRaw]}
-
           components={{
             // Customize components (optional, for more control)
-            p: ({ node, ...props }) => <p className="mb-2" {...props} />, // Add margin to paragraphs
-            a: ({ node, ...props }) => <a className="text-blue-600 hover:underline" {...props} />, // Style links
+            p: ({ node, ...props }) => <p className='mb-2' {...props} />, // Add margin to paragraphs
+            a: ({ node, ...props }) => (
+              <a className='text-blue-600 hover:underline' {...props} />
+            ), // Style links
             // Add more component overrides as needed (ul, ol, li, code, etc.)
-            pre: ({ node, ...props }) => <pre className="bg-gray-100 p-2 rounded-md overflow-x-auto" {...props} />,
-            code: ({ node, ...props }) => <code className="bg-gray-100 px-1 rounded" {...props} />,
-            h1: ({ node, ...props }) => <h1 className='text-2xl font-bold my-4' {...props} />,
-            h2: ({ node, ...props }) => <h2 className='text-xl font-semibold my-3' {...props} />,
-            h3: ({ node, ...props }) => <h3 className='text-lg font-medium my-2' {...props} />,
-            ul: ({ node, ...props }) => <ul className='list-disc list-inside my-2' {...props} />,
-            ol: ({ node, ...props }) => <ol className='list-decimal list-inside my-2' {...props} />,
-            li: ({ node, ...props }) => <li className='my-1' {...props} />,
+            pre: ({ node, ...props }) => (
+              <pre
+                className='overflow-x-auto rounded-md bg-gray-100 p-2'
+                {...props}
+              />
+            ),
+            code: ({ node, ...props }) => (
+              <code className='rounded bg-gray-100 px-1' {...props} />
+            ),
+            h1: ({ node, ...props }) => (
+              <h1 className='my-4 text-2xl font-bold' {...props} />
+            ),
+            h2: ({ node, ...props }) => (
+              <h2 className='my-3 text-xl font-semibold' {...props} />
+            ),
+            h3: ({ node, ...props }) => (
+              <h3 className='my-2 text-lg font-medium' {...props} />
+            ),
+            ul: ({ node, ...props }) => (
+              <ul className='my-2 list-inside list-disc' {...props} />
+            ),
+            ol: ({ node, ...props }) => (
+              <ol className='my-2 list-inside list-decimal' {...props} />
+            ),
+            li: ({ node, ...props }) => <li className='my-1' {...props} />
           }}
         >
           {notification.message}
@@ -114,10 +135,10 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
         {/* Display seenAt.  It will now ALWAYS be the initial seenAt value. */}
         {seenAt ? (
           <p className='mt-2 text-sm text-gray-500'>
-            Seen at: {formatDateFull(seenAt)}
+            {t('Seen_at')}: {formatDateFull(seenAt)}
           </p>
         ) : (
-          <p className='mt-2 text-sm text-gray-500'>Not yet seen</p>
+          <p className='mt-2 text-sm text-gray-500'>{t('Not_yet_seen')}</p>
         )}
       </div>
       <div className='mt-4 flex items-center space-x-2'>
