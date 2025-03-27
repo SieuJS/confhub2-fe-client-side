@@ -7,7 +7,7 @@ import { getConferenceFromJSON } from '../../app/api/conference/getConferenceDet
 const useConferenceDataJSON = (id: string | null, enabled: boolean = true) => {
     const [conferenceDataFromJSON, setConferenceData] = useState<ConferenceResponse | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(false); // Bắt đầu là false
+    const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         // Chỉ fetch khi id có giá trị VÀ hook được 'enabled'
@@ -24,6 +24,7 @@ const useConferenceDataJSON = (id: string | null, enabled: boolean = true) => {
             setError(null);
             try {
                 const conferenceInfo = await getConferenceFromJSON(id);
+                console.log(conferenceInfo)
                 setConferenceData(conferenceInfo);
             } catch (err: any) {
                 if (err.status === 404) {

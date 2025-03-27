@@ -20,6 +20,7 @@ import useAuthApi from '@/src/hooks/auth/useAuthApi' // Import useAuthApi
 // Import the custom hooks
 import useConferenceDataFromDB from '../../../../hooks/conferenceDetails/useConferenceDataFromDB'
 import useConferenceDataFromJSON from '../../../../hooks/conferenceDetails/useConferenceDataFromJSON'
+import useSequentialConferenceData from '@/src/hooks/conferenceDetails/useSequentialConferenceData'
 import useFollowConference from '../../../../hooks/conferenceDetails/useFollowConference'
 import useShareConference from '../../../../hooks/conferenceDetails/useShareConference'
 import useClickOutside from '../../../../hooks/conferenceDetails/useClickOutside'
@@ -28,7 +29,6 @@ import useFormatConferenceDates from '../../../../hooks/conferenceDetails/useFor
 import useAddToCalendar from '../../../../hooks/conferenceDetails/useAddToCalendar'
 import useUpdateConference from '../../../../hooks/conferenceDetails/useUpdateConference' // Import the hook
 import useBlacklistConference from '../../../../hooks/conferenceDetails/useBlacklistConference'; // Import the new hook
-import { add } from 'lodash'
 
 // Define the Feedback type (or import it)
 export type Feedback = {
@@ -52,21 +52,23 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     const router = useRouter()
     const pathname = usePathname()
 
-    const { conferenceDataFromDB, error: dbError, loading: dbLoading } = useConferenceDataFromDB(id);
+    // const { conferenceDataFromDB, error: dbError, loading: dbLoading } = useConferenceDataFromDB(id);
 
-    // Điều kiện để fetch JSON: DB fetch xong, không lỗi, và có data
-    const shouldFetchJson = !dbLoading && !dbError && !!conferenceDataFromDB;
+    // // Điều kiện để fetch JSON: DB fetch xong, không lỗi, và có data
+    // const shouldFetchJson = !dbLoading && !dbError;
 
-    // Fetch JSON data chỉ khi điều kiện được thỏa mãn
-    const { conferenceDataFromJSON, error: jsonError, loading: jsonLoading } = useConferenceDataFromJSON(id, shouldFetchJson);
+    // // Fetch JSON data chỉ khi điều kiện được thỏa mãn
+    // const { conferenceDataFromJSON, error: jsonError, loading: jsonLoading } = useConferenceDataFromJSON(id, shouldFetchJson);
+    // console.log("JSON", conferenceDataFromJSON)
 
-
-    const { isFollowing, handleFollowClick, loading: followLoading, error: followError } = useFollowConference(conferenceDataFromJSON); // Use conferenceDataFromJSON if it has .conference.id
-    const { isAddToCalendar, handleAddToCalendar, loading: calendarLoading, error: calendarError } = useAddToCalendar(conferenceDataFromJSON); // Use conferenceDataFromJSON
-    const { isUpdating, updateResult, updateConference } = useUpdateConference(); // Assuming update hook provides loading/error
-    const { isBlacklisted, handleBlacklistClick, loading: blacklistLoading, error: blacklistError } = useBlacklistConference(conferenceDataFromJSON);
-    const { handleShareClick } = useShareConference(conferenceDataFromDB)
-    const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } = useTopicsDisplay(conferenceDataFromDB?.organization?.topics || [])
+    // Sử dụng hook mới
+    const {
+        conferenceDataFromDB,
+        conferenceDataFromJSON,
+        dbError,
+        jsonError,
+        loading
+    } = useSequentialConferenceData(id);
 
     const transformDates = (dates: ImportantDate[] | null | undefined) => {
         if (!dates) {
@@ -83,6 +85,18 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
             })
             .filter(date => date !== undefined) // Filter out any null dates
     }
+
+
+
+    const { isFollowing, handleFollowClick, loading: followLoading, error: followError } = useFollowConference(conferenceDataFromJSON);
+    const { isAddToCalendar, handleAddToCalendar, loading: calendarLoading, error: calendarError } = useAddToCalendar(conferenceDataFromJSON);
+    const { isUpdating, updateResult, updateConference } = useUpdateConference(); // Assuming update hook provides loading/error
+    const { isBlacklisted, handleBlacklistClick, loading: blacklistLoading, error: blacklistError } = useBlacklistConference(conferenceDataFromJSON);
+    const { handleShareClick } = useShareConference(conferenceDataFromDB)
+    const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } = useTopicsDisplay(conferenceDataFromDB?.organization?.topics || [])
+
+
+
 
     const transformedDates = transformDates(conferenceDataFromDB?.dates)
     const { dateDisplay } = useFormatConferenceDates(transformedDates)
@@ -116,6 +130,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
             callback() // Execute the original action
         }
     }
+
 
     const renderShareMenu = () => {
         if (openMenu !== 'share') return null
@@ -255,7 +270,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
     // --- Loading & Error States ---
     // Combine loading states if needed for a general overlay
-    const isLoading = dbLoading || jsonLoading || isUpdating;
+    const isLoading = loading || isUpdating;
     // Combine errors or display them separately
     if (dbError === "Conference not found") return <NotFoundPage />;
     if (jsonError === "Conference not found") return <NotFoundPage />;
@@ -270,7 +285,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
             <div className='container mx-auto flex-grow px-4 py-8 pt-20'>
                 {/* Optional: General loading overlay */}
-                {isLoading && !dbLoading && !jsonLoading && ( // Show overlay for actions, not initial load
+                {isLoading && ( // Show overlay for actions, not initial load
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                         <Loading />
                     </div>

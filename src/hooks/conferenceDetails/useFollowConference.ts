@@ -11,7 +11,7 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!conferenceData?.conference?.id) {
+    if (!conferenceData) {
       setIsFollowing(false);
       return;
     }
@@ -47,7 +47,7 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
     };
 
     fetchUser();
-  }, [conferenceData?.conference?.id]);
+  }, [conferenceData]);
 
   const handleFollowClick = async () => {
     if (!conferenceData?.conference?.id) {
@@ -69,7 +69,7 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
     setError(null);
 
     try {
-      const response = await fetch(`${API_ENDPOINT}/${user.id}/follow`, {
+      const response = await fetch(`${API_ENDPOINT}/follow`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

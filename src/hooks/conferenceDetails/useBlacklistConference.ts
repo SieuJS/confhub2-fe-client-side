@@ -14,9 +14,8 @@ const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
 
   // Fetch initial blacklist status
   useEffect(() => {
-    // Reset state if conferenceId changes or is missing
-    setIsBlacklisted(false);
-    if (!conferenceId) {
+    if (!conferenceData) {
+      setIsBlacklisted(false);
       return;
     }
 
@@ -70,7 +69,7 @@ const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
     return () => {
         isMounted = false; // Cleanup function to set isMounted to false
     };
-  }, [conferenceId]); // Rerun effect if conferenceId changes
+  }, [conferenceData]); // Rerun effect if conferenceId changes
 
   // Function to handle the blacklist/unblacklist action
   const handleBlacklistClick = useCallback(async () => {
