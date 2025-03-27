@@ -11,3 +11,5 @@ export interface Feedback {
     createdAt: string;
     updatedAt: string;
 }
+
+export type SortOption = 'time' | 'star';
