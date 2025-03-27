@@ -7,6 +7,8 @@ import { Header } from '../utils/Header'
 import Footer from '../utils/Footer'
 import About from './about'
 import Support from './support'
+import SupportForm from './supportForm'
+import ContactMethods from './ContactMethods'
 
 const FAQ = ({ locale }: { locale: string }) => {
   const t = useTranslations('FAQ')
@@ -14,6 +16,8 @@ const FAQ = ({ locale }: { locale: string }) => {
   return (
     <>
       <Header locale={locale} />
+      <SupportForm />
+      <ContactMethods />
       <About />
       <Support />
       <Footer />

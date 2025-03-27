@@ -1,80 +1,118 @@
-import React from 'react';
+// Đảm bảo component này là Client Component nếu dùng App Router
+'use client'
+
+import React from 'react'
+import { useTranslations } from 'next-intl'
 
 const AIAbilities = () => {
-  return (
-    <div className="bg-gray-900 text-white flex flex-col items-center gap-8 p-4">
+  const t = useTranslations('AIAbilities')
 
+  // Không cần lấy mảng nữa
+
+  return (
+    <div className='flex flex-col items-center gap-8 bg-gray-900 p-4 text-white sm:p-8'>
       {/* Row 1 */}
-      <div className="flex flex-wrap justify-center gap-8">
+      <div className='flex w-full max-w-6xl flex-wrap justify-center gap-8'>
         {/* EASE OF USE */}
-        <div className="bg-gray-800 rounded-lg shadow-md p-6 w-full md:w-[350px] lg:w-[500px] lg:h-[500px]">
-          <h3 className="text-lg font-semibold text-blue-400 mb-2">EASE OF USE</h3>
-          <h2 className="text-2xl font-semibold text-white mb-4">Complex requests solved simply</h2>
-          <p className="text-gray-400 text-sm">
-            While your questions may be complex, the tool you use to answer them shouldnt be.
-            Thats why Research AI is designed to give you exactly the valuable insights youre looking for,
-            regardless of your experience with AI or Statista, what language you speak, or how specific your search is.
+        <div className='flex w-full flex-col rounded-lg bg-gray-800 p-6 shadow-md md:flex-1 lg:min-w-[400px]'>
+          <h3 className='mb-2 text-lg font-semibold text-blue-400'>
+            {t('easeOfUse.category')}
+          </h3>
+          <h2 className='mb-4 text-2xl font-semibold text-white'>
+            {t('easeOfUse.headline')}
+          </h2>
+          <p className='mb-4 flex-grow text-sm text-gray-400'>
+            {t('easeOfUse.description')}
           </p>
-          <div className="mt-4 flex flex-wrap gap-4">
-            <div className="border border-gray-700 rounded-md p-2 w-full">
-              <h4 className="text-gray-300 text-sm font-medium">The most spoken languages <br /> worldwide in 2023 <br /> <span className="text-xs text-gray-500">(by speakers in millions)</span></h4>
-              
+          {/* Ghi trực tiếp các thẻ div, sử dụng index trong key */}
+          <div className='mt-auto flex flex-wrap gap-2'>
+            <div className='rounded-md border border-gray-700 bg-gray-700/30 p-2 text-xs font-medium text-gray-300'>
+              {t('easeOfUse.exampleTexts.0')}
             </div>
+            <div className='rounded-md border border-gray-700 bg-gray-700/30 p-2 text-xs font-medium text-gray-300'>
+              {t('easeOfUse.exampleTexts.1')}
+            </div>
+            <div className='rounded-md border border-gray-700 bg-gray-700/30 p-2 text-xs font-medium text-gray-300'>
+              {t('easeOfUse.exampleTexts.2')}
+            </div>
+            <div className='rounded-md border border-gray-700 bg-gray-700/30 p-2 text-xs font-medium text-gray-300'>
+              {t('easeOfUse.exampleTexts.3')}
+            </div>
+            {/* Thêm hoặc bớt các div này nếu số lượng ví dụ thay đổi */}
           </div>
         </div>
 
         {/* EFFICIENCY */}
-        <div className="bg-gray-800 rounded-lg shadow-md p-6 w-full md:w-[350px] lg:w-[350px] lg:h-[400px] lg:mt-24">
-          <h3 className="text-lg font-semibold text-blue-400 mb-2">EFFICIENCY</h3>
-          <h2 className="text-2xl font-semibold text-white mb-4">Your shortcut to lasting good decisions</h2>
-          <p className="text-gray-400 text-sm">
-            Time is money, as they say, so urgency is key. However, its a real shame to see your savings go up in smoke due
-            to poor decisions. Research AI offers a double advantage: find insights in the blink of an eye that will
-            lead you to eternally sound decisions.
+        <div className='flex w-full flex-col rounded-lg bg-gray-800 p-6 shadow-md md:flex-1 lg:min-w-[350px]'>
+          <h3 className='mb-2 text-lg font-semibold text-blue-400'>
+            {t('efficiency.category')}
+          </h3>
+          <h2 className='mb-4 text-2xl font-semibold text-white'>
+            {t('efficiency.headline')}
+          </h2>
+          <p className='mb-4 flex-grow text-sm text-gray-400'>
+            {t('efficiency.description')}
           </p>
-
-          <div className="mt-4 border border-gray-700 rounded-md p-2">
-            <h4 className="text-gray-300 text-sm font-medium">Average time to insights</h4>
-            <p className="text-gray-400 text-xs mb-2">Split by different steps during a typical research, in minutes</p>
-            
+          <div className='mt-auto rounded-md border border-gray-700 bg-gray-700/30 p-3'>
+            <h4 className='mb-1 text-sm font-medium text-gray-300'>
+              {t('efficiency.exampleTitle')}
+            </h4>
+            <p className='whitespace-pre-line text-xs text-gray-400'>
+              {t('efficiency.exampleDescription')}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Row 2 */}
-      <div className="flex flex-wrap justify-center gap-8">
+      <div className='flex w-full max-w-6xl flex-wrap justify-center gap-8'>
         {/* QUALITY */}
-        <div className="bg-gray-800 rounded-lg shadow-md p-6 w-full md:w-[350px] lg:w-[350px] lg:h-[300px]">
-          <h3 className="text-lg font-semibold text-blue-400 mb-2">QUALITY</h3>
-          <h2 className="text-2xl font-semibold text-white mb-4">Half human, half AI</h2>
-          <p className="text-gray-400 text-sm">
-            The decisions you are facing are too important to be made on the basis of opaque, possibly erroneous data.
-            With Research AI
+        <div className='flex w-full flex-col rounded-lg bg-gray-800 p-6 shadow-md md:flex-1 lg:min-w-[350px]'>
+          <h3 className='mb-2 text-lg font-semibold text-blue-400'>
+            {t('quality.category')}
+          </h3>
+          <h2 className='mb-4 text-2xl font-semibold text-white'>
+            {t('quality.headline')}
+          </h2>
+          <p className='mb-4 flex-grow text-sm text-gray-400'>
+            {t('quality.description')}
           </p>
-          <div className="mt-4 p-2 bg-gray-700 rounded-md text-gray-300 text-xs">
-            The best solution to transform complex data into understandable insights: Research AI.
+          <div className='mt-auto rounded-md bg-gray-700 p-3 text-xs italic text-gray-300'>
+            {t('quality.quote')}
           </div>
         </div>
 
         {/* INNOVATION */}
-        <div className="bg-gray-800 rounded-lg shadow-md p-6 w-full md:w-[350px] lg:w-[500px]">
-          <h3 className="text-lg font-semibold text-blue-400 mb-2">INNOVATION</h3>
-          <h2 className="text-2xl font-semibold text-white mb-4">Uniquely customized</h2>
-          <p className="text-gray-400 text-sm">
-            Knowledge is not the same as insight. However, reliable decisions can only be made on the basis of real findings that
-            meet individual requirements. Unlike generic statistical AIs, Research AI provides you with a customized narrative based on
-            high-quality data collected and/or verified by Statista experts. In other words, it gives you real insight.
+        <div className='flex w-full flex-col rounded-lg bg-gray-800 p-6 shadow-md md:flex-1 lg:min-w-[400px]'>
+          <h3 className='mb-2 text-lg font-semibold text-blue-400'>
+            {t('innovation.category')}
+          </h3>
+          <h2 className='mb-4 text-2xl font-semibold text-white'>
+            {t('innovation.headline')}
+          </h2>
+          <p className='mb-4 flex-grow text-sm text-gray-400'>
+            {t('innovation.description')}
           </p>
-
-          <div className="mt-4 flex flex-col gap-2">
-            <button className="bg-gray-700 text-gray-300 text-xs px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none">Semantic Search Embeddings</button>
-            <button className="bg-gray-700 text-gray-300 text-xs px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none">Large Language Models (LLMs)</button>
-            <button className="bg-gray-700 text-gray-300 text-xs px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none">Retrieval Augmented Generation (RAG)</button>
+          {/* Ghi trực tiếp các thẻ button, sử dụng index trong key */}
+          <div className='mt-auto flex flex-wrap gap-2'>
+            <button className='rounded-md bg-gray-700 px-3 py-1.5 text-xs text-gray-300 transition duration-150 ease-in-out hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'>
+              {t('innovation.buttons.0')}
+            </button>
+            <button className='rounded-md bg-gray-700 px-3 py-1.5 text-xs text-gray-300 transition duration-150 ease-in-out hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'>
+              {t('innovation.buttons.1')}
+            </button>
+            <button className='rounded-md bg-gray-700 px-3 py-1.5 text-xs text-gray-300 transition duration-150 ease-in-out hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'>
+              {t('innovation.buttons.2')}
+            </button>
+            <button className='rounded-md bg-gray-700 px-3 py-1.5 text-xs text-gray-300 transition duration-150 ease-in-out hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'>
+              {t('innovation.buttons.3')}
+            </button>
+            {/* Thêm hoặc bớt các button này nếu số lượng nút thay đổi */}
           </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AIAbilities;
+export default AIAbilities
