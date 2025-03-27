@@ -89,7 +89,7 @@ const ProfileTab: React.FC = () => {
     return <div className='py-4 text-center'>No user data found.</div>
   }
 
-  const displayAvatarUrl = editedData.avatar || userData.avatar || '/s1.png'
+  const displayAvatarUrl = editedData.avatar || userData.avatar || '/avatar1.jpg'
   const displayBackgroundUrl =
     editedData.background || userData.background || '/bg-2.jpg'
 

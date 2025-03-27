@@ -1,62 +1,61 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import { useTranslations } from 'next-intl'
-import { useSearchParams } from 'next/navigation'
-import { Link } from '@/src/navigation'
-import SettingTab from './setting/SettingTab'
-import NotificationsTab from './notification/NotificationsTab'
-import FollowedTab from './follow/FollowedTab'
-import ProfileTab from './profile/ProfileTab'
-import NoteTab from './note/NoteTab'
-import MyConferencesTab from './myConferences/MyConferencesTab'
-import { Header } from '../utils/Header'
-import { useMediaQuery } from 'react-responsive'
+import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
+import { Link } from '@/src/navigation';
+import SettingTab from './setting/SettingTab';
+import NotificationsTab from './notification/NotificationsTab';
+import FollowedTab from './follow/FollowedTab';
+import ProfileTab from './profile/ProfileTab';
+import NoteTab from './note/NoteTab';
+import MyConferencesTab from './myConferences/MyConferencesTab';
+import { Header } from '../utils/Header';
+import { useMediaQuery } from 'react-responsive';
 
 export default function Dashboard({ locale }: { locale: string }) {
-  const t = useTranslations('')
-  const searchParams = useSearchParams()
-  const [activePage, setActivePage] = useState<string>('')
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const isMobile = useMediaQuery({ maxWidth: 768 })
+  const t = useTranslations('');
+  const searchParams = useSearchParams();
+  const [activePage, setActivePage] = useState<string>('');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Giữ nguyên init là false
+
+  // --- Thêm state để kiểm tra client ---
+  const [isClient, setIsClient] = useState(false);
+  const isMobile = useMediaQuery({ maxWidth: 768 }); // Vẫn gọi hook
 
   useEffect(() => {
-    const tab = searchParams.get('tab')
-    let initialPage = 'Profile'
-    if (tab === 'profile') {
-      initialPage = 'Profile'
-    } else if (tab === 'followed') {
-      initialPage = 'Followed'
-    } else if (tab === 'myconferences') {
-      initialPage = 'My Conferences'
-    } else if (tab === 'note') {
-      initialPage = 'Note'
-    } else if (tab === 'notifications') {
-      initialPage = 'Notifications'
-    } else if (tab === 'setting') {
-      initialPage = 'Setting'
-    }
-    setActivePage(initialPage)
-  }, [searchParams])
+    // Chỉ chạy ở client sau khi mount
+    setIsClient(true);
+  }, []);
+  // --------------------------------------
+
+  useEffect(() => {
+    // Logic cập nhật activePage dựa trên searchParams (giữ nguyên)
+    const tab = searchParams.get('tab');
+    let initialPage = 'Profile'; // Mặc định là Profile nếu không có tab hợp lệ
+    if (tab === 'followed') initialPage = 'Followed';
+    else if (tab === 'myconferences') initialPage = 'My Conferences';
+    else if (tab === 'note') initialPage = 'Note';
+    else if (tab === 'notifications') initialPage = 'Notifications';
+    else if (tab === 'setting') initialPage = 'Setting';
+    // Không cần else if (tab === 'profile') vì đã là mặc định
+    setActivePage(initialPage);
+  }, [searchParams]); // Phụ thuộc vào searchParams
 
   const renderPage = () => {
+    // Chỉ render nội dung tab KHI activePage đã được set (hoặc dùng giá trị mặc định)
+    // Không cần thay đổi nhiều ở đây, vì activePage được set trong useEffect
     switch (activePage) {
-      case 'Setting':
-        return <SettingTab />
-      case 'Notifications':
-        return <NotificationsTab />
-      case 'Followed':
-        return <FollowedTab />
-      case 'Note':
-        return <NoteTab />
-      case 'My Conferences':
-        return <MyConferencesTab />
-      case 'Profile':
-        return <ProfileTab />
-      default:
-        return <ProfileTab />
+      case 'Setting': return <SettingTab />;
+      case 'Notifications': return <NotificationsTab />;
+      case 'Followed': return <FollowedTab />;
+      case 'Note': return <NoteTab />;
+      case 'My Conferences': return <MyConferencesTab />;
+      case 'Profile': return <ProfileTab />;
+      default: // Render ProfileTab trong lần đầu hoặc nếu activePage không hợp lệ
+        return <ProfileTab />;
     }
-  }
+  };
 
   const menuItems = [
     {
@@ -242,31 +241,53 @@ export default function Dashboard({ locale }: { locale: string }) {
   )
 
   const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen)
+    // Chỉ toggle khi đã ở client (an toàn hơn)
+    if (isClient) {
+      setIsSidebarOpen(!isSidebarOpen);
+    }
+  };
+
+
+  // --- Điều chỉnh phần return ---
+
+  // Render placeholder hoặc null trong khi chưa mount client
+  // để đảm bảo server và client render giống nhau ban đầu
+  if (!isClient) {
+    return (
+      <>
+        <Header locale={locale} />
+        {/* Có thể thêm một skeleton loader đơn giản ở đây nếu muốn */}
+        <div className='relative justify-center'>
+          <div className='w-full bg-background py-8'></div>
+          <div className='flex'>
+            {/* Render trống hoặc skeleton cho sidebar và content */}
+            <div className="flex-1 min-h-screen"> {/* Div placeholder */}
+              {/* Loading indicator or skeleton */}
+            </div>
+          </div>
+        </div>
+      </>
+    );
   }
 
+  // --- Khi đã ở client (isClient = true) ---
+  // Bây giờ có thể sử dụng isMobile và isSidebarOpen một cách an toàn
   return (
     <>
       <Header locale={locale} />
       <div className='relative justify-center'>
         <div className='w-full bg-background py-8'></div>
         <div className='flex'>
-          {/* Sidebar */}
-          {isMobile ? null : (
+          {/* Sidebar: Chỉ render khi ở client VÀ không phải mobile */}
+          {!isMobile && (
             <aside
               className={`
-              fixed
-              flex
-              flex-col
-              bg-background
-              transition-all
-              
-              ease-in-out
-              ${isSidebarOpen ? 'w-50' : 'w-16'}
-            `}
+                fixed flex flex-col bg-background transition-all ease-in-out
+                ${isSidebarOpen ? 'w-50' : 'w-16'} // Sử dụng isSidebarOpen
+              `}
               style={{
-                height: 'calc(100vh - 72px)', // Adjust 72px if your header height changes.  Crucially *don't* set a fixed height.
-                overflowY: 'auto' // Add this to allow scrolling within the sidebar if content overflows.
+                height: 'calc(100vh - 72px)',
+                overflowY: 'auto'
               }}
             >
               <nav className='w-full flex-grow'>
@@ -345,26 +366,19 @@ export default function Dashboard({ locale }: { locale: string }) {
             </aside>
           )}
 
-          {/* Main Content */}
-          {isMobile ? (
-            <div className='flex-1'>{renderPage()}</div>
-          ) : (
-            <div
-              className={`
-              duration-50
-              min-h-screen
-              flex-1
-              transition-all
-              ease-in-out
-              ${isSidebarOpen ? 'ml-48' : 'ml-16'}
+          {/* Main Content: Render div và áp dụng margin nếu cần (ở client và không mobile) */}
+          <div
+            className={`
+              min-h-screen flex-1 transition-all ease-in-out duration-100
+              ${!isMobile && (isSidebarOpen ? 'ml-48' : 'ml-16')} 
             `}
-            >
-              {renderPage()}
-            </div>
-          )}
+          >
+            {/* Render page dựa trên activePage */}
+            {renderPage()}
+          </div>
         </div>
       </div>
       {/* <Footer /> */}
     </>
-  )
+  );
 }

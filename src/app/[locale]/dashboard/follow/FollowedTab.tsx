@@ -108,7 +108,7 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
   // Trong FollowedTab.tsx, trong transformedConferences
   const transformedConferences = followedConferences.map((conf) => {
     // Truy cập trực tiếp phần tử đầu tiên của mảng dates
-    const conferenceDates = conf.dates && conf.dates[0];
+    const conferenceDates = conf.dates;
 
     return {
       id: conf.id!,
@@ -169,7 +169,17 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
                   <span>{timeAgo(conference.followedAt)}</span>
                 </Tooltip>
               </div>
-              <ConferenceItem conference={conference} />
+              <ConferenceItem
+                key={conference.id}
+                conference={{
+                  id: conference.id,
+                  title: conference.title,
+                  acronym: conference.acronym,
+                  location: conference.location,
+                  fromDate: conference.fromDate,
+                  toDate: conference.toDate,
+                }}
+              />
             </div>
           )
         })

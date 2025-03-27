@@ -11,7 +11,7 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!conferenceData || !conferenceData.conference) {
+    if (!conferenceData) {
       setIsAddToCalendar(false);
       return;
     }
@@ -47,7 +47,7 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
 
     };
     fetchUser();
-  }, [conferenceData?.conference?.id]); // Chạy lại khi conferenceData.conference.id thay đổi
+  }, [conferenceData]); // Chạy lại khi conferenceData.conference.id thay đổi
 
   const handleAddToCalendar = async () => {
       if (!conferenceData?.conference?.id) {
@@ -69,7 +69,7 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
       setError(null);
   
       try {
-        const response = await fetch(`${API_ENDPOINT}/${user.id}/add-to-calendar`, {
+        const response = await fetch(`${API_ENDPOINT}/add-to-calendar`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

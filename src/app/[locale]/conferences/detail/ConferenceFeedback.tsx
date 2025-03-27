@@ -261,7 +261,7 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
                     {/* Responsive cho header comment */}
                     <div className='flex items-center'>
                       <Image
-                        src='/avatar3.jpg' // Use a generic placeholder
+                        src={feedback.avatar} // Use a generic placeholder
                         alt='User Avatar'
                         width={30}
                         height={30}
@@ -270,9 +270,7 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
 
                       <div className='font-medium text-gray-800'>
                         {' '}
-                        {/* Thêm màu */}
-                        User ID:{' '}
-                        {feedback.creatorId?.substring(0, 8) ?? 'Unknown'}
+                        {`${feedback.firstName} ${feedback.lastName}` || 'Unknown'}
                       </div>
                     </div>
                     <div className='flex text-yellow-500'>

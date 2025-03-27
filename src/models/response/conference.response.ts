@@ -6,7 +6,8 @@ export type ConferenceResponse = {
   ranks: Rank[] | null;
   feedBacks: Feedback[] | null;
   followedBy: FollowerInfo[] | null;
-  isLessReputable: boolean | null;
+  isLessReputable?: boolean; // <-- ADD THIS LINE
+
 };
 
 export type ConferenceIdentity = {
@@ -69,6 +70,9 @@ export type Feedback = {
   id: string;
   organizedId: string | null;
   creatorId: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  avatar: string;
   description: string | null;
   star: number | null;
   createdAt: string | null;
@@ -80,8 +84,7 @@ export type FollowerInfo = {
   email: string | null;
   firstName: string | null;
   lastName: string | null;
+  avatar: string;
   createdAt: string | null;
   updatedAt: string | null;
 };
-
-

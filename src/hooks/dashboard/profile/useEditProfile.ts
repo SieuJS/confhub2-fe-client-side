@@ -47,10 +47,13 @@ export const useEditProfile = (
       }
 
       const updatedUser = await updateUser(user.id, updatePayload);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      
       //Sign in to trigger all update event of useAuth
       await signIn({email: updatedUser.email, password: ""}) //This will trigger all the localStorage change
 
       setIsEditing(false);
+      window.location.reload();
 
     } catch (error: any) {
       console.error('Failed to update user:', error);
