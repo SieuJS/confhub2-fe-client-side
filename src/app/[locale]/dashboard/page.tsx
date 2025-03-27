@@ -7,6 +7,7 @@ import { Link } from '@/src/navigation';
 import SettingTab from './setting/SettingTab';
 import NotificationsTab from './notification/NotificationsTab';
 import FollowedTab from './follow/FollowedTab';
+import BlacklistTab from './blacklist/Blacklisttab';
 import ProfileTab from './profile/ProfileTab';
 import NoteTab from './note/NoteTab';
 import MyConferencesTab from './myConferences/MyConferencesTab';
@@ -37,6 +38,7 @@ export default function Dashboard({ locale }: { locale: string }) {
     else if (tab === 'myconferences') initialPage = 'My Conferences';
     else if (tab === 'note') initialPage = 'Note';
     else if (tab === 'notifications') initialPage = 'Notifications';
+    else if (tab === 'blacklisted') initialPage = 'Blacklisted';
     else if (tab === 'setting') initialPage = 'Setting';
     // Không cần else if (tab === 'profile') vì đã là mặc định
     setActivePage(initialPage);
@@ -49,6 +51,7 @@ export default function Dashboard({ locale }: { locale: string }) {
       case 'Setting': return <SettingTab />;
       case 'Notifications': return <NotificationsTab />;
       case 'Followed': return <FollowedTab />;
+      case 'Blacklisted': return <BlacklistTab />;
       case 'Note': return <NoteTab />;
       case 'My Conferences': return <MyConferencesTab />;
       case 'Profile': return <ProfileTab />;
@@ -178,6 +181,14 @@ export default function Dashboard({ locale }: { locale: string }) {
           <path d='M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326' />
           <path d='M4 2C2.8 3.7 2 5.7 2 8' />
         </svg>
+      )
+    },
+    {
+      page: 'Blacklisted',
+      label: t('Blacklisted'),
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 2 20 20" /><path d="M8.35 2.69A10 10 0 0 1 21.3 15.65" /><path d="M19.08 19.08A10 10 0 1 1 4.92 4.92" /></svg>
+
       )
     },
     {
