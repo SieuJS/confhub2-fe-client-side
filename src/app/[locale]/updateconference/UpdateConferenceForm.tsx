@@ -988,8 +988,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
               <svg className='h-3.5 w-3.5' aria-hidden='true' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 12'><path stroke='currentColor' strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M1 5.917 5.724 10.5 15 1.5'/></svg>
             </span>
             <div className='ml-2 w-full'>
-              <h3 className='font-medium leading-tight'>{t('Add_Conference')}</h3>
-              <p className='text-xs sm:text-sm'>Step add conference here</p>
+              <h3 className='font-medium leading-tight'>{t('Edit_Conference')}</h3>
             </div>
             {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
             <div className="hidden lg:block h-0.5 w-full bg-gray-300 mx-2"></div>
@@ -1005,7 +1004,6 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
             </span>
             <div className='ml-2 w-full'>
               <h3 className='font-medium leading-tight'>{t('Review')}</h3>
-              <p className='text-xs sm:text-sm'>Step review here</p>
             </div>
              {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
              <div className="hidden lg:block h-0.5 w-full bg-gray-300 mx-2"></div>
@@ -1021,7 +1019,6 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
             </span>
             <div className='ml-2 w-full'>
               <h3 className='font-medium leading-tight'>{t('Confirmation')}</h3>
-              <p className='text-xs sm:text-sm'>Step confirmation here</p>
             </div>
           </div>
         </div>
