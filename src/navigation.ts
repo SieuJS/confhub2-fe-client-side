@@ -23,6 +23,9 @@ export const pathnames = {
   '/journals/detail': '/journals/detail',
   '/auth/login': '/auth/login',
   '/auth/register': '/auth/register',
+  '/auth/verify-email': '/auth/verify-email',
+  '/auth/forgot-password': '/auth/forgot-password',
+  '/auth/reset-password': '/auth/reset-password',
   '/updateconference': '/updateconference'
 } satisfies Pathnames<typeof locales>
 
