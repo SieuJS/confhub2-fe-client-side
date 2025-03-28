@@ -66,7 +66,7 @@ function AltairComponent() {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(fc.args),
             });
-            responseData = await response.json();
+            responseData = await response.text();
           }
           else if (fc.name === "drawChart") {
             const response = await fetch(`${BASE_URL}/api/draw_chart`, {
@@ -88,6 +88,7 @@ function AltairComponent() {
             continue;
           }
 
+          console.log(responseData)
           client.sendToolResponse({
             functionResponses: toolCall.functionCalls.map((fc) => ({
               response: { content: responseData },

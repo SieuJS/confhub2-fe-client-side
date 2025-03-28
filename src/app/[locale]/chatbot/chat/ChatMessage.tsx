@@ -1,8 +1,7 @@
 // Trong ChatMessage.tsx
-import { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-
+import rehypeRaw from 'rehype-raw';
 
 
 interface ChatMessageProps {
@@ -11,13 +10,6 @@ interface ChatMessageProps {
 }
 
 const ChatMessageComponent: React.FC<ChatMessageProps> = ({ message, isUser }) => {
-    const linkTarget = useMemo(() => {
-        return {
-            a: ({ ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
-                <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline" />
-            ),
-        };
-    }, []);
 
     const handleCopyClick = () => {
         navigator.clipboard.writeText(message);
@@ -30,13 +22,48 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({ message, isUser }) =
     return (
         <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}>
             {/* Thay đổi ở đây: bỏ max-w-md hoặc thay bằng giá trị lớn hơn, có thể bỏ w-full */}
-            <div className={`p-4 rounded-lg  ${isUser ? 'bg-dropdown text-gray-700' : 'bg-selected text-black'} break-words`}>
-                    <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        components={linkTarget}
-                    >
-                        {message}
-                    </ReactMarkdown>
+            <div className={`p-4 rounded-lg  ${isUser ? 'bg-blue-100 text-gray-700' : 'bg-green-100 text-black'} break-words`}>
+                <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeRaw]}
+                    components={{
+
+                        // Customize components (optional, for more control)
+                        p: ({ node, ...props }) => <p className='mb-2' {...props} />, // Add margin to paragraphs
+                        a: ({ ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
+                            <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline" />
+                        ),
+                        // Add more component overrides as needed (ul, ol, li, code, etc.)
+                        pre: ({ node, ...props }) => (
+                            <pre
+                                className='overflow-x-auto rounded-md bg-gray-100 p-2'
+                                {...props}
+                            />
+                        ),
+                        code: ({ node, ...props }) => (
+                            <code className='rounded bg-gray-100 px-1' {...props} />
+                        ),
+                        h1: ({ node, ...props }) => (
+                            <h1 className='my-4 text-2xl font-bold' {...props} />
+                        ),
+                        h2: ({ node, ...props }) => (
+                            <h2 className='my-3 text-xl font-semibold' {...props} />
+                        ),
+                        h3: ({ node, ...props }) => (
+                            <h3 className='my-2 text-lg font-medium' {...props} />
+                        ),
+                        ul: ({ node, ...props }) => (
+                            <ul className='my-2 list-inside list-disc' {...props} />
+                        ),
+                        ol: ({ node, ...props }) => (
+                            <ol className='my-2 list-inside list-decimal' {...props} />
+                        ),
+                        li: ({ node, ...props }) => <li className='my-1' {...props} />
+                    }}
+                >
+                    {message}
+                </ReactMarkdown>
+
             </div>
             <div className="mt-2 space-x-2">
                 <button
@@ -56,8 +83,8 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({ message, isUser }) =
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125m-15.908 9.541a6 6 0 009-9m-9 9H2.25v2.25h2.25m-2.25-2.25l.5.167l2.697 8.092a3.75 3.75 0 002.182 3.124l.321.107a.75.75 0 01.53-.034l.276-.092a.75.75 0 00-.101-.089m.23 5.17l-.23-.077-1.777-.592m2.497.669l-2.497-.832-1.345-4.036" />
-                    </svg>
-                </button> )
+                        </svg>
+                    </button>)
                 }
             </div>
         </div>

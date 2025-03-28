@@ -349,6 +349,7 @@ const processDataForChart = (
         categories = [];
     }
     // --- Scatter Plot Logic ---
+    // --- Scatter Plot Logic ---
     else if (chartType === 'scatter') {
         if (!xAxisField?.accessor) {
             throw new Error(`Internal Error: X-Axis field '${xAxisField?.name}' is missing its accessor function.`);
@@ -364,16 +365,22 @@ const processDataForChart = (
             const xVal = xAxisField.accessor!(item);
             const yVal = yAxisField.accessor!(item);
             // Scatter points usually require numeric X and Y. Handle potential non-numeric data.
-            const numX = xAxisField.type === 'dimension' ? xAxisField.accessor!(item)?.toString() : parseNumericValue(xVal);
+            // FIX: For category X-axis, keep the string value from the accessor
+            const finalXVal = xAxisField.type === 'dimension'
+                ? (xVal === null || xVal === undefined ? UNKNOWN_CATEGORY : String(xVal)) // Ensure string for category axis
+                : parseNumericValue(xVal); // Parse if measure axis
             const numY = parseNumericValue(yVal);
             const sizeVal = sizeAccessor ? parseNumericValue(sizeAccessor(item)) : defaultSize;
 
-            if (numX === null || numX === undefined || numY === null || numY === undefined || isNaN(numY)) {
+            // Check validity *after* determining finalXVal type
+            if ((xAxisField.type === 'measure' && (finalXVal === null || finalXVal === undefined || isNaN(Number(finalXVal)))) ||
+                numY === null || numY === undefined || isNaN(numY)) {
                 // console.warn(`%c${logPrefixUtil} Skipping invalid scatter point: X=${xVal}, Y=${yVal}`, 'color: orange;');
                 return null; // Skip invalid points
             }
+
             // Format: [X, Y, Size?, ItemName/ID?] - ItemName could be used in tooltips
-            const pointData: (number | string | null)[] = [numX, numY];
+            const pointData: (number | string | null)[] = [finalXVal, numY];
             if (sizeAccessor) {
                 pointData.push(sizeVal > 0 ? sizeVal : 1); // Ensure size is positive
             }
@@ -386,13 +393,13 @@ const processDataForChart = (
         if (!colorField?.accessor) {
             // Simple Scatter (single series)
             console.log(`%c${logPrefixUtil} Simple scatter: Mapping points`, 'color: green;');
-            const data = rawData.map(mapItemToPoint).filter(point => point !== null) as (number | string)[][];
+            const data = rawData.map(mapItemToPoint).filter(point => point !== null); // Type: ((number | string | null)[] | null)[] -> (number | string | null)[][]
 
             series.push({
                 name: yAxisField.name,
                 type: 'scatter',
                 symbolSize: sizeAccessor ? undefined : defaultSize, // Let data control size if field exists
-                data: data,
+                data: data, // Assign the possibly mixed array here
                 emphasis: { focus: 'series', scale: 1.1 }, // Scale point on hover
             });
             legendData.push(yAxisField.name);
@@ -407,19 +414,51 @@ const processDataForChart = (
 
             series = legendData.map(colorValue => {
                 const colorGroupData = groupedByColor[colorValue];
-                const data = colorGroupData.map(mapItemToPoint).filter(point => point !== null) as (number | string)[][];
+                const data = colorGroupData.map(mapItemToPoint).filter(point => point !== null); // Type: (number | string | null)[][]
 
                 return {
                     name: colorValue,
                     type: 'scatter',
                     symbolSize: sizeAccessor ? undefined : defaultSize,
-                    data: data,
+                    data: data, // Assign the possibly mixed array here
                     emphasis: { focus: 'series', scale: 1.1 },
                 };
             });
         }
+
+        // --- FIX START: Correctly handle category generation ---
         // Determine X-axis type for scatter (Value or Category)
-        categories = xAxisField.type === 'dimension' ? rawData.map(xAxisField.accessor).filter((v, i, a) => a.indexOf(v) === i).sort() : [];
+        if (xAxisField.type === 'dimension') {
+            // Ensure accessor exists (should be guaranteed by earlier checks, but good practice)
+            if (!xAxisField.accessor) {
+                throw new Error(`Internal Error: X-Axis dimension field '${xAxisField?.name}' is missing its accessor function.`);
+            }
+            categories = rawData
+                .map(item => {
+                    const value = xAxisField.accessor!(item); // Get the raw value from the accessor
+
+                    // Explicitly handle null/undefined and convert other types to string
+                    if (value === null || value === undefined) {
+                        return UNKNOWN_CATEGORY; // Use your constant for consistency
+                    }
+                    // Handle potential arrays - decide how: placeholder, join, etc.
+                    if (Array.isArray(value)) {
+                        console.warn(`%c${logPrefixUtil} Dimension field ${xAxisField.id} returned an array. Using placeholder "${UNKNOWN_CATEGORY}".`, 'color: orange;');
+                        return UNKNOWN_CATEGORY; // Hoặc JSON.stringify(value) ? value.join(',') ? Tùy thuộc hành vi mong muốn
+                    }
+                    // Convert numbers, booleans, etc., to string
+                    return String(value);
+                })
+                .filter((v, i, a) => a.indexOf(v) === i) // Filter unique strings
+                .sort(); // Sort strings
+            console.log(`%c${logPrefixUtil} Scatter categories (dimension) found (${categories.length}): ${categories.slice(0, 10).join(', ')}...`, 'color: gray;');
+        } else {
+            // If X-axis is a measure, categories are usually not applicable for scatter ECharts config
+            // ECharts will treat the X-axis as 'value' type automatically.
+            categories = [];
+            console.log(`%c${logPrefixUtil} Scatter categories: Not applicable (X-axis is measure)`, 'color: gray;');
+        }
+        // --- FIX END ---
     }
 
     console.log(`%c${logPrefixUtil} processDataForChart finished. Series: ${series.length}, Categories: ${categories.length}, Legend: ${legendData.length}`, 'color: blue;');
@@ -451,17 +490,53 @@ export const generateChartOption = (
 
     const xAxisField = availableFields.find(f => f.id === config.xAxis?.fieldId);
     const yAxisField = availableFields.find(f => f.id === config.yAxis?.fieldId);
-    const sizeField = availableFields.find(f => f.id === config.size?.fieldId); // Needed for visualMap potentially
+    const sizeField = availableFields.find(f => f.id === config.size?.fieldId);
 
     // 2. Determine Axis Types
     let xAxisType: 'category' | 'value' | 'time' | 'log' = 'category'; // Default
     if (config.chartType === 'scatter') {
-        xAxisType = xAxisField?.type === 'measure' ? 'value' : 'category';
-        // Could also be 'time' if data allows, or 'log'
+        xAxisType = (xAxisField && xAxisField.type === 'measure') ? 'value' : 'category';
     } else if (config.chartType === 'bar' || config.chartType === 'line') {
-        xAxisType = 'category'; // Typically categorical for bar/line
+        xAxisType = 'category';
     }
-    // Pie charts don't have axes in the final option
+
+    // --- FIX: Define xAxisOption using indexed access type ---
+    let xAxisOption: EChartsOption['xAxis'] = undefined;
+    if (config.chartType !== 'pie') {
+        if (xAxisType === 'category') {
+            xAxisOption = {
+                type: 'category',
+                name: xAxisField?.name,
+                nameLocation: 'middle',
+                nameGap: (categories && categories.length > 10) ? 40 : 25,
+                nameTextStyle: { fontSize: 12 },
+                data: categories,
+                axisTick: { alignWithLabel: true },
+                axisLabel: {
+                    fontSize: 10,
+                    rotate: (categories && categories.length > 10) ? 30 : 0,
+                    interval: (categories && categories.length > 20) ? 'auto' : 0,
+                },
+                boundaryGap: true, // <-- Boolean là đúng cho category
+            };
+        } else { // Includes 'value', 'time', 'log'
+            xAxisOption = {
+                type: 'value', // Hoặc 'time', 'log'
+                name: xAxisField?.name,
+                nameLocation: 'middle',
+                nameGap: 25,
+                nameTextStyle: { fontSize: 12 },
+                axisTick: undefined, // Thường không cần tick đặc biệt cho value axis
+                axisLabel: {
+                    fontSize: 10,
+                },
+                // boundaryGap: false, // <-- XÓA DÒNG NÀY
+                // Mặc định cho type 'value' là không có khoảng đệm thêm (boundaryGap = [0,0])
+            };
+        }
+    }
+    // --- FIX END ---
+
 
     // 3. Build Base Option Structure
     const finalOption: EChartsOption = {
@@ -515,23 +590,8 @@ export const generateChartOption = (
             top: '15%', // Padding for title
             containLabel: true // Ensure axis labels fit
         },
-        xAxis: config.chartType !== 'pie' ? {
-            type: xAxisType,
-            name: xAxisField?.name,
-            nameLocation: 'middle',
-            nameGap: (xAxisType === 'category' && categories.length > 10) ? 40 : 25, // More gap if labels might rotate
-            nameTextStyle: { fontSize: 12 },
-            data: xAxisType === 'category' ? categories : undefined,
-            axisTick: { alignWithLabel: true },
-            axisLabel: {
-                fontSize: 10,
-                rotate: (xAxisType === 'category' && categories.length > 10) ? 30 : 0, // Rotate labels if many categories
-                interval: (xAxisType === 'category' && categories.length > 20) ? 'auto' : 0, // Auto skip labels if very many
-                // formatter: // Custom formatting if needed
-            },
-            boundaryGap: xAxisType === 'category' ? true : false, // Add padding for category axis
-        } : undefined, // No xAxis for Pie
-        yAxis: config.chartType !== 'pie' ? {
+        xAxis: xAxisOption, // <-- Assign the conditionally created option object
+        yAxis: config.chartType !== 'pie' ? { // yAxis is usually 'value' in these examples
             type: 'value',
             name: yAxisField?.name,
             nameLocation: 'middle',
@@ -550,9 +610,9 @@ export const generateChartOption = (
 
     // 4. Apply Chart-Specific Overrides & Enhancements
 
-    // Pie Chart: Remove axis/grid explicitly
+    // Pie Chart: Remove axis/grid explicitly (already handled by xAxisOption being undefined)
     if (config.chartType === 'pie') {
-        delete finalOption.xAxis;
+        // delete finalOption.xAxis; // No longer needed
         delete finalOption.yAxis;
         delete finalOption.grid;
         // Adjust tooltip formatter for Pie
@@ -563,49 +623,70 @@ export const generateChartOption = (
         };
     }
 
-    // Scatter Chart: Ensure value axis types are correct
+    // Scatter Chart: Ensure value axis types are correct (already handled by xAxisOption logic)
+    // Scatter Chart logic
+    // Scatter Chart logic
     if (config.chartType === 'scatter') {
-        if (finalOption.xAxis && (finalOption.xAxis as any).type !== 'category') {
-            (finalOption.xAxis as any).type = 'value';
-            (finalOption.xAxis as any).data = undefined;
-            (finalOption.xAxis as any).boundaryGap = false; // No padding for value axis
-        }
+
         // Add visualMap if size field is used
-        if (sizeField && finalOption.series?.length > 0) {
-            // Find min/max size values across all series for scaling
+        if (sizeField && finalOption.series && Array.isArray(finalOption.series) && finalOption.series.length > 0) {
             let minSize = Infinity, maxSize = -Infinity;
+            let sizeDataExists = false;
+
             finalOption.series.forEach(s => {
-                if (s.type === 'scatter' && s.data && s.data.length > 0 && s.data[0].length > 2) { // Check if size data exists
-                    s.data.forEach((point: any[]) => {
-                        const sizeVal = point[2];
-                        if (typeof sizeVal === 'number') {
-                            minSize = Math.min(minSize, sizeVal);
-                            maxSize = Math.max(maxSize, sizeVal);
+                // Check if series is scatter and data exists and has length
+                // (length check is important for ArrayLike)
+                if (s.type === 'scatter' && s.data && typeof (s.data as any).length === 'number') {
+
+                    // --- FIX START: Use standard for loop for ArrayLike compatibility ---
+                    const dataLength = (s.data as any).length; // Get length safely
+                    for (let i = 0; i < dataLength; i++) {
+                        // Truy cập phần tử bằng chỉ mục
+                        const item = (s.data as any)[i];
+
+                        // Giữ nguyên type guard bên trong cho từng 'item'
+                        if (Array.isArray(item) && item.length > 2) {
+                            const sizeVal = item[2];
+                            if (typeof sizeVal === 'number' && !isNaN(sizeVal)) {
+                                sizeDataExists = true;
+                                minSize = Math.min(minSize, sizeVal);
+                                maxSize = Math.max(maxSize, sizeVal);
+                            }
                         }
-                    });
+                        // Bạn có thể thêm else if để xử lý trường hợp item là object
+                        // else if (typeof item === 'object' && item !== null && Array.isArray((item as any).value)) {
+                        //    // Xử lý item.value[2] nếu cần
+                        // }
+                        // else {
+                        //    console.warn("Unexpected scatter data item format:", item);
+                        // }
+                    }
+                    // --- FIX END ---
                 }
             });
 
-            if (isFinite(minSize) && isFinite(maxSize) && minSize !== maxSize) {
+            // Logic thêm visualMap không đổi
+            if (sizeDataExists && isFinite(minSize) && isFinite(maxSize) && minSize !== maxSize) {
                 console.log(`%c${logPrefixUtil} Adding visualMap for size. Range: ${minSize}-${maxSize}`, 'color: purple;');
-                finalOption.visualMap = [{ // Use array if multiple visualMaps needed
+                finalOption.visualMap = [{
                     type: 'continuous',
-                    dimension: 2, // Map to the 3rd item in data array ([x, y, size])
+                    dimension: 2,
                     min: minSize,
                     max: maxSize,
                     itemWidth: 15,
                     itemHeight: 80,
-                    text: ['Max Size', 'Min Size'],
+                    text: [`Max: ${maxSize.toFixed(1)}`, `Min: ${minSize.toFixed(1)}`],
                     textGap: 5,
                     textStyle: { fontSize: 10 },
-                    calculable: true, // Allows dragging handles
-                    realtime: true, // Update chart while dragging
-                    // Map data value to symbol size
-                    inRange: { symbolSize: [5, 30] }, // Visual size range (pixels)
+                    calculable: true,
+                    realtime: true,
+                    inRange: { symbolSize: [5, 30] },
                     orient: 'vertical',
-                    left: 10, // Position visualMap
+                    left: 10,
                     bottom: '15%'
                 }];
+            } else if (sizeDataExists) {
+                console.log(`%c${logPrefixUtil} Size field selected, but min/max range invalid or constant (${minSize}-${maxSize}). Skipping visualMap.`, 'color: orange;');
             }
         }
         // Adjust scatter tooltip formatter
@@ -615,11 +696,13 @@ export const generateChartOption = (
             formatter: (params: any) => {
                 const seriesName = params.seriesName;
                 const data = params.data || [];
+                // Use axis field names if available, otherwise default
                 const xName = xAxisField?.name ?? 'X';
                 const yName = yAxisField?.name ?? 'Y';
                 let tooltip = `${seriesName}<br/>`;
-                tooltip += `${xName}: ${data[0]}<br/>`;
-                tooltip += `${yName}: ${data[1]}<br/>`;
+                // Access data array elements, checking length
+                if (data.length > 0) tooltip += `${xName}: ${data[0]}<br/>`;
+                if (data.length > 1) tooltip += `${yName}: ${data[1]}<br/>`;
                 if (sizeField && data.length > 2) {
                     tooltip += `${sizeField.name}: ${data[2]}<br/>`;
                 }
@@ -629,27 +712,49 @@ export const generateChartOption = (
     }
 
     // Add DataZoom for charts with many categories or value-based X-axis
-    const addDataZoom = (xAxisType === 'value') || (xAxisType === 'category' && categories.length > 20);
+    const addDataZoom = (xAxisType === 'value') || (xAxisType === 'category' && categories && categories.length > 20);
     if (config.chartType !== 'pie' && addDataZoom) {
         console.log(`%c${logPrefixUtil} Adding dataZoom for X-axis.`, 'color: purple;');
         finalOption.dataZoom = [
             {
-                type: 'slider', // Slider control at the bottom
-                xAxisIndex: 0, // Control the first (index 0) X-axis
-                filterMode: 'filter', // Or 'empty'. 'filter' recalculates based on zoomed data.
-                bottom: options.showLegend && legendData && legendData.length > 0 ? 30 : 10, // Position slider below legend
+                type: 'slider',
+                xAxisIndex: 0,
+                filterMode: 'filter',
+                bottom: (options.showLegend && legendData && legendData.length > 0) ? 35 : 15,
                 height: 15,
-                start: 0, // Initial zoom range (0-100%)
+                start: 0,
                 end: 100
             },
             {
-                type: 'inside', // Allow zooming/panning inside the chart area
+                type: 'inside',
                 xAxisIndex: 0,
                 filterMode: 'filter',
             }
         ];
-        // Potentially adjust grid bottom padding further if dataZoom is added
-        // finalOption.grid.bottom = ...
+
+        // --- FIX START: Adjust grid bottom padding more safely ---
+        // Kiểm tra grid tồn tại VÀ không phải là mảng (vì chúng ta khởi tạo nó là object)
+        if (finalOption.grid && !Array.isArray(finalOption.grid)) {
+            // Bên trong khối này, TypeScript biết finalOption.grid là một object đơn lẻ (GridComponentOption)
+            if (options.showLegend && legendData && legendData.length > 0) {
+                // Tăng padding nếu cả legend và zoom đều hiển thị
+                finalOption.grid.bottom = '15%'; // Truy cập trực tiếp, không cần 'as'
+            } else {
+                // Padding ít hơn nếu chỉ có zoom
+                finalOption.grid.bottom = '10%'; // Truy cập trực tiếp
+            }
+        }
+        // Optional: Nếu có khả năng grid là mảng ở đâu đó khác, bạn cần xử lý trường hợp đó:
+        // else if (Array.isArray(finalOption.grid) && finalOption.grid.length > 0) {
+        //     // Quyết định grid nào cần sửa, ví dụ: grid đầu tiên
+        //     const gridToModify = finalOption.grid[0];
+        //     if (options.showLegend && legendData && legendData.length > 0) {
+        //         gridToModify.bottom = '15%';
+        //     } else {
+        //         gridToModify.bottom = '10%';
+        //     }
+        // }
+        // --- FIX END ---
     }
 
 
