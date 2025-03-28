@@ -10,8 +10,18 @@ interface UseSocketConnectionProps {
 }
 
 const socketInitializer = () => {
-  console.log(process.env.NEXT_PUBLIC_BACKEND_URL);
-  return io(`${process.env.NEXT_PUBLIC_BACKEND_URL}`); // Your backend URL
+  // Lấy URL cơ sở từ biến môi trường (nếu có, hoặc để trống nếu chỉ dùng origin hiện tại)
+  // Trong trường hợp này, vì NEXT_PUBLIC_BACKEND_URL chỉ là "/api", chúng ta không cần chỉ định URL cơ sở,
+  // client sẽ tự dùng origin hiện tại (https://confhub.ddns.net).
+  const backendNamespace = process.env.NEXT_PUBLIC_BACKEND_URL || '/'; // Dùng /api
+
+  console.log(`Initializing socket connection to namespace: ${backendNamespace}`);
+  console.log(`Explicitly setting path to: ${backendNamespace}/api/socket.io`); // Log đường dẫn sẽ dùng
+
+  return io(backendNamespace, { // Kết nối đến namespace /api
+    path: `${backendNamespace}/api/socket.io` // Quan trọng: Chỉ định rõ đường dẫn transport
+    // transports: ['websocket', 'polling'] // Có thể thêm nếu muốn ưu tiên websocket
+  });
 };
 
 export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionProps) => {
