@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'; // Thêm useRef
 import { fetchVisualizationData } from '@/src/app/api/conference/visualizationApi';
-// import { ConferenceData } from '@/src/types/conference'; // Use specific type if defined
 
 interface UseVisualizationDataReturn {
   data: any[] | null; // Use ConferenceData[] | null if defined
