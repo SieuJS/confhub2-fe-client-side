@@ -10,6 +10,7 @@ interface UseSocketConnectionProps {
 }
 
 const socketInitializer = () => {
+  console.log(process.env.NEXT_PUBLIC_BACKEND_URL);
   return io(`${process.env.NEXT_PUBLIC_BACKEND_URL}`); // Your backend URL
 };
 
