@@ -2,7 +2,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation' // Removed usePathname
+import { useRouter, usePathname } from 'next/navigation' // Removed usePathname
 import countryData from '../addconference/countries.json'
 import { useTranslations } from 'next-intl'
 import {
@@ -29,6 +29,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
 }) => {
   const t = useTranslations('')
   const router = useRouter()
+  const pathname = usePathname()
 
   const [currentStep, setCurrentStep] = useState(1)
   const [title, setTitle] = useState('')
@@ -56,6 +57,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
   const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [loading, setLoading] = useState(false) // Loading state
   const [error, setError] = useState<string | null>(null) // Error state
+  const [userId, setUserId] = useState<string>('');
 
   // --- Location States ---
   const [countries, setCountries] = useState<Country[]>([])
@@ -67,6 +69,11 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
   const [selectedContinent, setSelectedContinent] = useState<string>('')
   const [filteredCountries, setFilteredCountries] = useState<Country[]>([])
 
+  // --- Loading States ---
+  const [isFetchingLocations, setIsFetchingLocations] = useState(false);
+  const [initialCityStateProvinceValue, setInitialCityStateProvinceValue] = useState<string | null>(null);
+  const [initialLocationSet, setInitialLocationSet] = useState(false);
+
   const continentOptions = ['Americas', 'Europe', 'Asia', 'Africa', 'Oceania']
   const dateTypeOptions = [
     { value: 'submissionDate', name: 'Submission Date' },
@@ -76,76 +83,91 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
     { value: 'cameraReadyDate', name: 'Camera Ready Date' }
   ]
 
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+        const user = JSON.parse(userData);
+        console.log("User ID from localStorage:", user.id); // Add this line
+
+        setUserId(user.id);
+    }
+  }, []);
+
   // --- Data Fetching (for editing) ---
   useEffect(() => {
+    
     const fetchData = async () => {
-      if (!conferenceId) return //  Only fetch if we have an ID
-
+      if (!conferenceId || !userId) return
       setLoading(true)
       setError(null)
+      setInitialCityStateProvinceValue(null); // Reset giá trị cũ
       try {
-        const res = await fetch(`${API_BASE_URL}/conferences/${conferenceId}`)
+        const res = await fetch(`${API_BASE_URL}/user/${userId}/my-conferences`)
         if (!res.ok) {
           throw new Error(`Failed to fetch: ${res.status}`)
         }
         const data = await res.json()
-
+        const fetchedConferences = data.find((c: any) => c.conference.id === conferenceId)
         //  Populate form fields
-        setTitle(data.title || '')
-        setAcronym(data.acronym || '')
-        setLink(data.websiteUrl || '') // Assuming 'websiteUrl' is the field
-        setTopics(data.topics || []) // Assuming you store topics
-        setType(data.type || 'offline') //  Default to offline
-        setDescription(data.summerize || '')
-        setImageUrl(data.imageUrl || '')
-
-        // Set location data, handle the case where it is string
-        if (data.location) {
-          if (typeof data.location === 'string') {
-            const locationParts = data.location.split(', ')
+        setTitle(fetchedConferences.conference.title || '')
+        setAcronym(fetchedConferences.conference.acronym || '')
+        setLink(fetchedConferences.organization.link || '') // Assuming 'websiteUrl' is the field
+        setTopics(fetchedConferences.organization.topics || []) // Assuming you store topics
+        setType(fetchedConferences.organization.accessType || 'offline') //  Default to offline
+        setDescription(fetchedConferences.organization.summerize || '')
+        setImageUrl(fetchedConferences.imageUrl || '')
+        
+        // Set location fetchedConferences, handle the case where it is string
+        if (fetchedConferences.location) {
+          if (typeof fetchedConferences.location === 'string') {
+            const locationParts = fetchedConferences.location.split(', ')
             if (locationParts.length >= 2) {
               setLocation({
                 address: '', // You may not have a separate address in string form
                 cityStateProvince: locationParts[0],
                 country: locationParts[1],
-                continent: data.continent || '' // Add continent if available
+                continent: fetchedConferences.continent || '' // Add continent if available
               })
-              setSelectedCity(locationParts[0]) // Preselect city
+              setSelectedContinent(fetchedConferences.continent)
+              setInitialCityStateProvinceValue(locationParts[0] || null);
               const country = countryData.find(
                 (c: any) => c.name === locationParts[1]
               )
-              setSelectedCountry(country?.iso2 || '') // Preselect country
+              if (country) {
+                setSelectedCountry(country.iso2); // Trigger useEffect fetch states/cities
+              } else {
+                setSelectedCountry('');
+                setInitialCityStateProvinceValue(null); // Reset nếu country không hợp lệ
+              }
             }
           } else {
             setLocation({
-              address: data.location.address || '',
-              cityStateProvince: data.location.cityStateProvince || '',
-              country: data.location.country || '',
-              continent: data.location.continent || ''
+              address: fetchedConferences.location.address || '',
+              cityStateProvince: fetchedConferences.location.cityStateProvince || '',
+              country: fetchedConferences.location.country || '',
+              continent: fetchedConferences.location.continent || ''
             })
-            setSelectedContinent(data.location.continent || '')
+            setSelectedContinent(fetchedConferences.location.continent || '')
             const country = countryData.find(
-              (c: any) => c.name === data.location.country
+              (c: any) => c.name === fetchedConferences.location.country
             )
-            setSelectedCountry(country?.iso2 || '') // Pre-select country
+            setInitialCityStateProvinceValue(fetchedConferences.location.cityStateProvince || null);
+            if (country) {
+              setSelectedCountry(country.iso2); // Trigger useEffect fetch states/cities
+            } else {
+              setSelectedCountry('');
+              setInitialCityStateProvinceValue(null); // Reset nếu country không hợp lệ
 
-            if (data.location.cityStateProvince) {
-              // Check if it's a city or state
-              const state = states.find(
-                s => s.name === data.location.cityStateProvince
-              )
-              if (state) {
-                setSelectedState(state.iso2)
-              } else {
-                setSelectedCity(data.location.cityStateProvince) // If not a state, assume a city
-              }
             }
           }
         }
+        else {
+          setInitialCityStateProvinceValue(null);
+        }
 
         // Set dates
-        if (data.dates && Array.isArray(data.dates)) {
-          const fetchedDates = data.dates.map((d: any) => ({
+        if (fetchedConferences.dates && Array.isArray(fetchedConferences.dates)) {
+          const fetchedDates = fetchedConferences.dates.map((d: any) => ({
             type: d.type || '',
             name: d.name || '',
             fromDate: d.fromDate
@@ -183,12 +205,11 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
       } catch (err: any) {
         setError(err.message)
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
-
     fetchData()
-  }, [conferenceId, states]) //  Re-fetch if conferenceId changes
+  }, [userId, conferenceId]) //  Re-fetch if conferenceId changes
 
   useEffect(() => {
     const mappedCountries: Country[] = countryData.map((c: any) => ({
@@ -199,33 +220,65 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
     setCountries(mappedCountries)
   }, [])
 
+
   useEffect(() => {
     if (selectedContinent) {
+      setStates([]);
+      setCities([]);
+      setSelectedState('');
+      setSelectedCity('');
       const newFilteredCountries = countries.filter(
         country => country.region === selectedContinent
       )
       setFilteredCountries(newFilteredCountries)
+      if (initialLocationSet && selectedCountry && !newFilteredCountries.some(c => c.iso2 === selectedCountry)) {
+        setSelectedCountry('');
+      }
+      setLocation({
+        ...location,
+        country: newFilteredCountries.find(c => c.iso2 === selectedCountry)?.name || '',
+        cityStateProvince: '',
+        continent: selectedContinent
+      })
     } else {
       setFilteredCountries([])
     }
-    setSelectedCountry('')
-    setSelectedState('')
-    setSelectedCity('')
-    setLocation({
-      ...location,
-      country: '',
-      cityStateProvince: '',
-      continent: selectedContinent
-    })
-  }, [selectedContinent, countries])
+    if (!selectedContinent && initialLocationSet) {
+      setStates([]);
+      setCities([]);
+      setSelectedCountry('');
+      setSelectedState('');
+      setSelectedCity('');
+      setLocation({
+        ...location,
+        country: '',
+        cityStateProvince: '',
+        continent: selectedContinent
+      })
+  }
+  }, [selectedContinent, countries, initialLocationSet, selectedCountry])
+
   useEffect(() => {
     const fetchStatesOrCities = async () => {
-      if (!selectedCountry) {
+    if (initialLocationSet) {
         setStates([])
         setCities([])
-        return
+        setSelectedState('');
+        setSelectedCity('');
+        setLocation(prev => ({ ...prev, cityStateProvince: '' }));
+    }
+    if (!selectedCountry) {
+      setIsFetchingLocations(false);
+      setStates([])
+      setCities([])
+      // Nếu country bị xóa (không phải lần load đầu), đánh dấu là đã xử lý xong
+      if (initialLocationSet) {
+          console.log("eff5: Country cleared, marking initial location set");
+          // Không cần set lại setInitialLocationSet(true) vì nó đã là true
       }
-
+      return;
+    }
+      setIsFetchingLocations(true);
       try {
         const statesResponse = await fetch(
           `https://api.countrystatecity.in/v1/countries/${selectedCountry}/states`,
@@ -294,19 +347,71 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
         console.error('Error fetching states or cities:', error)
         setStates([])
         setCities([])
+      } finally {
+        setIsFetchingLocations(false);
       }
     }
-
     fetchStatesOrCities()
-  }, [selectedCountry])
+  }, [selectedCountry, initialLocationSet])
+
+  useEffect(() => {
+    // Chỉ chạy khi có giá trị ban đầu, có states/cities VÀ chưa xử lý lần đầu
+    if (initialCityStateProvinceValue && (states.length > 0 || cities.length > 0)) {
+      let found = false; // Cờ kiểm tra xem đã tìm thấy và set hay chưa
+
+      if (states.length > 0) {
+        const foundState = states.find(s => s.name === initialCityStateProvinceValue);
+        if (foundState) {
+          setSelectedState(foundState.iso2);
+          setLocation(prev => ({ ...prev, cityStateProvince: foundState.name }));
+          found = true;
+          
+        } else {
+           console.warn("Initial state not found in states list:", initialCityStateProvinceValue);
+        }
+      }
+
+      // Chỉ tìm city nếu không tìm thấy state hoặc không có state nào
+      if (!found && cities.length > 0) {
+        const foundCity = cities.find(c => c.name === initialCityStateProvinceValue);
+        if (foundCity) {
+          setSelectedCity(foundCity.name);
+          setLocation(prev => ({ ...prev, cityStateProvince: foundCity.name }));
+          found = true;
+        } else {
+            console.warn("Initial city not found in cities list:", initialCityStateProvinceValue);
+        }
+      }
+
+      // Đánh dấu đã xử lý sau khi đã thử tìm kiếm
+      setInitialLocationSet(true);
+      //setInitialCityStateProvinceValue(null) //Xóa dòng này nếu muốn hiển thị lại state/province gốc khi quay về country ban đầu
+      console.log("Marked initial data as processed.");
+
+    }
+    // Xử lý trường hợp không có giá trị ban đầu hoặc không có state/city để set
+    // nhưng states/cities đã load xong (để đánh dấu là đã xử lý)
+    else if (selectedCountry && (states.length > 0 || cities.length > 0)) {
+        console.log("Marking initial data as processed because states/cities loaded but no initial value or match.");
+        setInitialLocationSet(true);
+    }
+     // Xử lý trường hợp không có state/city nào được trả về từ API
+    else if (selectedCountry && states.length === 0 && cities.length === 0) {
+        console.log("Marking initial data as processed because country selected but no states/cities found and not loading.");
+        setInitialLocationSet(true); 
+    }
+
+  // Chạy khi states, cities, initialCityStateProvinceValue, hoặc cờ processed thay đổi
+  }, [states, cities, initialCityStateProvinceValue, isFetchingLocations] );
+
   const handleContinentChange = (continent: string) => {
+    setInitialLocationSet(true); // <<< Đặt cờ là TRUE
     setSelectedContinent(continent)
   }
 
   const handleCountryChange = (countryIso2: string) => {
+    setInitialLocationSet(true); // <<< Đặt cờ là TRUE
     setSelectedCountry(countryIso2)
-    setSelectedState('')
-    setSelectedCity('')
     setLocation({
       ...location,
       country: filteredCountries.find(c => c.iso2 === countryIso2)?.name || '',
@@ -314,16 +419,18 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
     })
   }
 
-  const handleStateChange = (stateCode: string) => {
-    setSelectedState(stateCode)
+  const handleStateChange = (stateIso2: string) => {
+    setInitialLocationSet(true); // <<< Đặt cờ là TRUE
+    setSelectedState(stateIso2)
     setLocation({
       ...location,
       cityStateProvince:
-        states.find(s => s.state_code === stateCode)?.name || ''
+        states.find(s => s.iso2 === stateIso2)?.name || ''
     })
   }
 
   const handleCityChange = (cityName: string) => {
+    setInitialLocationSet(true); // <<< Đặt cờ là TRUE
     setSelectedCity(cityName)
     setLocation({
       ...location,
@@ -395,17 +502,12 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
     }
   }
 
-  // --- Form Submission (Handles both Add and Update) ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!agreedToTerms) {
       alert('Please agree to the terms and conditions.')
       return
     }
-
-    setLoading(true)
-    setError(null)
 
     const conferenceData: ConferenceFormData = {
       title,
@@ -419,30 +521,22 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
       description
     }
 
+    const userData = localStorage.getItem('user')
+    if (!userData) {
+      console.error('User not logged in')
+      alert('Please log in to add new Conference')
+      return
+    }
+    const user = JSON.parse(userData)
+    const userId = user.id
+    console.log(conferenceData)
     try {
-      const url = conferenceId
-        ? `${API_UPDATE_CONFERENCE_ENDPOINT}/${conferenceId}`
-        : API_ADD_CONFERENCE_ENDPOINT
-      const method = conferenceId ? 'PUT' : 'POST'
-
-      const userData = localStorage.getItem('user')
-      if (!userData) {
-        console.error('User not logged in')
-        alert('Please log in to add new Conference')
-        return
-      }
-      const user = JSON.parse(userData)
-      const userId = user.id
-      console.log(conferenceData)
-
-      const response = await fetch(url, {
-        method,
+      const response = await fetch(API_ADD_CONFERENCE_ENDPOINT, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(
-          conferenceId ? { ...conferenceData } : { ...conferenceData, userId }
-        )
+        body: JSON.stringify({ ...conferenceData, userId })
       })
 
       if (!response.ok) {
@@ -452,23 +546,22 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
         )
       }
 
-      const result = await response.json() //  Get result (new or updated)
-      console.log(result)
-      // Use the correct locale for redirection
-      router.push(
-        `/${locale}/conferences/detail?id=${conferenceId || result.id}`
-      )
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
+      const addedConference = await response.json()
+      console.log('Conference added:', addedConference)
+
+      const localePrefix = pathname.split('/')[1]
+      const pathWithLocale = `/${localePrefix}/dashboard?tab=myconferences`
+
+      router.push(pathWithLocale)
+    } catch (error: any) {
+      console.error('Error adding conference:', error.message)
     }
   }
 
   const renderStepOne = () => (
     <>
-      {/* ... (rest of your step one form fields) ... */}
-      <div className='sm:col-span-2'>
+      {/* Step 1 Form Fields (giữ nguyên nội dung) */}
+       <div className='sm:col-span-2'>
         <label htmlFor='title' className='block text-sm  '>
           * {t('Conference_Name')}:
         </label>
@@ -533,7 +626,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
 
       <div className='sm:col-span-2'>
         <label className='block text-base  '>* {t('Location')}:</label>
-        <div className='grid grid-cols-1 gap-y-4 sm:grid-cols-4 sm:gap-x-4'>
+        <div className='grid grid-cols-1 gap-y-4 sm:grid-cols-2 md:grid-cols-4 sm:gap-x-4'> {/* Responsive Grid */}
           <div>
             <label htmlFor='address' className='block text-sm  '>
               {t('Address')}:
@@ -611,7 +704,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
               </option>
               {states.length > 0
                 ? states.map(state => (
-                    <option key={state.iso2} value={state.state_code}>
+                    <option key={state.iso2} value={state.iso2}>
                       {state.name}
                     </option>
                   ))
@@ -627,7 +720,8 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
       <div className='sm:col-span-2'>
         <label className='block text-sm  '>{t('Important_Dates')}:</label>
         {dates.map((date, index) => (
-          <div key={index} className='mt-1 grid grid-cols-4 gap-4'>
+          // Grid cho Dates: 1 cột mặc định, 2 cột trên sm, 4 cột trên lg
+          <div key={index} className='mt-1 grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-4 lg:gap-x-4'>
             <div>
               <label htmlFor={`name-${index}`} className='block text-sm  '>
                 {t('Name')}:
@@ -638,9 +732,9 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
                 value={date.name}
                 onChange={e => handleDateChange(index, 'name', e.target.value)}
                 className={`mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm
-                    ${index === 0 ? 'opacity-50' : ''}`}
+                    ${index === 0 ? 'pointer-events-none opacity-50' : ''}`} // Dùng pointer-events-none thay vì readOnly
                 required
-                readOnly={index === 0}
+                disabled={index === 0} // Dùng disabled thay vì readOnly
               />
             </div>
             <div>
@@ -666,7 +760,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
             </div>
             <div>
               <label htmlFor={`fromDate-${index}`} className='block text-sm  '>
-                {t('Start_Date')}:
+                {t('Start')}: {/* Đổi label cho ngắn gọn */}
               </label>
               <input
                 type='date'
@@ -679,9 +773,9 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
                 required
               />
             </div>
-            <div>
+            <div className="relative"> {/* Container cho nút xóa */}
               <label htmlFor={`toDate-${index}`} className='block text-sm  '>
-                {t('End_Date')}:
+                {t('End')}: {/* Đổi label */}
               </label>
               <input
                 type='date'
@@ -693,80 +787,74 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
                 className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                 required
               />
-            </div>
-
-            {index !== 0 && (
-              <button
-                type='button'
-                onClick={() => removeDate(index)}
-                className='mt-6 text-red-500 hover:text-red-700 focus:outline-none'
-                aria-label='Remove date'
-              >
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  className='h-5 w-5'
-                  viewBox='0 0 20 20'
-                  fill='currentColor'
+              {/* Nút xóa: Đặt cạnh input cuối cùng */}
+              {index !== 0 && (
+                <button
+                  type='button'
+                  onClick={() => removeDate(index)}
+                  className='absolute -right-6 top-1/2 mt-2 -translate-y-1/2 text-red-500 hover:text-red-700 focus:outline-none sm:-right-8' // Điều chỉnh vị trí nút xóa
+                  aria-label='Remove date'
                 >
-                  <path
-                    fillRule='evenodd'
-                    d='M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 111.414 1.414L11.414 10l2.293 2.293a1 1 0 01-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 01-1.414-1.414L8.586 10 6.293 7.707a1 1 0 010-1.414z'
-                    clipRule='evenodd'
-                  />
-                </svg>
-              </button>
-            )}
+                  <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5' viewBox='0 0 20 20' fill='currentColor'>
+                    <path fillRule='evenodd' d='M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 111.414 1.414L11.414 10l2.293 2.293a1 1 0 01-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 01-1.414-1.414L8.586 10 6.293 7.707a1 1 0 010-1.414z' clipRule='evenodd' />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
         ))}
         <button
           type='button'
           onClick={addDate}
-          className='mt-2 rounded bg-button px-4 py-2 font-bold text-button-text hover:bg-button focus:ring-2 focus:ring-button focus:ring-offset-2 hover:focus:outline-none'
+          className='mt-4 rounded bg-button px-4 py-2 text-sm font-bold text-button-text hover:bg-button focus:ring-2 focus:ring-button focus:ring-offset-2 hover:focus:outline-none' // Giảm kích thước nút
         >
           {t('Add_Date')}
         </button>
       </div>
-      <div className='sm:col-span-1'>
+      {/* Topics Section: Sắp xếp lại input và button */}
+      <div className='sm:col-span-2'> {/* Để chiếm toàn bộ chiều rộng trên mobile */}
         <label htmlFor='newTopic' className='block text-sm  '>
           {t('Topics')}:
         </label>
-        <div className='mt-1 items-center'>
+        <div className='mt-1 flex flex-col sm:flex-row sm:items-center sm:gap-3'>
           <input
             type='text'
             id='newTopic'
             value={newTopic}
             onChange={e => setNewTopic(e.target.value)}
-            className='w-5/6 flex-1 rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+            className='flex-grow rounded-md border border-button px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm' // flex-grow để chiếm không gian còn lại
             placeholder='Add a topic'
           />
           <button
             type='button'
             onClick={handleAddTopic}
-            className='ml-3 rounded-md bg-button px-4 py-2 text-button-text hover:bg-button focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
+            className='mt-2 w-full rounded-md bg-button px-4 py-2 text-sm text-button-text hover:bg-button focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2 sm:mt-0 sm:w-auto' // w-full trên mobile, w-auto trên sm+
           >
             {t('Add')}
           </button>
-
-          <div className='mt-2'>
+        </div>
+         {/* Hiển thị topics đã chọn */}
+         <div className='mt-3 flex flex-wrap gap-2'>
             {topics.map((topic, index) => (
               <span
                 key={index}
-                className='mb-2 mr-2 inline-block rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold '
+                className='inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold '
               >
                 {topic}
                 <button
                   type='button'
                   onClick={() => handleRemoveTopic(topic)}
-                  className='hover: ml-1  focus:outline-none'
+                  className='ml-1.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-gray-300 hover: focus:bg-gray-400 focus:text-white focus:outline-none'
+                  aria-label={`Remove ${topic}`}
                 >
-                  ×
+                 <svg className="h-2 w-2" stroke="currentColor" fill="none" viewBox="0 0 8 8"><path strokeLinecap="round" strokeWidth="1.5" d="M1 1l6 6m0-6L1 7" /></svg>
                 </button>
               </span>
             ))}
           </div>
-        </div>
       </div>
-      <div className='sm:col-span-1'>
+      {/* Image URL và Description (giữ nguyên hoặc điều chỉnh grid nếu cần) */}
+      <div className='sm:col-span-2'> {/* Có thể cho Image URL chiếm 1 cột trên md+ */}
         <label htmlFor='imageUrl' className='block text-sm  '>
           {t('Image_URL')}:
         </label>
@@ -775,7 +863,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
           id='imageUrl'
           value={imageUrl}
           onChange={e => setImageUrl(e.target.value)}
-          className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+          className='mt-1 block w-full rounded-md border border-button px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
         />
       </div>
       <div className='sm:col-span-2'>
@@ -787,261 +875,197 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
           value={description}
           onChange={e => setDescription(e.target.value)}
           rows={4}
-          className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
+          className='mt-1 block w-full rounded-md border border-button px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
         />
       </div>
     </>
   )
 
   const renderStepTwo = () => (
-    <>
-      {loading ? (
-        <div>Loading...</div> // Show loading indicator
-      ) : error ? (
-        <div>Error: {error}</div> // Show error message
-      ) : (
-        <div className='sm:col-span-2'>
-          <h2 className='mb-4 text-xl font-semibold'>
-            {t('Review_Information')}
-          </h2>
-          <p>
-            <strong>{t('Conference_Name')}:</strong> {title}
-          </p>
-          <p>
-            <strong>{t('Acronym')}:</strong> {acronym}
-          </p>
-          <p>
-            <strong>{t('Link')}:</strong> {link}
-          </p>
-          <p>
-            <strong>{t('Type')}:</strong> {t(type)}
-          </p>
-          <p>
-            <strong>{t('Address')}:</strong> {location.address}
-          </p>
-          <p>
-            <strong>{t('Continent')}:</strong> {location.continent}
-          </p>
-          <p>
-            <strong>{t('Country')}:</strong> {location.country}
-          </p>
-          <p>
-            <strong>
-              {location.cityStateProvince ? t('City') : t('State_Province')}:
-            </strong>{' '}
-            {location.cityStateProvince}
-          </p>
+    // Step 2 Content (giữ nguyên nội dung, Tailwind sẽ tự xuống dòng)
+     <div className='space-y-3 sm:col-span-2'> {/* Thêm space-y để tạo khoảng cách giữa các dòng */}
+      <h2 className='mb-4 text-lg font-semibold sm:text-xl'>{t('Review_Information')}</h2>
+      <p>
+        <strong>{t('Conference_Name')}:</strong> {title}
+      </p>
+      <p>
+        <strong>{t('Acronym')}:</strong> {acronym}
+      </p>
+      <p>
+        <strong>{t('Link')}:</strong>{' '}
+        <a href={link} target='_blank' rel='noopener noreferrer' className='break-all text-button hover:underline'> {/* break-all để xuống dòng nếu link quá dài */}
+          {link}
+        </a>
+      </p>
+      <p>
+        <strong>{t('Type')}:</strong> {t(type)}
+      </p>
+      <p>
+        <strong>{t('Address')}:</strong> {location.address}
+      </p>
+      <p>
+        <strong>{t('Continent')}:</strong> {location.continent}
+      </p>
+      <p>
+        <strong>{t('Country')}:</strong> {location.country}
+      </p>
+      <p>
+        <strong>
+          {states.length > 0 ? t('State_Province') : t('City')}: {/* Sửa logic hiển thị label */}
+        </strong>{' '}
+        {location.cityStateProvince}
+      </p>
 
-          <p>
-            <strong>{t('Important_Dates')}:</strong>
-          </p>
-          <ul>
-            {dates.map((date, index) => (
-              <li key={index}>
-                {date.name}: {date.fromDate} - {date.toDate} ({date.type})
-              </li>
-            ))}
-          </ul>
-          <p>
-            <strong>{t('Topics')}:</strong> {topics.join(', ')}
-          </p>
-          {imageUrl && (
-            <p>
-              <strong>{t('Image_URL')}:</strong>{' '}
-              <a href={imageUrl} target='_blank' rel='noopener noreferrer'>
-                {imageUrl}
-              </a>
-            </p>
-          )}
-          <p>
-            <strong>{t('Description')}:</strong> {description}
-          </p>
-        </div>
+      <div> {/* Bọc list dates trong div để dễ quản lý */}
+        <strong>{t('Important_Dates')}:</strong>
+        <ul className="list-disc pl-5 mt-1 space-y-1"> {/* Thêm style cho list */}
+          {dates.map((date, index) => (
+            <li key={index}>
+              {date.name || 'Unnamed Date'}: {date.fromDate || 'N/A'} - {date.toDate || 'N/A'} ({date.type || 'N/A'})
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div> {/* Bọc list topics */}
+        <strong>{t('Topics')}:</strong>
+        {topics.length > 0 ? (
+            <span className="ml-2">{topics.join(', ')}</span>
+         ) : (
+            <span className="ml-2 italic text-gray-500">No topics added</span>
+         )}
+      </div>
+      {imageUrl && (
+        <p>
+          <strong>{t('Image_URL')}:</strong>{' '}
+          <a href={imageUrl} target='_blank' rel='noopener noreferrer' className='break-all text-button hover:underline'>
+            {imageUrl}
+          </a>
+        </p>
       )}
-    </>
+      <p>
+        <strong>{t('Description')}:</strong> {description || <span className="italic text-gray-500">No description provided</span>}
+      </p>
+    </div>
   )
 
   const renderStepThree = () => (
+    // Step 3 Content (giữ nguyên nội dung)
     <div className='sm:col-span-2'>
-      <h2 className='mb-4 text-xl font-semibold'>
+      <h2 className='mb-4 text-lg font-semibold sm:text-xl'>
         {t('Terms_and_Conditions')}
       </h2>
-      <div className='mb-4 border p-4'>
-        {/* Replace this with your actual terms and conditions */}
+      <div className='mb-4 max-h-60 overflow-y-auto rounded border p-4'> {/* Giới hạn chiều cao và cho phép cuộn */}
         <p>
           Bằng cách nhấp vào nút Đăng hội nghị, tôi xác nhận rằng tôi đã đọc,
           hiểu và đồng ý tuân thủ tất cả các điều khoản và điều kiện dành cho
           người tổ chức/đăng tải hội nghị trên nền tảng này. Tôi cũng đồng ý với
           chính sách bảo mật của nền tảng.
         </p>
+        {/* Thêm nội dung điều khoản dài hơn nếu cần */}
       </div>
       <label className='flex items-center'>
         <input
           type='checkbox'
           checked={agreedToTerms}
           onChange={e => setAgreedToTerms(e.target.checked)}
-          className='mr-2'
+          className='mr-2 h-4 w-4 rounded border-gray-300 text-button focus:ring-button' // Style checkbox
         />
-        {t('I_agree_to_the_terms_and_conditions')}
+        <span className='text-sm'>{t('I_agree_to_the_terms_and_conditions')}</span>
       </label>
     </div>
   )
 
   return (
-    <>
-      <div className='mb-10'>
-        <ol className='flex w-full items-center  '>
-          <li
-            className={`flex w-full items-center ${
-              currentStep >= 1 ? 'text-button ' : ''
-            } `}
-          >
-            <span
-              className={`flex h-8 w-8 items-center justify-center rounded-full ring-2  ${
-                currentStep >= 1
-                  ? 'bg-background-secondary ring-button'
-                  : 'ring-primary'
-              } `}
-            >
-              <svg
-                className='h-3.5 w-3.5'
-                aria-hidden='true'
-                xmlns='http://www.w3.org/2000/svg'
-                fill='none'
-                viewBox='0 0 16 12'
-              >
-                <path
-                  stroke='currentColor'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  d='M1 5.917 5.724 10.5 15 1.5'
-                />
-              </svg>
+    <div className="mx-auto  px-4 py-8 sm:px-6 lg:px-8"> {/* Container chính */}
+      {/* Stepper */}
+      <div className='mb-8 sm:mb-10'>
+        {/* Luôn hiển thị div chứa stepper */}
+        <div className="flex items-center justify-center sm:justify-start">
+          {/* Step 1 */}
+          <div className={`flex w-full items-center ${currentStep === 1 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 1 ? 'text-button' : ''}`}>
+            <span className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 1 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}>
+              {/* SVG Icon 1 */}
+              <svg className='h-3.5 w-3.5' aria-hidden='true' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 12'><path stroke='currentColor' strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M1 5.917 5.724 10.5 15 1.5'/></svg>
             </span>
             <div className='ml-2 w-full'>
-              {/* Thêm ml-2 để tạo khoảng cách */}
-              <h3 className='font-medium leading-tight'>
-                {conferenceId ? t('Edit_Conference') : t('Add_Conference')}
-              </h3>
-              <p className='text-sm'>
-                {conferenceId
-                  ? t('Edit_conference_step')
-                  : t('Add_conference_step')}
-              </p>
+              <h3 className='font-medium leading-tight'>{t('Edit_Conference')}</h3>
             </div>
-          </li>
+            {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
+            <div className="hidden lg:block h-0.5 w-full bg-gray-300 mx-2"></div>
+          </div>
 
-          <li
-            className={`flex w-full items-center ${
-              currentStep >= 2 ? 'text-button ' : ''
-            } `}
-          >
-            <span
-              className={`flex h-8 w-8 items-center justify-center rounded-full ring-2  ${
-                currentStep >= 2
-                  ? 'bg-background-secondary ring-button'
-                  : 'ring-primary'
-              } `}
-            >
-              <svg
-                className='h-3.5 w-3.5  '
-                aria-hidden='true'
-                xmlns='http://www.w3.org/2000/svg'
-                fill='currentColor'
-                viewBox='0 0 18 20'
-              >
-                <path d='M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2Zm-3 14H5a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2Zm0-4H5a1 1 0 0 1 0-2h8a1 1 0 1 1 0 2Zm0-5H5a1 1 0 0 1 0-2h2V2h4v2h2a1 1 0 1 1 0 2Z' />
-              </svg>
+          {/* Step 2 */}
+           <div className={`flex w-full items-center ${currentStep === 2 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 2 ? 'text-button' : ''}`}>
+             {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
+             <div className="hidden lg:block h-0.5 w-full bg-gray-300 mx-2"></div>
+            <span className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 2 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}>
+              {/* SVG Icon 2 */}
+               <svg className='h-3.5 w-3.5' aria-hidden='true' xmlns='http://www.w3.org/2000/svg' fill='currentColor' viewBox='0 0 18 20'><path d='M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2Zm-3 14H5a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2Zm0-4H5a1 1 0 0 1 0-2h8a1 1 0 1 1 0 2Zm0-5H5a1 1 0 0 1 0-2h2V2h4v2h2a1 1 0 1 1 0 2Z'/></svg>
             </span>
             <div className='ml-2 w-full'>
-              {/* Thêm ml-2 để tạo khoảng cách */}
               <h3 className='font-medium leading-tight'>{t('Review')}</h3>
-              <p className='text-sm'>{t('Review_step')}</p>
             </div>
-          </li>
-          <li
-            className={`flex w-full items-center ${
-              currentStep >= 3 ? 'text-button ' : ''
-            } `}
-          >
-            <span
-              className={`flex h-8 w-8 items-center justify-center rounded-full ring-2  ${
-                currentStep >= 3
-                  ? 'bg-background-secondary ring-button'
-                  : 'ring-primary'
-              } `}
-            >
-              <svg
-                className='h-3.5 w-3.5  '
-                aria-hidden='true'
-                xmlns='http://www.w3.org/2000/svg'
-                fill='currentColor'
-                viewBox='0 0 18 20'
-              >
-                <path d='M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2ZM7 2h4v3H7V2Zm5.7 8.289-3.975 3.857a1 1 0 0 1-1.393 0L5.3 12.182a1.002 1.002 0 1 1 1.4-1.436l1.328 1.289 3.28-3.181a1 1 0 1 1 1.392 1.435Z' />
-              </svg>
+             {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
+             <div className="hidden lg:block h-0.5 w-full bg-gray-300 mx-2"></div>
+          </div>
+
+          {/* Step 3 */}
+          <div className={`flex w-full items-center ${currentStep === 3 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 3 ? 'text-button' : ''}`}>
+            {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
+            <div className="hidden lg:block h-0.5 w-full bg-gray-300 mx-2"></div>
+            <span className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 3 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}>
+             {/* SVG Icon 3 */}
+              <svg className='h-3.5 w-3.5' aria-hidden='true' xmlns='http://www.w3.org/2000/svg' fill='currentColor' viewBox='0 0 18 20'><path d='M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2ZM7 2h4v3H7V2Zm5.7 8.289-3.975 3.857a1 1 0 0 1-1.393 0L5.3 12.182a1.002 1.002 0 1 1 1.4-1.436l1.328 1.289 3.28-3.181a1 1 0 1 1 1.392 1.435Z'/></svg>
             </span>
             <div className='ml-2 w-full'>
               <h3 className='font-medium leading-tight'>{t('Confirmation')}</h3>
-              <p className='text-sm'>{t('Confirmation_step')}</p>
             </div>
-          </li>
-        </ol>
+          </div>
+        </div>
       </div>
 
-      {error && <div className='text-red-500'>{error}</div>}
+      {/* Form Content */}
+      {/* Grid cho nội dung form: 1 cột mặc định, 2 cột trên sm+ */}
+      <form onSubmit={handleSubmit} className='grid grid-cols-1 gap-y-5 sm:grid-cols-2 sm:gap-x-6'>
+        {currentStep === 1 && renderStepOne()}
+        {currentStep === 2 && renderStepTwo()}
+        {currentStep === 3 && renderStepThree()}
 
-      {loading ? (
-        <div>{t('Loading')}...</div>
-      ) : (
-        <form onSubmit={handleSubmit} className='grid gap-5'>
-          {currentStep === 1 && renderStepOne()}
-          {currentStep === 2 && renderStepTwo()}
-          {currentStep === 3 && renderStepThree()}
+        {/* Navigation Buttons: Đặt ở cuối, chiếm toàn bộ chiều rộng trên mobile */}
+        <div className='col-span-1 mt-6 flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:justify-start'>
+          {currentStep > 1 && (
+            <button
+              type='button'
+              onClick={goToPreviousStep}
+              className='w-full rounded bg-gray-500 px-4 py-2 text-sm text-white hover:bg-gray-700 focus:outline-none sm:w-auto' // w-full trên mobile, w-auto trên sm+
+            >
+              {t('Back')}
+            </button>
+          )}
 
-          <div className='my-6 flex justify-start gap-4'>
-            {currentStep > 1 && (
-              <button
-                type='button'
-                onClick={goToPreviousStep}
-                className='rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-700 focus:outline-none'
-              >
-                {t('Back')}
-              </button>
-            )}
+          {currentStep < 3 && (
+            <button
+              type='button'
+              onClick={goToNextStep}
+              className='w-full rounded bg-button px-4 py-2 text-sm text-button-text hover:bg-button-hover focus:outline-none sm:w-auto' // w-full trên mobile, w-auto trên sm+
+            >
+              {t('Next')}
+            </button>
+          )}
 
-            {currentStep < 3 && (
-              <button
-                type='button'
-                onClick={goToNextStep}
-                className='hover:bg-button-hover rounded bg-button px-4 py-2 text-button-text focus:outline-none'
-                disabled={currentStep === 3 && !agreedToTerms}
-              >
-                {t('Next')}
-              </button>
-            )}
-
-            {currentStep === 3 && (
-              <button
-                type='submit'
-                className=' hover:bg-button-hover rounded bg-button px-4 py-2 text-button-text focus:outline-none'
-                disabled={!agreedToTerms || loading} // Disable while loading
-              >
-                {loading
-                  ? conferenceId
-                    ? t('Updating')
-                    : t('Adding')
-                  : conferenceId
-                    ? t('Update_Conference')
-                    : t('Add_Conference')}
-              </button>
-            )}
-          </div>
-        </form>
-      )}
-    </>
+          {currentStep === 3 && (
+            <button
+              type='submit'
+              // onClick={handleSubmit} // onSubmit của form đã xử lý
+              className='w-full rounded bg-button px-4 py-2 text-sm text-button-text hover:bg-button-hover focus:outline-none sm:w-auto' // w-full trên mobile, w-auto trên sm+
+              disabled={!agreedToTerms}
+            >
+              {t('Add_Conference')}
+            </button>
+          )}
+        </div>
+      </form>
+    </div>
   )
 }
-
-export default ConferenceForm
+export default ConferenceForm 
