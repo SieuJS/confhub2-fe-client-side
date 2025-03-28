@@ -6,7 +6,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export async function fetchVisualizationData(): Promise<ConferenceResponse[]> {
     try {
-        const response = await fetch(`${API_BASE_URL}/v1/visualization/conference`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/visualization/conference`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
