@@ -7,8 +7,8 @@ interface ChatBotPageProps {
 
 const ChatBotPage: React.FC<ChatBotPageProps> = () => {
   return (
-    <div className="px-10 py-10 text-center text-2xl">
-      <div className="py-14 bg-background w-full"></div>
+    <div className="py-6 text-center text-xl">
+      <div className="bg-background w-full"></div>
       <ChatBot />
     </div>
   );

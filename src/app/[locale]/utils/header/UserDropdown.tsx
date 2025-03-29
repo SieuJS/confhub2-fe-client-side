@@ -163,6 +163,7 @@ const UserDropdown: FC<Props> = ({
             <hr className='my-1 border-gray-200 dark:border-gray-700' />
             {/* Logout Button */}
             <button
+            
               onClick={async () => {
                 await logout()
                 if (socketRef.current) {
@@ -174,6 +175,7 @@ const UserDropdown: FC<Props> = ({
                 setLastName(null) // Reset state
                 closeAllMenus()
               }}
+              
               className='block w-full px-2 py-2 text-left text-sm text-red-600 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none dark:text-red-500 dark:hover:bg-gray-700 dark:focus:bg-gray-700' // Thêm màu đỏ cho logout
             >
               {t('Logout')}

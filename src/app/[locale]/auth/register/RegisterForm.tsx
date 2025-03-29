@@ -114,13 +114,33 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
                 ></path>
               </svg>
               <h2 className='text-2xl font-semibold text-gray-800'>
-                {t('Registration_Successful')}
+                {/* {t('Registration_Successful')} */}
+                {t('Check_Your_Email')} {/* <<< Thay đổi tiêu đề */}
               </h2>
-              <p className=''>{t('Thank_you_for_registering')}</p>
-              <p className='text-sm '>
+              <p className=''>
+                {/* {t('Thank_you_for_registering')} */}
+                {t('Verification_email_sent', { email: email })} {/* <<< Thêm email vào thông báo nếu muốn */}
+              </p>
+              <p className='text-sm font-medium text-gray-800 mt-4'>
+                {t('Enter_Verification_Code_Prompt')}
+              </p>
+              {/* TÙY CHỌN: Thêm Link/Button đến trang xác thực */}
+              <div className='pt-2'>
+                <Link
+
+                  href={{
+                    pathname: `/auth/verify-email`,
+                  }}
+
+                  className='hover:bg-button/90 rounded-md bg-button px-4 py-2 text-sm font-medium text-white shadow-sm'
+                >
+                  {t('Go_To_Verification_Page')}
+                </Link>
+              </div>
+              <p className='pt-4 text-sm '>
                 {t('If_you_did_not_receive_the_email')}
               </p>
-              <div className='pt-4'>
+              <div className='pt-2'> {/* Giữ lại link đến Login phòng trường hợp user quay lại sau */}
                 <Link
                   href='/auth/login'
                   className='hover:text-button/80 font-medium text-button'

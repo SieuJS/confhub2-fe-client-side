@@ -1,11 +1,7 @@
-// import React from 'react';
+import React from 'react';
 
-interface LoadingIndicatorProps {
-    // This component doesn't actually accept any props, but if it did in the future,
-    // you would define them here. For now, it's an empty interface.
-}
 
-const LoadingIndicator: LoadingIndicatorProps = () => {
+const LoadingIndicator = () => {
     return (
         <div id="loading-container" className="mb-2 flex items-center">
             <button

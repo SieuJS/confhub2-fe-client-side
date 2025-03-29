@@ -14,7 +14,6 @@ import { MenuIcon, CloseIcon } from './header/Icon'
 import Button from './Button'
 import useAuthApi from '../../../hooks/auth/useAuthApi'
 
-import { useMediaQuery } from 'react-responsive'
 
 interface Props {
   locale: string

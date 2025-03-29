@@ -1,7 +1,6 @@
-import { useState, useMemo, useCallback, useRef } from 'react'; // Thêm useRef
-import * as echarts from 'echarts/core';
+import { useState, useMemo, useCallback, useEffect } from 'react'; // Thêm useRef
 import { EChartsOption } from 'echarts';
-import { ChartConfig, ChartOptions, DataField, ProcessedChartData } from '../../models/visualization/visualization';
+import { ChartConfig, ChartOptions, DataField } from '../../models/visualization/visualization';
 import { generateChartOption, getAvailableFields } from '../../app/[locale]/visualization/utils/visualizationUtils';
 interface UseChartBuilderProps {
     rawData: any[] | null; // The data fetched from backend
@@ -39,109 +38,97 @@ const useChartBuilder = ({ rawData }: UseChartBuilderProps): UseChartBuilderRetu
     console.log(`%c${logPrefix} Hook executing. rawData exists: ${!!rawData}`);
     const [chartConfig, setChartConfig] = useState<ChartConfig>(defaultChartConfig);
     const [chartOptions, setChartOptions] = useState<ChartOptions>(defaultChartOptions);
-    const prevRawDataRef = useRef<any[] | null>(null);
 
-    // Kiểm tra tham chiếu rawData
-    if (prevRawDataRef.current !== rawData) {
-        console.log(`%c${logPrefix} rawData reference CHANGED!`);
-        prevRawDataRef.current = rawData;
-    } else {
-         console.log(`%c${logPrefix} rawData reference is STABLE.`);
-    }
+    // --- Stabilized availableFields Calculation ---
+    // Key can be simpler now, just based on whether data exists,
+    // as getAvailableFields content is stable.
+    const dataExists = useMemo(() => !!rawData && rawData.length > 0, [rawData]);
 
-    // Define available fields (memoized)
+    // --- Stabilized availableFields Calculation ---
     const availableFields = useMemo<DataField[]>(() => {
-        console.log(`%c${logPrefix} Recalculating availableFields...`);
-        if (!rawData || rawData.length === 0) {
-             console.log(`%c${logPrefix} ... no rawData, returning [].`);
+        console.log(`%c${logPrefix} Recalculating availableFields memo (dataExists: ${dataExists})...`);
+        if (!dataExists || !rawData) {
+             console.log(`%c${logPrefix} ... no data, returning [].`);
              return [];
         }
-        const fields = getAvailableFields(rawData[0]); // Pass a sample item to infer fields
-        console.log(`%c${logPrefix} ... calculated ${fields.length} available fields.`);
+        // getAvailableFields now returns a STABLE reference if data exists
+        const fields = getAvailableFields(rawData[0]);
+        console.log(`%c${logPrefix} ... memo received ${fields.length} available fields (reference should be stable).`);
         return fields;
-    }, [rawData]);
+    }, [dataExists, rawData]); // Keep rawData dependency if getAvailableFields needs the sample
 
-    // Process data and generate ECharts option (memoized)
+    // Add useEffect for logging stability check
+    useEffect(() => {
+        console.log(`%c${logPrefix} availableFields reference check in useEffect. Count: ${availableFields.length}`, 'color: magenta');
+    }, [availableFields]); // Log when the reference *actually* changes
+
+
+    // --- Process data and generate ECharts option (memoized) ---
     const echartsOption = useMemo<EChartsOption | null>(() => {
-        console.log(`%c${logPrefix} Recalculating echartsOption...`);
-        if (!rawData || !availableFields.length) {
-             console.log(`%c${logPrefix} ... no rawData or availableFields, returning null.`);
+        console.log(`%c${logPrefix} Recalculating echartsOption memo...`);
+        if (!dataExists || availableFields.length === 0 || !rawData) {
+             console.log(`%c${logPrefix} ... no data or fields, returning null.`);
              return null;
         }
 
         try {
+            // Pass the stable availableFields reference
             const option = generateChartOption(rawData, chartConfig, chartOptions, availableFields);
             console.log(`%c${logPrefix} ... successfully generated chart option.`);
             return option;
-        } catch (error) {
-            console.error(`%c${logPrefix} Error generating chart option:`, error);
-            return {
-                title: { text: 'Error Generating Chart', subtext: (error as Error).message },
-            };
+        } catch (error: any) { // Catch specific error
+            console.error(`%c${logPrefix} Error generating chart option:`, 'color: red;', error);
+            // Return null or a specific error state object instead of {}
+            // Returning null signals ChartDisplay to show placeholder
+            return null;
+            // Optionally return an error structure ECharts can understand, but null is simpler here
+            // return { title: { text: `Error: ${error.message}` } };
         }
-    }, [rawData, chartConfig, chartOptions, availableFields]);
+    }, [dataExists, rawData, chartConfig, chartOptions, availableFields]); // availableFields reference is now stable
 
-    // Check if chart is ready (memoized)
-    const isChartReady = useMemo(() => {
-        console.log(`%c${logPrefix} Recalculating isChartReady...`);
-        if (!echartsOption || !rawData) {
-             console.log(`%c${logPrefix} ... echartsOption or rawData missing, returning false.`);
+
+    // --- isChartReady (memoized - Add optional chaining) ---
+     const isChartReady = useMemo(() => {
+        console.log(`%c${logPrefix} Recalculating isChartReady memo...`);
+        // Check if option exists and required fields are selected
+        if (!echartsOption || !rawData || !dataExists) {
+             console.log(`%c${logPrefix} ... isChartReady: false (no option/data).`);
              return false;
         }
+        // Check if option generation failed (if returning null on error)
+        // This check is now implicitly handled by !echartsOption above.
+
         const { chartType, xAxis, yAxis, color } = chartConfig;
         let ready = false;
         if (chartType === 'pie') {
-            ready = !!(color.fieldId && yAxis.fieldId);
-        } else {
-            ready = !!(xAxis.fieldId && yAxis.fieldId);
+            ready = !!(color?.fieldId && yAxis?.fieldId);
+        } else { // Covers bar, line, scatter etc.
+            ready = !!(xAxis?.fieldId && yAxis?.fieldId);
         }
-         console.log(`%c${logPrefix} ... isChartReady result: ${ready}`);
+         console.log(`%c${logPrefix} ... isChartReady result: ${ready} (Type: ${chartType}, X: ${xAxis?.fieldId}, Y: ${yAxis?.fieldId}, Color: ${color?.fieldId})`);
         return ready;
-    }, [echartsOption, chartConfig, rawData]);
+    // }, [echartsOption, chartConfig, rawData, dataExists]); // Add dataExists dependency
+     }, [echartsOption, chartConfig, dataExists]); // rawData is implicitly covered by echartsOption and dataExists
 
+    // --- Callbacks (Keep as before) ---
     const updateChartConfig = useCallback((newConfig: Partial<ChartConfig>) => {
-        console.log(`%c${logPrefix} updateChartConfig called with:`, newConfig);
-        setChartConfig(prev => {
-            const updated = { ...prev, ...newConfig };
-            console.log(`%c${logPrefix} ... new chartConfig state:`, updated);
-            return updated;
-        });
-    }, []); // Dependencies trống là đúng vì chỉ sử dụng `setChartConfig`
-
+        setChartConfig(prev => ({ ...prev, ...newConfig }));
+    }, []);
     const updateChartOptions = useCallback((newOptions: Partial<ChartOptions>) => {
-        console.log(`%c${logPrefix} updateChartOptions called with:`, newOptions);
-        setChartOptions(prev => {
-            const updated = { ...prev, ...newOptions };
-            console.log(`%c${logPrefix} ... new chartOptions state:`, updated);
-            return updated;
-        });
-    }, []); // Dependencies trống là đúng
-
-    const setChartConfigDirectly = useCallback((value: ChartConfig | ((prevState: ChartConfig) => ChartConfig)) => {
-        console.log(`%c${logPrefix} setChartConfig (direct) called. Value type: ${typeof value}`);
-        setChartConfig(value); // Log bên trong callback nếu value là hàm
-         if (typeof value === 'function') {
-             setChartConfig(prev => {
-                 const result = (value as (prevState: ChartConfig) => ChartConfig)(prev);
-                 console.log(`%c${logPrefix} ... new chartConfig state (from function):`, result);
-                 return result;
-             });
-         } else {
-              console.log(`%c${logPrefix} ... new chartConfig state (direct value):`, value);
-              setChartConfig(value);
-         }
+        setChartOptions(prev => ({ ...prev, ...newOptions }));
     }, []);
 
-    console.log(`%c${logPrefix} Returning values.`);
+
+    console.log(`%c${logPrefix} Returning values. availableFields count: ${availableFields.length}`);
     return {
         echartsOption,
-        availableFields,
+        availableFields, // This reference is now stable once dataExists is true
         chartConfig,
         chartOptions,
         isChartReady,
         updateChartConfig,
         updateChartOptions,
-        setChartConfig: setChartConfigDirectly, // Sử dụng hàm đã bọc log
+        setChartConfig, // Pass original setter for handleDragEnd/handleRemoveField
     };
 };
 

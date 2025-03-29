@@ -188,20 +188,29 @@ function ChatBot() {
         }
     }, [isStreaming, sendChatMessageNoStream]);
     return (
-                <div id="chat-container" className="bg-white rounded-xl shadow-lg w-full p-4 flex flex-col">
-                    <h1 className="text-2xl text-center mb-6 font-semibold text-gray-800">Conferences Suggest Chatbot</h1>
-                    <ChatHistory messages={chatMessages} />
-                    {!hasChatStarted && <Introduction onFillInput={handleFillInput} />}
-                    {isChatbotLoading && <LoadingIndicator />}
-                    <div className="mb-4">
-                        <label className="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" value="" className="sr-only peer" checked={isStreaming} onChange={toggleStreaming} />
-                            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
-                            <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">{isStreaming ? 'Chế độ Stream' : 'Chế độ Không Stream'}</span>
-                        </label>
-                    </div>
-                    <ChatInput onSendMessage={handleSendMessage} onFillInput={handleFillInput} />
+        // THAY ĐỔI Ở ĐÂY: Thêm max-h-[...] ví dụ max-h-[80vh] hoặc max-h-[600px]
+        // Đảm bảo flex và flex-col vẫn còn
+        <div id="chat-container" className="bg-white rounded-xl shadow-lg w-full mx-auto p-4 flex flex-col max-h-[95vh]">
+            <h1 className="text-2xl text-center mb-4 font-semibold text-gray-800 flex-shrink-0">Conferences Suggest Chatbot</h1>
+
+            {/* ChatHistory sẽ chiếm không gian còn lại */}
+            <ChatHistory messages={chatMessages} />
+
+            {/* Các thành phần khác không co giãn */}
+            <div className="flex-shrink-0">
+                {!hasChatStarted && <Introduction onFillInput={handleFillInput} />}
+                {isChatbotLoading && <LoadingIndicator/>}
+                <div className="my-3"> {/* Thêm margin để tách biệt */}
+                    <label className="inline-flex items-center cursor-pointer">
+                        <input type="checkbox" value="" className="sr-only peer" checked={isStreaming} onChange={toggleStreaming} />
+                        <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
+                        <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">{isStreaming ? 'Chế độ Stream' : 'Chế độ Không Stream'}</span>
+                    </label>
                 </div>
+                {/* Truyền handleFillInput xuống ChatInput nếu cần */}
+                <ChatInput onSendMessage={handleSendMessage} /* onFillInput={handleFillInput} */ />
+            </div>
+        </div>
     );
 }
 
