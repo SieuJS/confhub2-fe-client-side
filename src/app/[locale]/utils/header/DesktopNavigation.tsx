@@ -3,7 +3,6 @@ import { FC } from 'react'
 import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
-import { ThemeProvider } from '../ThemeProvider'
 import ThemeSwitch from '../ThemeSwitch'
 import LangSwitcher from '../LangSwitcher'
 

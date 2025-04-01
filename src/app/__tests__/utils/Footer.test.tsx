@@ -4,7 +4,7 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom' // Đảm bảo import này ở jest.setup.ts hoặc ở đây
 
-import Footer from '../../[locale]/utils/Footer' // Adjust the path to your Footer component
+import Footer from '@/src/app/[locale]/utils/Footer' // Adjust the path to your Footer component
 
 // --- Mocking Dependencies ---
 

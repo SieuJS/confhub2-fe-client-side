@@ -5,7 +5,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom' // Đảm bảo bạn đã import cái này trong jest.setup.js hoặc ở đây
 
-import Button from '../../[locale]/utils/Button' // Điều chỉnh đường dẫn nếu cần
+import Button from '@/src/app/[locale]/utils/Button' // Điều chỉnh đường dẫn nếu cần
 
 describe('Button Component', () => {
   // --- Test Rendering Cơ bản ---

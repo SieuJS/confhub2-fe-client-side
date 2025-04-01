@@ -95,6 +95,7 @@ export default function ScrollToTopButton() {
           strokeLinecap='round'
           transform={`rotate(-90 ${center} ${center})`}
           style={{ transition: 'stroke-dashoffset 0.1s linear' }}
+          data-testid='progress-circle'
         />
         {/* Arrow Icon */}
         <svg

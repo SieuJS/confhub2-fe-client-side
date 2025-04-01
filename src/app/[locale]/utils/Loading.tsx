@@ -1,16 +1,21 @@
+// Loading.tsx
 
-import React from 'react';
+import React from 'react'
 
 const Loading: React.FC = () => {
   return (
-    <div className="bg-gradient-to-r to-background-secondary min-h-screen flex items-center justify-center">
+    <div className='flex min-h-screen items-center justify-center bg-gradient-to-r to-background-secondary'>
       {/* Add a loading spinner container */}
-      <div className="flex flex-col items-center bg-white/80 p-6 rounded-lg">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div> {/* Spinner */}
-        <span className="ml-2 text-xl text-gray-800 mt-4">Loading ...</span>
+      <div className='flex flex-col items-center rounded-lg bg-white/80 p-6'>
+        <div
+          data-testid='loading-spinner' // <-- THÊM DÒNG NÀY
+          className='h-16 w-16 animate-spin rounded-full border-t-4 border-blue-500'
+        ></div>{' '}
+        {/* Spinner */}
+        <span className='ml-2 mt-4 text-xl text-gray-800'>Loading ...</span>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Loading;
+export default Loading

@@ -1,4 +1,4 @@
-// components/Tooltip.tsx (tạo file mới)
+// components/Tooltip.tsx
 
 import React, { useState } from 'react'
 
