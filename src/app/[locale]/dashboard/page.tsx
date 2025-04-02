@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 import { Link } from '@/src/navigation'
+import Analysis from './logAnalysis/Analysis'
 import SettingTab from './setting/SettingTab'
 import NotificationsTab from './notification/NotificationsTab'
 import FollowedTab from './follow/FollowedTab'
@@ -33,8 +34,9 @@ export default function Dashboard({ locale }: { locale: string }) {
   useEffect(() => {
     // Logic cập nhật activePage dựa trên searchParams (giữ nguyên)
     const tab = searchParams.get('tab')
-    let initialPage = 'Profile' // Mặc định là Profile nếu không có tab hợp lệ
+    let initialPage = 'analysis' // Mặc định là Profile nếu không có tab hợp lệ
     if (tab === 'followed') initialPage = 'Followed'
+    else if (tab === 'profile') initialPage = 'Profile'
     else if (tab === 'myconferences') initialPage = 'My Conferences'
     else if (tab === 'note') initialPage = 'Note'
     else if (tab === 'notifications') initialPage = 'Notifications'
@@ -62,12 +64,36 @@ export default function Dashboard({ locale }: { locale: string }) {
         return <MyConferencesTab />
       case 'Profile':
         return <ProfileTab />
+      case 'Analysis':
+        return <Analysis />
       default: // Render ProfileTab trong lần đầu hoặc nếu activePage không hợp lệ
-        return <ProfileTab />
+        return <Analysis />
     }
   }
 
   const menuItems = [
+    {
+      page: 'Analysis',
+      label: t('Analysis'),
+      icon: (
+        <svg
+          xmlns='http://www.w3.org/2000/svg'
+          width='24'
+          height='24'
+          viewBox='0 0 24 24'
+          fill='none'
+          stroke='#525252'
+          strokeWidth='1.5'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+          className='lucide lucide-circle-user-round '
+        >
+          <path d='M18 20a6 6 0 0 0-12 0' />
+          <circle cx='12' cy='10' r='4' />
+          <circle cx='12' cy='12' r='10' />
+        </svg>
+      )
+    },
     {
       page: 'Profile',
       label: t('Profile'),
@@ -372,16 +398,14 @@ export default function Dashboard({ locale }: { locale: string }) {
                           hover:bg-button
                           hover:opacity-60
                           focus:outline-none
-                          ${
-                            activePage === item.page
+                          ${activePage === item.page
                               ? 'bg-button text-button-text hover:bg-secondary'
                               : ''
-                          }
-                          ${
-                            isSidebarOpen
+                            }
+                          ${isSidebarOpen
                               ? 'w-50 h-12 justify-start'
                               : 'h-12 w-16 justify-center'
-                          }
+                            }
                         `}
                         >
                           {/* Conditional margin on menu item icons */}

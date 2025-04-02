@@ -94,6 +94,14 @@ const UserDropdown: FC<Props> = ({
             {/* Bỏ gap-1 nếu muốn sát nhau hơn */}
             {/* Các Link menu */}
             <Link
+              href={{ pathname: `/dashboard`, query: { tab: 'analysis' } }}
+              locale={locale}
+              className='block px-2 py-2 text-sm  hover:bg-gray-100  dark:hover:bg-gray-700'
+              onClick={closeAllMenus}
+            >
+              {t('Analysis')}
+            </Link>
+            <Link
               href={{ pathname: `/dashboard`, query: { tab: 'profile' } }}
               locale={locale}
               className='block px-2 py-2 text-sm  hover:bg-gray-100  dark:hover:bg-gray-700'
@@ -101,7 +109,6 @@ const UserDropdown: FC<Props> = ({
             >
               {t('Profile')}
             </Link>
-            {/* ... (các Link khác tương tự) ... */}
             <Link
               href={{
                 pathname: `/dashboard`,
