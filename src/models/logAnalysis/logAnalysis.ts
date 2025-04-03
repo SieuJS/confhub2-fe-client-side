@@ -1,11 +1,9 @@
-// src/models/dashboard/logAnalysis.ts
-
 // ../types/logAnalysis.ts
 
 /** Thông tin chi tiết về quá trình xử lý một conference cụ thể */
 export interface ConferenceAnalysisDetail {
     acronym: string;
-    status: 'success' | 'failed' | 'processing' | 'unknown'; // Trạng thái cuối cùng
+    status: 'completed' | 'failed' | 'processing' | 'unknown'; // Trạng thái cuối cùng
     startTime: string | null;
     endTime: string | null;
     durationSeconds: number | null;
@@ -19,6 +17,8 @@ export interface ConferenceAnalysisDetail {
         html_save_success: boolean | null; // Có thể cần logic phức tạp hơn để xác định chính xác
         link_processing_attempted: number;
         link_processing_success: number;
+        link_processing_failed: Array<{ timestamp: string; message: string; details?: any }>;
+
         gemini_determine_attempted: boolean;
         gemini_determine_success: boolean | null;
         gemini_determine_cache_used: boolean | null;
@@ -47,8 +47,9 @@ export interface LogAnalysisResult {
         durationSeconds: number | null;
         totalConferencesInput: number | null;
         processedConferencesCount: number; // Số conference có log được ghi nhận
-        successfulTasks: number; // Số conference kết thúc thành công
-        failedTasks: number; // Số conference kết thúc thất bại
+        completedTasks: number;         // Tasks Completed (Ran without fatal errors logged by task_finish or inferred)
+        failedOrCrashedTasks: number;   // Tasks Failed/Crashed (Logged fatal errors or task_finish success=false or inferred failure)
+        successfulExtractions: number;  // Tasks with Successful Gemini Extraction API calls
     };
     googleSearch: {
         totalRequests: number;
@@ -76,9 +77,13 @@ export interface LogAnalysisResult {
     geminiApi: {
         totalCalls: number;
         callsByType: { [apiType: string]: number };
+        callsByModel: { [modelName: string]: number };
+
         successfulCalls: number;
         failedCalls: number;
-        retries: number;
+        retriesByType:  { [apiType: string]: number };
+        retriesByModel: { [modelName: string]: number };
+
         cacheAttempts: number;
         cacheHits: number;
         cacheMisses: number;
@@ -86,7 +91,6 @@ export interface LogAnalysisResult {
         cacheCreationFailed: number;
         cacheInvalidations: number;
         blockedBySafety: number;
-        modelUsage: { [modelName: string]: number };
         totalTokens: number; // Có thể tính tổng token nếu log có thông tin
         errorsByType: { [key: string]: number }; // Lỗi tổng hợp của Gemini
         rateLimitWaits: number;
