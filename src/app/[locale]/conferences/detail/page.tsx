@@ -18,8 +18,8 @@ import { ImportantDate } from '@/src/models/response/conference.response'
 import useAuthApi from '@/src/hooks/auth/useAuthApi' // Import useAuthApi
 
 // Import the custom hooks
-import useConferenceDataFromDB from '../../../../hooks/conferenceDetails/useConferenceDataFromDB'
-import useConferenceDataFromJSON from '../../../../hooks/conferenceDetails/useConferenceDataFromJSON'
+// import useconferenceDataFromJSON from '../../../../hooks/conferenceDetails/useconferenceDataFromJSON'
+// import useConferenceDataFromJSON from '../../../../hooks/conferenceDetails/useConferenceDataFromJSON'
 import useSequentialConferenceData from '@/src/hooks/conferenceDetails/useSequentialConferenceData'
 import useFollowConference from '../../../../hooks/conferenceDetails/useFollowConference'
 import useShareConference from '../../../../hooks/conferenceDetails/useShareConference'
@@ -53,9 +53,9 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   const pathname = usePathname()
 
   const {
-    conferenceDataFromDB,
+    // conferenceDataFromJSON,
     conferenceDataFromJSON,
-    dbError,
+    // dbError,
     jsonError,
     loading: sequentialLoading // Đổi tên để tránh trùng lặp
   } = useSequentialConferenceData(id)
@@ -96,10 +96,10 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   } = useBlacklistConference(conferenceDataFromJSON)
   const language = t('language') // Get the language from translations
   const { isUpdating, updateResult, updateConference } = useUpdateConference()
-  const { handleShareClick } = useShareConference(conferenceDataFromDB)
+  const { handleShareClick } = useShareConference(conferenceDataFromJSON)
   const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } =
-    useTopicsDisplay(conferenceDataFromDB?.organization?.topics || [])
-  const transformedDates = transformDates(conferenceDataFromDB?.dates)
+    useTopicsDisplay(conferenceDataFromJSON?.organization?.topics || [])
+  const transformedDates = transformDates(conferenceDataFromJSON?.dates)
   const { dateDisplay } = useFormatConferenceDates(transformedDates, language)
   const { isLoggedIn } = useAuthApi()
 
@@ -276,12 +276,12 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   // Combine loading states if needed for a general overlay
   const isLoading = sequentialLoading || isUpdating
   // Combine errors or display them separately
-  if (dbError === 'Conference not found') return <NotFoundPage />
+  // if (dbError === 'Conference not found') return <NotFoundPage />
   if (jsonError === 'Conference not found') return <NotFoundPage />
 
   if (isLoading) return <Loading /> // Show initial loading
 
-  const { conference, organization, location } = conferenceDataFromDB || {}
+  const { conference, organization, location } = conferenceDataFromJSON || {}
   const { followedBy, isLessReputable } = conferenceDataFromJSON || {}
 
   const overallRating = calculateOverallRating(
@@ -434,7 +434,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                         <path d='M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20' />
                       </svg>
 
-                      {organization?.publisher || 'Location Not Available'}
+                      {organization?.publisher || 'Unknown Publisher'}
                     </Link>
                   </div>
                   {/* Followers Display */}
@@ -679,7 +679,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
               </div>
             </div>
           </div>
-          <ConferenceTabs conference={conferenceDataFromDB} />
+          <ConferenceTabs conference={conferenceDataFromJSON} />
         </div>
 
         <div className='mt-8 rounded-lg bg-white p-4 shadow-md'>

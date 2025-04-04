@@ -1,4 +1,7 @@
 // --- Helper Functions cho Biểu đồ (Giữ nguyên hoặc cải tiến nhẹ) ---
+export type BarChartData = { labels: string[]; values: number[] };
+
+
 
 // Helper function to create Pie chart options (Doughnut)
 export const getPieChartOption = (title: string, data: Array<{ name: string; value: number }>, colors?: string[]) => {

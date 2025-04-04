@@ -4,9 +4,9 @@ import { ConferenceResponse } from '../../models/response/conference.response';
 import { getConferenceFromDB, getConferenceFromJSON } from '../../app/api/conference/getConferenceDetails';
 
 const useSequentialConferenceData = (id: string | null) => {
-    const [conferenceDataFromDB, setDbData] = useState<ConferenceResponse | null>(null);
+    // const [conferenceDataFromDB, setDbData] = useState<ConferenceResponse | null>(null);
     const [conferenceDataFromJSON, setJsonData] = useState<ConferenceResponse | null>(null);
-    const [dbError, setDbError] = useState<string | null>(null);
+    // const [dbError, setDbError] = useState<string | null>(null);
     const [jsonError, setJsonError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true); // Tổng trạng thái loading
 
@@ -18,17 +18,17 @@ const useSequentialConferenceData = (id: string | null) => {
             }
 
             setLoading(true);
-            setDbData(null);
+            // setDbData(null);
             setJsonData(null);
-            setDbError(null);
+            // setDbError(null);
             setJsonError(null);
 
             try {
-                // --- Bước 1: Fetch từ DB ---
-                console.log("Fetching from DB...");
-                const dbInfo = await getConferenceFromDB(id);
-                setDbData(dbInfo);
-                console.log("Fetched from DB successfully.");
+                // // --- Bước 1: Fetch từ DB ---
+                // console.log("Fetching from DB...");
+                // const dbInfo = await getConferenceFromDB(id);
+                // setDbData(dbInfo);
+                // console.log("Fetched from DB successfully.");
 
                 // --- Bước 2: Fetch từ JSON (chỉ khi DB thành công) ---
                 try {
@@ -50,9 +50,9 @@ const useSequentialConferenceData = (id: string | null) => {
             } catch (dbErr: any) {
                 console.error('Error fetching DB data:', dbErr);
                 if (dbErr.status === 404) {
-                    setDbError("Conference not found in DB");
+                    // setDbError("Conference not found in DB");
                 } else {
-                    setDbError(dbErr.message || 'An error occurred while fetching DB data.');
+                    // setDbError(dbErr.message || 'An error occurred while fetching DB data.');
                 }
                 // Nếu lỗi DB, không cần fetch JSON nữa
             } finally {
@@ -66,9 +66,9 @@ const useSequentialConferenceData = (id: string | null) => {
     }, [id]); // Chạy lại khi id thay đổi
 
     return {
-        conferenceDataFromDB,
+        // conferenceDataFromDB,
         conferenceDataFromJSON,
-        dbError,
+        // dbError,
         jsonError,
         loading // Trạng thái loading tổng
     };

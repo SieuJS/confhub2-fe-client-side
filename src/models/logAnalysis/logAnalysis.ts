@@ -2,6 +2,7 @@
 
 /** Thông tin chi tiết về quá trình xử lý một conference cụ thể */
 export interface ConferenceAnalysisDetail {
+    title: string;
     acronym: string;
     status: 'completed' | 'failed' | 'processing' | 'unknown'; // Trạng thái cuối cùng
     startTime: string | null;
@@ -17,7 +18,7 @@ export interface ConferenceAnalysisDetail {
         html_save_success: boolean | null; // Có thể cần logic phức tạp hơn để xác định chính xác
         link_processing_attempted: number;
         link_processing_success: number;
-        link_processing_failed: Array<{ timestamp: string; message: string; details?: any }>;
+        link_processing_failed: Array<{ timestamp: string; details?: any }>;
 
         gemini_determine_attempted: boolean;
         gemini_determine_success: boolean | null;
