@@ -88,8 +88,8 @@ export const useConferenceCrawl = (): UseConferenceCrawlReturn => {
                         // return; // Bỏ comment nếu chắc chắn dòng đầu là header
                      }
 
-                    const Title = row[1]?.trim();
-                    const Acronym = row[2]?.trim();
+                    const Title = row[1]?.replace(/\s*\(.*?\)$/g, '').trim() || 'N/A';
+                    const Acronym = row[2]?.replace(/\s*\(.*?\)$/g, '').trim() || 'N/A';
 
                     if (Title && Acronym) {
                         conferences.push({ Title, Acronym });
