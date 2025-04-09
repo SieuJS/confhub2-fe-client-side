@@ -2,7 +2,7 @@
 "use_client";
 import { ConferenceListResponse } from '../../../models/response/conference.list.response';
 
-const API_GET_CONFERENCE_ENDPOINT = 'http://confhub.engineer:3000/api/v1'; 
+const API_GET_CONFERENCE_ENDPOINT = 'http://confhub.engineer/api/v1'; 
 
 async function getListConferenceFromDB(): Promise<ConferenceListResponse> {
   try {
