@@ -264,7 +264,7 @@ const useAuthApi = (): AuthApiResult => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
+        body: JSON.stringify({...credentials , mode : "user"}),
       });
 
       const data = await response.json();
@@ -277,7 +277,7 @@ const useAuthApi = (): AuthApiResult => {
         // 1. Cập nhật localStorage TRƯỚC khi cập nhật state
         localStorage.setItem('user', JSON.stringify(loggedInUser));
         localStorage.setItem('loginStatus', 'true');
-
+        localStorage.setItem('token', data.token); // Lưu token nếu cần
         // 2. Cập nhật Cookie (vẫn hữu ích cho một số trường hợp và server-side)
         document.cookie = `loginStatus=true; path=/; SameSite=Lax; max-age=2592000`; // max-age=30 days
         // Lưu ý: Không nên lưu toàn bộ user object vào cookie nếu nó quá lớn hoặc chứa thông tin nhạy cảm không cần thiết ở cookie.

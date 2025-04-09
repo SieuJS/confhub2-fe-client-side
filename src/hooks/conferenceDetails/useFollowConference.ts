@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { ConferenceResponse } from '../../models/response/conference.response';
 import { UserResponse } from '../../models/response/user.response';
 
-const API_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user`;
+const API_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1`;
 
 const useFollowConference = (conferenceData: ConferenceResponse | null) => {
   const [isFollowing, setIsFollowing] = useState(false);
@@ -28,7 +28,13 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
 
       const user = JSON.parse(userData);
       try {
-        const response = await fetch(`${API_ENDPOINT}/${user.id}`);
+        const response = await fetch(`${API_ENDPOINT}`, {
+          method: 'GET',
+          headers:{
+            "Authorization": `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
+            'Content-Type': 'application/json',
+          }}
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -69,10 +75,11 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
     setError(null);
 
     try {
-      const response = await fetch(`${API_ENDPOINT}/follow`, {
+      const response = await fetch(`${API_ENDPOINT}/user/follow-conference`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
         },
         body: JSON.stringify({ conferenceId, userId: user.id }),
       });

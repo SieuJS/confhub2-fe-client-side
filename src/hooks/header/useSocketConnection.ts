@@ -37,7 +37,13 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
     if (user?.id) {
       setIsLoadingNotifications(true);
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/${user.id}/notifications`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/notification/user`, {
+          method: 'GET',
+          headers : {
+            "Authorization" : `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
+            'Content-Type': 'application/json',
+          }
+        });
         if (response.ok) {
           const data: Notification[] = await response.json();
           const filteredNotifications = data.filter(n => n.deletedAt === null);

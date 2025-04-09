@@ -3,7 +3,14 @@ import { Notification } from '@/src/models/response/user.response'; // Import No
 
 export const getNotifications = async (userId: string): Promise<Notification[] | null> => {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/${userId}/notifications`); // Adjust the API endpoint as needed
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/notification/user`,
+      {
+        headers : {
+          'Content-Type': 'application/json',
+          'Authorization' : `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
+        }
+      }
+    ); // Adjust the API endpoint as needed
 
     if (!response.ok) {
       // Handle non-2xx responses (e.g., 404, 500)
