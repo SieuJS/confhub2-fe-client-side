@@ -4,7 +4,7 @@ import axios, { AxiosError } from 'axios';
 const API_SAVE_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/conference/save-to-json`; // Or read from config
 
 interface SaveResult {
-    acronym: string;
+    title: string;
     success: boolean;
     message: string;
 }
@@ -26,7 +26,7 @@ export const saveConferenceToJson = async (acronym: string, title: string | unde
         const errorMsg = `Conference title is missing for acronym ${acronym}.`;
         console.error("Save Validation Error:", errorMsg);
         // Reject with a structured error matching the expected failure format
-        return Promise.reject<SaveError>({ acronym, success: false, message: errorMsg });
+        return Promise.reject<SaveError>({ title, success: false, message: errorMsg });
     }
 
     console.log(`API Call: Saving ${acronym} - ${title}`);
@@ -40,7 +40,7 @@ export const saveConferenceToJson = async (acronym: string, title: string | unde
         // Backend explicitly indicated success or failure in the response body
         console.log(`API Response for ${acronym}:`, response.data);
         return {
-            acronym,
+            title,
             success: response.data.success,
             message: response.data.message || (response.data.success ? 'Saved successfully.' : 'Save failed (backend logic).')
         };

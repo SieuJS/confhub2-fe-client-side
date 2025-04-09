@@ -32,7 +32,7 @@ const ConferenceDetails: React.FC<ConferenceDetailsProps> = ({ conferenceAnalysi
              </div>
 
             <ConferenceTableControls
-                selectedCount={tableManager.selectedAcronyms.length}
+                selectedCount={tableManager.selectedTitles.length}
                 isSaveEnabled={tableManager.isSaveEnabled}
                 mainSaveStatus={tableManager.mainSaveStatus}
                 rowSaveErrorsCount={rowSaveErrorsCount} // Pass the count

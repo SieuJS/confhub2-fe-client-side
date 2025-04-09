@@ -2,7 +2,7 @@
 // api/getConferenceDetails/getConferenceDetails.ts
 import { ConferenceResponse } from '../../../models/response/conference.response';
 
-const API_GET_CONFERENCE_ENDPOINT = 'http://178.128.28.130:3000/api/v1/conference'; //  3005 for details
+const API_GET_CONFERENCE_ENDPOINT = 'http://confhub.engineer/api/v1/conference'; //  3005 for details
 const API_SAVE_CONFERENCE_DETAILS_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/conferences/details/save`;
 
 

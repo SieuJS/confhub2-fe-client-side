@@ -2,7 +2,7 @@
 import React from 'react';
 import { FaSort, FaSortUp, FaSortDown, FaTimesCircle, FaSave } from 'react-icons/fa';
 
-type SortableColumn = 'acronym' | 'status' | 'durationSeconds' | 'errorCount';
+type SortableColumn = 'title' | 'acronym' | 'status' | 'durationSeconds' | 'errorCount';
 type SortDirection = 'asc' | 'desc';
 
 interface ConferenceTableHeaderProps {
@@ -45,9 +45,11 @@ export const ConferenceTableHeader: React.FC<ConferenceTableHeaderProps> = ({
             <tr>
                 <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[4%]">Select</th>
                 <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[6%]">Expand</th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12">
-                    <SortButton column="acronym" title="Acronym">Acronym</SortButton>
+                
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">
+                    <SortButton column="title" title="Title">Title</SortButton>
                 </th>
+   
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">
                     <SortButton column="status" title="Status">Status</SortButton>
                 </th>

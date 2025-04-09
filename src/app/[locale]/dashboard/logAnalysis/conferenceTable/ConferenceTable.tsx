@@ -5,7 +5,7 @@ import { ConferenceTableHeader } from './ConferenceTableHeader';
 import { ConferenceTableRow } from './ConferenceTableRow';
 
 // Re-define types or import from hook/types file
-type SortableColumn = 'acronym' | 'status' | 'durationSeconds' | 'errorCount';
+type SortableColumn = 'title' | 'acronym' | 'status' | 'durationSeconds' | 'errorCount';
 type SortDirection = 'asc' | 'desc';
 
 // NEW: Define RowSaveStatus type here or import it
@@ -22,8 +22,8 @@ interface ConferenceTableProps {
     rowSaveErrors: Record<string, string>;
     // Callbacks
     onSort: (column: SortableColumn) => void;
-    onToggleExpand: (acronym: string) => void;
-    onSelectToggle: (acronym: string) => void;
+    onToggleExpand: (title: string) => void;
+    onSelectToggle: (title: string) => void;
 }
 
 export const ConferenceTable: React.FC<ConferenceTableProps> = ({
@@ -48,18 +48,18 @@ export const ConferenceTable: React.FC<ConferenceTableProps> = ({
                 />
                 <tbody className="bg-white divide-y divide-gray-200">
                     {data.map((confData) => {
-                        const acronym = confData.acronym;
+                        const title = confData.title;
                         return (
                             <ConferenceTableRow
-                                key={acronym}
+                                key={title}
                                 confData={confData}
-                                isSelected={!!selectedConferences[acronym]}
-                                isExpanded={expandedConference === acronym}
+                                isSelected={!!selectedConferences[title]}
+                                isExpanded={expandedConference === title}
                                 onSelectToggle={onSelectToggle}
                                 onToggleExpand={onToggleExpand}
                                 // Pass the specific status and error for this row
-                                saveStatus={rowSaveStatus[acronym] || 'idle'} // Default to 'idle' if not found
-                                saveError={rowSaveErrors[acronym]}
+                                saveStatus={rowSaveStatus[title] || 'idle'} // Default to 'idle' if not found
+                                saveError={rowSaveErrors[title]}
                             />
                         );
                     })}
