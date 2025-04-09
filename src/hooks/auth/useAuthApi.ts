@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation'; // Correct import for App Router
-import { UserResponse } from '@/src/models/response/user.response'; // Adjust path as needed
+import { AuthResponse, UserResponse } from '@/src/models/response/user.response'; // Adjust path as needed
 
 // --- Helper Functions (ngoài component để tránh tạo lại và chạy ở client) ---
 
@@ -30,6 +30,22 @@ const getInitialUser = (): UserResponse | null => {
   // Trả về null nếu không ở client, không có user, hoặc loginStatus không phải 'true'
   return null;
 };
+
+export const login = (user : AuthResponse) => {
+  // Lưu thông tin user vào localStorage
+  localStorage.setItem('user', JSON.stringify(user.user));
+  localStorage.setItem('loginStatus', 'true');
+  // Lưu thông tin token vào localStorage
+  localStorage.setItem('token', user.token);
+  // Lưu thông tin returnUrl vào localStorage nếu cần
+  const returnUrl = localStorage.getItem('returnUrl') || '/';
+  localStorage.removeItem('returnUrl'); // Xóa sau khi đọc
+  return returnUrl;
+}
+
+export const getToken = () => {
+  return localStorage.getItem('token');
+}
 
 /**
  * Lấy trạng thái đăng nhập ban đầu từ localStorage.
@@ -245,7 +261,7 @@ const useAuthApi = (): AuthApiResult => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/signin`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),

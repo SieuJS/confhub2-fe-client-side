@@ -44,12 +44,14 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => { // Nh
         setIsLoading(true);
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/verify-email`, {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/verify`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${token}`, // Thêm token vào header
                 },
-                body: JSON.stringify({ email, code }),
+                body: JSON.stringify({ code }),
             });
 
             const data = await response.json();
@@ -166,7 +168,7 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => { // Nh
                     <div className='text-center text-sm'>
                         <span className='text-gray-600'>{('Did not receive code yet?')} {/* Nên dùng t('verifyEmail.noCode') */} </span>
                         {/* Có thể thêm link gửi lại code nếu cần */}
-                        <Link href="/auth/resend-verification" className='hover:text-button/80 font-medium text-button'>
+                        <Link href = "/" className='hover:text-button/80 font-medium text-button'>
                             {('Resend code')} {/* Nên dùng t('verifyEmail.resendLink') */}
                         </Link>
                         {' '} {/* Thêm khoảng trắng nếu cần */}

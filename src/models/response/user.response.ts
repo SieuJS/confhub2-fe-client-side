@@ -25,6 +25,11 @@ export type UserResponse = {
   updatedAt: string;
 }
 
+export type AuthResponse = {
+  user : any ; 
+  token : string;
+}
+
 export type Follow = {
   id: string;
   createdAt: string;
