@@ -185,7 +185,7 @@ const IntroduceVisualization: React.FC = () => {
       )
     } else if (chartType === 'pie') {
       chartElement = (
-        <PieChart>
+        <PieChart data={chartData}>
           <Pie
             data={chartData}
             cx='50%'

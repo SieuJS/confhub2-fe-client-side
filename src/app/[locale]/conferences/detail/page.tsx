@@ -53,9 +53,9 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   const pathname = usePathname()
 
   const {
-    // conferenceDataFromJSON,
+    conferenceDataFromDB,
     conferenceDataFromJSON,
-    // dbError,
+    dbError,
     jsonError,
     loading: sequentialLoading // Đổi tên để tránh trùng lặp
   } = useSequentialConferenceData(id)
@@ -81,25 +81,25 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     handleFollowClick,
     loading: followLoading,
     error: followError
-  } = useFollowConference(conferenceDataFromJSON)
+  } = useFollowConference(conferenceDataFromDB)
   const {
     isAddToCalendar,
     handleAddToCalendar,
     loading: calendarLoading,
     error: calendarError
-  } = useAddToCalendar(conferenceDataFromJSON)
+  } = useAddToCalendar(conferenceDataFromDB)
   const {
     isBlacklisted,
     handleBlacklistClick,
     loading: blacklistLoading,
     error: blacklistError
-  } = useBlacklistConference(conferenceDataFromJSON)
+  } = useBlacklistConference(conferenceDataFromDB)
   const language = t('language') // Get the language from translations
   const { isUpdating, updateResult, updateConference } = useUpdateConference()
-  const { handleShareClick } = useShareConference(conferenceDataFromJSON)
+  const { handleShareClick } = useShareConference(conferenceDataFromDB)
   const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } =
-    useTopicsDisplay(conferenceDataFromJSON?.organization?.topics || [])
-  const transformedDates = transformDates(conferenceDataFromJSON?.dates)
+    useTopicsDisplay(conferenceDataFromDB?.organization?.topics || [])
+  const transformedDates = transformDates(conferenceDataFromDB?.dates)
   const { dateDisplay } = useFormatConferenceDates(transformedDates, language)
   const { isLoggedIn } = useAuthApi()
 
@@ -276,18 +276,18 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   // Combine loading states if needed for a general overlay
   const isLoading = sequentialLoading || isUpdating
   // Combine errors or display them separately
-  // if (dbError === 'Conference not found') return <NotFoundPage />
-  if (jsonError === 'Conference not found') return <NotFoundPage />
+  if (dbError === 'Conference not found') return <NotFoundPage />
+  //if (jsonError === 'Conference not found') return <NotFoundPage />
 
   if (isLoading) return <Loading /> // Show initial loading
 
-  const { conference, organization, location } = conferenceDataFromJSON || {}
-  const { followedBy, isLessReputable } = conferenceDataFromJSON || {}
+  const { conference, organization, location } = conferenceDataFromDB || {}
+  const { followedBy, isLessReputable } = conferenceDataFromDB || {}
 
   const overallRating = calculateOverallRating(
-    conferenceDataFromJSON?.feedBacks
+    conferenceDataFromDB?.feedBacks
   )
-  const totalReviews = conferenceDataFromJSON?.feedBacks?.length || 0
+  const totalReviews = conferenceDataFromDB?.feedBacks?.length || 0
 
   return (
     <div className='flex min-h-screen flex-col bg-gray-50'>
@@ -679,12 +679,12 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
               </div>
             </div>
           </div>
-          <ConferenceTabs conference={conferenceDataFromJSON} />
+          <ConferenceTabs conference={conferenceDataFromDB} />
         </div>
 
         <div className='mt-8 rounded-lg bg-white p-4 shadow-md'>
           {/* Pass conferenceData to ConferenceFeedback */}
-          <ConferenceFeedback conferenceData={conferenceDataFromJSON} />
+          <ConferenceFeedback conferenceData={conferenceDataFromDB} />
         </div>
       </div>
 
