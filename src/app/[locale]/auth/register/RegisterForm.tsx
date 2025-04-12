@@ -17,6 +17,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [dob, setDob] = useState('');
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showVerificationMessage, setShowVerificationMessage] = useState(false) // <<< State mới
@@ -27,7 +28,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
     setShowVerificationMessage(false) // Reset message khi submit lại
 
     // --- Validation cơ bản (giữ nguyên) ---
-    if (!firstname || !lastname || !email || !password || !confirmPassword) {
+    if (!firstname || !lastname || !email || !password || !confirmPassword || !dob) {
       setError('Please fill in all required fields.')
       return
     }
@@ -55,8 +56,8 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
             firstName: firstname,
             lastName: lastname,
             email: email,
-            dob : new Date().toISOString(),
-            password: password
+            password: password,
+            dob: dob,
           })
         }
       )
@@ -218,6 +219,8 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
                       name='dob'
                       type='date'
                       required
+                      value={dob}
+                      onChange={e => setDob(e.target.value)}
                       className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm'
                     />
                   </div>
