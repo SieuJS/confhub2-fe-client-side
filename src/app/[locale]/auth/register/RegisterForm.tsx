@@ -3,6 +3,7 @@
 import { Link } from '@/src/navigation'
 import React, { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { login } from '@/src/hooks/auth/useAuthApi'
 
 interface RegisterFormProps {
   // No props needed
@@ -62,7 +63,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
       )
 
       const data = await response.json()
-
+      login(data)
       if (response.status === 201) {
         // <<< Backend trả về 201 khi cần verify
         console.log('Registration pending verification:', data.message)

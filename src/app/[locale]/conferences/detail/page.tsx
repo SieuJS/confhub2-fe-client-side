@@ -18,8 +18,8 @@ import { ImportantDate } from '@/src/models/response/conference.response'
 import useAuthApi from '@/src/hooks/auth/useAuthApi' // Import useAuthApi
 
 // Import the custom hooks
-// import useconferenceDataFromJSON from '../../../../hooks/conferenceDetails/useconferenceDataFromJSON'
-// import useConferenceDataFromJSON from '../../../../hooks/conferenceDetails/useConferenceDataFromJSON'
+import useConferenceDataFromDB from '../../../../hooks/conferenceDetails/useConferenceDataFromDB'
+import useConferenceDataFromJSON from '../../../../hooks/conferenceDetails/useConferenceDataFromJSON'
 import useSequentialConferenceData from '@/src/hooks/conferenceDetails/useSequentialConferenceData'
 import useFollowConference from '../../../../hooks/conferenceDetails/useFollowConference'
 import useShareConference from '../../../../hooks/conferenceDetails/useShareConference'
@@ -434,7 +434,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                         <path d='M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20' />
                       </svg>
 
-                      {organization?.publisher || 'Unknown Publisher'}
+                      {organization?.publisher || 'Unknown'}
                     </Link>
                   </div>
                   {/* Followers Display */}

@@ -14,7 +14,6 @@ import { MenuIcon, CloseIcon } from './header/Icon'
 import Button from './Button'
 import useAuthApi from '../../../hooks/auth/useAuthApi'
 
-
 interface Props {
   locale: string
 }
@@ -92,7 +91,7 @@ export const Header: FC<Props> = ({ locale }) => {
         )}
 
         <Button
-          className='block md:hidden'
+          className='block lg:hidden'
           onClick={e => {
             e.stopPropagation()
             openMobileMenu()

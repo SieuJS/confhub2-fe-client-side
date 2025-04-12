@@ -5,14 +5,15 @@ interface UpdateNotificationsData {
   notifications: Notification[];
 }
 
-const API_UPDATE_NOTIFICATIONS_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user`;
+const API_UPDATE_NOTIFICATIONS_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1`;
 
 async function updateNotifications(userId: string, data: UpdateNotificationsData): Promise<void> {
   try {
-    const response = await fetch(`${API_UPDATE_NOTIFICATIONS_ENDPOINT}/${userId}/notifications`, {
+    const response = await fetch(`${API_UPDATE_NOTIFICATIONS_ENDPOINT}/notification/user`, {
       method: 'PUT', // Use PUT for updating existing resources
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`, // Ensure token is set correctly
       },
       body: JSON.stringify(data),
     });

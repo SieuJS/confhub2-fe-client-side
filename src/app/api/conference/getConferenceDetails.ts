@@ -2,13 +2,13 @@
 // api/getConferenceDetails/getConferenceDetails.ts
 import { ConferenceResponse } from '../../../models/response/conference.response';
 
-const API_GET_CONFERENCE_ENDPOINT = 'http://confhub.engineer/api/v1/conference'; //  3005 for details
+const API_GET_CONFERENCE_ENDPOINT = process.env.NEXT_PUBLIC_BACKEND_URL; //  3005 for details
 const API_SAVE_CONFERENCE_DETAILS_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/conferences/details/save`;
 
 
 async function getConferenceFromDB(id: string): Promise<ConferenceResponse> {
   try {
-    const response = await fetch(`${API_GET_CONFERENCE_ENDPOINT}/${id}`, {  // Removed /api/v1/conference
+    const response = await fetch(`${API_GET_CONFERENCE_ENDPOINT}/api/v1/conference/${id}`, {  // Removed /api/v1/confeence
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -35,22 +35,7 @@ async function getConferenceFromDB(id: string): Promise<ConferenceResponse> {
     }
 
 
-    // Send to backend (3000) for saving
-    const saveResponse = await fetch(API_SAVE_CONFERENCE_DETAILS_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(responseData), // Send the entire ConferenceResponse
-    });
-
-    if (!saveResponse.ok) {
-      const errorText = await saveResponse.text(); // Get error message as text
-      throw new Error(`Save operation failed! Status: ${saveResponse.status}, Message: ${errorText}`);
-    }
-
-    const saveResult = await saveResponse.json();
-    console.log(saveResult.message);  // Log save success/already exists message.
+    // Send to backend (3000) for savin// Log save success/already exists message.
 
     return responseData;
 

@@ -12,8 +12,8 @@ interface ConferenceTableRowProps {
     confData: ConferenceTableData;
     isSelected: boolean;
     isExpanded: boolean;
-    onSelectToggle: (acronym: string) => void;
-    onToggleExpand: (acronym: string) => void;
+    onSelectToggle: (title: string) => void;
+    onToggleExpand: (title: string) => void;
     // NEW Props for save status
     saveStatus: RowSaveStatus;
     saveError?: string; // Optional error message for tooltip
@@ -28,7 +28,7 @@ export const ConferenceTableRow: React.FC<ConferenceTableRowProps> = ({
     saveStatus, // Destructure new props
     saveError,   // Destructure new props
 }) => {
-    const { acronym, status, durationSeconds, steps, errors, finalResultPreview, errorCount } = confData;
+    const { title, acronym, status, durationSeconds, steps, errors, finalResultPreview, errorCount } = confData;
     const hasErrors = errorCount > 0;
 
     // Row Background Logic
@@ -68,17 +68,18 @@ export const ConferenceTableRow: React.FC<ConferenceTableRowProps> = ({
                         type="checkbox"
                         className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
                         checked={isSelected}
-                        onChange={() => onSelectToggle(acronym)}
-                        aria-label={`Select ${acronym}`}
-                        title={`Select/Deselect ${acronym}`}
+                        onChange={() => onSelectToggle(title)}
+                        aria-label={`Select ${title}`}
+                        title={`Select/Deselect ${title}`}
                     />
                 </td>
                 <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500 text-center">
-                    <button onClick={() => onToggleExpand(acronym)} className="text-blue-600 hover:text-blue-800 focus:outline-none" title={isExpanded ? 'Collapse Details' : 'Expand Details'}>
+                    <button onClick={() => onToggleExpand(title)} className="text-blue-600 hover:text-blue-800 focus:outline-none" title={isExpanded ? 'Collapse Details' : 'Expand Details'}>
                         {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
                     </button>
                 </td>
-                <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{acronym}</td>
+
+                <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{title}</td>
                 <td className="px-4 py-2 whitespace-nowrap text-sm">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusBadgeClass}`}>
                         {status || 'N/A'}
