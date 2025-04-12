@@ -32,6 +32,7 @@ export type AuthResponse = {
 
 export type Follow = {
   id: string;
+  conferenceId: string;
   createdAt: string;
   updatedAt: string;
 }
