@@ -28,7 +28,7 @@ const MobileNavigation: FC<Props> = ({
 
   return (
     <div
-      className={`mobile-navigation border-border absolute right-0 top-full z-40 w-40 border-b bg-background-secondary shadow-md sm:hidden ${
+      className={`mobile-navigation border-border absolute right-0 top-full z-40 w-40 border-b bg-background-secondary shadow-md lg:hidden ${
         isMobileMenuOpen ? '' : 'hidden'
       }`}
       // suppressHydrationWarning // Nếu cần, đặt nó làm prop của div

@@ -19,7 +19,7 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
   }
 
   return (
-    <nav className='mr-4 hidden gap-0 sm:inline-flex'>
+    <nav className='mr-4 hidden gap-0 lg:inline-flex'>
       <Link
         lang={locale}
         href={`/conferences`}
