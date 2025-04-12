@@ -10,6 +10,7 @@ import remarkBreaks from 'remark-breaks'
 import useSectionNavigation from '../../../../hooks/conferenceDetails/useSectionNavigation'
 import useActiveSection from '../../../../hooks/conferenceDetails/useActiveSection'
 import { useTranslations } from 'next-intl'
+import rehypeRaw from 'rehype-raw';
 
 interface ConferenceTabsProps {
   conference: ConferenceResponse | null
@@ -25,22 +26,22 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
   // Use keys that can map directly to translation keys (or keep original if needed for IDs)
   const sectionKeys = conference
     ? [
-        'overview',
-        'important-date',
-        'Call for papers', // Keep space for ID matching if necessary, handle href separately
-        'category-topics',
-        ...(conference.ranks && conference.ranks.length > 0
-          ? ['source-rank']
-          : []),
-        'map'
-      ]
+      'overview',
+      'important-dates',
+      'call-for-papers', // Keep space for ID matching if necessary, handle href separately
+      'category-topics',
+      ...(conference.ranks && conference.ranks.length > 0
+        ? ['source-rank']
+        : []),
+      'map'
+    ]
     : []
 
   // Map section keys to translation keys
   const sectionTranslationMap: { [key: string]: string } = {
     overview: 'Overview',
-    'important-date': 'Important_Dates', // Reuse existing key
-    'Call for papers': 'Call_for_papers',
+    'important-dates': 'Important_Dates', // Reuse existing key
+    'call-for-papers': 'Call_for_papers',
     'category-topics': 'Category_and_Topics', // Reuse existing key
     'source-rank': 'Source_Rank',
     map: 'Map'
@@ -102,7 +103,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
                 activeSection === sectionKey
                   ? 'bg-gray-100 text-blue-600'
                   : 'text-gray-600 hover:bg-gray-100 hover:text-blue-600'
-              }`}
+                }`}
             >
               {/* Use translated name for display */}
               {t(translationKey)}
@@ -125,7 +126,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       </section>
 
       <section
-        id='important-date' // Keep original or sanitized ID
+        id='important-dates' // Keep original or sanitized ID
         className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
         <h2 className='mb-6 text-xl font-semibold md:text-2xl '>
@@ -175,7 +176,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
 
       {/* Ensure section ID matches href */}
       <section
-        id='Call-for-papers' // Example sanitized ID
+        id='call-for-papers' // Example sanitized ID
         className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
         <h2 className='mb-4 text-xl font-semibold md:text-2xl '>
@@ -183,6 +184,44 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         </h2>
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkBreaks]} // Added remarkBreaks
+          rehypePlugins={[rehypeRaw]}
+
+
+          components={{
+
+            // Customize components (optional, for more control)
+            p: ({ node, ...props }) => <p className='mb-2' {...props} />, // Add margin to paragraphs
+            a: ({ ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
+              <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline" />
+            ),
+            // Add more component overrides as needed (ul, ol, li, code, etc.)
+            pre: ({ node, ...props }) => (
+              <pre
+                className='overflow-x-auto rounded-md bg-gray-100 p-2'
+                {...props}
+              />
+            ),
+            code: ({ node, ...props }) => (
+              <code className='rounded bg-gray-100 px-1' {...props} />
+            ),
+            h1: ({ node, ...props }) => (
+              <h1 className='my-4 text-2xl font-bold' {...props} />
+            ),
+            h2: ({ node, ...props }) => (
+              <h2 className='my-3 text-xl font-semibold' {...props} />
+            ),
+            h3: ({ node, ...props }) => (
+              <h3 className='my-2 text-lg font-medium' {...props} />
+            ),
+            ul: ({ node, ...props }) => (
+              <ul className='my-2 list-inside list-disc' {...props} />
+            ),
+            ol: ({ node, ...props }) => (
+              <ol className='my-2 list-inside list-decimal' {...props} />
+            ),
+            li: ({ node, ...props }) => <li className='my-1' {...props} />
+          }}
+
         >
           {organization?.callForPaper || t('No_call_for_papers_available')}
         </ReactMarkdown>
@@ -206,7 +245,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         <div>
           <h3 className='mb-2 text-xl font-medium '>{t('Topics')}</h3>
           {organization?.topics && organization.topics.length > 0 ? (
-            <ul className='grid list-disc grid-cols-1 gap-2 pl-5  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
+            <ul className='grid list-disc grid-cols-1 gap-12 pl-8  sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2'>
               {organization.topics.map((topic, index) => (
                 <li key={index}>{topic}</li>
               ))}

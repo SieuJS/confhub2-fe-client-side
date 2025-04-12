@@ -81,19 +81,19 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     handleFollowClick,
     loading: followLoading,
     error: followError
-  } = useFollowConference(conferenceDataFromJSON)
+  } = useFollowConference(conferenceDataFromDB)
   const {
     isAddToCalendar,
     handleAddToCalendar,
     loading: calendarLoading,
     error: calendarError
-  } = useAddToCalendar(conferenceDataFromJSON)
+  } = useAddToCalendar(conferenceDataFromDB)
   const {
     isBlacklisted,
     handleBlacklistClick,
     loading: blacklistLoading,
     error: blacklistError
-  } = useBlacklistConference(conferenceDataFromJSON)
+  } = useBlacklistConference(conferenceDataFromDB)
   const language = t('language') // Get the language from translations
   const { isUpdating, updateResult, updateConference } = useUpdateConference()
   const { handleShareClick } = useShareConference(conferenceDataFromDB)
@@ -277,17 +277,17 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   const isLoading = sequentialLoading || isUpdating
   // Combine errors or display them separately
   if (dbError === 'Conference not found') return <NotFoundPage />
-  if (jsonError === 'Conference not found') return <NotFoundPage />
+  //if (jsonError === 'Conference not found') return <NotFoundPage />
 
   if (isLoading) return <Loading /> // Show initial loading
 
   const { conference, organization, location } = conferenceDataFromDB || {}
-  const { followedBy, isLessReputable } = conferenceDataFromJSON || {}
+  const { followedBy, isLessReputable } = conferenceDataFromDB || {}
 
   const overallRating = calculateOverallRating(
-    conferenceDataFromJSON?.feedBacks
+    conferenceDataFromDB?.feedBacks
   )
-  const totalReviews = conferenceDataFromJSON?.feedBacks?.length || 0
+  const totalReviews = conferenceDataFromDB?.feedBacks?.length || 0
 
   return (
     <div className='flex min-h-screen flex-col bg-gray-50'>
@@ -434,7 +434,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                         <path d='M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20' />
                       </svg>
 
-                      {organization?.publisher || 'Location Not Available'}
+                      {organization?.publisher || 'Unknown'}
                     </Link>
                   </div>
                   {/* Followers Display */}
@@ -684,7 +684,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
         <div className='mt-8 rounded-lg bg-white p-4 shadow-md'>
           {/* Pass conferenceData to ConferenceFeedback */}
-          <ConferenceFeedback conferenceData={conferenceDataFromJSON} />
+          <ConferenceFeedback conferenceData={conferenceDataFromDB} />
         </div>
       </div>
 
