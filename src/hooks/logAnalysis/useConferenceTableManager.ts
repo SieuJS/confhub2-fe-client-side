@@ -1,10 +1,10 @@
 // src/hooks/useConferenceTableManager.ts
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ConferenceAnalysisDetail } from '@/src/models/logAnalysis/logAnalysis';
-import { saveConferenceToJson } from '../../app/api/logAnalysis/saveConferences'; 
+import { saveConferenceToJson } from '../../app/api/logAnalysis/saveConferences';
 
 // Re-define types needed within the hook or import from a central types file
-type SortableColumn = 'acronym' | 'status' | 'durationSeconds' | 'errorCount';
+type SortableColumn = 'title' | 'acronym' | 'status' | 'durationSeconds' | 'errorCount';
 type SortDirection = 'asc' | 'desc';
 type MainSavingStatus = 'idle' | 'saving' | 'success' | 'error';
 
@@ -32,17 +32,17 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
 
     // --- NEW State for Row Status ---
     const [rowSaveStatus, setRowSaveStatus] = useState<Record<string, RowSaveStatus>>({});
-    const [rowSaveErrors, setRowSaveErrors] = useState<Record<string, string>>({}); // Store error message per acronym
+    const [rowSaveErrors, setRowSaveErrors] = useState<Record<string, string>>({}); // Store error message per title
 
 
     // --- Data Preparation ---
     const conferenceDataArray: ConferenceTableData[] = useMemo(() => {
         if (!initialData) return [];
-        return Object.entries(initialData).map(([keyAcronym, data]) => ({
+        return Object.entries(initialData).map(([keyTitle, data]) => ({
             ...data,
-            acronym: keyAcronym,
+            title: keyTitle,
             errorCount: data.errors?.length || 0,
-            title: data.title || '', // Ensure title exists
+            acronym: data.acronym || '',
         }));
     }, [initialData]);
 
@@ -50,7 +50,7 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
     useEffect(() => {
         const initialStatus: Record<string, RowSaveStatus> = {};
         conferenceDataArray.forEach(conf => {
-            initialStatus[conf.acronym] = 'idle';
+            initialStatus[conf.title] = 'idle';
         });
         setRowSaveStatus(initialStatus);
         setRowSaveErrors({}); // Clear previous errors
@@ -66,31 +66,32 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
         if (!sortColumn) return conferenceDataArray;
         // Sorting logic remains the same as before...
         return [...conferenceDataArray].sort((a, b) => {
-             let aValue: any = a[sortColumn];
-             let bValue: any = b[sortColumn];
+            let aValue: any = a[sortColumn];
+            let bValue: any = b[sortColumn];
 
-             const handleNull = (val: any) => (val === null || val === undefined);
-             if (handleNull(aValue) && handleNull(bValue)) return 0;
-             if (handleNull(aValue)) return sortDirection === 'asc' ? 1 : -1;
-             if (handleNull(bValue)) return sortDirection === 'asc' ? -1 : 1;
+            const handleNull = (val: any) => (val === null || val === undefined);
+            if (handleNull(aValue) && handleNull(bValue)) return 0;
+            if (handleNull(aValue)) return sortDirection === 'asc' ? 1 : -1;
+            if (handleNull(bValue)) return sortDirection === 'asc' ? -1 : 1;
 
-             switch (sortColumn) {
-                 case 'acronym':
-                 case 'status':
-                     aValue = String(aValue).toLowerCase();
-                     bValue = String(bValue).toLowerCase();
-                     if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-                     if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-                     return 0;
-                 case 'durationSeconds':
-                 case 'errorCount':
-                     aValue = Number(aValue);
-                     bValue = Number(bValue);
-                     return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
-                 default:
-                     return 0;
-             }
-         });
+            switch (sortColumn) {
+                case 'acronym':
+                case 'title':
+                case 'status':
+                    aValue = String(aValue).toLowerCase();
+                    bValue = String(bValue).toLowerCase();
+                    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+                    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+                    return 0;
+                case 'durationSeconds':
+                case 'errorCount':
+                    aValue = Number(aValue);
+                    bValue = Number(bValue);
+                    return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+                default:
+                    return 0;
+            }
+        });
     }, [conferenceDataArray, sortColumn, sortDirection]);
 
     const handleSort = useCallback((column: SortableColumn) => {
@@ -104,22 +105,22 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
 
 
     // --- Selection ---
-    const selectedAcronyms = useMemo(() => {
+    const selectedTitles = useMemo(() => {
         return Object.entries(selectedConferences)
             .filter(([, isSelected]) => isSelected)
-            .map(([acronym]) => acronym);
+            .map(([title]) => title);
     }, [selectedConferences]);
 
-    const handleRowSelectToggle = useCallback((acronym: string) => {
+    const handleRowSelectToggle = useCallback((title: string) => {
         setSelectedConferences(prev => ({
             ...prev,
-            [acronym]: !prev[acronym]
+            [title]: !prev[title]
         }));
     }, []);
 
     const handleSelectAll = useCallback(() => {
         const newSelection: Record<string, boolean> = {};
-        sortedData.forEach(conf => { newSelection[conf.acronym] = true; });
+        sortedData.forEach(conf => { newSelection[conf.title] = true; });
         setSelectedConferences(newSelection);
     }, [sortedData]);
 
@@ -129,37 +130,37 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
 
     const handleSelectNoError = useCallback(() => {
         const newSelection: Record<string, boolean> = {};
-        sortedData.forEach(conf => { if (conf.errorCount === 0) newSelection[conf.acronym] = true; });
+        sortedData.forEach(conf => { if (conf.errorCount === 0) newSelection[conf.title] = true; });
         setSelectedConferences(newSelection);
     }, [sortedData]);
 
     const handleSelectError = useCallback(() => {
         const newSelection: Record<string, boolean> = {};
-        sortedData.forEach(conf => { if (conf.errorCount > 0) newSelection[conf.acronym] = true; });
+        sortedData.forEach(conf => { if (conf.errorCount > 0) newSelection[conf.title] = true; });
         setSelectedConferences(newSelection);
     }, [sortedData]);
 
     // --- Expand/Collapse ---
-    const toggleExpand = useCallback((acronym: string) => {
-        setExpandedConference(prev => (prev === acronym ? null : acronym));
+    const toggleExpand = useCallback((title: string) => {
+        setExpandedConference(prev => (prev === title ? null : title));
     }, []);
 
     // --- Saving Logic ---
     const isSelectedWithError = useMemo(() => {
-        if (selectedAcronyms.length === 0) return false;
-        const selectedData = sortedData.filter(conf => selectedConferences[conf.acronym]);
+        if (selectedTitles.length === 0) return false;
+        const selectedData = sortedData.filter(conf => selectedConferences[conf.title]);
         return selectedData.some(conf => conf.errorCount > 0);
-    }, [selectedAcronyms, selectedConferences, sortedData]);
+    }, [selectedTitles, selectedConferences, sortedData]);
 
     const isSaveEnabled = useMemo(() => {
-        return selectedAcronyms.length > 0 && !isSelectedWithError && mainSaveStatus !== 'saving';
-    }, [selectedAcronyms, isSelectedWithError, mainSaveStatus]);
+        return selectedTitles.length > 0 && !isSelectedWithError && mainSaveStatus !== 'saving';
+    }, [selectedTitles, isSelectedWithError, mainSaveStatus]);
 
-     // Effect to reset main save status when selection changes AFTER an operation
+    // Effect to reset main save status when selection changes AFTER an operation
     useEffect(() => {
         if (mainSaveStatus === 'error' || mainSaveStatus === 'success') {
-             setMainSaveStatus('idle');
-             // Do NOT reset rowSaveStatus or rowSaveErrors here, they persist until next save
+            setMainSaveStatus('idle');
+            // Do NOT reset rowSaveStatus or rowSaveErrors here, they persist until next save
         }
     }, [selectedConferences, mainSaveStatus]);
 
@@ -172,18 +173,18 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
         // Reset statuses and errors ONLY for the items about to be saved
         const nextRowStatus = { ...rowSaveStatus };
         const nextRowErrors = { ...rowSaveErrors };
-        selectedAcronyms.forEach(acronym => {
-            nextRowStatus[acronym] = 'idle'; // Reset to idle before attempting save
-            delete nextRowErrors[acronym];   // Clear previous error for this item
+        selectedTitles.forEach(title => {
+            nextRowStatus[title] = 'idle'; // Reset to idle before attempting save
+            delete nextRowErrors[title];   // Clear previous error for this item
         });
         setRowSaveStatus(nextRowStatus); // Update state to potentially clear old icons visually
         setRowSaveErrors(nextRowErrors);
 
-        console.log(`Starting bulk save for: ${selectedAcronyms.join(', ')}`);
+        console.log(`Starting bulk save for: ${selectedTitles.join(', ')}`);
 
-        const itemsToSave = conferenceDataArray.filter(conf => selectedConferences[conf.acronym]);
+        const itemsToSave = conferenceDataArray.filter(conf => selectedConferences[conf.title]);
         const savePromises = itemsToSave.map(conf =>
-            saveConferenceToJson(conf.acronym, conf.title)
+            saveConferenceToJson(conf.title, conf.title)
         );
 
         const results = await Promise.allSettled(savePromises);
@@ -199,22 +200,22 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
             if (result.status === 'rejected') {
                 overallSuccess = false;
                 failedSaves++;
-                const reason = result.reason as { acronym: string; message: string };
-                finalRowStatus[reason.acronym] = 'error';
-                finalRowErrors[reason.acronym] = reason.message;
-                console.error(`Bulk Save Error (Rejected): ${reason.acronym}`, reason.message);
+                const reason = result.reason as { title: string; message: string };
+                finalRowStatus[reason.title] = 'error';
+                finalRowErrors[reason.title] = reason.message;
+                console.error(`Bulk Save Error (Rejected): ${reason.title}`, reason.message);
             } else if (result.status === 'fulfilled') {
                 const response = result.value;
                 if (!response.success) {
                     overallSuccess = false;
                     failedSaves++;
-                    finalRowStatus[response.acronym] = 'error';
-                    finalRowErrors[response.acronym] = response.message;
-                    console.error(`Bulk Save Error (Fulfilled, Backend Fail): ${response.acronym}`, response.message);
+                    finalRowStatus[response.title] = 'error';
+                    finalRowErrors[response.title] = response.message;
+                    console.error(`Bulk Save Error (Fulfilled, Backend Fail): ${response.title}`, response.message);
                 } else {
                     successfulSaves++;
-                    finalRowStatus[response.acronym] = 'success';
-                     console.log(`Bulk Save Success: ${response.acronym}`);
+                    finalRowStatus[response.title] = 'success';
+                    console.log(`Bulk Save Success: ${response.title}`);
                 }
             }
         });
@@ -230,21 +231,21 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
             setTimeout(() => setMainSaveStatus('idle'), 3000);
         } else {
             setMainSaveStatus('error');
-            console.error(`Bulk save completed with ${failedSaves} error(s) out of ${selectedAcronyms.length} selected items.`);
-             // Errors are shown per row, main button just indicates failure happened.
-             // Optionally, keep error state longer or until next action
+            console.error(`Bulk save completed with ${failedSaves} error(s) out of ${selectedTitles.length} selected items.`);
+            // Errors are shown per row, main button just indicates failure happened.
+            // Optionally, keep error state longer or until next action
         }
-    }, [isSaveEnabled, selectedAcronyms, selectedConferences, conferenceDataArray, rowSaveStatus, rowSaveErrors, handleDeselectAll]); // Added row status/errors
+    }, [isSaveEnabled, selectedTitles, selectedConferences, conferenceDataArray, rowSaveStatus, rowSaveErrors, handleDeselectAll]); // Added row status/errors
 
 
     // --- Mock Crawl Again Logic ---
     const handleCrawlAgain = useCallback(() => {
-        if (selectedAcronyms.length === 0) return;
+        if (selectedTitles.length === 0) return;
         console.log("--- MOCK CRAWL AGAIN ---");
-        console.log("Would trigger crawl for:", selectedAcronyms.join(', '));
-        alert(`Mock: Triggering crawl again for ${selectedAcronyms.length} conference(s):\n${selectedAcronyms.join('\n')}`);
+        console.log("Would trigger crawl for:", selectedTitles.join(', '));
+        alert(`Mock: Triggering crawl again for ${selectedTitles.length} conference(s):\n${selectedTitles.join('\n')}`);
         // Placeholder for future API call, e.g., using crawlConferenceAgain service
-    }, [selectedAcronyms]);
+    }, [selectedTitles]);
 
 
     // --- Return state and handlers ---
@@ -261,7 +262,7 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
 
         // Selection
         selectedConferences,
-        selectedAcronyms,
+        selectedTitles,
         handleRowSelectToggle,
         handleSelectAll,
         handleSelectNoError,
