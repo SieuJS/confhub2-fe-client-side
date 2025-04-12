@@ -1,38 +1,67 @@
 // jest.config.ts
 import type { Config } from 'jest';
-import nextJest from 'next/jest.js'; // Sử dụng .js ở cuối cho tương thích ESM
+import nextJest from 'next/jest.js'; // Ensure .js extension for ESM compatibility
 
 const createJestConfig = nextJest({
-  // Cung cấp đường dẫn đến ứng dụng Next.js của bạn để tải next.config.js và .env
+  // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
   dir: './',
 });
 
-// Cấu hình Jest tùy chỉnh
+// Add any custom config to be passed to Jest
 const customJestConfig: Config = {
-  // Môi trường test giống trình duyệt (cần cho React Testing Library)
   testEnvironment: 'jest-environment-jsdom',
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'], // Make sure this path is correct
 
-  // Chạy file này sau khi môi trường test được thiết lập (để thêm jest-dom matchers)
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'], // Đảm bảo đường dẫn đúng
-
-  // Xử lý Path Aliases (quan trọng nếu bạn dùng '@/' trong tsconfig.json)
   moduleNameMapper: {
-    // Ánh xạ alias từ tsconfig.json
-    '^@/(.*)$': '<rootDir>/$1',
-    // Bạn có thể cần thêm các mapper khác nếu dùng CSS Modules hoặc file tĩnh,
-    // nhưng next/jest thường xử lý nhiều thứ cho bạn.
+    // Handle module aliases (this needs to match your tsconfig paths)
+    '^@/(.*)$': '<rootDir>/$1', // Adjust <rootDir>/ if your src folder is elsewhere
+
+    // You might need mappings for CSS/SASS modules if next/jest doesn't handle them automatically,
+    // but usually, it does. Example:
+    // '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
   },
 
-  // !! QUAN TRỌNG: Xử lý lỗi "ERR_REQUIRE_ESM" !!
-  // Nói Jest KHÔNG bỏ qua việc biến đổi (transform) các package ESM này.
-  // Jest cần biến đổi chúng thành CommonJS để có thể chạy đúng.
+  // --- Consolidated transformIgnorePatterns ---
+  // This tells Jest *not* to ignore transforming these ESM packages.
   transformIgnorePatterns: [
-    '/node_modules/(?!(string-width|strip-ansi|ansi-regex)/)', // Chỉ tập trung vào 3 cái này trước
-    '^.+\\.module\\.(css|sass|scss)$',
-],
+    // This single pattern handles ignoring node_modules EXCEPT for the listed ESM packages.
+    // Start with the core react-markdown ecosystem and add others if specific errors occur.
+    '/node_modules/(?!(react-markdown' +
+      '|remark-gfm' + // Common plugin
+      '|remark-.+' + // Other remark plugins
+      '|rehype-.+' + // Rehype plugins (if used, e.g., rehype-raw)
+      '|unified' +
+      '|unist-.+' + // Includes unist-util-visit, etc.
+      '|vfile' +
+      '|vfile-message' +
+      '|bail' + // unified dependencies
+      '|trough' + // unified dependencies
+      '|micromark-.+' + // Micromark dependencies
+      '|parse-entities' + // Micromark dependencies
+      '|character-entities' + // Micromark dependencies
+      '|ccount' + // Micromark dependencies
+      '|decode-named-character-reference' + // Micromark dependencies
+      '|github-slugger' + // remark-gfm dependency
+      // Add other specific ESM packages here if errors point to them, e.g.:
+      // '|string-width' +
+      // '|strip-ansi' +
+      // '|ansi-regex' +
+      ')/)',
 
-  // Không cần thêm 'preset: 'ts-jest'' vì next/jest đã xử lý việc biên dịch TS/TSX
+    // Keep ignoring CSS Modules transformation (standard Next.js behavior)
+    '^.+\\.module\\.(css|sass|scss)$',
+  ],
+
+  // Optional: If you still face issues, explicitly defining the transform might help,
+  // but next/jest SHOULD handle this. Use this as a last resort.
+  // transform: {
+  //   // Use Babel or SWC for transpiling JS/TS files. next/jest usually sets this up.
+  //   '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { presets: ['next/babel'] }],
+  // },
+
+  // Automatically clear mock calls, instances, contexts and results before every test
+  clearMocks: true,
 };
 
-// Export cấu hình cuối cùng bằng cách gọi hàm createJestConfig
+// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
 export default createJestConfig(customJestConfig);

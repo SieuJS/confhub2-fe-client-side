@@ -1,6 +1,5 @@
-// src/components/ChangePasswordForm.tsx
 'use client'
-import React, { useState } from 'react'
+import React from 'react'
 import Button from '../../utils/Button' // Assuming you have a Button component
 import { useChangePassword } from '../../../../hooks/dashboard/profile/useChangePassword'
 import { useTranslations } from 'next-intl'
@@ -52,6 +51,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
               value={currentPassword}
               onChange={handleCurrentPasswordChange}
               className='mt-1 block w-full rounded-md border p-2 focus:border-blue-500 focus:ring-blue-500'
+              aria-label={t('Current_Password')} // Added aria-label for better testing if needed
             />
             {error && <p className='mt-2 text-sm text-red-500'>{error}</p>}
             <div className='mt-4 flex justify-end space-x-4'>
@@ -92,6 +92,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
                 value={newPassword}
                 onChange={handleNewPasswordChange}
                 className='mt-1 block w-full rounded-md border p-2 focus:border-blue-500 focus:ring-blue-500'
+                aria-label={t('New_Password')} // Added aria-label for better testing if needed
               />
             </div>
             <div className='mt-4'>
@@ -108,6 +109,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
                 value={confirmNewPassword}
                 onChange={handleConfirmNewPasswordChange}
                 className='mt-1 block w-full rounded-md border p-2 focus:border-blue-500 focus:ring-blue-500'
+                aria-label={t('Confirm_New_Password')} // Added aria-label for better testing if needed
               />
             </div>
             {error && <p className='mt-2 text-sm text-red-500'>{error}</p>}

@@ -7,6 +7,7 @@ import Footer from './utils/Footer'
 import ConsumerInsights from './home/ConsumerInsights'
 import { Header } from './utils/Header'
 import IntroduceVisualization from './home/IntroduceVisualization'
+import SuperBanner from './home/SuperBanner'
 
 export default function HomePage({ locale }: { locale: string }) {
   const [isVisibleButton, setIsVisibleButton] = useState(false)
@@ -37,7 +38,7 @@ export default function HomePage({ locale }: { locale: string }) {
   return (
     <div className=''>
       <Header locale={locale} />
-      <Banner />
+      <SuperBanner />
       <PopularConferences />
       <ConsumerInsights />
       <IntroduceVisualization />
