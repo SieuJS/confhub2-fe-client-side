@@ -1,7 +1,7 @@
 // hooks/useSequentialConferenceData.ts
 import { useState, useEffect } from 'react';
 import { ConferenceResponse } from '../../models/response/conference.response';
-import { getConferenceFromDB, getConferenceFromJSON } from '../../app/api/conference/getConferenceDetails';
+import { getConferenceFromDB } from '../../app/api/conference/getConferenceDetails';
 
 const useSequentialConferenceData = (id: string | null) => {
     const [conferenceDataFromDB, setDbData] = useState<ConferenceResponse | null>(null);
@@ -31,21 +31,6 @@ const useSequentialConferenceData = (id: string | null) => {
                 console.log("Fetched from DB successfully.");
 
                 // --- Bước 2: Fetch từ JSON (chỉ khi DB thành công) ---
-                try {
-                    console.log("Fetching from JSON...");
-                    const jsonInfo = await getConferenceFromJSON(id);
-                    setJsonData(jsonInfo);
-                    console.log("Fetched from JSON successfully.");
-                } catch (jsonErr: any) {
-                     console.error('Error fetching JSON data:', jsonErr);
-                    if (jsonErr.status === 404) {
-                        setJsonError("Conference not found in JSON");
-                    } else {
-                        setJsonError(jsonErr.message || 'An error occurred while fetching JSON data.');
-                    }
-                    // Quyết định xem lỗi JSON có nên dừng toàn bộ quá trình không
-                    // Ở đây ta vẫn tiếp tục và set loading false, component có thể dùng data DB
-                }
 
             } catch (dbErr: any) {
                 console.error('Error fetching DB data:', dbErr);
