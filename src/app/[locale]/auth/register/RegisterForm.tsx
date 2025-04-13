@@ -46,7 +46,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/signup`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/signup`,
         {
           method: 'POST',
           headers: {
