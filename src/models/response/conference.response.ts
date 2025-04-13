@@ -1,13 +1,49 @@
 export type ConferenceResponse = {
-  conference: ConferenceIdentity;
-  organization: Organization;
-  location: Location | null;
-  dates: ImportantDate[] | null;
-  ranks: Rank[] | null;
-  feedBacks: Feedback[] | null;
-  followedBy: FollowerInfo[] | null;
-  isLessReputable?: boolean; // <-- ADD THIS LINE
-
+  id: string;
+  title: string;
+  acronym: string;
+  creatorId: string | null;
+  adminId: string;
+  createdAt: string;
+  updatedAt: string;
+  status: string;
+  ranks: {
+    year: number;
+    rank: string;
+    source: string;
+    fieldOfResearch: string;
+  }[];
+  organizations: {
+    id: string;
+    isAvailable: boolean;
+    createdAt: string;
+    updatedAt: string;
+    conferenceId: string;
+    year: number;
+    accessType: string;
+    summary: string;
+    callForPaper: string;
+    link: string;
+    impLink: string;
+    cfpLink: string;
+    summerize: string;
+    publisher: string;
+    locations: {
+      address: string;
+      cityStateProvince: string;
+      country: string;
+      continent: string;
+    }[];
+    topics: string[];
+    conferenceDates: {
+      fromDate: string;
+      toDate: string;
+      type: string;
+      name: string;
+    }[];
+  }[];
+  feedbacks: any[];
+  followBy: any[];
 };
 
 export type ConferenceIdentity = {
@@ -37,15 +73,10 @@ export type Organization = {
 };
 
 export type ImportantDate = {
-  id: string;
-  organizedId: string | null;
   fromDate: string | null;
   toDate: string | null;
   type: string | null;
   name: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  isAvailable: boolean | null;
 } | null;
 
 export type Location = {

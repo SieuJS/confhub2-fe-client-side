@@ -1,9 +1,9 @@
 // hooks/useAddToCalendar.ts
 import { useState, useEffect } from 'react';
 import { ConferenceResponse } from '../../models/response/conference.response';
-import { UserResponse } from '../../models/response/user.response';
+import { Calendar, UserResponse } from '../../models/response/user.response';
 
-const API_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user`;
+const API_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1`;
 
 const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
   const [isAddToCalendar, setIsAddToCalendar] = useState(false);
@@ -27,15 +27,22 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
       }
       const user = JSON.parse(userData);
       try {
-        const response = await fetch(`${API_ENDPOINT}/${user.id}`);
+        const response = await fetch(`${API_ENDPOINT}/calendar/events`,
+          {
+            method: 'GET',
+            headers: {
+              "Authorization": `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
+              'Content-Type': 'application/json',
+            },
+          }
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const userData: UserResponse = await response.json();
-        console.log(userData);
+        const userData: Calendar[] = await response.json();
         setIsAddToCalendar(
-          userData.calendar?.some(
-            (calendarConf) => calendarConf.id === conferenceData.conference.id
+          userData.some(
+            (calendarConf) => calendarConf.conferenceId === conferenceData.conference.id
           ) ?? false
         );
       } catch (err: any) {
@@ -69,10 +76,11 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
       setError(null);
   
       try {
-        const response = await fetch(`${API_ENDPOINT}/add-to-calendar`, {
-          method: 'POST',
+        const response = await fetch(`${API_ENDPOINT}${isAddToCalendar ? '/calendar/remove-event' :'/calendar/add-event'}`, {
+          method: 'PUT',
           headers: {
-            'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
           },
           body: JSON.stringify({ conferenceId, userId: user.id }),
         });
@@ -84,8 +92,8 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
           );
         }
   
-        const updatedUser: UserResponse = await response.json();
-        setIsAddToCalendar(updatedUser.calendar?.some(conf => conf.id === conferenceId) ?? false); // FIXED HERE
+        const updatedUser: Calendar[] = await response.json();
+        setIsAddToCalendar(updatedUser.some(conf => conf.conferenceId === conferenceId) ?? false); // FIXED HERE
       } catch (err:any) {
         setError(err.message || 'Error addToCalendar/unAddToCalendar conference.');
         console.error('Error addToCalendar/unAddToCalendar conference:', err);

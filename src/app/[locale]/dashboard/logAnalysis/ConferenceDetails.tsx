@@ -13,7 +13,6 @@ const ConferenceDetails: React.FC<ConferenceDetailsProps> = ({ conferenceAnalysi
     const tableManager = useConferenceTableManager({ initialData: conferenceAnalysis });
 
     if (!conferenceAnalysis || Object.keys(conferenceAnalysis).length === 0) {
-        // ... (no data state)
         return (
              <section className="p-4">
                   <h2 className="text-xl font-semibold text-gray-700 mb-4 pb-2 border-b border-gray-300">Detailed Conference Analysis</h2>

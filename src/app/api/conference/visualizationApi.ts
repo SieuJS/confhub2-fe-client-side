@@ -18,7 +18,7 @@ export async function fetchVisualizationData(): Promise<ConferenceResponse[]> {
         }
 
         const responseData: ConferenceResponse[] = await response.json();
-
+        console.log(responseData)
         return responseData;
 
     } catch (error: any) {

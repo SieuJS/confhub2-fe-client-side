@@ -39,6 +39,7 @@ export type Follow = {
 
 export type Calendar = {
   id: string;
+  conferenceId: string;
   createdAt: string;
   updatedAt: string;
 }
