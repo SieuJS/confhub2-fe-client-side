@@ -1,5 +1,5 @@
 // LogEntry.tsx (Minor Adjustments for Clarity)
-import React, { ReactNode } from "react";
+import React, { ReactNode, memo } from "react";
 import cn from "classnames";
 import { StreamingLog } from "../multimodal-live-types";
 
@@ -33,4 +33,4 @@ const LogEntry: React.FC<LogEntryProps> = ({ log, MessageComponent }): JSX.Eleme
   );
 };
 
-export default LogEntry;
+export default memo(LogEntry);
