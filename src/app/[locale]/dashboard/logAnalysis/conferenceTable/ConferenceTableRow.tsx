@@ -79,7 +79,7 @@ export const ConferenceTableRow: React.FC<ConferenceTableRowProps> = ({
                     </button>
                 </td>
 
-                <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{title}</td>
+                <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{title.substring(0, 50)}...</td>
                 <td className="px-4 py-2 whitespace-nowrap text-sm">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusBadgeClass}`}>
                         {status || 'N/A'}
