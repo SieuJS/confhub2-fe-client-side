@@ -284,9 +284,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   const { conference, organization, location } = conferenceDataFromDB || {}
   const { followedBy, isLessReputable } = conferenceDataFromDB || {}
 
-  const overallRating = calculateOverallRating(
-    conferenceDataFromDB?.feedBacks
-  )
+  const overallRating = calculateOverallRating(conferenceDataFromDB?.feedBacks)
   const totalReviews = conferenceDataFromDB?.feedBacks?.length || 0
 
   return (
@@ -683,7 +681,6 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         </div>
 
         <div className='mt-8 rounded-lg bg-white p-4 shadow-md'>
-          {/* Pass conferenceData to ConferenceFeedback */}
           <ConferenceFeedback conferenceData={conferenceDataFromDB} />
         </div>
       </div>
