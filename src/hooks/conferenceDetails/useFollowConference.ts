@@ -42,7 +42,7 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
         console.log('userData', userData);
         setIsFollowing(
           follows.some(
-            (followedConf) => followedConf.conferenceId === conferenceData.conference.id
+            (followedConf) => followedConf.conferenceId === conferenceData?.id
           ) ?? false
         );
       } catch (err:any) {
@@ -57,12 +57,12 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
   }, [conferenceData]);
 
   const handleFollowClick = async () => {
-    if (!conferenceData?.conference?.id) {
+    if (!conferenceData?.id) {
       setError("Conference data is missing.");
       return;
     }
 
-    const conferenceId = conferenceData.conference.id;
+    const conferenceId = conferenceData?.id;
     const userData = localStorage.getItem('user');
 
     if (!userData) {

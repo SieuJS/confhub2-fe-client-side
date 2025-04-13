@@ -42,7 +42,7 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
         const userData: Calendar[] = await response.json();
         setIsAddToCalendar(
           userData.some(
-            (calendarConf) => calendarConf.conferenceId === conferenceData.conference.id
+            (calendarConf) => calendarConf.conferenceId === conferenceData?.id
           ) ?? false
         );
       } catch (err: any) {
@@ -57,12 +57,12 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
   }, [conferenceData]); // Chạy lại khi conferenceData.conference.id thay đổi
 
   const handleAddToCalendar = async () => {
-      if (!conferenceData?.conference?.id) {
+      if (!conferenceData?.id) {
         setError("Conference data is missing.");
         return;
       }
   
-      const conferenceId = conferenceData.conference.id;
+      const conferenceId = conferenceData?.id;
       const userData = localStorage.getItem('user');
   
       if (!userData) {
