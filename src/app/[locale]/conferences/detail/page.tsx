@@ -18,8 +18,6 @@ import { ImportantDate } from '@/src/models/response/conference.response'
 import useAuthApi from '@/src/hooks/auth/useAuthApi' // Import useAuthApi
 
 // Import the custom hooks
-import useConferenceDataFromDB from '../../../../hooks/conferenceDetails/useConferenceDataFromDB'
-import useConferenceDataFromJSON from '../../../../hooks/conferenceDetails/useConferenceDataFromJSON'
 import useSequentialConferenceData from '@/src/hooks/conferenceDetails/useSequentialConferenceData'
 import useFollowConference from '../../../../hooks/conferenceDetails/useFollowConference'
 import useShareConference from '../../../../hooks/conferenceDetails/useShareConference'
