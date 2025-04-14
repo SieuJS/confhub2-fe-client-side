@@ -3,7 +3,7 @@ import { Notification } from '@/src/models/response/user.response'; // Import No
 
 export const getNotifications = async (userId: string): Promise<Notification[] | null> => {
   try {
-    const response = await fetch(`${process.env.DATABASE_URL}/api/v1/notification/user`,
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/user`,
       {
         headers : {
           'Content-Type': 'application/json',

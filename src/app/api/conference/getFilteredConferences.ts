@@ -1,6 +1,6 @@
 import { ConferenceListResponse } from '@/src/models/response/conference.list.response';
 
-const API_FILTERED_CONFERENCES_ENDPOINT = 'http://confhub.engineer/api/v1/conference';
+const API_FILTERED_CONFERENCES_ENDPOINT = `${process.env.NEXT_PUBLIC_DATABASE_URL}/api/v1/conference`;
 export interface FetchConferencesParams {
   keyword?: string;
   title?: string;

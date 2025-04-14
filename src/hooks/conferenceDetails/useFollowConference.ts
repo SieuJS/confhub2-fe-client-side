@@ -25,7 +25,6 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
           return;
       }
 
-      const user = JSON.parse(userData);
       try {
         const response = await fetch(`${API_ENDPOINT}/follow-conference/followed`, {
           method: 'GET',
@@ -91,7 +90,9 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
       }
 
       const follows: Follow[] = await response.json();
-      setIsFollowing(follows?.some(conf => conf.id === conferenceId) ?? false); // FIXED HERE
+      console.log('follows', follows);
+
+      setIsFollowing(follows?.some(conf => conf.conferenceId === conferenceId) ?? false); // FIXED HERE
     } catch (err:any) {
       setError(err.message || 'Error following/unfollowing conference.');
       console.error('Error following/unfollowing conference:', err);
