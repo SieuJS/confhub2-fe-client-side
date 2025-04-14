@@ -96,8 +96,12 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   const { isUpdating, updateResult, updateConference } = useUpdateConference()
   const { handleShareClick } = useShareConference(conferenceDataFromDB)
   const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } =
-    useTopicsDisplay(conferenceDataFromDB?.organizations[0].topics || [])
-  const transformedDates = transformDates(conferenceDataFromDB?.organizations[0].conferenceDates)
+    useTopicsDisplay(conferenceDataFromDB?.organizations?.[0]?.topics || [])
+
+  const transformedDates = transformDates(
+    conferenceDataFromDB?.organizations?.[0]?.conferenceDates
+  )
+
   const { dateDisplay } = useFormatConferenceDates(transformedDates, language)
   const { isLoggedIn } = useAuthApi()
 
@@ -279,7 +283,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
   if (isLoading) return <Loading /> // Show initial loading
 
-  const {  organizations} = conferenceDataFromDB || {}
+  const { organizations } = conferenceDataFromDB || {}
   const { followBy } = conferenceDataFromDB || {}
 
   const overallRating = calculateOverallRating(conferenceDataFromDB?.feedbacks)
@@ -403,7 +407,8 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                         <circle cx='12' cy='10' r='3' />
                       </svg>
 
-                      {organizations?.[0].locations[0].address || 'Location Not Available'}
+                      {organizations?.[0]?.locations?.[0]?.address ||
+                        'Location Not Available'}
                     </a>
                     <Link
                       className='mt-1 flex items-center text-sm text-blue-600 hover:underline'
@@ -430,7 +435,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                         <path d='M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20' />
                       </svg>
 
-                      {organizations?.[0].publisher || 'Unknown'}
+                      {organizations?.[0]?.publisher || 'Unknown'}
                     </Link>
                   </div>
                   {/* Followers Display */}
