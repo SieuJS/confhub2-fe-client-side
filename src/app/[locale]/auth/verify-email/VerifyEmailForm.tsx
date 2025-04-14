@@ -42,7 +42,7 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => { // Nh
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/verify`, {
+            const response = await fetch(`${process.env.DATABASE_URL}/api/v1/auth/verify`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

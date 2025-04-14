@@ -1,8 +1,8 @@
 // src/hooks/useChangePassword.ts (Đã cập nhật)
 import { useState, useCallback } from 'react';
 
-const API_VERIFY_PASSWORD_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/verify-password`;
-const API_CHANGE_PASSWORD_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/change-password`;
+const API_VERIFY_PASSWORD_ENDPOINT = `${process.env.DATABASE_URL}/api/v1/user/verify-password`;
+const API_CHANGE_PASSWORD_ENDPOINT = `${process.env.DATABASE_URL}/api/v1/user/change-password`;
 
 export const useChangePassword = (userId: string, onClose: () => void) => {
   const [currentPassword, setCurrentPassword] = useState('');

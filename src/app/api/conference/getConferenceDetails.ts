@@ -3,7 +3,7 @@
 // import { ConferenceResponse, ConferenceIdentity, Organization, Location, ImportantDate, Rank, Feedback, FollowerInfo } from '../../../models/response/conference.response';
 
 // const API_GET_CONFERENCE_ENDPOINT = 'http://confhub.engineer/api/v1/conference'; //  3005 for details
-// const API_SAVE_CONFERENCE_DETAILS_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/conferences/details/save`;
+// const API_SAVE_CONFERENCE_DETAILS_ENDPOINT = `${process.env.DATABASE_URL}/api/v1/conferences/details/save`;
 
 
 // async function getConferenceFromDB(id: string): Promise<ConferenceResponse> {
@@ -245,7 +245,7 @@
 //   }
 // }
 
-// const API_GET_JSON_CONFERENCE_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/conference`;
+// const API_GET_JSON_CONFERENCE_ENDPOINT = `${process.env.DATABASE_URL}/api/v1/conference`;
 
 // async function getConferenceFromJSON(id: string): Promise<ConferenceResponse> {
 //   try {
@@ -288,12 +288,9 @@
 
 // export { getConferenceFromDB, getConferenceFromJSON };
 
-
-"use client";
 // api/getConferenceDetails/getConferenceDetails.ts
 import { ConferenceResponse} from '../../../models/response/conference.response';
-import { ConferenceDetailsResponse } from '@/src/models/response/conference.details.list.response';
-const API_GET_CONFERENCE_ENDPOINT = process.env.NEXT_PUBLIC_BACKEND_URL; //  3005 for details
+const API_GET_CONFERENCE_ENDPOINT = process.env.DATABASE_URL || "http://confhub.engineer"; //  3005 for details
 
 
 async function getConferenceFromDB(id: string): Promise<ConferenceResponse> {
@@ -314,39 +311,6 @@ async function getConferenceFromDB(id: string): Promise<ConferenceResponse> {
     }
 
     const responseData: ConferenceResponse = await response.json();
-    return responseData; // Trả về dữ liệu đã gửi đi
-
-  } catch (error: any) {
-    console.error('--- Error in getConferenceFromDB ---');
-    console.error('Error message:', error.message);
-    if (error.cause) { console.error('Error cause:', error.cause); }
-    console.error('Stack trace:', error.stack);
-    if (responseData) { console.error('Response data received before error:', responseData); }
-    console.error('------------------------------------');
-    throw error;
-  }
-}
-
-
-async function getListConferenceFromDB(id: string): Promise<ConferenceDetailsResponse[]> {
-  let responseData: any;
-  try {
-    const response = await fetch(`${API_GET_CONFERENCE_ENDPOINT}/api/v1/conference?mode=detail&perPage=50`, { 
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`HTTP error fetching conference! Status: ${response.status}, Body: ${errorText}`);
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const responseData: ConferenceDetailsResponse[] = await response.json();
-
     return responseData; // Trả về dữ liệu đã gửi đi
 
   } catch (error: any) {

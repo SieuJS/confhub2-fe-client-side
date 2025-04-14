@@ -1,6 +1,6 @@
 // src/api/envApi.ts
 
-const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
+const API_BASE_URL = `${process.env.DATABASE_URL}/api`;
 
 interface EnvResponse {
     success: boolean;

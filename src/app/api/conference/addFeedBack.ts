@@ -16,7 +16,7 @@ export const addFeedback = async (feedbackData: {
         throw new Error("User ID not found in local storage");
     }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/conferences/${feedbackData.conferenceId}/feedback`, { // Use conferenceId in URL
+    const response = await fetch(`${process.env.DATABASE_URL}/api/v1/conferences/${feedbackData.conferenceId}/feedback`, { // Use conferenceId in URL
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

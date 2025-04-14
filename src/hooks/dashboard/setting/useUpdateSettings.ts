@@ -19,7 +19,7 @@ export const useUpdateUser = (): UpdateUserResult => {
     setError(null);
     try {
       // Fetch the current user data
-      const response =  await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/me`, {
+      const response =  await fetch(`${process.env.DATABASE_URL}/api/v1/user/me`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers

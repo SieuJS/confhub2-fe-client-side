@@ -13,7 +13,7 @@ import { useTranslations } from 'next-intl'
 
 interface NoteTabProps {}
 
-const API_GET_USER_CALENDAR_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user`
+const API_GET_USER_CALENDAR_ENDPOINT = `${process.env.DATABASE_URL}/api/v1/user`
 
 const NoteTab: React.FC<NoteTabProps> = () => {
   const t = useTranslations('')

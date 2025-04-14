@@ -19,7 +19,7 @@ const useMyConferences = (userId: string): UseMyConferencesResult => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/${userId}/my-conferences`);
+            const response = await fetch(`${process.env.DATABASE_URL}/api/v1/user/${userId}/my-conferences`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch conferences: ${response.status} ${response.statusText}`);
             }
