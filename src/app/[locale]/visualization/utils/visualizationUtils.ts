@@ -2,6 +2,7 @@
 import { EChartsOption } from 'echarts';
 import { ChartConfig, ChartOptions, DataField, FieldType, ProcessedChartData, ChartType } from '../../../../models/visualization/visualization'; // Adjust path as needed
 import { groupBy, mapValues, sumBy, countBy, meanBy } from 'lodash'; // Ensure lodash is installed
+import { ConferenceResponse } from '@/src/models/response/conference.response';
 
 // --- Constants ---
 const UNKNOWN_CATEGORY = 'Unknown'; // Consistent handling for null/undefined keys
@@ -49,13 +50,13 @@ const parseNumericValue = (value: any): number => {
 // --- STABLE ACCESSOR DEFINITIONS ---
 // Define accessors outside getAvailableFields so they have stable references
 const accessors = {
-    continent: (d: any) => getNestedValue(d, 'location.continent') ?? UNKNOWN_CATEGORY,
-    country: (d: any) => getNestedValue(d, 'location.country') ?? UNKNOWN_CATEGORY,
-    year: (d: any) => getNestedValue(d, 'organization.year')?.toString() ?? UNKNOWN_CATEGORY,
-    accessType: (d: any) => getNestedValue(d, 'organization.accessType') ?? UNKNOWN_CATEGORY,
+    continent: (d: any) => getNestedValue(d, 'organizations.locations[0].continent') ?? UNKNOWN_CATEGORY,
+    country: (d: any) => getNestedValue(d, 'organizations.locations[0].country') ?? UNKNOWN_CATEGORY,
+    year: (d: any) => getNestedValue(d, 'organizations.year')?.toString() ?? UNKNOWN_CATEGORY,
+    accessType: (d: any) => getNestedValue(d, 'organizations.accessType') ?? UNKNOWN_CATEGORY,
     followersCount: (d: any) => getNestedValue(d, 'followedBy')?.length ?? 0,
     feedbacksCount: (d: any) => getNestedValue(d, 'feedBacks')?.length ?? 0,
-    topicsCount: (d: any) => getNestedValue(d, 'organization.topics')?.length ?? 0,
+    topicsCount: (d: any) => getNestedValue(d, 'organizations.topics')?.length ?? 0,
     feedbacksArray: (d: any) => getNestedValue(d, 'feedBacks'), // Returns array for aggregation
 };
 
@@ -64,10 +65,10 @@ const accessors = {
 // Define this structure ONCE, outside the function.
 const AVAILABLE_FIELDS_TEMPLATE: DataField[] = [
     // Dimensions
-    { id: 'location.continent', name: 'Continent', type: 'dimension', accessor: accessors.continent },
-    { id: 'location.country', name: 'Country', type: 'dimension', accessor: accessors.country },
-    { id: 'organization.year', name: 'Year', type: 'dimension', accessor: accessors.year },
-    { id: 'organization.accessType', name: 'Access Type', type: 'dimension', accessor: accessors.accessType },
+    { id: 'organizations.location[0].continent', name: 'Continent', type: 'dimension', accessor: accessors.continent },
+    { id: 'organizations.location[0].country', name: 'Country', type: 'dimension', accessor: accessors.country },
+    { id: 'organizations.year', name: 'Year', type: 'dimension', accessor: accessors.year },
+    { id: 'organizations.accessType', name: 'Access Type', type: 'dimension', accessor: accessors.accessType },
 
     // Measures
     { id: 'count_records', name: 'Record Count', type: 'measure', aggregation: 'count' }, // No accessor needed for simple count
@@ -477,12 +478,12 @@ const processDataForChart = (
  * @throws Error from processDataForChart if configuration is invalid.
  */
 export const generateChartOption = (
-    rawData: any[],
+    rawData: ConferenceResponse[],
     config: ChartConfig,
     options: ChartOptions,
     availableFields: DataField[]
 ): EChartsOption => {
-    console.log(`generateChartOption called. Type: ${config.chartType}, Title: "${options.title}"`, 'color: purple;');
+    // console.log(`generateChartOption called. Type: ${config.chartType}, Title: "${options.title}"`, 'color: purple;');
 
     // 1. Process Data
     const { categories, series, legendData } = processDataForChart(rawData, config, availableFields);

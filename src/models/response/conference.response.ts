@@ -1,3 +1,8 @@
+export type ConferenceDetailsListResponse = {
+  payload: ConferenceResponse[];
+  meta: Meta;
+};
+
 export type ConferenceResponse = {
   id: string;
   title: string;
@@ -118,4 +123,15 @@ export type FollowerInfo = {
   avatar: string;
   createdAt: string | null;
   updatedAt: string | null;
+};
+
+
+
+export type Meta = {
+  curPage: number;
+  perPage: number;
+  totalPage: number;
+  prevPage: number | null;
+  nextPage: number | null;
+  totalItems: number;
 };

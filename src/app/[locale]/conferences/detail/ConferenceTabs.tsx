@@ -69,12 +69,12 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         try {
           const date = new Date(current.createdAt)
           if (!isNaN(date.getTime())) currentCreatedAt = date
-        } catch {}
+        } catch { }
         let latestCreatedAt: Date | null = null
         try {
           const date = new Date(latest.createdAt)
           if (!isNaN(date.getTime())) latestCreatedAt = date
-        } catch {}
+        } catch { }
         if (
           currentCreatedAt &&
           (!latestCreatedAt || currentCreatedAt > latestCreatedAt)
@@ -172,13 +172,13 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
   // --- Hooks (remain the same) ---
   const sectionKeys = conference
     ? [
-        'overview',
-        'important-dates',
-        'call-for-papers',
-        'category-topics',
-        ...(ranks && ranks.length > 0 ? ['source-rank'] : []),
-        'map'
-      ]
+      'overview',
+      'important-dates',
+      'call-for-papers',
+      'category-topics',
+      ...(ranks && ranks.length > 0 ? ['source-rank'] : []),
+      'map'
+    ]
     : []
   const sectionTranslationMap: { [key: string]: string } = {
     overview: 'Overview',
@@ -290,7 +290,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
                                     o =>
                                       o.fromDate !== groupInfo.current.fromDate
                                   ).length -
-                                    1 && ', '}
+                                  1 && ', '}
                               </React.Fragment>
                             ))}
                           {groupInfo.differentOldDates.some(
@@ -318,7 +318,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
                                   arr.filter(
                                     o => o.toDate !== groupInfo.current.toDate
                                   ).length -
-                                    1 && ', '}
+                                  1 && ', '}
                               </React.Fragment>
                             ))}
                           {groupInfo.differentOldDates.some(
@@ -354,6 +354,40 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkBreaks]}
           rehypePlugins={[rehypeRaw]}
+          components={{
+
+            // Customize components (optional, for more control)
+            p: ({ node, ...props }) => <p className='mb-2' {...props} />, // Add margin to paragraphs
+            a: ({ ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
+              <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline" />
+            ),
+            // Add more component overrides as needed (ul, ol, li, code, etc.)
+            pre: ({ node, ...props }) => (
+              <pre
+                className='overflow-x-auto rounded-md bg-gray-100 p-2'
+                {...props}
+              />
+            ),
+            code: ({ node, ...props }) => (
+              <code className='rounded bg-gray-100 px-1' {...props} />
+            ),
+            h1: ({ node, ...props }) => (
+              <h1 className='my-4 text-2xl font-bold' {...props} />
+            ),
+            h2: ({ node, ...props }) => (
+              <h2 className='my-3 text-xl font-semibold' {...props} />
+            ),
+            h3: ({ node, ...props }) => (
+              <h3 className='my-2 text-lg font-medium' {...props} />
+            ),
+            ul: ({ node, ...props }) => (
+              <ul className='my-2 list-inside list-disc' {...props} />
+            ),
+            ol: ({ node, ...props }) => (
+              <ol className='my-2 list-inside list-decimal' {...props} />
+            ),
+            li: ({ node, ...props }) => <li className='my-1' {...props} />
+          }}
         >
           {callForPaper || t('No_call_for_papers_available')}
         </ReactMarkdown>

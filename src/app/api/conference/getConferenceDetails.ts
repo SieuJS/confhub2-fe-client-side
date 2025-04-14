@@ -291,8 +291,8 @@
 
 "use client";
 // api/getConferenceDetails/getConferenceDetails.ts
-import { ConferenceResponse, ConferenceIdentity, Organization, Location, ImportantDate, Rank, Feedback, FollowerInfo } from '../../../models/response/conference.response';
-
+import { ConferenceResponse} from '../../../models/response/conference.response';
+import { ConferenceDetailsResponse } from '@/src/models/response/conference.details.list.response';
 const API_GET_CONFERENCE_ENDPOINT = process.env.NEXT_PUBLIC_BACKEND_URL; //  3005 for details
 
 
@@ -314,10 +314,6 @@ async function getConferenceFromDB(id: string): Promise<ConferenceResponse> {
     }
 
     const responseData: ConferenceResponse = await response.json();
-
-
-    // Send to backend (3000) for savin// Log save success/already exists message.
-
     return responseData; // Trả về dữ liệu đã gửi đi
 
   } catch (error: any) {
@@ -335,7 +331,7 @@ async function getConferenceFromDB(id: string): Promise<ConferenceResponse> {
 async function getListConferenceFromDB(id: string): Promise<ConferenceDetailsResponse[]> {
   let responseData: any;
   try {
-    const response = await fetch(`${API_GET_CONFERENCE_ENDPOINT}/api/v1/conference?mode=detail&perPage=50`, {  // Removed /api/v1/confeence
+    const response = await fetch(`${API_GET_CONFERENCE_ENDPOINT}/api/v1/conference?mode=detail&perPage=50`, { 
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
