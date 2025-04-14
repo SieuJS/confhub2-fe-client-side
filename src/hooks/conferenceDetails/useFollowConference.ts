@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { ConferenceResponse } from '../../models/response/conference.response';
 import { Follow, UserResponse } from '../../models/response/user.response';
 
-const API_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1`;
+const API_ENDPOINT = `${process.env.DATABASE_URL}/api/v1`;
 
 const useFollowConference = (conferenceData: ConferenceResponse | null) => {
   const [isFollowing, setIsFollowing] = useState(false);

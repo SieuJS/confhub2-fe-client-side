@@ -1,8 +1,6 @@
 import { ConferenceListResponse } from '@/src/models/response/conference.list.response';
 
-const API_FILTERED_CONFERENCES_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/conference`;
-const API_SAVE_CONFERENCE_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/conference`;
-
+const API_FILTERED_CONFERENCES_ENDPOINT = 'http://confhub.engineer/api/v1/conference';
 export interface FetchConferencesParams {
   keyword?: string;
   title?: string;
@@ -52,6 +50,21 @@ export const fetchConferences = async (params: FetchConferencesParams): Promise<
 
   // 2. Send the received data to your backend (3000)
   
+  // // 2. Send the received data to your backend (3000)
+  // const saveResponse = await fetch(API_SAVE_CONFERENCE_ENDPOINT, {
+  //   method: 'POST', // Use POST for sending data
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  //   body: JSON.stringify(data), // Send the ENTIRE responseData
+  // });
+
+  // if (!saveResponse.ok) {
+  //   // Handle errors from the save operation
+  //   throw new Error(`Save operation failed! status: ${saveResponse.status}`);
+  // }
+  // const saveResult = await saveResponse.json(); //get save success message
+  // console.log(saveResult.message); // log save success message
 
   return data;
 };

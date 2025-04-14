@@ -1,7 +1,7 @@
 import { UserResponse } from '@/src/models/response/user.response';
 
 export const updateUser = async (userId: string, updatedData: Partial<UserResponse>): Promise<UserResponse> => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/${userId}`, {
+    const response = await fetch(`${process.env.DATABASE_URL}/api/v1/user/${userId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

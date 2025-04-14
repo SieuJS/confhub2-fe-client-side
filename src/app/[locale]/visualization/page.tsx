@@ -17,7 +17,6 @@ import { ChevronDoubleLeftIcon, ChevronDoubleRightIcon } from '@heroicons/react/
 
 // --- Constants ---
 const FIELD_LIST_DROPPABLE_ID = 'availableFields';
-const logPrefixPage = "[VisualizationPage]";
 
 // Define a type for keys in ChartConfig that hold field configuration objects
 type ConfigZoneKey = 'xAxis' | 'yAxis' | 'color' | 'size';
@@ -113,7 +112,7 @@ const VisualizationPage: React.FC = () => {
 
             if (acceptedType !== 'any' && field.type !== acceptedType) {
                 const zoneLabel = targetZoneId.charAt(0).toUpperCase() + targetZoneId.slice(1);
-                console.warn(`%c${logPrefixPage} -> Invalid drop: ${field.type} field into ${zoneLabel} zone (requires ${acceptedType})`);
+                console.warn(`-> Invalid drop: ${field.type} field into ${zoneLabel} zone (requires ${acceptedType})`);
                 alert(`Cannot drop a ${field.type} field into the ${zoneLabel} zone (requires ${acceptedType}).`);
                 return;
             }
@@ -175,10 +174,10 @@ const VisualizationPage: React.FC = () => {
             try {
                 downloadChartAsSvg(chartInstanceRef, chartOptions.title || 'chart');
             } catch (error) {
-                console.error(`%c${logPrefixPage} -> Error during SVG download:`, error);
+                console.error(`-> Error during SVG download:`, error);
             }
         } else {
-            console.warn(`%c${logPrefixPage} -> Download failed: Chart instance ref not available or chart not ready.`);
+            console.warn(`-> Download failed: Chart instance ref not available or chart not ready.`);
         }
     }, [chartOptions.title]);
 

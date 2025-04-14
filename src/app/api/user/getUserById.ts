@@ -3,7 +3,7 @@ import { UserResponse } from '@/src/models/response/user.response';
 
 
 export const getUserById = async (userId: string): Promise<UserResponse> => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/me` ,{
+  const response = await fetch(`${process.env.DATABASE_URL}/api/v1/user/me` ,{
     headers : {
       "Authorization" : `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
       'Content-Type': 'application/json',

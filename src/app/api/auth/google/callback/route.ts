@@ -41,7 +41,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: 'Could not retrieve user information' }, { status: 500 });
     }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/google-login`, {
+    const response = await fetch(`${process.env.DATABASE_URL}/api/v1/user/google-login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

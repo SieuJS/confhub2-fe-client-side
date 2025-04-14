@@ -17,8 +17,6 @@ interface ChartConfigPanelProps {
   onToggle: () => void; // New prop
 }
 
-const logPrefixCCP = "[ChartConfigPanel]";
-
 const ChartConfigPanel: React.FC<ChartConfigPanelProps> = ({
     availableFields,
     config,

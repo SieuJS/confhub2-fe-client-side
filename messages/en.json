@@ -679,5 +679,46 @@
     "phoneIconLabel": "Phone icon",
     "supportIconLabel": "Support icon"
   },
-  "Analysis": "Analysis"
+  "Analysis": "Analysis",
+  "Error_Age_Requirement": "You must be at least 18 years old to use this service. Please check the age requirement and try again.",
+  "Error_Password_Too_Short": "Your password must be at least 8 characters long. Please enter a longer password.",
+  "Error_Password_Mismatch": "The passwords you entered do not match. Please re-enter your password.",
+  "Error_Fill_All_Fields": "Please fill in all required fields before submitting the form.",
+  "Error_Invalid_Email_Format": "The email address you entered is not in a valid format. Please enter a valid email address.",
+  "Error_Registration_Failed_Status": "Registration failed. Please check your information and try again.",
+  "Error_Registration_Generic": "Registration failed. Please try again later.",
+  "Check_Your_Email": "Check your email for a verification link to activate your account.",
+  "Verification_email_sent": "A verification email has been sent to your email address. Please check your inbox (and spam folder) to verify your account.",
+  "Enter_Verification_Code_Prompt": "Enter the verification code sent to your email address.",
+  "Go_To_Verification_Page": "Go to verification page",
+  "Verify_Your_Email_Address": "Verify your email address",
+  "Enter_Code_Sent_To_Email": "Enter the code sent to your email address",
+  "VerifyEmail": {
+    "instructions": "Enter the 6-digit code sent to {email}",
+    "codeLabel": "Verification Code",
+    "codePlaceholder": "Enter code",
+    "submitButton": "Verify Account",
+    "success": {
+      "message": "Account verified successfully! You can now log in."
+    },
+    "error": {
+      "missingCode": "Please enter the verification code.",
+      "invalidCodeFormat": "Verification code must be 6 digits.",
+      "backendFailed": "Verification failed. The code might be incorrect or expired.",
+      "network": "An error occurred. Please check your connection and try again."
+    },
+    "resend": {
+      "link": "Resend code",
+      "cooldown": "Resend available in {seconds}s",
+      "success": "A new verification code has been sent to your email.",
+      "errorGeneral": "Failed to resend code. Please try again later.",
+      "errorNetwork": "An error occurred while trying to resend the code."
+    },
+    "backToLogin": "Go back to Login",
+    "returnToLoginButton": "Return to Login"
+  },
+  "Common": {
+    "loading": "Loading...",
+    "or": "or"
+  }
 }

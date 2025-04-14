@@ -5,7 +5,7 @@ interface UpdateNotificationsData {
   notifications: Notification[];
 }
 
-const API_UPDATE_NOTIFICATIONS_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1`;
+const API_UPDATE_NOTIFICATIONS_ENDPOINT = `${process.env.DATABASE_URL}/api/v1`;
 
 async function updateNotifications(userId: string, data: UpdateNotificationsData): Promise<void> {
   try {

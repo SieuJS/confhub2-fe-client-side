@@ -13,7 +13,7 @@ import { useTranslations } from 'next-intl'
 
 interface BlacklistTabProps {}
 
-const API_GET_USER_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user`
+const API_GET_USER_ENDPOINT = `${process.env.DATABASE_URL}/api/v1/user`
 
 const BlacklistTab: React.FC<BlacklistTabProps> = () => {
   const t = useTranslations('')

@@ -1,27 +1,27 @@
-// hooks/useInteractionHandlers.ts (Corrected)
-import { ClientContentMessage } from "../multimodal-live-types"; // Import ClientContentMessage
+// hooks/useInteractionHandlers.ts (Modified for Voice only)
+import { ClientContentMessage } from "../multimodal-live-types";
 
 interface InteractionHandlersProps {
     connected: boolean;
-    connectWithPermissions: (supportsVideo: boolean) => Promise<void>; // Pass connect function
-    changeStreams: (next?: any) => () => Promise<void>; // Pass changeStreams function
+    // Adjust connectWithPermissions signature if needed (remove supportsVideo if always false)
+    connectWithPermissions: (/* supportsVideo: boolean */) => Promise<void>;
+    // Removed: changeStreams: (next?: any) => () => Promise<void>;
     setMuted: (muted: boolean) => void;
-    webcam: any;          // Replace 'any' with the correct type
-    screenCapture: any;   // Replace 'any' with the correct type
-    supportsVideo: boolean;
-    client: any;  // Replace 'any' with your client's type from LiveAPIContext
-    log: (logEntry: any) => void; // Replace 'any' with your log entry type
-
+    // Removed: webcam: any;
+    // Removed: screenCapture: any;
+    // Removed: supportsVideo: boolean; // No longer needed
+    client: any;
+    log: (logEntry: any) => void;
 }
 
 const useInteractionHandlers = ({
     connected,
     connectWithPermissions,
-    changeStreams,
+    // Removed: changeStreams,
     setMuted,
-    webcam,
-    screenCapture,
-    supportsVideo,
+    // Removed: webcam,
+    // Removed: screenCapture,
+    // Removed: supportsVideo,
     client,
     log
 }: InteractionHandlersProps) => {
@@ -33,44 +33,41 @@ const useInteractionHandlers = ({
         const parts = [{ text: textInput }];
         client.send(parts);
 
-        // Create a proper ClientContentMessage for logging
         const clientContentMessage: ClientContentMessage = {
             clientContent: {
                 turns: [{ role: "user", parts }],
-                turnComplete: true, // Important: Indicate the turn is complete
+                turnComplete: true,
             },
         };
 
         log({
             date: new Date(),
             type: "send.text",
-            message: clientContentMessage,  // Log the full object
+            message: clientContentMessage,
         });
     };
 
     const handleStartVoice = async () => {
         if (!connected) {
-            await connectWithPermissions(supportsVideo);
+            // Call connect without video support flag
+            await connectWithPermissions(/* supportsVideo: false */);
         }
         setMuted(false);
     };
 
+    // Removed handleStartWebcam and handleStartScreenShare functions
+    /*
     const handleStartWebcam = async () => {
-        if (!connected) {
-            await connectWithPermissions(supportsVideo);
-        }
-        changeStreams(webcam)();
+        // ... Removed logic ...
     };
 
     const handleStartScreenShare = async () => {
-        if (!connected) {
-            await connectWithPermissions(supportsVideo);
-        }
-        changeStreams(screenCapture)();
+        // ... Removed logic ...
     };
+    */
 
-
-    return { handleSendMessage, handleStartVoice, handleStartWebcam, handleStartScreenShare };
+    // Return only relevant handlers
+    return { handleSendMessage, handleStartVoice /* Removed: handleStartWebcam, handleStartScreenShare */ };
 }
 
 export default useInteractionHandlers;
