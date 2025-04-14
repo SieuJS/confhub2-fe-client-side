@@ -1,7 +1,7 @@
 // hooks/useAddToCalendar.ts
 import { useState, useEffect } from 'react';
 import { ConferenceResponse } from '../../models/response/conference.response';
-import { Calendar, UserResponse } from '../../models/response/user.response';
+import { Calendar } from '../../models/response/user.response';
 
 const API_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1`;
 

@@ -1,7 +1,7 @@
 // FollowedTab.tsx
 import React, { useState, useEffect, useCallback } from 'react'
 import ConferenceItem from '../../conferences/ConferenceItem'
-import { getListConferenceFromJSON } from '../../../../app/api/conference/getListConferences'
+import { getListConferenceFromDB, getListConferenceFromJSON } from '../../../../app/api/conference/getListConferences'
 import { ConferenceInfo } from '../../../../models/response/conference.list.response'
 import { UserResponse, Follow } from '../../../../models/response/user.response'
 import { timeAgo, formatDateFull } from '../timeFormat'
@@ -10,7 +10,7 @@ import { useTranslations } from 'next-intl'
 
 interface FollowedTabProps {}
 
-const API_GET_USER_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user`
+const API_GET_USER_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1`
 
 const FollowedTab: React.FC<FollowedTabProps> = () => {
   const t = useTranslations('')
@@ -26,21 +26,24 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
   const fetchData = useCallback(async () => {
     try {
       const userData = localStorage.getItem('user')
-
       if (!userData) {
         setLoggedIn(false)
         if (initialLoad) {
           setLoading(false)
           setInitialLoad(false)
         }
-
         return
       }
-
       const user = JSON.parse(userData)
       setLoggedIn(true)
 
-      const userResponse = await fetch(`${API_GET_USER_ENDPOINT}/${user.id}`)
+      const userResponse = await fetch(`${API_GET_USER_ENDPOINT}/follow-conference/followed`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
+          'Content-Type': 'application/json'
+        }
+      })
 
       if (!userResponse.ok) {
         throw new Error(`HTTP error! status: ${userResponse.status}`)
@@ -49,7 +52,7 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
       const userDetails: UserResponse = await userResponse.json()
 
       if ((userDetails.followedConferences ?? []).length > 0) {
-        const conferencesData = await getListConferenceFromJSON()
+        const conferencesData = await getListConferenceFromDB()
 
         const followed = conferencesData.payload
           .filter((conf: ConferenceInfo) => conf.id !== null)
@@ -157,7 +160,7 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
             <path d='M22 4v4h-4' />
           </svg>
         </button>
-      </div>
+      </div> 
 
       {followedConferences.length === 0 ? (
         <p>{t('You_are_not_following_any_conferences_yet')}</p>

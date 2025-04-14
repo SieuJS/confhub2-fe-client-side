@@ -8,9 +8,9 @@ import useDatePickerControl from '../../../../hooks/dashboard/note/useDatePicker
 import useViewSwitching from '../../../../hooks/dashboard/note/useViewSwitching'
 import AddNoteDialog from './AddNoteDialog'
 import { ConferenceResponse } from '../../../../models/response/conference.response'
-import { getConferenceFromJSON } from '../../../../app/api/conference/getConferenceDetails'
 import useDialogPosition from '../../../../hooks/dashboard/note/useDialogPosition'
 import { useTranslations } from 'next-intl'
+import { getConferenceFromDB } from '@/src/app/api/conference/getConferenceDetails'
 
 const DEFAULT_DOM_RECT: DOMRect = {
   x: 0,
@@ -215,7 +215,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
       if (event.conferenceId) {
         try {
           setLoadingDetails(true)
-          const conferenceDetails = await getConferenceFromJSON(
+          const conferenceDetails = await getConferenceFromDB(
             event.conferenceId
           )
           setSelectedEventDetail(conferenceDetails)
