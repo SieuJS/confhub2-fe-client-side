@@ -4,7 +4,6 @@ import { ChartConfig, ChartOptions, DataField, FieldType, ProcessedChartData, Ch
 import { groupBy, mapValues, sumBy, countBy, meanBy } from 'lodash'; // Ensure lodash is installed
 
 // --- Constants ---
-const logPrefixUtil = "[visualizationUtils]";
 const UNKNOWN_CATEGORY = 'Unknown'; // Consistent handling for null/undefined keys
 
 // --- Utility Functions ---
@@ -25,7 +24,7 @@ const getNestedValue = (obj: any, path: string): any => {
         return path.split('.').reduce((acc, part) => acc && acc[part], obj);
     } catch (error) {
         // Handle potential errors during reduce if path is malformed, though unlikely with string split
-        console.error(`%c${logPrefixUtil} Error accessing path "${path}":`, 'color: red;', error);
+        console.error(`Error accessing path "${path}":`, 'color: red;', error);
         return undefined;
     }
 };
@@ -92,14 +91,14 @@ const AVAILABLE_FIELDS_TEMPLATE: DataField[] = [
  * @returns A STABLE array of DataField objects, or an empty array.
  */
 export const getAvailableFields = (sampleItem: any): DataField[] => {
-    console.log(`%c${logPrefixUtil} getAvailableFields called. Sample exists: ${!!sampleItem}`, 'color: blue;');
+    console.log(`getAvailableFields called. Sample exists: ${!!sampleItem}`, 'color: blue;');
     if (!sampleItem || typeof sampleItem !== 'object') {
-        console.warn(`%c${logPrefixUtil} Invalid or missing sampleItem. Returning empty fields.`, 'color: orange;');
+        console.warn(`Invalid or missing sampleItem. Returning empty fields.`, 'color: orange;');
         return []; // Return empty array if no data/sample
     }
 
     // Return the pre-defined STABLE template array
-    console.log(`%c${logPrefixUtil} Returning STABLE template with ${AVAILABLE_FIELDS_TEMPLATE.length} fields.`, 'color: blue;');
+    console.log(`Returning STABLE template with ${AVAILABLE_FIELDS_TEMPLATE.length} fields.`, 'color: blue;');
     return AVAILABLE_FIELDS_TEMPLATE;
 };
 
@@ -117,18 +116,18 @@ const aggregateData = (
     groupedData: Record<string, any[]>,
     measureField: DataField
 ): Record<string, number> => {
-    console.log(`%c${logPrefixUtil} aggregateData called for measure: ${measureField.id} (Aggregation: ${measureField.aggregation || 'none'})`, 'color: green;');
+    console.log(`aggregateData called for measure: ${measureField.id} (Aggregation: ${measureField.aggregation || 'none'})`, 'color: green;');
 
     if (!measureField.aggregation) {
-        console.warn(`%c${logPrefixUtil} Measure field ${measureField.id} is missing aggregation type. Returning 0 for all groups.`, 'color: orange;');
+        console.warn(`Measure field ${measureField.id} is missing aggregation type. Returning 0 for all groups.`, 'color: orange;');
         return mapValues(groupedData, () => 0);
     }
 
     switch (measureField.aggregation) {
         case 'sum':
-            console.log(`%c${logPrefixUtil}   Aggregating with SUM`, 'color: green;');
+            console.log(`  Aggregating with SUM`, 'color: green;');
             if (!measureField.accessor) {
-                console.warn(`%c${logPrefixUtil}   SUM aggregation for ${measureField.id} requires an accessor. Returning 0.`, 'color: orange;');
+                console.warn(`  SUM aggregation for ${measureField.id} requires an accessor. Returning 0.`, 'color: orange;');
                 return mapValues(groupedData, () => 0);
             }
             return mapValues(groupedData, group =>
@@ -136,9 +135,9 @@ const aggregateData = (
             );
 
         case 'average':
-            console.log(`%c${logPrefixUtil}   Aggregating with AVERAGE`, 'color: green;');
+            console.log(`  Aggregating with AVERAGE`, 'color: green;');
             if (!measureField.accessor) {
-                console.warn(`%c${logPrefixUtil}   AVERAGE aggregation for ${measureField.id} requires an accessor. Returning 0.`, 'color: orange;');
+                console.warn(`  AVERAGE aggregation for ${measureField.id} requires an accessor. Returning 0.`, 'color: orange;');
                 return mapValues(groupedData, () => 0);
             }
             // Handle average differently: assumes accessor returns an array (e.g., feedback objects)
@@ -163,12 +162,12 @@ const aggregateData = (
 
 
         case 'count':
-            console.log(`%c${logPrefixUtil}   Aggregating with COUNT`, 'color: green;');
+            console.log(`  Aggregating with COUNT`, 'color: green;');
             // Count the number of items in each group
             return mapValues(groupedData, group => group.length);
 
         default:
-            console.warn(`%c${logPrefixUtil}   Unknown aggregation type: ${measureField.aggregation}. Returning 0.`, 'color: orange;');
+            console.warn(`  Unknown aggregation type: ${measureField.aggregation}. Returning 0.`, 'color: orange;');
             return mapValues(groupedData, () => 0);
     }
 };
@@ -188,9 +187,9 @@ const processDataForChart = (
     config: ChartConfig,
     availableFields: DataField[]
 ): ProcessedChartData => {
-    console.log(`%c${logPrefixUtil} processDataForChart started for type: ${config.chartType}`, 'color: blue;');
+    console.log(`processDataForChart started for type: ${config.chartType}`, 'color: blue;');
     if (!rawData || rawData.length === 0) {
-        console.warn(`%c${logPrefixUtil} Raw data is empty or invalid.`, 'color: orange;');
+        console.warn(`Raw data is empty or invalid.`, 'color: orange;');
         return { categories: [], series: [], legendData: [] };
     }
 
@@ -199,7 +198,7 @@ const processDataForChart = (
     const colorField = availableFields.find(f => f.id === config.color?.fieldId);
     const sizeField = availableFields.find(f => f.id === config.size?.fieldId);
 
-    console.log(`%c${logPrefixUtil} Fields - X: ${xAxisField?.id || 'N/A'}, Y: ${yAxisField?.id || 'N/A'}, Color: ${colorField?.id || 'N/A'}, Size: ${sizeField?.id || 'N/A'}`, 'color: gray;');
+    console.log(`Fields - X: ${xAxisField?.id || 'N/A'}, Y: ${yAxisField?.id || 'N/A'}, Color: ${colorField?.id || 'N/A'}, Size: ${sizeField?.id || 'N/A'}`, 'color: gray;');
 
     // --- Input Validation ---
     // !!! IMPORTANT FIX: Check fields existence *before* assuming type/accessor exists !!!
@@ -251,7 +250,7 @@ const processDataForChart = (
     let legendData: string[] = [];
     const chartType = config.chartType as ChartType;
 
-    console.log(`%c${logPrefixUtil} Processing logic for ${chartType}`, 'color: blue;');
+    console.log(`Processing logic for ${chartType}`, 'color: blue;');
 
     // --- Bar/Line Chart Logic ---
     if (chartType === 'bar' || chartType === 'line') {
@@ -263,14 +262,14 @@ const processDataForChart = (
         // No need to check yAxisField.accessor here as aggregation handles it
 
         const groupKeyAccessor = (item: any): string => xAxisField.accessor!(item)?.toString() ?? UNKNOWN_CATEGORY;
-        console.log(`%c${logPrefixUtil} Grouping by X-Axis: ${xAxisField.id}`, 'color: green;');
+        console.log(`Grouping by X-Axis: ${xAxisField.id}`, 'color: green;');
         const groupedByX = groupBy(rawData, groupKeyAccessor);
         categories = Object.keys(groupedByX).sort(); // Use sorted keys as categories
-        console.log(`%c${logPrefixUtil} Categories found (${categories.length}): ${categories.slice(0, 10).join(', ')}...`, 'color: gray;');
+        console.log(`Categories found (${categories.length}): ${categories.slice(0, 10).join(', ')}...`, 'color: gray;');
 
         if (!colorField?.accessor) {
             // Single series (no color grouping)
-            console.log(`%c${logPrefixUtil} Single series ${chartType}: Aggregating Y-Axis (${yAxisField.id})`, 'color: green;');
+            console.log(`Single series ${chartType}: Aggregating Y-Axis (${yAxisField.id})`, 'color: green;');
             const aggregatedValues = aggregateData(groupedByX, yAxisField);
             const data = categories.map(cat => aggregatedValues[cat] ?? 0);
 
@@ -286,11 +285,11 @@ const processDataForChart = (
 
         } else {
             // Multiple series (grouped by color)
-            console.log(`%c${logPrefixUtil} Grouped ${chartType}: Grouping by Color (${colorField.id})`, 'color: green;');
+            console.log(`Grouped ${chartType}: Grouping by Color (${colorField.id})`, 'color: green;');
             const colorKeyAccessor = (item: any): string => colorField.accessor!(item)?.toString() ?? UNKNOWN_CATEGORY;
             const groupedByColor = groupBy(rawData, colorKeyAccessor);
             legendData = Object.keys(groupedByColor).sort();
-            console.log(`%c${logPrefixUtil} Color groups found (${legendData.length}): ${legendData.slice(0, 10).join(', ')}...`, 'color: gray;');
+            console.log(`Color groups found (${legendData.length}): ${legendData.slice(0, 10).join(', ')}...`, 'color: gray;');
 
             series = legendData.map(colorValue => {
                 const colorGroupData = groupedByColor[colorValue];
@@ -319,12 +318,12 @@ const processDataForChart = (
         }
         // yAxisField guaranteed from validation
         const groupKeyAccessor = (item: any): string => colorField.accessor!(item)?.toString() ?? UNKNOWN_CATEGORY;
-        console.log(`%c${logPrefixUtil} Grouping Pie by Color: ${colorField.id}`, 'color: green;');
+        console.log(`Grouping Pie by Color: ${colorField.id}`, 'color: green;');
         const groupedByColor = groupBy(rawData, groupKeyAccessor);
         legendData = Object.keys(groupedByColor).sort();
-        console.log(`%c${logPrefixUtil} Pie slices found (${legendData.length}): ${legendData.slice(0, 10).join(', ')}...`, 'color: gray;');
+        console.log(`Pie slices found (${legendData.length}): ${legendData.slice(0, 10).join(', ')}...`, 'color: gray;');
 
-        console.log(`%c${logPrefixUtil} Aggregating Pie values by Y-Axis: ${yAxisField.id}`, 'color: green;');
+        console.log(`Aggregating Pie values by Y-Axis: ${yAxisField.id}`, 'color: green;');
         const aggregatedValues = aggregateData(groupedByColor, yAxisField);
 
         const data = legendData.map(name => ({
@@ -375,7 +374,7 @@ const processDataForChart = (
             // Check validity *after* determining finalXVal type
             if ((xAxisField.type === 'measure' && (finalXVal === null || finalXVal === undefined || isNaN(Number(finalXVal)))) ||
                 numY === null || numY === undefined || isNaN(numY)) {
-                // console.warn(`%c${logPrefixUtil} Skipping invalid scatter point: X=${xVal}, Y=${yVal}`, 'color: orange;');
+                // console.warn(`Skipping invalid scatter point: X=${xVal}, Y=${yVal}`, 'color: orange;');
                 return null; // Skip invalid points
             }
 
@@ -392,7 +391,7 @@ const processDataForChart = (
 
         if (!colorField?.accessor) {
             // Simple Scatter (single series)
-            console.log(`%c${logPrefixUtil} Simple scatter: Mapping points`, 'color: green;');
+            console.log(`Simple scatter: Mapping points`, 'color: green;');
             const data = rawData.map(mapItemToPoint).filter(point => point !== null); // Type: ((number | string | null)[] | null)[] -> (number | string | null)[][]
 
             series.push({
@@ -406,11 +405,11 @@ const processDataForChart = (
 
         } else {
             // Grouped Scatter (by color)
-            console.log(`%c${logPrefixUtil} Grouped scatter: Grouping by Color (${colorField.id})`, 'color: green;');
+            console.log(`Grouped scatter: Grouping by Color (${colorField.id})`, 'color: green;');
             const colorKeyAccessor = (item: any): string => colorField.accessor!(item)?.toString() ?? UNKNOWN_CATEGORY;
             const groupedByColor = groupBy(rawData, colorKeyAccessor);
             legendData = Object.keys(groupedByColor).sort();
-            console.log(`%c${logPrefixUtil} Color groups found (${legendData.length}): ${legendData.slice(0, 10).join(', ')}...`, 'color: gray;');
+            console.log(`Color groups found (${legendData.length}): ${legendData.slice(0, 10).join(', ')}...`, 'color: gray;');
 
             series = legendData.map(colorValue => {
                 const colorGroupData = groupedByColor[colorValue];
@@ -443,7 +442,7 @@ const processDataForChart = (
                     }
                     // Handle potential arrays - decide how: placeholder, join, etc.
                     if (Array.isArray(value)) {
-                        console.warn(`%c${logPrefixUtil} Dimension field ${xAxisField.id} returned an array. Using placeholder "${UNKNOWN_CATEGORY}".`, 'color: orange;');
+                        console.warn(`Dimension field ${xAxisField.id} returned an array. Using placeholder "${UNKNOWN_CATEGORY}".`, 'color: orange;');
                         return UNKNOWN_CATEGORY; // Hoặc JSON.stringify(value) ? value.join(',') ? Tùy thuộc hành vi mong muốn
                     }
                     // Convert numbers, booleans, etc., to string
@@ -451,17 +450,17 @@ const processDataForChart = (
                 })
                 .filter((v, i, a) => a.indexOf(v) === i) // Filter unique strings
                 .sort(); // Sort strings
-            console.log(`%c${logPrefixUtil} Scatter categories (dimension) found (${categories.length}): ${categories.slice(0, 10).join(', ')}...`, 'color: gray;');
+            console.log(`Scatter categories (dimension) found (${categories.length}): ${categories.slice(0, 10).join(', ')}...`, 'color: gray;');
         } else {
             // If X-axis is a measure, categories are usually not applicable for scatter ECharts config
             // ECharts will treat the X-axis as 'value' type automatically.
             categories = [];
-            console.log(`%c${logPrefixUtil} Scatter categories: Not applicable (X-axis is measure)`, 'color: gray;');
+            console.log(`Scatter categories: Not applicable (X-axis is measure)`, 'color: gray;');
         }
         // --- FIX END ---
     }
 
-    console.log(`%c${logPrefixUtil} processDataForChart finished. Series: ${series.length}, Categories: ${categories.length}, Legend: ${legendData.length}`, 'color: blue;');
+    console.log(`processDataForChart finished. Series: ${series.length}, Categories: ${categories.length}, Legend: ${legendData.length}`, 'color: blue;');
     return { categories, series, legendData };
 };
 
@@ -483,7 +482,7 @@ export const generateChartOption = (
     options: ChartOptions,
     availableFields: DataField[]
 ): EChartsOption => {
-    console.log(`%c${logPrefixUtil} generateChartOption called. Type: ${config.chartType}, Title: "${options.title}"`, 'color: purple;');
+    console.log(`generateChartOption called. Type: ${config.chartType}, Title: "${options.title}"`, 'color: purple;');
 
     // 1. Process Data
     const { categories, series, legendData } = processDataForChart(rawData, config, availableFields);
@@ -667,7 +666,7 @@ export const generateChartOption = (
 
             // Logic thêm visualMap không đổi
             if (sizeDataExists && isFinite(minSize) && isFinite(maxSize) && minSize !== maxSize) {
-                console.log(`%c${logPrefixUtil} Adding visualMap for size. Range: ${minSize}-${maxSize}`, 'color: purple;');
+                console.log(`Adding visualMap for size. Range: ${minSize}-${maxSize}`, 'color: purple;');
                 finalOption.visualMap = [{
                     type: 'continuous',
                     dimension: 2,
@@ -686,7 +685,7 @@ export const generateChartOption = (
                     bottom: '15%'
                 }];
             } else if (sizeDataExists) {
-                console.log(`%c${logPrefixUtil} Size field selected, but min/max range invalid or constant (${minSize}-${maxSize}). Skipping visualMap.`, 'color: orange;');
+                console.log(`Size field selected, but min/max range invalid or constant (${minSize}-${maxSize}). Skipping visualMap.`, 'color: orange;');
             }
         }
         // Adjust scatter tooltip formatter
@@ -714,7 +713,7 @@ export const generateChartOption = (
     // Add DataZoom for charts with many categories or value-based X-axis
     const addDataZoom = (xAxisType === 'value') || (xAxisType === 'category' && categories && categories.length > 20);
     if (config.chartType !== 'pie' && addDataZoom) {
-        console.log(`%c${logPrefixUtil} Adding dataZoom for X-axis.`, 'color: purple;');
+        console.log(`Adding dataZoom for X-axis.`, 'color: purple;');
         finalOption.dataZoom = [
             {
                 type: 'slider',
@@ -758,7 +757,7 @@ export const generateChartOption = (
     }
 
 
-    console.log(`%c${logPrefixUtil} Final ECharts option constructed.`, 'color: purple; font-weight: bold;');
+    console.log(`Final ECharts option constructed.`, 'color: purple; font-weight: bold;');
     // console.log(JSON.stringify(finalOption, null, 2)); // Deep log final option if needed
 
     return finalOption;

@@ -2,11 +2,11 @@
 
 import { ConferenceResponse } from "@/src/models/response/conference.response";
 // Replace with your actual backend URL
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const API_BASE_URL = process.env.DATABASE_URL;
 
 export async function fetchVisualizationData(): Promise<ConferenceResponse[]> {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/visualization/conference`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/conference&mode=detail`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
