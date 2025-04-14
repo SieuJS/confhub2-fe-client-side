@@ -1,22 +1,22 @@
-import { useTranslations } from 'next-intl';
-import VerifyEmailForm from './VerifyEmailForm'; // Component form sẽ tạo ở dưới
-import { Suspense } from 'react'; // <<< Import Suspense
+import { useTranslations } from 'next-intl'
+import VerifyEmailForm from './VerifyEmailForm' // Component form sẽ tạo ở dưới
+import { Suspense } from 'react' // <<< Import Suspense
 
 // Function để lấy email từ searchParams một cách an toàn phía Client
 function VerifyEmailClientContent() {
-  const t = useTranslations('');
+  const t = useTranslations('')
   // --- Cần component con để dùng useSearchParams ---
-  return <VerifyEmailForm/>;
+  return <VerifyEmailForm />
 }
 
 export default function VerifyEmailPage() {
-  const t = useTranslations(''); // t có thể dùng cho tiêu đề chung của trang
+  const t = useTranslations('') // t có thể dùng cho tiêu đề chung của trang
 
   return (
     <div className='flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8'>
       <div className='w-full max-w-md'>
         <div className='bg-white px-8 py-10 shadow-xl sm:rounded-lg sm:px-10'>
-          <div className='space-y-2 text-center mb-8'>
+          <div className='mb-8 space-y-2 text-center'>
             <h1 className='text-2xl font-bold tracking-tight text-gray-900'>
               {t('Verify_Your_Email_Address')}
             </h1>
@@ -25,11 +25,13 @@ export default function VerifyEmailPage() {
             </p>
           </div>
           {/* --- Bọc component dùng searchParams bằng Suspense --- */}
-          <Suspense fallback={<div className='text-center'>{t('Loading...')}</div>}>
+          <Suspense
+            fallback={<div className='text-center'>{t('Loading')}</div>}
+          >
             <VerifyEmailClientContent />
           </Suspense>
         </div>
       </div>
     </div>
-  );
+  )
 }
