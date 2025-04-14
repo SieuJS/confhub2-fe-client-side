@@ -3,8 +3,7 @@ import { useState, useEffect } from 'react';
 import { ConferenceResponse } from '../../models/response/conference.response';
 import { Follow, UserResponse } from '../../models/response/user.response';
 
-const API_ENDPOINT = `${process.env.DATABASE_URL}/api/v1`;
-
+const API_ENDPOINT = `${process.env.NEXT_PUBLIC_DATABASE_URL}/api/v1`;
 const useFollowConference = (conferenceData: ConferenceResponse | null) => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -26,7 +25,6 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
           return;
       }
 
-      const user = JSON.parse(userData);
       try {
         const response = await fetch(`${API_ENDPOINT}/follow-conference/followed`, {
           method: 'GET',
@@ -92,6 +90,8 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
       }
 
       const follows: Follow[] = await response.json();
+      console.log('follows', follows);
+
       setIsFollowing(follows?.some(conf => conf.conferenceId === conferenceId) ?? false); // FIXED HERE
     } catch (err:any) {
       setError(err.message || 'Error following/unfollowing conference.');

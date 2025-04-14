@@ -50,7 +50,7 @@ const useSearchAdvanceForm = ({
   useEffect(() => {
     const fetchTopics = async () => {
       try {
-        const response = await fetch(`${process.env.DATABASE_URL}/api/v1/conference-organization/topics`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_URL}/api/v1/conference-organization/topics`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

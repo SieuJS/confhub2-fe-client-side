@@ -80,7 +80,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
 
     try {
       const response = await fetch(
-        `${process.env.DATABASE_URL}/api/v1/auth/signup`,
+        `${process.env.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/signup`,
         {
           method: 'POST',
           headers: {

@@ -37,7 +37,7 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
     if (user?.id) {
       setIsLoadingNotifications(true);
       try {
-        const response = await fetch(`${process.env.DATABASE_URL}/api/v1/notification/user`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/user`, {
           method: 'GET',
           headers : {
             "Authorization" : `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
@@ -64,7 +64,7 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
     if (!user?.id) return;
 
     try {
-      const response = await fetch(`${process.env.DATABASE_URL}/api/v1/notification/mark-all-as-read`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/mark-all-as-read`, {
         method: 'PUT', // Use PUT or POST, depending on your API design
         headers: {
           'Content-Type': 'application/json',
