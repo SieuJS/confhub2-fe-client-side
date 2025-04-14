@@ -15,16 +15,13 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => { // Nh
     const searchParams = useSearchParams();
     // const router = useRouter(); // <<< Không cần router.push nữa
     // const pathname = usePathname(); // <<< Không cần pathname nữa nếu chỉ dùng Link
-    const initialEmail = searchParams.get('email') || '';
 
-    const [email, setEmail] = useState(initialEmail);
     const [code, setCode] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     useEffect(() => {
-        setEmail(searchParams.get('email') || '');
     }, [searchParams]);
 
     const handleSubmit = async (event: FormEvent) => {
@@ -32,7 +29,7 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => { // Nh
         setError(null);
         setSuccessMessage(null); // Reset success message on new submit attempt
 
-        if (!email || !code) {
+        if ( !code) {
             setError('Please enter email and code'); // Nên dùng t('verifyEmail.error.missingFields')
             return;
         }
@@ -44,12 +41,14 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => { // Nh
         setIsLoading(true);
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/verify-email`, {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/verify`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${token}`, // Thêm token vào header
                 },
-                body: JSON.stringify({ email, code }),
+                body: JSON.stringify({ code }),
             });
 
             const data = await response.json();
@@ -105,25 +104,6 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => { // Nh
             {!successMessage && (
                 <form className='space-y-6' onSubmit={handleSubmit}>
                     {/* Input Email */}
-                    <div>
-                        <label htmlFor='email' className='block text-sm font-medium text-gray-700'>
-                            {('Email')} {/* Nên dùng t('common.email') */}
-                        </label>
-                        <div className='mt-1'>
-                            <input
-                                id='email'
-                                name='email'
-                                type='email'
-                                autoComplete='email'
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                readOnly={!!initialEmail}
-                                className={`block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm ${initialEmail ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                                placeholder='you@example.com'
-                            />
-                        </div>
-                    </div>
 
                     {/* Input Verification Code */}
                     <div>
@@ -166,7 +146,7 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => { // Nh
                     <div className='text-center text-sm'>
                         <span className='text-gray-600'>{('Did not receive code yet?')} {/* Nên dùng t('verifyEmail.noCode') */} </span>
                         {/* Có thể thêm link gửi lại code nếu cần */}
-                        <Link href="/auth/resend-verification" className='hover:text-button/80 font-medium text-button'>
+                        <Link href = "/" className='hover:text-button/80 font-medium text-button'>
                             {('Resend code')} {/* Nên dùng t('verifyEmail.resendLink') */}
                         </Link>
                         {' '} {/* Thêm khoảng trắng nếu cần */}

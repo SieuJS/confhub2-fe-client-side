@@ -37,7 +37,13 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
     if (user?.id) {
       setIsLoadingNotifications(true);
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/${user.id}/notifications`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/notification/user`, {
+          method: 'GET',
+          headers : {
+            "Authorization" : `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
+            'Content-Type': 'application/json',
+          }
+        });
         if (response.ok) {
           const data: Notification[] = await response.json();
           const filteredNotifications = data.filter(n => n.deletedAt === null);
@@ -58,10 +64,11 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
     if (!user?.id) return;
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/${user.id}/notifications/mark-all-as-read`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/notification/mark-all-as-read`, {
         method: 'PUT', // Use PUT or POST, depending on your API design
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
         },
         // You might not need a body, if your backend uses the user ID from the URL
       });

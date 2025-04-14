@@ -49,8 +49,8 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
   const { isLoggedIn } = useAuthApi()
 
   // --- Data Preparation ---
-  const conferenceId = conferenceData?.conference.id
-  const baseFeedbacks = conferenceData?.feedBacks ?? []
+  const conferenceId = conferenceData?.id
+  const baseFeedbacks = conferenceData?.feedbacks ?? []
 
   // Combine base feedbacks and new feedback (if any)
   const allFeedbacks = useMemo(() => {

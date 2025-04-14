@@ -290,9 +290,9 @@
 
 
 "use client";
-// api/conference/getConferenceDetails.ts
-import { ConferenceResponse } from '../../../models/response/conference.response';
-import { ConferenceDetailsResponse } from '@/src/models/response/conference.details.list.response';
+// api/getConferenceDetails/getConferenceDetails.ts
+import { ConferenceResponse, ConferenceIdentity, Organization, Location, ImportantDate, Rank, Feedback, FollowerInfo } from '../../../models/response/conference.response';
+
 const API_GET_CONFERENCE_ENDPOINT = process.env.NEXT_PUBLIC_BACKEND_URL; //  3005 for details
 
 

@@ -3,6 +3,7 @@
 import { Link } from '@/src/navigation'
 import React, { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { login } from '@/src/hooks/auth/useAuthApi'
 
 interface RegisterFormProps {
   // No props needed
@@ -16,6 +17,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [dob, setDob] = useState('');
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showVerificationMessage, setShowVerificationMessage] = useState(false) // <<< State mới
@@ -26,7 +28,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
     setShowVerificationMessage(false) // Reset message khi submit lại
 
     // --- Validation cơ bản (giữ nguyên) ---
-    if (!firstname || !lastname || !email || !password || !confirmPassword) {
+    if (!firstname || !lastname || !email || !password || !confirmPassword || !dob) {
       setError('Please fill in all required fields.')
       return
     }
@@ -44,7 +46,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/signup`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/signup`,
         {
           method: 'POST',
           headers: {
@@ -54,13 +56,14 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
             firstName: firstname,
             lastName: lastname,
             email: email,
-            password: password
+            password: password,
+            dob: dob,
           })
         }
       )
 
       const data = await response.json()
-
+      login(data)
       if (response.status === 201) {
         // <<< Backend trả về 201 khi cần verify
         console.log('Registration pending verification:', data.message)
@@ -201,6 +204,25 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
                         placeholder={t('Last_Name')}
                       />
                     </div>
+                  </div>
+                </div>
+                <div>
+                  <label
+                    htmlFor='dob'
+                    className='block text-sm font-medium text-gray-700'
+                  >
+                    {t('Date_of_Birth')}
+                  </label>
+                  <div className='mt-1'>
+                    <input
+                      id='dob'
+                      name='dob'
+                      type='date'
+                      required
+                      value={dob}
+                      onChange={e => setDob(e.target.value)}
+                      className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm'
+                    />
                   </div>
                 </div>
                 <div>

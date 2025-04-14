@@ -18,8 +18,6 @@ import { ImportantDate } from '@/src/models/response/conference.response'
 import useAuthApi from '@/src/hooks/auth/useAuthApi' // Import useAuthApi
 
 // Import the custom hooks
-import useConferenceDataFromDB from '../../../../hooks/conferenceDetails/useConferenceDataFromDB'
-import useConferenceDataFromJSON from '../../../../hooks/conferenceDetails/useConferenceDataFromJSON'
 import useSequentialConferenceData from '@/src/hooks/conferenceDetails/useSequentialConferenceData'
 import useFollowConference from '../../../../hooks/conferenceDetails/useFollowConference'
 import useShareConference from '../../../../hooks/conferenceDetails/useShareConference'
@@ -98,8 +96,8 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   const { isUpdating, updateResult, updateConference } = useUpdateConference()
   const { handleShareClick } = useShareConference(conferenceDataFromDB)
   const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } =
-    useTopicsDisplay(conferenceDataFromDB?.organization?.topics || [])
-  const transformedDates = transformDates(conferenceDataFromDB?.dates)
+    useTopicsDisplay(conferenceDataFromDB?.organizations[0].topics || [])
+  const transformedDates = transformDates(conferenceDataFromDB?.organizations[0].conferenceDates)
   const { dateDisplay } = useFormatConferenceDates(transformedDates, language)
   const { isLoggedIn } = useAuthApi()
 
@@ -222,25 +220,25 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   }
 
   const renderFollowerAvatars = () => {
-    if (!followedBy || followedBy.length === 0) {
+    if (!followBy || followBy.length === 0) {
       return <p className='text-sm text-gray-500'>{t('No_followers_yet')}</p>
     }
 
     const maxVisibleFollowers = 5
-    const visibleFollowers = followedBy.slice(0, maxVisibleFollowers)
-    const remainingFollowers = followedBy.length - maxVisibleFollowers
+    const visibleFollowers = followBy.slice(0, maxVisibleFollowers)
+    const remainingFollowers = followBy.length - maxVisibleFollowers
 
     return (
       <div className='flex items-center'>
-        {visibleFollowers.map((followedBy: any) => (
+        {visibleFollowers.map((followBy: any) => (
           <img
-            key={followedBy.id}
+            key={followBy.id}
             src={
-              followedBy.avatar
-                ? followedBy.avatar
-                : `https://ui-avatars.com/api/?name=${followedBy.firstName}+${followedBy.lastName}&background=random&size=32`
+              followBy.avatar
+                ? followBy.avatar
+                : `https://ui-avatars.com/api/?name=${followBy.firstName}+${followBy.lastName}&background=random&size=32`
             }
-            alt={`${followedBy.firstName} ${followedBy.lastName}`}
+            alt={`${followBy.firstName} ${followBy.lastName}`}
             width={32}
             height={32}
             className='h-8 w-8 rounded-full border-2 border-white'
@@ -281,11 +279,11 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
   if (isLoading) return <Loading /> // Show initial loading
 
-  const { conference, organization, location } = conferenceDataFromDB || {}
-  const { followedBy, isLessReputable } = conferenceDataFromDB || {}
+  const {  organizations} = conferenceDataFromDB || {}
+  const { followBy } = conferenceDataFromDB || {}
 
-  const overallRating = calculateOverallRating(conferenceDataFromDB?.feedBacks)
-  const totalReviews = conferenceDataFromDB?.feedBacks?.length || 0
+  const overallRating = calculateOverallRating(conferenceDataFromDB?.feedbacks)
+  const totalReviews = conferenceDataFromDB?.feedbacks?.length || 0
 
   return (
     <div className='flex min-h-screen flex-col bg-gray-50'>
@@ -322,8 +320,8 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                   <Image
                     src={'/bg-2.jpg'}
                     alt={
-                      conference?.title
-                        ? `${conference.title} Logo`
+                      conferenceDataFromDB?.title
+                        ? `${conferenceDataFromDB.title} Logo`
                         : 'Conference Logo'
                     }
                     width={300}
@@ -336,7 +334,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                   {' '}
                   {/* Text details container */}
                   {/* ====================== WARNING SECTION ====================== */}
-                  {isLessReputable && (
+                  {true && (
                     <div
                       className='mb-4 rounded-md border-l-4 border-yellow-500 bg-yellow-100 p-4 text-yellow-700 shadow-sm'
                       role='alert'
@@ -372,7 +370,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                     {dateDisplay}
                   </p>
                   <h1 className='mt-1 text-xl font-bold md:text-2xl'>
-                    {conference?.title || 'Conference Details'}
+                    {conferenceDataFromDB?.title || 'Conference Details'}
                   </h1>
                   <div className='flex items-center text-sm text-gray-600'>
                     <div className='mr-2 text-xl text-yellow-500'>★</div>
@@ -405,13 +403,13 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                         <circle cx='12' cy='10' r='3' />
                       </svg>
 
-                      {location?.address || 'Location Not Available'}
+                      {organizations?.[0].locations[0].address || 'Location Not Available'}
                     </a>
                     <Link
                       className='mt-1 flex items-center text-sm text-blue-600 hover:underline'
                       href={{
                         pathname: `/conferences`,
-                        query: { publisher: organization?.publisher }
+                        query: { publisher: organizations?.[0]?.publisher }
                       }}
                     >
                       <svg
@@ -432,7 +430,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                         <path d='M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20' />
                       </svg>
 
-                      {organization?.publisher || 'Unknown'}
+                      {organizations?.[0].publisher || 'Unknown'}
                     </Link>
                   </div>
                   {/* Followers Display */}
@@ -604,8 +602,8 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                   </Button>
                   <Button
                     onClick={() => {
-                      if (organization?.link) {
-                        window.open(organization.link, '_blank')
+                      if (organizations?.[0]?.link) {
+                        window.open(organizations?.[0]?.link, '_blank')
                       } else {
                         alert(t('Website_link_is_not_available'))
                       }

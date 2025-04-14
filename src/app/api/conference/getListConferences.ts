@@ -2,12 +2,12 @@
 "use_client";
 import { ConferenceListResponse } from '../../../models/response/conference.list.response';
 
-const API_GET_CONFERENCE_ENDPOINT = 'http://confhub.engineer/api/v1'; 
+const API_GET_CONFERENCE_ENDPOINT = process.env.NEXT_PUBLIC_BACKEND_URL; //  3005 for details
 
 async function getListConferenceFromDB(): Promise<ConferenceListResponse> {
   try {
     // 1. Fetch from the original endpoint (3005)
-    const response = await fetch(`${API_GET_CONFERENCE_ENDPOINT}/conference`, {
+    const response = await fetch(`${API_GET_CONFERENCE_ENDPOINT}/api/v1/conference`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
