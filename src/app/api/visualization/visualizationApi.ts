@@ -1,10 +1,10 @@
 // src/app/api/conference/visualizationApi.ts
 
-import { ConferenceResponse } from "@/src/models/response/conference.response";
+import { ConferenceDetailsResponse } from "@/src/models/response/conference.details.list.response";
 // Replace with your actual backend URL
 const API_BASE_URL = process.env.DATABASE_URL;
 
-export async function fetchVisualizationData(): Promise<ConferenceResponse[]> {
+export async function fetchVisualizationData(): Promise<ConferenceDetailsResponse[]> {
     try {
         const response = await fetch(`${API_BASE_URL}/api/v1/conference&mode=detail`, {
             method: 'GET',
@@ -17,7 +17,7 @@ export async function fetchVisualizationData(): Promise<ConferenceResponse[]> {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const responseData: ConferenceResponse[] = await response.json();
+        const responseData: ConferenceDetailsResponse[] = await response.json();
         console.log(responseData)
         return responseData;
 
