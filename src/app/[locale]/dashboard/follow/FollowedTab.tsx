@@ -1,16 +1,20 @@
 // FollowedTab.tsx
 import React, { useState, useEffect, useCallback } from 'react'
 import ConferenceItem from '../../conferences/ConferenceItem'
-import { getListConferenceFromDB, getListConferenceFromJSON } from '../../../../app/api/conference/getListConferences'
+import {
+  getListConferenceFromDB,
+  getListConferenceFromJSON
+} from '../../../../app/api/conference/getListConferences'
 import { ConferenceInfo } from '../../../../models/response/conference.list.response'
 import { UserResponse, Follow } from '../../../../models/response/user.response'
 import { timeAgo, formatDateFull } from '../timeFormat'
 import Tooltip from '../../utils/Tooltip'
 import { useTranslations } from 'next-intl'
+import { appConfig } from '@/src/middleware'
 
-interface FollowedTabProps { }
+interface FollowedTabProps {}
 
-const API_GET_USER_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1`
+const API_GET_USER_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1`
 
 const FollowedTab: React.FC<FollowedTabProps> = () => {
   const t = useTranslations('')
@@ -25,21 +29,21 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
 
   const fetchData = useCallback(async () => {
     try {
-
-
-      const featchFollow = await fetch(`${API_GET_USER_ENDPOINT}/follow-conference/followed`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}` // Add userId to the headers
+      const featchFollow = await fetch(
+        `${API_GET_USER_ENDPOINT}/follow-conference/followed`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}` // Add userId to the headers
+          }
         }
-      })
+      )
       if (!featchFollow.ok) {
         throw new Error(`HTTP error! status: ${featchFollow.status}`)
       }
       const followed: any[] = await featchFollow.json()
       setFollowedConferences(followed)
-
     } catch (error) {
       console.error('Failed to fetch data:', error)
     } finally {
