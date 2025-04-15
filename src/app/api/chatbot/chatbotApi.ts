@@ -1,7 +1,9 @@
 // File chatbotApi.ts:
 
+import { appConfig } from "@/src/middleware";
+
 // Giữ lại base URL
-const API_BASE_URL = `${process.env.DATABASE_URL}/api`;
+const API_BASE_URL = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api`;
 
 // --- BEGIN: Simplified Response Types ---
 

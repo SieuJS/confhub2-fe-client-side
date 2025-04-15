@@ -1,8 +1,9 @@
 // frontend/getListConferences.ts
 "use_client";
+import { appConfig } from '@/src/middleware';
 import { ConferenceListResponse } from '../../../models/response/conference.list.response';
 
-const API_GET_CONFERENCE_ENDPOINT = process.env.DATABASE_URL; //  3005 for details
+const API_GET_CONFERENCE_ENDPOINT = appConfig.NEXT_PUBLIC_DATABASE_URL; //  3005 for details
 
 async function getListConferenceFromDB(): Promise<ConferenceListResponse> {
   try {
@@ -44,7 +45,7 @@ async function getListConferenceFromDB(): Promise<ConferenceListResponse> {
   }
 }
 
-const API_GET_JSON_CONFERENCE_ENDPOINT = `${process.env.DATABASE_URL}/api/v1`; 
+const API_GET_JSON_CONFERENCE_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1`; 
 
 async function getListConferenceFromJSON(): Promise<ConferenceListResponse> {
   try {

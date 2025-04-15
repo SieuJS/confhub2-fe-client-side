@@ -13,8 +13,9 @@ import {
   Country,
   ConferenceFormData
 } from '@/src/models/send/addConference.send'
+import { appConfig } from '@/src/middleware'
 
-const API_ADD_CONFERENCE_ENDPOINT = `${process.env.DATABASE_URL}/api/v1/user/add-conference`
+const API_ADD_CONFERENCE_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/user/add-conference`
 const CSC_API_KEY = process.env.NEXT_PUBLIC_CSC_API_KEY
 
 const ConferenceForm: React.FC = () => {

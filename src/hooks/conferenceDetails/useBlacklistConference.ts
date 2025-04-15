@@ -2,8 +2,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ConferenceResponse } from '@/src/models/response/conference.response'; // Adjust path
 import { UserResponse } from '@/src/models/response/user.response'; // Adjust path
+import { appConfig } from '@/src/middleware';
 
-const API_ENDPOINT = `${process.env.NEXT_PUBLIC_DATABASE_URL}/api/v1/user`; // Base user endpoint
+const API_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/user`; // Base user endpoint
 
 const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
   const [isBlacklisted, setIsBlacklisted] = useState(false);

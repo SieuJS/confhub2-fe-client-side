@@ -3,7 +3,7 @@
 // import { ConferenceResponse, ConferenceIdentity, Organization, Location, ImportantDate, Rank, Feedback, FollowerInfo } from '../../../models/response/conference.response';
 
 // const API_GET_CONFERENCE_ENDPOINT = 'http://confhub.engineer/api/v1/conference'; //  3005 for details
-// const API_SAVE_CONFERENCE_DETAILS_ENDPOINT = `${process.env.DATABASE_URL}/api/v1/conferences/details/save`;
+// const API_SAVE_CONFERENCE_DETAILS_ENDPOINT = `${process.env.NEXT_PUBLIC_DATABASE_URL}/api/v1/conferences/details/save`;
 
 
 // async function getConferenceFromDB(id: string): Promise<ConferenceResponse> {
@@ -245,7 +245,7 @@
 //   }
 // }
 
-// const API_GET_JSON_CONFERENCE_ENDPOINT = `${process.env.DATABASE_URL}/api/v1/conference`;
+// const API_GET_JSON_CONFERENCE_ENDPOINT = `${process.env.NEXT_PUBLIC_DATABASE_URL}/api/v1/conference`;
 
 // async function getConferenceFromJSON(id: string): Promise<ConferenceResponse> {
 //   try {
@@ -289,8 +289,9 @@
 // export { getConferenceFromDB, getConferenceFromJSON };
 
 // api/getConferenceDetails/getConferenceDetails.ts
+import { appConfig } from '@/src/middleware';
 import { ConferenceResponse} from '../../../models/response/conference.response';
-const API_GET_CONFERENCE_ENDPOINT = process.env.NEXT_PUBLIC_DATABASE_URL || "http://confhub.engineer"; //  3005 for details
+const API_GET_CONFERENCE_ENDPOINT = appConfig.NEXT_PUBLIC_DATABASE_URL || "http://confhub.engineer"; //  3005 for details
 
 
 async function getConferenceFromDB(id: string): Promise<ConferenceResponse> {

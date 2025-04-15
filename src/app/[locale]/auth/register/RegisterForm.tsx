@@ -3,6 +3,7 @@
 import { Link, useRouter } from '@/src/navigation' // <<< Import useRouter
 import React, { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { appConfig } from '@/src/middleware'
 // Bỏ import login nếu không dùng nữa sau khi đăng ký thành công mà chưa xác thực
 // import { login } from '@/src/hooks/auth/useAuthApi'
 
@@ -80,7 +81,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/signup`,
+        `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/signup`,
         {
           method: 'POST',
           headers: {

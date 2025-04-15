@@ -1,8 +1,9 @@
 // src/app/api/conference/visualizationApi.ts
 
+import { appConfig } from "@/src/middleware";
 import { ConferenceDetailsListResponse } from "@/src/models/response/conference.response";
 // Replace with your actual backend URL
-const API_BASE_URL = process.env.DATABASE_URL || "http://confhub.engineer/api/v1";
+const API_BASE_URL = appConfig.NEXT_PUBLIC_DATABASE_URL || "http://confhub.engineer/api/v1";
 
 export async function fetchVisualizationData(): Promise<ConferenceDetailsListResponse> {
     try {

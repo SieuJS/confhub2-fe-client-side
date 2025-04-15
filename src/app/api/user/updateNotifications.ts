@@ -1,11 +1,12 @@
 // src/api/user/updateNotifications.ts
+import { appConfig } from '@/src/middleware';
 import { Notification } from '@/src/models/response/user.response'; // Make sure this import is correct
 
 interface UpdateNotificationsData {
   notifications: Notification[];
 }
 
-const API_UPDATE_NOTIFICATIONS_ENDPOINT = `${process.env.DATABASE_URL}/api/v1`;
+const API_UPDATE_NOTIFICATIONS_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1`;
 
 async function updateNotifications(userId: string, data: UpdateNotificationsData): Promise<void> {
   try {

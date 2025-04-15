@@ -3,6 +3,7 @@ import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { headers } from 'next/headers';
+import { appConfig } from '@/src/middleware';
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
@@ -41,7 +42,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: 'Could not retrieve user information' }, { status: 500 });
     }
 
-    const response = await fetch(`${process.env.DATABASE_URL}/api/v1/user/google-login`, {
+    const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/user/google-login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

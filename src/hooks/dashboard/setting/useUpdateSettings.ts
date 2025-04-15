@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { UserResponse, Setting } from '@/src/models/response/user.response';  // Import your UserResponse and Setting type
 import { updateUser } from '../../../app/api/user/updateUser'; // Adjust path if needed.
+import { appConfig } from '@/src/middleware';
 
 interface UpdateUserResult {
   updateUserSetting: (userId: string, updatedSetting: Partial<Setting>) => Promise<void>;
@@ -19,7 +20,7 @@ export const useUpdateUser = (): UpdateUserResult => {
     setError(null);
     try {
       // Fetch the current user data
-      const response =  await fetch(`${process.env.DATABASE_URL}/api/v1/user/me`, {
+      const response =  await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/user/me`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers

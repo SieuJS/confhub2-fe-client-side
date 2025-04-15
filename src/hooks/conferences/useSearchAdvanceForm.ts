@@ -1,5 +1,6 @@
 // src/hooks/useSearchAdvanceForm.ts
 
+import { appConfig } from '@/src/middleware';
 import { useState, ChangeEvent, KeyboardEvent, useEffect } from 'react'; // Add useEffect
 
 interface UseSearchAdvanceFormProps {
@@ -50,7 +51,7 @@ const useSearchAdvanceForm = ({
   useEffect(() => {
     const fetchTopics = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_DATABASE_URL}/api/v1/conference-organization/topics`);
+        const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/conference-organization/topics`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
