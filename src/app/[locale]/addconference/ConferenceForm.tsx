@@ -15,7 +15,7 @@ import {
 } from '@/src/models/send/addConference.send'
 import { appConfig } from '@/src/middleware'
 
-const API_ADD_CONFERENCE_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/user/add-conference`
+const API_ADD_CONFERENCE_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/conference/add`
 const CSC_API_KEY = process.env.NEXT_PUBLIC_CSC_API_KEY
 
 const ConferenceForm: React.FC = () => {
@@ -308,7 +308,8 @@ const ConferenceForm: React.FC = () => {
       const response = await fetch(API_ADD_CONFERENCE_ENDPOINT, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}` // Thêm token vào header
         },
         body: JSON.stringify({ ...conferenceData, userId })
       })
