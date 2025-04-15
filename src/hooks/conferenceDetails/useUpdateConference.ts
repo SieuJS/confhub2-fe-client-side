@@ -1,6 +1,7 @@
 // In useUpdateConference.ts
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { appConfig } from '@/src/middleware';
 
 interface UpdateConferenceResult {
   success: boolean;
@@ -23,7 +24,7 @@ const useUpdateConference = () => {
     setUpdateResult(null); // Clear previous results
 
     try {
-      const response = await fetch(`http://178.128.28.130:3000/api/v1/conference/update/${conferenceId}`, {
+      const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/conference/update/${conferenceId}`, {
         method: 'POST', // Changed to PUT for updates (more standard RESTful practice), can also be PATCH
         headers: {
           'Content-Type': 'application/json',
