@@ -10,10 +10,11 @@ import { Link } from '@/src/navigation'
 import Button from '../../utils/Button'
 import { useTranslations } from 'next-intl'
 import { getConferenceFromDB } from '@/src/app/api/conference/getConferenceDetails'
+import { appConfig } from '@/src/middleware'
 
 interface NoteTabProps {}
 
-const API_GET_USER_CALENDAR_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}`
+const API_GET_USER_CALENDAR_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}`
 
 const NoteTab: React.FC<NoteTabProps> = () => {
   const t = useTranslations('')
@@ -152,7 +153,8 @@ const NoteTab: React.FC<NoteTabProps> = () => {
         setLoggedIn(true)
 
         const calendarResponse = await fetch(
-          `${API_GET_USER_CALENDAR_ENDPOINT}/api/v1/calendar/events`,{
+          `${API_GET_USER_CALENDAR_ENDPOINT}/api/v1/calendar/events`,
+          {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -172,7 +174,6 @@ const NoteTab: React.FC<NoteTabProps> = () => {
 
         const calendarData: CalendarEvent[] = await calendarResponse.json()
         setCalendarEvents(calendarData)
-
         const today = new Date()
         today.setHours(0, 0, 0, 0)
 
@@ -213,29 +214,30 @@ const NoteTab: React.FC<NoteTabProps> = () => {
 
               let eventName = ''
               if (conferenceDetails.organizations[0].conferenceDates) {
-                const matchingDate = conferenceDetails.organizations[0].conferenceDates.find(
-                  (d: ImportantDate) => {
-                    if (!d) return false
-                    const fromDate = d.fromDate ? new Date(d.fromDate) : null
-                    const toDate = d.toDate ? new Date(d.toDate) : null
-                    const checkDate = new Date(
-                      event.year,
-                      event.month - 1,
-                      event.day
-                    )
+                const matchingDate =
+                  conferenceDetails.organizations[0].conferenceDates.find(
+                    (d: ImportantDate) => {
+                      if (!d) return false
+                      const fromDate = d.fromDate ? new Date(d.fromDate) : null
+                      const toDate = d.toDate ? new Date(d.toDate) : null
+                      const checkDate = new Date(
+                        event.year,
+                        event.month - 1,
+                        event.day
+                      )
 
-                    return (
-                      (fromDate &&
-                        checkDate.getFullYear() === fromDate.getFullYear() &&
-                        checkDate.getMonth() === fromDate.getMonth() &&
-                        checkDate.getDate() === fromDate.getDate()) ||
-                      (fromDate &&
-                        toDate &&
-                        checkDate >= fromDate &&
-                        checkDate <= toDate)
-                    )
-                  }
-                )
+                      return (
+                        (fromDate &&
+                          checkDate.getFullYear() === fromDate.getFullYear() &&
+                          checkDate.getMonth() === fromDate.getMonth() &&
+                          checkDate.getDate() === fromDate.getDate()) ||
+                        (fromDate &&
+                          toDate &&
+                          checkDate >= fromDate &&
+                          checkDate <= toDate)
+                      )
+                    }
+                  )
 
                 if (matchingDate && matchingDate.name) {
                   eventName = matchingDate.name
