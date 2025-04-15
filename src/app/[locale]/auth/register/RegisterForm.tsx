@@ -4,6 +4,7 @@ import { Link, useRouter } from '@/src/navigation' // <<< Import useRouter
 import React, { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { appConfig } from '@/src/middleware'
+import { login } from '@/src/hooks/auth/useAuthApi'
 // Bỏ import login nếu không dùng nữa sau khi đăng ký thành công mà chưa xác thực
 // import { login } from '@/src/hooks/auth/useAuthApi'
 
@@ -81,7 +82,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
 
     try {
       const response = await fetch(
-        `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/signup`,
+        `${process.env.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/signup`,
         {
           method: 'POST',
           headers: {
@@ -98,7 +99,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
       )
 
       const data = await response.json()
-      // login(data) // <<< Không đăng nhập nếu cần verify
+      login(data) // <<< Không đăng nhập nếu cần verify
 
       if (response.status === 201) {
         console.log('Registration pending verification:', data.message)
