@@ -63,6 +63,13 @@ const MobileNavigation: FC<Props> = ({
           {t('Journals')}
         </Link>
         <Link
+          href={`/visualization`}
+          locale={locale}
+          className='px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700'
+        >
+          {t('Visualization')}
+        </Link>
+        <Link
           href={`/chatbot`}
           locale={locale}
           className='px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -81,7 +88,7 @@ const MobileNavigation: FC<Props> = ({
           locale={locale}
           className='px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700'
         >
-          {t('Add_Conference')}
+          {t('Publish')}
         </Link>
 
         {/* Chỉ render phần này sau khi đã chắc chắn ở client */}

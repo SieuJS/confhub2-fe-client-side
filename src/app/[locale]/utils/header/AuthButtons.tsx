@@ -46,22 +46,22 @@ const AuthButtons: FC<Props> = ({
   // Render UI cho trạng thái chưa đăng nhập
   return (
     <>
-      <div className='flex pt-1 font-bold'>
+      <div className='flex  font-bold'>
         {/* <ThemeSwitch /> */}
         {/* <LangSwitcher /> */}
       </div>
       <Link
         lang={locale}
         href={`/auth/login`}
-        className={`group relative inline-flex items-center rounded-md bg-button px-4 py-2 font-semibold text-button-text shadow-md transition-colors duration-200 hover:opacity-90 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-button ${
+        className={`group relative inline-flex items-center rounded-md bg-button px-2 py-2 text-sm font-semibold text-button-text shadow-md transition-colors duration-200 hover:opacity-90 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-button ${
           pathname.includes('/auth/login') ? 'bg-blue-600' : ''
         }`}
       >
         <div className='flex items-center'>
           <svg
             xmlns='http://www.w3.org/2000/svg'
-            width='24'
-            height='24'
+            width='20'
+            height='20'
             viewBox='0 0 24 24'
             fill='none'
             stroke='#ffffff'
