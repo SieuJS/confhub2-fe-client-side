@@ -2,7 +2,7 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-
+import remarkBreaks from 'remark-breaks';
 
 interface ChatMessageProps {
     message: string;
@@ -24,7 +24,7 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({ message, isUser }) =
             {/* Thay đổi ở đây: bỏ max-w-md hoặc thay bằng giá trị lớn hơn, có thể bỏ w-full */}
             <div className={`p-4 rounded-lg  ${isUser ? 'bg-blue-100 text-gray-700' : 'bg-green-100 text-black'} break-words`}>
                 <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
+                    remarkPlugins={[remarkGfm, remarkBreaks]} // Added remarkBreaks
                     rehypePlugins={[rehypeRaw]}
                     components={{
 

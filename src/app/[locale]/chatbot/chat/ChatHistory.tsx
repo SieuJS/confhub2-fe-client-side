@@ -1,7 +1,8 @@
-// Trong ChatHistory.tsx
+// src/components/ChatHistory.tsx
 import React, { useRef, useEffect } from 'react';
-import ChatMessage from './ChatMessage';
-import { ChatMessageType } from './ChatBot'; // Giả sử bạn export type này
+import ChatMessageComponent from './ChatMessage'; // Renamed from ChatMessage to avoid conflict
+import ThoughtProcess from './ThoughtProcess'; // *** IMPORT ThoughtProcess ***
+import { ChatMessageType } from './ChatBot';
 
 interface ChatHistoryProps {
     messages: ChatMessageType[];
@@ -11,37 +12,41 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ messages }) => {
     const chatHistoryRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        // console.log("ChatHistory received messages prop:", messages); // Bỏ comment nếu cần debug
         const chatHistoryElement = chatHistoryRef.current;
         if (chatHistoryElement) {
-            // Cuộn xuống dưới cùng một cách mượt mà hơn khi có tin nhắn mới
-            chatHistoryElement.scrollTo({
+                chatHistoryElement.scrollTo({
                 top: chatHistoryElement.scrollHeight,
-                behavior: 'smooth' // Thêm hiệu ứng cuộn mượt
+                behavior: 'smooth'
             });
         }
-    }, [messages]); // Chỉ chạy khi messages thay đổi
+    }, [messages]);
 
     return (
-        // THAY ĐỔI Ở ĐÂY: Thêm class `flex-1`
         <div
             id="chat-history"
-            className="flex-1 p-2 border border-gray-200 rounded-lg mb-2 relative overflow-y-auto" // Giữ mb-4 hoặc mb-5 tùy ý
+            className="flex-1 p-4 space-y-4 border border-gray-200 dark:border-gray-700 rounded-lg mb-4 relative overflow-y-auto bg-white dark:bg-gray-800" // Added padding, space-y, background
             ref={chatHistoryRef}
         >
             {messages.map((msg, index) => {
-                // max-w-full là ổn để tin nhắn không bị giới hạn chiều rộng không cần thiết
+                // Use flex alignment instead of float for better control
                 const containerClasses = `message-container p-3 rounded-xl clear-both max-w-full ${msg.isUser ? 'float-right text-right' : 'float-left text-left'}`;
-                // Sử dụng flex justify-end/start thay cho float để căn chỉnh tốt hơn
+
                 return (
                     <div key={index} className={containerClasses}>
-                        {/* Bọc nội dung trong một div con để áp dụng background và padding */}
-                        <div className={`inline-block`}> {/* Giới hạn chiều rộng của bong bóng chat */}
-                            {msg.isUser ? (
-                                <ChatMessage message={msg.message} isUser={msg.isUser} />
-                            ) : (
-                                    <ChatMessage message={msg.message} isUser={msg.isUser} />
-                                )}
+                        {/* Container for message bubble and potentially thoughts */}
+                        <div className={`flex flex-col ${msg.isUser ? 'items-end' : 'items-start'}`}>
+                            {/* *** Render ThoughtProcess for bot messages *** */}
+                            {!msg.isUser && msg.thoughts && msg.thoughts.length > 0 && (
+                                <ThoughtProcess thoughts={msg.thoughts} />
+                            )}
+
+                            {/* Render the actual message */}
+                            <ChatMessageComponent
+                                message={msg.message}
+                                isUser={msg.isUser}
+                                // Pass type if ChatMessageComponent needs it
+                                // type={msg.type}
+                            />
                         </div>
                     </div>
                 );
