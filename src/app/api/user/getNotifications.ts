@@ -1,9 +1,10 @@
 // src/api/user/getNotifications.ts
+import { appConfig } from '@/src/middleware';
 import { Notification } from '@/src/models/response/user.response'; // Import Notification
 
 export const getNotifications = async (userId: string): Promise<Notification[] | null> => {
   try {
-    const response = await fetch(`${process.env.DATABASE_URL}/api/v1/notification/user`,
+    const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/user`,
       {
         headers : {
           'Content-Type': 'application/json',

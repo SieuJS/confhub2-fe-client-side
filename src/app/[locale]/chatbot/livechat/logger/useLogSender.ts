@@ -2,6 +2,7 @@
 import { useCallback } from "react";
 import { debounce } from "lodash";
 import { StreamingLog } from "../multimodal-live-types";
+import { appConfig } from "@/src/middleware";
 
 async function sendLogToBackend(log: StreamingLog) {
   try {
@@ -12,7 +13,7 @@ async function sendLogToBackend(log: StreamingLog) {
       count: log.count || null,
     };
 
-    const response = await fetch(`${process.env.DATABASE_URL}/log`, {
+    const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/log`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

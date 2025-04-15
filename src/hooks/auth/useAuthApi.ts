@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation'; // Correct import for App Router
 import { AuthResponse, UserResponse } from '@/src/models/response/user.response'; // Adjust path as needed
+import { appConfig } from '@/src/middleware';
 
 // --- Helper Functions (ngoài component để tránh tạo lại và chạy ở client) ---
 
@@ -261,7 +262,7 @@ const useAuthApi = (): AuthApiResult => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${process.env.DATABASE_URL}/api/v1/auth/login`, {
+      const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({...credentials , mode : "user"}),

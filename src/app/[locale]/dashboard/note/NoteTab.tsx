@@ -6,14 +6,14 @@ import {
   ConferenceResponse,
   ImportantDate
 } from '../../../../models/response/conference.response'
-import { getConferenceFromJSON } from '../../../../app/api/conference/getConferenceDetails'
 import { Link } from '@/src/navigation'
 import Button from '../../utils/Button'
 import { useTranslations } from 'next-intl'
+import { getConferenceFromDB } from '@/src/app/api/conference/getConferenceDetails'
 
 interface NoteTabProps {}
 
-const API_GET_USER_CALENDAR_ENDPOINT = `${process.env.DATABASE_URL}/api/v1/user`
+const API_GET_USER_CALENDAR_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}`
 
 const NoteTab: React.FC<NoteTabProps> = () => {
   const t = useTranslations('')
@@ -152,7 +152,13 @@ const NoteTab: React.FC<NoteTabProps> = () => {
         setLoggedIn(true)
 
         const calendarResponse = await fetch(
-          `${API_GET_USER_CALENDAR_ENDPOINT}/${user.id}/calendar`
+          `${API_GET_USER_CALENDAR_ENDPOINT}/api/v1/calendar/events`,{
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json'
+            }
+          }
         )
 
         if (!calendarResponse.ok) {
@@ -203,11 +209,11 @@ const NoteTab: React.FC<NoteTabProps> = () => {
 
             try {
               const conferenceDetails: ConferenceResponse =
-                await getConferenceFromJSON(event.conferenceId)
+                await getConferenceFromDB(event.conferenceId)
 
               let eventName = ''
-              if (conferenceDetails.dates) {
-                const matchingDate = conferenceDetails.dates.find(
+              if (conferenceDetails.organizations[0].conferenceDates) {
+                const matchingDate = conferenceDetails.organizations[0].conferenceDates.find(
                   (d: ImportantDate) => {
                     if (!d) return false
                     const fromDate = d.fromDate ? new Date(d.fromDate) : null
@@ -240,7 +246,7 @@ const NoteTab: React.FC<NoteTabProps> = () => {
                 type: event.type,
                 conference: event.conference,
                 id: event.conferenceId,
-                location: `${conferenceDetails.location?.cityStateProvince}, ${conferenceDetails.location?.country}`,
+                location: `${conferenceDetails.organizations[0].locations[0].cityStateProvince}, ${conferenceDetails.organizations[0].locations[0].country}`,
                 date: formattedDate,
                 countdown: countdownString,
                 year: event.year,

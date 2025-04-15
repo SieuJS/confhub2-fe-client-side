@@ -1,6 +1,7 @@
 // frontend/hooks/useMyConferences.ts
 import { useState, useEffect } from 'react';
 import { AddedConference } from '../../../models/send/addConference.send'; //  Define this type
+import { appConfig } from '@/src/middleware';
 
 // Define the shape of the data returned by the API
 interface UseMyConferencesResult {
@@ -19,7 +20,7 @@ const useMyConferences = (userId: string): UseMyConferencesResult => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${process.env.DATABASE_URL}/api/v1/user/${userId}/my-conferences`);
+            const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/user/${userId}/my-conferences`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch conferences: ${response.status} ${response.statusText}`);
             }

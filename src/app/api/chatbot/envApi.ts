@@ -1,6 +1,8 @@
 // src/api/envApi.ts
 
-const API_BASE_URL = `${process.env.DATABASE_URL}/api`;
+import { appConfig } from "@/src/middleware";
+
+const API_BASE_URL = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api`;
 
 interface EnvResponse {
     success: boolean;

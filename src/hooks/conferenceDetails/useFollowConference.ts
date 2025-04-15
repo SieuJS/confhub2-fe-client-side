@@ -2,9 +2,9 @@
 import { useState, useEffect } from 'react';
 import { ConferenceResponse } from '../../models/response/conference.response';
 import { Follow, UserResponse } from '../../models/response/user.response';
+import { appConfig } from '@/src/middleware';
 
-const API_ENDPOINT = `${process.env.DATABASE_URL}/api/v1`;
-
+const API_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1`;
 const useFollowConference = (conferenceData: ConferenceResponse | null) => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -26,9 +26,8 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
           return;
       }
 
-      const user = JSON.parse(userData);
       try {
-        const response = await fetch(`${API_ENDPOINT}/user/follow-conferences`, {
+        const response = await fetch(`${API_ENDPOINT}/follow-conference/followed`, {
           method: 'GET',
           headers:{
             "Authorization": `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
@@ -39,10 +38,9 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const follows: Follow[] = await response.json();
-        console.log('userData', userData);
         setIsFollowing(
           follows.some(
-            (followedConf) => followedConf.conferenceId === conferenceData?.id
+            (followedConf) => followedConf.id === conferenceData?.id
           ) ?? false
         );
       } catch (err:any) {
@@ -76,7 +74,7 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
     setError(null);
 
     try {
-      const response = await fetch(`${API_ENDPOINT}/user${isFollowing ? '/unfollow-conference' : '/follow-conference'}`, {
+      const response = await fetch(`${API_ENDPOINT}/follow-conference${isFollowing ? '/remove' : '/add'}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -93,6 +91,8 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
       }
 
       const follows: Follow[] = await response.json();
+      console.log('follows', follows);
+
       setIsFollowing(follows?.some(conf => conf.conferenceId === conferenceId) ?? false); // FIXED HERE
     } catch (err:any) {
       setError(err.message || 'Error following/unfollowing conference.');
@@ -101,7 +101,6 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
       setLoading(false);
     }
   };
-
   return { isFollowing, handleFollowClick, loading, error };
 };
 

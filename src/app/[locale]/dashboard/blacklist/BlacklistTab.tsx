@@ -10,10 +10,11 @@ import {
 import { timeAgo, formatDateFull } from '../timeFormat'
 import Tooltip from '../../utils/Tooltip'
 import { useTranslations } from 'next-intl'
+import { appConfig } from '@/src/middleware'
 
 interface BlacklistTabProps {}
 
-const API_GET_USER_ENDPOINT = `${process.env.DATABASE_URL}/api/v1/user`
+const API_GET_USER_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/user`
 
 const BlacklistTab: React.FC<BlacklistTabProps> = () => {
   const t = useTranslations('')

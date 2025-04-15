@@ -13,8 +13,9 @@ import {
   Country,
   ConferenceFormData
 } from '@/src/models/send/addConference.send' //  paths might need adjusting
+import { appConfig } from '@/src/middleware'
 
-const API_BASE_URL = `${process.env.DATABASE_URL}/api/v1`
+const API_BASE_URL = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1`
 const API_ADD_CONFERENCE_ENDPOINT = `${API_BASE_URL}/user/add-conference`
 const API_UPDATE_CONFERENCE_ENDPOINT = `${API_BASE_URL}/conferences` // No [id] here
 const CSC_API_KEY = process.env.NEXT_PUBLIC_CSC_API_KEY
@@ -57,7 +58,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
   const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [loading, setLoading] = useState(false) // Loading state
   const [error, setError] = useState<string | null>(null) // Error state
-  const [userId, setUserId] = useState<string>('');
+  const [userId, setUserId] = useState<string>('')
 
   // --- Location States ---
   const [countries, setCountries] = useState<Country[]>([])
@@ -70,9 +71,10 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
   const [filteredCountries, setFilteredCountries] = useState<Country[]>([])
 
   // --- Loading States ---
-  const [isFetchingLocations, setIsFetchingLocations] = useState(false);
-  const [initialCityStateProvinceValue, setInitialCityStateProvinceValue] = useState<string | null>(null);
-  const [initialLocationSet, setInitialLocationSet] = useState(false);
+  const [isFetchingLocations, setIsFetchingLocations] = useState(false)
+  const [initialCityStateProvinceValue, setInitialCityStateProvinceValue] =
+    useState<string | null>(null)
+  const [initialLocationSet, setInitialLocationSet] = useState(false)
 
   const continentOptions = ['Americas', 'Europe', 'Asia', 'Africa', 'Oceania']
   const dateTypeOptions = [
@@ -84,30 +86,31 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
   ]
 
   useEffect(() => {
-    const userData = localStorage.getItem('user');
+    const userData = localStorage.getItem('user')
     if (userData) {
-        const user = JSON.parse(userData);
-        console.log("User ID from localStorage:", user.id); // Add this line
+      const user = JSON.parse(userData)
+      console.log('User ID from localStorage:', user.id) // Add this line
 
-        setUserId(user.id);
+      setUserId(user.id)
     }
-  }, []);
+  }, [])
 
   // --- Data Fetching (for editing) ---
   useEffect(() => {
-    
     const fetchData = async () => {
       if (!conferenceId || !userId) return
       setLoading(true)
       setError(null)
-      setInitialCityStateProvinceValue(null); // Reset giá trị cũ
+      setInitialCityStateProvinceValue(null) // Reset giá trị cũ
       try {
         const res = await fetch(`${API_BASE_URL}/user/${userId}/my-conferences`)
         if (!res.ok) {
           throw new Error(`Failed to fetch: ${res.status}`)
         }
         const data = await res.json()
-        const fetchedConferences = data.find((c: any) => c.conference.id === conferenceId)
+        const fetchedConferences = data.find(
+          (c: any) => c.conference.id === conferenceId
+        )
         //  Populate form fields
         setTitle(fetchedConferences.conference.title || '')
         setAcronym(fetchedConferences.conference.acronym || '')
@@ -116,7 +119,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
         setType(fetchedConferences.organization.accessType || 'offline') //  Default to offline
         setDescription(fetchedConferences.organization.summerize || '')
         setImageUrl(fetchedConferences.imageUrl || '')
-        
+
         // Set location fetchedConferences, handle the case where it is string
         if (fetchedConferences.location) {
           if (typeof fetchedConferences.location === 'string') {
@@ -129,21 +132,22 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
                 continent: fetchedConferences.continent || '' // Add continent if available
               })
               setSelectedContinent(fetchedConferences.continent)
-              setInitialCityStateProvinceValue(locationParts[0] || null);
+              setInitialCityStateProvinceValue(locationParts[0] || null)
               const country = countryData.find(
                 (c: any) => c.name === locationParts[1]
               )
               if (country) {
-                setSelectedCountry(country.iso2); // Trigger useEffect fetch states/cities
+                setSelectedCountry(country.iso2) // Trigger useEffect fetch states/cities
               } else {
-                setSelectedCountry('');
-                setInitialCityStateProvinceValue(null); // Reset nếu country không hợp lệ
+                setSelectedCountry('')
+                setInitialCityStateProvinceValue(null) // Reset nếu country không hợp lệ
               }
             }
           } else {
             setLocation({
               address: fetchedConferences.location.address || '',
-              cityStateProvince: fetchedConferences.location.cityStateProvince || '',
+              cityStateProvince:
+                fetchedConferences.location.cityStateProvince || '',
               country: fetchedConferences.location.country || '',
               continent: fetchedConferences.location.continent || ''
             })
@@ -151,22 +155,25 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
             const country = countryData.find(
               (c: any) => c.name === fetchedConferences.location.country
             )
-            setInitialCityStateProvinceValue(fetchedConferences.location.cityStateProvince || null);
+            setInitialCityStateProvinceValue(
+              fetchedConferences.location.cityStateProvince || null
+            )
             if (country) {
-              setSelectedCountry(country.iso2); // Trigger useEffect fetch states/cities
+              setSelectedCountry(country.iso2) // Trigger useEffect fetch states/cities
             } else {
-              setSelectedCountry('');
-              setInitialCityStateProvinceValue(null); // Reset nếu country không hợp lệ
-
+              setSelectedCountry('')
+              setInitialCityStateProvinceValue(null) // Reset nếu country không hợp lệ
             }
           }
-        }
-        else {
-          setInitialCityStateProvinceValue(null);
+        } else {
+          setInitialCityStateProvinceValue(null)
         }
 
         // Set dates
-        if (fetchedConferences.dates && Array.isArray(fetchedConferences.dates)) {
+        if (
+          fetchedConferences.dates &&
+          Array.isArray(fetchedConferences.dates)
+        ) {
           const fetchedDates = fetchedConferences.dates.map((d: any) => ({
             type: d.type || '',
             name: d.name || '',
@@ -205,7 +212,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
       } catch (err: any) {
         setError(err.message)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
     fetchData()
@@ -220,23 +227,28 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
     setCountries(mappedCountries)
   }, [])
 
-
   useEffect(() => {
     if (selectedContinent) {
-      setStates([]);
-      setCities([]);
-      setSelectedState('');
-      setSelectedCity('');
+      setStates([])
+      setCities([])
+      setSelectedState('')
+      setSelectedCity('')
       const newFilteredCountries = countries.filter(
         country => country.region === selectedContinent
       )
       setFilteredCountries(newFilteredCountries)
-      if (initialLocationSet && selectedCountry && !newFilteredCountries.some(c => c.iso2 === selectedCountry)) {
-        setSelectedCountry('');
+      if (
+        initialLocationSet &&
+        selectedCountry &&
+        !newFilteredCountries.some(c => c.iso2 === selectedCountry)
+      ) {
+        setSelectedCountry('')
       }
       setLocation({
         ...location,
-        country: newFilteredCountries.find(c => c.iso2 === selectedCountry)?.name || '',
+        country:
+          newFilteredCountries.find(c => c.iso2 === selectedCountry)?.name ||
+          '',
         cityStateProvince: '',
         continent: selectedContinent
       })
@@ -244,41 +256,41 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
       setFilteredCountries([])
     }
     if (!selectedContinent && initialLocationSet) {
-      setStates([]);
-      setCities([]);
-      setSelectedCountry('');
-      setSelectedState('');
-      setSelectedCity('');
+      setStates([])
+      setCities([])
+      setSelectedCountry('')
+      setSelectedState('')
+      setSelectedCity('')
       setLocation({
         ...location,
         country: '',
         cityStateProvince: '',
         continent: selectedContinent
       })
-  }
+    }
   }, [selectedContinent, countries, initialLocationSet, selectedCountry])
 
   useEffect(() => {
     const fetchStatesOrCities = async () => {
-    if (initialLocationSet) {
+      if (initialLocationSet) {
         setStates([])
         setCities([])
-        setSelectedState('');
-        setSelectedCity('');
-        setLocation(prev => ({ ...prev, cityStateProvince: '' }));
-    }
-    if (!selectedCountry) {
-      setIsFetchingLocations(false);
-      setStates([])
-      setCities([])
-      // Nếu country bị xóa (không phải lần load đầu), đánh dấu là đã xử lý xong
-      if (initialLocationSet) {
-          console.log("eff5: Country cleared, marking initial location set");
-          // Không cần set lại setInitialLocationSet(true) vì nó đã là true
+        setSelectedState('')
+        setSelectedCity('')
+        setLocation(prev => ({ ...prev, cityStateProvince: '' }))
       }
-      return;
-    }
-      setIsFetchingLocations(true);
+      if (!selectedCountry) {
+        setIsFetchingLocations(false)
+        setStates([])
+        setCities([])
+        // Nếu country bị xóa (không phải lần load đầu), đánh dấu là đã xử lý xong
+        if (initialLocationSet) {
+          console.log('eff5: Country cleared, marking initial location set')
+          // Không cần set lại setInitialLocationSet(true) vì nó đã là true
+        }
+        return
+      }
+      setIsFetchingLocations(true)
       try {
         const statesResponse = await fetch(
           `https://api.countrystatecity.in/v1/countries/${selectedCountry}/states`,
@@ -348,7 +360,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
         setStates([])
         setCities([])
       } finally {
-        setIsFetchingLocations(false);
+        setIsFetchingLocations(false)
       }
     }
     fetchStatesOrCities()
@@ -356,61 +368,76 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
 
   useEffect(() => {
     // Chỉ chạy khi có giá trị ban đầu, có states/cities VÀ chưa xử lý lần đầu
-    if (initialCityStateProvinceValue && (states.length > 0 || cities.length > 0)) {
-      let found = false; // Cờ kiểm tra xem đã tìm thấy và set hay chưa
+    if (
+      initialCityStateProvinceValue &&
+      (states.length > 0 || cities.length > 0)
+    ) {
+      let found = false // Cờ kiểm tra xem đã tìm thấy và set hay chưa
 
       if (states.length > 0) {
-        const foundState = states.find(s => s.name === initialCityStateProvinceValue);
+        const foundState = states.find(
+          s => s.name === initialCityStateProvinceValue
+        )
         if (foundState) {
-          setSelectedState(foundState.iso2);
-          setLocation(prev => ({ ...prev, cityStateProvince: foundState.name }));
-          found = true;
-          
+          setSelectedState(foundState.iso2)
+          setLocation(prev => ({ ...prev, cityStateProvince: foundState.name }))
+          found = true
         } else {
-           console.warn("Initial state not found in states list:", initialCityStateProvinceValue);
+          console.warn(
+            'Initial state not found in states list:',
+            initialCityStateProvinceValue
+          )
         }
       }
 
       // Chỉ tìm city nếu không tìm thấy state hoặc không có state nào
       if (!found && cities.length > 0) {
-        const foundCity = cities.find(c => c.name === initialCityStateProvinceValue);
+        const foundCity = cities.find(
+          c => c.name === initialCityStateProvinceValue
+        )
         if (foundCity) {
-          setSelectedCity(foundCity.name);
-          setLocation(prev => ({ ...prev, cityStateProvince: foundCity.name }));
-          found = true;
+          setSelectedCity(foundCity.name)
+          setLocation(prev => ({ ...prev, cityStateProvince: foundCity.name }))
+          found = true
         } else {
-            console.warn("Initial city not found in cities list:", initialCityStateProvinceValue);
+          console.warn(
+            'Initial city not found in cities list:',
+            initialCityStateProvinceValue
+          )
         }
       }
 
       // Đánh dấu đã xử lý sau khi đã thử tìm kiếm
-      setInitialLocationSet(true);
+      setInitialLocationSet(true)
       //setInitialCityStateProvinceValue(null) //Xóa dòng này nếu muốn hiển thị lại state/province gốc khi quay về country ban đầu
-      console.log("Marked initial data as processed.");
-
+      console.log('Marked initial data as processed.')
     }
     // Xử lý trường hợp không có giá trị ban đầu hoặc không có state/city để set
     // nhưng states/cities đã load xong (để đánh dấu là đã xử lý)
     else if (selectedCountry && (states.length > 0 || cities.length > 0)) {
-        console.log("Marking initial data as processed because states/cities loaded but no initial value or match.");
-        setInitialLocationSet(true);
+      console.log(
+        'Marking initial data as processed because states/cities loaded but no initial value or match.'
+      )
+      setInitialLocationSet(true)
     }
-     // Xử lý trường hợp không có state/city nào được trả về từ API
+    // Xử lý trường hợp không có state/city nào được trả về từ API
     else if (selectedCountry && states.length === 0 && cities.length === 0) {
-        console.log("Marking initial data as processed because country selected but no states/cities found and not loading.");
-        setInitialLocationSet(true); 
+      console.log(
+        'Marking initial data as processed because country selected but no states/cities found and not loading.'
+      )
+      setInitialLocationSet(true)
     }
 
-  // Chạy khi states, cities, initialCityStateProvinceValue, hoặc cờ processed thay đổi
-  }, [states, cities, initialCityStateProvinceValue, isFetchingLocations] );
+    // Chạy khi states, cities, initialCityStateProvinceValue, hoặc cờ processed thay đổi
+  }, [states, cities, initialCityStateProvinceValue, isFetchingLocations])
 
   const handleContinentChange = (continent: string) => {
-    setInitialLocationSet(true); // <<< Đặt cờ là TRUE
+    setInitialLocationSet(true) // <<< Đặt cờ là TRUE
     setSelectedContinent(continent)
   }
 
   const handleCountryChange = (countryIso2: string) => {
-    setInitialLocationSet(true); // <<< Đặt cờ là TRUE
+    setInitialLocationSet(true) // <<< Đặt cờ là TRUE
     setSelectedCountry(countryIso2)
     setLocation({
       ...location,
@@ -420,17 +447,16 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
   }
 
   const handleStateChange = (stateIso2: string) => {
-    setInitialLocationSet(true); // <<< Đặt cờ là TRUE
+    setInitialLocationSet(true) // <<< Đặt cờ là TRUE
     setSelectedState(stateIso2)
     setLocation({
       ...location,
-      cityStateProvince:
-        states.find(s => s.iso2 === stateIso2)?.name || ''
+      cityStateProvince: states.find(s => s.iso2 === stateIso2)?.name || ''
     })
   }
 
   const handleCityChange = (cityName: string) => {
-    setInitialLocationSet(true); // <<< Đặt cờ là TRUE
+    setInitialLocationSet(true) // <<< Đặt cờ là TRUE
     setSelectedCity(cityName)
     setLocation({
       ...location,
@@ -561,7 +587,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
   const renderStepOne = () => (
     <>
       {/* Step 1 Form Fields (giữ nguyên nội dung) */}
-       <div className='sm:col-span-2'>
+      <div className='sm:col-span-2'>
         <label htmlFor='title' className='block text-sm  '>
           * {t('Conference_Name')}:
         </label>
@@ -626,7 +652,9 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
 
       <div className='sm:col-span-2'>
         <label className='block text-base  '>* {t('Location')}:</label>
-        <div className='grid grid-cols-1 gap-y-4 sm:grid-cols-2 md:grid-cols-4 sm:gap-x-4'> {/* Responsive Grid */}
+        <div className='grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-4 md:grid-cols-4'>
+          {' '}
+          {/* Responsive Grid */}
           <div>
             <label htmlFor='address' className='block text-sm  '>
               {t('Address')}:
@@ -640,7 +668,6 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
               required
             />
           </div>
-
           <div>
             <label htmlFor='continent' className='block text-sm'>
               {t('Continent')}:
@@ -721,7 +748,10 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
         <label className='block text-sm  '>{t('Important_Dates')}:</label>
         {dates.map((date, index) => (
           // Grid cho Dates: 1 cột mặc định, 2 cột trên sm, 4 cột trên lg
-          <div key={index} className='mt-1 grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-4 lg:gap-x-4'>
+          <div
+            key={index}
+            className='mt-1 grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-4 lg:gap-x-4'
+          >
             <div>
               <label htmlFor={`name-${index}`} className='block text-sm  '>
                 {t('Name')}:
@@ -773,7 +803,9 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
                 required
               />
             </div>
-            <div className="relative"> {/* Container cho nút xóa */}
+            <div className='relative'>
+              {' '}
+              {/* Container cho nút xóa */}
               <label htmlFor={`toDate-${index}`} className='block text-sm  '>
                 {t('End')}: {/* Đổi label */}
               </label>
@@ -795,8 +827,17 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
                   className='absolute -right-6 top-1/2 mt-2 -translate-y-1/2 text-red-500 hover:text-red-700 focus:outline-none sm:-right-8' // Điều chỉnh vị trí nút xóa
                   aria-label='Remove date'
                 >
-                  <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5' viewBox='0 0 20 20' fill='currentColor'>
-                    <path fillRule='evenodd' d='M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 111.414 1.414L11.414 10l2.293 2.293a1 1 0 01-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 01-1.414-1.414L8.586 10 6.293 7.707a1 1 0 010-1.414z' clipRule='evenodd' />
+                  <svg
+                    xmlns='http://www.w3.org/2000/svg'
+                    className='h-5 w-5'
+                    viewBox='0 0 20 20'
+                    fill='currentColor'
+                  >
+                    <path
+                      fillRule='evenodd'
+                      d='M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 111.414 1.414L11.414 10l2.293 2.293a1 1 0 01-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 01-1.414-1.414L8.586 10 6.293 7.707a1 1 0 010-1.414z'
+                      clipRule='evenodd'
+                    />
                   </svg>
                 </button>
               )}
@@ -812,7 +853,9 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
         </button>
       </div>
       {/* Topics Section: Sắp xếp lại input và button */}
-      <div className='sm:col-span-2'> {/* Để chiếm toàn bộ chiều rộng trên mobile */}
+      <div className='sm:col-span-2'>
+        {' '}
+        {/* Để chiếm toàn bộ chiều rộng trên mobile */}
         <label htmlFor='newTopic' className='block text-sm  '>
           {t('Topics')}:
         </label>
@@ -833,28 +876,41 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
             {t('Add')}
           </button>
         </div>
-         {/* Hiển thị topics đã chọn */}
-         <div className='mt-3 flex flex-wrap gap-2'>
-            {topics.map((topic, index) => (
-              <span
-                key={index}
-                className='inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold '
+        {/* Hiển thị topics đã chọn */}
+        <div className='mt-3 flex flex-wrap gap-2'>
+          {topics.map((topic, index) => (
+            <span
+              key={index}
+              className='inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold '
+            >
+              {topic}
+              <button
+                type='button'
+                onClick={() => handleRemoveTopic(topic)}
+                className='hover: ml-1.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-gray-300 focus:bg-gray-400 focus:text-white focus:outline-none'
+                aria-label={`Remove ${topic}`}
               >
-                {topic}
-                <button
-                  type='button'
-                  onClick={() => handleRemoveTopic(topic)}
-                  className='ml-1.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-gray-300 hover: focus:bg-gray-400 focus:text-white focus:outline-none'
-                  aria-label={`Remove ${topic}`}
+                <svg
+                  className='h-2 w-2'
+                  stroke='currentColor'
+                  fill='none'
+                  viewBox='0 0 8 8'
                 >
-                 <svg className="h-2 w-2" stroke="currentColor" fill="none" viewBox="0 0 8 8"><path strokeLinecap="round" strokeWidth="1.5" d="M1 1l6 6m0-6L1 7" /></svg>
-                </button>
-              </span>
-            ))}
-          </div>
+                  <path
+                    strokeLinecap='round'
+                    strokeWidth='1.5'
+                    d='M1 1l6 6m0-6L1 7'
+                  />
+                </svg>
+              </button>
+            </span>
+          ))}
+        </div>
       </div>
       {/* Image URL và Description (giữ nguyên hoặc điều chỉnh grid nếu cần) */}
-      <div className='sm:col-span-2'> {/* Có thể cho Image URL chiếm 1 cột trên md+ */}
+      <div className='sm:col-span-2'>
+        {' '}
+        {/* Có thể cho Image URL chiếm 1 cột trên md+ */}
         <label htmlFor='imageUrl' className='block text-sm  '>
           {t('Image_URL')}:
         </label>
@@ -883,8 +939,12 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
 
   const renderStepTwo = () => (
     // Step 2 Content (giữ nguyên nội dung, Tailwind sẽ tự xuống dòng)
-     <div className='space-y-3 sm:col-span-2'> {/* Thêm space-y để tạo khoảng cách giữa các dòng */}
-      <h2 className='mb-4 text-lg font-semibold sm:text-xl'>{t('Review_Information')}</h2>
+    <div className='space-y-3 sm:col-span-2'>
+      {' '}
+      {/* Thêm space-y để tạo khoảng cách giữa các dòng */}
+      <h2 className='mb-4 text-lg font-semibold sm:text-xl'>
+        {t('Review_Information')}
+      </h2>
       <p>
         <strong>{t('Conference_Name')}:</strong> {title}
       </p>
@@ -893,7 +953,14 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
       </p>
       <p>
         <strong>{t('Link')}:</strong>{' '}
-        <a href={link} target='_blank' rel='noopener noreferrer' className='break-all text-button hover:underline'> {/* break-all để xuống dòng nếu link quá dài */}
+        <a
+          href={link}
+          target='_blank'
+          rel='noopener noreferrer'
+          className='break-all text-button hover:underline'
+        >
+          {' '}
+          {/* break-all để xuống dòng nếu link quá dài */}
           {link}
         </a>
       </p>
@@ -911,39 +978,54 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
       </p>
       <p>
         <strong>
-          {states.length > 0 ? t('State_Province') : t('City')}: {/* Sửa logic hiển thị label */}
+          {states.length > 0 ? t('State_Province') : t('City')}:{' '}
+          {/* Sửa logic hiển thị label */}
         </strong>{' '}
         {location.cityStateProvince}
       </p>
-
-      <div> {/* Bọc list dates trong div để dễ quản lý */}
+      <div>
+        {' '}
+        {/* Bọc list dates trong div để dễ quản lý */}
         <strong>{t('Important_Dates')}:</strong>
-        <ul className="list-disc pl-5 mt-1 space-y-1"> {/* Thêm style cho list */}
+        <ul className='mt-1 list-disc space-y-1 pl-5'>
+          {' '}
+          {/* Thêm style cho list */}
           {dates.map((date, index) => (
             <li key={index}>
-              {date.name || 'Unnamed Date'}: {date.fromDate || 'N/A'} - {date.toDate || 'N/A'} ({date.type || 'N/A'})
+              {date.name || 'Unnamed Date'}: {date.fromDate || 'N/A'} -{' '}
+              {date.toDate || 'N/A'} ({date.type || 'N/A'})
             </li>
           ))}
         </ul>
       </div>
-      <div> {/* Bọc list topics */}
+      <div>
+        {' '}
+        {/* Bọc list topics */}
         <strong>{t('Topics')}:</strong>
         {topics.length > 0 ? (
-            <span className="ml-2">{topics.join(', ')}</span>
-         ) : (
-            <span className="ml-2 italic text-gray-500">No topics added</span>
-         )}
+          <span className='ml-2'>{topics.join(', ')}</span>
+        ) : (
+          <span className='ml-2 italic text-gray-500'>No topics added</span>
+        )}
       </div>
       {imageUrl && (
         <p>
           <strong>{t('Image_URL')}:</strong>{' '}
-          <a href={imageUrl} target='_blank' rel='noopener noreferrer' className='break-all text-button hover:underline'>
+          <a
+            href={imageUrl}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='break-all text-button hover:underline'
+          >
             {imageUrl}
           </a>
         </p>
       )}
       <p>
-        <strong>{t('Description')}:</strong> {description || <span className="italic text-gray-500">No description provided</span>}
+        <strong>{t('Description')}:</strong>{' '}
+        {description || (
+          <span className='italic text-gray-500'>No description provided</span>
+        )}
       </p>
     </div>
   )
@@ -954,7 +1036,9 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
       <h2 className='mb-4 text-lg font-semibold sm:text-xl'>
         {t('Terms_and_Conditions')}
       </h2>
-      <div className='mb-4 max-h-60 overflow-y-auto rounded border p-4'> {/* Giới hạn chiều cao và cho phép cuộn */}
+      <div className='mb-4 max-h-60 overflow-y-auto rounded border p-4'>
+        {' '}
+        {/* Giới hạn chiều cao và cho phép cuộn */}
         <p>
           Bằng cách nhấp vào nút Đăng hội nghị, tôi xác nhận rằng tôi đã đọc,
           hiểu và đồng ý tuân thủ tất cả các điều khoản và điều kiện dành cho
@@ -970,52 +1054,100 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
           onChange={e => setAgreedToTerms(e.target.checked)}
           className='mr-2 h-4 w-4 rounded border-gray-300 text-button focus:ring-button' // Style checkbox
         />
-        <span className='text-sm'>{t('I_agree_to_the_terms_and_conditions')}</span>
+        <span className='text-sm'>
+          {t('I_agree_to_the_terms_and_conditions')}
+        </span>
       </label>
     </div>
   )
 
   return (
-    <div className="mx-auto  px-4 py-8 sm:px-6 lg:px-8"> {/* Container chính */}
+    <div className='mx-auto  px-4 py-8 sm:px-6 lg:px-8'>
+      {' '}
+      {/* Container chính */}
       {/* Stepper */}
       <div className='mb-8 sm:mb-10'>
         {/* Luôn hiển thị div chứa stepper */}
-        <div className="flex items-center justify-center sm:justify-start">
+        <div className='flex items-center justify-center sm:justify-start'>
           {/* Step 1 */}
-          <div className={`flex w-full items-center ${currentStep === 1 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 1 ? 'text-button' : ''}`}>
-            <span className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 1 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}>
+          <div
+            className={`flex w-full items-center ${currentStep === 1 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 1 ? 'text-button' : ''}`}
+          >
+            <span
+              className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 1 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}
+            >
               {/* SVG Icon 1 */}
-              <svg className='h-3.5 w-3.5' aria-hidden='true' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 12'><path stroke='currentColor' strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M1 5.917 5.724 10.5 15 1.5'/></svg>
+              <svg
+                className='h-3.5 w-3.5'
+                aria-hidden='true'
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 16 12'
+              >
+                <path
+                  stroke='currentColor'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  d='M1 5.917 5.724 10.5 15 1.5'
+                />
+              </svg>
             </span>
             <div className='ml-2 w-full'>
-              <h3 className='font-medium leading-tight'>{t('Edit_Conference')}</h3>
+              <h3 className='font-medium leading-tight'>
+                {t('Edit_Conference')}
+              </h3>
             </div>
             {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
-            <div className="hidden lg:block h-0.5 w-full bg-gray-300 mx-2"></div>
+            <div className='mx-2 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
           </div>
 
           {/* Step 2 */}
-           <div className={`flex w-full items-center ${currentStep === 2 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 2 ? 'text-button' : ''}`}>
-             {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
-             <div className="hidden lg:block h-0.5 w-full bg-gray-300 mx-2"></div>
-            <span className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 2 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}>
+          <div
+            className={`flex w-full items-center ${currentStep === 2 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 2 ? 'text-button' : ''}`}
+          >
+            {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
+            <div className='mx-2 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
+            <span
+              className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 2 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}
+            >
               {/* SVG Icon 2 */}
-               <svg className='h-3.5 w-3.5' aria-hidden='true' xmlns='http://www.w3.org/2000/svg' fill='currentColor' viewBox='0 0 18 20'><path d='M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2Zm-3 14H5a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2Zm0-4H5a1 1 0 0 1 0-2h8a1 1 0 1 1 0 2Zm0-5H5a1 1 0 0 1 0-2h2V2h4v2h2a1 1 0 1 1 0 2Z'/></svg>
+              <svg
+                className='h-3.5 w-3.5'
+                aria-hidden='true'
+                xmlns='http://www.w3.org/2000/svg'
+                fill='currentColor'
+                viewBox='0 0 18 20'
+              >
+                <path d='M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2Zm-3 14H5a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2Zm0-4H5a1 1 0 0 1 0-2h8a1 1 0 1 1 0 2Zm0-5H5a1 1 0 0 1 0-2h2V2h4v2h2a1 1 0 1 1 0 2Z' />
+              </svg>
             </span>
             <div className='ml-2 w-full'>
               <h3 className='font-medium leading-tight'>{t('Review')}</h3>
             </div>
-             {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
-             <div className="hidden lg:block h-0.5 w-full bg-gray-300 mx-2"></div>
+            {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
+            <div className='mx-2 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
           </div>
 
           {/* Step 3 */}
-          <div className={`flex w-full items-center ${currentStep === 3 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 3 ? 'text-button' : ''}`}>
+          <div
+            className={`flex w-full items-center ${currentStep === 3 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 3 ? 'text-button' : ''}`}
+          >
             {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
-            <div className="hidden lg:block h-0.5 w-full bg-gray-300 mx-2"></div>
-            <span className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 3 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}>
-             {/* SVG Icon 3 */}
-              <svg className='h-3.5 w-3.5' aria-hidden='true' xmlns='http://www.w3.org/2000/svg' fill='currentColor' viewBox='0 0 18 20'><path d='M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2ZM7 2h4v3H7V2Zm5.7 8.289-3.975 3.857a1 1 0 0 1-1.393 0L5.3 12.182a1.002 1.002 0 1 1 1.4-1.436l1.328 1.289 3.28-3.181a1 1 0 1 1 1.392 1.435Z'/></svg>
+            <div className='mx-2 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
+            <span
+              className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 3 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}
+            >
+              {/* SVG Icon 3 */}
+              <svg
+                className='h-3.5 w-3.5'
+                aria-hidden='true'
+                xmlns='http://www.w3.org/2000/svg'
+                fill='currentColor'
+                viewBox='0 0 18 20'
+              >
+                <path d='M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2ZM7 2h4v3H7V2Zm5.7 8.289-3.975 3.857a1 1 0 0 1-1.393 0L5.3 12.182a1.002 1.002 0 1 1 1.4-1.436l1.328 1.289 3.28-3.181a1 1 0 1 1 1.392 1.435Z' />
+              </svg>
             </span>
             <div className='ml-2 w-full'>
               <h3 className='font-medium leading-tight'>{t('Confirmation')}</h3>
@@ -1023,10 +1155,12 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
           </div>
         </div>
       </div>
-
       {/* Form Content */}
       {/* Grid cho nội dung form: 1 cột mặc định, 2 cột trên sm+ */}
-      <form onSubmit={handleSubmit} className='grid grid-cols-1 gap-y-5 sm:grid-cols-2 sm:gap-x-6'>
+      <form
+        onSubmit={handleSubmit}
+        className='grid grid-cols-1 gap-y-5 sm:grid-cols-2 sm:gap-x-6'
+      >
         {currentStep === 1 && renderStepOne()}
         {currentStep === 2 && renderStepTwo()}
         {currentStep === 3 && renderStepThree()}
@@ -1047,7 +1181,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
             <button
               type='button'
               onClick={goToNextStep}
-              className='w-full rounded bg-button px-4 py-2 text-sm text-button-text hover:bg-button-hover focus:outline-none sm:w-auto' // w-full trên mobile, w-auto trên sm+
+              className='hover:bg-button-hover w-full rounded bg-button px-4 py-2 text-sm text-button-text focus:outline-none sm:w-auto' // w-full trên mobile, w-auto trên sm+
             >
               {t('Next')}
             </button>
@@ -1057,7 +1191,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
             <button
               type='submit'
               // onClick={handleSubmit} // onSubmit của form đã xử lý
-              className='w-full rounded bg-button px-4 py-2 text-sm text-button-text hover:bg-button-hover focus:outline-none sm:w-auto' // w-full trên mobile, w-auto trên sm+
+              className='hover:bg-button-hover w-full rounded bg-button px-4 py-2 text-sm text-button-text focus:outline-none sm:w-auto' // w-full trên mobile, w-auto trên sm+
               disabled={!agreedToTerms}
             >
               {t('Add_Conference')}
@@ -1068,4 +1202,4 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
     </div>
   )
 }
-export default ConferenceForm 
+export default ConferenceForm

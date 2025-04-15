@@ -1,26 +1,48 @@
-// app/api/chatbot/chatbotApi.ts
+// File chatbotApi.ts:
 
-// --- Imports and Types (Keep existing StatusUpdate, ResultUpdate, ErrorUpdate, ApiHistoryItem etc.) ---
-import { StatusUpdate, ResultUpdate, ErrorUpdate, StreamMessage, HistoryItem as ApiHistoryItem } from '../../../../../NEW-SERVER-TS/src/shared/types'; // Adjust path if necessary
+import { appConfig } from "@/src/middleware";
 
-// Keep the base URL or use environment variables
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api` : '/api';
+// Giữ lại base URL
+const API_BASE_URL = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api`;
 
+// --- BEGIN: Simplified Response Types ---
 
-// --- Type Guards (Keep as is) ---
-function isStatusUpdate(msg: StreamMessage): msg is StatusUpdate {
-    return msg.type === 'status';
-}
-function isResultUpdate(msg: StreamMessage): msg is ResultUpdate {
-    return msg.type === 'result';
-}
-function isErrorUpdate(msg: StreamMessage): msg is ErrorUpdate {
-    return msg.type === 'error';
+// 1. Text Response (Giữ nguyên hoặc điều chỉnh nếu backend thay đổi key)
+export interface TextMessageResponse {
+    type: 'text';
+    message: string;
+    // thought?: string; // Có thể giữ lại nếu backend vẫn gửi thought cho text
 }
 
+// 2. Unified Error Response (Khớp với backend và lỗi fetch/network)
+export interface ApiErrorResponse {
+    type: 'error'; // Thêm 'type' để thống nhất
+    message: string; // Sử dụng 'message' thay vì 'error' để nhất quán
+    thought?: string; // Giữ lại thought để debug
+}
 
-// --- Main Function ---
-export function sendStreamChatRequest(
+// 3. Updated API Response Union Type (Chỉ còn text hoặc error)
+export type ApiResponse = TextMessageResponse | ApiErrorResponse;
+
+// --- END: Simplified Response Types ---
+
+
+// --- BEGIN: Simplified History Item Type for API ---
+
+// Chỉ cần role và parts khi gửi lên API
+export interface ApiHistoryItem {
+     role: "user" | "model";
+     parts: [{ text: string }];
+     // Không cần trường 'type' ở đây nữa
+}
+
+export type ApiChatHistory = ApiHistoryItem[];
+
+// --- END: Simplified History Item Type for API ---
+
+
+// --- BEGIN: Updated sendNonStreamChatRequest Function ---
+export const sendNonStreamChatRequest = async (
     userInput: string,
     history: ApiHistoryItem[],
     onStatusUpdate: (update: StatusUpdate) => void,

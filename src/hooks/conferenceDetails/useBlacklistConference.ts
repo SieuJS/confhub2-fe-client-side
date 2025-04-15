@@ -2,8 +2,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ConferenceResponse } from '@/src/models/response/conference.response'; // Adjust path
 import { UserResponse } from '@/src/models/response/user.response'; // Adjust path
+import { appConfig } from '@/src/middleware';
 
-const API_ENDPOINT = `${process.env.DATABASE_URL}/api/v1/user`; // Base user endpoint
+const API_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/user`; // Base user endpoint
 
 const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
   const [isBlacklisted, setIsBlacklisted] = useState(false);
@@ -34,7 +35,7 @@ const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
         const userData: UserResponse = await response.json();
         setIsBlacklisted(
           userData.blacklist?.some(
-            (blacklistConf) => blacklistConf.id === conferenceData.conference.id
+            (blacklistConf) => blacklistConf.id === conferenceData.id
           ) ?? false
         );
       } catch (err: any) {
@@ -53,13 +54,13 @@ const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
 
   // Function to handle the blacklist/unblacklist action
   const handleBlacklistClick = async () => {
-    if (!conferenceData?.conference?.id) {
+    if (!conferenceData?.id) {
       setError("Conference ID is missing.");
       console.error("Conference ID is missing for blacklist action.");
       return;
     }
 
-    const conferenceId = conferenceData.conference.id;
+    const conferenceId = conferenceData.id;
     const userData = localStorage.getItem('user');
     if (!userData) {
       setError("User not logged in.");

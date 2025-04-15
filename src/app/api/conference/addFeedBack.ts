@@ -1,4 +1,5 @@
 // api/feedback/addFeedback.ts
+import { appConfig } from "@/src/middleware";
 import { Feedback } from "../../../models/send/feedback.send"; // Create this model
 
 export const addFeedback = async (feedbackData: {
@@ -16,7 +17,7 @@ export const addFeedback = async (feedbackData: {
         throw new Error("User ID not found in local storage");
     }
 
-    const response = await fetch(`${process.env.DATABASE_URL}/api/v1/conferences/${feedbackData.conferenceId}/feedback`, { // Use conferenceId in URL
+    const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/conferences/${feedbackData.conferenceId}/feedback`, { // Use conferenceId in URL
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

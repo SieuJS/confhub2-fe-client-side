@@ -1,9 +1,10 @@
 // hooks/useAddToCalendar.ts
 import { useState, useEffect } from 'react';
 import { ConferenceResponse } from '../../models/response/conference.response';
-import { Calendar, UserResponse } from '../../models/response/user.response';
+import { Calendar } from '../../models/response/user.response';
+import { appConfig } from '@/src/middleware';
 
-const API_ENDPOINT = `${process.env.DATABASE_URL}/api/v1`;
+const API_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1`;
 
 const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
   const [isAddToCalendar, setIsAddToCalendar] = useState(false);
