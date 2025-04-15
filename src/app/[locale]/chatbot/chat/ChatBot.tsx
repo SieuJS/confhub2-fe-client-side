@@ -10,7 +10,7 @@ import Introduction from './ChatIntroduction';
 import {
     HistoryItem as ApiHistoryItem, StatusUpdate, ResultUpdate, ErrorUpdate, ThoughtStep
 } from '../../../../../../NEW-SERVER-TS/src/shared/types'; // Adjust path if needed
-import ThoughtProcess from './ThoughtProcess';
+import { appConfig } from '@/src/middleware';
 
 // Types
 // Update ChatMessageType
@@ -27,7 +27,7 @@ interface LoadingState {
     message: string;
 }
 
-const SOCKET_SERVER_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+const SOCKET_SERVER_URL = appConfig.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
 
 function ChatBot() {
     const [chatMessages, setChatMessages] = useState<ChatMessageType[]>([]);
