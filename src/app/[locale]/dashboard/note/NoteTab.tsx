@@ -14,7 +14,7 @@ import { appConfig } from '@/src/middleware'
 
 interface NoteTabProps {}
 
-const API_GET_USER_CALENDAR_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}`
+const API_GET_USER_CALENDAR_ENDPOINT = `${process.env.NEXT_PUBLIC_DATABASE_URL}`
 
 const NoteTab: React.FC<NoteTabProps> = () => {
   const t = useTranslations('')
