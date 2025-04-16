@@ -43,18 +43,21 @@ const MyConferencesTab: React.FC = () => {
     }
     return conferences
       .map((conf) => ({
-        id: conf.conference.id,
-        title: conf.conference.title,
-        acronym: conf.conference.acronym,
-        location: `${conf.location.cityStateProvince}, ${conf.location.country}`,
-        year: conf.organization.year,
-        summerize: conf.organization.summerize,
-        fromDate: conf.dates.find((d) => d.type === 'conferenceDates')
+        id: conf.id,
+        title: conf.title,
+        acronym: conf.acronym,
+        location: conf.organizations?.[0]?.locations?.[0] 
+          ? `${conf.organizations[0].locations[0].cityStateProvince || ''}, ${conf.organizations[0].locations[0].country || ''}` 
+          : '',
+        year: conf.organizations?.[0]?.year || '',
+        summerize: conf.organizations?.[0]?.summary || '',
+        fromDate: conf.organizations?.[0]?.conferenceDates?.find((d) => d.type === 'conferenceDates')
           ?.fromDate,
-        toDate: conf.dates.find((d) => d.type === 'conferenceDates')?.toDate,
-        websiteUrl: conf.organization.link,
+        toDate: conf.organizations?.[0]?.conferenceDates?.find((d) => d.type === 'conferenceDates')
+          ?.toDate,
+        websiteUrl: conf.organizations?.[0]?.link || '',
         status: conf.status as ConferenceStatus,
-        createdAt: conf.conference.createdAt,
+        createdAt: conf.createdAt,
       }))
       .sort((a, b) => {
         if (!a.createdAt) return 1;
@@ -65,11 +68,13 @@ const MyConferencesTab: React.FC = () => {
       });
   }, [conferences]);
 
+  console.log('conferences', conferences);
+
   const filteredConferences = useMemo(() => {
-    return transformedConferences.filter(
-      (conference) => conference.status === displayStatus
-    );
+    return transformedConferences
   }, [transformedConferences, displayStatus]);
+
+  console.log('filteredConferences', filteredConferences);
 
     // Wait for both authentication and conference data to load
   if (isAuthLoading || isLoading) {

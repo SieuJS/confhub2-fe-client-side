@@ -63,18 +63,18 @@ export const Header: FC<Props> = ({ locale }) => {
   return (
     <div
       ref={headerRef}
-      className={`fixed left-0 right-0 top-0 z-40 mx-auto flex h-[60px] max-w-screen-2xl flex-row items-center justify-between bg-gradient-to-r from-background to-background-secondary p-3 shadow-md transition-all duration-300 ease-in-out`}
+      className={`fixed left-0 right-0 top-0 z-40 mx-auto flex h-[60px] max-w-screen-2xl flex-row items-center justify-between bg-gradient-to-r from-background to-background-secondary p-3 text-sm shadow-md transition-all duration-300 ease-in-out`}
     >
       <Link href='/' locale={locale}>
-        <div className='flex flex-row items-center pt-2'>
+        <div className='flex flex-row items-center '>
           <div className='mb-2 h-10 w-10'>
             <LogoIcon />
           </div>
-          <strong className='mx-2 select-none'>Global Conference Hub</strong>
+          <strong className='mx-2 select-none '>Global Conference Hub</strong>
         </div>
       </Link>
 
-      <div className='relative flex flex-row items-center gap-4'>
+      <div className='relative flex flex-row items-center gap-2 md:gap-4'>
         <DesktopNavigation locale={locale} />
 
         {isLoading ? (

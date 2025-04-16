@@ -82,7 +82,6 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
         setNotifications(prevNotifications =>
           prevNotifications.map(n => ({ ...n, seenAt: new Date().toISOString() }))
         );
-        console.log("markAllAsRead Success")
 
       } else {
         console.error('Failed to mark all as read:', response.status);
@@ -100,12 +99,10 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
             socketRef.current = newSocket;
 
             newSocket.on('connect', () => {
-            console.log('Connected to socket server');
             newSocket.emit('register', user.id);
             });
 
             newSocket.on('notification', (newNotification: Notification) => {
-            console.log('Received notification:', newNotification);
             setNotifications(prevNotifications => {
                 if (prevNotifications.some(n => n.id === newNotification.id) || newNotification.deletedAt !== null) {
                 return prevNotifications;
