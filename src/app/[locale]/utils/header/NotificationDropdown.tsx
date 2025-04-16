@@ -1,10 +1,10 @@
 // components/Header/header/NotificationDropdown.tsx (NotificationDropdown Component)
 
-import { FC, useEffect, useCallback } from 'react'
+import { FC, useEffect, useCallback, useMemo } from 'react' // Thêm useMemo
 import { Link } from '@/src/navigation'
 import { Notification } from '../../../../models/response/user.response'
 import { useTranslations } from 'next-intl'
-import { timeAgo } from '../../dashboard/timeFormat'
+import { timeAgo } from '../../dashboard/timeFormat' // Đảm bảo import đúng
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
@@ -21,7 +21,7 @@ interface Props {
 }
 
 const NotificationDropdown: FC<Props> = ({
-  notifications,
+  notifications, // Mảng gốc từ props
   isNotificationOpen,
   closeAllMenus,
   locale,
@@ -31,6 +31,20 @@ const NotificationDropdown: FC<Props> = ({
 }) => {
   const t = useTranslations('')
   const language = t('language')
+
+  // --- BƯỚC 1: SẮP XẾP THÔNG BÁO ---
+  const sortedNotifications = useMemo(() => {
+    // Tạo bản sao và sắp xếp theo createdAt giảm dần (mới nhất trước)
+    return [...notifications].sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+      const validTimeA = !isNaN(timeA) ? timeA : 0
+      const validTimeB = !isNaN(timeB) ? timeB : 0
+      return validTimeB - validTimeA // Mới nhất lên đầu
+    })
+  }, [notifications]) // Chỉ sắp xếp lại khi notifications thay đổi
+  // --- KẾT THÚC SẮP XẾP ---
+
   const memoizedFetchNotifications = useCallback(() => {
     fetchNotifications()
   }, [fetchNotifications])
@@ -41,29 +55,45 @@ const NotificationDropdown: FC<Props> = ({
     }
   }, [isNotificationOpen, memoizedFetchNotifications])
 
-  const groupNotifications = useCallback((notifications: Notification[]) => {
-    const now = new Date()
-    const oneDayAgo = now.getTime() - 24 * 60 * 60 * 1000
+  // Hàm groupNotifications gốc, không thay đổi
+  const groupNotifications = useCallback(
+    (notificationsToGroup: Notification[]) => {
+      // Đổi tên param để rõ ràng
+      const now = new Date()
+      const oneDayAgo = now.getTime() - 24 * 60 * 60 * 1000
 
-    const newNotifications = notifications.filter(
-      n => new Date(n.createdAt).getTime() >= oneDayAgo
-    )
-    const earlierNotifications = notifications.filter(
-      n => new Date(n.createdAt).getTime() < oneDayAgo
-    )
-    return { newNotifications, earlierNotifications }
-  }, [])
+      // Lọc dựa trên mảng đã được sắp xếp đầu vào
+      const newNotificationsGroup = notificationsToGroup.filter(
+        n => new Date(n.createdAt).getTime() >= oneDayAgo
+      )
+      const earlierNotificationsGroup = notificationsToGroup.filter(
+        n => new Date(n.createdAt).getTime() < oneDayAgo
+      )
+      // Thứ tự trong các group này sẽ giữ nguyên từ mảng đầu vào đã sắp xếp
+      return {
+        newNotifications: newNotificationsGroup,
+        earlierNotifications: earlierNotificationsGroup
+      }
+    },
+    []
+  ) // Dependencies của useCallback này không thay đổi
 
-  // No changes needed here, as we're already working with a limited set of notifications
+  // --- BƯỚC 2: SỬ DỤNG DANH SÁCH ĐÃ SẮP XẾP ĐỂ NHÓM ---
+  // Gọi hàm nhóm với `sortedNotifications` thay vì `notifications` gốc
   const { newNotifications, earlierNotifications } =
-    groupNotifications(notifications)
+    groupNotifications(sortedNotifications)
+  // --- KẾT THÚC SỬ DỤNG SẮP XẾP ---
 
+  // Hàm renderNotificationItem gốc, không thay đổi logic bên trong
   const renderNotificationItem = useCallback(
     (notification: Notification) => {
-      const sanitizedMessage = DOMPurify.sanitize(notification.message)
+      // DOMPurify chỉ chạy ở client
+      const sanitizedMessage =
+        typeof window !== 'undefined'
+          ? DOMPurify.sanitize(notification.message)
+          : notification.message
 
       return (
-        // Removed legacyBehavior and <a> tag.  Link handles the click now.
         <Link
           href={{
             pathname: `/dashboard`,
@@ -71,7 +101,7 @@ const NotificationDropdown: FC<Props> = ({
           }}
           lang={locale}
           key={notification.id}
-          onClick={closeAllMenus} // Moved onClick to the Link component
+          onClick={closeAllMenus}
         >
           <div
             className={`flex items-start border-b border-gray-200 p-4 hover:bg-gray-50 ${notification.seenAt ? '' : 'bg-blue-50'}`}
@@ -79,7 +109,9 @@ const NotificationDropdown: FC<Props> = ({
             <div className='mr-3 flex-shrink-0'>
               <div className='relative flex h-10 w-10 items-center justify-center rounded-full bg-gray-200'>
                 <span className='font-medium '>
-                  {notification.type.charAt(0)}
+                  {notification.type
+                    ? notification.type.charAt(0).toUpperCase()
+                    : '?'}
                 </span>
                 {notification.seenAt === null && (
                   <span className='absolute right-0 top-0 block h-2.5 w-2.5 rounded-full bg-red-500'></span>
@@ -91,13 +123,12 @@ const NotificationDropdown: FC<Props> = ({
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeRaw]}
                 components={{
-                  // Apply the className to the *outermost* element rendered by the custom components.
                   p: ({ node, ...props }) => (
                     <p
                       className={`mb-0.5 text-sm ${notification.seenAt ? '' : 'font-bold'}`}
                       {...props}
                     />
-                  ), // Remove bottom margin
+                  ),
                   a: ({ node, ...props }) => (
                     <a className='text-button hover:underline' {...props} />
                   ),
@@ -112,30 +143,25 @@ const NotificationDropdown: FC<Props> = ({
                   ),
                   h1: ({ node, ...props }) => (
                     <h1 className='text-base font-bold' {...props} />
-                  ), // Reduce size
+                  ),
                   h2: ({ node, ...props }) => (
                     <h2 className='text-sm font-semibold' {...props} />
-                  ), // Reduce size
+                  ),
                   h3: ({ node, ...props }) => (
                     <h3 className='text-sm font-medium' {...props} />
-                  ), // Reduce size
+                  ),
                   ul: ({ node, ...props }) => (
                     <ul className='list-inside list-disc text-sm' {...props} />
-                  ), // Reduce size
+                  ),
                   ol: ({ node, ...props }) => (
                     <ol
                       className='list-inside list-decimal text-sm'
                       {...props}
                     />
-                  ), // Reduce size
+                  ),
                   li: ({ node, ...props }) => (
                     <li className='text-sm' {...props} />
-                  ), // Reduce size
-
-                  // Add a default wrapper (div) to apply the className
-                  // if none of the above components match. This isn't strictly needed
-                  // if you're *sure* you've covered all possible Markdown elements,
-                  // but it's a good safety net.
+                  ),
                   div: ({ node, ...props }) => (
                     <div
                       className={`text-sm ${notification.seenAt ? '' : 'font-bold'}`}
@@ -154,27 +180,30 @@ const NotificationDropdown: FC<Props> = ({
         </Link>
       )
     },
-    [closeAllMenus, locale, notifications] // Corrected dependency array
+    [closeAllMenus, locale, language, timeAgo] // Dependencies không đổi so với logic gốc (nếu timeAgo và language ổn định)
   )
 
+  // Hàm handleMarkAllAsRead gốc, không thay đổi
   const handleMarkAllAsRead = useCallback(
     async (e: React.MouseEvent) => {
       e.stopPropagation()
       await markAllAsRead()
-      fetchNotifications()
+      fetchNotifications() // Giữ lại fetch nếu logic gốc yêu cầu
     },
     [markAllAsRead, fetchNotifications]
   )
 
+  // JSX Render gốc, chỉ thay đổi việc sử dụng `sortedNotifications` để kiểm tra length
   return (
     <div
       className={`absolute right-0 z-50 mr-8 mt-10 w-80 overflow-hidden rounded-lg bg-white shadow-xl transition-all duration-300 ease-in-out md:w-[400px] ${
+        // Giữ nguyên style gốc
         isNotificationOpen
           ? 'visible translate-y-0 opacity-100'
           : 'invisible translate-y-1 opacity-0'
       }`}
       style={{
-        inset: '0px 0px auto auto'
+        inset: '0px 0px auto auto' // Giữ nguyên style gốc
       }}
       onClick={e => e.stopPropagation()}
     >
@@ -195,8 +224,10 @@ const NotificationDropdown: FC<Props> = ({
       <div className='overflow-y-auto' style={{ maxHeight: '25rem' }}>
         {isLoadingNotifications ? (
           <div className='p-4 text-center text-gray-500'>{t('Loading')}</div>
-        ) : notifications.length > 0 ? (
+        ) : sortedNotifications.length > 0 ? ( // --- BƯỚC 3: KIỂM TRA LENGTH CỦA MẢNG ĐÃ SẮP XẾP ---
           <>
+            {/* Phần render newNotifications và earlierNotifications không đổi,
+                            chúng tự động có thứ tự đúng do đầu vào đã sắp xếp */}
             {newNotifications.length > 0 && (
               <>
                 <div className='border-b border-gray-200 px-4 py-2 text-sm font-semibold '>
