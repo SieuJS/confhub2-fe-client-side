@@ -238,9 +238,8 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
           <img
             key={followBy.id}
             src={
-              followBy.avatar
-                ? followBy.avatar
-                : `https://ui-avatars.com/api/?name=${followBy.firstName}+${followBy.lastName}&background=random&size=32`
+              followBy.avatar ? followBy.avatar : '/avatar1.jpg'
+              // : `https://ui-avatars.com/api/?name=${followBy.firstName}+${followBy.lastName}&background=random&size=32`
             }
             alt={`${followBy.firstName} ${followBy.lastName}`}
             width={32}
@@ -281,7 +280,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   if (dbError === 'Conference not found') return <NotFoundPage />
   //if (jsonError === 'Conference not found') return <NotFoundPage />
 
-  if (isLoading) return <Loading /> // Show initial loading
+  // if (isLoading) return <Loading /> // Show initial loading
 
   const { organizations } = conferenceDataFromDB || {}
   const { followBy } = conferenceDataFromDB || {}

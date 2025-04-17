@@ -1,5 +1,6 @@
-// ConferenceFeedback.tsx
-import React, { useState, useMemo } from 'react'
+// src/app/[locale]/conferences/detail/ConferenceFeedback.tsx
+
+import React, { useState, useMemo, useEffect } from 'react' // Thêm useEffect
 import { ConferenceResponse } from '../../../../models/response/conference.response' // Adjust path
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import useAddFeedback from '../../../../hooks/conferenceDetails/useAddFeedBack' // Adjust path
@@ -40,13 +41,20 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
   const [description, setDescription] = useState('')
   const [star, setStar] = useState<number | null>(null)
   const [currentPage, setCurrentPage] = useState(1) // State for pagination
+  const [isClient, setIsClient] = useState(false) // <-- Thêm state để theo dõi client mount
 
   // --- Hooks ---
   const { submitFeedback, loading, error, newFeedback } = useAddFeedback()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const { isLoggedIn } = useAuthApi()
+  const { isLoggedIn } = useAuthApi() // Hook này vẫn được gọi
+
+  // --- Effects ---
+  useEffect(() => {
+    // Effect này chỉ chạy sau khi component mount ở phía client
+    setIsClient(true)
+  }, []) // Mảng dependency rỗng đảm bảo nó chỉ chạy một lần sau khi mount
 
   // --- Data Preparation ---
   const conferenceId = conferenceData?.id
@@ -81,19 +89,17 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
   // Handler for the Pagination component
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
-    // Optional: Scroll to top of feedback list when page changes
-    // window.scrollTo({ top: feedbackListRef.current?.offsetTop, behavior: 'smooth' });
   }
 
   // Reset page to 1 when filters/sort change
-  React.useEffect(() => {
+  useEffect(() => {
+    // Đổi tên React.useEffect thành useEffect cho nhất quán
     setCurrentPage(1)
   }, [filterStar, sortOption])
 
   const totalReviews = displayedFeedbacks.length // Total *filtered/sorted* reviews
 
   // --- Calculations (Based on *all* feedbacks) ---
-  // Use useMemo to recalculate only when allFeedbacks changes
   const { overallRating, ratingDistribution } = useMemo(() => {
     const reviews = allFeedbacks
     return {
@@ -109,7 +115,7 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
 
   const handleSubmit = async () => {
     if (!conferenceId || star === null || description.trim() === '') {
-      alert('Please select a rating and write a review.')
+      // Nên sử dụng một thông báo tinh tế hơn alert
       console.error('Missing conferenceId, star, or description', {
         conferenceId,
         star,
@@ -122,7 +128,6 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
     if (addedFeedback) {
       setDescription('')
       setStar(null)
-      // `allFeedbacks` will update via `newFeedback`, triggering `useProcessedFeedbacks`
     }
   }
 
@@ -138,15 +143,21 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
     router.push(pathWithLocale)
   }
 
+  // Xác định thông báo khi không có feedback
   let message
-  if (displayedFeedbacks.length > 0) {
-    message = t('no_feedback_on_page')
-  } else {
+  if (paginatedFeedbacks.length > 0) {
+    // Kiểm tra paginatedFeedbacks thay vì displayedFeedbacks
+    message = t('no_feedback_on_page') // Thông báo này có thể không cần thiết nếu danh sách không rỗng
+  } else if (displayedFeedbacks.length === 0) {
+    // Nếu không có feedback nào sau khi lọc
     if (filterStar !== null) {
       message = t('no_feedback_matching_filter', { starCount: filterStar })
     } else {
       message = t('no_feedback_yet')
     }
+  } else {
+    // Nếu có feedback sau khi lọc nhưng trang hiện tại rỗng (trường hợp hiếm)
+    message = t('no_feedback_on_page')
   }
 
   // --- Render ---
@@ -155,60 +166,89 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
       <FeedbackControls
         filterStar={filterStar}
         sortOption={sortOption}
-        totalReviews={allFeedbacks.length} // Show total unfiltered count here maybe?
-        displayedCount={displayedFeedbacks.length} // Or show filtered count
+        totalReviews={allFeedbacks.length} // Tổng số feedback chưa lọc
+        displayedCount={displayedFeedbacks.length} // Tổng số feedback đã lọc/sắp xếp
         onFilterChange={setFilterStar}
         onSortChange={setSortOption}
       />
 
       {/* Main Content Area */}
-      <div className='flex flex-col md:flex-row md:space-x-8'>
-        <div className=''>
+      <div className='mt-6 flex flex-col gap-8 md:flex-row md:gap-8'>
+        {' '}
+        {/* Thêm khoảng cách mt-6 và gap */}
+        {/* === Left Column (Summary & Form/Prompt) === */}
+        <div className='w-full md:w-1/2 lg:w-1/3'>
+          {' '}
+          {/* Điều chỉnh độ rộng cột */}
           <FeedbackSummary
             overallRating={overallRating}
             ratingDistribution={ratingDistribution}
-            totalReviews={totalReviews}
+            totalReviews={allFeedbacks.length} // Sử dụng allFeedbacks.length cho tổng số thực
           />
-
-          {/* Post Feedback Section or Sign In Prompt */}
-          {isLoggedIn ? (
-            <FeedbackForm
-              star={star}
-              description={description}
-              loading={loading}
-              error={error}
-              onStarClick={handleStarClick}
-              onDescriptionChange={setDescription}
-              onSubmit={handleSubmit}
-            />
-          ) : (
-            <SignInPrompt onSignInClick={handleSignInClick} />
-          )}
-        </div>
-
-        {/* === Right Column (Comments & Form/Prompt) === */}
-        <div className='w-full md:w-1/2'>
-          {/* Feedback Comments List - Use *paginated* feedbacks */}
-          <div className='mb-8 space-y-4'>
-            {paginatedFeedbacks.length === 0 ? (
-              <div className='text-center '>{message}</div>
+          {/* === Post Feedback Section or Sign In Prompt === */}
+          <div className='mt-6'>
+            {' '}
+            {/* Thêm khoảng cách */}
+            {/*
+               Render SignInPrompt ban đầu (để khớp với server nếu server render nó).
+               Sau khi client mount (isClient = true), render dựa trên isLoggedIn thực tế.
+            */}
+            {isClient ? ( // Chỉ render phần động sau khi client mount
+              isLoggedIn ? (
+                <FeedbackForm
+                  star={star}
+                  description={description}
+                  loading={loading}
+                  error={error}
+                  onStarClick={handleStarClick}
+                  onDescriptionChange={setDescription}
+                  onSubmit={handleSubmit}
+                />
+              ) : (
+                <SignInPrompt onSignInClick={handleSignInClick} />
+              )
             ) : (
-              // Use paginatedFeedbacks here
+              // Render SignInPrompt để khớp với server render (giả định server render cái này)
+              // Hoặc bạn có thể render `null` nếu muốn
+              <SignInPrompt onSignInClick={handleSignInClick} />
+            )}
+          </div>
+        </div>
+        {/* === Right Column (Comments List & Pagination) === */}
+        <div className='w-full md:w-1/2 lg:w-2/3'>
+          {' '}
+          {/* Điều chỉnh độ rộng cột */}
+          {/* Feedback Comments List - Use *paginated* feedbacks */}
+          <div className='space-y-4'>
+            {' '}
+            {/* Bỏ mb-8 ở đây vì đã có gap ở flex container */}
+            {paginatedFeedbacks.length === 0 &&
+            displayedFeedbacks.length === 0 ? ( // Chỉ hiển thị thông báo khi không có feedback nào cả (sau khi lọc)
+              <div className='pt-4 text-center text-gray-500'>{message}</div>
+            ) : paginatedFeedbacks.length === 0 &&
+              displayedFeedbacks.length > 0 ? ( // Hiển thị nếu trang hiện tại rỗng nhưng có feedback ở trang khác
+              <div className='pt-4 text-center text-gray-500'>
+                {t('no_feedback_on_page')}
+              </div>
+            ) : (
+              // Render danh sách feedback đã phân trang
               paginatedFeedbacks.map(feedback => (
                 <FeedbackItem key={feedback.id} feedback={feedback} />
               ))
             )}
           </div>
-
-          {/* Render Pagination Component */}
-          <GeneralPagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-            // You can optionally pass maxPageNumbersToShow or className here
-            // maxPageNumbersToShow={7}
-            className='mb-4'
-          />
+          {/* Render Pagination Component chỉ khi có nhiều hơn 1 trang */}
+          {totalPages > 1 && (
+            <div className='mt-6 flex justify-center'>
+              {' '}
+              {/* Căn giữa và thêm khoảng cách */}
+              <GeneralPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

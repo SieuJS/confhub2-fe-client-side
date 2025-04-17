@@ -8,6 +8,7 @@ import ConsumerInsights from './home/ConsumerInsights'
 import { Header } from './utils/Header'
 import IntroduceVisualization from './home/IntroduceVisualization'
 import SuperBanner from './home/SuperBanner'
+import FeatureComparisonTable from './home/FeatureComparisonTable'
 
 export default function HomePage({ locale }: { locale: string }) {
   const [isVisibleButton, setIsVisibleButton] = useState(false)
@@ -42,6 +43,7 @@ export default function HomePage({ locale }: { locale: string }) {
       <PopularConferences />
       <ConsumerInsights />
       <IntroduceVisualization />
+      <FeatureComparisonTable />
       <Footer />
       {isVisibleButton && (
         <Button

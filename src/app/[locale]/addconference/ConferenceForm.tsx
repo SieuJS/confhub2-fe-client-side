@@ -30,7 +30,7 @@ const ConferenceForm: React.FC = () => {
   const [link, setLink] = useState('')
   const [topics, setTopics] = useState<string[]>([])
   const [newTopic, setNewTopic] = useState('')
-  const [type, setType] = useState<'offline' | 'online' | 'hybrid'>('offline')
+  const [type, setType] = useState<'Offline' | 'Online' | 'Hybrid'>('Offline')
   const [location, setLocation] = useState<LocationInput>({
     address: '',
     cityStateProvince: '',
@@ -391,13 +391,13 @@ const ConferenceForm: React.FC = () => {
             className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
             value={type}
             onChange={e =>
-              setType(e.target.value as 'offline' | 'online' | 'hybrid')
+              setType(e.target.value as 'Offline' | 'Online' | 'Hybrid')
             }
             required
           >
-            <option value='offline'>{t('Offline')}</option>
-            <option value='online'>{t('Online')}</option>
-            <option value='hybrid'>{t('Hybrid')}</option>
+            <option value='Offline'>{t('Offline')}</option>
+            <option value='Online'>{t('Online')}</option>
+            <option value='Hybrid'>{t('Hybrid')}</option>
           </select>
         </div>
       </div>

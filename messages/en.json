@@ -721,5 +721,9 @@
     "loading": "Loading...",
     "or": "or"
   },
-  "Publish": "Publish"
+  "Publish": "Publish",
+  "No_summary_available": "No summary available.",
+  "FieldOfResearch_and_Topics": "Field of Research and Topics",
+  "fieldOfResearch_not_available": "Field of Research not available.",
+  "Field_Of_Research": "Field of Research"
 }
