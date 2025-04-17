@@ -27,7 +27,7 @@ const ConferencePreviewTable: React.FC<{ data: Conference[] }> = ({ data }) => (
                         </tr>
                     ))}
                     {data.length === 0 && ( // Show message inside tbody if table is empty but exists
-                         <tr>
+                        <tr>
                             <td colSpan={3} className="p-4 text-center text-sm text-gray-500">No conferences found in the table.</td>
                         </tr>
                     )}
@@ -106,7 +106,7 @@ export const ConferenceCrawlUploader: React.FC = () => {
                                 <FaCheckCircle className="mr-1" /> Parsed {parsedData.length} conferences. Ready to crawl.
                             </p>
                         )}
-                         {!hasData && file && !isParsing && !parseError && ( // Show message if file parsed but no valid data
+                        {!hasData && file && !isParsing && !parseError && ( // Show message if file parsed but no valid data
                             <p className="mt-2 text-sm text-yellow-700 flex items-center">
                                 <FaExclamationTriangle className="mr-1" /> Could not find valid conference data (Title, Acronym) in the selected file.
                             </p>
@@ -161,7 +161,7 @@ export const ConferenceCrawlUploader: React.FC = () => {
                             ) : (
                                 <FaPlay className="-ml-1 mr-2 h-5 w-5" /> // Simplified icon logic
                             )}
-                             {/* Simplified button text */}
+                            {/* Simplified button text */}
                             {isCrawling ? 'Crawling...' : (crawlProgress.status !== 'idle' && crawlProgress.status !== 'crawling' ? 'Start Crawl Again' : 'Start Crawl')}
                         </button>
                         <button
@@ -173,11 +173,6 @@ export const ConferenceCrawlUploader: React.FC = () => {
                             <FaRedo className="mr-2" /> Reset
                         </button>
                     </div>
-
-                </div> {/* End Left Column */}
-
-                {/* === Right Column === */}
-                <div className="md:w-1/2 flex flex-col space-y-4 mt-4 md:mt-0"> {/* Right column, half width on md+, add margin top for mobile stacking */}
 
                     {/* --- Progress and Results Section --- */}
                     {showStatusSection && ( // Conditionally render the entire status section
@@ -229,19 +224,26 @@ export const ConferenceCrawlUploader: React.FC = () => {
                                 </p>
                             )}
 
-                            
-                             {/* Messages Log */}
-                    {crawlMessages.length > 0 && (
-                        <div className="max-h-60 overflow-y-auto bg-gray-50 p-3 rounded border border-gray-100 text-xs text-gray-600 space-y-1 custom-scrollbar">
-                            {crawlMessages.map((msg, index) => (
-                                <p key={index} className={`break-words ${msg.startsWith('FAILED') ? 'text-red-500 font-medium' : ''}`}>
-                                    {msg}
-                                </p>
-                            ))}
+
+                            {/* Messages Log */}
+                            {crawlMessages.length > 0 && (
+                                <div className="max-h-60 overflow-y-auto bg-gray-50 p-3 rounded border border-gray-100 text-xs text-gray-600 space-y-1 custom-scrollbar">
+                                    {crawlMessages.map((msg, index) => (
+                                        <p key={index} className={`break-words ${msg.startsWith('FAILED') ? 'text-red-500 font-medium' : ''}`}>
+                                            {msg}
+                                        </p>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
-                        </div>
-                    )}
+
+                </div> {/* End Left Column */}
+
+                {/* === Right Column === */}
+                <div className="md:w-1/2 flex flex-col space-y-4 mt-4 md:mt-0"> {/* Right column, half width on md+, add margin top for mobile stacking */}
+
+
 
                     {/* --- Conference Preview Table Section --- */}
                     {hasData && !isParsing && ( // Show preview only if data was parsed successfully
