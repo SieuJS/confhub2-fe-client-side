@@ -101,7 +101,7 @@ const NotificationDropdown: FC<Props> = ({
           }}
           lang={locale}
           key={notification.id}
-          onClick={closeAllMenus}
+          // onClick={closeAllMenus}
         >
           <div
             className={`flex items-start border-b border-gray-200 p-4 hover:bg-gray-50 ${notification.seenAt ? '' : 'bg-blue-50'}`}
@@ -226,8 +226,6 @@ const NotificationDropdown: FC<Props> = ({
           <div className='p-4 text-center text-gray-500'>{t('Loading')}</div>
         ) : sortedNotifications.length > 0 ? ( // --- BƯỚC 3: KIỂM TRA LENGTH CỦA MẢNG ĐÃ SẮP XẾP ---
           <>
-            {/* Phần render newNotifications và earlierNotifications không đổi,
-                            chúng tự động có thứ tự đúng do đầu vào đã sắp xếp */}
             {newNotifications.length > 0 && (
               <>
                 <div className='border-b border-gray-200 px-4 py-2 text-sm font-semibold '>

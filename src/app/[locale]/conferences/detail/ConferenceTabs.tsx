@@ -1,8 +1,7 @@
 'use client'
 
-import React, { useRef } from 'react'
+import React, { useMemo, useRef } from 'react' // Added useMemo
 import { ConferenceResponse } from '../../../../models/response/conference.response'
-// --- RENAME THE IMPORT ---
 import MapDisplay from './Map' // Renamed from Map to MapDisplay
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -16,10 +15,9 @@ interface ConferenceTabsProps {
   conference: ConferenceResponse | null
 }
 
-// Type alias for the organization type within ConferenceResponse
 type OrgType = ConferenceResponse['organizations'][number]
+type RankType = NonNullable<ConferenceResponse['ranks']>[number] // Define RankType
 
-// Type for storing grouped date information for rendering
 type GroupedDateInfo = {
   name: string
   current: {
@@ -32,6 +30,13 @@ type GroupedDateInfo = {
   }[]
 }
 
+// Define a type for the grouped rank data
+type GroupedRankInfo = {
+  source: string
+  rank: string
+  fieldsOfResearch: string[]
+}
+
 export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
   conference
 }) => {
@@ -41,7 +46,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
 
   // --- Helper Functions ---
   const formatDate = (date: string | null | undefined): string => {
-    // ... (formatDate implementation remains the same)
+    // ... (formatDate function remains the same)
     if (!date) return t('TBD')
     try {
       const dateObj = new Date(date)
@@ -60,7 +65,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
 
   // --- Find the LATEST organization based on createdAt ---
   const findLatestOrganization = (): OrgType | null => {
-    // ... (findLatestOrganization implementation remains the same)
+    // ... (findLatestOrganization function remains the same)
     if (!conference?.organizations || conference.organizations.length === 0)
       return null
     const latestOrg = conference.organizations.reduce(
@@ -91,18 +96,13 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
 
   // --- Prepare Grouped Dates for the "Important Dates" Section ---
   const getGroupedDates = (): GroupedDateInfo[] => {
+    // ... (getGroupedDates function remains the same)
     if (!conference?.organizations || !latestOrganization?.conferenceDates) {
       return []
     }
-
-    // --- THIS LINE NOW WORKS ---
-    // It correctly refers to the built-in JavaScript Map constructor
     const groupedDatesMap = new Map<string, GroupedDateInfo>()
-    // ---
-
     const latestOrgId = latestOrganization.id
 
-    // 1. Populate map with current dates
     latestOrganization.conferenceDates.forEach(dateItem => {
       if (dateItem?.name) {
         groupedDatesMap.set(dateItem.name, {
@@ -113,33 +113,27 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       }
     })
 
-    // Set to track unique old dates added per name
     const addedOldDates = new Map<string, Set<string>>()
 
-    // 2. Iterate through ALL orgs to find different old dates
     conference.organizations.forEach(org => {
       if (org.id === latestOrgId) return // Skip latest
-
       if (org.conferenceDates) {
         org.conferenceDates.forEach(oldDateItem => {
           const groupInfo = oldDateItem?.name
             ? groupedDatesMap.get(oldDateItem.name)
             : undefined
-
           if (groupInfo) {
             const current = groupInfo.current
             const oldFrom = oldDateItem.fromDate
             const oldTo = oldDateItem.toDate
             const isDifferent =
               current.fromDate !== oldFrom || current.toDate !== oldTo
-
             if (isDifferent) {
               const oldDateKey = `${oldFrom || 'null'}|${oldTo || 'null'}`
               if (!addedOldDates.has(groupInfo.name)) {
                 addedOldDates.set(groupInfo.name, new Set<string>())
               }
               const nameSet = addedOldDates.get(groupInfo.name)!
-
               if (!nameSet.has(oldDateKey)) {
                 groupInfo.differentOldDates.push({
                   fromDate: oldFrom,
@@ -153,7 +147,6 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       }
     })
 
-    // 4. Convert map to array and sort
     const result = Array.from(groupedDatesMap.values())
     result.sort((a, b) => a.name.localeCompare(b.name))
     return result
@@ -161,22 +154,74 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
 
   const groupedDates = getGroupedDates()
 
-  // --- Other Data Extraction (remains the same) ---
-  const ranks = conference?.ranks
+  // --- Process and Group Ranks ---
+  // Use useMemo to avoid recalculating on every render unless conference.ranks changes
+  const processedRanks = useMemo(() => {
+    if (!conference?.ranks || conference.ranks.length === 0) {
+      return []
+    }
+
+    // Use a Map for efficient grouping. Key: "source-rank", Value: GroupedRankInfo
+    const rankGroups = new Map<string, GroupedRankInfo>()
+
+    conference.ranks.forEach(rank => {
+      const source = rank.source || t('Not_Available') // Handle missing source
+      const rankValue = rank.rank || t('Not_Available') // Handle missing rank
+      const field = rank.fieldOfResearch
+
+      const groupKey = `${source}-${rankValue}`
+
+      if (rankGroups.has(groupKey)) {
+        // Group exists, add field if it's valid and not already present (optional uniqueness check)
+        const existingGroup = rankGroups.get(groupKey)!
+        if (field && !existingGroup.fieldsOfResearch.includes(field)) {
+          // Add only if field exists and is unique within the group
+          existingGroup.fieldsOfResearch.push(field)
+        }
+      } else {
+        // New group, create it
+        rankGroups.set(groupKey, {
+          source: source,
+          rank: rankValue,
+          fieldsOfResearch: field ? [field] : [] // Initialize with the first field if it exists
+        })
+      }
+    })
+
+    // Convert Map values to an array for rendering
+    return Array.from(rankGroups.values())
+  }, [conference?.ranks, t]) // Dependency array includes conference.ranks and t (for translations)
+
+  // --- Other Data Extraction ---
+  // Removed 'ranks' variable here as we use processedRanks now
   const topics = latestOrganization?.topics
   const primaryLocation = latestOrganization?.locations?.[0]
   const summary = latestOrganization?.summary || latestOrganization?.summerize
   const callForPaper = latestOrganization?.callForPaper
-  const accessType = latestOrganization?.accessType
+  const accessType = latestOrganization?.accessType // Not used currently, but kept if needed later
 
-  // --- Hooks (remain the same) ---
+  // --- Extract Unique Fields of Research (for the combined section) ---
+  const uniqueFieldsOfResearch = useMemo(() => {
+    // This calculation remains useful for the dedicated "Field of Research" section
+    return conference?.ranks
+      ? [
+          ...new Set(
+            conference.ranks
+              .map(rank => rank.fieldOfResearch)
+              .filter((field): field is string => !!field) // Type guard for filtering
+          )
+        ]
+      : []
+  }, [conference?.ranks])
+
+  // --- Hooks ---
   const sectionKeys = conference
     ? [
         'overview',
         'important-dates',
         'call-for-papers',
-        'fieldOfResearch-topics',
-        ...(ranks && ranks.length > 0 ? ['source-rank'] : []),
+        'fieldOfResearch-topics', // Combined section
+        ...(processedRanks.length > 0 ? ['source-rank'] : []), // Use processedRanks check
         'map'
       ]
     : []
@@ -184,10 +229,10 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
     overview: 'Overview',
     'important-dates': 'Important_Dates',
     'call-for-papers': 'Call_for_papers',
-    'fieldOfResearch-topics': 'FieldOfResearch_and_Topics',
+    'fieldOfResearch-topics': 'FieldOfResearch_and_Topics', // Combined label
     'source-rank': 'Source_Rank',
     map: 'Map'
-  } // Renamed 'map' key value for clarity if needed, but not strictly necessary
+  }
   const { activeSection, setActiveSection } = useActiveSection({
     navRef,
     updatedSections: sectionKeys
@@ -205,11 +250,12 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
   // --- JSX Rendering ---
   return (
     <div className='container mx-auto px-0 py-8 md:px-4'>
-      {/* Navigation (remains the same) */}
+      {/* Navigation */}
       <nav
         ref={navRef}
         className='sticky top-14 z-30 flex overflow-x-auto whitespace-nowrap border-b border-gray-200 bg-white bg-opacity-95 py-2'
       >
+        {/* ... (Navigation mapping remains the same) ... */}
         {sectionKeys.map(sectionKey => {
           const hrefId = sectionKey
           const href = `#${hrefId}`
@@ -226,11 +272,12 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         })}
       </nav>
 
-      {/* Overview Section (remains the same) */}
+      {/* Overview Section */}
       <section
         id='overview'
         className='mt-4 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
+        {/* ... (Overview section remains the same) ... */}
         <h2 className='mb-4 text-xl font-semibold md:text-2xl '>
           {t('Overview')}
         </h2>
@@ -239,11 +286,12 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         </p>
       </section>
 
-      {/* Important Dates Section (Rendering logic remains the same) */}
+      {/* Important Dates Section */}
       <section
         id='important-dates'
         className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
+        {/* ... (Important Dates section remains the same) ... */}
         <h2 className='mb-6 text-xl font-semibold md:text-2xl '>
           {t('Important_Dates')}
         </h2>
@@ -273,57 +321,38 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
                     </td>
                     <td className='border-b border-gray-300 px-2 py-4 md:px-4'>
                       {formatDate(groupInfo.current.fromDate)}
+                      {/* Strikethrough rendering logic if needed */}
                       {groupInfo.differentOldDates.length > 0 && (
                         <span className='ml-2 text-xs text-gray-500'>
                           (
-                          {groupInfo.differentOldDates
-                            .filter(
-                              old => old.fromDate !== groupInfo.current.fromDate
-                            )
-                            .map((old, index, arr) => (
-                              <React.Fragment key={`from-${index}`}>
-                                <span className='italic line-through'>
-                                  {formatDate(old.fromDate)}
-                                </span>
-                                {index <
-                                  arr.filter(
-                                    o =>
-                                      o.fromDate !== groupInfo.current.fromDate
-                                  ).length -
-                                    1 && ', '}
-                              </React.Fragment>
-                            ))}
-                          {groupInfo.differentOldDates.some(
-                            old => old.fromDate !== groupInfo.current.fromDate
-                          )}
+                          {groupInfo.differentOldDates.map((old, i) => (
+                            <React.Fragment key={i}>
+                              <span className='line-through'>
+                                {formatDate(old.fromDate)}
+                              </span>
+                              {i < groupInfo.differentOldDates.length - 1 &&
+                                ', '}
+                            </React.Fragment>
+                          ))}
                           )
                         </span>
                       )}
                     </td>
                     <td className='border-b border-gray-300 px-2 py-4 md:px-4'>
                       {formatDate(groupInfo.current.toDate)}
+                      {/* Strikethrough rendering logic if needed */}
                       {groupInfo.differentOldDates.length > 0 && (
                         <span className='ml-2 text-xs text-gray-500'>
                           (
-                          {groupInfo.differentOldDates
-                            .filter(
-                              old => old.toDate !== groupInfo.current.toDate
-                            )
-                            .map((old, index, arr) => (
-                              <React.Fragment key={`to-${index}`}>
-                                <span className='italic line-through'>
-                                  {formatDate(old.toDate)}
-                                </span>
-                                {index <
-                                  arr.filter(
-                                    o => o.toDate !== groupInfo.current.toDate
-                                  ).length -
-                                    1 && ', '}
-                              </React.Fragment>
-                            ))}
-                          {groupInfo.differentOldDates.some(
-                            old => old.toDate !== groupInfo.current.toDate
-                          )}
+                          {groupInfo.differentOldDates.map((old, i) => (
+                            <React.Fragment key={i}>
+                              <span className='line-through'>
+                                {formatDate(old.toDate)}
+                              </span>
+                              {i < groupInfo.differentOldDates.length - 1 &&
+                                ', '}
+                            </React.Fragment>
+                          ))}
                           )
                         </span>
                       )}
@@ -343,11 +372,12 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         )}
       </section>
 
-      {/* Other Sections (remain the same) */}
+      {/* Call for Papers Section */}
       <section
         id='call-for-papers'
         className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
+        {/* ... (Call for Papers section remains the same) ... */}
         <h2 className='mb-4 text-xl font-semibold md:text-2xl '>
           {t('Call_for_papers')}
         </h2>
@@ -355,8 +385,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
           remarkPlugins={[remarkGfm, remarkBreaks]}
           rehypePlugins={[rehypeRaw]}
           components={{
-            // Customize components (optional, for more control)
-            p: ({ node, ...props }) => <p className='mb-2' {...props} />, // Add margin to paragraphs
+            p: ({ node, ...props }) => <p className='mb-2' {...props} />,
             a: ({ ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
               <a
                 {...props}
@@ -365,7 +394,6 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
                 className='text-blue-500 hover:underline'
               />
             ),
-            // Add more component overrides as needed (ul, ol, li, code, etc.)
             pre: ({ node, ...props }) => (
               <pre
                 className='overflow-x-auto rounded-md bg-gray-100 p-2'
@@ -396,35 +424,67 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
           {callForPaper || t('No_call_for_papers_available')}
         </ReactMarkdown>
       </section>
+
+      {/* Field of Research and Topics Section */}
       <section
         id='fieldOfResearch-topics'
         className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
+        {/* ... (Field of Research and Topics section remains the same) ... */}
         <h2 className='mb-6 text-xl font-semibold md:text-2xl '>
           {t('FieldOfResearch_and_Topics')}
         </h2>
+
+        {/* Field of Research Subsection */}
         <div className='mb-6'>
-          <h3 className='mb-2 text-xl font-medium '>
+          {' '}
+          {/* Add margin-bottom to separate subsections */}
+          <h3 className='mb-2 text-lg font-medium '>
+            {' '}
+            {/* Slightly smaller heading */}
             {t('Field_Of_Research')}
           </h3>
-          <p className=''>{accessType || t('fieldOfResearch_not_available')}</p>
+          {uniqueFieldsOfResearch.length > 0 ? (
+            <ul className='list-disc pl-5'>
+              {' '}
+              {/* Use a list for multiple fields */}
+              {uniqueFieldsOfResearch.map((field, index) => (
+                <li key={index} className='mb-1'>
+                  {field}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className='text-gray-600'>
+              {t('fieldOfResearch_not_available')}
+            </p>
+          )}
         </div>
+
+        {/* Topics Subsection */}
         <div>
-          <h3 className='mb-2 text-xl font-medium '>{t('Topics')}</h3>
+          <h3 className='mb-2 text-lg font-medium '>{t('Topics')}</h3>{' '}
+          {/* Slightly smaller heading */}
           {topics && topics.length > 0 ? (
-            <ul className='grid list-disc grid-cols-1 gap-x-12 gap-y-2 pl-8 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2'>
+            <ul className='grid list-disc grid-cols-1 gap-x-12 gap-y-2 pl-5 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2'>
+              {' '}
+              {/* Adjusted padding */}
               {topics.map((topic, index) => (
-                <li key={index}>
+                <li key={index} className='mb-1'>
+                  {' '}
+                  {/* Added margin-bottom */}
                   {typeof topic === 'string' ? topic : t('Invalid_Topic')}
                 </li>
               ))}
             </ul>
           ) : (
-            <p className=''>{t('No_topics_available')}</p>
+            <p className='text-gray-600'>{t('No_topics_available')}</p>
           )}
         </div>
       </section>
-      {ranks && ranks.length > 0 && (
+
+      {/* --- REFACTORED Source Rank Section --- */}
+      {processedRanks.length > 0 && (
         <section
           id='source-rank'
           className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
@@ -432,32 +492,40 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
           <h2 className='mb-6 text-xl font-semibold md:text-2xl '>
             {t('Source_Rank')}
           </h2>
-          {ranks.map((rank, index) => (
+          {/* Iterate over the processed (grouped) ranks */}
+          {processedRanks.map((group, index) => (
             <div
-              key={`${rank.source}-${rank.rank}-${index}`}
+              // Use a combination of source, rank, and index for a stable key
+              key={`${group.source}-${group.rank}-${index}`}
               className='mb-4 border-b border-gray-200 pb-4 last:mb-0 last:border-b-0 last:pb-0'
             >
               <p className='text-gray-700'>
-                <strong>{t('Source')}:</strong>{' '}
-                {rank.source || t('Not_Available')}
+                <strong>{t('Source')}:</strong> {group.source}{' '}
+                {/* Already handled potential null in grouping */}
               </p>
               <p className='text-gray-700'>
-                <strong>{t('Rank')}:</strong> {rank.rank || t('Not_Available')}
+                <strong>{t('Rank')}:</strong> {group.rank}{' '}
+                {/* Already handled potential null in grouping */}
               </p>
               <p className='text-gray-700'>
                 <strong>{t('Field_of_Research')}:</strong>{' '}
-                {rank.fieldOfResearch || t('Not_Available')}
+                {/* Join the collected fields with a comma and space */}
+                {group.fieldsOfResearch.length > 0
+                  ? group.fieldsOfResearch.join(', ')
+                  : t('Not_Available')}
               </p>
             </div>
           ))}
         </section>
       )}
+      {/* --- END REFACTORED Section --- */}
 
-      {/* Map Section --- USE RENAMED COMPONENT --- */}
+      {/* Map Section */}
       <section
         id='map'
         className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
+        {/* ... (Map section remains the same) ... */}
         <h2 className='mb-4 text-xl font-semibold md:text-2xl '>{t('Map')}</h2>
         {primaryLocation?.address ? (
           <MapDisplay location={primaryLocation.address} />

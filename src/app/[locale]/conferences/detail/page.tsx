@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
-import { useState, useRef, useEffect } from 'react' // Import useEffect
+import { useState, useRef, useEffect, useCallback } from 'react' // Import useCallback
 import Button from '../../utils/Button'
 import ConferenceFeedback from '../../conferences/detail/ConferenceFeedback'
 import NotFoundPage from '../../utils/NotFoundPage'
@@ -11,11 +11,13 @@ import { ConferenceTabs } from '../../conferences/detail/ConferenceTabs'
 import { useSearchParams } from 'next/navigation'
 import { Header } from '../../utils/Header'
 import Footer from '../../utils/Footer'
-import { Link } from '@/src/navigation' // Import useRouter
-// import { useLocalStorage } from 'usehooks-ts'; // REMOVE: No direct localStorage
+import { Link } from '@/src/navigation'
 import { useRouter, usePathname } from 'next/navigation'
-import { ImportantDate } from '@/src/models/response/conference.response'
-import useAuthApi from '@/src/hooks/auth/useAuthApi' // Import useAuthApi
+import {
+  ImportantDate,
+  ConferenceResponse // Import ConferenceResponse type
+} from '@/src/models/response/conference.response'
+import useAuthApi from '@/src/hooks/auth/useAuthApi'
 
 // Import the custom hooks
 import useSequentialConferenceData from '@/src/hooks/conferenceDetails/useSequentialConferenceData'
@@ -25,8 +27,8 @@ import useClickOutside from '../../../../hooks/conferenceDetails/useClickOutside
 import useTopicsDisplay from '../../../../hooks/conferenceDetails/useTopicsDisplay'
 import useFormatConferenceDates from '../../../../hooks/conferenceDetails/useFormatConferenceDates'
 import useAddToCalendar from '../../../../hooks/conferenceDetails/useAddToCalendar'
-import useUpdateConference from '../../../../hooks/conferenceDetails/useUpdateConference' // Import the hook
-import useBlacklistConference from '../../../../hooks/conferenceDetails/useBlacklistConference' // Import the new hook
+import useUpdateConference from '../../../../hooks/conferenceDetails/useUpdateConference'
+import useBlacklistConference from '../../../../hooks/conferenceDetails/useBlacklistConference'
 
 // Define the Feedback type (or import it)
 export type Feedback = {
@@ -52,11 +54,33 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
   const {
     conferenceDataFromDB,
-    conferenceDataFromJSON,
+    conferenceDataFromJSON, // Keep this if you use it elsewhere, otherwise removable
     dbError,
-    jsonError,
-    loading: sequentialLoading // Đổi tên để tránh trùng lặp
+    jsonError, // Keep this if you use it elsewhere, otherwise removable
+    loading: sequentialLoading
   } = useSequentialConferenceData(id)
+
+  // --- Define getAccessTypeColor ---
+  const getAccessTypeColor = useCallback((accessType?: string): string => {
+    const upperAccessType = accessType?.toUpperCase() ?? ''
+    switch (upperAccessType) {
+      case 'ONLINE':
+        return 'bg-green-100 text-green-700 border border-green-300'
+      case 'OFFLINE':
+        return 'bg-red-100 text-red-700 border border-red-300'
+      case 'HYBRID':
+        return 'bg-blue-100 text-blue-700 border border-blue-300'
+      default:
+        return 'bg-gray-100 text-gray-600 border border-gray-300' // Added border for consistency
+    }
+  }, [])
+
+  // --- Extract accessType from the last organization ---
+  const lastOrganization =
+    conferenceDataFromDB?.organizations?.[
+      conferenceDataFromDB.organizations.length - 1
+    ]
+  const accessType = lastOrganization?.accessType
 
   const transformDates = (dates: ImportantDate[] | null | undefined) => {
     if (!dates) {
@@ -92,15 +116,14 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     loading: blacklistLoading,
     error: blacklistError
   } = useBlacklistConference(conferenceDataFromDB)
-  const language = t('language') // Get the language from translations
+  const language = t('language')
   const { isUpdating, updateResult, updateConference } = useUpdateConference()
   const { handleShareClick } = useShareConference(conferenceDataFromDB)
   const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } =
-    useTopicsDisplay(conferenceDataFromDB?.organizations?.[0]?.topics || [])
+    useTopicsDisplay(lastOrganization?.topics || []) // Use last org's topics if that's intended
 
-  const transformedDates = transformDates(
-    conferenceDataFromDB?.organizations?.[0]?.conferenceDates
-  )
+  // Use dates from the last organization if that's the correct logic
+  const transformedDates = transformDates(lastOrganization?.conferenceDates)
 
   const { dateDisplay } = useFormatConferenceDates(transformedDates, language)
   const { isLoggedIn } = useAuthApi()
@@ -118,24 +141,28 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
   useClickOutside(menuContainerRef, closeMenu)
 
-  // --- Helper Function for Authentication Check ---
   const checkLoginAndRedirect = (callback: () => void) => {
     if (!isLoggedIn) {
-      // --- Prepend Locale Prefix ---
       const localePrefix = pathname.split('/')[1]
       const pathWithLocale = `/${localePrefix}/auth/login`
-
       router.push(pathWithLocale)
     } else {
-      callback() // Execute the original action
+      callback()
     }
   }
 
   const renderShareMenu = () => {
     if (openMenu !== 'share') return null
 
+    // Ensure you have the correct class for share menu items if it differs
+    const menuItemClass =
+      'share-menu-container block w-full px-4 py-2 text-left text-sm hover:bg-gray-100'
+
     return (
-      <div className='absolute right-0 z-20 mt-2 w-56 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
+      <div
+        className='absolute right-0 z-20 mt-2 w-56 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'
+        style={{ top: '100%' }} // Position below the share button
+      >
         <div className='py-1'>
           <button
             onClick={() => {
@@ -144,8 +171,9 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                 closeMenu()
               })
             }}
-            className='share-menu-container block w-full px-4 py-2 text-left text-sm  hover:bg-gray-100'
+            className={menuItemClass}
           >
+            {/* ... SVG and Text for Facebook ... */}
             <span className='flex items-center'>
               <svg
                 xmlns='http://www.w3.org/2000/svg'
@@ -167,8 +195,9 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                 closeMenu()
               })
             }}
-            className='share-menu-container block w-full px-4 py-2 text-left text-sm  hover:bg-gray-100'
+            className={menuItemClass}
           >
+            {/* ... SVG and Text for Twitter/X ... */}
             <span className='flex items-center'>
               <svg
                 xmlns='http://www.w3.org/2000/svg'
@@ -190,8 +219,9 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                 closeMenu()
               })
             }}
-            className='share-menu-container block w-full px-4 py-2 text-left text-sm  hover:bg-gray-100'
+            className={menuItemClass}
           >
+            {/* ... SVG and Text for Reddit ... */}
             <span className='flex items-center'>
               <svg
                 xmlns='http://www.w3.org/2000/svg'
@@ -224,6 +254,8 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   }
 
   const renderFollowerAvatars = () => {
+    // Assuming followBy comes directly from conferenceDataFromDB
+    const followBy = conferenceDataFromDB?.followBy
     if (!followBy || followBy.length === 0) {
       return <p className='text-sm text-gray-500'>{t('No_followers_yet')}</p>
     }
@@ -233,23 +265,23 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     const remainingFollowers = followBy.length - maxVisibleFollowers
 
     return (
-      <div className='flex items-center'>
-        {visibleFollowers.map((followBy: any) => (
+      <div className='flex items-center -space-x-1'>
+        {' '}
+        {/* Added -space-x-1 for overlap */}
+        {visibleFollowers.map((follower: any) => (
+          // Make sure follower structure matches your data (e.g., follower.user.avatar)
           <img
-            key={followBy.id}
-            src={
-              followBy.avatar ? followBy.avatar : '/avatar1.jpg'
-              // : `https://ui-avatars.com/api/?name=${followBy.firstName}+${followBy.lastName}&background=random&size=32`
-            }
-            alt={`${followBy.firstName} ${followBy.lastName}`}
+            key={follower.id} // Use a stable key, like follower.id or follower.userId
+            src={follower.avatar || '/avatar1.jpg'} // Adjust path as needed
+            alt={`${follower.firstName || ''} ${follower.lastName || ''}`} // Handle potential missing names
             width={32}
             height={32}
             className='h-8 w-8 rounded-full border-2 border-white'
-            style={{ marginLeft: '-0.25rem' }}
+            // Removed inline style, handled by -space-x-1 on parent
           />
         ))}
         {remainingFollowers > 0 && (
-          <span className='ml-2 text-sm text-gray-600'>
+          <span className='z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-gray-200 text-xs font-medium text-gray-600'>
             +{remainingFollowers}
           </span>
         )}
@@ -259,32 +291,26 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
   useEffect(() => {
     if (updateResult) {
-      // Display a notification (consider using a library like react-toastify)
       if (updateResult.success) {
-        alert(updateResult.message) // Or use a toast notification
+        alert(updateResult.message) // Replace with a better notification system
       } else {
-        alert(`Error: ${updateResult.error}`)
+        alert(`Error: ${updateResult.error}`) // Replace with a better notification system
       }
     }
-  }, [updateResult])
+  }, [updateResult, t]) // Added t to dependencies if used in alert messages
 
-  // --- Define Combined Loading State ---
-  // Trang đang tải nếu:
-  // 1. Dữ liệu chính đang được tải (sequentialLoading).
-  // 2. HOẶC dữ liệu chính chưa có sẵn (sau khi sequentialLoading xong nhưng data là null/undefined).
-  // 3. HOẶC một trong các hook phụ thuộc (follow, calendar, blacklist) đang tải *trạng thái ban đầu* của chúng.
   // --- Loading & Error States ---
-  // Combine loading states if needed for a general overlay
   const isLoading = sequentialLoading || isUpdating
-  // Combine errors or display them separately
   if (dbError === 'Conference not found') return <NotFoundPage />
-  //if (jsonError === 'Conference not found') return <NotFoundPage />
+  // Handle jsonError if needed:
+  // if (jsonError === 'Conference not found' && !conferenceDataFromDB) return <NotFoundPage />;
 
-  // if (isLoading) return <Loading /> // Show initial loading
+  // Show initial loading spinner if no data is available yet
+  if (sequentialLoading && !conferenceDataFromDB) return <Loading />
 
-  const { organizations } = conferenceDataFromDB || {}
-  const { followBy } = conferenceDataFromDB || {}
-
+  // Use last organization data where relevant, fallback to first or defaults
+  const displayOrganization =
+    lastOrganization ?? conferenceDataFromDB?.organizations?.[0]
   const overallRating = calculateOverallRating(conferenceDataFromDB?.feedbacks)
   const totalReviews = conferenceDataFromDB?.feedbacks?.length || 0
 
@@ -293,176 +319,167 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
       <Header locale={locale} />
 
       <div className='container mx-auto flex-grow px-0 py-8 pt-20 md:px-4'>
-        {/* Optional: General loading overlay */}
-        {isUpdating && ( // Show overlay for actions, not initial load
+        {/* Action Loading Overlay */}
+        {isUpdating && (
           <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
             <Loading />
           </div>
         )}
 
-        {/* Display specific errors (e.g., using toasts) */}
-        {/* {followError && <Toast type="error" message={followError} />} */}
-        {/* {blacklistError && <Toast type="error" message={blacklistError} />} */}
-        {/* {updateError && <Toast type="error" message={updateError} />} */}
-        {/* {calendarError && <Toast type="error" message={calendarError} />} */}
+        {/* Render errors using a toast notification system ideally */}
+        {/* Example: {followError && <Toast type="error" message={followError} />} */}
 
+        {/* Main content wrapper */}
         <div className='rounded-lg bg-white p-2 shadow-md md:p-4'>
-          {' '}
-          {/* Main content wrapper */}
           <div className='flex flex-col gap-4 md:flex-row'>
             {/* Left Column */}
             <div className='md:w-4/5'>
-              {' '}
-              {/* Adjusted width */}
               <div className='flex flex-col items-start md:flex-row'>
-                {' '}
-                {/* Wrap image and details */}
-                <div className='mb-4 md:mb-0 md:w-1/4'>
-                  {' '}
-                  {/* Image container */}
+                {/* Image container */}
+                <div className='mb-4 w-full md:mb-0 md:w-1/4'>
                   <Image
-                    src={'/bg-2.jpg'}
+                    src={'/bg-2.jpg'} // Consider a dynamic or placeholder image
                     alt={
                       conferenceDataFromDB?.title
                         ? `${conferenceDataFromDB.title} Logo`
                         : 'Conference Logo'
                     }
-                    width={300}
-                    height={300}
-                    className='hidden h-auto w-full rounded-lg md:block' // Make image responsive
-                    style={{ objectFit: 'contain' }}
+                    width={200} // Adjust size as needed
+                    height={200} // Adjust size as needed
+                    className='hidden h-auto w-full rounded-lg object-contain md:block'
                   />
                 </div>
-                <div className='md:w-3/4 md:pl-6'>
-                  {' '}
-                  {/* Text details container */}
-                  {/* ====================== WARNING SECTION ====================== */}
-                  {true && (
-                    <div
-                      className='mb-4 rounded-md border-l-4 border-yellow-500 bg-yellow-100 p-4 text-yellow-700 shadow-sm'
-                      role='alert'
-                    >
-                      <div className='flex items-center'>
-                        <svg
-                          xmlns='http://www.w3.org/2000/svg'
-                          className='mr-3 h-6 w-6 flex-shrink-0'
-                          fill='none'
-                          viewBox='0 0 24 24'
-                          stroke='currentColor'
-                          strokeWidth='2'
-                        >
-                          <path
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                            d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
-                          />
-                        </svg>
-                        <div>
-                          <p className='font-bold'>
-                            {t('Potential_Reputation_Concern')}
-                          </p>
-                          <p className='text-sm'>
-                            {t('Potential_Reputation_Concern_Description')}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  {/* ============================================================ */}
-                  <p className='text-sm font-semibold text-red-500'>
-                    {dateDisplay}
-                  </p>
-                  <h1 className='mt-1 text-xl font-bold md:text-2xl'>
-                    {conferenceDataFromDB?.title || 'Conference Details'}
+
+                {/* Text details container */}
+                <div className='w-full md:w-3/4 md:pl-6'>
+                  {/* --- Warning Section (Keep logic if needed) --- */}
+                  {/* {isPotentiallyPredatory && ( ... )} */}
+
+                  {/* --- Date and Access Type --- */}
+                  <div className='mb-1 flex items-center justify-between'>
+                    <p className='text-sm font-semibold text-red-500'>
+                      {dateDisplay || t('Date_TBA')}
+                    </p>
+                    {/* --- Access Type Badge --- */}
+                    {accessType && (
+                      <span
+                        className={`rounded px-2 py-0.5 text-xs font-semibold ${getAccessTypeColor(accessType)}`}
+                      >
+                        {accessType.toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* --- Title --- */}
+                  <h1 className='mb-1 text-xl font-bold md:text-2xl'>
+                    {conferenceDataFromDB?.title || t('Conference_Details')}
                   </h1>
-                  <div className='flex items-center text-sm text-gray-600'>
-                    <div className='mr-2 text-xl text-yellow-500'>★</div>
+
+                  {/* --- Rating --- */}
+                  <div className='mb-2 flex items-center text-sm text-gray-600'>
+                    <div className='mr-1 text-xl text-yellow-500'>★</div>
                     <strong>
                       {overallRating.toFixed(1)}{' '}
-                      <span className='ml-1 text-gray-500'>
-                        {' '}
+                      <span className='ml-1 font-normal text-gray-500'>
                         ({totalReviews} {t('Ratings')})
                       </span>
                     </strong>
                   </div>
-                  <div className='flex gap-4'>
-                    <a
-                      href='#map'
-                      className='mt-1 flex items-center text-sm text-blue-600 hover:underline'
-                    >
-                      <svg
-                        xmlns='http://www.w3.org/2000/svg'
-                        width='16'
-                        height='16'
-                        viewBox='0 0 24 24'
-                        fill='none'
-                        stroke='currentColor'
-                        strokeWidth='1.5'
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        className='lucide lucide-map-pin mr-2'
-                      >
-                        <path d='M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0' />
-                        <circle cx='12' cy='10' r='3' />
-                      </svg>
 
-                      {organizations?.[0]?.locations?.[0]?.address ||
-                        'Location Not Available'}
-                    </a>
-                    <Link
-                      className='mt-1 flex items-center text-sm text-blue-600 hover:underline'
-                      href={{
-                        pathname: `/conferences`,
-                        query: { publisher: organizations?.[0]?.publisher }
-                      }}
-                    >
-                      <svg
-                        xmlns='http://www.w3.org/2000/svg'
-                        width='16'
-                        height='16'
-                        viewBox='0 0 24 24'
-                        fill='none'
-                        stroke='currentColor'
-                        strokeWidth='1.5'
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        className='lucide lucide-book-type mr-2'
+                  {/* --- Location and Publisher Links --- */}
+                  <div className='mb-2 flex flex-wrap gap-x-4 gap-y-1'>
+                    {displayOrganization?.locations?.[0]?.address && (
+                      <a
+                        href='#map' // Make sure you have an element with id="map"
+                        className='flex items-center text-sm text-blue-600 hover:underline'
+                        title={displayOrganization.locations[0].address} // Add tooltip for full address
                       >
-                        <path d='M10 13h4' />
-                        <path d='M12 6v7' />
-                        <path d='M16 8V6H8v2' />
-                        <path d='M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20' />
-                      </svg>
-
-                      {organizations?.[0]?.publisher || 'Unknown'}
-                    </Link>
+                        <svg
+                          xmlns='http://www.w3.org/2000/svg'
+                          width='16'
+                          height='16'
+                          viewBox='0 0 24 24'
+                          fill='none'
+                          stroke='currentColor'
+                          strokeWidth='1.5'
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          className='lucide lucide-map-pin mr-1 flex-shrink-0' // Adjusted margin
+                        >
+                          <path d='M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0' />
+                          <circle cx='12' cy='10' r='3' />
+                        </svg>
+                        {/* Show City/Country or a shorter version */}
+                        {displayOrganization.locations[0].cityStateProvince ||
+                          displayOrganization.locations[0].country ||
+                          t('Location_Available')}
+                      </a>
+                    )}
+                    {displayOrganization?.publisher && (
+                      <Link
+                        className='flex items-center text-sm text-blue-600 hover:underline'
+                        href={{
+                          pathname: `/conferences`,
+                          query: { publisher: displayOrganization.publisher }
+                        }}
+                      >
+                        <svg
+                          xmlns='http://www.w3.org/2000/svg'
+                          width='16'
+                          height='16'
+                          viewBox='0 0 24 24'
+                          fill='none'
+                          stroke='currentColor'
+                          strokeWidth='1.5'
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          className='lucide lucide-book-type mr-1 flex-shrink-0' // Adjusted margin
+                        >
+                          <path d='M10 13h4' />
+                          <path d='M12 6v7' />
+                          <path d='M16 8V6H8v2' />
+                          <path d='M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20' />
+                        </svg>
+                        {displayOrganization.publisher}
+                      </Link>
+                    )}
                   </div>
-                  {/* Followers Display */}
-                  <div className='mt-2'>{renderFollowerAvatars()}</div>
+
+                  {/* --- Followers Display --- */}
+                  <div className='mt-3'>{renderFollowerAvatars()}</div>
                 </div>
               </div>
-              <div className='mt-2'>
+
+              {/* --- Topics Section --- */}
+              <div className='mt-4 border-t pt-4 md:mt-2 md:border-0 md:pt-0'>
                 <h2 className='mb-2 text-base font-semibold md:text-lg'>
                   {t('Topics')}:
                 </h2>
-                <div className='flex flex-wrap'>
-                  {/* Use optional chaining and nullish coalescing here */}
-                  {(displayedTopics || []).map(topic => (
-                    <Link
-                      key={topic}
-                      href={{
-                        pathname: `/conferences`,
-                        query: { topics: topic }
-                      }}
-                    >
-                      <button className='my-1 mr-2 rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold  hover:bg-gray-300'>
-                        {topic}
-                      </button>
-                    </Link>
-                  ))}
+                <div className='flex flex-wrap gap-2'>
+                  {' '}
+                  {/* Use gap for spacing */}
+                  {displayedTopics.length > 0 ? (
+                    displayedTopics.map(topic => (
+                      <Link
+                        key={topic}
+                        href={{
+                          pathname: `/conferences`,
+                          query: { topics: topic }
+                        }}
+                      >
+                        <span className='cursor-pointer rounded-full bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-300'>
+                          {topic}
+                        </span>
+                      </Link>
+                    ))
+                  ) : (
+                    <p className='text-sm text-gray-500'>
+                      {t('No_topics_listed')}
+                    </p>
+                  )}
                   {hasMoreTopics && (
                     <button
-                      className='my-1 mr-2 rounded-full bg-blue-500 px-3 py-1 text-sm font-semibold text-white hover:bg-blue-600'
+                      className='rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700 hover:bg-blue-200'
                       onClick={() => setShowAllTopics(!showAllTopics)}
                     >
                       {showAllTopics ? t('View_Less') : t('View_More')}
@@ -472,37 +489,38 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
               </div>
             </div>
 
-            {/* Right Column */}
+            {/* Right Column (Action Buttons) */}
             <div className='md:w-1/5'>
-              <div className='sticky top-4'>
-                <div className='flex flex-col gap-3'>
-                  {' '}
-                  {/* Removed items-stretch */}
+              <div className='sticky top-24'>
+                {' '}
+                {/* Adjust top value based on header height */}
+                <div className='flex flex-row flex-wrap justify-center gap-2 md:flex-col md:items-stretch md:justify-start md:gap-3'>
+                  {/* Calendar Button */}
                   <Button
                     onClick={() => checkLoginAndRedirect(handleAddToCalendar)}
                     variant={isAddToCalendar ? 'primary' : 'secondary'}
                     size='small'
-                    className='mx-4 flex  items-center justify-start gap-x-2' // Added justify-start and gap-x-2 mx-4
+                    className='flex flex-grow items-center justify-center gap-x-2 md:flex-grow-0 md:justify-start'
                     title={
                       isAddToCalendar
                         ? t(
                             'Remove_this_conference_from_your_personal_calendar'
                           )
                         : t('Add_this_conference_to_your_personal_calendar')
-                    } // Tooltip
+                    }
                     disabled={calendarLoading}
                   >
+                    {/* Calendar SVG */}
                     <svg
                       xmlns='http://www.w3.org/2000/svg'
-                      width='20'
-                      height='20'
+                      width='18'
+                      height='18'
                       viewBox='0 0 24 24'
                       fill='none'
                       stroke='currentColor'
                       strokeWidth='1.5'
                       strokeLinecap='round'
                       strokeLinejoin='round'
-                      className='h-5 w-5'
                     >
                       <path d='M8 2v4' />
                       <path d='M16 2v4' />
@@ -515,25 +533,35 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                       <path d='M12 18h.01' />
                       <path d='M16 18h.01' />
                     </svg>
-                    {isAddToCalendar ? t('Added') : t('Calendar')}
+                    <span className='hidden sm:inline'>
+                      {isAddToCalendar ? t('Added') : t('Calendar')}
+                    </span>
                   </Button>
+
+                  {/* Share Button & Menu */}
                   <div
-                    className='relative flex flex-col gap-3'
+                    className='relative flex flex-grow md:flex-grow-0'
                     ref={menuContainerRef}
                   >
                     <Button
                       onClick={() => checkLoginAndRedirect(toggleShareMenu)}
                       variant='secondary'
                       size='small'
-                      className='share-menu-container mx-4 flex items-center justify-start gap-x-2' // Added justify-start and gap-x-2 mx-4
+                      className='flex w-full items-center justify-center gap-x-2 md:justify-start'
+                      aria-haspopup='true'
+                      aria-expanded={openMenu === 'share'}
                     >
+                      {/* Share SVG */}
                       <svg
                         xmlns='http://www.w3.org/2000/svg'
-                        fill='none'
+                        width='18'
+                        height='18'
                         viewBox='0 0 24 24'
-                        strokeWidth='1.5'
+                        fill='none'
                         stroke='currentColor'
-                        className='h-5 w-5'
+                        strokeWidth='1.5'
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
                       >
                         <path
                           strokeLinecap='round'
@@ -541,106 +569,122 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                           d='M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z'
                         />
                       </svg>
-                      {t('Share')}
+                      <span className='hidden sm:inline'>{t('Share')}</span>
                     </Button>
                     {renderShareMenu()}
                   </div>
+
+                  {/* Follow Button */}
                   <Button
                     onClick={() => checkLoginAndRedirect(handleFollowClick)}
                     variant={isFollowing ? 'primary' : 'secondary'}
                     size='small'
-                    className='mx-4 flex items-center justify-start gap-x-2' // Added justify-start and gap-x-2 mx-4
+                    className='flex flex-grow items-center justify-center gap-x-2 md:flex-grow-0 md:justify-start'
                     title={
                       isFollowing
                         ? t(
                             'Remove_this_conference_from_your_personal_follow_list'
                           )
                         : t('Add_this_conference_to_your_personal_follow_list')
-                    } // Tooltip
+                    }
                     disabled={followLoading}
                   >
+                    {/* Follow SVG */}
                     <svg
                       xmlns='http://www.w3.org/2000/svg'
-                      width='20'
-                      height='20'
+                      width='18'
+                      height='18'
                       viewBox='0 0 24 24'
                       fill='none'
                       stroke='currentColor'
                       strokeWidth='1.5'
                       strokeLinecap='round'
                       strokeLinejoin='round'
-                      className='h-5 w-5'
                     >
                       <path d='M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.122 2.122 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1 -.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z' />
                     </svg>
-                    {isFollowing ? t('Followed') : t('Follow')}
+                    <span className='hidden sm:inline'>
+                      {isFollowing ? t('Followed') : t('Follow')}
+                    </span>
                   </Button>
+
+                  {/* Update Button */}
                   <Button
                     variant={'secondary'}
                     size='small'
                     onClick={() =>
                       checkLoginAndRedirect(() => updateConference(id))
-                    } // Call updateConference
-                    className={`mx-4 flex items-center justify-start gap-x-2 ${isUpdating ? 'cursor-not-allowed opacity-50' : ''}`}
-                    disabled={isUpdating}
+                    }
+                    className={`flex flex-grow items-center justify-center gap-x-2 md:flex-grow-0 md:justify-start ${isUpdating ? 'cursor-not-allowed opacity-50' : ''}`}
+                    disabled={isUpdating || !id} // Disable if no id
                     title={t('Update_this_conference')}
                   >
+                    {/* Update SVG */}
                     <svg
                       xmlns='http://www.w3.org/2000/svg'
-                      width='20'
-                      height='20'
+                      width='18'
+                      height='18'
                       viewBox='0 0 24 24'
                       fill='none'
                       stroke='currentColor'
                       strokeWidth='1.5'
                       strokeLinecap='round'
                       strokeLinejoin='round'
-                      className='h-5 w-5'
                     >
                       <path d='M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8' />
                       <path d='M3 3v5h5' />
                       <path d='M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16' />
                       <path d='M16 16h5v5' />
                     </svg>
-                    {isUpdating ? t('Updating') : t('Update')}
+                    <span className='hidden sm:inline'>
+                      {isUpdating ? t('Updating') : t('Update')}
+                    </span>
                   </Button>
+
+                  {/* Website Button */}
                   <Button
                     onClick={() => {
-                      if (organizations?.[0]?.link) {
-                        window.open(organizations?.[0]?.link, '_blank')
+                      if (displayOrganization?.link) {
+                        window.open(
+                          displayOrganization.link,
+                          '_blank',
+                          'noopener noreferrer'
+                        ) // Added rel="noopener noreferrer"
                       } else {
-                        alert(t('Website_link_is_not_available'))
+                        alert(t('Website_link_is_not_available')) // Use toast ideally
                       }
                     }}
                     variant={'secondary'}
                     size='small'
-                    className='mx-4 flex items-center justify-start gap-x-2' // Added justify-start and gap-x-2 mx-4
+                    className='flex flex-grow items-center justify-center gap-x-2 md:flex-grow-0 md:justify-start'
                     title={t('Go_to_conference_website')}
+                    disabled={!displayOrganization?.link} // Disable if no link
                   >
+                    {/* Website SVG */}
                     <svg
                       xmlns='http://www.w3.org/2000/svg'
-                      width='20'
-                      height='20'
+                      width='18'
+                      height='18'
                       viewBox='0 0 24 24'
                       fill='none'
                       stroke='currentColor'
                       strokeWidth='1.5'
                       strokeLinecap='round'
                       strokeLinejoin='round'
-                      className='h-5 w-5'
                     >
                       <path d='M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6' />
                       <path d='m21 3-9 9' />
                       <path d='M15 3h6v6' />
                     </svg>
-                    {t('Website')}
+                    <span className='hidden sm:inline'>{t('Website')}</span>
                   </Button>
-                  {/* --- Add to Blacklist Button --- */}
+
+                  {/* Blacklist Button */}
                   <Button
                     onClick={() => checkLoginAndRedirect(handleBlacklistClick)}
-                    variant={isBlacklisted ? 'primary' : 'secondary'} // Use danger variant when blacklisted
+                    variant={isBlacklisted ? 'danger' : 'secondary'} // Changed to danger when active
                     size='small'
-                    className={`mx-4  flex items-center justify-start gap-x-2 `}
+                    className='flex flex-grow items-center justify-center gap-x-2 md:flex-grow-0 md:justify-start'
                     disabled={blacklistLoading}
                     title={
                       isBlacklisted
@@ -648,30 +692,32 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                             'Remove_this_conference_from_your_personal_blacklist'
                           )
                         : t('Add_this_conference_to_your_personal_blacklist')
-                    } // Tooltip
+                    }
                   >
+                    {/* Blacklist SVG */}
                     <svg
                       xmlns='http://www.w3.org/2000/svg'
-                      width='20'
-                      height='20'
+                      width='18'
+                      height='18'
                       viewBox='0 0 24 24'
                       fill='none'
                       stroke='currentColor'
                       strokeWidth='1.5'
                       strokeLinecap='round'
                       strokeLinejoin='round'
-                      className='h-5 w-5'
                     >
                       <path d='m2 2 20 20' />
                       <path d='M8.35 2.69A10 10 0 0 1 21.3 15.65' />
                       <path d='M19.08 19.08A10 10 0 1 1 4.92 4.92' />
                     </svg>
-                    {/* Text changes based on state */}
-                    {isBlacklisted ? t('Blacklisted') : t('Blacklist')}
+                    <span className='hidden sm:inline'>
+                      {isBlacklisted ? t('Blacklisted') : t('Blacklist')}
+                    </span>
                   </Button>
-                  {/* Display blacklist error if needed */}
+
+                  {/* Display blacklist error */}
                   {blacklistError && (
-                    <p className='mt-1 text-center text-xs text-red-500'>
+                    <p className='mt-1 w-full text-center text-xs text-red-500 md:text-left'>
                       {t('Error')}: {blacklistError}
                     </p>
                   )}
@@ -679,10 +725,15 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
               </div>
             </div>
           </div>
-          <ConferenceTabs conference={conferenceDataFromDB} />
+
+          {/* Conference Tabs */}
+          <div className='mt-6 border-t pt-6 md:mt-4 md:pt-4'>
+            <ConferenceTabs conference={conferenceDataFromDB} />
+          </div>
         </div>
 
-        <div className='mt-8 rounded-lg bg-white p-4 shadow-md'>
+        {/* Feedback Section */}
+        <div className='mt-8 rounded-lg bg-white p-4 shadow-md md:p-6'>
           <ConferenceFeedback conferenceData={conferenceDataFromDB} />
         </div>
       </div>
