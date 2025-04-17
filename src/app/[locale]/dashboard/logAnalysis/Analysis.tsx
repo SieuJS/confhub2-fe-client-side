@@ -1,160 +1,186 @@
 import React, { useState, useEffect } from 'react';
-import { useLogAnalysisData } from '../../../../hooks/logAnalysis/useLogAnalysisData'; // Điều chỉnh đường dẫn nếu cần
-import { FaExclamationTriangle, FaSyncAlt } from 'react-icons/fa'; // Giữ lại icon cho phần loading/error tổng
+import { useLogAnalysisData } from '../../../../hooks/logAnalysis/useLogAnalysisData'; // Adjust path
+import {
+    FaExclamationTriangle, FaSyncAlt, FaTable, FaBookOpen,
+    FaChevronUp, FaChevronDown
+} from 'react-icons/fa';
 
-
-// Import các component con đã tách
+// Import child components
 import ConferenceCrawlUploader from './ConferenceCrawlUploader';
+import JournalCrawlUploader from './JournalCrawlUploader';
 import AnalysisHeader from './AnalysisHeader';
 import OverallSummary from './OverallSummary';
 import ConferenceDetails from './ConferenceDetails';
+import JournalDetails from './JournalDetails'; // <-- Import the new component
 
-// Import kiểu dữ liệu nếu cần định nghĩa ở file riêng
-// import { LogAnalysisData } from './types';
-
-// (Optional) Import hook quản lý time filter nếu tạo
-// import { useTimeFilter } from './hooks/useTimeFilter';
+type CrawlerType = 'conference' | 'journal';
 
 const Analysis: React.FC = () => {
-    // --- State cho Bộ lọc Thời gian ---
+    // --- States ---
     const [timeFilterOption, setTimeFilterOption] = useState<string>('latest');
     const [filterStartTime, setFilterStartTime] = useState<number | undefined>(undefined);
     const [filterEndTime, setFilterEndTime] = useState<number | undefined>(undefined);
+    const [isSummaryExpanded, setIsSummaryExpanded] = useState(true);
+    const [activeCrawler, setActiveCrawler] = useState<CrawlerType>('conference'); // Determines which crawler AND analysis to show
+    const [isCrawlerSectionExpanded, setIsCrawlerSectionExpanded] = useState(true);
 
-    // --- State cho việc mở rộng/thu hẹp Overall Summary ---
-    const [isSummaryExpanded, setIsSummaryExpanded] = useState(true); // Mặc định mở rộng
-
-    // --- Tính toán startTime/endTime dựa trên lựa chọn filter ---
+    // --- Calculate time filters ---
     useEffect(() => {
+        // ... (time filter logic remains the same)
         const now = Date.now();
         let start: number | undefined = undefined;
-        let end: number | undefined = now; // Mặc định là đến hiện tại
+        let end: number | undefined = now;
 
         switch (timeFilterOption) {
             case 'last_hour': start = now - 60 * 60 * 1000; break;
             case 'last_6h': start = now - 6 * 60 * 60 * 1000; break;
             case 'last_24h': start = now - 24 * 60 * 60 * 1000; break;
             case 'last_7d': start = now - 7 * 24 * 60 * 60 * 1000; break;
-            case 'latest': // Hoặc 'all_time'
+            case 'latest':
             default: start = undefined; end = undefined; break;
         }
-        console.log(`Time filter changed to: ${timeFilterOption}. Start: ${start ? new Date(start).toISOString() : 'None'}, End: ${end ? new Date(end).toISOString() : 'None'}`);
         setFilterStartTime(start);
         setFilterEndTime(end);
     }, [timeFilterOption]);
 
     // --- Fetch Data ---
+    // Assume useLogAnalysisData fetches ALL relevant analysis data (overall, conference, journal)
+    // Or modify the hook if it needs to fetch selectively based on a parameter
     const { data, loading, error, isConnected, refetchData } = useLogAnalysisData(filterStartTime, filterEndTime);
 
-    // --- Hàm xử lý thay đổi bộ lọc ---
+    // --- Handlers ---
     const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setTimeFilterOption(event.target.value);
-        // Hook sẽ tự động fetch lại
     };
-
-    // --- Hàm xử lý toggle Summary ---
     const handleToggleSummary = () => {
         setIsSummaryExpanded(prev => !prev);
+    };
+    const handleToggleCrawlerSection = () => {
+        setIsCrawlerSectionExpanded(prev => !prev);
     };
 
     // --- Render Logic ---
 
-    // 1. Loading Initial (Không có data cũ)
+    // 1. Initial Loading / Error States (remain the same)
     if (loading && !data) {
         return (
             <div className="p-4 md:p-6 lg:p-8 bg-gradient-to-br from-gray-100 to-blue-50 min-h-screen font-sans">
-                {/* Vẫn render Header ở trạng thái loading */}
-                <AnalysisHeader
-                    loading={true}
-                    error={null}
-                    isConnected={isConnected} // Vẫn có thể hiển thị trạng thái connect
-                    data={null}
-                    timeFilterOption={timeFilterOption}
-                    handleFilterChange={handleFilterChange}
-                    refetchData={refetchData}
-                />
-                <div className="flex justify-center items-center h-[calc(100vh-200px)] text-gray-600">
-                    Loading Analysis Data...
-                    <FaSyncAlt className="ml-2 animate-spin" />
-
-                </div>
+                <AnalysisHeader loading={true} error={null} isConnected={isConnected} data={null} timeFilterOption={timeFilterOption} handleFilterChange={handleFilterChange} refetchData={refetchData} />
+                <div className="flex justify-center items-center h-[calc(100vh-200px)] text-gray-600"><FaSyncAlt className="mr-2 animate-spin" /> Loading Analysis Data...</div>
             </div>
         );
     }
-
-    // 2. Error Initial (Lỗi và không có data cũ)
     if (error && !data) {
         return (
-            <div className="p-4 md:p-6 lg:p-8 bg-gradient-to-br from-gray-100 to-red-50 min-h-screen font-sans">
-                {/* Render Header ở trạng thái lỗi */}
-                <AnalysisHeader
-                    loading={false} // Không loading nữa khi đã có lỗi
-                    error={error}
-                    isConnected={isConnected}
-                    data={null}
-                    timeFilterOption={timeFilterOption}
-                    handleFilterChange={handleFilterChange}
-                    refetchData={refetchData} // Cho phép thử lại
-                />
-                <div className="flex flex-col justify-center items-center h-[calc(100vh-200px)] text-red-600 font-semibold">
-                    <FaExclamationTriangle size={32} className="mb-4 text-red-500" />
-                    Error loading analysis data:
-                    <p className="text-sm mt-2 text-center max-w-md">{error}</p>
-                    <span className="text-xs text-gray-500 mt-4">(Check console for more details or try refreshing)</span>
-                </div>
+             <div className="p-4 md:p-6 lg:p-8 bg-gradient-to-br from-gray-100 to-red-50 min-h-screen font-sans">
+                 <AnalysisHeader loading={false} error={error} isConnected={isConnected} data={null} timeFilterOption={timeFilterOption} handleFilterChange={handleFilterChange} refetchData={refetchData} />
+                 <div className="flex flex-col justify-center items-center h-[calc(100vh-200px)] text-red-600 font-semibold"><FaExclamationTriangle size={32} className="mb-4 text-red-500" />Error loading analysis data: <p className="text-sm mt-2 text-center max-w-md">{error}</p><span className="text-xs text-gray-500 mt-4">(Check console or try refreshing)</span></div>
             </div>
         );
     }
 
-    // 3. No Data (Không lỗi, không loading, nhưng data là null/undefined hoặc không có gì)
-    if (!data || !data.overall) { // Kiểm tra data hoặc một trường quan trọng như overall
-        return (
-            <div className="p-4 md:p-6 lg:p-8 bg-gradient-to-br from-gray-100 to-blue-50 min-h-screen font-sans">
-                {/* Render Header bình thường, cho phép chọn filter/refresh */}
-                <AnalysisHeader
-                    loading={loading} // Vẫn có thể đang refresh
-                    error={error} // Hiển thị lỗi fetch cuối nếu có
-                    isConnected={isConnected}
-                    data={data} // data có thể là {} rỗng
-                    timeFilterOption={timeFilterOption}
-                    handleFilterChange={handleFilterChange}
-                    refetchData={refetchData}
-                />
-                <div className="flex justify-center items-center h-[calc(100vh-200px)] text-gray-500">
-                    No analysis data available for the selected period or log file.
-                </div>
-            </div>
-        );
-    }
+    // 3. Has Data or No Data State
+    // Check if there's *any* overall data to potentially show header/summary
+    const hasOverallData = data && data.overall;
+    // Specific checks for detailed data presence
+    const hasConferenceDetailsData = data?.conferenceAnalysis && Object.keys(data.conferenceAnalysis).length > 0;
+    // const hasJournalDetailsData = data?.journalAnalysis && Object.keys(data.journalAnalysis).length > 0;
 
-    // 4. Success (Có data để hiển thị, có thể đang refresh trong nền)
+
     return (
-        <div className="p-4 md:p-2 lg:p-4 bg-gradient-to-br from-gray-100 to-blue-50 min-h-screen font-sans">
+        <div className="p-4 md:p-6 lg:p-8 bg-gradient-to-br from-gray-100 to-blue-50 min-h-screen font-sans space-y-6">
 
-            <div className="mb-4">
-                <ConferenceCrawlUploader />
+            {/* --- Section: Data Crawlers (Collapsible) --- */}
+            <div className="bg-white rounded-lg shadow border border-gray-200">
+                {/* Header with Toggle */}
+                <div className="flex justify-between items-center p-4 border-b border-gray-200">
+                    <h2 className="text-lg font-semibold text-gray-800">Data Crawling Tools</h2>
+                    <button onClick={handleToggleCrawlerSection} className="text-gray-500 hover:text-blue-600 focus:outline-none p-1 rounded-full hover:bg-gray-100" aria-label={isCrawlerSectionExpanded ? "Collapse" : "Expand"}>
+                        {isCrawlerSectionExpanded ? <FaChevronUp size={18} /> : <FaChevronDown size={18} />}
+                    </button>
+                </div>
+                {/* Collapsible Content */}
+                <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isCrawlerSectionExpanded ? 'max-h-[1500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                    <div className="p-4">
+                        {/* Conference/Journal Toggle */}
+                        <div className="flex border-b border-gray-200 mb-4">
+                             <button onClick={() => setActiveCrawler('conference')} className={`flex items-center py-2 px-4 text-sm font-medium border-b-2 focus:outline-none transition-colors duration-150 ${activeCrawler === 'conference' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
+                                <FaTable className="mr-2" /> Crawl Conferences
+                            </button>
+                            <button onClick={() => setActiveCrawler('journal')} className={`flex items-center py-2 px-4 text-sm font-medium border-b-2 focus:outline-none transition-colors duration-150 ${activeCrawler === 'journal' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
+                                <FaBookOpen className="mr-2" /> Crawl Journals
+                            </button>
+                        </div>
+                        {/* Conditional Uploader */}
+                        <div>
+                            {activeCrawler === 'conference' && <ConferenceCrawlUploader />}
+                            {activeCrawler === 'journal' && <JournalCrawlUploader />}
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {/* Render Header với đầy đủ thông tin */}
+            {/* --- Section: Analysis Results --- */}
+            {/* Header is always shown if not in initial error/loading */}
             <AnalysisHeader
-                loading={loading} // Chỉ báo loading nếu đang refresh
-                error={error} // Hiển thị lỗi fetch cuối nếu có
+                loading={loading && !hasOverallData} // Show header loading only if NO data exists yet
+                error={error} // Show error if fetch failed
                 isConnected={isConnected}
-                data={data}
+                data={data} // Pass data for potential header info
                 timeFilterOption={timeFilterOption}
                 handleFilterChange={handleFilterChange}
                 refetchData={refetchData}
             />
 
-            {/* Render các section con, truyền data và props cho toggle xuống */}
-            <OverallSummary
-                data={data}
-                timeFilterOption={timeFilterOption}
-                isExpanded={isSummaryExpanded} // Truyền state xuống
-                onToggle={handleToggleSummary} // Truyền handler xuống
-            />
-            <ConferenceDetails conferenceAnalysis={data.conferenceAnalysis} />
+            {/* Render Summary only if overall data exists */}
+            {hasOverallData ? (
+                <OverallSummary
+                    data={data}
+                    timeFilterOption={timeFilterOption}
+                    isExpanded={isSummaryExpanded}
+                    onToggle={handleToggleSummary}
+                />
+            ) : (
+                // Show message if loading finished but no data at all was found
+                 !loading && (
+                     <div className="mt-6 text-center text-gray-500 bg-white p-6 rounded-lg shadow border border-gray-200">
+                         No analysis results found for the selected time period or current logs.
+                         <br />
+                         {error && <span className='text-red-500 text-sm'>(Last fetch attempt failed: {error})</span>}
+                     </div>
+                 )
+            )}
 
+            {/* --- Dynamically Render Details Based on activeCrawler --- */}
+            {/* Show Conference details only if active and data exists */}
+            {activeCrawler === 'conference' && hasConferenceDetailsData && (
+                <ConferenceDetails conferenceAnalysis={data.conferenceAnalysis} />
+            )}
+
+            {/* Show Journal details only if active and data exists */}
+            {/* {activeCrawler === 'journal' && hasJournalDetailsData && (
+                <JournalDetails journalAnalysis={data.journalAnalysis} />
+            )} */}
+
+            {/* Show specific 'No Data' message if the active section lacks data but overall data might exist */}
+            {activeCrawler === 'conference' && hasOverallData && !hasConferenceDetailsData && !loading && (
+                 <div className="mt-6 text-center text-gray-500 bg-white p-4 rounded-lg shadow border border-gray-200">
+                     No specific Conference analysis data available for this period.
+                 </div>
+            )}
+             {/* {activeCrawler === 'journal' && hasOverallData && !hasJournalDetailsData && !loading && (
+                 <div className="mt-6 text-center text-gray-500 bg-white p-4 rounded-lg shadow border border-gray-200">
+                      No specific Journal analysis data available for this period.
+                 </div>
+            )} */}
+
+
+            {/* Show loading indicator only when refreshing existing data */}
+            {loading && hasOverallData && (
+                <div className="mt-6 text-center text-blue-600">
+                    <FaSyncAlt className="inline mr-2 animate-spin" /> Refreshing analysis data...
+                </div>
+            )}
         </div>
     );
 };

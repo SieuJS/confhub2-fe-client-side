@@ -1,26 +1,24 @@
 // src/app/[locale]/dashboard/logAnalysis/ConferenceTable.tsx
 import React from 'react';
-import { ConferenceTableData } from '../../../../../hooks/logAnalysis/useConferenceTableManager';
+// --- IMPORT TYPES TỪ HOOK ---
+import {
+    ConferenceTableData,
+    SortableColumn, // <-- Import từ hook
+    SortDirection,  // <-- Import từ hook (nếu đã export)
+    RowSaveStatus   // <-- Import từ hook (nếu đã export)
+} from '../../../../../hooks/logAnalysis/useConferenceTableManager'; // Điều chỉnh đường dẫn nếu cần
 import { ConferenceTableHeader } from './ConferenceTableHeader';
 import { ConferenceTableRow } from './ConferenceTableRow';
-
-// Re-define types or import from hook/types file
-type SortableColumn = 'title' | 'acronym' | 'status' | 'durationSeconds' | 'errorCount';
-type SortDirection = 'asc' | 'desc';
-
-// NEW: Define RowSaveStatus type here or import it
-import { RowSaveStatus } from './ConferenceTableRow';
 
 interface ConferenceTableProps {
     data: ConferenceTableData[];
     selectedConferences: Record<string, boolean>;
     expandedConference: string | null;
-    sortColumn: SortableColumn | null;
-    sortDirection: SortDirection;
-    // NEW Props
-    rowSaveStatus: Record<string, RowSaveStatus>;
+    sortColumn: SortableColumn | null; // <-- Giờ sử dụng kiểu đã import
+    sortDirection: SortDirection;      // <-- Giờ sử dụng kiểu đã import/định nghĩa
+    rowSaveStatus: Record<string, RowSaveStatus>; // <-- Giờ sử dụng kiểu đã import/định nghĩa
     rowSaveErrors: Record<string, string>;
-    // Callbacks
+    // Callback giờ sẽ tương thích vì dùng cùng type SortableColumn
     onSort: (column: SortableColumn) => void;
     onToggleExpand: (title: string) => void;
     onSelectToggle: (title: string) => void;
@@ -32,9 +30,9 @@ export const ConferenceTable: React.FC<ConferenceTableProps> = ({
     expandedConference,
     sortColumn,
     sortDirection,
-    rowSaveStatus, // Destructure new props
-    rowSaveErrors, // Destructure new props
-    onSort,
+    rowSaveStatus,
+    rowSaveErrors,
+    onSort, // Hàm onSort này giờ có kiểu đúng
     onToggleExpand,
     onSelectToggle,
 }) => {

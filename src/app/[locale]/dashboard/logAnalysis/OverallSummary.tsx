@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
-import { FaExclamationTriangle, FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { FaExclamationTriangle, FaChevronUp, FaChevronDown, FaClipboardCheck } from 'react-icons/fa';
 import { getBarChartOption, getPieChartOption, transformRecordForBarChart, BarChartData } from './utils/chartUtils';
 // --- CẬP NHẬT IMPORT TYPE ---
 import { LogAnalysisResult } from '../../../../models/logAnalysis/logAnalysis'; // Đảm bảo type này đã cập nhật processingTasks
@@ -115,10 +115,21 @@ const OverallSummary: React.FC<OverallSummaryProps> = ({ data, timeFilterOption,
         return transformRecordForBarChart(data?.errorsAggregated, 10, true);
     }, [data?.errorsAggregated]);
 
+
+     // --- DỮ LIỆU MỚI CHO VALIDATION CHART ---
+     const warningsByFieldData = useMemo<BarChartData>(() => {
+        // Sử dụng transformRecordForBarChart để chuyển đổi dữ liệu
+        // Tham số thứ 2 (limit) là 0 để hiển thị tất cả các field
+        // Tham số thứ 3 (sort) là true để sắp xếp giảm dần theo số lượng warnings
+        return transformRecordForBarChart(data?.validationStats?.warningsByField, 0, true);
+    }, [data?.validationStats?.warningsByField]);
+
+
+    // --- Render ---
     // --- Render ---
     return (
-        <section className="mb-8 bg-white shadow rounded-lg border border-gray-100"> {/* Bọc toàn bộ section để shadow/border bao gồm cả header */}
-            {/* --- Header Section with Toggle --- */}
+        <section className="mb-8 bg-white shadow rounded-lg border border-gray-100">
+            {/* Header Section */}
             <div className="flex justify-between items-center p-4 border-b border-gray-300">
                 <h2 className="text-xl font-semibold text-gray-700">
                     Overall Crawl Summary {timeFilterOption !== 'latest' && `(${timeFilterOption.replace('_', ' ').replace('last ', 'Last ')})`}
@@ -127,21 +138,22 @@ const OverallSummary: React.FC<OverallSummaryProps> = ({ data, timeFilterOption,
                     onClick={onToggle}
                     className="p-1 rounded text-gray-500 hover:text-blue-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-300"
                     aria-expanded={isExpanded}
-                    aria-controls="overall-summary-content" // ID cho content để accessibility liên kết
-                    title={isExpanded ? 'Collapse Summary' : 'Expand Summary'} // Tooltip
+                    aria-controls="overall-summary-content"
+                    title={isExpanded ? 'Collapse Summary' : 'Expand Summary'}
                 >
                     {isExpanded ? <FaChevronUp size={18} /> : <FaChevronDown size={18} />}
-                    <span className="sr-only">{isExpanded ? 'Collapse' : 'Expand'}</span> {/* Accessibility */}
+                    <span className="sr-only">{isExpanded ? 'Collapse' : 'Expand'}</span>
                 </button>
             </div>
 
-            {/* --- Collapsible Content Area --- */}
+            {/* Collapsible Content Area */}
             <div
-                id="overall-summary-content" // ID này khớp với aria-controls ở trên
-                className={`transition-all duration-500 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[5000px] opacity-100 p-4' : 'max-h-0 opacity-0 p-0'}`} // Dùng max-h và opacity cho transition. Thêm padding khi mở.
+                id="overall-summary-content"
+                className={`transition-all duration-500 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[5000px] opacity-100 p-4' : 'max-h-0 opacity-0 p-0'}`}
             >
                 {/* --- KPI Cards --- */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                {/* CẬP NHẬT: Grid layout thành 5 cột trên màn hình lớn (lg) để chứa card mới */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
                     {/* Card 1: Duration */}
                     <div className="bg-gray-50 shadow-md rounded-lg p-4 flex items-center space-x-3 border border-gray-200 hover:shadow-lg transition-shadow duration-300">
                         <div className="p-3 rounded-full bg-blue-100 text-blue-600">
@@ -176,7 +188,20 @@ const OverallSummary: React.FC<OverallSummaryProps> = ({ data, timeFilterOption,
                             <p className="text-xl font-semibold text-gray-800">{totalGeminiCallsWithRetries}</p>
                         </div>
                     </div>
-                    {/* Card 4: Total Errors */}
+                    {/* --- CARD MỚI: Validation Warnings --- */}
+                    <div className="bg-gray-50 shadow-md rounded-lg p-4 flex items-center space-x-3 border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+                        {/* Sử dụng màu vàng/cam cho warnings */}
+                        <div className={`p-3 rounded-full ${(data.validationStats?.totalValidationWarnings || 0) > 0 ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-600'}`}>
+                            <FaClipboardCheck className="h-6 w-6" /> {/* Icon kiểm tra/validation */}
+                        </div>
+                        <div>
+                            <p className="text-sm text-gray-500 mb-1">Validation Warnings</p>
+                            <p className={`text-xl font-semibold ${(data.validationStats?.totalValidationWarnings || 0) > 0 ? 'text-amber-600' : 'text-gray-800'}`}>
+                                {data.validationStats?.totalValidationWarnings ?? 0}
+                            </p>
+                        </div>
+                    </div>
+                    {/* Card 5 (trước là 4): Total Errors */}
                     <div className="bg-gray-50 shadow-md rounded-lg p-4 flex items-center space-x-3 border border-gray-200 hover:shadow-lg transition-shadow duration-300">
                         <div className={`p-3 rounded-full ${(data.errorLogCount || 0) > 0 ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'}`}>
                             <FaExclamationTriangle className="h-6 w-6" />
@@ -189,8 +214,9 @@ const OverallSummary: React.FC<OverallSummaryProps> = ({ data, timeFilterOption,
                 </div>
 
                 {/* --- Charts Grid --- */}
+                {/* Giữ nguyên lg:grid-cols-3, chart mới sẽ làm hàng cuối không đều, hoặc điều chỉnh grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                    {/* --- CẬP NHẬT Chart: Overall Task Status --- */}
+                    {/* Chart: Overall Task Status */}
                     <div className="bg-white shadow rounded-lg p-4 border border-gray-100 min-h-[340px]">
                         {overallStatusData.length > 0 ? (
                             <ReactECharts
@@ -224,21 +250,41 @@ const OverallSummary: React.FC<OverallSummaryProps> = ({ data, timeFilterOption,
                     <div className="bg-white shadow rounded-lg p-4 border border-gray-100 min-h-[340px]">
                         {callsByModelWithRetriesData.labels.length > 0 ? <ReactECharts option={getBarChartOption('Gemini Model Usage (incl. Retries)', callsByModelWithRetriesData.labels, callsByModelWithRetriesData.values, 'Calls', '#9a60b4')} style={{ height: '300px', width: '100%' }} notMerge={true} lazyUpdate={true} /> : <div className="h-[300px] flex items-center justify-center text-gray-500">No Gemini Model Usage Data</div>}
                     </div>
-                    <div className="bg-white shadow rounded-lg p-4 border border-gray-100 lg:col-span-1 min-h-[340px]">
+                    {/* --- CHART MỚI: Validation Warnings by Field --- */}
+                    <div className="bg-white shadow rounded-lg p-4 border border-gray-100 min-h-[340px]">
+                         {warningsByFieldData.labels.length > 0 ? (
+                            <ReactECharts
+                                option={getBarChartOption(
+                                    'Validation Warnings by Field', // Title
+                                    warningsByFieldData.labels,     // Labels (field names)
+                                    warningsByFieldData.values,     // Values (counts)
+                                    'Warnings',                     // Value axis name
+                                    '#f59e0b'                       // Bar color (Amber/Orange)
+                                )}
+                                style={{ height: '300px', width: '100%' }}
+                                notMerge={true}
+                                lazyUpdate={true}
+                            />
+                        ) : (
+                            <div className="h-[300px] flex items-center justify-center text-gray-500">No Validation Warnings Found</div>
+                        )}
+                    </div>
+                    {/* --- Các chart còn lại --- */}
+                    <div className="bg-white shadow rounded-lg p-4 border border-gray-100 lg:col-span-1 min-h-[340px]"> {/* Điều chỉnh col-span nếu cần */}
                         {apiKeyUsageData.labels.length > 0 ? <ReactECharts option={getBarChartOption('Google API Key Usage', apiKeyUsageData.labels, apiKeyUsageData.values, 'Requests', '#ea7ccc')} style={{ height: '300px', width: '100%' }} notMerge={true} lazyUpdate={true} /> : <div className="h-[300px] flex items-center justify-center text-gray-500">No API Key Usage Data</div>}
                     </div>
-                    <div className="bg-white shadow rounded-lg p-4 border border-gray-100 lg:col-span-1 min-h-[340px]">
+                     <div className="bg-white shadow rounded-lg p-4 border border-gray-100 lg:col-span-1 min-h-[340px]"> {/* Điều chỉnh col-span nếu cần */}
                         {callsByTypeWithRetriesData.labels.length > 0 ? <ReactECharts option={getBarChartOption('Gemini Calls by Type (incl. Retries)', callsByTypeWithRetriesData.labels, callsByTypeWithRetriesData.values, 'Calls', '#5470c6')} style={{ height: '300px', width: '100%' }} notMerge={true} lazyUpdate={true} /> : <div className="h-[300px] flex items-center justify-center text-gray-500">No Gemini Calls by Type Data</div>}
                     </div>
-                    <div className="bg-white shadow rounded-lg p-4 border border-gray-100 md:col-span-2 lg:col-span-1 min-h-[340px]">
+                    <div className="bg-white shadow rounded-lg p-4 border border-gray-100 md:col-span-2 lg:col-span-3 min-h-[340px]"> {/* Thay đổi col-span cho Top Errors để cân đối layout */}
                         {topErrorsData.labels.length > 0 ? <ReactECharts option={getBarChartOption('Top Aggregated Errors', topErrorsData.labels, topErrorsData.values, 'Count', '#ee6666')} style={{ height: '300px', width: '100%' }} notMerge={true} lazyUpdate={true} /> : <div className="h-[300px] flex items-center justify-center text-gray-500">No Aggregated Errors Found</div>}
                     </div>
                 </div>
 
 
-                {/* --- Log Processing Errors (Nếu có) --- */}
+                {/* Log Processing Errors */}
                 {data.logProcessingErrors && data.logProcessingErrors.length > 0 && (
-                    <div className="bg-yellow-50 border border-yellow-300 shadow-sm rounded-lg p-4 mt-6"> {/* Giữ nguyên padding/margin nếu cần */}
+                    <div className="bg-yellow-50 border border-yellow-300 shadow-sm rounded-lg p-4 mt-6">
                         <h3 className="text-md font-semibold mb-2 text-yellow-800 flex items-center">
                             <FaExclamationTriangle className="mr-2" />
                             Log Parsing Issues ({data.parseErrors} errors / {data.totalLogEntries} entries)
@@ -251,7 +297,7 @@ const OverallSummary: React.FC<OverallSummaryProps> = ({ data, timeFilterOption,
                         </ul>
                     </div>
                 )}
-            </div> {/* Kết thúc div của content có thể thu gọn */}
+            </div>
         </section>
     );
 };

@@ -10,6 +10,7 @@ interface ConferenceDetailsProps {
 }
 
 const ConferenceDetails: React.FC<ConferenceDetailsProps> = ({ conferenceAnalysis }) => {
+    // Hook useConferenceTableManager giờ đã trả về handleSelectNoWarning và handleSelectWarning
     const tableManager = useConferenceTableManager({ initialData: conferenceAnalysis });
 
     if (!conferenceAnalysis || Object.keys(conferenceAnalysis).length === 0) {
@@ -21,7 +22,6 @@ const ConferenceDetails: React.FC<ConferenceDetailsProps> = ({ conferenceAnalysi
          );
     }
 
-    // Calculate error count for the controls button
     const rowSaveErrorsCount = Object.keys(tableManager.rowSaveErrors).length;
 
     return (
@@ -34,12 +34,16 @@ const ConferenceDetails: React.FC<ConferenceDetailsProps> = ({ conferenceAnalysi
                 selectedCount={tableManager.selectedTitles.length}
                 isSaveEnabled={tableManager.isSaveEnabled}
                 mainSaveStatus={tableManager.mainSaveStatus}
-                rowSaveErrorsCount={rowSaveErrorsCount} // Pass the count
+                rowSaveErrorsCount={rowSaveErrorsCount}
                 onSave={tableManager.handleBulkSave}
                 onCrawl={tableManager.handleCrawlAgain}
                 onSelectAll={tableManager.handleSelectAll}
                 onSelectNoError={tableManager.handleSelectNoError}
                 onSelectError={tableManager.handleSelectError}
+                // --- TRUYỀN CÁC PROPS CÒN THIẾU ---
+                onSelectNoWarning={tableManager.handleSelectNoWarning} // <-- Thêm dòng này
+                onSelectWarning={tableManager.handleSelectWarning}     // <-- Thêm dòng này
+                // ---------------------------------
                 onDeselectAll={tableManager.handleDeselectAll}
             />
 
@@ -49,10 +53,8 @@ const ConferenceDetails: React.FC<ConferenceDetailsProps> = ({ conferenceAnalysi
                 expandedConference={tableManager.expandedConference}
                 sortColumn={tableManager.sortColumn}
                 sortDirection={tableManager.sortDirection}
-                // Pass row status and errors objects
                 rowSaveStatus={tableManager.rowSaveStatus}
                 rowSaveErrors={tableManager.rowSaveErrors}
-                // Callbacks
                 onSort={tableManager.handleSort}
                 onToggleExpand={tableManager.toggleExpand}
                 onSelectToggle={tableManager.handleRowSelectToggle}

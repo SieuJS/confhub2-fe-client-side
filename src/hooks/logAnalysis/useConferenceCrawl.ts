@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import axios, { AxiosError } from 'axios';
 import Papa from 'papaparse';
-import { Conference, ApiCrawlResponse, CrawlProgress } from '../../models/logAnalysis/importCrawl'; // Điều chỉnh đường dẫn nếu cần
+import { Conference, ApiCrawlResponse, CrawlProgress } from '../../models/logAnalysis/importConferenceCrawl'; // Điều chỉnh đường dẫn nếu cần
 
 // --- Configuration ---
 const API_CONFERENCE_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/crawl-conferences`;

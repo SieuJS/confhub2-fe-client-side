@@ -3,11 +3,11 @@
 import { appConfig } from "@/src/middleware";
 import { ConferenceDetailsListResponse } from "@/src/models/response/conference.response";
 // Replace with your actual backend URL
-const API_BASE_URL = appConfig.NEXT_PUBLIC_DATABASE_URL || "http://confhub.engineer/api/v1";
+const API_BASE_URL = appConfig.NEXT_PUBLIC_DATABASE_URL || "http://confhub.engineer";
 
 export async function fetchVisualizationData(): Promise<ConferenceDetailsListResponse> {
     try {
-        const response = await fetch(`${API_BASE_URL}/conference?mode=detail&perPage=50`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/conference?mode=detail&perPage=956`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -19,6 +19,7 @@ export async function fetchVisualizationData(): Promise<ConferenceDetailsListRes
         }
 
         const responseData: ConferenceDetailsListResponse = await response.json();
+        // console.log(responseData.payload.slice(0,2))
         return responseData;
 
     } catch (error: any) {

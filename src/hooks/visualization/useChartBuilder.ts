@@ -1,8 +1,9 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'; // Thêm useRef
 import { EChartsOption } from 'echarts';
 import { ChartConfig, ChartOptions, DataField } from '../../models/visualization/visualization';
-import { generateChartOption, getAvailableFields } from '../../app/[locale]/visualization/utils/visualizationUtils';
 import { ConferenceDetailsListResponse } from '@/src/models/response/conference.response';
+import { getAvailableFields, generateChartOption } from '../../app/[locale]/visualization/utils'; // Import from index.ts
+
 interface UseChartBuilderProps {
     rawData: ConferenceDetailsListResponse | null; // The data fetched from backend
 }

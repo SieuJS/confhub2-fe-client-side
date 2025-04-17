@@ -1,27 +1,27 @@
-// src/hooks/useConferenceTableManager.ts
+// src/hooks/logAnalysis/useConferenceTableManager.ts
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ConferenceAnalysisDetail } from '@/src/models/logAnalysis/logAnalysis';
 import { saveConferenceToJson } from '../../app/api/logAnalysis/saveConferences';
 
-// Re-define types needed within the hook or import from a central types file
-type SortableColumn = 'title' | 'acronym' | 'status' | 'durationSeconds' | 'errorCount';
-type SortDirection = 'asc' | 'desc';
-type MainSavingStatus = 'idle' | 'saving' | 'success' | 'error';
+// --- EXPORT CÁC TYPE CẦN THIẾT ---
+export type SortableColumn = 'title' | 'acronym' | 'status' | 'durationSeconds' | 'errorCount' | 'validationWarningCount';
+export type SortDirection = 'asc' | 'desc'; // Export nếu cần ở nơi khác
+export type MainSavingStatus = 'idle' | 'saving' | 'success' | 'error'; // Export nếu cần
+export type RowSaveStatus = 'idle' | 'success' | 'error'; // Export nếu cần
 
-// Interface for the data structure used internally by the hook/table
+// --- Interface ConferenceTableData (đã cập nhật) ---
 export interface ConferenceTableData extends ConferenceAnalysisDetail {
+    title: string;
     acronym: string;
     errorCount: number;
-    title: string; // Ensure title is always present
+    validationWarningCount: number;
+    hasValidationWarnings: boolean;
+    validationWarnings?: ConferenceAnalysisDetail['validationIssues'];
 }
-
-// NEW: Type for row-specific save status
-type RowSaveStatus = 'idle' | 'success' | 'error';
 
 export interface UseConferenceTableManagerProps {
     initialData: Record<string, ConferenceAnalysisDetail> | null | undefined;
 }
-
 
 export const useConferenceTableManager = ({ initialData }: UseConferenceTableManagerProps) => {
     const [expandedConference, setExpandedConference] = useState<string | null>(null);
@@ -29,42 +29,50 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
     const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
     const [selectedConferences, setSelectedConferences] = useState<Record<string, boolean>>({});
     const [mainSaveStatus, setMainSaveStatus] = useState<MainSavingStatus>('idle');
-
-    // --- NEW State for Row Status ---
     const [rowSaveStatus, setRowSaveStatus] = useState<Record<string, RowSaveStatus>>({});
-    const [rowSaveErrors, setRowSaveErrors] = useState<Record<string, string>>({}); // Store error message per title
+    const [rowSaveErrors, setRowSaveErrors] = useState<Record<string, string>>({});
 
-
-    // --- Data Preparation ---
+    // --- CẬP NHẬT Data Preparation ---
     const conferenceDataArray: ConferenceTableData[] = useMemo(() => {
         if (!initialData) return [];
-        return Object.entries(initialData).map(([keyTitle, data]) => ({
-            ...data,
-            title: keyTitle,
-            errorCount: data.errors?.length || 0,
-            acronym: data.acronym || '',
-        }));
+        return Object.entries(initialData).map(([keyTitle, data]) => {
+            // Tính toán các chỉ số validation
+            const validationIssuesArray = data.validationIssues || []; // Đảm bảo là mảng
+            const validationWarningCount = validationIssuesArray.length;
+            const hasValidationWarnings = validationWarningCount > 0;
+
+            return {
+                ...data, // Bao gồm tất cả các trường từ ConferenceAnalysisDetail gốc
+                title: keyTitle, // Sử dụng key làm title chính
+                errorCount: data.errors?.length || 0,
+                acronym: data.acronym || '',
+                // --- Gán các giá trị validation đã tính toán ---
+                validationWarningCount: validationWarningCount,
+                hasValidationWarnings: hasValidationWarnings,
+                validationWarnings: validationIssuesArray, // Giữ mảng gốc
+                // ---------------------------------------------
+            };
+        });
     }, [initialData]);
 
-    // --- Effect to initialize/reset row statuses when data changes ---
+    // Effect to initialize/reset row statuses (giữ nguyên)
     useEffect(() => {
         const initialStatus: Record<string, RowSaveStatus> = {};
         conferenceDataArray.forEach(conf => {
             initialStatus[conf.title] = 'idle';
         });
         setRowSaveStatus(initialStatus);
-        setRowSaveErrors({}); // Clear previous errors
-        setSelectedConferences({}); // Reset selection
-        setMainSaveStatus('idle'); // Reset main button
-        setExpandedConference(null); // Collapse all rows
-    }, [conferenceDataArray]); // Dependency on the processed data array
+        setRowSaveErrors({});
+        setSelectedConferences({});
+        setMainSaveStatus('idle');
+        setExpandedConference(null);
+    }, [conferenceDataArray]);
 
 
-
-    // --- Sorting ---
+    // --- CẬP NHẬT Sorting ---
     const sortedData = useMemo(() => {
         if (!sortColumn) return conferenceDataArray;
-        // Sorting logic remains the same as before...
+
         return [...conferenceDataArray].sort((a, b) => {
             let aValue: any = a[sortColumn];
             let bValue: any = b[sortColumn];
@@ -85,16 +93,20 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
                     return 0;
                 case 'durationSeconds':
                 case 'errorCount':
+                // --- THÊM CASE SORT CHO VALIDATION WARNING COUNT ---
+                case 'validationWarningCount':
                     aValue = Number(aValue);
                     bValue = Number(bValue);
                     return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+                // -----------------------------------------------
                 default:
                     return 0;
             }
         });
     }, [conferenceDataArray, sortColumn, sortDirection]);
 
-    const handleSort = useCallback((column: SortableColumn) => {
+    // handleSort (cập nhật type SortableColumn đã đủ)
+     const handleSort = useCallback((column: SortableColumn) => {
         if (sortColumn === column) {
             setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
         } else {
@@ -130,158 +142,187 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
 
     const handleSelectNoError = useCallback(() => {
         const newSelection: Record<string, boolean> = {};
+        // Lọc dựa trên errorCount đã tính
         sortedData.forEach(conf => { if (conf.errorCount === 0) newSelection[conf.title] = true; });
         setSelectedConferences(newSelection);
     }, [sortedData]);
 
     const handleSelectError = useCallback(() => {
         const newSelection: Record<string, boolean> = {};
+         // Lọc dựa trên errorCount đã tính
         sortedData.forEach(conf => { if (conf.errorCount > 0) newSelection[conf.title] = true; });
         setSelectedConferences(newSelection);
     }, [sortedData]);
 
-    // --- Expand/Collapse ---
+    // --- THÊM HÀM CHỌN THEO WARNING ---
+    const handleSelectWarning = useCallback(() => {
+        const newSelection: Record<string, boolean> = {};
+         // Lọc dựa trên hasValidationWarnings đã tính
+        sortedData.forEach(conf => { if (conf.hasValidationWarnings) newSelection[conf.title] = true; });
+        setSelectedConferences(newSelection);
+    }, [sortedData]);
+
+    const handleSelectNoWarning = useCallback(() => {
+        const newSelection: Record<string, boolean> = {};
+         // Lọc dựa trên hasValidationWarnings đã tính
+        sortedData.forEach(conf => { if (!conf.hasValidationWarnings) newSelection[conf.title] = true; });
+        setSelectedConferences(newSelection);
+    }, [sortedData]);
+    // ----------------------------------
+
+    // --- Expand/Collapse (giữ nguyên) ---
     const toggleExpand = useCallback((title: string) => {
         setExpandedConference(prev => (prev === title ? null : title));
     }, []);
 
-    // --- Saving Logic ---
-    const isSelectedWithError = useMemo(() => {
+    // --- CẬP NHẬT Saving Logic ---
+    // Tính toán xem có hàng nào được chọn mà có lỗi HOẶC warning không
+    const isSelectedWithProblem = useMemo(() => {
         if (selectedTitles.length === 0) return false;
         const selectedData = sortedData.filter(conf => selectedConferences[conf.title]);
-        return selectedData.some(conf => conf.errorCount > 0);
+        // Trả về true nếu có bất kỳ hàng nào được chọn có errorCount > 0 HOẶC hasValidationWarnings === true
+        return selectedData.some(conf => conf.errorCount > 0 || conf.hasValidationWarnings);
     }, [selectedTitles, selectedConferences, sortedData]);
 
+    // Cập nhật isSaveEnabled để kiểm tra isSelectedWithProblem
     const isSaveEnabled = useMemo(() => {
-        return selectedTitles.length > 0 && !isSelectedWithError && mainSaveStatus !== 'saving';
-    }, [selectedTitles, isSelectedWithError, mainSaveStatus]);
+        // Chỉ bật khi có hàng được chọn, không có hàng nào có vấn đề (lỗi hoặc warning), và không đang lưu
+        return selectedTitles.length > 0 && !isSelectedWithProblem && mainSaveStatus !== 'saving';
+    }, [selectedTitles.length, isSelectedWithProblem, mainSaveStatus]); // Thay đổi dependencies
 
-    // Effect to reset main save status when selection changes AFTER an operation
+    // Effect to reset main save status (giữ nguyên)
     useEffect(() => {
         if (mainSaveStatus === 'error' || mainSaveStatus === 'success') {
             setMainSaveStatus('idle');
-            // Do NOT reset rowSaveStatus or rowSaveErrors here, they persist until next save
         }
     }, [selectedConferences, mainSaveStatus]);
 
-
-    // MODIFIED: Handle Bulk Save to update row statuses
-    const handleBulkSave = useCallback(async () => {
-        if (!isSaveEnabled) return;
+    // handleBulkSave (logic bên trong không cần thay đổi nhiều, vì isSaveEnabled đã lọc trước)
+     const handleBulkSave = useCallback(async () => {
+        if (!isSaveEnabled) return; // Guard đã bao gồm cả check warning
 
         setMainSaveStatus('saving');
-        // Reset statuses and errors ONLY for the items about to be saved
         const nextRowStatus = { ...rowSaveStatus };
         const nextRowErrors = { ...rowSaveErrors };
         selectedTitles.forEach(title => {
-            nextRowStatus[title] = 'idle'; // Reset to idle before attempting save
-            delete nextRowErrors[title];   // Clear previous error for this item
+            nextRowStatus[title] = 'idle';
+            delete nextRowErrors[title];
         });
-        setRowSaveStatus(nextRowStatus); // Update state to potentially clear old icons visually
+        setRowSaveStatus(nextRowStatus);
         setRowSaveErrors(nextRowErrors);
 
         console.log(`Starting bulk save for: ${selectedTitles.join(', ')}`);
 
+        // Filter items to save based on current selection
         const itemsToSave = conferenceDataArray.filter(conf => selectedConferences[conf.title]);
+        // --- QUAN TRỌNG: Truyền dữ liệu cần thiết cho API ---
+        // API `saveConferenceToJson` có thể cần toàn bộ `conf` hoặc chỉ một phần
+        // Ví dụ: chỉ truyền title và finalResultPreview (nếu có) hoặc toàn bộ object
         const savePromises = itemsToSave.map(conf =>
-            saveConferenceToJson(conf.title, conf.title)
+            // Giả sử API chỉ cần title và dữ liệu preview (hoặc toàn bộ conf nếu cần)
+            // Đảm bảo API của bạn nhận đúng dữ liệu bạn muốn lưu
+             saveConferenceToJson(conf.title, conf.finalResultPreview || {}) // Ví dụ: chỉ lưu preview
+           // saveConferenceToJson(conf.title, conf) // Hoặc lưu toàn bộ conf
         );
 
         const results = await Promise.allSettled(savePromises);
 
-        // Process results and update final row statuses/errors
-        const finalRowStatus: Record<string, RowSaveStatus> = { ...nextRowStatus }; // Start from the reset state
+        // Process results (logic này vẫn đúng để cập nhật row status)
+        const finalRowStatus: Record<string, RowSaveStatus> = { ...nextRowStatus };
         const finalRowErrors: Record<string, string> = { ...nextRowErrors };
         let overallSuccess = true;
         let successfulSaves = 0;
         let failedSaves = 0;
 
-        results.forEach(result => {
+        results.forEach((result, index) => { // Sử dụng index để lấy title từ itemsToSave nếu API không trả về
+            const currentTitle = itemsToSave[index].title; // Lấy title từ mảng gốc để đảm bảo
+
             if (result.status === 'rejected') {
                 overallSuccess = false;
                 failedSaves++;
-                const reason = result.reason as { title: string; message: string };
-                finalRowStatus[reason.title] = 'error';
-                finalRowErrors[reason.title] = reason.message;
-                console.error(`Bulk Save Error (Rejected): ${reason.title}`, reason.message);
+                // Cố gắng lấy message lỗi một cách an toàn hơn
+                const errorMessage = typeof result.reason === 'object' && result.reason !== null && 'message' in result.reason
+                                     ? String(result.reason.message)
+                                     : String(result.reason);
+                finalRowStatus[currentTitle] = 'error';
+                finalRowErrors[currentTitle] = errorMessage;
+                console.error(`Bulk Save Error (Rejected): ${currentTitle}`, errorMessage);
             } else if (result.status === 'fulfilled') {
-                const response = result.value;
+                 // API có thể trả về { success: boolean, title: string, message?: string }
+                 const response = result.value as { success: boolean, title?: string, message?: string }; // Type assertion
+                 const titleFromResponse = response.title ?? currentTitle; // Ưu tiên title từ response nếu có
+
                 if (!response.success) {
                     overallSuccess = false;
                     failedSaves++;
-                    finalRowStatus[response.title] = 'error';
-                    finalRowErrors[response.title] = response.message;
-                    console.error(`Bulk Save Error (Fulfilled, Backend Fail): ${response.title}`, response.message);
+                    finalRowStatus[titleFromResponse] = 'error';
+                    finalRowErrors[titleFromResponse] = response.message || 'Save operation failed (no specific message).';
+                    console.error(`Bulk Save Error (Fulfilled, Backend Fail): ${titleFromResponse}`, response.message);
                 } else {
                     successfulSaves++;
-                    finalRowStatus[response.title] = 'success';
-                    console.log(`Bulk Save Success: ${response.title}`);
+                    finalRowStatus[titleFromResponse] = 'success';
+                    console.log(`Bulk Save Success: ${titleFromResponse}`);
                 }
             }
         });
 
-        // Update state once with the final results
         setRowSaveStatus(finalRowStatus);
         setRowSaveErrors(finalRowErrors);
 
         if (overallSuccess) {
             setMainSaveStatus('success');
             console.log(`Bulk save completed successfully for ${successfulSaves} items.`);
-            handleDeselectAll(); // Clear selection on success
+            handleDeselectAll();
             setTimeout(() => setMainSaveStatus('idle'), 3000);
         } else {
             setMainSaveStatus('error');
             console.error(`Bulk save completed with ${failedSaves} error(s) out of ${selectedTitles.length} selected items.`);
-            // Errors are shown per row, main button just indicates failure happened.
-            // Optionally, keep error state longer or until next action
         }
-    }, [isSaveEnabled, selectedTitles, selectedConferences, conferenceDataArray, rowSaveStatus, rowSaveErrors, handleDeselectAll]); // Added row status/errors
+    }, [
+        isSaveEnabled,
+        selectedTitles,
+        selectedConferences,
+        conferenceDataArray, // Quan trọng: cần để filter itemsToSave
+        rowSaveStatus,
+        rowSaveErrors,
+        handleDeselectAll // Thêm handleDeselectAll vào dependencies
+    ]);
 
 
-    // --- Mock Crawl Again Logic ---
+    // Mock Crawl Again Logic (giữ nguyên)
     const handleCrawlAgain = useCallback(() => {
         if (selectedTitles.length === 0) return;
         console.log("--- MOCK CRAWL AGAIN ---");
         console.log("Would trigger crawl for:", selectedTitles.join(', '));
         alert(`Mock: Triggering crawl again for ${selectedTitles.length} conference(s):\n${selectedTitles.join('\n')}`);
-        // Placeholder for future API call, e.g., using crawlConferenceAgain service
     }, [selectedTitles]);
 
 
-    // --- Return state and handlers ---
-    // --- Return state and handlers ---
-    return {
-        // Data
+     // --- CẬP NHẬT Return state and handlers ---
+     // Đảm bảo hook trả về các hàm đã được định nghĩa trong phạm vi của nó
+     // với các kiểu đã export ở trên
+     return {
         sortedData,
         conferenceDataArray,
-
-        // Sorting
         sortColumn,
         sortDirection,
-        handleSort,
-
-        // Selection
+        handleSort, // Hàm này sử dụng SortableColumn đã export
         selectedConferences,
         selectedTitles,
         handleRowSelectToggle,
         handleSelectAll,
         handleSelectNoError,
         handleSelectError,
+        handleSelectWarning,
+        handleSelectNoWarning,
         handleDeselectAll,
-
-        // Expansion
         expandedConference,
         toggleExpand,
-
-        // Saving
         mainSaveStatus,
         isSaveEnabled,
         handleBulkSave,
-        // NEW: Row specific status/errors
         rowSaveStatus,
         rowSaveErrors,
-
-        // Other Actions
         handleCrawlAgain,
-    };
+     };
 };
