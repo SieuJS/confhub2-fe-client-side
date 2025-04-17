@@ -69,12 +69,12 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         try {
           const date = new Date(current.createdAt)
           if (!isNaN(date.getTime())) currentCreatedAt = date
-        } catch { }
+        } catch {}
         let latestCreatedAt: Date | null = null
         try {
           const date = new Date(latest.createdAt)
           if (!isNaN(date.getTime())) latestCreatedAt = date
-        } catch { }
+        } catch {}
         if (
           currentCreatedAt &&
           (!latestCreatedAt || currentCreatedAt > latestCreatedAt)
@@ -172,19 +172,19 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
   // --- Hooks (remain the same) ---
   const sectionKeys = conference
     ? [
-      'overview',
-      'important-dates',
-      'call-for-papers',
-      'category-topics',
-      ...(ranks && ranks.length > 0 ? ['source-rank'] : []),
-      'map'
-    ]
+        'overview',
+        'important-dates',
+        'call-for-papers',
+        'fieldOfResearch-topics',
+        ...(ranks && ranks.length > 0 ? ['source-rank'] : []),
+        'map'
+      ]
     : []
   const sectionTranslationMap: { [key: string]: string } = {
     overview: 'Overview',
     'important-dates': 'Important_Dates',
     'call-for-papers': 'Call_for_papers',
-    'category-topics': 'Category_and_Topics',
+    'fieldOfResearch-topics': 'FieldOfResearch_and_Topics',
     'source-rank': 'Source_Rank',
     map: 'Map'
   } // Renamed 'map' key value for clarity if needed, but not strictly necessary
@@ -290,7 +290,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
                                     o =>
                                       o.fromDate !== groupInfo.current.fromDate
                                   ).length -
-                                  1 && ', '}
+                                    1 && ', '}
                               </React.Fragment>
                             ))}
                           {groupInfo.differentOldDates.some(
@@ -318,7 +318,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
                                   arr.filter(
                                     o => o.toDate !== groupInfo.current.toDate
                                   ).length -
-                                  1 && ', '}
+                                    1 && ', '}
                               </React.Fragment>
                             ))}
                           {groupInfo.differentOldDates.some(
@@ -355,11 +355,15 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
           remarkPlugins={[remarkGfm, remarkBreaks]}
           rehypePlugins={[rehypeRaw]}
           components={{
-
             // Customize components (optional, for more control)
             p: ({ node, ...props }) => <p className='mb-2' {...props} />, // Add margin to paragraphs
             a: ({ ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
-              <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline" />
+              <a
+                {...props}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-blue-500 hover:underline'
+              />
             ),
             // Add more component overrides as needed (ul, ol, li, code, etc.)
             pre: ({ node, ...props }) => (
@@ -393,15 +397,17 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         </ReactMarkdown>
       </section>
       <section
-        id='category-topics'
+        id='fieldOfResearch-topics'
         className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
         <h2 className='mb-6 text-xl font-semibold md:text-2xl '>
-          {t('Category_and_Topics')}
+          {t('FieldOfResearch_and_Topics')}
         </h2>
         <div className='mb-6'>
-          <h3 className='mb-2 text-xl font-medium '>{t('Category')}</h3>
-          <p className=''>{accessType || t('Category_not_available')}</p>
+          <h3 className='mb-2 text-xl font-medium '>
+            {t('Field_Of_Research')}
+          </h3>
+          <p className=''>{accessType || t('fieldOfResearch_not_available')}</p>
         </div>
         <div>
           <h3 className='mb-2 text-xl font-medium '>{t('Topics')}</h3>

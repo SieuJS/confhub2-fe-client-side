@@ -3,7 +3,7 @@ export interface ConferenceFormData {
   acronym: string
   link: string
   topics: string[]
-  type: 'offline' | 'online' | 'hybrid'
+  type: 'Offline' | 'Online' | 'Hybrid'
   location: LocationInput
   dates: ImportantDateInput[]
   imageUrl: string

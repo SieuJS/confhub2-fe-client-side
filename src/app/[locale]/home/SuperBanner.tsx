@@ -1,16 +1,16 @@
 // src/components/SuperBanner.tsx
 
-import React, { useEffect, useRef } from 'react';
-import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
-import { Link } from '@/src/navigation'; // Đảm bảo đường dẫn này chính xác
-import * as echarts from 'echarts/core'; // Import core
-import { CanvasRenderer } from 'echarts/renderers'; // Import renderer
-import { GraphicComponent } from 'echarts/components'; // Import graphic component
-import type { EChartsCoreOption, EChartsType } from 'echarts/core'; // Import types
+import React, { useEffect, useRef } from 'react'
+import { useTranslations } from 'next-intl'
+import { motion } from 'framer-motion'
+import { Link } from '@/src/navigation' // Đảm bảo đường dẫn này chính xác
+import * as echarts from 'echarts/core' // Import core
+import { CanvasRenderer } from 'echarts/renderers' // Import renderer
+import { GraphicComponent } from 'echarts/components' // Import graphic component
+import type { EChartsCoreOption, EChartsType } from 'echarts/core' // Import types
 
 // --- Đăng ký các components và renderer cần thiết ---
-echarts.use([GraphicComponent, CanvasRenderer]);
+echarts.use([GraphicComponent, CanvasRenderer])
 
 // --- Animation Variants (Giữ nguyên) ---
 const containerVariants = {
@@ -19,10 +19,10 @@ const containerVariants = {
     opacity: 1,
     transition: {
       staggerChildren: 0.2,
-      delayChildren: 0.3,
-    },
-  },
-};
+      delayChildren: 0.3
+    }
+  }
+}
 
 const itemVariants = {
   hidden: { y: 30, opacity: 0 },
@@ -31,27 +31,27 @@ const itemVariants = {
     opacity: 1,
     transition: {
       duration: 0.6,
-      ease: 'easeOut',
-    },
-  },
-};
+      ease: 'easeOut'
+    }
+  }
+}
 // --- Kết thúc Variants ---
 
 const SuperBanner: React.FC = () => {
-  const t = useTranslations('');
-  const backgroundImageUrl = '/world.svg'; // Đường dẫn tới file SVG trong public
-  const chartRef = useRef<HTMLDivElement>(null); // Ref cho div chứa ECharts
-  const chartInstanceRef = useRef<EChartsType | null>(null); // Ref để lưu trữ instance ECharts
+  const t = useTranslations('')
+  const backgroundImageUrl = '/world.svg' // Đường dẫn tới file SVG trong public
+  const chartRef = useRef<HTMLDivElement>(null) // Ref cho div chứa ECharts
+  const chartInstanceRef = useRef<EChartsType | null>(null) // Ref để lưu trữ instance ECharts
 
-  const sloganText = t('Slogan_Website'); // Lấy text slogan
+  const sloganText = t('Slogan_Website') // Lấy text slogan
 
   useEffect(() => {
-    let chart: EChartsType | null = null; // Khởi tạo biến chart cục bộ
+    let chart: EChartsType | null = null // Khởi tạo biến chart cục bộ
 
     // Chỉ khởi tạo ECharts nếu chartRef đã được gắn vào DOM
     if (chartRef.current) {
-      chart = echarts.init(chartRef.current);
-      chartInstanceRef.current = chart; // Lưu instance vào ref
+      chart = echarts.init(chartRef.current)
+      chartInstanceRef.current = chart // Lưu instance vào ref
 
       // --- Cấu hình ECharts Option với text động ---
       const option: EChartsCoreOption = {
@@ -75,10 +75,10 @@ const SuperBanner: React.FC = () => {
                 stroke: '#FFFFFF', // Màu viền ban đầu (giống màu text-button)
                 lineWidth: 1, // Độ dày viền
                 // Thêm textShadow nếu muốn giữ hiệu ứng shadow tương tự h1 cũ
-                 textShadowBlur: 4,
-                 textShadowColor: 'rgba(0, 0, 0, 0.3)', // Tương tự var(--logo-shadow)
-                 textShadowOffsetX: 0,
-                 textShadowOffsetY: 2,
+                textShadowBlur: 4,
+                textShadowColor: 'rgba(0, 0, 0, 0.3)', // Tương tự var(--logo-shadow)
+                textShadowOffsetX: 0,
+                textShadowOffsetY: 2
               },
               keyframeAnimation: {
                 duration: 3000,
@@ -89,52 +89,51 @@ const SuperBanner: React.FC = () => {
                     style: {
                       fill: 'transparent',
                       lineDashOffset: 200,
-                      lineDash: [200, 0],
-                    },
+                      lineDash: [200, 0]
+                    }
                   },
                   {
                     // Stop for a while.
                     percent: 0.8,
                     style: {
-                      fill: 'transparent',
-                    },
+                      fill: 'transparent'
+                    }
                   },
                   {
                     percent: 1,
                     style: {
-                       // Màu cuối cùng khi text hiện đầy đủ (giống màu text-button)
-                      fill: '#FFFFFF', // Thay '#FFFFFF' bằng mã màu thực tế
-                    },
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      };
+                      // Màu cuối cùng khi text hiện đầy đủ (giống màu text-button)
+                      fill: '#FFFFFF' // Thay '#FFFFFF' bằng mã màu thực tế
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
       // --- Kết thúc cấu hình ECharts Option ---
 
-      chart.setOption(option);
+      chart.setOption(option)
 
       // --- Xử lý resize để Echarts tự điều chỉnh kích thước ---
       const handleResize = () => {
-        chart?.resize();
-      };
-      window.addEventListener('resize', handleResize);
+        chart?.resize()
+      }
+      window.addEventListener('resize', handleResize)
 
       // --- Hàm cleanup ---
       return () => {
-        window.removeEventListener('resize', handleResize);
+        window.removeEventListener('resize', handleResize)
         // Sử dụng instance đã lưu để dispose
-        chartInstanceRef.current?.dispose();
-        chartInstanceRef.current = null; // Reset ref
-         console.log('ECharts instance disposed');
-      };
+        chartInstanceRef.current?.dispose()
+        chartInstanceRef.current = null // Reset ref
+        console.log('ECharts instance disposed')
+      }
     }
-     // Thêm sloganText vào dependency array để nếu text thay đổi (ví dụ đổi ngôn ngữ), chart sẽ re-render
-     // Tuy nhiên, nếu đổi ngôn ngữ làm cả component re-render thì không cần thiết lắm
-  }, [sloganText]);
-
+    // Thêm sloganText vào dependency array để nếu text thay đổi (ví dụ đổi ngôn ngữ), chart sẽ re-render
+    // Tuy nhiên, nếu đổi ngôn ngữ làm cả component re-render thì không cần thiết lắm
+  }, [sloganText])
 
   return (
     <motion.section
@@ -151,7 +150,7 @@ const SuperBanner: React.FC = () => {
         transition={{
           duration: 12,
           repeat: Infinity,
-          ease: 'easeInOut',
+          ease: 'easeInOut'
         }}
         aria-hidden='true'
       >
@@ -162,14 +161,14 @@ const SuperBanner: React.FC = () => {
       </motion.div>
 
       {/* Lớp phủ gradient nhẹ (Giữ nguyên) */}
-      <div
+      {/* <div
         className='pointer-events-none absolute inset-0 z-[1]'
         style={{
           background:
             'linear-gradient(to top, rgba(51, 51, 102, 0.4), transparent, rgba(9, 127, 165, 0.1))',
         }}
         aria-hidden='true'
-      ></div>
+      ></div> */}
 
       {/* Blobs (Giữ nguyên) */}
       <motion.div
@@ -184,13 +183,14 @@ const SuperBanner: React.FC = () => {
           duration: 25,
           repeat: Infinity,
           ease: 'linear',
-          delay: 2,
+          delay: 2
         }}
       />
 
       {/* Content chính */}
-      <div className='relative z-10 mx-0 flex max-w-6xl flex-col items-center text-center'> {/* Thêm flex flex-col items-center */}
-
+      <div className='relative z-10 mx-0 flex max-w-6xl flex-col items-center text-center'>
+        {' '}
+        {/* Thêm flex flex-col items-center */}
         {/* === Thay thế H1 bằng Div chứa ECharts === */}
         <motion.div
           ref={chartRef}
@@ -203,15 +203,13 @@ const SuperBanner: React.FC = () => {
           {/* ECharts sẽ render vào đây */}
         </motion.div>
         {/* ========================================== */}
-
         <motion.p
-          className='mx-0 mb-10 max-w-6xl text-lg text-button opacity-90 sm:text-xl md:text-2xl'
+          className='mx-0 mb-10 max-w-6xl text-lg font-semibold text-button opacity-90 sm:text-xl md:text-2xl'
           variants={itemVariants}
-          style={{ textShadow: '0 1px 3px var(--logo-shadow)' }}
+          // style={{ textShadow: ' var(--logo-shadow)' }}
         >
           {t('Slogan_Website_describe')}
         </motion.p>
-
         <motion.div
           className='flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6'
           variants={itemVariants}
@@ -242,7 +240,7 @@ const SuperBanner: React.FC = () => {
         </motion.div>
       </div>
     </motion.section>
-  );
-};
+  )
+}
 
-export default SuperBanner;
+export default SuperBanner
