@@ -632,25 +632,6 @@
   "Camera_Ready_Date": "Camera Ready Date",
   "Invalid_Date": "Invalid Date",
   "Not_Available": "Not Available",
-  "IntroduceVisualization": {
-    "heading": "Explore Conference Insights through Visualization",
-    "description": "Data visualization helps you easily grasp key trends, and compare the effectiveness of sessions, speakers, and topics. Discover the big picture of the conference in a vivid and intuitive way.",
-    "buttonText": "Explore Now",
-    "buttonAriaLabel": "Go to the Visualization page",
-    "chartExampleLabel": "Example: Conference count by continent ({chartType})",
-    "chartTypeBar": "Bar Chart",
-    "chartTypePie": "Pie Chart",
-    "chartTypeLine": "Line Chart",
-    "valueLabel": "Count",
-    "continent": {
-      "asia": "Asia",
-      "europe": "Europe",
-      "northAmerica": "North America",
-      "southAmerica": "South America",
-      "africa": "Africa",
-      "oceania": "Oceania"
-    }
-  },
   "SupportForm": {
     "headerTitle": "Contact Us",
     "headerSubtitle": "We use an agile approach to test assumptions and connect with the needs of your audience early and often.",
@@ -725,5 +706,31 @@
   "No_summary_available": "No summary available.",
   "FieldOfResearch_and_Topics": "Field of Research and Topics",
   "fieldOfResearch_not_available": "Field of Research not available.",
-  "Field_Of_Research": "Field of Research"
+  "Field_Of_Research": "Field of Research",
+  "You_have_no_notifications_matching_criteria": "You have no notifications matching the criteria.",
+  "IntroduceVisualization": {
+    "continent": {
+      "asia": "Asia",
+      "europe": "Europe",
+      "northAmerica": "North America",
+      "southAmerica": "South America",
+      "africa": "Africa",
+      "oceania": "Oceania",
+      "Europe": "Europe",
+      "North America": "North America",
+      "Asia": "Asia",
+      "South America": "South America",
+      "Africa": "Africa",
+      "Oceania": "Oceania"
+    },
+    "valueLabel": "Value",
+    "chartTypeBar": "Bar Chart",
+    "chartTypePie": "Pie Chart",
+    "chartTypeLine": "Line Chart",
+    "heading": "Interactive Data Visualization",
+    "description": "Explore data through dynamic and engaging charts. Switch between different visualization types to gain new perspectives.",
+    "buttonAriaLabel": "Explore visualization examples",
+    "buttonText": "Explore More",
+    "chartExampleLabel": "Example: {chartType}"
+  }
 }

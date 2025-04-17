@@ -11,19 +11,10 @@ import {
   NextIntlClientProvider,
   useMessages,
 } from 'next-intl';
-import { Inter, Rubik } from 'next/font/google';
 import localFont from 'next/font/local'
 import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--inter',
-});
-const rubik = Rubik({
-  subsets: ['arabic'],
-  variable: '--rubik',
-});
 // Tải Space Grotesk cục bộ
 const spaceGrotesk = localFont({
   src: [
@@ -41,6 +32,41 @@ const spaceGrotesk = localFont({
   variable: '--font-space-grotesk', // Tên biến CSS
   display: 'swap', 
 });
+
+const inter = localFont({
+  src: [
+    {
+      path: '../../../public/fonts/Inter_18pt-Regular.ttf', 
+      weight: '400', 
+      style: 'normal', 
+    },
+    {
+      path: '../../../public/fonts/Inter_18pt-Bold.ttf',
+      weight: '700',  
+      style: 'normal',
+    },
+  ],
+  variable: '--inter', // Tên biến CSS
+  display: 'swap', 
+});
+
+const rubik = localFont({
+  src: [
+    {
+      path: '../../../public/fonts/Rubik-Regular.ttf', 
+      weight: '400', 
+      style: 'normal', 
+    },
+    {
+      path: '../../../public/fonts/Rubik-Bold.ttf',
+      weight: '700',  
+      style: 'normal',
+    },
+  ],
+  variable: '--rubik', // Tên biến CSS
+  display: 'swap', 
+});
+
 export const metadata: Metadata = {
   title: 'ConFHub - Conference Management Platform',
   description: 'ConFHub is a comprehensive platform for managing and discovering academic conferences and journals.',

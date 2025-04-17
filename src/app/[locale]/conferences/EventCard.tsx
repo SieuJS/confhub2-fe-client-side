@@ -207,7 +207,12 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
                 key={topic}
                 href={{ pathname: `/conferences`, query: { topics: topic } }}
               >
-                <span className='cursor-pointer rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700 transition duration-200 hover:bg-gray-200'>
+                <span
+                  className=' inline-block max-w-64 cursor-pointer overflow-hidden text-ellipsis
+              whitespace-nowrap rounded-full bg-gray-100 px-2 py-1 align-bottom text-xs
+              text-gray-700 transition duration-200
+              hover:bg-gray-200'
+                >
                   {topic}
                 </span>
               </Link>
