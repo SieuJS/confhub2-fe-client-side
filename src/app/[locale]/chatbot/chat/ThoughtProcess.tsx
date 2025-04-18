@@ -1,6 +1,6 @@
 // src/components/ThoughtProcess.tsx
 import React, { useState } from 'react';
-import { ThoughtStep } from '../../../../../../NEW-SERVER-TS/src/shared/types'; // Adjust path
+import { ThoughtStep } from '@/src/models/chatbot/chatbot'; // Adjust path
 
 // Re-define or import stepIcons - simpler to redefine here if not shared globally
 const stepIcons: { [key: string]: string } = {
@@ -57,7 +57,7 @@ const ThoughtProcess: React.FC<ThoughtProcessProps> = ({ thoughts }) => {
                             </span>
                             <span className="flex-grow">{thought.message}</span>
                             {/* Optional: Display timestamp or details */}
-                            {/* <span className="text-gray-400 text-[10px]">{new Date(thought.timestamp).toLocaleTimeString()}</span> */}
+                            <span className="text-gray-400 text-[10px]">{new Date(thought.timestamp).toLocaleTimeString()}</span>
                         </li>
                     ))}
                 </ul>

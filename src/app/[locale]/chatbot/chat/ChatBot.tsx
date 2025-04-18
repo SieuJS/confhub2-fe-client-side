@@ -1,31 +1,19 @@
-// src/components/ChatBot.tsx (or appropriate path)
+// src/app/[locale]/chatbot/chat/ChatBot.tsx
 "use client";
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
-import ChatHistory from './ChatHistory';
-import ChatInput from './ChatInput';
-import LoadingIndicator from './LoadingIndicator';
-import Introduction from './ChatIntroduction';
+import { SendHorizonal, Loader2, ServerCrash, TriangleAlert } from 'lucide-react'; // Using lucide-react for icons (npm install lucide-react)
+
+import ChatHistory from './ChatHistory'; // Assume this component handles rendering individual messages based on props
+import ChatInput from './ChatInput';     // Assume this handles the input field and button logic
+import LoadingIndicator from './LoadingIndicator'; // Assume this displays loading info
+import Introduction from './ChatIntroduction'; // Assume this shows the intro content
+
 import {
-    HistoryItem as ApiHistoryItem, StatusUpdate, ResultUpdate, ErrorUpdate, ThoughtStep
-} from '../../../../../../NEW-SERVER-TS/src/shared/types'; // Adjust path if needed
+    HistoryItem as ApiHistoryItem, StatusUpdate, ResultUpdate, ErrorUpdate, ThoughtStep, ChatMessageType, LoadingState
+} from '@/src/models/chatbot/chatbot';
 import { appConfig } from '@/src/middleware';
-
-// Types
-// Update ChatMessageType
-export interface ChatMessageType {
-    message: string;
-    isUser: boolean;
-    type: 'text' | 'error';
-    thoughts?: ThoughtStep[]; // *** ADD thoughts array ***
-}
-
-interface LoadingState {
-    isLoading: boolean;
-    step: string;
-    message: string;
-}
 
 const SOCKET_SERVER_URL = appConfig.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
 
@@ -35,153 +23,169 @@ function ChatBot() {
     const [timeCounter, setTimeCounter] = useState<string>('0s');
     const timerInterval = useRef<number | null>(null);
     const [hasChatStarted, setHasChatStarted] = useState<boolean>(false);
-    const [fillInputFunction, setFillInputFunction] = useState<((text: string) => void) | null>(null); // Corrected type for fillInput
+    const [fillInputFunction, setFillInputFunction] = useState<((text: string) => void) | null>(null);
 
     const socketRef = useRef<Socket | null>(null);
     const isMountedRef = useRef(false);
-    // *** Add Ref for Loading State ***
     const loadingStateRef = useRef(loadingState);
+    const chatHistoryRef = useRef<HTMLDivElement>(null); // Ref for the history container
 
+    // --- Mount/Unmount and State Ref ---
     useEffect(() => {
         isMountedRef.current = true;
         console.log("ChatBot Component Mounted");
         return () => {
             isMountedRef.current = false;
             console.log("ChatBot Component Unmounted");
-            // Cleanup handled in socket effect
+            stopTimer(); // Ensure timer stops on unmount
+            // Socket cleanup handled in its own effect
         };
-    }, []);
+    }, []); // Removed stopTimer from deps as it's stable now
 
-    // Update the loading state ref whenever loadingState changes
     useEffect(() => {
         loadingStateRef.current = loadingState;
     }, [loadingState]);
 
-    // --- Timer functions ---
+    // --- Scroll to Bottom ---
+    useEffect(() => {
+        // Scroll to bottom when messages change
+        if (chatHistoryRef.current) {
+            chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight;
+        }
+    }, [chatMessages]);
+
+    // --- Timer Functions (Stable) ---
     const stopTimer = useCallback(() => {
         if (timerInterval.current) {
             clearInterval(timerInterval.current);
             timerInterval.current = null;
-            console.log("Timer stopped.");
+            // console.log("Timer stopped."); // Less noisy logging
         }
-    }, []); // Stable
+    }, []);
 
     const startTimer = useCallback(() => {
-        if (timerInterval.current) clearInterval(timerInterval.current);
+        stopTimer(); // Ensure only one timer runs
         const startTime = Date.now();
-        setTimeCounter('0s');
+        setTimeCounter('0.0s'); // Start with decimal
         timerInterval.current = window.setInterval(() => {
             if (isMountedRef.current) {
                 const elapsedTime = Date.now() - startTime;
                 const seconds = (elapsedTime / 1000).toFixed(1);
                 setTimeCounter(`${seconds}s`);
             } else {
-                stopTimer(); // Call stable stopTimer
+                stopTimer();
             }
         }, 100);
-    }, [stopTimer]); // Depends only on stable stopTimer
-
-    // --- Stable Handlers (using refs for state access where needed) ---
-
-    const handleConnect = useCallback(() => {
-        console.log('Socket connected:', socketRef.current?.id);
-        // No state needed here generally
-    }, []); // Stable
-
-    
-    // *** Stabilized handleError ***
-    // Depends only on stopTimer (stable)
-    const handleError = useCallback((error: ErrorUpdate | { message: string }) => {
-        if (!isMountedRef.current) return;
-        console.error("Socket Error:", error);
-        setLoadingState({ isLoading: false, step: 'error', message: 'Error received' });
-        stopTimer();
-    
-        const errorPayload = error as ErrorUpdate; // Type assertion to access thoughts
-        const errorBotMessage: ChatMessageType = {
-            message: `Sorry, an error occurred: ${error.message || 'Unknown server error'}`,
-            isUser: false,
-            type: 'error',
-            // thought: errorPayload.thought // Keep if needed, otherwise remove
-            thoughts: errorPayload.thoughts // *** STORE thoughts ***
-        };
-        setChatMessages(prev => [...prev, errorBotMessage]);
     }, [stopTimer]);
 
-    // *** Stabilized handleDisconnect ***
-    // Now depends only on stable functions (stopTimer, handleError)
+    // --- Socket Event Handlers (Stable) ---
+    const handleConnect = useCallback(() => {
+        console.log('Socket connected:', socketRef.current?.id);
+    }, []);
+
+    const handleError = useCallback((error: ErrorUpdate | { message: string; type?: 'error' | 'warning', thoughts?: ThoughtStep[] }) => {
+        if (!isMountedRef.current) return;
+        console.error("Chat Error:", error);
+        const isErrorUpdate = 'step' in error; // Check if it's the structured ErrorUpdate
+        const message = error.message || 'An unknown error occurred.';
+        const thoughts = 'thoughts' in error ? error.thoughts : undefined;
+
+        // Stop loading indicator & timer
+        setLoadingState({ isLoading: false, step: 'error', message: 'Error' });
+        stopTimer();
+
+        // Add error message to chat
+        const errorBotMessage: ChatMessageType = {
+            message: message,
+            isUser: false,
+            type: 'error', // Mark as error type for specific styling
+            thoughts: thoughts
+        };
+        setChatMessages(prev => [...prev, errorBotMessage]);
+
+    }, [stopTimer]); // Depends only on stable stopTimer
+
     const handleDisconnect = useCallback((reason: Socket.DisconnectReason) => {
         console.warn('Socket disconnected:', reason);
-         if (isMountedRef.current) {
-             // Access current loading state via ref, *don't* put state in deps array
-             if (loadingStateRef.current.isLoading) {
-                 // Call stable handleError
-                 handleError({ message: `Connection lost: ${reason}. Please try sending your message again.` });
-             }
-             // Update state directly
-             setLoadingState({ isLoading: false, step: 'disconnected', message: 'Connection lost' });
-             stopTimer(); // Call stable stopTimer
-         }
-    }, [stopTimer, handleError]); // Now stable
+        if (isMountedRef.current) {
+            // Use the ref to check current loading state without adding state dependency
+            if (loadingStateRef.current.isLoading) {
+                handleError({ message: `Connection lost while processing: ${reason}. Please check your connection and try again.`, type: 'error' });
+            } else {
+                 // Add a less intrusive warning if not actively loading
+                 const warningMessage: ChatMessageType = {
+                    message: `Connection lost: ${reason}. You may need to reconnect or refresh.`,
+                    isUser: false,
+                    type: 'warning', // Use a 'warning' type for styling
+                };
+                setChatMessages(prev => [...prev, warningMessage]);
+            }
+            setLoadingState({ isLoading: false, step: 'disconnected', message: 'Disconnected' });
+            stopTimer();
+        }
+    }, [stopTimer, handleError]); // Stable dependencies
 
-    // *** Stabilized handleConnectError ***
-    // Depends only on stable functions (stopTimer, handleError)
     const handleConnectError = useCallback((err: Error) => {
         console.error('Socket connection error:', err);
         if (isMountedRef.current) {
-             handleError({ message: `Failed to connect to chat server: ${err.message}` });
-             // Update state directly
-             setLoadingState({ isLoading: false, step: 'connection_error', message: 'Connection failed' });
-             stopTimer(); // Call stable stopTimer
+            handleError({ message: `Failed to connect to the chat server. Please check the server and your network.`, type: 'error' });
+            setLoadingState({ isLoading: false, step: 'connection_error', message: 'Connection Failed' });
+            // No need to call stopTimer here, it wasn't started
         }
-    }, [stopTimer, handleError]); // Now stable
+    }, [handleError]); // Stable dependency
 
     const handleStatusUpdate = useCallback((update: StatusUpdate) => {
         if (!isMountedRef.current) return;
-        console.log("Socket Status:", update);
-        // Update state directly
+        // console.log("Socket Status:", update); // Less noisy logging
         setLoadingState({
             isLoading: true,
             step: update.step,
             message: update.message,
+            // Optionally store details if your StatusUpdate includes them
+            // details: update.details
         });
     }, []); // Stable
 
     const handleResult = useCallback((result: ResultUpdate) => {
         if (!isMountedRef.current) return;
-        console.log("Socket Result:", result);
-        setLoadingState({ isLoading: false, step: '', message: '' });
+        // console.log("Socket Result:", result); // Less noisy logging
+        setLoadingState({ isLoading: false, step: 'result_received', message: '' });
         stopTimer();
         const newBotMessage: ChatMessageType = {
             message: result.message,
             isUser: false,
-            type: 'text',
-            thoughts: result.thoughts // *** STORE thoughts ***
+            type: 'text', // Normal text response
+            thoughts: result.thoughts
         };
         setChatMessages(prev => [...prev, newBotMessage]);
-    }, [stopTimer]);
-    
+    }, [stopTimer]); // Stable dependency
 
-    // --- Socket Connection Effect (Now with stable dependencies) ---
+    // --- Socket Connection Effect ---
     useEffect(() => {
-        console.log("Attempting to connect Socket.IO...");
+        console.log("Setting up Socket.IO connection...");
+        // Ensure any previous socket is disconnected before creating a new one
+        if (socketRef.current) {
+            console.log("Disconnecting existing socket before reconnecting...");
+            socketRef.current.disconnect();
+        }
+
         const socket = io(SOCKET_SERVER_URL, {
-            // Consider adding transports and upgrade options if needed
-            // transports: ['websocket'], // Force websockets if proxies cause issues with polling
+            reconnectionAttempts: 5, // Limit reconnection attempts
+            reconnectionDelay: 1000, // Start with 1s delay
+            reconnectionDelayMax: 5000, // Max delay 5s
+            // transports: ['websocket'], // Consider uncommenting if polling causes issues
         });
         socketRef.current = socket;
 
-        // --- Setup Event Listeners (using stable handlers) ---
         socket.on('connect', handleConnect);
         socket.on('disconnect', handleDisconnect);
         socket.on('connect_error', handleConnectError);
         socket.on('status_update', handleStatusUpdate);
         socket.on('chat_result', handleResult);
-        socket.on('chat_error', handleError);
+        socket.on('chat_error', handleError); // Use the unified error handler
 
-        // --- Cleanup Function ---
         return () => {
-            console.log("Cleaning up socket connection...");
+            console.log("Cleaning up socket connection effect...");
             socket.off('connect', handleConnect);
             socket.off('disconnect', handleDisconnect);
             socket.off('connect_error', handleConnectError);
@@ -190,84 +194,105 @@ function ChatBot() {
             socket.off('chat_error', handleError);
 
             if (socket.connected) {
-                console.log(`Explicitly disconnecting socket ${socket.id} in cleanup.`);
+                console.log(`Disconnecting socket ${socket.id} during cleanup.`);
                 socket.disconnect();
-            } else {
-                console.log(`Socket ${socket.id} already disconnected or never connected, skipping disconnect call in cleanup.`);
             }
-            socketRef.current = null;
-            console.log("Socket disconnected and listeners removed.");
+            socketRef.current = null; // Clear the ref
+            console.log("Socket listeners removed and disconnected.");
         };
-        // This dependency array now contains only stable functions
-    }, [handleConnect, handleDisconnect, handleConnectError, handleStatusUpdate, handleResult, handleError]);
+    }, [SOCKET_SERVER_URL, handleConnect, handleDisconnect, handleConnectError, handleStatusUpdate, handleResult, handleError]); // Add URL and stable handlers
 
 
-    // --- Send Chat Message via Socket ---
-    // Depends on chatMessages, hasChatStarted, startTimer, handleError (stable)
+    // --- Send Chat Message ---
     const sendChatMessage = useCallback(async (userMessage: string) => {
         const trimmedMessage = userMessage.trim();
         if (!trimmedMessage) return;
 
         if (!socketRef.current || !socketRef.current.connected) {
-            console.error("Cannot send message: Socket not connected.");
-            handleError({ message: "Not connected to the chat server. Please wait or refresh." });
+            // Use the unified error handler
+            handleError({ message: "Cannot send message: Not connected. Please wait or refresh.", type: 'error' });
             return;
         }
 
-        // Update loading state - this will trigger the loadingStateRef update
-        setLoadingState({ isLoading: true, step: 'sending', message: 'Sending message...' });
+        setLoadingState({ isLoading: true, step: 'sending', message: 'Sending...' });
         startTimer();
         if (!hasChatStarted) setHasChatStarted(true);
 
-        // Use functional update for chatMessages if you want to make this callback
-        // independent of chatMessages state, but it's usually fine as is.
-
+        // 1. Create the user message object for display
         const newUserMessage: ChatMessageType = { message: trimmedMessage, isUser: true, type: 'text' };
-        const historyForApi: ApiHistoryItem[] = chatMessages.map(msg => ({
-            role: msg.isUser ? "user" : "model",
-            parts: [{ text: msg.message }],
-        }));
 
-
+        // 2. Update the local display state immediately
+        //    No need for functional update here unless you have complex async logic inside
         setChatMessages(prevMessages => [...prevMessages, newUserMessage]);
 
-        console.log("Emitting 'send_message' via socket...");
+        // 3. Emit ONLY the user input to the backend
+        //    The backend will manage the actual API history.
+        console.log("Emitting 'send_message' with user input only.");
         socketRef.current.emit('send_message', {
             userInput: trimmedMessage,
-            history: historyForApi, // Send history *before* the current message
+            // NO history is sent from the frontend anymore.
         });
 
-    }, [chatMessages, hasChatStarted, startTimer, handleError]); // Keep dependencies needed for logic
+    }, [hasChatStarted, startTimer, handleError]); // Dependencies are stable or primitive
 
-     // --- Other functions ---
-     const handleFillInput = useCallback((fill: (text: string) => void) => {
-        // Use functional update to ensure stability if needed, but simple set is likely fine
-        setFillInputFunction(() => fill);
-     }, []);
+
+    // --- Function to pass down to Introduction/ChatInput ---
+    const handleSetFillInput = useCallback((fillFunc: (text: string) => void) => {
+        setFillInputFunction(() => fillFunc);
+    }, []);
+
+    const handleSuggestionClick = (suggestion: string) => {
+        if (fillInputFunction) {
+            fillInputFunction(suggestion);
+        }
+        // Optionally send the message directly:
+        // sendChatMessage(suggestion);
+    };
+
 
     // --- JSX Structure ---
     return (
-        <div id="chat-container" className="bg-white rounded-xl shadow-lg w-full mx-auto p-4 flex flex-col max-h-[95vh]">
-            {/* ... header ... */}
-             <h1 className="text-2xl text-center mb-4 font-semibold text-gray-800 flex-shrink-0">Conferences Suggest Chatbot (Socket.IO)</h1>
+        <div className="flex flex-col h-[calc(100vh-4rem)] max-h-[800px] w-full max-w mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
 
-            <ChatHistory messages={chatMessages} />
-
-            <div className="flex-shrink-0 mt-auto pt-4">
-                {!hasChatStarted && <Introduction onFillInput={handleFillInput} />}
-
-                {loadingState.isLoading && (
-                    <LoadingIndicator
-                        step={loadingState.step}
-                        message={loadingState.message}
-                        timeCounter={timeCounter}
-                    />
-                )}
-
-                <ChatInput onSendMessage={sendChatMessage} disabled={loadingState.isLoading} onFillInput={handleFillInput} /> {/* Pass handleFillInput */}
-                 <div className="text-center text-xs text-gray-500 mt-2">
-                    Socket Status: {socketRef.current?.connected ? `Connected (${socketRef.current.id})` : 'Disconnected'}
+            {/* Header */}
+            <div className="flex-shrink-0 p-4 border-b border-gray-200 bg-gray-50">
+                <h1 className="text-lg font-semibold text-center text-gray-800">
+                    AI Conference Assistant
+                </h1>
+                 {/* Optional: Connection Status Indicator */}
+                 <div className="text-center text-xs text-gray-500 mt-1 flex items-center justify-center space-x-1">
+                    <span className={`h-2 w-2 rounded-full ${socketRef.current?.connected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
+                    <span>{socketRef.current?.connected ? 'Connected' : 'Disconnected'}</span>
                  </div>
+            </div>
+
+            {/* Chat History Area */}
+            <div ref={chatHistoryRef} className="flex-grow overflow-y-auto p-4 md:p-6 space-y-4 bg-gradient-to-b from-white to-gray-50">
+                {!hasChatStarted && (
+                    <Introduction onSuggestionClick={handleSuggestionClick} />
+                )}
+                <ChatHistory messages={chatMessages} /> {/* Pass messages down */}
+            </div>
+
+            {/* Loading Indicator Area */}
+            {loadingState.isLoading && (
+                 <div className="flex-shrink-0 px-4 py-2 border-t border-gray-100 bg-gray-50">
+                    <LoadingIndicator
+                         step={loadingState.step}
+                         message={loadingState.message}
+                         timeCounter={timeCounter}
+                     />
+                 </div>
+             )}
+
+
+            {/* Input Area */}
+            <div className="flex-shrink-0 p-3 md:p-4 border-t border-gray-200 bg-gray-50">
+                <ChatInput
+                    onSendMessage={sendChatMessage}
+                    disabled={loadingState.isLoading}
+                    onRegisterFillFunction={handleSetFillInput} // Pass the registration function
+                 />
             </div>
         </div>
     );

@@ -1,56 +1,37 @@
-// src/components/ChatHistory.tsx
-import React, { useRef, useEffect } from 'react';
-import ChatMessageComponent from './ChatMessage'; // Renamed from ChatMessage to avoid conflict
-import ThoughtProcess from './ThoughtProcess'; // *** IMPORT ThoughtProcess ***
-import { ChatMessageType } from './ChatBot';
+// src/app/[locale]/chatbot/chat/ChatHistory.tsx
+import React from 'react';
+// Assuming ChatMessageComponent handles rendering the bubble and thoughts
+// You might need to create/adjust this component based on the ChatMessage/ThoughtProcess logic
+import ChatMessageDisplay from './ChatMessageDisplay'; // Renamed for clarity
+import { ChatMessageType } from '@/src/models/chatbot/chatbot'; // Adjust path if needed
 
 interface ChatHistoryProps {
     messages: ChatMessageType[];
 }
 
 const ChatHistory: React.FC<ChatHistoryProps> = ({ messages }) => {
-    const chatHistoryRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const chatHistoryElement = chatHistoryRef.current;
-        if (chatHistoryElement) {
-                chatHistoryElement.scrollTo({
-                top: chatHistoryElement.scrollHeight,
-                behavior: 'smooth'
-            });
-        }
-    }, [messages]);
+    // No scrolling logic needed here - parent handles it
 
     return (
-        <div
-            id="chat-history"
-            className="flex-1 p-4 space-y-4 border border-gray-200 dark:border-gray-700 rounded-lg mb-4 relative overflow-y-auto bg-white dark:bg-gray-800" // Added padding, space-y, background
-            ref={chatHistoryRef}
-        >
-            {messages.map((msg, index) => {
-                // Use flex alignment instead of float for better control
-                const containerClasses = `message-container p-3 rounded-xl clear-both max-w-full ${msg.isUser ? 'float-right text-right' : 'float-left text-left'}`;
-
-                return (
-                    <div key={index} className={containerClasses}>
-                        {/* Container for message bubble and potentially thoughts */}
-                        <div className={`flex flex-col ${msg.isUser ? 'items-end' : 'items-start'}`}>
-                            {/* *** Render ThoughtProcess for bot messages *** */}
-                            {!msg.isUser && msg.thoughts && msg.thoughts.length > 0 && (
-                                <ThoughtProcess thoughts={msg.thoughts} />
-                            )}
-
-                            {/* Render the actual message */}
-                            <ChatMessageComponent
-                                message={msg.message}
-                                isUser={msg.isUser}
-                                // Pass type if ChatMessageComponent needs it
-                                // type={msg.type}
-                            />
-                        </div>
-                    </div>
-                );
-            })}
+        // This div is just for mapping and adding space between messages
+        // The parent component provides the main scrollable container styling
+        <div className="space-y-4"> {/* Adds space between message rows */}
+            {messages.map((msg, index) => (
+                // Each message row uses flex to align left or right
+                <div key={index} className={`flex ${msg.isUser ? 'justify-end' : 'justify-start text-left'}`}>
+                    {/*
+                       Pass all necessary info to the component that renders
+                       the actual message bubble and any associated thoughts.
+                       This component handles the bubble's appearance based on props.
+                    */}
+                    <ChatMessageDisplay
+                        message={msg.message}
+                        isUser={msg.isUser}
+                        type={msg.type}
+                        thoughts={msg.thoughts}
+                    />
+                </div>
+            ))}
         </div>
     );
 };

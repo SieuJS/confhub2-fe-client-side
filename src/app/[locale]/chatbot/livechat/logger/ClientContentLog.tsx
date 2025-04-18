@@ -13,7 +13,7 @@ const ClientContentLog: React.FC<ClientContentLogProps> = ({ message }) => {
 
   return (
     <div className="m-4 bg-blue-100 rounded-lg p-4 shadow-md">
-      <h4 className="text-lg font-semibold text-blue-600 mb-2">User</h4>
+      {/* <h4 className="text-lg font-semibold text-blue-600 mb-2">User</h4> */}
       {turns.map((turn, i) => (
         <div key={`message-turn-${i}`} className="mb-4 last:mb-0">
           {turn.parts

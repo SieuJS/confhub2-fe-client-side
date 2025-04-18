@@ -23,7 +23,7 @@ const ModelTurnLog: React.FC<ModelTurnLogProps> = ({ message }): JSX.Element => 
 
   return (
     <div className="m-4 bg-green-100 rounded-lg p-4 shadow-md">
-      <h4 className="text-lg font-semibold text-green-700 mb-2">Model</h4>
+      {/* <h4 className="text-lg font-semibold text-green-700 mb-2">Model</h4> */}
       {/* Render combined text using ReactMarkdown */}
       {combinedText && (
 
@@ -73,11 +73,11 @@ const ModelTurnLog: React.FC<ModelTurnLogProps> = ({ message }): JSX.Element => 
         </ReactMarkdown>
       )}
       {/* Render other parts (code, etc.) */}
-      {parts
+      {/* {parts
         .filter((part) => !part.text || part.text === "\n") // filter only part is not text
         .map((part, j) => (
           <RenderPart part={part} key={`model-turn-part-${j}`} />
-        ))}
+        ))} */}
     </div>
   );
 };
