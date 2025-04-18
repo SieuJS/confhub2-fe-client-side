@@ -1,8 +1,13 @@
 // src/models/logAnalysis/importCrawl.ts
 
 export interface Conference {
-    Title: string; // Đổi tên cho nhất quán camelCase
-    Acronym: string;
+    id: string;
+    title: string;
+    sources: string[];
+    acronym: string;
+    ranks: string[];
+    researchFields: string[];
+    status: string ; // Assuming possible statuses
 }
 
 export interface ApiCrawlResponse {
@@ -16,5 +21,10 @@ export interface CrawlProgress {
     current: number;
     total: number;
     status: 'idle' | 'parsing' | 'crawling' | 'success' | 'error' | 'stopped';
-    currentChunkData?: Conference[]; // Thêm dữ liệu chunk hiện tại để hiển thị (optional)
+    currentChunkData?: SendToCrawlConference[]; // Thêm dữ liệu chunk hiện tại để hiển thị (optional)
+}
+
+export interface SendToCrawlConference {
+    Title : string;
+    Acronym : string;
 }
