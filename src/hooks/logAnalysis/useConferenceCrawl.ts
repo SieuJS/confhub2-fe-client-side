@@ -33,6 +33,7 @@ export interface UseConferenceCrawlReturn {
     setChunkSize: (size: number) => void;
     startCrawl: () => Promise<void>;
     resetCrawl: () => void; // Thêm hàm reset
+    onSelectionChanged: (event: any) => void; // Thêm hàm xử lý sự kiện chọn hàng
 }
 
 export const useConferenceCrawl = (): UseConferenceCrawlReturn => {
@@ -109,6 +110,17 @@ export const useConferenceCrawl = (): UseConferenceCrawlReturn => {
             setIsParsing(false);
         });
     }, []);
+
+    const onSelectionChanged = useCallback( (event : any) => {
+        console.log("on chsnged" , JSON.stringify(event.selectedNodes.map((node : any) => ({
+            Title : node.data.title,
+            Acronym : node.data.acronym
+        }))));
+        setSelectedRows(event.selectedNodes.map((node : any) => ({
+            Title : node.data.title,
+            Acronym : node.data.acronym
+        })));
+      } , [])
 
 
     // --- API Call Logic ---
@@ -206,7 +218,7 @@ export const useConferenceCrawl = (): UseConferenceCrawlReturn => {
 
         setIsCrawling(false); // Mark crawling as finished (success, error, or stopped)
 
-    }, [parsedData, isCrawling, enableChunking, chunkSize, sendApiRequest]);
+    }, [parsedData, isCrawling, enableChunking, chunkSize, sendApiRequest, selectedRows]);
 
     // --- Reset Function ---
      const resetCrawl = useCallback(() => {
@@ -243,5 +255,6 @@ export const useConferenceCrawl = (): UseConferenceCrawlReturn => {
         setChunkSize,
         startCrawl,
         resetCrawl,
+        onSelectionChanged
     };
 };

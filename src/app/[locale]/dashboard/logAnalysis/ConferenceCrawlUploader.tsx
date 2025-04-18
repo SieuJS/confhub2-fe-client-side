@@ -28,6 +28,7 @@ export const ConferenceCrawlUploader: React.FC = () => {
         setChunkSize,
         startCrawl,
         resetCrawl,
+        onSelectionChanged
     } = useConferenceCrawl();
 
     const hasData = parsedData && parsedData.length > 0;
@@ -53,27 +54,7 @@ export const ConferenceCrawlUploader: React.FC = () => {
         };
       }, []);
 
-      const onSelectionChanged = (event : any) => {
-        console.log(event.selectedNodes.data)
-        setSelectedRows(event.selectedNodes.map((node : any) => ({
-            Title : node.data.title,
-            Acronym : node.data.acronym
-        })));
-        console.log(selectedRows)
-      }
 
-      const onRowSelected = (event : any) => {
-        setSelectedRows((selects) => {
-            const selected = event.node.data;
-            const isSelected = event.node.isSelected();
-            const newSelects = selects.filter((item) => item.Acronym !== selected.acronym);
-            if (isSelected) {
-                newSelects.push({ Title: selected.title, Acronym: selected.acronym });
-            }
-            return newSelects;
-        })
-        console.log(selectedRows)
-      }
     
     return (
         <div className="p-4 md:p-6 bg-white shadow-lg rounded-lg border border-gray-200 mx-auto">
@@ -266,7 +247,6 @@ export const ConferenceCrawlUploader: React.FC = () => {
                             columnDefs={colDef}
                             rowSelection={rowSelection as any}
                             onSelectionChanged={onSelectionChanged}
-                            onRowSelected={onRowSelected}
                         />
                         // <ConferencePreviewTable data={parsedData} />
                     )}
