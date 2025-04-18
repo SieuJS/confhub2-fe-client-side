@@ -7,7 +7,7 @@ import Footer from './utils/Footer'
 import ConsumerInsights from './home/ConsumerInsights'
 import { Header } from './utils/Header'
 import IntroduceVisualization from './home/IntroduceVisualization'
-import SuperBanner from './home/SuperBanner'
+import SuperBannerTree from './home/SuperBannerTree'
 import FeatureComparisonTable from './home/FeatureComparisonTable'
 
 export default function HomePage({ locale }: { locale: string }) {
@@ -39,7 +39,7 @@ export default function HomePage({ locale }: { locale: string }) {
   return (
     <div className=''>
       <Header locale={locale} />
-      <SuperBanner />
+      <SuperBannerTree />
       <PopularConferences />
       <ConsumerInsights />
       <IntroduceVisualization />

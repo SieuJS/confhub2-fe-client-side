@@ -732,5 +732,9 @@
     "buttonAriaLabel": "Explore visualization examples",
     "buttonText": "Explore More",
     "chartExampleLabel": "Example: {chartType}"
-  }
+  },
+  "Strikethrough_values_indicate_different_dates_from_older_records": "Strikethrough values indicate different dates from older records",
+  "No_topics_listed": "No topics listed",
+  "Conference_Published_By_User": "Conference Published By User",
+  "Conference_Published_By_User_Description": "This conference listing was added by a community member and does not currently have an official academic ranking (e.g., CORE, Scopus). We recommend carefully reviewing the conference website, organizers, and call for papers to assess its quality and legitimacy before submitting or attending."
 }
