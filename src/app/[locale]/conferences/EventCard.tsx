@@ -220,7 +220,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
             {event.topics.length > 3 && (
               <span
                 key='more-topics'
-                className='px-2 py-1 text-xs text-gray-500'
+                className=' inline-block max-w-64 cursor-pointer overflow-hidden text-ellipsis
+                whitespace-nowrap rounded-full bg-gray-100 px-2 py-1 align-bottom text-xs
+                text-gray-700 transition duration-200
+                hover:bg-gray-200'
               >
                 +{event.topics.length - 3} {t('more')}
               </span>

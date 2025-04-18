@@ -20,6 +20,7 @@ type RankType = NonNullable<ConferenceResponse['ranks']>[number] // Define RankT
 
 type GroupedDateInfo = {
   name: string
+  isNew: boolean // Added field to track new date names
   current: {
     fromDate: string | null | undefined
     toDate: string | null | undefined
@@ -96,38 +97,59 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
 
   // --- Prepare Grouped Dates for the "Important Dates" Section ---
   const getGroupedDates = (): GroupedDateInfo[] => {
-    // ... (getGroupedDates function remains the same)
     if (!conference?.organizations || !latestOrganization?.conferenceDates) {
       return []
     }
+
     const groupedDatesMap = new Map<string, GroupedDateInfo>()
     const latestOrgId = latestOrganization.id
+    const olderDateNames = new Set<string>() // Set to store names from older orgs
 
-    latestOrganization.conferenceDates.forEach(dateItem => {
-      if (dateItem?.name) {
-        groupedDatesMap.set(dateItem.name, {
-          name: dateItem.name,
-          current: { fromDate: dateItem.fromDate, toDate: dateItem.toDate },
-          differentOldDates: []
+    // --- First Pass: Collect all date names from older organizations ---
+    conference.organizations.forEach(org => {
+      if (org.id === latestOrgId) return // Skip the latest organization
+
+      if (org.conferenceDates) {
+        org.conferenceDates.forEach(oldDateItem => {
+          if (oldDateItem?.name) {
+            olderDateNames.add(oldDateItem.name) // Add name to the set
+          }
         })
       }
     })
 
-    const addedOldDates = new Map<string, Set<string>>()
+    // --- Second Pass: Process the latest organization's dates ---
+    latestOrganization.conferenceDates.forEach(dateItem => {
+      if (dateItem?.name) {
+        const isNewName = !olderDateNames.has(dateItem.name) // Check if name exists in older orgs
+        groupedDatesMap.set(dateItem.name, {
+          name: dateItem.name,
+          isNew: isNewName, // Set the isNew flag
+          current: { fromDate: dateItem.fromDate, toDate: dateItem.toDate },
+          differentOldDates: [] // Initialize empty, will be populated next
+        })
+      }
+    })
 
+    // --- Third Pass: Populate differentOldDates (as before) ---
+    const addedOldDates = new Map<string, Set<string>>()
     conference.organizations.forEach(org => {
-      if (org.id === latestOrgId) return // Skip latest
+      if (org.id === latestOrgId) return // Skip latest again
+
       if (org.conferenceDates) {
         org.conferenceDates.forEach(oldDateItem => {
           const groupInfo = oldDateItem?.name
             ? groupedDatesMap.get(oldDateItem.name)
             : undefined
+
+          // Only add different dates if the date NAME itself existed in the latest org
           if (groupInfo) {
             const current = groupInfo.current
             const oldFrom = oldDateItem.fromDate
             const oldTo = oldDateItem.toDate
             const isDifferent =
               current.fromDate !== oldFrom || current.toDate !== oldTo
+
             if (isDifferent) {
               const oldDateKey = `${oldFrom || 'null'}|${oldTo || 'null'}`
               if (!addedOldDates.has(groupInfo.name)) {
@@ -143,6 +165,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
               }
             }
           }
+          // Note: We don't need to add dates here if the *name* itself didn't exist in the latest org
         })
       }
     })
@@ -152,7 +175,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
     return result
   }
 
-  const groupedDates = getGroupedDates()
+  const groupedDates = getGroupedDates() // Call the updated function
 
   // --- Process and Group Ranks ---
   // Use useMemo to avoid recalculating on every render unless conference.ranks changes
@@ -291,7 +314,6 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         id='important-dates'
         className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md md:px-4'
       >
-        {/* ... (Important Dates section remains the same) ... */}
         <h2 className='mb-6 text-xl font-semibold md:text-2xl '>
           {t('Important_Dates')}
         </h2>
@@ -316,12 +338,19 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
               <tbody>
                 {groupedDates.map(groupInfo => (
                   <tr key={groupInfo.name} className='hover:bg-gray-50'>
+                    {/* --- MODIFIED TD --- */}
                     <td className='border-b border-gray-300 px-2 py-4 font-medium md:px-4'>
                       {groupInfo.name}
+                      {groupInfo.isNew && ( // Check the isNew flag
+                        <span className='ml-2 inline-block rounded bg-green-100 px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-green-700'>
+                          {/* Added badge styling */}
+                          NEW
+                        </span>
+                      )}
                     </td>
+                    {/* --- END MODIFIED TD --- */}
                     <td className='border-b border-gray-300 px-2 py-4 md:px-4'>
                       {formatDate(groupInfo.current.fromDate)}
-                      {/* Strikethrough rendering logic if needed */}
                       {groupInfo.differentOldDates.length > 0 && (
                         <span className='ml-2 text-xs text-gray-500'>
                           (
@@ -340,7 +369,6 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
                     </td>
                     <td className='border-b border-gray-300 px-2 py-4 md:px-4'>
                       {formatDate(groupInfo.current.toDate)}
-                      {/* Strikethrough rendering logic if needed */}
                       {groupInfo.differentOldDates.length > 0 && (
                         <span className='ml-2 text-xs text-gray-500'>
                           (

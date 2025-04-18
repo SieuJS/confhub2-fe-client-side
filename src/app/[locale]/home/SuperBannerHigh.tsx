@@ -3,16 +3,17 @@
 import React, { useEffect, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
-import { Link } from '@/src/navigation' // Đảm bảo đường dẫn này chính xác
-import * as echarts from 'echarts/core' // Import core
-import { CanvasRenderer } from 'echarts/renderers' // Import renderer
-import { GraphicComponent } from 'echarts/components' // Import graphic component
-import type { EChartsCoreOption, EChartsType } from 'echarts/core' // Import types
+import { Link } from '@/src/navigation'
+import * as echarts from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { GraphicComponent } from 'echarts/components'
+import type { EChartsCoreOption, EChartsType } from 'echarts/core'
+import WorldMap from './world'
 
-// --- Đăng ký các components và renderer cần thiết ---
+// Register necessary ECharts components and renderers
 echarts.use([GraphicComponent, CanvasRenderer])
 
-// --- Animation Variants (Giữ nguyên) ---
+// --- Animation Variants ---
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -35,25 +36,37 @@ const itemVariants = {
     }
   }
 }
-// --- Kết thúc Variants ---
+// --- End Variants ---
 
 const SuperBannerHigh: React.FC = () => {
-  const t = useTranslations('')
-  const backgroundImageUrl = '/world.svg' // Đường dẫn tới file SVG trong public
-  const chartRef = useRef<HTMLDivElement>(null) // Ref cho div chứa ECharts
-  const chartInstanceRef = useRef<EChartsType | null>(null) // Ref để lưu trữ instance ECharts
+  const t = useTranslations('') // Initialize translations
+  const chartRef = useRef<HTMLDivElement>(null) // Ref for ECharts container
+  const chartInstanceRef = useRef<EChartsType | null>(null) // Ref for ECharts instance
+  const sloganText = t('Slogan_Website') // Get slogan text
 
-  const sloganText = t('Slogan_Website') // Lấy text slogan
+  // --- Define Colors for WorldMap ---
+  // This object maps country IDs (strings) to Tailwind fill classes (strings)
+  // Example: Color specific countries with some transparency
+  const countryColors: { [key: string]: string } = {
+    AD: 'fill-blue-500',
+    AE: 'fill-green-500',
+    US: 'fill-red-400',
+    CA: 'fill-red-400'
+  }
 
+  // Example: Semi-transparent gray
+  const defaultMapColor = 'fill-gray-500'
+
+  // --- ECharts Initialization Effect ---
   useEffect(() => {
-    let chart: EChartsType | null = null // Khởi tạo biến chart cục bộ
+    let chart: EChartsType | null = null // Local chart instance
 
-    // Chỉ khởi tạo ECharts nếu chartRef đã được gắn vào DOM
+    // Initialize ECharts only if the ref is attached to the DOM
     if (chartRef.current) {
       chart = echarts.init(chartRef.current)
-      chartInstanceRef.current = chart // Lưu instance vào ref
+      chartInstanceRef.current = chart // Store instance in ref
 
-      // --- Cấu hình ECharts Option với text động ---
+      // ECharts configuration with dynamic text
       const option: EChartsCoreOption = {
         graphic: {
           elements: [
@@ -62,30 +75,26 @@ const SuperBannerHigh: React.FC = () => {
               left: 'center',
               top: 'center',
               style: {
-                text: sloganText, // Sử dụng text từ translation
-                // Điều chỉnh fontSize cho phù hợp với design của bạn
-                // Có thể cần điều chỉnh dựa trên kích thước màn hình nếu muốn responsive phức tạp hơn
-                fontSize: 'clamp(2.5rem, 8vw, 4.5rem)', // Responsive font size (điều chỉnh min, preferred, max)
+                text: sloganText, // Use text from translation
+                fontSize: 'clamp(2.5rem, 8vw, 4.5rem)', // Responsive font size
                 fontWeight: 'bold',
                 lineDash: [0, 200],
                 lineDashOffset: 0,
-                fill: 'transparent',
-                // Sử dụng màu từ theme của bạn (ví dụ: màu của text-button)
-                // Thay '#FFFFFF' bằng mã màu thực tế của text-button nếu khác
-                stroke: '#FFFFFF', // Màu viền ban đầu (giống màu text-button)
-                lineWidth: 1, // Độ dày viền
-                // Thêm textShadow nếu muốn giữ hiệu ứng shadow tương tự h1 cũ
-                textShadowBlur: 4,
-                textShadowColor: 'rgba(0, 0, 0, 0.3)', // Tương tự var(--logo-shadow)
+                fill: 'transparent', // Initial fill color
+                stroke: '#FFFFFF', // Initial stroke color (e.g., button text color)
+                lineWidth: 1,
+                textShadowBlur: 4, // Optional text shadow
+                textShadowColor: 'rgba(0, 0, 0, 0.3)',
                 textShadowOffsetX: 0,
                 textShadowOffsetY: 2
               },
+              // Text animation keyframes
               keyframeAnimation: {
                 duration: 3000,
-                loop: true,
+                loop: true, // Loop the animation
                 keyframes: [
                   {
-                    percent: 0.7,
+                    percent: 0.7, // Point where drawing finishes
                     style: {
                       fill: 'transparent',
                       lineDashOffset: 200,
@@ -93,18 +102,12 @@ const SuperBannerHigh: React.FC = () => {
                     }
                   },
                   {
-                    // Stop for a while.
-                    percent: 0.8,
-                    style: {
-                      fill: 'transparent'
-                    }
+                    percent: 0.8, // Pause slightly
+                    style: { fill: 'transparent' }
                   },
                   {
-                    percent: 1,
-                    style: {
-                      // Màu cuối cùng khi text hiện đầy đủ (giống màu text-button)
-                      fill: '#FFFFFF' // Thay '#FFFFFF' bằng mã màu thực tế
-                    }
+                    percent: 1, // Final state: filled text
+                    style: { fill: '#FFFFFF' } // Final fill color
                   }
                 ]
               }
@@ -112,73 +115,58 @@ const SuperBannerHigh: React.FC = () => {
           ]
         }
       }
-      // --- Kết thúc cấu hình ECharts Option ---
 
       chart.setOption(option)
 
-      // --- Xử lý resize để Echarts tự điều chỉnh kích thước ---
+      // Handle window resize to adjust ECharts layout
       const handleResize = () => {
         chart?.resize()
       }
       window.addEventListener('resize', handleResize)
 
-      // --- Hàm cleanup ---
+      // Cleanup function on component unmount
       return () => {
         window.removeEventListener('resize', handleResize)
-        // Sử dụng instance đã lưu để dispose
-        chartInstanceRef.current?.dispose()
+        chartInstanceRef.current?.dispose() // Dispose ECharts instance
         chartInstanceRef.current = null // Reset ref
-        console.log('ECharts instance disposed')
       }
     }
-    // Thêm sloganText vào dependency array để nếu text thay đổi (ví dụ đổi ngôn ngữ), chart sẽ re-render
-    // Tuy nhiên, nếu đổi ngôn ngữ làm cả component re-render thì không cần thiết lắm
+    // Dependency array: Re-run effect if sloganText changes
   }, [sloganText])
 
   return (
     <motion.section
+      // Main section styling: background gradient, layout, text color
       className='bg-span-gradient relative flex h-screen flex-col items-center justify-center overflow-hidden px-4 py-16 text-button-text sm:px-2 lg:px-4'
       variants={containerVariants}
       initial='hidden'
       animate='visible'
     >
-      {/* Background Map (Giữ nguyên) */}
-      <motion.div
-        className='absolute inset-0 z-0'
-        initial={{ opacity: 0.1 }}
-        animate={{ opacity: [0.1, 0.2, 0.1] }}
-        transition={{
-          duration: 12,
-          repeat: Infinity,
-          ease: 'easeInOut'
-        }}
-        aria-hidden='true'
+      {/* --- WorldMap Background --- */}
+      <div // Changed from motion.div as animation is removed, but motion.div is fine too
+        className='absolute inset-0 z-0 overflow-hidden ' // <- STATIC OPACITY SET HERE
+        aria-hidden='true' // Hide from screen readers
       >
-        <div
-          className='h-full w-full bg-cover bg-center bg-no-repeat'
-          style={{ backgroundImage: `url(${backgroundImageUrl})` }}
-        ></div>
-      </motion.div>
+        {/* Render the WorldMap component */}
+        <WorldMap
+          // Styling to make the SVG fill the container and cover it
+          className='h-full w-full object-cover'
+          // Pass the color configuration props
+          coloredCountries={countryColors}
+          defaultColor={defaultMapColor}
+        />
+      </div>
 
-      {/* Lớp phủ gradient nhẹ (Giữ nguyên) */}
-      {/* <div
-        className='pointer-events-none absolute inset-0 z-[1]'
-        style={{
-          background:
-            'linear-gradient(to top, rgba(51, 51, 102, 0.4), transparent, rgba(9, 127, 165, 0.1))',
-        }}
-        aria-hidden='true'
-      ></div> */}
-
-      {/* Blobs (Giữ nguyên) */}
+      {/* --- Decorative Blobs --- */}
       <motion.div
-        className='absolute left-0 top-0 z-[5] h-32 w-32 -translate-x-1/4 -translate-y-1/4 rounded-full bg-white/10 opacity-40 blur-xl filter'
-        animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
-        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+        // Top-left blob styling and position (higher z-index)
+        className='absolute left-0 top-0 z-[5] h-32 w-32 -translate-x-1/4 -translate-y-1/4 rounded-full bg-white/10 opacity-30 blur-xl filter'
+        // Optional: Add subtle animation if desired
       />
       <motion.div
-        className='absolute bottom-0 right-0 z-[5] h-48 w-48 translate-x-1/4 translate-y-1/4 rounded-full bg-white/10 opacity-40 blur-xl filter'
-        animate={{ scale: [1, 1.1, 1], rotate: [0, -180, -360] }}
+        // Bottom-right blob styling, position, and animation (higher z-index)
+        className='absolute bottom-0 right-0 z-[5] h-48 w-48 translate-x-1/4 translate-y-1/4 rounded-full bg-white/10 opacity-30 blur-xl filter'
+        animate={{ scale: [1, 1.15, 1], rotate: [0, -180, -360] }}
         transition={{
           duration: 25,
           repeat: Infinity,
@@ -187,52 +175,51 @@ const SuperBannerHigh: React.FC = () => {
         }}
       />
 
-      {/* Content chính */}
-      <div className='relative z-10 mx-0 flex max-w-6xl flex-col items-center text-center'>
-        {' '}
-        {/* Thêm flex flex-col items-center */}
-        {/* === Thay thế H1 bằng Div chứa ECharts === */}
+      {/* --- Main Content Area --- */}
+      <div className='relative z-10 mx-auto flex max-w-7xl flex-col items-center px-4 text-center'>
+        {/* ECharts Animated Slogan */}
         <motion.div
           ref={chartRef}
-          // Cần đặt chiều cao và chiều rộng cho div này để ECharts có không gian render
-          // Chiều cao nên đủ lớn để chứa font size lớn nhất bạn đặt
-          className='mb-5 h-24 w-full cursor-default sm:h-28 md:h-32 lg:h-36' // Điều chỉnh chiều cao (h-*) nếu cần
-          variants={itemVariants} // Áp dụng animation xuất hiện chung
-          // Không cần whileHover ở đây nữa vì ECharts không tương tác hover như text HTML
-        >
-          {/* ECharts sẽ render vào đây */}
-        </motion.div>
-        {/* ========================================== */}
-        <motion.p
-          className='mx-0 mb-10 max-w-6xl text-lg font-semibold text-button opacity-90 sm:text-xl md:text-2xl'
+          // Ensure sufficient height for the large text
+          className='mb-6 h-24 w-full max-w-full cursor-default sm:h-28 md:h-32 lg:h-40'
           variants={itemVariants}
-          // style={{ textShadow: ' var(--logo-shadow)' }}
+          aria-label={sloganText} // Accessible label for the animation
+        >
+          {/* ECharts renders here */}
+        </motion.div>
+
+        {/* Slogan Description */}
+        <motion.p
+          // Styling for the descriptive text
+          className='mb-10 max-w-7xl text-lg font-medium text-button opacity-90 sm:text-xl md:text-2xl'
+          variants={itemVariants}
         >
           {t('Slogan_Website_describe')}
         </motion.p>
+
+        {/* Action Buttons */}
         <motion.div
+          // Layout for buttons
           className='flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6'
           variants={itemVariants}
         >
-          {/* Buttons (Giữ nguyên) */}
+          {/* Link to Conferences Page */}
           <Link href='/conferences' passHref legacyBehavior={false}>
             <motion.button
-              className='w-full transform rounded-lg bg-button px-8 py-3 font-semibold text-button-text shadow-md transition-transform duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-button
-                         focus:ring-offset-2 focus:ring-offset-primary sm:w-auto'
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              // Primary button styling
+              className='w-full transform rounded-lg bg-button px-8 py-3 font-semibold text-button-text shadow-md transition-transform duration-200 ease-in-out hover:scale-105 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2 focus:ring-offset-background active:scale-95 sm:w-auto'
+              whileTap={{ scale: 0.97 }}
             >
               {t('Search_Conferences')}
             </motion.button>
           </Link>
 
+          {/* Link to Journals Page */}
           <Link href='/journals' passHref legacyBehavior={false}>
             <motion.button
-              className='w-full transform rounded-lg border-2 border-button-text bg-transparent px-8 py-3 font-semibold text-button-text shadow-sm transition-all duration-200 ease-in-out hover:bg-button-text hover:text-secondary
-                         focus:outline-none focus:ring-2
-                         focus:ring-button-text focus:ring-offset-primary sm:w-auto'
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              // Secondary/outline button styling
+              className='w-full transform rounded-lg border-2 border-button-text bg-transparent px-8 py-3 font-semibold text-button-text shadow-sm transition-all duration-200 ease-in-out hover:scale-105 hover:bg-button-text hover:text-button focus:outline-none focus:ring-2 focus:ring-button-text focus:ring-offset-2 focus:ring-offset-background active:scale-95 sm:w-auto'
+              whileTap={{ scale: 0.97 }}
             >
               {t('Search_Journals')}
             </motion.button>
