@@ -14,6 +14,7 @@ interface AltairComponentProps {
   outputModality: OutputModality;
   selectedVoice: PrebuiltVoice;
 }
+import { transformConferenceData } from './transformApiData';
 
 function AltairComponent({ outputModality, selectedVoice }: AltairComponentProps) {
   const { client, setConfig } = useLiveAPIContext();
@@ -83,6 +84,7 @@ function AltairComponent({ outputModality, selectedVoice }: AltairComponentProps
         let responseData: any;
         let finalUrl = ''; // Biến để chứa URL cuối cùng
 
+        let searchQuery: string = '';
         try {
           switch (fc.name) {
             case "getConferences":
@@ -105,10 +107,10 @@ function AltairComponent({ outputModality, selectedVoice }: AltairComponentProps
               }
 
               // 3. Sử dụng giá trị đã được kiểm tra
-              const searchQuery: string = searchQueryValue;
+              searchQuery = searchQueryValue;
               console.log("Extracted Conference Search Query:", searchQuery);
 
-              finalUrl = `${apiUrl}?${searchQuery}&mode=detail`;
+              finalUrl = `${apiUrl}?${searchQuery}`;
               // --- END: Sửa lỗi getConferences ---
               break; // Quan trọng: Đừng quên break!
 
@@ -159,10 +161,12 @@ function AltairComponent({ outputModality, selectedVoice }: AltairComponentProps
           }
 
           responseData = requiresJsonResponse ? await response.json() : await response.text();
-          console.log(`Response data for ${fc.name}:`, responseData);
+          const transformedData = transformConferenceData(responseData, searchQuery);
+
+          console.log(`Response data for ${fc.name}:`, transformedData);
 
           responses.push({
-            response: { content: responseData },
+            response: { content: transformedData },
             id: fc.id,
           });
 

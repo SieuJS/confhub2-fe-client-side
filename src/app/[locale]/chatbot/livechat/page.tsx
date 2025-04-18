@@ -5,7 +5,6 @@
 import { LiveAPIProvider } from "./contexts/LiveAPIContext";
 import ChatUI from "./side-panel/ChatUI"; // Import the new component
 
-// Removed: useConnection, useTimer, ConnectionStatus, RestartStreamButton, useState, cn, SidePanel, Altair imports from here
 
 // --- BEGIN: Thêm định nghĩa kiểu dữ liệu (Giữ nguyên) ---
 export type OutputModality = "text" | "audio";
