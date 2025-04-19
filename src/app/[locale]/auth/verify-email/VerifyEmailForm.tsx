@@ -3,10 +3,11 @@
 
 import React, { useState, useEffect, FormEvent } from 'react'
 import {
-  useSearchParams // <<< Bỏ useRouter, usePathname nếu không dùng nữa
+  useSearchParams //
 } from 'next/navigation'
 import { Link } from '@/src/navigation' // <<< Import Link của next-intl
 import { appConfig } from '@/src/middleware'
+import { useTranslations } from 'next-intl'
 
 interface VerifyEmailFormProps {
   // Có thể thêm props nếu cần, ví dụ: t cho i18n
@@ -15,6 +16,7 @@ interface VerifyEmailFormProps {
 
 const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => {
   // Nhận t nếu bạn dùng i18n
+  //  const { t } = useTranslations(''); // Nếu dùng i18n
   const searchParams = useSearchParams()
   // const router = useRouter(); // <<< Không cần router.push nữa
   // const pathname = usePathname(); // <<< Không cần pathname nữa nếu chỉ dùng Link
@@ -187,7 +189,7 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => {
             className='hover:bg-button/90 flex w-full justify-center rounded-md border border-transparent bg-button px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
           >
             {/* Nên dùng t('verifyEmail.returnToLoginButton') */}
-            {'Return to Login'}
+            {'Return_to_homepage'}
           </Link>
         </div>
       )}

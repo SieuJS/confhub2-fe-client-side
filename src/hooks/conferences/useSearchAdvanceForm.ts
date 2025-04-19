@@ -1,12 +1,10 @@
 // src/hooks/useSearchAdvanceForm.ts
 
 import { appConfig } from '@/src/middleware';
-import { useState, ChangeEvent, KeyboardEvent, useEffect } from 'react'; // Add useEffect
+import { useState, ChangeEvent, KeyboardEvent, useEffect } from 'react';
 
 interface UseSearchAdvanceFormProps {
-  // ... (rest of your props)
-  onSubmissionDateChange: (date: Date | null) => void;
-  submissionDate: Date | null;
+  // Remove submissionDate and onSubmissionDateChange props
   onRankChange: (rank: string | null) => void;
   selectedRank: string | null;
   onSourceChange: (source: string | null) => void;
@@ -22,8 +20,8 @@ interface UseSearchAdvanceFormProps {
 }
 
 const useSearchAdvanceForm = ({
-  onSubmissionDateChange,
-  submissionDate,
+  // submissionDate, // Removed
+  // onSubmissionDateChange, // Removed
   onRankChange,
   selectedRank,
   onSourceChange,
@@ -43,10 +41,12 @@ const useSearchAdvanceForm = ({
   const [fieldOfResearchSuggestions, setFieldOfResearchSuggestions] = useState<string[]>([]);
   const [availableTopics, setAvailableTopics] = useState<string[]>([]); // State for fetched topics
 
+  // This availableFieldsOfResearch should likely be fetched or come from config
   const availableFieldsOfResearch = [
     "Computer Science", "Information Technology", "Software Engineering", "Data Analytics", "Artificial Intelligence",
     "Cybersecurity", "Information Systems", "Human-Computer Interaction", "Bioinformatics", "Computational Linguistics"
     ];
+
   // Fetch topics from the backend when the component mounts
   useEffect(() => {
     const fetchTopics = async () => {
@@ -55,20 +55,20 @@ const useSearchAdvanceForm = ({
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data: string[] = await response.json(); // Type assertion
+        const data: string[] = await response.json();
         console.log(data);
-        setAvailableTopics(data); // Update state with fetched topics
+        setAvailableTopics(data);
       } catch (error) {
         console.error("Could not fetch topics:", error);
-        // Optionally set an error state to display to the user
       }
     };
 
     fetchTopics();
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
 
-  const handleTopicInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  // ... (Keep all topic and field of research handlers: handleTopicInputChange, handleTopicSuggestionClick, etc.) ...
+   const handleTopicInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     setTopicsInput(inputValue);
     const trimmedInput = inputValue.trim();
@@ -146,10 +146,13 @@ const useSearchAdvanceForm = ({
     onFieldOfResearchChange(selectedFieldsOfResearch.filter(field => field !== fieldToRemove));
   };
 
-    const handleSubmissionDateInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const date = event.target.value ? new Date(event.target.value) : null;
-    onSubmissionDateChange(date);
-  };
+
+  // --- Remove submission date handler ---
+  // const handleSubmissionDateInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+  //   const date = event.target.value ? new Date(event.target.value) : null;
+  //   onSubmissionDateChange(date);
+  // };
+  // --- End Remove ---
 
   const handleRankChangeInput = (event: ChangeEvent<HTMLSelectElement>) => {
     onRankChange(event.target.value === "" ? null : event.target.value);
@@ -172,6 +175,7 @@ const useSearchAdvanceForm = ({
       }
   }
 
+
   return {
     topicsInput,
     topicSuggestions,
@@ -185,11 +189,11 @@ const useSearchAdvanceForm = ({
     handleFieldOfResearchSuggestionClick,
     handleFieldOfResearchInputKeyDown,
     handleRemoveFieldOfResearch,
-      handleSubmissionDateInputChange,
+    // handleSubmissionDateInputChange, // Removed
     handleRankChangeInput,
     handleSourceChangeInput,
     handleAverageScoreChangeInput,
-      handlePublisherInputChange, // Return the new handler
+      handlePublisherInputChange,
     handlePublisherEnter
   };
 };
