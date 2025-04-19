@@ -17,12 +17,12 @@ export const addFeedback = async (feedbackData: {
         throw new Error("User ID not found in local storage");
     }
 
-    const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/conferences/${feedbackData.conferenceId}/feedback`, { // Use conferenceId in URL
+    const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/conference/feedback`, { // Use conferenceId in URL
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ description: feedbackData.description, star: feedbackData.star, creatorId }), // Send description, star, and creatorId
+        body: JSON.stringify({ conferenceId: feedbackData.conferenceId, creatorId, description: feedbackData.description, star: feedbackData.star }), // Send description, star, and creatorId
     });
 
     if (!response.ok) {

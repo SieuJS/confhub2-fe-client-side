@@ -1,263 +1,323 @@
-// SidePanel.tsx (Adjusted for Voice Only and external Connection Status)
-"use client";
-import { useRef, useState, useEffect } from "react";
-import { useLiveAPIContext } from "../contexts/LiveAPIContext";
-import { useLoggerStore } from "../lib/store-logger";
-import Logger from "../logger/Logger";
-import { AudioRecorder } from "../lib/audio-recorder";
+// SidePanel.tsx (Adjusted: Output format is Audio or Text)
+'use client'
+import { useRef, useState, useEffect } from 'react'
+import { useLiveAPIContext } from '../contexts/LiveAPIContext'
+import { useLoggerStore } from '../lib/store-logger'
+import Logger from '../logger/Logger'
+import { AudioRecorder } from '../lib/audio-recorder'
+import ChatInput from './ChatInput'
+import useLoggerScroll from '../hooks/useLoggerScroll'
+import useLoggerEvents from '../hooks/useLoggerEvents'
+import useAudioRecorder from '../hooks/useAudioRecorder'
+import useModelAudioResponse from '../hooks/useModelAudioResponse'
+import useVolumeControl from '../hooks/useVolumeControl'
+import ConnectionButton from './ConnectionButton'
+import MicButton from './MicButton'
+import ChatIntroduction from './ChatIntroduction'
+import useInteractionHandlers from '../hooks/useInteractionHandlers'
+// Ensure OutputModality type in parent is 'audio' | 'text'
+import { OutputModality, PrebuiltVoice } from '../page'
+import { Link } from '@/src/navigation'
 
-// Removed: import { useScreenCapture } from "../hooks/useScreenCapture";
-// Removed: import { useWebcam } from "../hooks/useWebcam";
-import ChatInput from "./ChatInput";
-import useLoggerScroll from "../hooks/useLoggerScroll";
-import useLoggerEvents from "../hooks/useLoggerEvents";
-// Removed: useVideoFrameSender hook
-import useAudioRecorder from "../hooks/useAudioRecorder";
-import useModelAudioResponse from "../hooks/useModelAudioResponse";
-import useVolumeControl from "../hooks/useVolumeControl";
-import ConnectionButton from "./ConnectionButton";
-import MicButton from "./MicButton";
-// Removed: MediaStreamButton
-import ChatIntroduction from "./ChatIntroduction";
-// Removed: RestartStreamButton (Its rendering logic is moved to parent)
-// Removed: ConnectionStatus (Its rendering is moved to parent)
-// Removed: VideoStreamPopup
-// Removed: useConnection (Its state/handlers are now passed via props)
-// Removed: useStreamSwitching (Video related)
-import useInteractionHandlers from "../hooks/useInteractionHandlers";
-// Removed: useTimer (Its state/handlers are now passed via props)
-
-import { OutputModality, PrebuiltVoice } from '../page';
-
-// --- Props now include connection state and handlers from parent ---
+// --- Props ---
 interface SidePanelProps {
-    // Removed: videoRef, supportsVideo, onVideoStreamChange
-    currentModality: OutputModality;
-    onModalityChange: (modality: OutputModality) => void;
-    currentVoice: PrebuiltVoice;
-    onVoiceChange: (voice: PrebuiltVoice) => void;
-    availableVoices: PrebuiltVoice[];
-
-    // --- Connection State and Handlers (Passed from Parent) ---
-    connected: boolean;
-    isConnecting: boolean;
-    streamStartTime: number | null; // Still useful for internal SidePanel logic like hasInteracted
-    connectionStatusMessage: string | null; // Still useful for internal SidePanel logic if needed, though primary display is external
-    connectWithPermissions: () => Promise<void>;
-    handleDisconnect: () => void;
-    // handleReconnect is likely used by the parent component now for the RestartButton,
-    // but if any *internal* SidePanel logic needed it, it would also be a prop.
-    // Based on the original code, it was primarily for the RestartStreamButton,
-    // so we won't add it here unless needed otherwise.
-    // handleReconnect: () => void;
-
-    // --- Timer State and Handlers (Passed from Parent) ---
-    // showTimer and elapsedTime are primarily for the *external* ConnectionStatus,
-    // so they don't strictly need to be passed to SidePanel unless internal logic uses them.
-    // Let's assume they are not needed internally for simplicity.
-    // showTimer: boolean;
-    // elapsedTime: number;
-    // handleCloseTimer: () => void;
+  // Ensure parent passes 'audio' or 'text'
+  currentModality: OutputModality
+  onModalityChange: (modality: OutputModality) => void
+  currentVoice: PrebuiltVoice
+  onVoiceChange: (voice: PrebuiltVoice) => void
+  availableVoices: PrebuiltVoice[]
+  connected: boolean
+  isConnecting: boolean
+  streamStartTime: number | null
+  connectionStatusMessage: string | null
+  connectWithPermissions: () => Promise<void>
+  handleDisconnect: () => void
 }
-// --- END Props update ---
-
+// --- END Props ---
 
 // --- Main Component ---
 export default function SidePanel({
-    // Removed: videoRef, supportsVideo, onVideoStreamChange
-    currentModality,
-    onModalityChange,
-    currentVoice,
-    onVoiceChange,
-    availableVoices,
-
-    // --- Destructure Connection/Timer Props ---
-    connected,
-    isConnecting,
-    streamStartTime,
-    connectionStatusMessage, // Keep if SidePanel might display it internally sometimes
-    connectWithPermissions,
-    handleDisconnect,
-    // handleReconnect, // Not needed internally based on analysis
-    // showTimer, // Not needed internally
-    // elapsedTime, // Not needed internally
-    // handleCloseTimer, // Not needed internally
+  currentModality,
+  onModalityChange, // This should now expect 'audio' or 'text'
+  currentVoice,
+  onVoiceChange,
+  availableVoices,
+  connected,
+  isConnecting,
+  streamStartTime,
+  // connectionStatusMessage,
+  connectWithPermissions,
+  handleDisconnect
 }: SidePanelProps) {
-    const { client, volume, on, off } = useLiveAPIContext();
-    const loggerRef = useRef<HTMLDivElement>(null);
-    const { log, clearLogs } = useLoggerStore();
+  const { client, volume, on, off } = useLiveAPIContext()
+  const loggerRef = useRef<HTMLDivElement>(null)
+  const { log, clearLogs } = useLoggerStore()
 
-    // Removed video stream hooks and state
-    // const videoStreams = [useWebcam(), useScreenCapture()];
-    // const [webcam, screenCapture] = videoStreams;
+  const [inVolume, setInVolume] = useState(0)
+  const [audioRecorder] = useState(() => new AudioRecorder())
+  const [muted, setMuted] = useState(false)
+  const [hasInteracted, setHasInteracted] = useState(false)
+  const [isOutputSettingsOpen, setIsOutputSettingsOpen] = useState(true)
 
-    const [inVolume, setInVolume] = useState(0);
-    const [audioRecorder] = useState(() => new AudioRecorder());
-    const [muted, setMuted] = useState(false);
-    // hasInteracted state remains useful for showing initial intro vs logger
-    const [hasInteracted, setHasInteracted] = useState(false);
+  const { handleSendMessage, handleStartVoice } = useInteractionHandlers({
+    connected,
+    connectWithPermissions,
+    setMuted,
+    client,
+    log
+  })
 
+  // --- Effects ---
+  useEffect(() => {
+    if (connected) {
+      clearLogs()
+    }
+  }, [connected, clearLogs])
 
-    // Removed: useConnection hook call - state comes from props
-    // Removed: useTimer hook call - state/handlers come from props (or parent handles)
-    // Removed: useStreamSwitching hook call
+  useEffect(() => {
+    if (connected || isConnecting || streamStartTime !== null) {
+      setHasInteracted(true)
+    }
+  }, [connected, isConnecting, streamStartTime])
 
-    // Pass only relevant functions and state to useInteractionHandlers
-    // useInteractionHandlers now receives connection actions/state from SidePanel's props
-    const { handleSendMessage, handleStartVoice /* Removed: handleStartWebcam, handleStartScreenShare */ } = useInteractionHandlers({
-        connected, // From props
-        connectWithPermissions, // From props
-        // Removed: changeStreams,
-        setMuted,
-        // Removed: webcam, screenCapture, supportsVideo
-        client,
-        log
-    });
+  // --- Hooks ---
+  useLoggerScroll(loggerRef)
+  useLoggerEvents(on, off, log)
+  useAudioRecorder(connected, muted, audioRecorder, client, log, setInVolume)
+  useModelAudioResponse(on, off, log) // This hook might need adjustment based on whether 'text' modality should still play audio internally
+  useVolumeControl(inVolume)
 
-    // Clear logs when connected (dependency now uses prop)
-    useEffect(() => {
-        if (connected) {
-            clearLogs();
-            // Reset hasInteracted when successfully connected? Depends on desired flow.
-            // setHasInteracted(true); // This might be redundant with the other useEffect
-        }
-    }, [connected, clearLogs]);
+  // --- Handlers ---
+  // Renamed for clarity, passes 'audio' or 'text' directly
+  const handleModalityButtonClick = (newValue: OutputModality) => {
+    if (!connected) {
+      onModalityChange(newValue) // Pass 'audio' or 'text'
+    }
+  }
 
-    // Update hasInteracted based on connection attempt status (dependencies now use props)
-    useEffect(() => {
-        // Removed activeVideoStream from dependency
-        if (connected || isConnecting || streamStartTime !== null) { // Check streamStartTime if it indicates an attempt was made
-            setHasInteracted(true);
-        }
-    }, [connected, isConnecting, streamStartTime]);
+  const handleVoiceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    if (!connected) {
+      onVoiceChange(event.target.value as PrebuiltVoice)
+    }
+  }
 
+  // Show Voice selection only when 'audio' modality is selected
+  const isAudioSelected = currentModality === 'audio'
 
-    // Hooks remain, using state/props as needed
-    useLoggerScroll(loggerRef);
-    useLoggerEvents(on, off, log);
-    // Removed: useVideoFrameSender hook call
-    useAudioRecorder(connected, muted, audioRecorder, client, log, setInVolume); // 'connected' from props
-    useModelAudioResponse(on, off, log);
-    useVolumeControl(inVolume);
-
-    const handleModalityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (!connected) { // 'connected' from props
-            onModalityChange(event.target.value as OutputModality);
-        }
-    };
-
-    const handleVoiceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        if (!connected) { // 'connected' from props
-            onVoiceChange(event.target.value as PrebuiltVoice);
-        }
-    };
-
-    // UI now purely inside the SidePanel div
-    return (
-        // Removed: VideoStreamPopup and the container div for external status/restart button
-        <div className="flex flex-col h-screen bg-white text-gray-700 rounded-2xl p-4 space-y-4">
-            {/* Logger Area */}
-            <div className="flex-grow overflow-y-auto" ref={loggerRef}>
-                {/* Show intro if not connected and no interaction yet */}
-                {!connected && !hasInteracted ? ( // 'connected' from props
-                    <ChatIntroduction
-                        onStartVoice={() => { handleStartVoice(); setHasInteracted(true); }}
-                        // Removed webcam/screenshare handlers
-                    />
-                ) : (
-                    // Show logger otherwise
-                    <Logger filter="none" />
-                )}
-                 {/* Optionally display connectionStatusMessage here if not handled by external component,
-                     or if you want it in the log/panel area too for certain messages.
-                     For this adjustment, we assume the external component is the primary display.
-                 */}
-                 {/* {connectionStatusMessage && !showTimer && ( // Example: show message if no external timer active
-                     <div className="mt-2 text-sm text-gray-600">{connectionStatusMessage}</div>
-                 )} */}
-            </div>
-
-            {/* --- Container for Timer and Restart Button REMOVED ---
-                 This UI is now controlled and rendered by the parent component.
-            */}
-
-
-            {/* Khu vực cài đặt Output */}
-            <fieldset
-                disabled={connected} // 'connected' from props
-                className="border-t border-gray-200 pt-4 space-y-3 disabled:opacity-60 disabled:cursor-not-allowed"
+  // --- Render ---
+  return (
+    <div className='flex h-screen flex-row bg-gray-100'>
+      {' '}
+      {/* Outer container */}
+      {/* --- Left Panel (Settings - Light Theme) --- */}
+      <div
+        className={`relative flex flex-col overflow-y-auto rounded-l-2xl border-r border-gray-200 bg-white text-gray-700 transition-all duration-300 ease-in-out ${isOutputSettingsOpen ? 'w-64 p-4' : 'w-12 p-2'}`}
+      >
+        {/* Toggle Button */}
+        <button
+          onClick={() => setIsOutputSettingsOpen(!isOutputSettingsOpen)}
+          className='absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded text-gray-500 hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400'
+          title={isOutputSettingsOpen ? 'Thu gọn Cài đặt' : 'Mở Cài đặt'}
+          aria-expanded={isOutputSettingsOpen}
+        >
+          {/* Chevron Icon */}
+          {isOutputSettingsOpen ? (
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              fill='none'
+              viewBox='0 0 24 24'
+              strokeWidth={1.5}
+              stroke='currentColor'
+              className='h-4 w-4'
             >
-                 <legend className="text-sm font-medium text-gray-600 mb-2 px-1">
-                    Cài đặt Output
-                    {connected && <span className="text-xs text-red-500 ml-2">(Ngắt kết nối để thay đổi)</span>} {/* 'connected' from props */}
-                </legend>
+              {' '}
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                d='M15.75 19.5L8.25 12l7.5-7.5'
+              />{' '}
+            </svg>
+          ) : (
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              fill='none'
+              viewBox='0 0 24 24'
+              strokeWidth={1.5}
+              stroke='currentColor'
+              className='h-4 w-4'
+            >
+              {' '}
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                d='M8.25 4.5l7.5 7.5-7.5 7.5'
+              />{' '}
+            </svg>
+          )}
+          <span className='sr-only'>
+            {isOutputSettingsOpen ? 'Thu gọn Cài đặt' : 'Mở Cài đặt'}
+          </span>
+        </button>
 
-                 <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">Loại phản hồi</label>
-                    <div className="flex space-x-4">
-                        <label className={`flex items-center text-sm ${!connected ? 'cursor-pointer' : 'cursor-not-allowed'}`}> {/* 'connected' from props */}
-                            <input
-                                type="radio"
-                                name="outputModality"
-                                value="text"
-                                checked={currentModality === 'text'}
-                                onChange={handleModalityChange} // This handler uses 'connected' prop internally
-                                className="mr-1 form-radio h-4 w-4 text-blue-600 focus:ring-blue-500"
-                                disabled={connected} // Redundant with fieldset, but explicit is fine
-                            />
-                            Text
-                        </label>
-                        <label className={`flex items-center text-sm ${!connected ? 'cursor-pointer' : 'cursor-not-allowed'}`}> {/* 'connected' from props */}
-                            <input
-                                type="radio"
-                                name="outputModality"
-                                value="audio"
-                                checked={currentModality === 'audio'}
-                                onChange={handleModalityChange} // This handler uses 'connected' prop internally
-                                className="mr-1 form-radio h-4 w-4 text-blue-600 focus:ring-blue-500"
-                                disabled={connected} // Redundant with fieldset
-                            />
-                            Audio
-                        </label>
-                    </div>
-                 </div>
+        {/* Settings Content */}
+        <div
+          className={`flex-grow space-y-2 overflow-hidden transition-opacity duration-200 ${isOutputSettingsOpen ? 'opacity-100' : 'pointer-events-none h-0 opacity-0'}`}
+        >
+          <div className=' text-lg font-semibold text-gray-800'>LIVE CHAT</div>
+          <div className='flex flex-col  border-t border-gray-200 pt-2'>
+            <Link
+              href='/'
+              className='flex items-center space-x-2 rounded p-2 text-sm font-medium text-gray-600 transition-colors duration-150 hover:bg-gray-100 hover:text-gray-800'
+            >
+              <span>HOME</span>
+            </Link>
+            <Link
+              href='/chatbot/chat'
+              className='flex items-center space-x-2 rounded p-2 text-sm font-medium text-gray-600 transition-colors duration-150 hover:bg-gray-100 hover:text-gray-800'
+            >
+              <span>CHATBOT</span>
+            </Link>
+          </div>
+          <fieldset
+            disabled={connected || !isOutputSettingsOpen}
+            className='space-y-4 border-t border-gray-200 pt-4 disabled:cursor-not-allowed disabled:opacity-60'
+          >
+            {/* --- Output Format --- */}
+            <div>
+              <label className='mb-2 block text-sm font-medium text-gray-600'>
+                Output format
+              </label>
+              <div className='flex space-x-2'>
+                {/* Audio Button */}
+                <button
+                  type='button'
+                  onClick={() => handleModalityButtonClick('audio')} // Send 'audio'
+                  disabled={connected || !isOutputSettingsOpen}
+                  className={`flex flex-1 flex-col items-center justify-center rounded-lg border p-3 transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50
+                                        ${
+                                          isAudioSelected // Check if currentModality is 'audio'
+                                            ? 'border-blue-600 bg-blue-500 text-white shadow-sm' // Selected style
+                                            : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50' // Default style
+                                        }`}
+                >
+                  {/* Icon representing Audio (e.g., Speaker) */}
+                  <svg
+                    xmlns='http://www.w3.org/2000/svg'
+                    fill='none'
+                    viewBox='0 0 24 24'
+                    strokeWidth={1.5}
+                    stroke='currentColor'
+                    className={`mb-1 h-5 w-5 ${isAudioSelected ? 'text-white' : 'text-gray-500'}`}
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      d='M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z'
+                    />
+                  </svg>
+                  <span className='text-xs font-medium'>Audio</span>{' '}
+                  {/* Changed Label */}
+                </button>
 
-                 {currentModality === 'audio' && (
-                    <div>
-                        <label htmlFor="voiceSelect" className="block text-xs font-medium text-gray-500 mb-1">Giọng nói</label>
-                        <select
-                            id="voiceSelect"
-                            value={currentVoice}
-                            onChange={handleVoiceChange} // This handler uses 'connected' prop internally
-                            className={`w-full p-1.5 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 ${!connected ? 'cursor-pointer' : 'cursor-not-allowed'}`}
-                            disabled={connected} // Redundant with fieldset
-                        >
-                            {availableVoices.map((voice) => (
-                            <option key={voice} value={voice}>
-                                {voice}
-                            </option>
-                            ))}
-                        </select>
-                    </div>
-                 )}
-            </fieldset>
-            {/* --- END: Khu vực cài đặt Output --- */}
-
-            {/* Combined Input Area */}
-            <div className="flex gap-2 rounded-full border border-gray-300 p-1.5 bg-gray-100 items-center">
-                {/* ConnectionButton now uses props */}
-                <ConnectionButton
-                    connected={connected} // From props
-                    connect={connectWithPermissions} // From props
-                    disconnect={handleDisconnect} // From props
-                />
-                {/* MicButton now uses props */}
-                <MicButton muted={muted} setMuted={setMuted} volume={volume} connected={connected} /> {/* 'connected' from props */}
-                {/* Removed MediaStreamButtons */}
-                <div className="flex-grow">
-                   <ChatInput onSendMessage={handleSendMessage} disabled={!connected} /> {/* 'connected' from props */}
-                </div>
+                {/* Text Button */}
+                <button
+                  type='button'
+                  onClick={() => handleModalityButtonClick('text')} // Send 'text'
+                  disabled={connected || !isOutputSettingsOpen}
+                  className={`flex flex-1 flex-col items-center justify-center rounded-lg border p-3 transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50
+                                        ${
+                                          currentModality === 'text' // Check if currentModality is 'text'
+                                            ? 'border-blue-600 bg-blue-500 text-white shadow-sm' // Selected style
+                                            : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50' // Default style
+                                        }`}
+                >
+                  {/* Icon representing Text (e.g., Document/Lines) */}
+                  <svg
+                    xmlns='http://www.w3.org/2000/svg'
+                    fill='none'
+                    viewBox='0 0 24 24'
+                    strokeWidth={1.5}
+                    stroke='currentColor'
+                    className={`mb-1 h-5 w-5 ${currentModality === 'text' ? 'text-white' : 'text-gray-500'}`}
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      d='M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12'
+                    />{' '}
+                    {/* Simple text lines icon */}
+                  </svg>
+                  <span className='text-xs font-medium'>Text</span>{' '}
+                  {/* Label remains Text */}
+                </button>
+              </div>
             </div>
+
+            {/* --- Voice Selection (Conditional) --- */}
+            {isAudioSelected && ( // Show only when currentModality is 'audio'
+              <div>
+                <label
+                  htmlFor='voiceSelect'
+                  className='mb-2 block text-sm font-medium text-gray-600'
+                >
+                  Voice
+                </label>
+                <select
+                  id='voiceSelect'
+                  value={currentVoice}
+                  onChange={handleVoiceChange}
+                  className={`w-full rounded border border-gray-300 bg-white p-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:opacity-70 ${!connected ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                  disabled={connected || !isOutputSettingsOpen}
+                >
+                  {availableVoices.map(voice => (
+                    <option key={voice} value={voice}>
+                      {voice}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </fieldset>
         </div>
-    );
+      </div>
+      {/* --- End Left Panel --- */}
+      {/* --- Right Panel (Main Chat Area) --- */}
+      <div className='flex flex-grow flex-col space-y-4 rounded-r-2xl border-l border-gray-200 bg-white p-4 text-gray-700'>
+        <div className='flex-grow overflow-y-auto' ref={loggerRef}>
+          {!connected && !hasInteracted ? (
+            <ChatIntroduction
+              onStartVoice={() => {
+                handleStartVoice()
+                setHasInteracted(true)
+              }}
+            />
+          ) : (
+            <Logger filter='none' />
+          )}
+        </div>
+        <div className='flex items-center gap-2 rounded-full border border-gray-300 bg-gray-100 p-1.5'>
+          <ConnectionButton
+            connected={connected}
+            connect={connectWithPermissions}
+            disconnect={handleDisconnect}
+          />
+          <MicButton
+            muted={muted}
+            setMuted={setMuted}
+            volume={volume}
+            connected={connected}
+          />
+          <div className='flex-grow'>
+            {' '}
+            <ChatInput
+              onSendMessage={handleSendMessage}
+              disabled={!connected}
+            />{' '}
+          </div>
+        </div>
+      </div>
+      {/* --- End Right Panel --- */}
+    </div> // End Main Flex Row Container
+  )
 }
