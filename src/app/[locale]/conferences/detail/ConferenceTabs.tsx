@@ -56,7 +56,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       }
       return dateObj.toLocaleDateString(language, {
         year: 'numeric',
-        month: 'short',
+        month: 'long',
         day: 'numeric'
       })
     } catch (error) {

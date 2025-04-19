@@ -700,7 +700,8 @@
   },
   "Common": {
     "loading": "Loading...",
-    "or": "or"
+    "or": "or",
+    "new": "NEW"
   },
   "Publish": "Publish",
   "No_summary_available": "No summary available.",
@@ -736,5 +737,106 @@
   "Strikethrough_values_indicate_different_dates_from_older_records": "Strikethrough values indicate different dates from older records",
   "No_topics_listed": "No topics listed",
   "Conference_Published_By_User": "Conference Published By User",
-  "Conference_Published_By_User_Description": "This conference listing was added by a community member and does not currently have an official academic ranking (e.g., CORE, Scopus). We recommend carefully reviewing the conference website, organizers, and call for papers to assess its quality and legitimacy before submitting or attending."
+  "Conference_Published_By_User_Description": "This conference listing was added by a community member and does not currently have an official academic ranking (e.g., CORE, Scopus). We recommend carefully reviewing the conference website, organizers, and call for papers to assess its quality and legitimacy before submitting or attending.",
+  "Return_to_homepage": "Return to home page",
+  "Remove_from_Calendar": "Remove from Calendar",
+  "Add_to_Calendar": "Add to Calendar",
+  "Remove_from_Favorites": "Remove from Favorites",
+  "Add_to_Favorites": "Add to Favorites",
+  "Select_Date_Range": "Select Date Range",
+  "FeatureComparisonTable": {
+    "title": "Feature Comparison: Guest vs. Logged-in Users",
+    "headers": {
+      "feature": "Feature",
+      "guest": "Guest User",
+      "loggedIn": "Logged-in User"
+    },
+    "availability": {
+      "available": "Available",
+      "notAvailable": "Not available"
+    },
+    "categories": {
+      "general": "General User Functions",
+      "loggedIn": "Logged-in User Functions"
+    },
+    "features": {
+      "auth": {
+        "name": "Account Access (Sign Up / Log In)",
+        "description": "Register a new account or log in using your credentials or Google."
+      },
+      "search": {
+        "name": "Find Conferences",
+        "description": [
+          "Search for conferences using criteria like:",
+          "Location",
+          "Date",
+          "Rank",
+          "Source",
+          "Organizer Type"
+        ]
+      },
+      "location_map": {
+        "name": "View Conference Location Map",
+        "description": "See the conference venue on an interactive map within the details page."
+      },
+      "journal_search": {
+        "name": "Search Scientific Journals",
+        "description": "Find relevant scientific journals using the search tool."
+      },
+      "chatbot": {
+        "name": "AI Assistant (Chatbot)",
+        "description": [
+          "Get instant answers about conferences and journals.",
+          "Receive help navigating the platform.",
+          "Navigate quickly to relevant sections.",
+          "Interact via text, voice, video, or screen sharing."
+        ]
+      },
+      "follow": {
+        "name": "Track Conferences",
+        "description": "Save conferences you're interested in ('Follow') to receive updates."
+      },
+      "feedback": {
+        "name": "Rate & Review Conferences",
+        "description": "Share your experience by rating conferences (1-5 stars) and leaving comments."
+      },
+      "notes": {
+        "name": "Personal Calendar & Notes",
+        "description": [
+          "View your saved events and notes on a personal calendar.",
+          "Add custom notes for specific dates to stay organized."
+        ]
+      },
+      "submit_conf": {
+        "name": "Submit Conference for Listing",
+        "description": "Contribute by submitting new conference details for review and potential inclusion."
+      },
+      "notifications": {
+        "name": "Stay Updated (Notifications)",
+        "description": [
+          "Receive important updates directly within the application.",
+          "Opt-in for email alerts."
+        ]
+      },
+      "settings": {
+        "name": "Customize Your Experience",
+        "description": [
+          "Manage your email notification preferences.",
+          "Choose to auto-add tracked conferences to your personal calendar."
+        ]
+      },
+      "profile_update": {
+        "name": "Manage Your Profile",
+        "description": [
+          "Update your display name.",
+          "Change your password.",
+          "Keep your address current."
+        ]
+      },
+      "chart_visualization": {
+        "name": "Visualize Conference Data",
+        "description": "Explore conference information and trends through interactive charts."
+      }
+    }
+  }
 }
