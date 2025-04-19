@@ -1,11 +1,11 @@
-// src/app/[locale]/chatbot/chat/ChatBot.tsx
+// src/app/[locale]/chatbot/chat/RegularChat.tsx
 "use client";
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import ChatHistory from './ChatHistory';
-import ChatInput from './ChatInput';
-import LoadingIndicator from './LoadingIndicator';
-import Introduction from './ChatIntroduction';
+import ChatHistory from './regularchat/ChatHistory';
+import ChatInput from './regularchat/ChatInput';
+import LoadingIndicator from './regularchat/LoadingIndicator';
+import Introduction from './regularchat/ChatIntroduction';
 
 // Import hooks
 import { useTimer } from '@/src/hooks/chatbot/useTimer';
@@ -14,7 +14,7 @@ import { appConfig } from '@/src/middleware';
 
 const SOCKET_SERVER_URL = appConfig.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
 
-function ChatBot() {
+function RegularChat() {
     // --- Use Hooks ---
     const { timeCounter, startTimer, stopTimer } = useTimer();
     const {
@@ -156,4 +156,4 @@ function ChatBot() {
     );
 }
 
-export default ChatBot
+export default RegularChat

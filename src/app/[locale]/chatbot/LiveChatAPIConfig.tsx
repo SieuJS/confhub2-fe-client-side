@@ -1,8 +1,7 @@
-// src/components/AltairComponent.tsx (Adjusted)
+// src/components/LiveChatAPIConfig.tsx (Adjusted)
 "use client";
 import { useEffect, memo } from "react";
-import { useLiveAPIContext } from "../contexts/LiveAPIContext"; // Adjust path
-import { ToolCall } from "../multimodal-live-types"; // Adjust path
+import { useLiveAPIContext } from '@/src/app/[locale]/chatbot/livechat/contexts/LiveAPIContext';
 import {
   getConferencesDeclaration,
   getJournalsDeclaration,
@@ -11,20 +10,20 @@ import {
   vietnam_getConferencesDeclaration, vietnam_getJournalsDeclaration, vietnam_getWebsiteInformationDeclaration, vietnam_drawChartDeclaration,
   china_getConferencesDeclaration, china_getJournalsDeclaration, china_getWebsiteInformationDeclaration, china_drawChartDeclaration,
 
-} from "./functionDeclaration"; // Adjust path
-import { OutputModality, PrebuiltVoice, Language } from '../multimodal-live-types'; // Or from src/types.ts
-import { transformConferenceData } from './transformApiData'; // Adjust path
+} from "./lib/functionsDeclaration"; // Adjust path
+import { OutputModality, PrebuiltVoice, Language, ToolCall } from '@/src/app/[locale]/chatbot/lib/types';
+import { transformConferenceData } from './utils/transformApiData'; // Adjust path
 import { appConfig } from "@/src/middleware"; // Adjust path
 import { FunctionDeclaration } from "@google/generative-ai";
 
-interface AltairComponentProps {
+interface LiveChatAPIConfigProps {
   outputModality: OutputModality;
   selectedVoice: PrebuiltVoice;
   language: Language;
   systemInstructions: string;
 }
 
-function AltairComponent({ outputModality, selectedVoice, language, systemInstructions }: AltairComponentProps) {
+function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructions }: LiveChatAPIConfigProps) {
   const { client, setConfig } = useLiveAPIContext();
 
   // Effect 1: Configure the API client based on props
@@ -225,4 +224,4 @@ function AltairComponent({ outputModality, selectedVoice, language, systemInstru
   return null;
 }
 
-export const Altair = memo(AltairComponent);
+export const LiveChatAPIConfig = memo(LiveChatAPI);

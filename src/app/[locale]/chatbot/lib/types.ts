@@ -1,3 +1,6 @@
+// src/app/[locale]/chatbot/lib/types.ts
+
+
 import type {
   Content,
   FunctionCall,
@@ -6,6 +9,7 @@ import type {
   Part,
   Tool,
 } from "@google/generative-ai";
+
 
 /**
  * this module contains type-definitions and Type-Guards
@@ -29,6 +33,12 @@ export type PrebuiltVoice = "Puck" | "Charon" | "Kore" | "Fenrir" | "Aoede" | "O
 export type OutputModality = "text" | "audio" | "image";
 export type Language = 'en' | 'vi' | 'zh';
 export type ChatMode = 'live' | 'regular';
+export interface LanguageOption {
+    code: Language;
+    name: string;
+    flagCode: string;
+}
+
 
 
 export type LiveGenerationConfig = GenerationConfig & {
