@@ -1,10 +1,9 @@
 'use client'
 // src/components/SuperBannerTree.tsx
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
-import { Link } from '@/src/navigation' // Giả sử đây là thiết lập định tuyến quốc tế hóa của bạn
 
 // --- ECharts Core Imports (CHỈ DÙNG CHO SLOGAN) ---
 import * as echarts from 'echarts/core'
@@ -40,17 +39,14 @@ const itemVariants = {
 }
 // --- End Variants ---
 
-// --- !!! DỮ LIỆU CHO BẢN ĐỒ THẾ GIỚI VÀ ĐƯỜNG BAY !!! ---
-
-// Interface cho dữ liệu đường dẫn quốc gia riêng lẻ
+// --- DỮ LIỆU BẢN ĐỒ VÀ ĐƯỜNG BAY ---
 interface CountryData {
-  id: string // Mã quốc gia 2 chữ cái (ví dụ: 'US')
-  title: string // Tên đầy đủ của quốc gia
-  d: string // Chuỗi dữ liệu đường dẫn SVG (CẦN THAY THẾ BẰNG DỮ LIỆU THỰC)
+  id: string
+  title: string
+  d: string // Dữ liệu đường dẫn SVG (giữ ngắn gọn)
 }
 
-// --- !!! QUAN TRỌNG: BẠN PHẢI THAY THẾ CÁC GIÁ TRỊ 'd' DƯỚI ĐÂY BẰNG DỮ LIỆU ĐƯỜNG DẪN SVG THỰC TẾ CỦA BẠN !!! ---
-// Nếu không, các quốc gia sẽ không được vẽ trên bản đồ.
+// --- Dữ liệu quốc gia với 'd' ngắn gọn (PLACEHOLDER - THAY BẰNG DỮ LIỆU SVG THỰC) ---
 const countriesData: CountryData[] = [
   {
     d: 'm 479.68275,331.6274 -0.077,0.025 -0.258,0.155 -0.147,0.054 -0.134,0.027 -0.105,-0.011 -0.058,-0.091 0.006,-0.139 -0.024,-0.124 -0.02,-0.067 0.038,-0.181 0.086,-0.097 0.119,-0.08 0.188,0.029 0.398,0.116 0.083,0.109 10e-4,0.072 -0.073,0.119 z',
@@ -1334,8 +1330,7 @@ const countriesData: CountryData[] = [
   }
 ]
 
-// Tọa độ Trung tâm Ước tính (X, Y) cho mỗi quốc gia trong viewBox SVG
-// --- !!! QUAN TRỌNG: ĐIỀU CHỈNH CẨN THẬN CÁC TỌA ĐỘ NÀY ĐỂ KHỚP VỚI BẢN ĐỒ SVG CỦA BẠN !!! ---
+// --- Tọa độ tâm quốc gia (Ước tính - ĐIỀU CHỈNH CẨN THẬN THEO SVG THỰC) ---
 const countryCoordinates: { [key: string]: { x: number; y: number } } = {
   US: { x: 190 + 65, y: 200 + 150 },
   CA: { x: 180 + 80, y: 130 + 180 },
@@ -1349,73 +1344,164 @@ const countryCoordinates: { [key: string]: { x: number; y: number } } = {
   CN: { x: 720 + 80, y: 220 + 150 },
   JP: { x: 840 + 25, y: 210 + 150 },
   IN: { x: 670 + 25, y: 290 + 120 },
-  VN: { x: 745 + 25, y: 320 + 82 },
+  VN: { x: 770, y: 402 },
   KR: { x: 815 + 20, y: 215 + 140 },
   ZA: { x: 515 + 20, y: 540 + 20 },
-  AU: { x: 830 + 60, y: 500 + 65 }
+  AU: { x: 830 + 60, y: 500 + 65 }, // Điều chỉnh nếu cần
+  TH: { x: 770 - 10, y: 400 + 25 },
+  NZ: { x: 1000 - 30, y: 600 - 20 },
+  PH: { x: 770 + 45, y: 400 + 25 },
+  AR: { x: 170 + 110, y: 500 + 70 },
+  TW: { x: 770 + 45, y: 400 - 7 },
+  IT: { x: 470 + 50, y: 300 + 40 },
+  CU: { x: 170 + 75, y: 400 }
 }
 
-// Interface để định nghĩa một đường bay
+// --- Danh sách chuyến bay ví dụ ---
 interface Flight {
-  from: string // ID quốc gia khởi hành (ví dụ: 'US')
-  to: string // ID quốc gia đến (ví dụ: 'GB')
+  from: string
+  to: string
+  order: number // Thuộc tính thứ tự, CÓ THỂ TRÙNG LẶP
 }
 
-// Danh sách chuyến bay ví dụ (Thêm nhiều hơn nếu muốn)
-const exampleFlights: Flight[] = [
-  { from: 'US', to: 'GB' },
-  { from: 'US', to: 'JP' },
-  { from: 'FR', to: 'BR' },
-  { from: 'DE', to: 'CN' },
-  { from: 'GB', to: 'AU' },
-  { from: 'VN', to: 'JP' },
-  { from: 'VN', to: 'US' },
-  { from: 'CA', to: 'FR' },
-  { from: 'MX', to: 'ES' },
-  { from: 'BR', to: 'ZA' },
-  { from: 'CN', to: 'RU' },
-  { from: 'IN', to: 'DE' },
-  { from: 'JP', to: 'AU' },
-  { from: 'KR', to: 'VN' },
-  { from: 'ZA', to: 'GB' },
-  { from: 'ES', to: 'MX' },
-  { from: 'RU', to: 'US' },
-  { from: 'AU', to: 'CA' },
-  { from: 'DE', to: 'ZA' },
-  { from: 'CN', to: 'BR' },
-  { from: 'IN', to: 'US' },
-  { from: 'KR', to: 'GB' }
+// Tạo danh sách chuyến bay mới dựa trên các quốc gia trên
+const exampleFlights = [
+  // === Đợt 1 (Order 1) - Khởi hành từ VN ===
+  { from: 'VN', to: 'JP', order: 1 }, // VN -> Nhật Bản
+  { from: 'VN', to: 'AU', order: 1 }, // VN -> Úc
+  { from: 'VN', to: 'US', order: 1 }, // VN -> Mỹ
+  { from: 'VN', to: 'FR', order: 1 }, // VN -> Pháp
+  { from: 'VN', to: 'TH', order: 1 }, // VN -> Thái Lan
+  { from: 'VN', to: 'KR', order: 1 }, // VN -> Hàn Quốc
+  { from: 'VN', to: 'CN', order: 1 }, // VN -> Trung Quốc
+
+  // === Đợt 2 (Order 2) - Khởi hành từ cùng điểm với Order 1 (VN) ===
+  // Logic: Bay từ điểm gốc đợt 1 đến các điểm mới hoặc đã có
+
+  // === Đợt 3 (Order 3) - Khởi hành từ đích của Order 1 ===
+  // Logic: Bay từ các điểm đến của đợt 1 (JP, AU, US, FR, TH, KR, CN)
+  { from: 'JP', to: 'KR', order: 3 }, // Nhật -> Hàn
+  { from: 'JP', to: 'US', order: 3 }, // Nhật -> Mỹ
+  { from: 'JP', to: 'CN', order: 3 }, // Thái -> Trung Quốc
+  { from: 'AU', to: 'NZ', order: 3 }, // Úc -> New Zealand
+  { from: 'AU', to: 'PH', order: 3 }, // Úc -> Philippines
+  { from: 'AU', to: 'CN', order: 3 }, // Hàn -> Trung Quốc
+  { from: 'US', to: 'CA', order: 3 }, // Mỹ -> Canada
+  { from: 'US', to: 'MX', order: 3 }, // Mỹ -> Mexico
+  { from: 'US', to: 'IT', order: 3 }, // Mỹ -> Mexico
+  { from: 'FR', to: 'DE', order: 3 }, // Pháp -> Đức
+  { from: 'FR', to: 'GB', order: 3 }, // Pháp -> Anh
+  { from: 'FR', to: 'TW', order: 3 }, // Pháp -> Anh
+  { from: 'CN', to: 'RU', order: 3 }, // Trung Quốc -> Nga
+  { from: 'CN', to: 'IN', order: 3 }, // Trung Quốc -> Ấn Độ
+  { from: 'CN', to: 'ZA', order: 3 }, // Trung Quốc -> Ấn Độ
+
+  // === Đợt 4 (Order 4) - Khởi hành từ cùng điểm với Order 3 ===
+  // Logic: Bay từ các điểm gốc của đợt 3 (JP, AU, US, FR, TH, KR, CN) đến các điểm mới
+  { from: 'JP', to: 'TW', order: 4 }, // Nhật -> Đài Loan
+  { from: 'JP', to: 'PH', order: 4 }, // Nhật -> Philippines
+  { from: 'AU', to: 'ZA', order: 4 }, // Úc -> Nam Phi
+  { from: 'AU', to: 'VN', order: 4 }, // Úc -> Việt Nam (Quay lại)
+  { from: 'US', to: 'BR', order: 4 }, // Mỹ -> Brazil
+  { from: 'US', to: 'CU', order: 4 }, // Mỹ -> Cuba
+  { from: 'FR', to: 'ES', order: 4 }, // Pháp -> Tây Ban Nha
+  { from: 'FR', to: 'IT', order: 4 }, // Pháp -> Ý
+  { from: 'TH', to: 'IN', order: 4 }, // Thái -> Ấn Độ
+  { from: 'KR', to: 'VN', order: 4 }, // Hàn -> Việt Nam (Quay lại)
+  { from: 'CN', to: 'JP', order: 4 }, // Trung Quốc -> Nhật (Quay lại)
+  { from: 'CN', to: 'KR', order: 4 }, // Trung Quốc -> Hàn (Quay lại)
+
+  // === Đợt 5 (Order 5) - Khởi hành từ đích của Order 3 ===
+  // Logic: Bay từ các điểm đến của đợt 3 (KR, US, NZ, PH, CA, MX, DE, GB, CN, RU, IN)
+  { from: 'KR', to: 'JP', order: 5 }, // Hàn -> Nhật
+  { from: 'US', to: 'GB', order: 5 }, // Mỹ -> Anh
+  { from: 'NZ', to: 'AU', order: 5 }, // New Zealand -> Úc
+  { from: 'PH', to: 'TW', order: 5 }, // Philippines -> Đài Loan
+  { from: 'CA', to: 'US', order: 5 }, // Canada -> Mỹ
+  { from: 'MX', to: 'CU', order: 5 }, // Mexico -> Cuba
+  { from: 'DE', to: 'IT', order: 5 }, // Đức -> Ý
+  { from: 'GB', to: 'FR', order: 5 }, // Anh -> Pháp
+  { from: 'CN', to: 'TH', order: 5 }, // Trung Quốc -> Thái
+  { from: 'RU', to: 'DE', order: 5 }, // Nga -> Đức
+  { from: 'IN', to: 'ZA', order: 5 }, // Ấn Độ -> Nam Phi
+
+  // === Đợt 6 (Order 6) - Khởi hành từ cùng điểm với Order 5 ===
+  // Logic: Bay từ các điểm gốc của đợt 5 (KR, US, NZ, PH, CA, MX, DE, GB, CN, RU, IN)
+  { from: 'KR', to: 'RU', order: 6 }, // Hàn -> Nga
+  { from: 'US', to: 'AR', order: 6 }, // Mỹ -> Argentina
+  { from: 'NZ', to: 'US', order: 6 }, // New Zealand -> Mỹ
+  { from: 'PH', to: 'VN', order: 6 }, // Philippines -> Việt Nam
+  { from: 'CA', to: 'GB', order: 6 }, // Canada -> Anh
+  { from: 'MX', to: 'BR', order: 6 }, // Mexico -> Brazil
+  { from: 'DE', to: 'ES', order: 6 }, // Đức -> Tây Ban Nha
+  { from: 'GB', to: 'DE', order: 6 }, // Anh -> Đức
+  { from: 'CN', to: 'VN', order: 6 }, // Trung Quốc -> Việt Nam
+  { from: 'RU', to: 'KR', order: 6 }, // Nga -> Hàn
+  { from: 'IN', to: 'AU', order: 6 }, // Ấn Độ -> Úc
+
+  // === Đợt 7 (Order 7) - Khởi hành từ đích của Order 5 ===
+  // Logic: Bay từ các điểm đến của đợt 5 (JP, GB, AU, TW, US, CU, IT, FR, TH, DE, ZA)
+  { from: 'JP', to: 'CN', order: 7 }, // Nhật -> Trung Quốc
+  { from: 'GB', to: 'US', order: 7 }, // Anh -> Mỹ
+  { from: 'AU', to: 'IN', order: 7 }, // Úc -> Ấn Độ
+  { from: 'TW', to: 'PH', order: 7 }, // Đài Loan -> Philippines
+  { from: 'US', to: 'MX', order: 7 }, // Mỹ -> Mexico
+  { from: 'CU', to: 'US', order: 7 }, // Cuba -> Mỹ
+  { from: 'IT', to: 'FR', order: 7 }, // Ý -> Pháp
+  { from: 'FR', to: 'ES', order: 7 }, // Pháp -> Tây Ban Nha
+  { from: 'TH', to: 'VN', order: 7 }, // Thái -> Việt Nam
+  { from: 'DE', to: 'GB', order: 7 }, // Đức -> Anh
+  { from: 'ZA', to: 'BR', order: 7 } // Nam Phi -> Brazil
+
+  // === Đợt 8 (Order 8) - Khởi hành từ cùng điểm với Order 7 ===
+  // Logic: Bay từ các điểm gốc của đợt 7 (JP, GB, AU, TW, US, CU, IT, FR, TH, DE, ZA)
+  // { from: 'JP', to: 'KR', order: 8 }, // Nhật -> Hàn
+  // { from: 'GB', to: 'CA', order: 8 }, // Anh -> Canada
+  // { from: 'AU', to: 'NZ', order: 8 }, // Úc -> New Zealand
+  // { from: 'TW', to: 'CN', order: 8 }, // Đài Loan -> Trung Quốc
+  // { from: 'US', to: 'CA', order: 8 }, // Mỹ -> Canada
+  // { from: 'CU', to: 'MX', order: 8 }, // Cuba -> Mexico
+  // { from: 'IT', to: 'DE', order: 8 }, // Ý -> Đức
+  // { from: 'FR', to: 'DE', order: 8 }, // Pháp -> Đức
+  // { from: 'TH', to: 'PH', order: 8 }, // Thái -> Philippines
+  // { from: 'DE', to: 'RU', order: 8 }, // Đức -> Nga
+  // { from: 'ZA', to: 'AU', order: 8 } // Nam Phi -> Úc
 ]
 
-// --- Component WorldMap SVG (với Đường bay & Đổi màu) ---
+// --- Component WorldMap ---
 interface WorldMapProps extends React.SVGProps<SVGSVGElement> {
   flights?: Flight[]
   coordinates?: { [key: string]: { x: number; y: number } }
-  highlightColorClass?: string // Tùy chọn: Prop cho lớp màu highlight
 }
 
 // --- Hằng số Thời gian Animation (tính bằng giây) ---
-const drawDuration = 1.5 // Thời gian vẽ đường bay
-const waitDuration = 5.0 // Thời gian chờ sau khi vẽ trước khi mờ dần
-const fadeDuration = 0.5 // Thời gian mờ dần
-const totalCycleDuration = drawDuration + waitDuration + fadeDuration // Tổng thời gian một chu kỳ
-const baseInitialDelay = 0.5 // Độ trễ cơ bản trước khi chuyến bay đầu tiên bắt đầu
-const staggerDelay = 0.15 // Độ trễ giữa các chuyến bay liên tiếp
+const drawDuration = 2.2 // Thời gian vẽ đường bay
+const waitDuration = -0.5 // Thời gian chờ sau khi vẽ xong (âm để thu gọn sớm)
+const shrinkDuration = 2.0 // Thời gian đuôi thu gọn
+const fadeOutDelay = 0.1 // Độ trễ nhỏ trước khi fade out khi thu gọn
+const rippleDuration = 1.0 // Thời gian hiệu ứng sóng
+const rippleDelayBetween = rippleDuration / 2.5 // Độ trễ giữa 2 vòng sóng
+const baseInitialDelay = 0.5 // Delay cơ bản ban đầu cho nhóm order đầu tiên
+const delayBetweenOrders = 1.1 // Khoảng cách thời gian cố định (1 giây) giữa các nhóm order
+
+// --- TÍNH TOÁN: Tổng thời gian 1 chu kỳ animation cho đường bay ---
+const totalPathCycleDuration = drawDuration + waitDuration + shrinkDuration
 
 const WorldMap: React.FC<WorldMapProps> = ({
-  viewBox = '0 0 1009.6727 665.96301', // ViewBox mặc định, điều chỉnh nếu của bạn khác
+  viewBox = '0 0 1009.6727 665.96301', // Điều chỉnh nếu SVG thực khác
   flights = [],
   coordinates = {},
-  highlightColorClass = 'fill-yellow-300', // Màu highlight mặc định
   className,
   ...restProps
 }) => {
-  // State để theo dõi số lượng chuyến bay đang hoạt động liên quan đến mỗi quốc gia
-  const [highlightCounts, setHighlightCounts] = useState<
-    Record<string, number>
-  >({})
+  // Sắp xếp các chuyến bay theo thứ tự 'order'
+  const sortedFlights = [...flights].sort((a, b) => a.order - b.order)
 
-  // Hàm trợ giúp tạo dữ liệu đường cong Bezier
+  // Tìm order nhỏ nhất để tính delay chuẩn
+  const minOrder =
+    sortedFlights.length > 0 ? Math.min(...sortedFlights.map(f => f.order)) : 0
+
+  // Hàm tạo đường cong cho đường bay
   const createArcPath = (
     startX: number,
     startY: number,
@@ -1426,136 +1512,74 @@ const WorldMap: React.FC<WorldMapProps> = ({
     const midY = (startY + endY) / 2
     const dx = endX - startX
     const dy = endY - startY
-    const arcIntensity = -0.2 // Điều chỉnh độ cong (-ve cong "lên trên")
+    const arcIntensity = -0.2 // Điều chỉnh độ cong nếu muốn
     const controlX = midX + arcIntensity * dy
     const controlY = midY - arcIntensity * dx
     return `M ${startX},${startY} Q ${controlX},${controlY} ${endX},${endY}`
   }
 
-  // Effect để lên lịch thay đổi highlight dựa trên thời gian animation chuyến bay
-  useEffect(() => {
-    const timeoutIds: NodeJS.Timeout[] = []
+  const goldColor = '#FFD700' // Màu vàng cho đường bay và hiệu ứng
 
-    // Hàm tăng số lượng highlight cho một quốc gia
-    const addHighlight = (countryId: string) => {
-      setHighlightCounts(prev => ({
-        ...prev,
-        [countryId]: (prev[countryId] || 0) + 1
-      }))
-    }
+  // --- TÍNH TOÁN: Các mốc thời gian (dưới dạng phần trăm) cho keyframes ---
+  const drawEnd = Math.max(0, drawDuration / totalPathCycleDuration)
+  const waitEnd = Math.max(
+    drawEnd,
+    (drawDuration + waitDuration) / totalPathCycleDuration
+  )
+  const shrinkEnd = 1 // Luôn là 1 (100%)
 
-    // Hàm giảm số lượng highlight cho một quốc gia
-    const removeHighlight = (countryId: string) => {
-      setHighlightCounts(prev => {
-        const newCount = Math.max(0, (prev[countryId] || 0) - 1)
-        return {
-          ...prev,
-          [countryId]: newCount
-        }
-      })
-    }
+  // --- TÍNH TOÁN: Mốc thời gian bắt đầu fade out khi thu gọn ---
+  const shrinkFadeStart = Math.max(
+    waitEnd,
+    (drawDuration + waitDuration + fadeOutDelay) / totalPathCycleDuration
+  )
 
-    // Hàm đệ quy để lên lịch bật/tắt highlight cho chu kỳ của một chuyến bay
-    const scheduleHighlightCycle = (flight: Flight, cycleStartTime: number) => {
-      // Thời điểm chuyến bay bắt đầu hiển thị hoặc bắt đầu animation
-      const highlightStartTime = cycleStartTime
-      // Thời điểm chuyến bay bắt đầu mờ dần (kết thúc highlight)
-      const highlightEndTime = cycleStartTime + drawDuration + waitDuration
-      // Thời điểm chu kỳ tiếp theo cho *chuyến bay cụ thể này* nên bắt đầu
-      const nextCycleStartTime = cycleStartTime + totalCycleDuration
-
-      // Lên lịch BẬT highlight khi bắt đầu giai đoạn hiển thị
-      const onTimeout = setTimeout(() => {
-        // Chỉ thêm highlight nếu có tọa độ hợp lệ
-        if (coordinates[flight.from] && coordinates[flight.to]) {
-          addHighlight(flight.from)
-          addHighlight(flight.to)
-        }
-      }, highlightStartTime * 1000) // Chuyển giây sang ms
-
-      // Lên lịch TẮT highlight khi bắt đầu mờ dần
-      const offTimeout = setTimeout(() => {
-        // Chỉ xóa highlight nếu có tọa độ hợp lệ
-        if (coordinates[flight.from] && coordinates[flight.to]) {
-          removeHighlight(flight.from)
-          removeHighlight(flight.to)
-        }
-        // Lên lịch chu kỳ tiếp theo cho chuyến bay này một cách đệ quy
-        scheduleHighlightCycle(flight, nextCycleStartTime)
-      }, highlightEndTime * 1000) // Chuyển giây sang ms
-
-      // Lưu trữ ID timeout để dọn dẹp
-      timeoutIds.push(onTimeout, offTimeout)
-    }
-
-    // Lên lịch ban đầu cho tất cả các chuyến bay
-    flights.forEach((flight, index) => {
-      const initialDelay = baseInitialDelay + index * staggerDelay
-      scheduleHighlightCycle(flight, initialDelay) // Bắt đầu chu kỳ đầu tiên
-    })
-
-    // Hàm dọn dẹp: Xóa tất cả các timeout đã lên lịch khi unmount hoặc dependencies thay đổi
-    return () => {
-      // console.log("Clearing highlight timeouts");
-      timeoutIds.forEach(clearTimeout)
-      setHighlightCounts({}) // Đặt lại số lượng khi dọn dẹp
-    }
-  }, [flights, coordinates]) // Chạy lại effect nếu flights hoặc coordinates thay đổi
-
-  // Tính toán thời điểm keyframe opacity (chuẩn hóa từ 0 đến 1)
-  const opacityTimes = [
-    0, // Bắt đầu mờ vào
-    drawDuration / totalCycleDuration, // Kết thúc mờ vào
-    (drawDuration + waitDuration) / totalCycleDuration, // Bắt đầu mờ ra
-    1 // Kết thúc mờ ra
-  ]
-
-  const goldColor = '#FFD700' // Mã hex màu vàng cổ điển
+  // Tính toán các mốc thời gian cho mảng 'times' của transition path
+  const pathTimes = [
+    0, // Bắt đầu
+    drawEnd, // Kết thúc vẽ, bắt đầu chờ
+    Math.max(drawEnd + 0.001, Math.min(shrinkFadeStart, shrinkEnd - 0.001)), // Bắt đầu fade out khi thu gọn (giữ opacity 1 đến đây)
+    shrinkEnd // Kết thúc thu gọn (opacity 0)
+  ].sort((a, b) => a - b) // Sắp xếp để đảm bảo thứ tự đúng
 
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
       viewBox={viewBox}
-      className={className} // Áp dụng className được truyền từ cha
+      className={className}
       {...restProps}
     >
-      {/* Layer 1: Tô màu Quốc gia */}
+      {/* Layer 1: Vẽ các quốc gia */}
       <g id='countries'>
-        {countriesData.map(country => {
-          // Kiểm tra xem quốc gia này có nên được highlight không
-          const isHighlighted = (highlightCounts[country.id] || 0) > 0
-
-          return (
-            <path
-              key={country.id}
-              id={country.id}
-              d={country.d}
-              // Áp dụng lớp highlight hoặc style mặc định
-              className={`
-                // Chuyển màu mượt transition-colors duration-300 ease-in-out
-                ${isHighlighted ? highlightColorClass : ''}
-              `}
-              // Áp dụng màu fill mặc định bằng biến CSS nếu không được highlight
-              style={
-                !isHighlighted ? { fill: 'var(--background-secondary)' } : {}
-              }
-            />
-          )
-        })}
+        {countriesData.map(country => (
+          <path
+            key={country.id}
+            id={country.id}
+            d={country.d}
+            style={{
+              fill: 'var(--background-secondary)', // Sử dụng biến CSS nếu có
+              stroke: 'rgba(255,255,255,0.1)',
+              strokeWidth: 0.5
+            }}
+          />
+        ))}
       </g>
 
-      {/* Layer 2: Đường bay và Điểm đánh dấu */}
-      <g id='flight-paths' strokeLinecap='round'>
-        {flights.map((flight, index) => {
+      {/* Layer 2: Vẽ hiệu ứng chuyến bay */}
+      <g id='flight-effects' strokeLinecap='round'>
+        {sortedFlights.map((flight, index) => {
           const startCoords = coordinates[flight.from]
           const endCoords = coordinates[flight.to]
 
-          // Bỏ qua render nếu thiếu tọa độ cho chuyến bay này
+          // Bỏ qua nếu thiếu tọa độ
           if (!startCoords || !endCoords) {
+            console.warn(
+              `Missing coordinates for flight: ${flight.from} -> ${flight.to}`
+            )
             return null
           }
 
-          // Tạo dữ liệu đường dẫn SVG cho cung tròn
+          // Tạo đường dẫn SVG
           const pathData = createArcPath(
             startCoords.x,
             startCoords.y,
@@ -1563,85 +1587,99 @@ const WorldMap: React.FC<WorldMapProps> = ({
             endCoords.y
           )
 
-          const initialDelay = baseInitialDelay + index * staggerDelay
+          // --- TÍNH TOÁN INITIAL DELAY DỰA TRÊN ORDER ---
+          const orderDifference = flight.order - minOrder
+          // Delay thêm = (số thứ tự order - order nhỏ nhất) * khoảng cách thời gian giữa các order
+          const orderBasedDelay = orderDifference * delayBetweenOrders // Nhân với 1.0 giây
+          // Delay cuối cùng = delay cơ bản + delay theo order
+          const initialDelay = baseInitialDelay + orderBasedDelay
+          // Tất cả chuyến bay có cùng flight.order sẽ có cùng initialDelay
 
           return (
-            // Sử dụng Fragment để nhóm path và circle cho mỗi chuyến bay, dùng key duy nhất
-            <React.Fragment key={`${flight.from}-${flight.to}-${index}`}>
-              {/* Đường bay (Màu vàng) */}
+            // Sử dụng React.Fragment để nhóm các phần tử cho mỗi chuyến bay
+            <React.Fragment
+              key={`${flight.from}-${flight.to}-${flight.order}-${index}`}
+            >
+              {/* 1. ĐƯỜNG BAY HOẠT HÌNH */}
               <motion.path
                 d={pathData}
-                fill='none'
-                stroke={goldColor} // Sử dụng màu vàng cho đường stroke
-                strokeWidth='1.5' // Độ dày đường path
-                // Animation lặp lại để vẽ, chờ và mờ dần
-                initial={{ pathLength: 0, opacity: 0 }}
+                fill='none' // Chỉ vẽ đường viền
+                stroke={goldColor}
+                strokeWidth='1.5'
+                initial={{
+                  pathLength: 0, // Bắt đầu ẩn
+                  pathOffset: 0, // Bắt đầu từ đầu đường dẫn
+                  opacity: 0 // Bắt đầu trong suốt
+                }}
                 animate={{
-                  pathLength: [0, 1], // Vẽ đường path
-                  opacity: [0, 1, 1, 0] // Mờ vào -> Giữ nguyên -> Mờ ra
+                  // Keyframes cho hoạt ảnh vẽ và thu gọn
+                  pathLength: [0, 1, 1, 0], // Vẽ -> Đầy đủ -> Đầy đủ -> Thu gọn
+                  pathOffset: [0, 0, 0, 1], // Đầu -> Đầu   -> Đầu   -> Đuôi chạy đến cuối
+                  opacity: [0, 1, 1, 0] // Mờ -> Rõ -> Rõ -> Mờ
+                  // Index của keyframes: 0    drawEnd   shrinkFadeStart  shrinkEnd
                 }}
                 transition={{
-                  // animation pathLength: Điều khiển hiệu ứng vẽ
-                  pathLength: {
-                    delay: initialDelay, // Bắt đầu xen kẽ
-                    duration: drawDuration, // Thời gian vẽ
-                    ease: 'easeInOut',
-                    repeat: Infinity, // Lặp lại animation vẽ
-                    repeatType: 'loop',
-                    repeatDelay: waitDuration + fadeDuration // Chờ trước khi vẽ lại
-                  },
-                  // animation opacity: Điều khiển chu kỳ hiển thị
-                  opacity: {
-                    delay: initialDelay, // Bắt đầu xen kẽ
-                    duration: totalCycleDuration, // Tổng thời gian cho một chu kỳ mờ
-                    ease: 'linear', // Mờ tuyến tính thường ổn
-                    times: opacityTimes, // Sử dụng thời điểm keyframe đã tính toán
-                    repeat: Infinity, // Lặp lại chu kỳ hiển thị
-                    repeatType: 'loop',
-                    repeatDelay: 0 // Chu kỳ opacity lặp lại ngay lập tức
-                  }
+                  delay: initialDelay, // Áp dụng delay đã tính
+                  duration: totalPathCycleDuration, // Tổng thời gian 1 chu kỳ
+                  ease: 'linear', // Chuyển động đều để khớp keyframes
+                  repeat: Infinity, // Lặp lại vô hạn
+                  repeatType: 'loop', // Lặp lại từ đầu
+                  times: pathTimes // Mốc thời gian cho các keyframes trên
                 }}
               />
-              {/* Điểm đánh dấu bắt đầu (Hình tròn vàng) */}
-              <motion.circle
-                cx={startCoords.x}
-                cy={startCoords.y}
-                r='2.5' // Bán kính điểm đánh dấu (điều chỉnh nếu cần)
-                fill={goldColor} // Màu vàng
-                // Animate opacity đồng bộ với chu kỳ hiển thị của path
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 1, 1, 0] }}
-                transition={{
-                  opacity: {
-                    delay: initialDelay, // Cùng độ trễ với path
-                    duration: totalCycleDuration, // Cùng thời gian
-                    ease: 'linear',
-                    times: opacityTimes, // Cùng thời điểm
-                    repeat: Infinity,
-                    repeatType: 'loop',
-                    repeatDelay: 0
-                  }
-                }}
-              />
-              {/* Điểm đánh dấu kết thúc (Hình tròn vàng) */}
+
+              {/* 2. HIỆU ỨNG SÓNG LAN TỎA TẠI ĐIỂM ĐẾN */}
+              {/* Vòng 1 */}
               <motion.circle
                 cx={endCoords.x}
                 cy={endCoords.y}
-                r='2.5' // Bán kính điểm đánh dấu
-                fill={goldColor} // Màu vàng
-                // Animate opacity đồng bộ với chu kỳ hiển thị của path
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 1, 1, 0] }}
+                r={0} // Bắt đầu bán kính 0
+                fill='none'
+                stroke={goldColor}
+                strokeWidth='1'
+                initial={{ opacity: 0 }} // Bắt đầu trong suốt
+                animate={{
+                  r: [0, 12], // Tăng bán kính
+                  opacity: [0, 0.7, 0] // Hiện ra rồi mờ dần
+                }}
                 transition={{
-                  opacity: {
-                    delay: initialDelay, // Cùng độ trễ với path
-                    duration: totalCycleDuration, // Cùng thời gian
-                    ease: 'linear',
-                    times: opacityTimes, // Cùng thời điểm
-                    repeat: Infinity,
-                    repeatType: 'loop',
-                    repeatDelay: 0
-                  }
+                  // Bắt đầu sau khi đường bay vẽ xong
+                  delay: initialDelay + drawDuration,
+                  duration: rippleDuration,
+                  ease: 'easeOut',
+                  repeat: Infinity,
+                  repeatType: 'loop',
+                  // Delay lặp lại = tổng chu kỳ đường bay - thời gian hiệu ứng sóng
+                  repeatDelay: Math.max(
+                    0,
+                    totalPathCycleDuration - rippleDuration
+                  )
+                }}
+              />
+              {/* Vòng 2 (trễ hơn và mờ hơn chút) */}
+              <motion.circle
+                cx={endCoords.x}
+                cy={endCoords.y}
+                r={0}
+                fill='none'
+                stroke={goldColor}
+                strokeWidth='0.8'
+                initial={{ opacity: 0 }}
+                animate={{
+                  r: [0, 15],
+                  opacity: [0, 0.5, 0]
+                }}
+                transition={{
+                  // Bắt đầu trễ hơn vòng 1
+                  delay: initialDelay + drawDuration + rippleDelayBetween,
+                  duration: rippleDuration,
+                  ease: 'easeOut',
+                  repeat: Infinity,
+                  repeatType: 'loop',
+                  repeatDelay: Math.max(
+                    0,
+                    totalPathCycleDuration - rippleDuration
+                  )
                 }}
               />
             </React.Fragment>
@@ -1654,22 +1692,29 @@ const WorldMap: React.FC<WorldMapProps> = ({
 
 // --- Component Banner Chính ---
 const SuperBannerTree: React.FC = () => {
-  const t = useTranslations('') // Dùng cho quốc tế hóa
-  const sloganText = t('Slogan_Website') // Lấy text slogan
+  const t = useTranslations('') // Hook lấy bản dịch
+  const sloganText = t('Slogan_Website') || 'Your Dynamic Slogan Here' // Lấy slogan hoặc fallback
+  const sloganChartRef = useRef<HTMLDivElement>(null) // Ref cho div chứa ECharts slogan
+  const sloganChartInstanceRef = useRef<EChartsType | null>(null) // Ref cho instance ECharts
 
-  // Ref cho container animation slogan ECharts
-  const sloganChartRef = useRef<HTMLDivElement>(null)
-  const sloganChartInstanceRef = useRef<EChartsType | null>(null)
-
-  // useEffect cho animation Slogan ECharts (giữ nguyên)
+  // useEffect để khởi tạo và quản lý ECharts cho slogan
   useEffect(() => {
     let chart: EChartsType | null = null
-    if (sloganChartRef.current) {
-      chart = echarts.init(sloganChartRef.current)
+    const chartDom = sloganChartRef.current
+
+    if (chartDom) {
+      // Lấy màu từ biến CSS (ví dụ --button) hoặc dùng màu trắng mặc định
+      const computedStyle = getComputedStyle(
+        chartDom.closest('section') || document.body
+      ) // Lấy style từ section cha
+      const buttonColor =
+        computedStyle.getPropertyValue('--button').trim() || '#FFFFFF'
+      const finalFillColor = buttonColor // Màu chữ slogan cuối cùng
+
+      chart = echarts.init(chartDom)
       sloganChartInstanceRef.current = chart
 
       const option: EChartsCoreOption = {
-        // Giữ nguyên options Echarts của bạn
         graphic: {
           elements: [
             {
@@ -1677,35 +1722,49 @@ const SuperBannerTree: React.FC = () => {
               left: 'center',
               top: 'center',
               style: {
-                text: sloganText, // Sử dụng text đã dịch
-                fontSize: 'clamp(2.5rem, 8vw, 4.5rem)', // Font size đáp ứng
+                text: sloganText,
+                // Responsive font size
+                fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
                 fontWeight: 'bold',
-                lineDash: [0, 200], // Cho hiệu ứng animation vẽ
+                lineDash: [0, 200], // Bắt đầu với nét đứt ẩn
                 lineDashOffset: 0,
                 fill: 'transparent', // Bắt đầu trong suốt
-                stroke: '#FFFFFF', // Màu đường viền
+                stroke: '#FFFFFF', // Viền chữ ban đầu
                 lineWidth: 1,
-                // Tùy chọn đổ bóng text để dễ đọc hơn
+                // Hiệu ứng đổ bóng nhẹ
                 textShadowBlur: 4,
                 textShadowColor: 'rgba(0, 0, 0, 0.3)',
                 textShadowOffsetX: 0,
                 textShadowOffsetY: 2
               },
-              // Animation keyframe cho text slogan
+              // Hoạt ảnh keyframe cho hiệu ứng vẽ chữ và tô màu
               keyframeAnimation: {
-                duration: 3000, // Thời gian animation (3 giây)
-                loop: true, // Lặp lại animation
+                duration: 3000, // Thời gian hoạt ảnh
+                loop: true, // Lặp lại
                 keyframes: [
                   {
-                    percent: 0.7, // Tại 70% tiến trình
+                    // Giai đoạn vẽ nét chữ
+                    percent: 0.7, // Đến 70% thời gian
                     style: {
-                      fill: 'transparent', // Giữ trong suốt khi vẽ đường viền
-                      lineDashOffset: 200, // Hoàn thành vẽ đường viền
-                      lineDash: [200, 0]
+                      fill: 'transparent', // Vẫn trong suốt
+                      lineDashOffset: 200, // Nét đứt chạy hết chiều dài
+                      lineDash: [200, 0] // Chuyển thành nét liền (ẩn đi do offset)
                     }
                   },
-                  { percent: 0.8, style: { fill: 'transparent' } }, // Giữ trong suốt một chút
-                  { percent: 1, style: { fill: '#FFFFFF' } } // Tô màu đặc ở cuối
+                  {
+                    // Giữ nguyên trạng thái trong suốt một chút
+                    percent: 0.8,
+                    style: {
+                      fill: 'transparent'
+                    }
+                  },
+                  {
+                    // Giai đoạn tô màu chữ
+                    percent: 1, // Đến 100% thời gian
+                    style: {
+                      fill: finalFillColor // Tô màu chữ cuối cùng
+                    }
+                  }
                 ]
               }
             }
@@ -1714,45 +1773,38 @@ const SuperBannerTree: React.FC = () => {
       }
       chart.setOption(option)
 
-      // Handler resize chart
+      // Resize chart khi cửa sổ thay đổi kích thước
       const handleResize = () => chart?.resize()
       window.addEventListener('resize', handleResize)
 
-      // Hàm cleanup khi component unmount
+      // Cleanup khi component unmount
       return () => {
         window.removeEventListener('resize', handleResize)
-        sloganChartInstanceRef.current?.dispose() // Dispose instance ECharts
+        sloganChartInstanceRef.current?.dispose() // Hủy instance ECharts
         sloganChartInstanceRef.current = null
-        // console.log('Slogan ECharts instance disposed');
       }
     }
-  }, [sloganText]) // Chạy lại effect nếu sloganText thay đổi
+  }, [sloganText]) // Chạy lại useEffect nếu sloganText thay đổi
 
   return (
+    // Section chính của banner, sử dụng motion để có hiệu ứng xuất hiện
     <motion.section
-      // --- Styling Section Chính ---
       className='bg-span-gradient relative flex h-screen flex-col items-center justify-center overflow-hidden px-4 py-16 text-button-text sm:px-2 lg:px-4'
-      // --- Framer Motion Variants cho Container ---
-      variants={containerVariants}
+      variants={containerVariants} // Áp dụng variant cho container
       initial='hidden'
       animate='visible'
     >
-      {/* --- Nền: World Map SVG với Đường bay Động --- */}
-      {/* Định vị tuyệt đối để lấp đầy section, phía sau nội dung (z-0) */}
-      {/* NHẮC NHỞ: Đảm bảo --background-secondary được định nghĩa trong CSS toàn cục! */}
+      {/* Lớp nền: Bản đồ thế giới với hiệu ứng chuyến bay */}
       <div className='absolute inset-0 z-0'>
         <WorldMap
-          flights={exampleFlights} // Truyền dữ liệu chuyến bay
-          coordinates={countryCoordinates} // Truyền dữ liệu tọa độ
-          // Bạn có thể tùy chỉnh màu highlight qua prop nếu cần:
-          // highlightColorClass='fill-teal-400'
-          className='h-full w-full object-cover' // Làm SVG bao phủ container
-          aria-hidden='true' // Phần tử trang trí, ẩn khỏi trình đọc màn hình
+          flights={exampleFlights} // Truyền danh sách chuyến bay
+          coordinates={countryCoordinates} // Truyền tọa độ
+          className='h-full w-full object-cover opacity-70' // CSS cho bản đồ
+          aria-hidden='true' // Ẩn khỏi trình đọc màn hình
         />
       </div>
 
-      {/* --- Các đốm màu trang trí (Tùy chọn) --- */}
-      {/* Định vị tuyệt đối, với blur và opacity thấp, sau nội dung nhưng trên bản đồ (z-5) */}
+      {/* Các đốm màu trang trí với hoạt ảnh */}
       <motion.div
         className='absolute left-0 top-0 z-[5] h-32 w-32 -translate-x-1/4 -translate-y-1/4 rounded-full bg-white/10 opacity-40 blur-xl filter'
         animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
@@ -1765,55 +1817,36 @@ const SuperBannerTree: React.FC = () => {
           duration: 25,
           repeat: Infinity,
           ease: 'linear',
-          delay: 2
+          delay: 2 // Trễ hơn đốm kia
         }}
       />
 
-      {/* --- Container Nội dung Chính --- */}
-      {/* Định vị tương đối, trên nền và đốm màu (z-10) */}
-      <div className='relative z-10 mx-0 flex max-w-6xl flex-col items-center text-center'>
-        {/* --- Slogan Động (sử dụng ECharts) --- */}
-        {/* <motion.div
+      {/* Container chứa nội dung chính (slogan, mô tả) */}
+      <div className='relative z-10 mx-0 flex max-w-6xl -translate-y-40 flex-col items-center text-center'>
+        {/* Slogan động (sử dụng div với ref để ECharts vẽ vào) */}
+        <motion.div
           ref={sloganChartRef}
-          // Đặt chiều cao cho container ECharts
-          className='mb-5 h-24 w-full cursor-default sm:h-28 md:h-32 lg:h-36'
-          variants={itemVariants} // Áp dụng variant animation item
-        >
-        </motion.div> */}
+          className='h-24 w-full sm:h-28 md:h-32 lg:h-36' // Đặt chiều cao cho slogan
+          variants={itemVariants} // Áp dụng variant cho item
+        ></motion.div>
 
-        {/* --- Mô tả Website --- */}
-        {/* <motion.p
-          className='mx-0 mb-10 max-w-7xl text-lg font-semibold text-button opacity-90 sm:text-xl md:text-2xl'
-          variants={itemVariants} // Áp dụng variant animation item
+        {/* Đoạn mô tả */}
+        <motion.p
+          className='mx-0 mb-8 max-w-7xl text-lg font-semibold text-button opacity-90 sm:text-xl md:text-2xl'
+          variants={itemVariants} // Áp dụng variant cho item
         >
+          {/* Lấy text mô tả từ file translation */}
           {t('Slogan_Website_describe')}
-        </motion.p> */}
+        </motion.p>
 
-        {/* --- Nút Kêu gọi Hành động --- */}
-        {/* <motion.div
-          className='flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6'
-          variants={itemVariants} // Áp dụng variant animation item
-        >
-          <Link href='/conferences' passHref legacyBehavior={false}>
-            <motion.button
-              className='w-full transform rounded-lg bg-button px-8 py-3 font-semibold text-button-text shadow-md transition-transform duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2 focus:ring-offset-background sm:w-auto'
-              whileHover={{ scale: 1.05 }} // Hiệu ứng hover
-              whileTap={{ scale: 0.95 }} // Hiệu ứng nhấn
-            >
-              {t('Search_Conferences')} 
-            </motion.button>
-          </Link>
-
-          <Link href='/journals' passHref legacyBehavior={false}>
-            <motion.button
-              className='w-full transform rounded-lg border-2 border-button-text bg-transparent px-8 py-3 font-semibold text-button-text shadow-sm transition-all duration-200 ease-in-out hover:bg-button-text hover:text-background focus:outline-none focus:ring-2 focus:ring-button-text focus:ring-offset-background sm:w-auto'
-              whileHover={{ scale: 1.05 }} // Hiệu ứng hover
-              whileTap={{ scale: 0.95 }} // Hiệu ứng nhấn
-            >
-              {t('Search_Journals')} 
-            </motion.button>
-          </Link>
-        </motion.div> */}
+        {/* Bạn có thể thêm nút Call to Action ở đây nếu cần */}
+        {/*
+        <motion.div variants={itemVariants}>
+          <button className="px-6 py-3 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors">
+            {t('Explore_Button')}
+          </button>
+        </motion.div>
+        */}
       </div>
     </motion.section>
   )
