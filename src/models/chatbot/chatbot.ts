@@ -16,6 +16,13 @@ export interface ChatResponse {
     thought?: string; // Optional field for internal reasoning/steps
 }
 
+export interface ChatUpdate {
+    type: 'partial_result'; // Hoặc 'chat_update' tùy bạn đặt tên event
+    textChunk: string;
+    // Tùy chọn: Gửi toàn bộ text nếu client muốn xử lý kiểu đó
+    // fullText?: string;
+}
+
 // You might want an intermediate response type if handleUserInput needs more info
 export interface GeminiInteractionResult {
     status: "requires_function_call" | "final_text" | "error";
@@ -58,9 +65,10 @@ export interface ErrorUpdate {
 
 
 export interface ChatMessageType {
+    id: string;
     message: string;
     isUser: boolean;
-    type: 'text' | 'error' | 'warning';
+    type: 'text' | 'error' | 'warning' | undefined;
     thoughts?: ThoughtStep[];
 }
 

@@ -15,7 +15,7 @@ import RestartStreamButton from "./RestartStreamButton";
 import { OutputModality, PrebuiltVoice } from "../page"; // Adjust import path if needed
 
 // Define the available voices (could also be passed as a prop if dynamic)
-const availableVoices: PrebuiltVoice[] = ["Puck", "Charon", "Kore", "Fenrir"];
+const availableVoices: PrebuiltVoice[] = ["Puck", "Charon", "Kore", "Fenrir", "Aoede", "Orus", "Zephyr"];
 
 export default function ChatUI() {
     // --- State for output (moved from page.tsx) ---

@@ -15,6 +15,7 @@ interface AltairComponentProps {
   selectedVoice: PrebuiltVoice;
 }
 import { transformConferenceData } from './transformApiData';
+import { appConfig } from "@/src/middleware";
 
 function AltairComponent({ outputModality, selectedVoice }: AltairComponentProps) {
   const { client, setConfig } = useLiveAPIContext();
@@ -70,8 +71,8 @@ function AltairComponent({ outputModality, selectedVoice }: AltairComponentProps
     const onToolCall = async (toolCall: ToolCall) => {
       console.log(`Got toolcall`, toolCall);
 
-      const BASE_URL = "http://confhub.engineer/api/v1";
-      console.log("Backend URL:", BASE_URL);
+      const NEXT_PUBLIC_DATABASE_URL = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1` || "http://confhub.engineer/api/v1";
+      console.log("Backend URL:", NEXT_PUBLIC_DATABASE_URL);
 
       const responses = [];
 
@@ -89,7 +90,7 @@ function AltairComponent({ outputModality, selectedVoice }: AltairComponentProps
           switch (fc.name) {
             case "getConferences":
               // Trong case "getConferences":
-              apiUrl = `${BASE_URL}/conference`;
+              apiUrl = `${NEXT_PUBLIC_DATABASE_URL}/conference`;
               method = 'GET';
               headers = {};
 
@@ -115,19 +116,19 @@ function AltairComponent({ outputModality, selectedVoice }: AltairComponentProps
               break; // Quan trọng: Đừng quên break!
 
             case "getJournals":
-              apiUrl = `${BASE_URL}/api/get_journals`; // Giả sử đây vẫn là POST
+              apiUrl = `${NEXT_PUBLIC_DATABASE_URL}/api/get_journals`; // Giả sử đây vẫn là POST
               method = 'POST';
               body = JSON.stringify(fc.args);
               finalUrl = apiUrl; // URL không có query params
               break;
             case "getWebsiteInformation":
-              apiUrl = `${BASE_URL}/api/get_website_information`; // Giả sử đây vẫn là POST
+              apiUrl = `${NEXT_PUBLIC_DATABASE_URL}/api/get_website_information`; // Giả sử đây vẫn là POST
               method = 'POST';
               body = JSON.stringify(fc.args);
               finalUrl = apiUrl; // URL không có query params
               break;
             case "drawChart":
-              apiUrl = `${BASE_URL}/api/draw_chart`; // Giả sử đây vẫn là POST
+              apiUrl = `${NEXT_PUBLIC_DATABASE_URL}/api/draw_chart`; // Giả sử đây vẫn là POST
               method = 'POST';
               body = JSON.stringify(fc.args);
               requiresJsonResponse = true; // Hàm này trả về JSON

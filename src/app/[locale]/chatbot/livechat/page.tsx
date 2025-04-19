@@ -8,7 +8,7 @@ import ChatUI from "./side-panel/ChatUI"; // Import the new component
 
 // --- BEGIN: Thêm định nghĩa kiểu dữ liệu (Giữ nguyên) ---
 export type OutputModality = "text" | "audio";
-export type PrebuiltVoice = "Puck" | "Charon" | "Kore" | "Fenrir";
+export type PrebuiltVoice = "Puck" | "Charon" | "Kore" | "Fenrir" | "Aoede" | "Orus" | "Zephyr";
 // --- END: Thêm định nghĩa kiểu dữ liệu ---
 
 // Lấy API Key - Cân nhắc sử dụng biến môi trường an toàn hơn trong thực tế
