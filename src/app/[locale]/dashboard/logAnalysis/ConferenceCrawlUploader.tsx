@@ -236,9 +236,6 @@ export const ConferenceCrawlUploader: React.FC = () => {
 
                 {/* === Right Column === */}
                 <div className="md:w-1/2 flex flex-col space-y-4 mt-4 md:mt-0"> {/* Right column, half width on md+, add margin top for mobile stacking */}
-
-
-
                     {/* --- Conference Preview Table Section --- */}
                     {hasData && !isParsing && ( // Show preview only if data was parsed successfully
                         <AgGridReact

@@ -226,7 +226,7 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
         );
 
         const results = await Promise.allSettled(savePromises);
-
+        console.log(`Bulk save results:`, JSON.stringify( results));
         // Process results (logic này vẫn đúng để cập nhật row status)
         const finalRowStatus: Record<string, RowSaveStatus> = { ...nextRowStatus };
         const finalRowErrors: Record<string, string> = { ...nextRowErrors };
@@ -266,8 +266,8 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
             }
         });
 
-        setRowSaveStatus(finalRowStatus);
-        setRowSaveErrors(finalRowErrors);
+        setRowSaveStatus({...finalRowStatus});
+        setRowSaveErrors({...finalRowErrors});
 
         if (overallSuccess) {
             setMainSaveStatus('success');
