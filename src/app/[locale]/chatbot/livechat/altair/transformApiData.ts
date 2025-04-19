@@ -105,23 +105,48 @@ const formatChange = (currentValue: any, previousValue: any, formatter?: (val: a
 
 // --- Data Transformation Logic ---
 
-export function transformConferenceData(rawData: string, searchQuery: string): string {
+
+// Define an interface for the expected structure for better type safety
+interface ConferenceApiResponse {
+    payload: any[]; // Or define a more specific Conference type: Conference[]
+    meta: Record<string, any>; // Or define a more specific Meta type
+}
+
+// Helper type guard to check if the input matches the expected structure
+function isConferenceApiResponse(data: any): data is ConferenceApiResponse {
+    return (
+        data &&
+        typeof data === 'object' &&
+        data !== null && // Ensure it's not null
+        Array.isArray(data.payload) && // Check if payload is an array
+        typeof data.meta === 'object' && // Check if meta is an object
+        data.meta !== null // Ensure meta is not null
+    );
+}
+
+export function transformConferenceData(
+    // Change input type from string to unknown for flexibility and safety
+    dataInput: unknown,
+    searchQuery: string | undefined
+): string { // Return type is string (for the LLM)
     // logToFile(`Transforming conference data. Search query: ${searchQuery}`);
-    let data;
-    try {
-        data = JSON.parse(rawData);
-        if (!data || typeof data !== 'object') {
-            // logToFile(`Transformation Error: Parsed data is not a valid object.`);
-            return "Error: Could not parse conference data from API.";
-        }
-    } catch (error) {
-        // logToFile(`Transformation Error: Failed to parse JSON: ${error}`);
-        return "Error: Invalid data format received from API.";
+
+    // 1. Validate the input data structure using the type guard
+    if (!isConferenceApiResponse(dataInput)) {
+        console.error("Transformation Error: Input data does not match expected structure { payload: [], meta: {} }.", dataInput);
+        // logToFile(`Transformation Error: Invalid data structure received.`);
+        // Provide a more informative error message
+        return "Error: Invalid data structure received from API. Expected 'payload' array and 'meta' object.";
     }
 
-    const payload = safeGet(data, 'payload', []);
-    const meta = safeGet(data, 'meta', {});
-    const isDetailMode = searchQuery.includes("mode=detail");
+    // 2. If validation passes, we know dataInput is ConferenceApiResponse
+    // No need for JSON.parse() anymore!
+    const data: ConferenceApiResponse = dataInput;
+    const payload = data.payload; // Direct access is now safe
+    const meta = data.meta;       // Direct access is now safe
+
+    // 3. Determine mode (optional, from original logic)
+    const isDetailMode = searchQuery?.includes("mode=detail");
 
     // 1. Format Metadata
     let metaString = "Meta:\n";

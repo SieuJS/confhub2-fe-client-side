@@ -9,7 +9,6 @@ import { AudioStreamer } from "../lib/audio-streamer";
 import { audioContext } from "../lib/utils";
 import VolMeterWorket from "../lib/worklets/vol-meter";
 import EventEmitter from "eventemitter3";
-import { base64ToArrayBuffer } from "../lib/utils";
 import { debounce } from 'lodash';
 import { Part } from "@google/generative-ai";
 

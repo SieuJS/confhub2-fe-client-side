@@ -130,11 +130,9 @@ function ChatBot() {
 
              {/* --- Streaming Toggle UI --- */}
              <div className="flex-shrink-0 px-4 pt-2 pb-1 border-t border-gray-100 bg-gray-50 flex items-center justify-end space-x-2">
-                 {/* <Label htmlFor="streaming-toggle" className="text-sm text-gray-600">Stream Response</Label> */}
                  <label htmlFor="streaming-toggle" className="text-sm text-gray-600 cursor-pointer">
                      Stream Response:
                  </label>
-                 {/* Đơn giản dùng checkbox */}
                  <input
                      type="checkbox"
                      id="streaming-toggle"
@@ -143,20 +141,11 @@ function ChatBot() {
                      className="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                      disabled={loadingState.isLoading} // Disable toggle while loading
                  />
-                 {/* Hoặc dùng component Switch nếu có */}
-                 {/*
-                 <Switch
-                     id="streaming-toggle"
-                     checked={isStreamingEnabled}
-                     onCheckedChange={setIsStreamingEnabled} // Handler của shadcn/ui
-                     disabled={loadingState.isLoading}
-                 />
-                 */}
             </div>
 
 
             {/* Input Area */}
-            <div className="flex-shrink-0 p-3 md:p-4 border-t border-gray-200 bg-gray-50 pt-2"> {/* Removed some padding-top */}
+            <div className="flex-shrink-0 p-3 md:p-4 border-t border-gray-200 bg-gray-50 pt-2">
                 <ChatInput
                     onSendMessage={sendChatMessage} // Pass the component's orchestrator
                     disabled={loadingState.isLoading || !isConnected}

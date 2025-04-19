@@ -1,34 +1,39 @@
+// src/components/AltairComponent.tsx (Adjusted)
 "use client";
 import { useEffect, memo } from "react";
-import { useLiveAPIContext } from "../contexts/LiveAPIContext";
-import { ToolCall } from "../multimodal-live-types"; // Thêm FunctionResponsePart nếu cần type rõ ràng
+import { useLiveAPIContext } from "../contexts/LiveAPIContext"; // Adjust path
+import { ToolCall } from "../multimodal-live-types"; // Adjust path
 import {
   getConferencesDeclaration,
   getJournalsDeclaration,
   getWebsiteInformationDeclaration,
-  // drawChartDeclaration,
-  systemInstructions,
-} from "./functionDeclaration"; // Đảm bảo đường dẫn đúng
-import { OutputModality, PrebuiltVoice } from "../page";
+  // drawChartDeclaration, // Keep commented if not used
+  vietnam_getConferencesDeclaration, vietnam_getJournalsDeclaration, vietnam_getWebsiteInformationDeclaration, vietnam_drawChartDeclaration,
+  china_getConferencesDeclaration, china_getJournalsDeclaration, china_getWebsiteInformationDeclaration, china_drawChartDeclaration,
+
+} from "./functionDeclaration"; // Adjust path
+import { OutputModality, PrebuiltVoice, Language } from '../multimodal-live-types'; // Or from src/types.ts
+import { transformConferenceData } from './transformApiData'; // Adjust path
+import { appConfig } from "@/src/middleware"; // Adjust path
+import { FunctionDeclaration } from "@google/generative-ai";
+
 interface AltairComponentProps {
   outputModality: OutputModality;
   selectedVoice: PrebuiltVoice;
+  language: Language;
+  systemInstructions: string;
 }
-import { transformConferenceData } from './transformApiData';
-import { appConfig } from "@/src/middleware";
 
-function AltairComponent({ outputModality, selectedVoice }: AltairComponentProps) {
+function AltairComponent({ outputModality, selectedVoice, language, systemInstructions }: AltairComponentProps) {
   const { client, setConfig } = useLiveAPIContext();
 
+  // Effect 1: Configure the API client based on props
   useEffect(() => {
-    console.log(`Configuring API for: Modality=${outputModality}, Voice=${selectedVoice}`);
+    console.log(`Configuring API for: Modality=${outputModality}, Voice=${selectedVoice}, Language=${language}`);
 
-    // Explicitly define responseModalities as an array
     const modalitiesConfig = outputModality === 'audio' ? ["AUDIO"] : ["TEXT"];
-
     const generationConfig: any = {
-      // responseModalities: outputModality.toUpperCase(), // Old way
-      responseModalities: modalitiesConfig, // Use the array
+      responseModalities: modalitiesConfig,
     };
 
     if (outputModality === 'audio') {
@@ -37,155 +42,177 @@ function AltairComponent({ outputModality, selectedVoice }: AltairComponentProps
           prebuiltVoiceConfig: { voiceName: selectedVoice }
         },
       };
-      console.log("Audio mode selected, enabling speechConfig and setting modality to AUDIO.");
-    } else {
-      console.log("Text mode selected, setting modality to TEXT.");
     }
 
-    // Add logging to see the exact config being sent
-    console.log("Setting config with generationConfig:", JSON.stringify(generationConfig, null, 2));
+    // --- Select Function Declarations based on Language ---
+    let activeFunctionDeclarations: FunctionDeclaration[]; // Declare the variable
 
-    setConfig({
+    if (language === 'vi') {
+      console.log("Using Vietnamese function declarations.");
+      activeFunctionDeclarations = [
+        vietnam_getConferencesDeclaration,
+        vietnam_getJournalsDeclaration,
+        vietnam_getWebsiteInformationDeclaration,
+        // vietnam_drawChartDeclaration, // Add if needed for Vietnamese
+      ];
+    } else if (language === 'zh') { // Check for Chinese (use ===)
+      console.log("Using Chinese function declarations."); // Corrected log message
+      activeFunctionDeclarations = [
+        china_getConferencesDeclaration,
+        china_getJournalsDeclaration,
+        china_getWebsiteInformationDeclaration,
+        // china_drawChartDeclaration, // Add if needed for Chinese
+      ];
+    } else { // Default to English (handles 'en' and any other unexpected value)
+      console.log("Using English function declarations (default).");
+      activeFunctionDeclarations = [
+        getConferencesDeclaration,
+        getJournalsDeclaration,
+        getWebsiteInformationDeclaration,
+        // drawChartDeclaration, // Add if needed for English/default
+      ];
+    }
+    // --- End Selection ---
+
+
+    // Set the configuration including the selected tools
+    const finalConfig = {
       model: "models/gemini-2.0-flash-live-001",
-      generationConfig: generationConfig, // Use the updated config
+      generationConfig: generationConfig,
       systemInstruction: {
-        parts: [{ text: systemInstructions }], // Use updated instructions
+        parts: [{ text: systemInstructions }],
       },
       tools: [
         {
-          functionDeclarations: [
-            getConferencesDeclaration,
-            getJournalsDeclaration,
-            getWebsiteInformationDeclaration,
-            // drawChartDeclaration,
-          ],
+          functionDeclarations: activeFunctionDeclarations, // Now guaranteed to be assigned
         },
       ],
-    });
-  }, [setConfig, outputModality, selectedVoice]); // Dependencies are correct
+    };
+
+    console.log("Setting config with functions:", JSON.stringify(finalConfig.tools, null, 2));
+    setConfig(finalConfig);
+
+  }, [setConfig, outputModality, selectedVoice, language, systemInstructions]); // Dependencies are correct
 
 
-  // Trong useEffect thứ hai của AltairComponent
-
+  // Effect 2: Handle Tool Calls - **MUST UPDATE SWITCH CASES FOR CHINESE**
   useEffect(() => {
     const onToolCall = async (toolCall: ToolCall) => {
       console.log(`Got toolcall`, toolCall);
-
       const NEXT_PUBLIC_DATABASE_URL = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1` || "http://confhub.engineer/api/v1";
-      console.log("Backend URL:", NEXT_PUBLIC_DATABASE_URL);
-
       const responses = [];
 
       for (const fc of toolCall.functionCalls) {
         let apiUrl = '';
-        let method: 'GET' | 'POST' = 'POST'; // Mặc định là POST
+        let method: 'GET' | 'POST' = 'POST';
         let body: string | undefined = undefined;
         let headers: HeadersInit = { 'Content-Type': 'application/json' };
-        let requiresJsonResponse = false; // Cờ để biết có cần parse JSON không
+        let requiresJsonResponse = false;
         let responseData: any;
-        let finalUrl = ''; // Biến để chứa URL cuối cùng
+        let finalUrl = '';
+        let searchQuery: string | undefined = undefined;
 
-        let searchQuery: string = '';
         try {
+          // --- IMPORTANT: Update switch to handle EN, VN, and ZH names ---
           switch (fc.name) {
-            case "getConferences":
-              // Trong case "getConferences":
+            case "getConferences":        // English name
+            case "vietnam_getConferences":     // Vietnamese name
+            case "china_getConferences":  // Chinese name
               apiUrl = `${NEXT_PUBLIC_DATABASE_URL}/conference`;
               method = 'GET';
               headers = {};
-
-              // 1. Kiểm tra fc.args và sự tồn tại của searchQuery
-              if (!fc.args || typeof fc.args !== 'object' || !('searchQuery' in fc.args)) {
-                console.error("Lỗi: 'searchQuery' bị thiếu trong fc.args:", fc.args);
-                throw new Error("Thuộc tính 'searchQuery' bị thiếu trong đối số nhận được từ model cho getConferences.");
+              searchQuery = fc.args && typeof fc.args === 'object' && typeof (fc.args as any).searchQuery === 'string'
+                ? (fc.args as any).searchQuery
+                : undefined;
+              if (!searchQuery) {
+                console.warn(`Warning: 'searchQuery' argument missing or invalid for ${fc.name}. Proceeding without search query.`);
+                finalUrl = apiUrl;
+              } else {
+                console.log(`Extracted Conference Search Query for ${fc.name}:`, searchQuery);
+                finalUrl = `${apiUrl}?${searchQuery}`;
               }
+              requiresJsonResponse = true;
+              break;
 
-              // 2. Kiểm tra kiểu của searchQuery
-              const searchQueryValue = (fc.args as any).searchQuery; // Tạm dùng any để lấy giá trị
-              if (typeof searchQueryValue !== 'string' || !searchQueryValue) {
-                console.error("Lỗi: 'searchQuery' không phải là string hoặc rỗng:", searchQueryValue);
-                throw new Error("Giá trị 'searchQuery' nhận được từ model không hợp lệ (không phải string hoặc rỗng).");
-              }
-
-              // 3. Sử dụng giá trị đã được kiểm tra
-              searchQuery = searchQueryValue;
-              console.log("Extracted Conference Search Query:", searchQuery);
-
-              finalUrl = `${apiUrl}?${searchQuery}`;
-              // --- END: Sửa lỗi getConferences ---
-              break; // Quan trọng: Đừng quên break!
-
-            case "getJournals":
-              apiUrl = `${NEXT_PUBLIC_DATABASE_URL}/api/get_journals`; // Giả sử đây vẫn là POST
+            case "getJournals":           // English name
+            case "vietnam_getJournals":        // Vietnamese name
+            case "china_getJournals":     // Chinese name
+              apiUrl = `${NEXT_PUBLIC_DATABASE_URL}/api/get_journals`; // Assuming same backend endpoint
               method = 'POST';
               body = JSON.stringify(fc.args);
-              finalUrl = apiUrl; // URL không có query params
+              finalUrl = apiUrl;
+              requiresJsonResponse = true;
               break;
-            case "getWebsiteInformation":
-              apiUrl = `${NEXT_PUBLIC_DATABASE_URL}/api/get_website_information`; // Giả sử đây vẫn là POST
+
+            case "getWebsiteInformation": // English name
+            case "vietnam_getWebsiteInformation": // Vietnamese name
+            case "china_getWebsiteInformation": // Chinese name
+              apiUrl = `${NEXT_PUBLIC_DATABASE_URL}/api/get_website_information`; // Assuming same backend endpoint
               method = 'POST';
               body = JSON.stringify(fc.args);
-              finalUrl = apiUrl; // URL không có query params
+              finalUrl = apiUrl;
+              requiresJsonResponse = true; // Or text, depending on API
               break;
-            case "drawChart":
-              apiUrl = `${NEXT_PUBLIC_DATABASE_URL}/api/draw_chart`; // Giả sử đây vẫn là POST
-              method = 'POST';
-              body = JSON.stringify(fc.args);
-              requiresJsonResponse = true; // Hàm này trả về JSON
-              finalUrl = apiUrl; // URL không có query params
-              break;
+
+            // case "drawChart": // Keep commented if not used globally
+            // case "vietnam_drawChart":
+            // case "china_drawChart":
+            //   console.warn(`${fc.name} function call received but is currently commented out/disabled.`);
+            //   responses.push({ response: { content: { type: "info", message: "Chart drawing is not enabled." } }, id: fc.id });
+            //   continue;
+
             default:
-              console.warn(`Unknown function call: ${fc.name}`);
-              responses.push({
-                response: { content: { type: "error", message: `Unknown function: ${fc.name}` } },
-                id: fc.id,
-              });
-              continue; // Bỏ qua function không xác định
+              console.warn(`Unknown function call name received: ${fc.name}`);
+              responses.push({ response: { content: { type: "error", message: `Unknown function: ${fc.name}` } }, id: fc.id });
+              continue;
           }
+          // --- End Switch Update ---
 
-          // Log URL và phương thức sẽ được gọi
           console.log(`Calling API for ${fc.name} using ${method} at: ${finalUrl}`);
           if (body) console.log('With body:', body);
 
-          // Thực hiện fetch request
-          const response = await fetch(finalUrl, {
-            method: method,
-            headers: headers,
-            body: body, // body sẽ là undefined cho GET
-          });
+          const response = await fetch(finalUrl, { method, headers, body });
 
-          // Xử lý response (giữ nguyên)
           if (!response.ok) {
             const errorText = await response.text();
             console.error(`API call for ${fc.name} failed with status ${response.status}: ${errorText}`);
             throw new Error(`API Error (${response.status}) for ${fc.name}: ${errorText.substring(0, 200)}`);
           }
 
-          responseData = requiresJsonResponse ? await response.json() : await response.text();
-          const transformedData = transformConferenceData(responseData, searchQuery);
+          try {
+            responseData = requiresJsonResponse ? await response.json() : await response.text();
+          } catch (parseError: any) {
+            console.error(`Error parsing ${requiresJsonResponse ? 'JSON' : 'text'} response for ${fc.name}:`, parseError);
+            const rawText = await response.text(); // Attempt to read as text for debugging
+            console.error("Raw response text:", rawText.substring(0, 500));
+            throw new Error(`Failed to parse API response for ${fc.name}.`);
+          }
 
-          console.log(`Response data for ${fc.name}:`, transformedData);
+          let contentToSend = responseData;
+          // Apply transformation only if the function was one of the conference functions
+          // And check if data exists and optionally if searchQuery was used
+          if ((fc.name === 'getConferences' || fc.name === 'vietnam_getConferences' || fc.name === 'china_getConferences') && responseData) {
+             console.log(`Transforming data for ${fc.name}${searchQuery ? ` with query: ${searchQuery}` : ''}`);
+             // Pass searchQuery even if undefined, let transform handle it
+             contentToSend = transformConferenceData(responseData, searchQuery);
+          }
 
-          responses.push({
-            response: { content: transformedData },
-            id: fc.id,
-          });
+          console.log(`Response data for ${fc.name}:`, contentToSend);
+          responses.push({ response: { content: contentToSend }, id: fc.id });
 
         } catch (error: any) {
           console.error(`Error processing function call ${fc.name}:`, error);
-          responses.push({
-            response: { content: { type: "error", message: error.message || "An unexpected error occurred." } },
-            id: fc.id,
-          });
+          let errorMessage = error.message || "An unexpected error occurred processing the tool call.";
+          if (errorMessage.length > 300) errorMessage = errorMessage.substring(0, 297) + "...";
+          responses.push({ response: { content: { type: "error", message: `Failed to execute ${fc.name}: ${errorMessage}` } }, id: fc.id });
         }
-      } // Kết thúc vòng lặp for
+      } // End for loop
 
-      // Gửi tất cả các phản hồi tool thu thập được (giữ nguyên)
       if (responses.length > 0) {
-        console.log("Sending tool responses:", responses);
+        console.log("Sending tool responses:", JSON.stringify(responses, null, 2));
         client.sendToolResponse({ functionResponses: responses });
       } else {
-        console.log("No responses to send for this tool call batch.");
+        console.log("No responses generated for this tool call batch.");
       }
     };
 
@@ -193,7 +220,7 @@ function AltairComponent({ outputModality, selectedVoice }: AltairComponentProps
     return () => {
       client.off("toolcall", onToolCall);
     };
-  }, [client]); // Chỉ cần client ở đây
+  }, [client]); // Keep dependency array simple for tool call handler
 
   return null;
 }

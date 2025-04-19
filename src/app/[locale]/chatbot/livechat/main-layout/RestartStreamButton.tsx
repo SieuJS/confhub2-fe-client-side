@@ -9,7 +9,7 @@ const RestartStreamButton:React.FC<RestartStreamButtonProps> = ({onRestart}) => 
     return (
         <button
             onClick={onRestart}
-            className="bg-blue-400 hover:bg-blue-500 text-white p-4 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50 transition-all duration-200"
+            className="bg-blue-400 hover:bg-blue-500 text-white p-3 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50 transition-all duration-200"
             title="Restart Stream"
         >
             <svg

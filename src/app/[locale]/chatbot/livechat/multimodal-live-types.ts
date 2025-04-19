@@ -25,16 +25,22 @@ export type LiveConfig = {
   tools?: Array<Tool | { googleSearch: {} } | { codeExecution: {} }>;
 };
 
+export type PrebuiltVoice = "Puck" | "Charon" | "Kore" | "Fenrir" | "Aoede" | "Orus" | "Zephyr";
+export type OutputModality = "text" | "audio" | "image";
+export type Language = 'en' | 'vi' | 'zh';
+
+
 export type LiveGenerationConfig = GenerationConfig & {
-  responseModalities: "text" | "audio" | "image";
+  responseModalities: OutputModality;
   speechConfig?: {
     voiceConfig?: {
       prebuiltVoiceConfig?: {
-        voiceName: "Puck" | "Charon" | "Kore" | "Fenrir" | "Aoede" | string;
+        voiceName: PrebuiltVoice
       };
     };
   };
 };
+
 
 export type LiveOutgoingMessage =
   | SetupMessage
