@@ -23,6 +23,8 @@ const LoginPage= ({
 
   return (
     <>
+    {console.log(isLoading)}
+    {console.log(isLoggedIn)}
     {!isLoading && !isLoggedIn &&
       <div className="min-h-screen bg-gradient-to-br from-background to-background-secondary">
       <LoginForm />

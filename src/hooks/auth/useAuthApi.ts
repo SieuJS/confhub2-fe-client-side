@@ -204,6 +204,45 @@ const useAuthApi = (): AuthApiResult => {
 
   }, [user, isLoggedIn]); // Phụ thuộc vào state hiện tại để so sánh
 
+  const logout = useCallback(async (): Promise<void> => {
+    console.log("[useAuthApi - logout] Initiating logout...");
+    setIsLoading(true);
+    setError(null);
+    try {
+      // Gọi API backend để hủy session/token phía server (nếu có)
+      // await fetch('/api/auth/logout', { method: 'POST' }); // Ví dụ
+
+      // 1. Xóa localStorage TRƯỚC khi cập nhật state
+      localStorage.removeItem('user');
+      localStorage.removeItem('loginStatus');
+      localStorage.removeItem('token');
+      localStorage.removeItem('returnUrl'); // Xóa luôn returnUrl nếu có
+
+      // 2. Xóa Cookie
+      document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "loginStatus=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+      // 3. Cập nhật State
+      setUser(null);
+      setIsLoggedIn(false);
+
+      console.log("[useAuthApi - logout] Logout successful. Redirecting to home.");
+      router.push("/"); // Chuyển về trang chủ sau khi logout
+    } catch (error) {
+      console.error("[useAuthApi - logout] Logout failed:", error);
+      setError("Logout failed. Please try again.");
+      // Vẫn nên xóa storage/cookie và cập nhật state ở client ngay cả khi API server lỗi
+      localStorage.removeItem('user');
+      localStorage.removeItem('loginStatus');
+      document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "loginStatus=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      setUser(null);
+      setIsLoggedIn(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [router]); // router là dependency của logout
+
   // --- Effects ---
 
   /**
@@ -212,7 +251,67 @@ const useAuthApi = (): AuthApiResult => {
    */
   useEffect(() => {
     console.log("[useAuthApi - Initial Effect] Component mounted. Running initial sync/load.");
-    syncStateFromStorage();
+    
+    const checkAuthStatus = async () => {
+      const token = getToken(); // Lấy token từ localStorage
+
+      if (token) {
+        console.log("[useAuthApi - Initial Effect] Token found. Verifying with /me endpoint...");
+        try {
+          const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/user/me`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          console.log("[useAuthApi - /me Check] Response status:", response.status);
+
+          if (response.ok) {
+            const userData = await response.json() as UserResponse;
+            console.log("[useAuthApi - /me Check] Verification successful. User:", userData.email);
+            // Xác nhận đăng nhập thành công
+            setUser(userData);
+            setIsLoggedIn(true);
+            // Đảm bảo localStorage cũng nhất quán (phòng trường hợp user data thay đổi)
+            localStorage.setItem('user', JSON.stringify(userData));
+            localStorage.setItem('loginStatus', 'true');
+            // Token vẫn giữ nguyên vì nó hợp lệ
+          } else if (response.status === 401 || response.status === 403) {
+            // Lỗi Unauthorized hoặc Forbidden -> Token không hợp lệ/hết hạn
+            console.warn("[useAuthApi - /me Check] Verification failed (401/403 Unauthorized). Logging out.");
+            logout(); // Logout nhưng không redirect ngay lập tức
+          } else {
+            // Lỗi khác (server error, network error trong fetch đã bị catch)
+            console.error(`[useAuthApi - /me Check] Verification failed with status: ${response.status}. Logging out.`);
+             setError(`Failed to verify session (Status: ${response.status}).`); // Set lỗi
+            logout(); // Logout khi không thể xác thực
+          }
+        } catch (err) {
+          // Lỗi mạng hoặc lỗi trong quá trình fetch
+          console.error("[useAuthApi - /me Check] Network or fetch error during verification:", err);
+          setError("Network error during session verification."); // Set lỗi
+          logout(); // Logout khi có lỗi mạng
+        } finally {
+          // Chỉ set isLoading false ở đây nếu KHÔNG bị lỗi và KHÔNG logout
+          // performLogout đã tự set isLoading = false rồi.
+          // Nếu response.ok thì mới set isLoading = false
+          if(isLoggedIn) { // Kiểm tra lại state isLoggedIn vì nó có thể bị đổi bởi performLogout
+             setIsLoading(false);
+          }
+        }
+      } else {
+        // Không có token -> Chắc chắn chưa đăng nhập
+        console.log("[useAuthApi - Initial Effect] No token found. User is logged out.");
+        // Đảm bảo trạng thái là logged out và kết thúc loading
+        if (isLoggedIn || user) { // Nếu state hiện tại lại đang là logged in -> Sai -> Logout
+           logout();
+        } else {
+           setIsLoading(false); // Nếu state đã đúng là logged out thì chỉ cần tắt loading
+        }
+      }
+    };
 
     // --- Listener tùy chọn cho đồng bộ hóa giữa các tab ---
     // const handleStorageChange = (event: StorageEvent) => {
@@ -223,12 +322,13 @@ const useAuthApi = (): AuthApiResult => {
     // };
     // window.addEventListener('storage', handleStorageChange);
 
+    checkAuthStatus();
     return () => {
       console.log("[useAuthApi - Initial Effect] Component unmounting.");
       // window.removeEventListener('storage', handleStorageChange);
     };
     // Chạy một lần sau mount ban đầu
-  }, [syncStateFromStorage]); // Chỉ chạy lại nếu syncStateFromStorage thay đổi (thường là không)
+  }, [logout]); // Chỉ chạy lại nếu syncStateFromStorage thay đổi (thường là không)
 
   /**
    * Effect đồng bộ state `user` và `isLoggedIn` vào localStorage BẤT KỲ KHI NÀO chúng thay đổi.
@@ -248,9 +348,13 @@ const useAuthApi = (): AuthApiResult => {
         }
       } else {
         // Nếu không loggedIn hoặc không có user -> xóa khỏi localStorage
-        localStorage.removeItem('user');
-        localStorage.removeItem('loginStatus');
-        console.log("[useAuthApi - Sync Effect] Cleared localStorage due to logged out state.");
+        const storedStatus = localStorage.getItem('loginStatus');
+         if (storedStatus === 'true') { // Chỉ xóa nếu trước đó nó đang là true
+             console.log("[useAuthApi - Sync Effect] State changed to logged out. Clearing localStorage...");
+             localStorage.removeItem('user');
+             localStorage.removeItem('loginStatus');
+             localStorage.removeItem('token');
+         }
       }
     }
   }, [user, isLoggedIn]); // Chạy mỗi khi user hoặc isLoggedIn thay đổi
@@ -323,43 +427,7 @@ const useAuthApi = (): AuthApiResult => {
     window.location.href = `/api/auth/google`; // Điều chỉnh nếu API route khác
   };
 
-  const logout = useCallback(async (): Promise<void> => {
-    console.log("[useAuthApi - logout] Initiating logout...");
-    setIsLoading(true);
-    setError(null);
-    try {
-      // Gọi API backend để hủy session/token phía server (nếu có)
-      // await fetch('/api/auth/logout', { method: 'POST' }); // Ví dụ
-
-      // 1. Xóa localStorage TRƯỚC khi cập nhật state
-      localStorage.removeItem('user');
-      localStorage.removeItem('loginStatus');
-      localStorage.removeItem('returnUrl'); // Xóa luôn returnUrl nếu có
-
-      // 2. Xóa Cookie
-      document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      document.cookie = "loginStatus=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-      // 3. Cập nhật State
-      setUser(null);
-      setIsLoggedIn(false);
-
-      console.log("[useAuthApi - logout] Logout successful. Redirecting to home.");
-      router.push("/"); // Chuyển về trang chủ sau khi logout
-    } catch (error) {
-      console.error("[useAuthApi - logout] Logout failed:", error);
-      setError("Logout failed. Please try again.");
-      // Vẫn nên xóa storage/cookie và cập nhật state ở client ngay cả khi API server lỗi
-      localStorage.removeItem('user');
-      localStorage.removeItem('loginStatus');
-      document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      document.cookie = "loginStatus=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      setUser(null);
-      setIsLoggedIn(false);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [router]); // router là dependency của logout
+  
 
   // --- Return Value ---
   return {
