@@ -9,7 +9,6 @@ import {
 import { Language } from '@/src/app/[locale]/chatbot/lib/types'; // <<< Import Language type
 import { appConfig } from '@/src/middleware';
 import { usePathname } from 'next/navigation';
-import Map from '@/src/app/[locale]/conferences/detail/Map';
 
 // --- Interfaces ---
 export interface UseChatSocketProps {
@@ -373,32 +372,73 @@ export function useChatSocket({
     }, [BASE_WEB_URL, currentLocale, stopAnimation /* Add other dependencies */]);
 
 
-    // --- Socket Connection Effect ---
-    useEffect(() => {
+     // --- Socket Connection Effect (MODIFIED) ---
+     useEffect(() => {
         console.log("Attempting to establish Socket.IO connection...");
-        const newSocket = io(socketUrl, { reconnectionAttempts: 5, reconnectionDelay: 1000, reconnectionDelayMax: 5000 });
+        isMountedRef.current = true; // Set mounted flag early
+
+        // --- Get Auth Token ---
+        let authToken: string | null = null;
+        if (typeof window !== 'undefined') { // Check if running in browser
+            authToken = localStorage.getItem('token'); // <<< GET TOKEN
+            if (!authToken) {
+                console.warn("[ChatSocket] No auth token found in localStorage. Connecting without authentication.");
+                // Decide behavior: Connect anonymously or prevent connection?
+                // For now, we connect, backend middleware will handle lack of token.
+            } else {
+                 console.log("[ChatSocket] Auth token found. Sending with connection request.");
+            }
+        }
+        // --- End Get Auth Token ---
+
+        // --- Establish Connection with Auth ---
+        const newSocket = io(socketUrl, {
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            auth: { // <<< PASS TOKEN HERE
+                token: authToken
+            }
+        });
         socketRef.current = newSocket;
+        // --- End Establish Connection ---
+
+
+        // --- Register Event Handlers ---
         newSocket.on('connect', handleConnect);
         newSocket.on('disconnect', handleDisconnect);
-        newSocket.on('connect_error', handleConnectError);
+        newSocket.on('connect_error', handleConnectError); // This will fire if middleware rejects connection
         newSocket.on('status_update', handleStatusUpdate);
-        newSocket.on('chat_update', handlePartialResult); // Dùng handlePartialResult đã cập nhật
-        newSocket.on('chat_result', handleResult);       // Dùng handleResult đã cập nhật
+        newSocket.on('chat_update', handlePartialResult);
+        newSocket.on('chat_result', handleResult);
         newSocket.on('chat_error', (errorData: any) => handleError(errorData, true));
+        // Listen for specific auth errors from middleware (optional but good practice)
+        newSocket.on('auth_error', (error: { message: string }) => {
+             console.error("Authentication Error from Server:", error.message);
+             handleError({message: `Authentication failed: ${error.message}. Please log in again.`, type: 'error'}, true);
+             // Optionally disconnect or prompt user to log in
+             // newSocket.disconnect();
+        });
+        // --- End Register Handlers ---
 
 
+        // --- Cleanup Function ---
         return () => {
             console.log("Cleaning up socket connection effect...");
-            newSocket.off('connect', handleConnect);
-            newSocket.off('disconnect', handleDisconnect);
-            newSocket.off('connect_error', handleConnectError);
-            newSocket.off('status_update', handleStatusUpdate);
-            newSocket.off('chat_update', handlePartialResult);
-            newSocket.off('chat_result', handleResult);
-            newSocket.off('chat_error');
+            isMountedRef.current = false; // Mark as unmounted
 
-            // --- Cleanup Animation ---
-            stopAnimation(); // Quan trọng: Dừng animation khi unmount hoặc reconnect
+             // Unregister all listeners
+             newSocket.off('connect', handleConnect);
+             newSocket.off('disconnect', handleDisconnect);
+             newSocket.off('connect_error', handleConnectError);
+             newSocket.off('status_update', handleStatusUpdate);
+             newSocket.off('chat_update', handlePartialResult);
+             newSocket.off('chat_result', handleResult);
+             newSocket.off('chat_error');
+             newSocket.off('auth_error');
+
+            stopAnimation(); // Cleanup animation
+            // Reset streaming refs (important if component re-mounts)
             streamingMessageIdRef.current = null;
             fullStreamedTextRef.current = '';
             displayedTextLengthRef.current = 0;
@@ -408,16 +448,20 @@ export function useChatSocket({
             if (newSocket.connected) {
                 console.log(`Disconnecting socket ${newSocket.id} during cleanup.`);
                 newSocket.disconnect();
+            } else {
+                console.log(`Socket ${newSocket.id} already disconnected or never connected.`);
             }
             socketRef.current = null;
-            if (isMountedRef.current) {
-                setIsConnected(false);
-                setSocketId(null);
-            }
-            console.log("Socket listeners removed.");
+
+            // Reset state if component is truly unmounting (though maybe not needed if state resets on remount anyway)
+            // if (!isMountedRef.current) { // Double-check might be redundant
+            //     setIsConnected(false);
+            //     setSocketId(null);
+            // }
+             console.log("Socket cleanup complete.");
         };
-        // Các dependencies cần bao gồm cả các handler mới
-    }, [socketUrl, handleConnect, handleDisconnect, handleConnectError, handleStatusUpdate, handlePartialResult, handleResult, handleError, animateText, stopAnimation]);
+         // Dependencies: ensure all handlers used in the effect are stable or included
+    }, [socketUrl, handleConnect, handleDisconnect, handleConnectError, handleStatusUpdate, handlePartialResult, handleResult, handleError, animateText, stopAnimation, onConnectionChange, onInitialConnectionError]); // <<< Added missing dependencies
 
     // --- Send Chat Message Function (Giữ nguyên) ---
     // --- Send Chat Message Function (Accept language, emit it) ---
