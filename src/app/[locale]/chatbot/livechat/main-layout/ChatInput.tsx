@@ -1,18 +1,58 @@
 // ChatInput.tsx
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
-import Button from '../../../utils/Button';
+import Button from '../../../utils/Button'; // Assuming Button component path
+import { GrSend } from 'react-icons/gr';
+// Optional: Import a spinner component from a library
+// import { ClipLoader } from 'react-spinners'; // Example using react-spinners
+
+// --- Refined Tailwind Spinner SVG Component ---
+const SpinnerIcon = () => (
+  <svg
+    // animate-spin: Tailwind animation
+    // h-5 w-5: Kích thước spinner (có thể điều chỉnh)
+    // text-blue-600: Màu sắc spinner (có thể dùng màu thương hiệu của bạn)
+    className="animate-spin h-5 w-5 text-blue-600"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+  >
+    <circle
+      // Phần "track" mờ hơn của spinner
+      className="opacity-25" // Giữ nguyên hoặc giảm nhẹ nếu muốn (vd: opacity-20)
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="4" // Có thể giảm strokeWidth nếu muốn spinner mảnh hơn
+    ></circle>
+    <path
+      // Phần quay chính của spinner, rõ ràng hơn
+      className="opacity-100" // Tăng opacity để nổi bật hơn (trước là 75)
+      fill="currentColor"
+      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+    ></path>
+  </svg>
+);
+
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   onFillInput?: (fillInputCallback: (text: string) => void) => void;
-  disabled?: boolean; // Add the disabled prop
+  disabled?: boolean;
+  isLoading?: boolean; // Prop để kiểm soát trạng thái loading
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onFillInput, disabled = false }) => { // Add disabled with default
+const ChatInput: React.FC<ChatInputProps> = ({
+  onSendMessage,
+  onFillInput,
+  disabled = false,
+  isLoading = false
+}) => {
   const [message, setMessage] = useState<string>('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const [isFocused, setIsFocused] = useState<boolean>(false);
+  // Không cần state isFocused nếu không sử dụng để thay đổi style phức tạp
+  // const [isFocused, setIsFocused] = useState<boolean>(false);
 
   useEffect(() => {
     const handleFill = (text: string) => {
@@ -21,7 +61,6 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onFillInput, disab
         inputRef.current.focus();
       }
     };
-
     if (onFillInput) {
       onFillInput(handleFill);
     }
@@ -31,77 +70,92 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onFillInput, disab
     setMessage(e.target.value);
   }, []);
 
+  // Kết hợp trạng thái disabled và isLoading
+  const isEffectivelyDisabled = disabled || isLoading;
+
   const handleSendMessage = useCallback(() => {
-    if (message.trim() && !disabled) { // Check disabled here too
+    if (message.trim() && !isEffectivelyDisabled) {
       onSendMessage(message);
       setMessage('');
     }
-  }, [message, onSendMessage, disabled]); // Add disabled to dependency array
+  }, [message, onSendMessage, isEffectivelyDisabled]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (disabled) { // Prevent key presses if disabled
-        e.preventDefault();
-        return;
+    if (isEffectivelyDisabled) {
+      // Ngăn chặn nhập thêm khi đang tải hoặc bị vô hiệu hóa
+      e.preventDefault();
+      return;
     }
 
-    if (e.key === 'Enter' && !e.ctrlKey) {
-        setMessage(prevMessage => prevMessage + '\n');
+    // Ctrl+Enter để gửi, Enter để xuống dòng
+    if (e.key === 'Enter' && e.ctrlKey) {
+      e.preventDefault(); // Ngăn xuống dòng khi Ctrl+Enter
+      handleSendMessage();
+    }
+    // Nếu muốn Enter để gửi và Shift+Enter để xuống dòng thì bỏ comment phần dưới
+    /*
+    if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-    } else if (e.key === 'Enter' && e.ctrlKey) {
         handleSendMessage();
-        e.preventDefault();
     }
-}, [handleSendMessage, disabled]); // Add disabled to the dependency array
+    */
 
+  }, [handleSendMessage, isEffectivelyDisabled]);
 
-  const handleFocus = useCallback(() => {
-    setIsFocused(true);
-  }, []);
-
-  const handleBlur = useCallback(() => {
-    setIsFocused(false);
-  }, []);
-
-
+  // Không cần useCallback cho handleFocus/Blur nếu chỉ set state đơn giản
+  // const handleFocus = () => setIsFocused(true);
+  // const handleBlur = () => setIsFocused(false);
 
   return (
-    <div className="flex-grow flex rounded-full focus-within:border-blue-500" >
+    // ${isEffectivelyDisabled ? 'opacity-60 bg-gray-50' : 'bg-white'}
+    // --- Improved Styling ---
+    <div className={`
+      flex items-center w-full p-1                   
+      focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 
+      transition-all duration-200 ease-in-out    
+
+    `}>
       <TextareaAutosize
-        className="flex-grow px-4 p-4 text-gray-900 bg-transparent outline-none resize-none"
-        placeholder="Nhập tin nhắn..."
+        className="flex-grow px-4 py-2 text-sm text-gray-900 bg-transparent outline-none resize-none disabled:cursor-not-allowed" // Bỏ disabled:bg-gray-100 vì đã xử lý ở div cha
+        placeholder="Nhập tin nhắn (Ctrl+Enter để gửi)..."
         value={message}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         ref={inputRef}
         rows={1}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        disabled={disabled} // Apply disabled to TextareaAutosize
+        maxRows={5} // Giới hạn chiều cao tối đa
+        // onFocus={handleFocus} // Không cần thiết nếu không dùng isFocused
+        // onBlur={handleBlur}
+        disabled={isEffectivelyDisabled}
+        aria-label="Nội dung tin nhắn"
       />
-      <Button
-          variant="primary"
-          size="medium"
-          rounded={true}
-          onClick={handleSendMessage}
-          className="text-blue-500 hover:bg-gray-600 p-2 m-1"
-          style={{minWidth: '36px'}}
-          disabled={disabled} // Apply disabled to the Button
 
+      <Button
+        variant="secondary" // Sử dụng ghost hoặc một variant không có background mặc định để dễ tùy chỉnh hover
+        size="medium"    // Sử dụng size 'icon' nếu Button component hỗ trợ để tối ưu padding/margin cho icon
+        rounded={true} // Giữ bo tròn
+        onClick={handleSendMessage}
+        disabled={isEffectivelyDisabled}
+        aria-label={isLoading ? "Đang gửi..." : "Gửi tin nhắn"}
+        className={`
+          flex items-center justify-center         
+          text-blue-600 hover:bg-blue-100          
+          disabled:text-gray-400 disabled:hover:bg-transparent 
+          disabled:cursor-not-allowed
+          transition-all duration-200 ease-in-out    
+          w-8 h-8                                   
+          mr-1                                      
+        `}
+      // style={{ minWidth: '32px', minHeight: '32px' }} 
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2}
-          stroke="currentColor"
-          className="w-6 h-6"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-          />
-        </svg>
+        {/* --- Conditional Rendering: Spinner or Send Icon --- */}
+        {isLoading ? (
+          <SpinnerIcon />
+          // --- Hoặc dùng thư viện react-spinners ---
+          // <ClipLoader size={18} color={"#2563EB"} loading={true} /> // Điều chỉnh size/color phù hợp
+        ) : (
+          <GrSend className="w-4 h-4" size={18} color={"#2563EB"} /> // Điều chỉnh kích thước icon nếu cần
+        )}
       </Button>
     </div>
   );

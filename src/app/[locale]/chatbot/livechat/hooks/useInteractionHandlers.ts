@@ -1,73 +1,96 @@
-// hooks/useInteractionHandlers.ts (Modified for Voice only)
-import { ClientContentMessage } from "../multimodal-live-types";
+// hooks/useInteractionHandlers.ts
+import { ClientContentMessage, StreamingLog } from "../multimodal-live-types"; // Import StreamingLog if not already
+import { useLoggerStore } from "../lib/store-logger"; // Import store to get current logs length
 
 interface InteractionHandlersProps {
     connected: boolean;
-    // Adjust connectWithPermissions signature if needed (remove supportsVideo if always false)
-    connectWithPermissions: (/* supportsVideo: boolean */) => Promise<void>;
-    // Removed: changeStreams: (next?: any) => () => Promise<void>;
+    connectWithPermissions: () => Promise<void>;
     setMuted: (muted: boolean) => void;
-    // Removed: webcam: any;
-    // Removed: screenCapture: any;
-    // Removed: supportsVideo: boolean; // No longer needed
     client: any;
-    log: (logEntry: any) => void;
+    log: (logEntry: StreamingLog) => void; // Make sure type is specific
+    // Modify to accept the index of the sent log
+    startLoading: (sentLogIndex: number) => void;
+    stopLoading: () => void; // Add a separate function for stopping on error
 }
 
 const useInteractionHandlers = ({
     connected,
     connectWithPermissions,
-    // Removed: changeStreams,
     setMuted,
-    // Removed: webcam,
-    // Removed: screenCapture,
-    // Removed: supportsVideo,
     client,
-    log
+    log,
+    // Use the new props
+    startLoading,
+    stopLoading
 }: InteractionHandlersProps) => {
+    // Get current logs length to determine the index of the next log
+    // Note: This assumes log() adds to the end synchronously or predictably.
+    // If log is async, this might need adjustment. Zustand's set is sync by default.
 
-    const handleSendMessage = (textInput: string) => {
+    const handleSendMessage = async (textInput: string) => {
         if (!connected || textInput.trim() === "") {
             return;
         }
-        const parts = [{ text: textInput }];
-        client.send(parts);
 
-        const clientContentMessage: ClientContentMessage = {
-            clientContent: {
-                turns: [{ role: "user", parts }],
-                turnComplete: true,
-            },
-        };
+        // Get the index where the new log will be added
+        const currentLogs = useLoggerStore.getState().logs;
+        const nextLogIndex = currentLogs.length;
 
-        log({
-            date: new Date(),
-            type: "send.text",
-            message: clientContentMessage,
-        });
+        console.log(`[handleSendMessage] Triggered. Next log index: ${nextLogIndex}. Setting loading TRUE.`);
+        // Pass the index where the 'send.text' log will be
+        startLoading(nextLogIndex);
+
+        try {
+            const parts = [{ text: textInput }];
+            // It's better to log *before* the async call if possible,
+            // or handle potential state changes if log happens after await
+            const clientContentMessage: ClientContentMessage = {
+                clientContent: {
+                    turns: [{ role: "user", parts }],
+                    turnComplete: true,
+                },
+            };
+
+            const sendLogEntry: StreamingLog = { // Define the log entry explicitly
+                 date: new Date(),
+                 type: "send.text",
+                 message: clientContentMessage,
+                 count: 1, // Assuming count is needed by store logic
+            };
+
+            log(sendLogEntry); // Log the message *before* sending if safe
+
+            // If log must happen after: Be aware the index might change if other logs occur between
+            // getting length and logging here. Logging before is safer for index stability.
+            await client.send(parts);
+
+            // Log *after* send if required by logic (less safe for index tracking)
+            // log(sendLogEntry);
+
+            // DO NOT stop loading here. Let the useEffect handle it based on server response.
+
+        } catch (error) {
+            console.error("Failed to send message:", error);
+            log({ // Optionally log the error
+                date: new Date(),
+                type: "error",
+                message: `Failed to send message: ${error instanceof Error ? error.message : String(error)}`,
+                count: 1,
+            });
+            console.log("[handleSendMessage] Error occurred. Setting loading FALSE.");
+            // Stop loading only if the send itself fails
+            stopLoading();
+        }
     };
 
     const handleStartVoice = async () => {
         if (!connected) {
-            // Call connect without video support flag
-            await connectWithPermissions(/* supportsVideo: false */);
+            await connectWithPermissions();
         }
         setMuted(false);
     };
 
-    // Removed handleStartWebcam and handleStartScreenShare functions
-    /*
-    const handleStartWebcam = async () => {
-        // ... Removed logic ...
-    };
-
-    const handleStartScreenShare = async () => {
-        // ... Removed logic ...
-    };
-    */
-
-    // Return only relevant handlers
-    return { handleSendMessage, handleStartVoice /* Removed: handleStartWebcam, handleStartScreenShare */ };
+    return { handleSendMessage, handleStartVoice };
 }
 
 export default useInteractionHandlers;

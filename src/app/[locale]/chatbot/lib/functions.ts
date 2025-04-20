@@ -5,7 +5,7 @@ import {
 
 
 // English
-export const getConferencesDeclaration: FunctionDeclaration = {
+export const english_getConferencesDeclaration: FunctionDeclaration = {
     name: "getConferences",
     // Mô tả rõ mục đích là tạo query string
     description: "Generates a URL-encoded query string to search for conferences based on user-specified criteria. This query string will be used to fetch data from the backend API." +
@@ -69,7 +69,7 @@ export const getConferencesDeclaration: FunctionDeclaration = {
     }
 };
 
-export const getJournalsDeclaration: FunctionDeclaration = {
+export const english_getJournalsDeclaration: FunctionDeclaration = {
     name: "getJournals",
     description: "Retrieves information about journals based on filtering criteria.",
     parameters: {
@@ -167,12 +167,12 @@ export const getJournalsDeclaration: FunctionDeclaration = {
     },
 };
 
-export const getWebsiteInformationDeclaration: FunctionDeclaration = {
+export const english_getWebsiteInformationDeclaration: FunctionDeclaration = {
     name: "getWebsiteInformation",
     description: "Retrieves information about websites. This function don't need parameters, just call it"
 };
 
-export const drawChartDeclaration: FunctionDeclaration = {
+export const english_drawChartDeclaration: FunctionDeclaration = {
     name: "drawChart",
     description: "Draws a chart based on the provided data.",
     parameters: {
@@ -186,6 +186,48 @@ export const drawChartDeclaration: FunctionDeclaration = {
         required: ["chartType"],
     },
 };
+
+// --- NEW Navigation Declaration ---
+// List of allowed internal paths (for the model's description)
+const internalPaths = [
+    '/',
+    '/conferences',
+    '/dashboard',
+    '/journals',
+    '/chatbot',
+    '/visualization',
+    '/chatbot/chat',
+    '/chatbot/livechat',
+    '/support',
+    '/other',
+    '/addconference',
+    '/conferences/detail', // Base path, model might need to know how to get full ID path if needed
+    '/journals/detail',    // Base path
+    '/auth/login',
+    '/auth/register',
+    '/auth/verify-email',
+    '/auth/forgot-password',
+    '/auth/reset-password',
+    '/updateconference' // Base path
+];
+
+export const english_navigationDeclaration: FunctionDeclaration = {
+    name: "navigation",
+    description: `Navigates the user to a specified page within this website or to an external conference/journal website by opening a new browser tab.
+    - For INTERNAL navigation: Provide the relative path starting with '/'. The system will automatically add the base URL and locale. Allowed internal paths are: ${internalPaths.join(', ')}. Example: {"url": "/conferences"}
+    - For EXTERNAL conference/journal sites: Provide the full, valid URL starting with 'http://' or 'https://'. The model should typically obtain this URL from functions like 'getConferences' or 'getJournals' before calling 'navigation'. Example: {"url": "https://2025.inlgmeeting.org/"}`,
+    parameters: {
+        type: SchemaType.OBJECT,
+        properties: {
+            url: {
+                type: SchemaType.STRING,
+                description: `The internal path (starting with '/', e.g., '/dashboard') or the full external URL (starting with 'http://' or 'https://', e.g., 'https://some-journal.com/article') to navigate to.`
+            }
+        },
+        required: ["url"]
+    }
+};
+
 
 // Vietnamese
 export const vietnam_getConferencesDeclaration: FunctionDeclaration = {
@@ -552,3 +594,4 @@ export const china_drawChartDeclaration: FunctionDeclaration = {
         required: ["chartType"],
     },
 };
+

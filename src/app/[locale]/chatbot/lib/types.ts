@@ -41,6 +41,7 @@ export interface LanguageOption {
 
 
 
+
 export type LiveGenerationConfig = GenerationConfig & {
   responseModalities: OutputModality;
   speechConfig?: {

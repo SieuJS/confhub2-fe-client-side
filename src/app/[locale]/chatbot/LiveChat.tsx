@@ -2,31 +2,33 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useLiveAPIContext } from './livechat/contexts/LiveAPIContext'; // Adjusted path
-import { useLoggerStore } from './livechat/lib/store-logger'; // Adjusted path
-import Logger from './livechat/logger/Logger'; // Adjusted path
-import ChatInput from './livechat/main-layout/ChatInput'; // Adjust path if needed
-import ConnectionButton from './livechat/main-layout/ConnectionButton'; // Adjust path
-import MicButton from './livechat/main-layout/MicButton';       // Adjust path
-import ChatIntroduction from './livechat/main-layout/ChatIntroduction'; // Adjust path
-import ConnectionStatus from './livechat/main-layout/ConnectionStatus'; // Adjust path
-import RestartStreamButton from './livechat/main-layout/RestartStreamButton'; // Adjust path
-import { LiveChatAPIConfig } from './LiveChatAPIConfig'; // Renamed LiveChatAPI/LiveChatComponent for clarity
+import { useLiveAPIContext } from './livechat/contexts/LiveAPIContext';
+// Import isServerContentMessage and related types from where they are defined
+import { isServerContentMessage, isModelTurn, isTurnComplete, isInterrupted } from './livechat/multimodal-live-types';
+import { useLoggerStore } from './livechat/lib/store-logger';
+import Logger from './livechat/logger/Logger';
+import ChatInput from './livechat/main-layout/ChatInput';
+import ConnectionButton from './livechat/main-layout/ConnectionButton';
+import MicButton from './livechat/main-layout/MicButton';
+import ChatIntroduction from './livechat/main-layout/ChatIntroduction';
+import ConnectionStatus from './livechat/main-layout/ConnectionStatus';
+import RestartStreamButton from './livechat/main-layout/RestartStreamButton';
+import { LiveChatAPIConfig } from './LiveChatAPIConfig';
 
-// Hooks (adjust paths as needed)
+// Hooks
 import useConnection from './livechat/hooks/useConnection';
 import useTimer from './livechat/hooks/useTimer';
 import useLoggerScroll from './livechat/hooks/useLoggerScroll';
 import useLoggerEvents from './livechat/hooks/useLoggerEvents';
-import useAudioRecorder from './livechat/hooks/useAudioRecorder'; // Assuming you have this hook adapted
-import useModelAudioResponse from './livechat/hooks/useModelAudioResponse'; // Assuming you have this hook adapted
-import useVolumeControl from './livechat/hooks/useVolumeControl'; // Assuming you have this hook adapted
-import useInteractionHandlers from './livechat/hooks/useInteractionHandlers'; // Option 1: Use the hook
+import useAudioRecorder from './livechat/hooks/useAudioRecorder';
+import useModelAudioResponse from './livechat/hooks/useModelAudioResponse';
+import useVolumeControl from './livechat/hooks/useVolumeControl';
+import useInteractionHandlers from './livechat/hooks/useInteractionHandlers';
 
-// Types and Constants (adjust paths)
+// Types and Constants
 import { OutputModality, PrebuiltVoice, Language } from './lib/types';
 import { getSystemInstructions } from './lib/instructions';
-import { AudioRecorder } from './livechat/lib/audio-recorder'; // Assuming path
+import { AudioRecorder } from './livechat/lib/audio-recorder';
 
 // --- Props Interface ---
 interface LiveChatExperienceProps {
@@ -41,11 +43,8 @@ export default function LiveChatExperience({
     currentLanguage,
 }: LiveChatExperienceProps) {
 
-    // --- Context and Store Hooks ---
-    const { client, volume, on, off, setConfig } = useLiveAPIContext(); // Get necessary context values
-    const { log, clearLogs } = useLoggerStore();
 
-    // --- Connection & Timer Hooks (from useConnection/useTimer) ---
+    // --- Connection & Timer Hooks ---
     const {
         connected,
         isConnecting,
@@ -54,7 +53,7 @@ export default function LiveChatExperience({
         connectWithPermissions,
         handleDisconnect,
         handleReconnect,
-        error: connectionError, // Get error state if useConnection provides it
+        error: connectionError,
     } = useConnection();
 
     const { elapsedTime, showTimer, handleCloseTimer } = useTimer(
@@ -63,9 +62,18 @@ export default function LiveChatExperience({
         streamStartTime
     );
 
-    // --- State migrated from original MainLayout ---
+    // --- Context and Store Hooks ---
+    const { client, volume, on, off, setConfig } = useLiveAPIContext();
+    const { log, clearLogs, logs } // <-- Get logs array from store
+        = useLoggerStore();
+
+
+    // --- State ---
     const loggerRef = useRef<HTMLDivElement>(null);
-    const [inVolume, setInVolume] = useState(0);
+    const [isSendingMessage, setIsSendingMessage] = useState(false);
+    // *** Ref to store the index of the log we are waiting for a response to ***
+    const lastSentLogIndexRef = useRef<number | null>(null);
+    const [inVolume, setInVolume] = useState(0); // Keep other state
     const [audioRecorder] = useState(() => new AudioRecorder());
     const [muted, setMuted] = useState(false);
     const [hasInteracted, setHasInteracted] = useState(false);
@@ -73,22 +81,86 @@ export default function LiveChatExperience({
     // --- Interaction Handlers Hook ---
     const { handleSendMessage, handleStartVoice } = useInteractionHandlers({
         connected,
-        connectWithPermissions, // Pass connection trigger
+        connectWithPermissions,
         setMuted,
         client,
         log,
+        // *** Pass specific functions for loading state ***
+        startLoading: (sentLogIndex: number) => {
+            setIsSendingMessage(true);
+            lastSentLogIndexRef.current = sentLogIndex; // Store the index
+            console.log(`[startLoading Callback] Set isSending=true, lastSentLogIndex=${sentLogIndex}`);
+        },
+        stopLoading: () => {
+            setIsSendingMessage(false);
+            lastSentLogIndexRef.current = null; // Reset index on explicit stop (e.g., error)
+            console.log("[stopLoading Callback] Set isSending=false, lastSentLogIndex=null");
+        },
     });
 
-    // --- Effects migrated from original MainLayout ---
-    useEffect(() => { if (connected) { clearLogs(); } }, [connected, clearLogs]);
+    // --- Effects ---
+    useEffect(() => {
+        if (connected) {
+            clearLogs();
+            setIsSendingMessage(false); // Reset loading on connect/clear
+            lastSentLogIndexRef.current = null;
+        }
+    }, [connected, clearLogs]);
     useEffect(() => { if (connected || isConnecting || streamStartTime !== null) { setHasInteracted(true); } }, [connected, isConnecting, streamStartTime]);
 
-    // --- Other Hooks migrated from original MainLayout ---
-    useLoggerScroll(loggerRef); // Manages scrolling of the logger area
-    useLoggerEvents(on, off, log); // Listens for API events and logs them
-    useAudioRecorder(connected, muted, audioRecorder, client, log, setInVolume); // Handles mic input
-    useModelAudioResponse(on, off, log); // Handles playing audio responses
-    useVolumeControl(inVolume); // Visual feedback for input volume (optional)
+    // *** Modified Effect to watch logs based on index ***
+    useEffect(() => {
+        // Only run if we are loading AND have a valid index to check against
+        if (!isSendingMessage || lastSentLogIndexRef.current === null) {
+            // console.log(`[LogEffect] Skipping. isSending: ${isSendingMessage}, lastSentIndex: ${lastSentLogIndexRef.current}`);
+            return;
+        }
+
+        const startIndexToCheck = lastSentLogIndexRef.current + 1;
+        console.log(`[LogEffect] Running. isSending: ${isSendingMessage}, checking logs from index ${startIndexToCheck}`);
+
+        // Check logs that appeared *after* the sent message log
+        for (let i = startIndexToCheck; i < logs.length; i++) {
+            const currentLog = logs[i];
+
+            // console.log(`[LogEffect] Checking log at index ${i}:`, currentLog?.type);
+
+            // Basic check: ensure log and message exist
+            if (!currentLog?.message) {
+                continue;
+            }
+
+            // Check for relevant server response types
+            if (isServerContentMessage(currentLog.message)) {
+                const { serverContent } = currentLog.message;
+                if (isModelTurn(serverContent) || isTurnComplete(serverContent) || isInterrupted(serverContent)) {
+                    console.log(`[LogEffect] Found relevant ServerContentMessage at index ${i}. Stopping loading.`);
+                    setIsSendingMessage(false);
+                    lastSentLogIndexRef.current = null; // Reset ref as we found the response
+                    return; // Exit effect processing once response is found
+                }
+            }
+            // Add checks for other relevant server message types if needed (e.g., 'receive.audio')
+            else if (currentLog.type?.startsWith("receive.")) {
+                console.log(`[LogEffect] Found other server message type '${currentLog.type}' at index ${i}. Stopping loading.`);
+                setIsSendingMessage(false);
+                lastSentLogIndexRef.current = null; // Reset ref
+                return; // Exit effect processing
+            }
+        }
+        console.log(`[LogEffect] No relevant server response found yet after index ${lastSentLogIndexRef.current}. Still waiting.`);
+
+        // Depend on logs and the loading state itself.
+        // Do NOT depend on lastSentLogIndexRef.current directly as it's a ref.
+    }, [logs, isSendingMessage, setIsSendingMessage]); // Keep setIsSendingMessage for linting if needed
+
+
+    // --- Other Hooks ---
+    useLoggerScroll(loggerRef);
+    useLoggerEvents(on, off, log);
+    useAudioRecorder(connected, muted, audioRecorder, client, log, setInVolume);
+    useModelAudioResponse(on, off, log);
+    useVolumeControl(inVolume);
 
     // --- Determine System Instructions ---
     const systemInstructions = getSystemInstructions(currentLanguage);
@@ -97,7 +169,7 @@ export default function LiveChatExperience({
     let connectionStatusType: 'connected' | 'error' | 'info' | 'connecting' = 'info';
     if (isConnecting) connectionStatusType = 'connecting';
     else if (connected) connectionStatusType = 'connected';
-    else if (connectionStatusMessage || connectionError) connectionStatusType = streamStartTime !== null ? 'error' : 'info'; // Show error if attempt was made
+    else if (connectionStatusMessage || connectionError) connectionStatusType = streamStartTime !== null ? 'error' : 'info';
 
     const effectiveStatusMessage = connectionStatusMessage || connectionError?.message || null;
     const shouldShowExternalStatus = showTimer || (effectiveStatusMessage && connectionStatusType !== 'connected');
@@ -105,10 +177,8 @@ export default function LiveChatExperience({
 
 
     return (
-        // Main container for the live chat experience
-        <div className='relative flex h-full flex-col bg-white shadow-inner'> {/* Added bg/shadow */}
+        <div className='relative flex h-full flex-col bg-white shadow-inner rounded-xl border-2'>
 
-             {/* Non-UI Component for API Config / Tool Calls */}
             <LiveChatAPIConfig
                 outputModality={currentModality}
                 selectedVoice={currentVoice}
@@ -116,10 +186,8 @@ export default function LiveChatExperience({
                 systemInstructions={systemInstructions}
             />
 
-            {/* --- External Connection Status & Restart --- */}
-            {/* Position these absolutely within the relative parent */}
             {shouldShowExternalStatus && (
-                <div className='absolute top-4 left-1/2 z-10 -translate-x-1/2 transform px-4'>
+                <div className='z-10'> {/* Giữ lại z-index nếu cần */}
                     <ConnectionStatus
                         status={connectionStatusType}
                         message={effectiveStatusMessage}
@@ -130,52 +198,39 @@ export default function LiveChatExperience({
             )}
 
             {shouldShowRestartButton && (
-                // Position near the bottom, maybe above input? Adjust 'bottom-20' as needed
                 <div className='absolute bottom-20 left-1/2 z-10 -translate-x-1/2 transform px-4'>
                     <RestartStreamButton onRestart={handleReconnect} />
                 </div>
             )}
-            {/* --- END External Status --- */}
 
-
-            {/* --- Main Chat Display Area --- */}
-            {/* Takes up remaining space, scrolls */}
             <div className="flex-grow overflow-y-auto p-4" ref={loggerRef}>
-                {/* Show introduction only if not connected AND user hasn't interacted yet */}
-                 {!connected && !hasInteracted ? (
-                     <ChatIntroduction
-                         // Use handleStartVoice from the hook, which also sets muted state
-                         onStartVoice={() => { handleStartVoice(); setHasInteracted(true); }}
-                         // Add a way to connect via text input interaction if needed
-                         // onStartText={() => { connectWithPermissions(); setHasInteracted(true); }}
-                     />
-                 ) : (
-                     // Show the logger once connected or interaction started
-                     <Logger filter="none" /> // Use your logger component
-                 )}
+                {!connected && !hasInteracted ? (
+                    <ChatIntroduction
+                        onStartVoice={() => { handleStartVoice(); setHasInteracted(true); }}
+                    />
+                ) : (
+                    <Logger filter="none" />
+                )}
             </div>
 
-
-            {/* --- Chat Input Area (Migrated from original MainLayout) --- */}
-            {/* Fixed at the bottom */}
-            <div className="flex items-center gap-2 rounded-full border border-gray-300 bg-gray-100 p-1.5 m-4"> {/* Added margin */}
+            <div className="flex items-center gap-2 rounded-full border border-gray-300 bg-gray-100 p-1.5 m-4">
                 <ConnectionButton
                     connected={connected}
-                    connect={connectWithPermissions} // Use the function from useConnection
-                    disconnect={handleDisconnect}     // Use the function from useConnection
-                    isConnecting={isConnecting}       // Pass connecting state for button visual feedback
+                    connect={connectWithPermissions}
+                    disconnect={handleDisconnect}
+                    isConnecting={isConnecting}
                 />
                 <MicButton
                     muted={muted}
-                    setMuted={setMuted} // Allow MicButton to toggle mute state
-                    volume={volume}     // Pass volume for visual feedback
-                    connected={connected} // Disable if not connected
+                    setMuted={setMuted}
+                    volume={volume}
+                    connected={connected}
                 />
                 <div className="flex-grow">
-                     {/* Pass handleSendMessage from useInteractionHandlers */}
                     <ChatInput
                         onSendMessage={handleSendMessage}
-                        disabled={!connected} // Disable input if not connected
+                        disabled={!connected}
+                        isLoading={isSendingMessage} // Truyền trạng thái loading
                     />
                 </div>
             </div>

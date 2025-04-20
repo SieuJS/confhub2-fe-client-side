@@ -3,8 +3,8 @@
 
 import React, { useEffect, useRef } from 'react'
 
-// WARNING: Do not embed API keys directly in code or publish in source code without restricting API keys to be used by only the IP addresses, referrer URLs, and mobile apps that need them.
-const API_KEY = 'AIzaSyBg-9FAVGjxNmG_8UkmssL4MJ34iOSyTCE' // Thay thế bằng API Key của bạn
+// WARNING: Do not embed API keys directly in code... (Keep the warning)
+const API_KEY = 'AIzaSyBg-9FAVGjxNmG_8UkmssL4MJ34iOSyTCE' // Replace with your key
 
 interface MapProps {
   location: string
@@ -18,21 +18,36 @@ const Map: React.FC<MapProps> = ({ location }) => {
 
     const encodedLocation = encodeURIComponent(location)
     const iframe = document.createElement('iframe')
-    iframe.width = '100%'
-    iframe.height = '450'
+    iframe.width = '100%' // Use 100% width to fit container
+    iframe.height = '300' // Adjust height to be reasonable for chat history
     iframe.style.border = '0'
     iframe.loading = 'lazy'
-    iframe.allowFullscreen = true
+    iframe.allowFullscreen = true // Keep allowFullscreen
     iframe.referrerPolicy = 'no-referrer-when-downgrade'
     iframe.src = `https://www.google.com/maps/embed/v1/place?key=${API_KEY}&q=${encodedLocation}`
 
-    mapRef.current.innerHTML = '' // Clear previous content
-    mapRef.current.appendChild(iframe)
-  }, [location])
+    // Ensure mapRef.current is cleared before appending
+    const currentMapRef = mapRef.current;
+    currentMapRef.innerHTML = '' // Clear previous map if location changes
+    currentMapRef.appendChild(iframe)
+
+    // Cleanup function to remove iframe if component unmounts or location changes
+    // This might prevent issues if the component re-renders frequently
+    return () => {
+        if (currentMapRef && currentMapRef.contains(iframe)) {
+            currentMapRef.removeChild(iframe);
+        }
+    };
+
+
+  }, [location]) // Dependency array is correct
 
   return (
-    <div className=''>
-      <div ref={mapRef} className='map-container' />
+    // Add a wrapper class for easier styling from ChatHistory.css if needed
+    <div className='chat-map-wrapper my-2'> {/* Added margin top/bottom */}
+      <div ref={mapRef} className='map-container' /> {/* Inner container for the iframe */}
+      {/* Add a loading indicator or placeholder if needed */}
+       {!location && <p>Loading map...</p>}
     </div>
   )
 }

@@ -7,14 +7,20 @@ import ChatInput from './regularchat/ChatInput';
 import LoadingIndicator from './regularchat/LoadingIndicator';
 import Introduction from './regularchat/ChatIntroduction';
 
-// Import hooks
+// Import hooks and types
 import { useTimer } from '@/src/hooks/chatbot/useTimer';
 import { useChatSocket } from '@/src/hooks/chatbot/useChatSocket';
 import { appConfig } from '@/src/middleware';
+import { Language } from './lib/types'; // Adjust path as needed
 
 const SOCKET_SERVER_URL = appConfig.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
 
-function RegularChat() {
+// Define props interface
+interface RegularChatProps {
+    currentLanguage: Language; // <<< Accept language prop
+}
+
+function RegularChat({ currentLanguage }: RegularChatProps) { // <<< Destructure prop
     // --- Use Hooks ---
     const { timeCounter, startTimer, stopTimer } = useTimer();
     const {
@@ -23,7 +29,7 @@ function RegularChat() {
         isConnected,
         sendMessage: sendMessageViaSocket, // Hook's send function
         socketId
-    } = useChatSocket({ // Hook sẽ cần cập nhật để xử lý isStreaming
+    } = useChatSocket({
         socketUrl: SOCKET_SERVER_URL,
     });
 
@@ -33,7 +39,7 @@ function RegularChat() {
     const chatHistoryRef = useRef<HTMLDivElement>(null);
 
     // --- State for Streaming Toggle ---
-    const [isStreamingEnabled, setIsStreamingEnabled] = useState<boolean>(true); // Default to streaming
+    const [isStreamingEnabled, setIsStreamingEnabled] = useState<boolean>(true);
 
     // --- Scroll to Bottom ---
     useEffect(() => {
@@ -42,22 +48,21 @@ function RegularChat() {
         }
     }, [chatMessages]);
 
-    // --- Stop Timer Logic (uncomment/adjust if needed based on hook behavior) ---
+    // --- Stop Timer Logic ---
     useEffect(() => {
-         if (!loadingState.isLoading && timeCounter !== '0.0s') {
+        if (!loadingState.isLoading && timeCounter !== '0.0s') {
             stopTimer();
-         }
+        }
     }, [loadingState.isLoading, stopTimer, timeCounter]);
 
 
-    // --- Send Chat Message (Orchestrates hooks, now includes streaming flag) ---
+    // --- Send Chat Message (Pass language to hook) ---
     const sendChatMessage = useCallback(async (userMessage: string) => {
         const trimmedMessage = userMessage.trim();
         if (!trimmedMessage) return;
 
         if (!isConnected) {
             console.warn("Attempted to send message while disconnected.");
-            // Hook should handle adding error message to chat
             return;
         }
 
@@ -65,12 +70,12 @@ function RegularChat() {
             setHasChatStarted(true);
         }
 
-        startTimer(); // Start timing
+        startTimer();
 
-        // Pass the current state of the toggle to the hook's send function
-        sendMessageViaSocket(trimmedMessage, isStreamingEnabled);
+        // Pass the current language along with the streaming flag
+        sendMessageViaSocket(trimmedMessage, isStreamingEnabled, currentLanguage); // <<< Pass language
 
-    }, [isConnected, hasChatStarted, startTimer, sendMessageViaSocket, isStreamingEnabled]); // <<< Thêm isStreamingEnabled vào dependencies
+    }, [isConnected, hasChatStarted, startTimer, sendMessageViaSocket, isStreamingEnabled, currentLanguage]); // <<< Add currentLanguage dependency
 
 
     // --- Input Interaction Logic ---
@@ -82,11 +87,11 @@ function RegularChat() {
         if (fillInputFunction) {
             fillInputFunction(suggestion);
         }
-        // Decide if suggestion click should automatically send
+        // Optional: Automatically send suggestion
         // if (suggestion) {
-        //    sendChatMessage(suggestion); // Send with the current streaming setting
+        //    sendChatMessage(suggestion); // Will use current language and streaming settings
         // }
-    }, [fillInputFunction]); // Removed sendChatMessage dependency for clarity
+    }, [fillInputFunction]); // Removed sendChatMessage
 
 
     // --- Handle Toggle Change ---
@@ -94,9 +99,9 @@ function RegularChat() {
         setIsStreamingEnabled(event.target.checked);
     };
 
-    // --- JSX Structure ---
+    // --- JSX Structure (No changes needed here for language logic) ---
     return (
-        <div className="flex flex-col h-[calc(100vh-4rem)] max-h-[800px] w-full max-w mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200"> {/* Adjusted max-w */}
+        <div className="flex flex-col h-[calc(100vh-4rem)] max-h-[800px] w-full max-w mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
 
             {/* Header */}
             <div className="flex-shrink-0 p-4 border-b border-gray-200 bg-gray-50">
@@ -128,26 +133,25 @@ function RegularChat() {
                 </div>
             )}
 
-             {/* --- Streaming Toggle UI --- */}
-             <div className="flex-shrink-0 px-4 pt-2 pb-1 border-t border-gray-100 bg-gray-50 flex items-center justify-end space-x-2">
-                 <label htmlFor="streaming-toggle" className="text-sm text-gray-600 cursor-pointer">
-                     Stream Response:
-                 </label>
-                 <input
-                     type="checkbox"
-                     id="streaming-toggle"
-                     checked={isStreamingEnabled}
-                     onChange={handleStreamingToggle}
-                     className="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-                     disabled={loadingState.isLoading} // Disable toggle while loading
-                 />
+            {/* Streaming Toggle UI */}
+            <div className="flex-shrink-0 px-4 pt-2 pb-1 border-t border-gray-100 bg-gray-50 flex items-center justify-end space-x-2">
+                <label htmlFor="streaming-toggle" className="text-sm text-gray-600 cursor-pointer">
+                    Stream Response:
+                </label>
+                <input
+                    type="checkbox"
+                    id="streaming-toggle"
+                    checked={isStreamingEnabled}
+                    onChange={handleStreamingToggle}
+                    className="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                    disabled={loadingState.isLoading}
+                />
             </div>
-
 
             {/* Input Area */}
             <div className="flex-shrink-0 p-3 md:p-4 border-t border-gray-200 bg-gray-50 pt-2">
                 <ChatInput
-                    onSendMessage={sendChatMessage} // Pass the component's orchestrator
+                    onSendMessage={sendChatMessage}
                     disabled={loadingState.isLoading || !isConnected}
                     onRegisterFillFunction={handleSetFillInput}
                 />
@@ -156,4 +160,4 @@ function RegularChat() {
     );
 }
 
-export default RegularChat
+export default RegularChat;

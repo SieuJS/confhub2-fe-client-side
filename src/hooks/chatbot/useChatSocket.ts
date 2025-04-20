@@ -2,12 +2,19 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 import {
-    StatusUpdate, ResultUpdate, ErrorUpdate, ThoughtStep, ChatMessageType, LoadingState, ChatUpdate
+    StatusUpdate, ResultUpdate, // Ensure ResultUpdate is imported
+    NavigationAction, OpenMapAction, // <<< Import NavigationAction
+    ErrorUpdate, ThoughtStep, ChatMessageType, LoadingState, ChatUpdate
 } from '@/src/models/chatbot/chatbot'; // Adjust path if needed
+import { Language } from '@/src/app/[locale]/chatbot/lib/types'; // <<< Import Language type
+import { appConfig } from '@/src/middleware';
+import { usePathname } from 'next/navigation';
+import Map from '@/src/app/[locale]/conferences/detail/Map';
 
-// --- Interfaces (Giữ nguyên) ---
+// --- Interfaces ---
 export interface UseChatSocketProps {
     socketUrl: string;
+    // language: Language; // <<< ADD language prop
     onConnectionChange?: (isConnected: boolean) => void;
     onInitialConnectionError?: (error: Error) => void;
 }
@@ -16,20 +23,22 @@ export interface ChatSocketControls {
     chatMessages: ChatMessageType[];
     loadingState: LoadingState;
     isConnected: boolean;
-    sendMessage: (userInput: string, isStreaming: boolean) => void;
+    // Update sendMessage signature
+    sendMessage: (userInput: string, isStreaming: boolean, language: Language) => void; // <<< Add language
     socketId: string | null;
 }
 
 const generateMessageId = () => `msg-${Date.now()}-${Math.random()}`;
-
-// --- Constants for Animation ---
-const ANIMATION_INTERVAL_MS = 20; // Tần suất cập nhật animation (ms) - thử nghiệm giá trị này
-const MIN_CHARS_PER_INTERVAL = 1; // Số ký tự tối thiểu thêm mỗi lần cập nhật
-const MAX_CHARS_PER_INTERVAL = 3; // Số ký tự tối đa thêm mỗi lần cập nhật (để bắt kịp nếu server gửi nhanh)
-
+const ANIMATION_INTERVAL_MS = 10;
+const MIN_CHARS_PER_INTERVAL = 10;
+const MAX_CHARS_PER_INTERVAL = 20;
+// --- NEW CONSTANT ---
+// Start slowing down when fewer than this many characters remain in the current buffer
+const EASING_THRESHOLD_CHARS = MAX_CHARS_PER_INTERVAL * 1.5; // Ví dụ: 15 * 3 = 45 chars
 
 export function useChatSocket({
     socketUrl,
+    // language, // <<< Destructure language prop
     onConnectionChange,
     onInitialConnectionError
 }: UseChatSocketProps): ChatSocketControls {
@@ -40,14 +49,19 @@ export function useChatSocket({
 
     const socketRef = useRef<Socket | null>(null);
     const isMountedRef = useRef(true);
-    const loadingStateRef = useRef(loadingState); // Vẫn hữu ích để đọc state hiện tại trong callback
+    const loadingStateRef = useRef(loadingState);
 
-    // --- Refs cho Streaming Animation ---
-    const streamingMessageIdRef = useRef<string | null>(null);   // ID của tin nhắn đang được stream
-    const fullStreamedTextRef = useRef<string>('');        // Toàn bộ text đã nhận từ server cho tin nhắn hiện tại
-    const displayedTextLengthRef = useRef<number>(0);       // Độ dài text đã hiển thị trên UI
-    const animationTimerRef = useRef<NodeJS.Timeout | null>(null); // Lưu ID của setTimeout
-    const isStreamingCompleteRef = useRef<boolean>(false); // Cờ báo hiệu server đã gửi 'chat_result' chưa
+    const streamingMessageIdRef = useRef<string | null>(null);
+    const fullStreamedTextRef = useRef<string>('');
+    const displayedTextLengthRef = useRef<number>(0);
+    const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const isStreamingCompleteRef = useRef<boolean>(false);
+
+    // Get Base URL and Locale for internal navigation
+    const BASE_WEB_URL = appConfig.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:8386"; // Or your specific config key
+
+    const pathname = usePathname()
+    const currentLocale = pathname.split('/')[1];
 
     useEffect(() => {
         loadingStateRef.current = loadingState;
@@ -109,7 +123,6 @@ export function useChatSocket({
     // --- Animation Loop ---
     const animateText = useCallback(() => {
         if (!isMountedRef.current || !streamingMessageIdRef.current || animationTimerRef.current === null) {
-            // Nếu component unmounted, không còn stream, hoặc animation đã bị dừng -> thoát
             return;
         }
 
@@ -118,30 +131,69 @@ export function useChatSocket({
         const streamingId = streamingMessageIdRef.current; // Lấy ID một lần
 
         if (currentLength < targetLength) {
-            // Tính toán số ký tự cần thêm trong lần này
             const remainingChars = targetLength - currentLength;
-            // Tăng tốc độ nếu bị chậm nhiều
-            const charsToAddFactor = Math.max(1, Math.floor(remainingChars / 10)); // Ví dụ: tăng tốc nếu còn > 10 chars
-            const charsToAdd = Math.min(
-                remainingChars,
+
+            // --- Bước 1: Tính toán số ký tự cơ bản (logic bắt kịp cũ) ---
+            const charsToAddFactor = Math.max(1, Math.floor(remainingChars / 10));
+            const baseCharsToAdd = Math.min(
+                remainingChars, // Không bao giờ thêm nhiều hơn số còn lại
                 Math.max(MIN_CHARS_PER_INTERVAL, Math.min(MAX_CHARS_PER_INTERVAL, charsToAddFactor))
             );
 
-            const newLength = currentLength + charsToAdd;
-            const textToDisplay = fullStreamedTextRef.current.substring(0, newLength);
-            displayedTextLengthRef.current = newLength;
+            // --- Bước 2: Áp dụng Easing (Ease-Out) khi gần kết thúc ---
+            let finalCharsToAdd = baseCharsToAdd;
+            if (remainingChars > 0 && remainingChars <= EASING_THRESHOLD_CHARS) {
+                // Tính hệ số giảm tốc (Ease-Out Quadratic: chậm dần đều khi gần 0)
+                // (remainingChars / EASING_THRESHOLD_CHARS) tạo ra giá trị từ ~0 đến 1
+                // Bình phương nó để tạo đường cong ease-out (thay đổi chậm hơn khi gần 1, nhanh hơn khi gần 0 - nhưng chúng ta muốn ngược lại)
+                // -> Sử dụng căn bậc hai (pow 0.5) hoặc 1 - (1 - x)^2 cho ease-out đúng nghĩa hơn
+                // Hoặc đơn giản là dùng tỷ lệ tuyến tính rồi căn bậc hai:
+                const progressRatio = remainingChars / EASING_THRESHOLD_CHARS; // Gần 0 là gần hết, gần 1 là mới vào ngưỡng
+                // Dùng sqrt để tốc độ giảm nhanh hơn khi còn ít ký tự (ease-out effect)
+                const slowdownFactor = Math.sqrt(progressRatio); // Factor từ ~0 đến 1
 
-            // Cập nhật state React
-            setChatMessages(prev =>
-                prev.map(msg =>
-                    msg.id === streamingId
-                        ? { ...msg, message: textToDisplay }
-                        : msg
-                )
-            );
+                // Điều chỉnh số ký tự thêm:
+                // Nhân với factor, làm tròn lên để tránh = 0 quá sớm,
+                // nhưng phải đảm bảo tối thiểu là 1 và không vượt quá baseCharsToAdd
+                finalCharsToAdd = Math.max(
+                    1, // Luôn thêm ít nhất 1 ký tự nếu còn
+                    Math.min(baseCharsToAdd, Math.ceil(baseCharsToAdd * slowdownFactor))
+                );
 
-            // Lên lịch cho frame tiếp theo
-            animationTimerRef.current = setTimeout(animateText, ANIMATION_INTERVAL_MS);
+                // console.log(`Easing: remaining=${remainingChars}, base=${baseCharsToAdd}, factor=${slowdownFactor.toFixed(2)}, final=${finalCharsToAdd}`); // Bỏ comment để debug
+            }
+            // Đảm bảo không thêm nhiều hơn số ký tự thực sự còn lại (quan trọng sau khi làm tròn/tính toán)
+            finalCharsToAdd = Math.min(finalCharsToAdd, remainingChars);
+
+
+            // --- Bước 3: Cập nhật state React (chỉ khi có gì đó để thêm) ---
+            if (finalCharsToAdd > 0) {
+                const newLength = currentLength + finalCharsToAdd;
+                const textToDisplay = fullStreamedTextRef.current.substring(0, newLength);
+                displayedTextLengthRef.current = newLength;
+
+                setChatMessages(prev =>
+                    prev.map(msg =>
+                        msg.id === streamingId
+                            ? { ...msg, message: textToDisplay }
+                            : msg
+                    )
+                );
+
+                // Lên lịch cho frame tiếp theo
+                animationTimerRef.current = setTimeout(animateText, ANIMATION_INTERVAL_MS);
+            } else {
+                // Nếu finalCharsToAdd = 0 (đã hiển thị hết hoặc lỗi tính toán)
+                // Kiểm tra xem stream đã xong chưa để dừng hoặc đợi
+                if (!isStreamingCompleteRef.current) {
+                    // Đã hiển thị hết text hiện có, nhưng server chưa báo xong -> chờ chunk tiếp theo
+                    animationTimerRef.current = setTimeout(animateText, ANIMATION_INTERVAL_MS * 2); // Chờ lâu hơn một chút
+                } else {
+                    // Đã hiển thị hết VÀ server đã báo xong -> Dừng animation tự nhiên
+                    stopAnimation();
+                    console.log("Animation completed naturally (post-easing calc):", streamingId);
+                }
+            }
 
         } else if (!isStreamingCompleteRef.current) {
             // Đã hiển thị hết text hiện có, nhưng server chưa báo xong -> chờ chunk tiếp theo
@@ -149,10 +201,9 @@ export function useChatSocket({
         } else {
             // Đã hiển thị hết VÀ server đã báo xong -> Dừng animation tự nhiên
             stopAnimation();
-            console.log("Animation completed naturally for:", streamingId);
-            // Có thể không cần làm gì thêm ở đây vì handleResult sẽ xử lý state cuối cùng
+            console.log("Animation completed naturally (already displayed):", streamingId);
         }
-    }, [stopAnimation]); // Thêm stopAnimation
+    }, [stopAnimation]); // Nhớ thêm các dependencies khác nếu có (MIN_CHARS_..., MAX_CHARS_...)
 
     // --- Xử lý khi nhận chunk (handlePartialResult) ---
     const handlePartialResult = useCallback((update: ChatUpdate) => {
@@ -185,66 +236,146 @@ export function useChatSocket({
 
     }, [animateText, stopAnimation]); // Thêm animateText, stopAnimation
 
-    // --- Xử lý khi nhận kết quả cuối cùng ---
+    // --- Modify handleResult ---
+
+    // --- Modify handleResult ---
     const handleResult = useCallback((result: ResultUpdate) => {
         if (!isMountedRef.current) return;
-        console.log("Socket Result (Full):", result);
+        console.log("Socket Result Received:", result);
 
-        isStreamingCompleteRef.current = true; // Đặt cờ báo hiệu server đã gửi xong
+        // 1. Stop loading/streaming indicators
+        isStreamingCompleteRef.current = true;
+        setLoadingState({ isLoading: false, step: 'result_received', message: '' });
 
-        // Không dừng animation ngay lập tức ở đây, để cho animateText tự hoàn thành
-        // stopAnimation(); // <<<< Bỏ dòng này
-
-        const finalStreamingId = streamingMessageIdRef.current; // Lấy ID trước khi reset
-        const finalFullText = fullStreamedTextRef.current; // Lấy text cuối cùng từ buffer
-
-        // Reset trạng thái streaming cho lần sau
+        const finalStreamingId = streamingMessageIdRef.current;
         streamingMessageIdRef.current = null;
         fullStreamedTextRef.current = '';
         displayedTextLengthRef.current = 0;
 
-        // Đợi một chút để animation có thể hoàn thành frame cuối cùng (tùy chọn, có thể không cần)
-        // setTimeout(() => {
-        // if (!isMountedRef.current) return;
+        // Determine if the action is 'openMap'
+        const isOpenMapAction = result.action?.type === 'openMap';
+        const mapLocation = isOpenMapAction ? (result.action as OpenMapAction).location : undefined;
 
-        setChatMessages(prev => {
-            // Cập nhật tin nhắn cuối cùng với nội dung đầy đủ từ result
-            // và đổi ID để nó không còn là 'streaming-' nữa
-            return prev.map(msg => {
-                if (msg.id === finalStreamingId) {
-                    // Đảm bảo hiển thị nội dung cuối cùng từ result, có thể khác 1 chút so với stream
-                    return {
-                        ...msg,
-                        id: generateMessageId(), // ID mới, ổn định
-                        message: result.message, // Dùng message từ result là chuẩn nhất
-                        thoughts: result.thoughts // Cập nhật thoughts
+        // --- Update Chat History ---
+        setChatMessages(prevMessages => {
+            const finalMessageId = generateMessageId(); // Stable ID for the final message
+
+            // Check if we need to update the placeholder streaming message
+            const messageExistsIndex = finalStreamingId
+                ? prevMessages.findIndex(msg => msg.id === finalStreamingId)
+                : -1;
+
+            if (messageExistsIndex !== -1) {
+                // Update the existing streaming message
+                const updatedMessages = [...prevMessages];
+                const existingMsg = updatedMessages[messageExistsIndex];
+
+                if (isOpenMapAction && mapLocation) {
+                    // --- Transform into a Map Message ---
+                    updatedMessages[messageExistsIndex] = {
+                        ...existingMsg,
+                        id: finalMessageId, // Assign stable ID
+                        type: 'map',
+                        message: result.message || `Showing map for: ${mapLocation}`, // Use result msg or generate one
+                        location: mapLocation,
+                        thoughts: result.thoughts,
+                    };
+                } else {
+                     // --- Update as a Regular Text Message (or handle other actions) ---
+                     if (result.action?.type === 'navigate') {
+                        // Handle navigation action (still opens new tab for now)
+                        const action = result.action as NavigationAction;
+                        const urlToOpen = action.url;
+                        let finalUrlToOpen = urlToOpen;
+                         if (urlToOpen.startsWith('/')) {
+                             finalUrlToOpen = `${BASE_WEB_URL}/${currentLocale}${urlToOpen}`;
+                         }
+                         if (typeof window !== 'undefined') {
+                             console.log(`[ChatSocket] Executing window.open for navigation: ${finalUrlToOpen}`);
+                             window.open(finalUrlToOpen, '_blank', 'noopener,noreferrer');
+                         } else {
+                            console.warn("[ChatSocket] Cannot execute navigation action: 'window' object not available.");
+                            // Optional: add a warning message to chat?
+                         }
+                        // Update the text message *after* performing the action
+                         updatedMessages[messageExistsIndex] = {
+                             ...existingMsg,
+                             id: finalMessageId,
+                             type: 'text',
+                             message: result.message,
+                             thoughts: result.thoughts,
+                             location: undefined, // Ensure location is not set
+                         };
+
+                     } else {
+                        // Default: Update as plain text
+                        updatedMessages[messageExistsIndex] = {
+                            ...existingMsg,
+                            id: finalMessageId,
+                            type: 'text',
+                            message: result.message,
+                            thoughts: result.thoughts,
+                            location: undefined, // Ensure location is not set
+                        };
+                    }
+                }
+                return updatedMessages;
+
+            } else {
+                // Add as a completely new message (no prior streaming placeholder)
+                let newBotMessage: ChatMessageType;
+                if (isOpenMapAction && mapLocation) {
+                    // --- Add New Map Message ---
+                    newBotMessage = {
+                        id: finalMessageId,
+                        message: result.message || `Showing map for: ${mapLocation}`,
+                        isUser: false,
+                        type: 'map',
+                        location: mapLocation,
+                        thoughts: result.thoughts
+                    };
+                } else {
+                     // --- Add New Text Message (or handle other actions) ---
+                     if (result.action?.type === 'navigate') {
+                         // Handle navigation action (still opens new tab for now)
+                         const action = result.action as NavigationAction;
+                         const urlToOpen = action.url;
+                         let finalUrlToOpen = urlToOpen;
+                         if (urlToOpen.startsWith('/')) {
+                             finalUrlToOpen = `${BASE_WEB_URL}/${currentLocale}${urlToOpen}`;
+                         }
+                         if (typeof window !== 'undefined') {
+                             console.log(`[ChatSocket] Executing window.open for navigation: ${finalUrlToOpen}`);
+                             window.open(finalUrlToOpen, '_blank', 'noopener,noreferrer');
+                         } else {
+                             console.warn("[ChatSocket] Cannot execute navigation action: 'window' object not available.");
+                         }
+                     }
+                    // Default: Add new plain text message
+                    newBotMessage = {
+                        id: finalMessageId,
+                        message: result.message,
+                        isUser: false,
+                        type: 'text',
+                        thoughts: result.thoughts
                     };
                 }
-                return msg;
-            });
 
-            /* --- Cách khác: Xóa placeholder và thêm mới ---
-            const historyWithoutStreaming = prev.filter(msg => msg.id !== finalStreamingId);
-            const finalBotMessage: ChatMessageType = {
-                id: generateMessageId(),
-                message: result.message,
-                isUser: false,
-                type: 'text',
-                thoughts: result.thoughts
-            };
-            return [...historyWithoutStreaming, finalBotMessage];
-            */
+                // Avoid adding duplicates if handleResult is somehow called multiple times rapidly
+                if (!prevMessages.some(msg => msg.id === finalMessageId || (msg.id === finalStreamingId) || (msg.message === newBotMessage.message && !msg.isUser && msg.type === newBotMessage.type))) {
+                   return [...prevMessages, newBotMessage];
+                } else {
+                   return prevMessages; // Already added or updated
+                }
+            }
         });
 
-        setLoadingState({ isLoading: false, step: 'result_received', message: '' });
-        // }, ANIMATION_INTERVAL_MS * 2); // Đợi gấp đôi interval animation
+    }, [BASE_WEB_URL, currentLocale, stopAnimation /* Add other dependencies */]);
 
-    }, [/* stopAnimation không còn ở đây */]); // Dependencies có thể không cần thay đổi
 
     // --- Socket Connection Effect ---
     useEffect(() => {
         console.log("Attempting to establish Socket.IO connection...");
-        // ... (Phần khởi tạo socket và gán listener như cũ) ...
         const newSocket = io(socketUrl, { reconnectionAttempts: 5, reconnectionDelay: 1000, reconnectionDelayMax: 5000 });
         socketRef.current = newSocket;
         newSocket.on('connect', handleConnect);
@@ -258,7 +389,6 @@ export function useChatSocket({
 
         return () => {
             console.log("Cleaning up socket connection effect...");
-            // ... (Remove listeners như cũ) ...
             newSocket.off('connect', handleConnect);
             newSocket.off('disconnect', handleDisconnect);
             newSocket.off('connect_error', handleConnectError);
@@ -290,7 +420,8 @@ export function useChatSocket({
     }, [socketUrl, handleConnect, handleDisconnect, handleConnectError, handleStatusUpdate, handlePartialResult, handleResult, handleError, animateText, stopAnimation]);
 
     // --- Send Chat Message Function (Giữ nguyên) ---
-    const sendMessage = useCallback((userInput: string, isStreaming: boolean) => {
+    // --- Send Chat Message Function (Accept language, emit it) ---
+    const sendMessage = useCallback((userInput: string, isStreaming: boolean, language: Language) => { // <<< Accept language
         const trimmedMessage = userInput.trim();
         if (!trimmedMessage) return;
 
@@ -298,10 +429,11 @@ export function useChatSocket({
             handleError({ message: "Cannot send message: Not connected. Please wait or refresh.", type: 'error' }, false);
             return;
         }
-        // Dừng animation của response trước đó (nếu có) trước khi gửi tin nhắn mới
+
         stopAnimation();
-        streamingMessageIdRef.current = null; // Reset trạng thái stream cũ
+        streamingMessageIdRef.current = null;
         isStreamingCompleteRef.current = false;
+
 
         setLoadingState({ isLoading: true, step: 'sending', message: 'Sending...' });
 
@@ -311,18 +443,20 @@ export function useChatSocket({
             isUser: true,
             type: 'text'
         };
-        // Thêm tin nhắn người dùng vào ĐẦU buffer xử lý animation tiếp theo
-        fullStreamedTextRef.current = '';
-        displayedTextLengthRef.current = 0;
+
+        fullStreamedTextRef.current = ''; // Reset buffer for new message flow
+        displayedTextLengthRef.current = 0; // Reset display length
+
 
         setChatMessages(prevMessages => [...prevMessages, newUserMessage]);
 
-        console.log(`Emitting 'send_message' via socket hook (Streaming: ${isStreaming}).`);
+        console.log(`Emitting 'send_message' via socket hook (Streaming: ${isStreaming}, Language: ${language}).`); // Log language
         socketRef.current.emit('send_message', {
             userInput: trimmedMessage,
-            isStreaming: isStreaming
+            isStreaming: isStreaming,
+            language: language // <<< Send language to backend
         });
-    }, [handleError, stopAnimation]); // Thêm stopAnimation
+    }, [handleError, stopAnimation]); // Dependencies likely don't need language as it's just passed through
 
 
     // Return the state and controls
@@ -330,7 +464,7 @@ export function useChatSocket({
         chatMessages,
         loadingState,
         isConnected,
-        sendMessage,
+        sendMessage, // Return the updated function
         socketId
     };
 }

@@ -1,7 +1,6 @@
 // components/ConnectionStatus.tsx
 import React from 'react';
-// Nhập các icon cần thiết (chọn bộ icon bạn thích, ví dụ: Font Awesome)
-import { FaCheckCircle, FaTimesCircle, FaInfoCircle, FaSpinner, FaTimes } from 'react-icons/fa';
+import { FaCheckCircle, FaTimesCircle, FaInfoCircle, FaSpinner } from 'react-icons/fa';
 
 // Định nghĩa các trạng thái kết nối có thể có
 type ConnectionStateType = 'connected' | 'error' | 'info' | 'connecting';
@@ -58,13 +57,15 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
 
   return (
     <div
-      className={`fixed top-2
-                 ${bgColor} ${textColor}
-                 rounded-lg shadow-xl z-50
-                 flex items-center gap-3 p-2
-                 min-w-[200px] max-w-md // Đặt chiều rộng min/max
-                 transition-all duration-300 ease-in-out // Thêm hiệu ứng chuyển động nhẹ nhàng
-                 `}
+      className={`fixed top-6
+               left-1/2 // Đặt điểm neo ở giữa theo chiều ngang
+               transform -translate-x-1/2 // Dịch chuyển sang trái 50% chiều rộng của chính nó để căn giữa
+               ${bgColor} ${textColor}
+               rounded-lg shadow-xl z-50
+               flex items-center gap-3 p-2
+               min-w-[250px] max-w-md // Đặt chiều rộng min/max
+               transition-all duration-300 ease-in-out // Thêm hiệu ứng chuyển động nhẹ nhàng
+               `}
       role="alert" // Thêm vai trò ARIA để hỗ trợ tiếp cận
     >
       {/* Icon */}
@@ -76,7 +77,7 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
         {/* Chỉ hiển thị thời gian nếu đang kết nối và elapsedTime được cung cấp */}
         {status === 'connected' && elapsedTime !== undefined && (
           <p className="text-sm opacity-90">
-            Connected for: {formatTime(elapsedTime)}
+            Connected for: {formatTime(elapsedTime)} / 10:00
           </p>
         )}
       </div>

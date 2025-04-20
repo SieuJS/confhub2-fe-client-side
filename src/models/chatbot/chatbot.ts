@@ -48,10 +48,27 @@ export interface StatusUpdate {
 
 }
 
+// --- Define Action Types ---
+export interface NavigationAction {
+    type: 'navigate';
+    url: string; // The URL (internal path or full external URL)
+}
+
+// <<< NEW: Define OpenMapAction >>>
+export interface OpenMapAction {
+    type: 'openMap';
+    location: string; // The location string to search on Google Maps
+}
+
+// --- Update ChatAction Union Type ---
+export type ChatAction = NavigationAction | OpenMapAction; // <<< ADDED OpenMapAction
+
+// --- ResultUpdate (No change needed here, already has optional 'action') ---
 export interface ResultUpdate {
     type: 'result';
-    message: string;
-    thoughts?: ThoughtStep[]; // Add the thought process history
+    message: string; // The text message to display
+    thoughts?: ThoughtStep[];
+    action?: ChatAction; // Now includes NavigationAction or OpenMapAction
 }
 
 export interface ErrorUpdate {
@@ -64,16 +81,25 @@ export interface ErrorUpdate {
 
 
 
+
+export type MessageType = 'text' | 'error' | 'warning' | 'map' | undefined; // <<< Add 'map'
+
 export interface ChatMessageType {
     id: string;
-    message: string;
+    message: string; // Can be used as a label for the map or fallback text
     isUser: boolean;
-    type: 'text' | 'error' | 'warning' | undefined;
+    type: MessageType; // <<< Use the updated type
     thoughts?: ThoughtStep[];
+    location?: string; // <<< ADDED: Optional location for map messages
+    // Add other potential properties if needed
 }
+
 
 export interface LoadingState {
     isLoading: boolean;
     step: string;
     message: string;
 }
+
+
+
