@@ -21,7 +21,9 @@ interface SearchParams {
   toDate?: Date | null;
   location?: string | null;
   type?: ConferenceType | null;
-  submissionDate?: Date | null; // Keep Date | null
+  // submissionDate?: Date | null; // Keep Date | null
+  submissionStartDate?: Date | null; // NEW
+  submissionEndDate?: Date | null;   // NEW
   publisher?: string | null;
   rank?: string | null; // Keep string | null unless validating strictly
   source?: string | null;
@@ -106,7 +108,7 @@ const getInitialDateFromUrl = (
 
 // Helper to check if any advanced params exist to auto-show the section
 const shouldShowAdvancedOptionsInitially = (searchParams: URLSearchParams): boolean => {
-    const advancedParams = ['submissionDate', 'publisher', 'rank', 'source', 'averageScore', 'topics', 'fieldOfResearch'];
+    const advancedParams = ['submissionDate', 'publisher', 'rank', 'source', 'averageScore', 'topics', 'fieldOfResearch', 'subStartDate', 'subEndDate'];
     return advancedParams.some(param => searchParams.has(param));
 };
 
@@ -129,7 +131,7 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   const initialToDate = getInitialDateFromUrl(searchParams, 'toDate');
 
   // Initialize Advanced Fields
-  const initialSubmissionDate = getInitialDateFromUrl(searchParams, 'submissionDate');
+  // const initialSubmissionDate = getInitialDateFromUrl(searchParams, 'submissionDate');
   const initialPublisher = getInitialStringParam(searchParams, 'publisher');
   const initialRank = getInitialStringParam(searchParams, 'rank'); // Add validation if needed
   const initialSource = getInitialStringParam(searchParams, 'source'); // Add validation if needed
@@ -137,7 +139,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   const initialTopics = getInitialArrayParam(searchParams, 'topics');
   const initialFieldsOfResearch = getInitialArrayParam(searchParams, 'fieldOfResearch');
   const initialShowAdvanced = shouldShowAdvancedOptionsInitially(searchParams);
-
+  const initialSubmissionStartDate =  getInitialDateFromUrl(searchParams, 'subStartDate');
+  const initialSubmissionEndDate =  getInitialDateFromUrl(searchParams, 'subEndDate');
 
   // --- State Variables ---
   // Basic
@@ -158,7 +161,9 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
 
   // Advanced
   const [isAdvancedOptionsVisible, setIsAdvancedOptionsVisible] = useState<boolean>(initialShowAdvanced);
-  const [submissionDate, setSubmissionDate] = useState<Date | null>(initialSubmissionDate);
+  // const [submissionDate, setSubmissionDate] = useState<Date | null>(initialSubmissionDate);
+  const [submissionStartDate, setSubmissionStartDate] = useState<Date | null>(initialSubmissionStartDate); // NEW
+  const [submissionEndDate, setSubmissionEndDate] = useState<Date | null>(initialSubmissionEndDate);     // NEW
   const [selectedPublisher, setSelectedPublisher] = useState<string | null>(initialPublisher);
   const [selectedRank, setSelectedRank] = useState<string | null>(initialRank);
   const [selectedSource, setSelectedSource] = useState<string | null>(initialSource);
@@ -202,7 +207,13 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
 
   // Advanced Handlers (Pass state setters directly)
   const toggleAdvancedOptionsVisibility = () => { setIsAdvancedOptionsVisible(!isAdvancedOptionsVisible); };
-  const handleSubmissionDateChange = (date: Date | null) => { setSubmissionDate(date); };
+  // const handleSubmissionDateChange = (date: Date | null) => { setSubmissionDate(date); };
+  // NEW Handler for Date Range Picker
+  const handleSubmissionDateRangeChange = (dates: [Date | null, Date | null]) => {
+    const [start, end] = dates;
+    setSubmissionStartDate(start);
+    setSubmissionEndDate(end);
+};
   const handlePublisherChange = (publisher: string | null) => { setSelectedPublisher(publisher); };
   const handleRankChange = (rank: string | null) => { setSelectedRank(rank); };
   const handleSourceChange = (source: string | null) => { setSelectedSource(source); };
@@ -218,7 +229,9 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
       toDate,
       location: selectedLocation,
       type: selectedType,
-      submissionDate,
+      // submissionDate,
+      submissionStartDate, // NEW
+      submissionEndDate,   // NEW
       publisher: selectedPublisher,
       rank: selectedRank,
       source: selectedSource,
@@ -253,7 +266,9 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     setTypeSearchQuery('');
 
     // Reset Advanced state
-    setSubmissionDate(null);
+    // setSubmissionDate(null);
+    setSubmissionStartDate(null); // NEW
+    setSubmissionEndDate(null);   // NEW
     setSelectedPublisher(null);
     setSelectedRank(null);
     setSelectedSource(null);
@@ -313,7 +328,9 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
 
     // Advanced Search State & Handlers
     isAdvancedOptionsVisible, // Initialized based on URL
-    submissionDate,         // Initialized from URL
+    // submissionDate,         // Initialized from URL
+    submissionStartDate, // NEW
+    submissionEndDate,   // NEW
     selectedPublisher,      // Initialized from URL
     selectedRank,           // Initialized from URL
     selectedSource,         // Initialized from URL
@@ -321,7 +338,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     selectedTopics,         // Initialized from URL
     selectedFieldsOfResearch, // Initialized from URL
     toggleAdvancedOptionsVisibility,
-    handleSubmissionDateChange,
+    // handleSubmissionDateChange,
+    handleSubmissionDateRangeChange, // NEW
     handlePublisherChange,
     handleRankChange,
     handleSourceChange,

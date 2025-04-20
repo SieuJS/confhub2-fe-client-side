@@ -144,7 +144,7 @@ const AIBanner: React.FC = () => {
         {/* --- Container cho các nút bấm --- */}
         <div className='flex items-stretch justify-center gap-4'>
           {/* --- Nút Chat Now (với 2 Sparkle) --- */}
-          <Link href='/chatbot/chat'>
+          <Link href='/chatbot/livechat'>
             <motion.button
               // Giữ relative cho nút cha
               className='relative flex min-w-[180px] items-center justify-center gap-2 overflow-hidden rounded bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 font-bold text-white outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75'

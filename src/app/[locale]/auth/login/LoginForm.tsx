@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from '@/src/navigation'
 import useLoginForm from '../../../../hooks/auth/useLoginForm'
 import { useTranslations } from 'next-intl'
+import Button from '../../utils/Button'
 
 const LoginForm: React.FC = () => {
   const t = useTranslations('')
