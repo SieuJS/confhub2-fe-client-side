@@ -1724,6 +1724,12 @@ const SuperBannerTree: React.FC = () => {
       chart = echarts.init(chartDom)
       sloganChartInstanceRef.current = chart
 
+      // Kiểm tra giao diện có mobile hay không
+      const isMobile = window.innerWidth < 768 // Kiểm tra
+      const sloganFontSize = isMobile
+        ? 'clamp(1.5rem, 6vw, 3rem)'
+        : 'clamp(2.5rem, 8vw, 4.5rem)' // Responsive font size
+
       const option: EChartsCoreOption = {
         graphic: {
           elements: [
@@ -1734,7 +1740,7 @@ const SuperBannerTree: React.FC = () => {
               style: {
                 text: sloganText,
                 // Responsive font size
-                fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
+                fontSize: sloganFontSize,
                 fontWeight: 'bold',
                 lineDash: [0, 200], // Bắt đầu với nét đứt ẩn
                 lineDashOffset: 0,
@@ -1842,7 +1848,7 @@ const SuperBannerTree: React.FC = () => {
 
         {/* Đoạn mô tả */}
         <motion.p
-          className='mx-0 mb-8 max-w-7xl text-lg font-semibold text-button opacity-90 sm:text-xl md:text-2xl'
+          className='mx-0 mb-8 max-w-7xl text-base font-semibold text-button opacity-90 sm:text-xl md:text-2xl'
           variants={itemVariants} // Áp dụng variant cho item
         >
           {/* Lấy text mô tả từ file translation */}

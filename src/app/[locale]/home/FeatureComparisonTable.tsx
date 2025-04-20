@@ -260,7 +260,7 @@ const FeatureComparisonTable: React.FC = () => {
   )
 
   return (
-    <div className='w-full p-0 md:p-12'>
+    <div className='w-full px-0 py-12 md:px-12'>
       {/* Display the translated table title */}
       <h2 className='mb-4 text-center text-xl font-semibold text-gray-800'>
         {t('title')}

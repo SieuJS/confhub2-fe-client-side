@@ -834,5 +834,7 @@
         "description": "Explore conference information and trends through interactive charts."
       }
     }
-  }
+  },
+  "Mark_Selected_as_Read": "Mark Selected as Read",
+  "Mark_Selected_as_Unimportant": "Mark Selected as Unimportant"
 }
