@@ -467,7 +467,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                           // Thêm tooltip cho địa chỉ đầy đủ (sử dụng optional chaining để an toàn)
                           title={
                             displayOrganization.locations[0]?.address ||
-                            'Xem bản đồ'
+                            t('View_map')
                           }
                         >
                           <svg
@@ -486,18 +486,17 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                             <circle cx='12' cy='10' r='3' />
                           </svg>
                           {/* Hiển thị City/Country hoặc một phiên bản ngắn hơn (sử dụng optional chaining) */}
-                          {
+                          {displayOrganization.locations[0]?.address ||
                             displayOrganization.locations[0]
                               ?.cityStateProvince ||
-                              displayOrganization.locations[0]?.country ||
-                              t('Location_Available') // Hoặc một văn bản mặc định khác nếu cần
-                          }
+                            displayOrganization.locations[0]?.country ||
+                            t('Location_Available')}
                         </a>
                       ) : (
                         // Nếu không có location đầu tiên, hiển thị "No location"
                         // Bạn có thể thêm class CSS để style cho phù hợp
                         <span className='text-sm text-gray-500'>
-                          No location
+                          {t('No_location_available')}
                         </span>
                       )
                     }
@@ -540,7 +539,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                           {/* Thêm flex items-center nếu muốn icon đi kèm */}
                           {/* Bạn có thể thêm icon ở đây nếu muốn, giống như icon publisher nhưng màu xám chẳng hạn */}
                           {/* <svg ... className='lucide lucide-book-type mr-1 flex-shrink-0 text-gray-400'>...</svg> */}
-                          No publisher
+                          {t('No_publisher_available')}
                         </span>
                       )
                     }

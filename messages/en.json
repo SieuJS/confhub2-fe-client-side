@@ -836,5 +836,8 @@
     }
   },
   "Mark_Selected_as_Read": "Mark Selected as Read",
-  "Mark_Selected_as_Unimportant": "Mark Selected as Unimportant"
+  "Mark_Selected_as_Unimportant": "Mark Selected as Unimportant",
+  "No_location_available": "No location available.",
+  "View_map": "View map",
+  "No_publisher_available": "No publisher available."
 }
