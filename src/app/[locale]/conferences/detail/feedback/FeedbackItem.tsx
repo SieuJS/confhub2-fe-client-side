@@ -22,7 +22,7 @@ const FeedbackItem: React.FC<FeedbackItemProps> = ({ feedback }) => {
       <div className='mb-2 flex flex-col items-start justify-between space-y-2 sm:flex-row sm:items-center sm:space-y-0'>
         <div className='flex items-center'>
           <img
-            src={feedback.avatar || '/default-avatar.png'} // Use default
+            src={feedback.avatar || '/avatar1.jpg'} // Use default
             alt={`${feedback.firstName || 'User'}'s Avatar`}
             width={30}
             height={30}

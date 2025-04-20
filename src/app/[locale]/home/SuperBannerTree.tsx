@@ -1571,12 +1571,23 @@ const WorldMap: React.FC<WorldMapProps> = ({
           const startCoords = coordinates[flight.from]
           const endCoords = coordinates[flight.to]
 
-          // Bỏ qua nếu thiếu tọa độ
-          if (!startCoords || !endCoords) {
+          // Kiểm tra chặt chẽ hơn
+          const isValidStart =
+            startCoords &&
+            typeof startCoords.x === 'number' &&
+            typeof startCoords.y === 'number'
+          const isValidEnd =
+            endCoords &&
+            typeof endCoords.x === 'number' &&
+            typeof endCoords.y === 'number'
+
+          if (!isValidStart || !isValidEnd) {
+            // Log chi tiết hơn để debug
             console.warn(
-              `Missing coordinates for flight: ${flight.from} -> ${flight.to}`
+              `Invalid or missing coordinates for flight: ${flight.from} -> ${flight.to}`,
+              { startCoords, endCoords } // Log cả object để xem giá trị thực tế
             )
-            return null
+            return null // Bỏ qua chuyến bay này
           }
 
           // Tạo đường dẫn SVG
@@ -1627,7 +1638,6 @@ const WorldMap: React.FC<WorldMapProps> = ({
                   times: pathTimes // Mốc thời gian cho các keyframes trên
                 }}
               />
-
               {/* 2. HIỆU ỨNG SÓNG LAN TỎA TẠI ĐIỂM ĐẾN */}
               {/* Vòng 1 */}
               <motion.circle

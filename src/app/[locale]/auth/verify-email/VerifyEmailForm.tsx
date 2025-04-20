@@ -14,9 +14,9 @@ interface VerifyEmailFormProps {
   // t: (key: string) => string;
 }
 
-const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => {
+const VerifyEmailForm: React.FC<VerifyEmailFormProps> = () => {
   // Nhận t nếu bạn dùng i18n
-  //  const { t } = useTranslations(''); // Nếu dùng i18n
+  const t = useTranslations('')
   const searchParams = useSearchParams()
   // const router = useRouter(); // <<< Không cần router.push nữa
   // const pathname = usePathname(); // <<< Không cần pathname nữa nếu chỉ dùng Link
@@ -34,11 +34,11 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => {
     setSuccessMessage(null) // Reset success message on new submit attempt
 
     if (!code) {
-      setError('Please enter email and code') // Nên dùng t('verifyEmail.error.missingFields')
+      setError(t('verifyEmail.error.missingFields')) // Nên dùng t('verifyEmail.error.missingFields')
       return
     }
     if (code.length !== 6 || !/^\d+$/.test(code)) {
-      setError('Verification code must be 6 digits') // Nên dùng t('verifyEmail.error.invalidCodeFormat')
+      setError(t('verifyEmail.error.invalidCodeFormat'))
       return
     }
 
@@ -63,7 +63,7 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => {
       if (response.ok) {
         // Status 200
         // Chỉ cần set message thành công, không cần redirect tự động nữa
-        setSuccessMessage(data.message || 'Verification successful!') // Nên dùng t('verifyEmail.success.message')
+        setSuccessMessage(data.message || t('verifyEmail.success.message'))
         setCode('') // Xóa code khỏi input
         // --- BỎ PHẦN TỰ ĐỘNG CHUYỂN HƯỚNG ---
         // setTimeout(() => {
@@ -74,11 +74,11 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => {
         // --- KẾT THÚC BỎ ---
       } else {
         // Lỗi từ backend (400, 404, 500)
-        setError(data.message || 'Verification failed try again') // Nên dùng t('verifyEmail.error.backendFailed')
+        setError(data.message || t('verifyEmail.error.backendFailed'))
       }
     } catch (err) {
       console.error('Verification error:', err)
-      setError('An error occurred during verification') // Nên dùng t('verifyEmail.error.network')
+      setError(t('verifyEmail.error.network'))
     } finally {
       setIsLoading(false)
     }
@@ -121,7 +121,7 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => {
               htmlFor='code'
               className='block text-sm font-medium text-gray-700'
             >
-              {'Verification Code'} {/* Nên dùng t('verifyEmail.codeLabel') */}
+              {t('verifyEmail.codeLabel')}
             </label>
             <div className='mt-1'>
               <input
@@ -134,7 +134,7 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => {
                 value={code}
                 onChange={e => setCode(e.target.value.replace(/\D/g, ''))}
                 className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm'
-                placeholder={'Enter 6 digit code'}
+                placeholder={t('verifyEmail.codePlaceholder')}
               />
             </div>
           </div>
@@ -146,35 +146,32 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => {
               disabled={isLoading} // Không cần disable khi thành công nữa vì nút này sẽ bị ẩn
               className='hover:bg-button/90 flex w-full justify-center rounded-md border border-transparent bg-button px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2 disabled:opacity-50'
             >
-              {isLoading ? (
-                <>{'Verifying...'}</> /* Nên dùng t('verifyEmail.verifying') */
-              ) : (
-                'Verify Account' /* Nên dùng t('verifyEmail.submitButton') */
-              )}
+              {isLoading
+                ? t('verifyEmail.verifying')
+                : t('verifyEmail.submitButton')}
             </button>
           </div>
 
           {/* Link phụ */}
           <div className='text-center text-sm'>
             <span className='text-gray-600'>
-              {'Did not receive code yet?'}{' '}
-              {/* Nên dùng t('verifyEmail.noCode') */}{' '}
+              {t('verifyEmail.noCode')} {/* Nên dùng t('verifyEmail.noCode') */}{' '}
             </span>
             {/* Có thể thêm link gửi lại code nếu cần */}
             <Link
               href='/'
               className='hover:text-button/80 font-medium text-button'
             >
-              {'Resend code'} {/* Nên dùng t('verifyEmail.resendLink') */}
+              {t('verifyEmail.resendLink')}
             </Link>{' '}
             {/* Thêm khoảng trắng nếu cần */}
-            <span className='text-gray-600'>or</span>{' '}
+            <span className='text-gray-600'>{t('common.or')} </span>{' '}
             {/* Nên dùng t('common.or') */} {/* Thêm khoảng trắng nếu cần */}
             <Link
               href='/auth/login'
               className='hover:text-button/80 font-medium text-button'
             >
-              {'Go back to Login'} {/* Nên dùng t('verifyEmail.backToLogin') */}
+              {t('verifyEmail.backToLogin')}
             </Link>
           </div>
         </form>
@@ -188,8 +185,7 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = (/* { t } */) => {
             href='/auth/login' // Quan trọng: Dùng đường dẫn không có locale, Link của next-intl sẽ tự xử lý
             className='hover:bg-button/90 flex w-full justify-center rounded-md border border-transparent bg-button px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
           >
-            {/* Nên dùng t('verifyEmail.returnToLoginButton') */}
-            {'Return_to_homepage'}
+            {t('verifyEmail.returnToHomeButton')}
           </Link>
         </div>
       )}

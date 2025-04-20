@@ -11,11 +11,8 @@ import {
 } from 'react-icons/fa'
 
 // --- IMPORT ODOMETER CSS ---
-// Choose one theme. Import it globally (e.g., in _app.tsx) or here.
-// Make sure the path is correct based on your node_modules structure.
-import 'odometer/themes/odometer-theme-default.css' // Or choose another theme like digital, minimal etc.
+import 'odometer/themes/odometer-theme-default.css'
 
-// Interface remains simple
 interface ConsumerInsightsProps {}
 
 const ConsumerInsights: React.FC<ConsumerInsightsProps> = ({}) => {
@@ -26,14 +23,12 @@ const ConsumerInsights: React.FC<ConsumerInsightsProps> = ({}) => {
   const buttonText = t('buttonText')
 
   const statsData = [
-    { value: 956, label: t('stats.0'), Icon: FaUsers, color: '#3b82f6' }, // Blue
-    { value: 25000, label: t('stats.1'), Icon: FaChartBar, color: '#10b981' }, // Emerald
-    { value: 120, label: t('stats.2'), Icon: FaMapMarkedAlt, color: '#f59e0b' }, // Amber
-    { value: 75, label: t('stats.3'), Icon: FaHandshake, color: '#ef4444' } // Red
+    { value: 956, label: t('stats.0'), Icon: FaUsers, color: '#3b82f6' },
+    { value: 25000, label: t('stats.1'), Icon: FaChartBar, color: '#10b981' },
+    { value: 120, label: t('stats.2'), Icon: FaMapMarkedAlt, color: '#f59e0b' },
+    { value: 75, label: t('stats.3'), Icon: FaHandshake, color: '#ef4444' }
   ]
 
-  // --- Visibility State and Observer ---
-  // We need this again because react-odometerjs doesn't have built-in scroll spying
   const [isVisible, setIsVisible] = useState(false)
   const componentRef = useRef<HTMLDivElement>(null)
 
@@ -42,13 +37,13 @@ const ConsumerInsights: React.FC<ConsumerInsightsProps> = ({}) => {
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true)
-          observer.unobserve(entry.target) // Stop observing once visible
+          observer.unobserve(entry.target)
         }
       },
       {
         root: null,
         rootMargin: '0px',
-        threshold: 0.1 // Trigger when 10% is visible
+        threshold: 0.1
       }
     )
 
@@ -62,16 +57,12 @@ const ConsumerInsights: React.FC<ConsumerInsightsProps> = ({}) => {
         observer.unobserve(currentRef)
       }
     }
-  }, []) // Empty dependency array ensures this runs only once on mount
-
-  // Note: Odometer formatting (like 'k' suffix) is less flexible than CountUp.
-  // It primarily formats numbers with digits and separators.
-  // We will display the full number here.
+  }, [])
 
   return (
     <section
       id='consumer-insights'
-      ref={componentRef} // Attach ref for IntersectionObserver
+      ref={componentRef}
       className='m-12 overflow-hidden rounded-lg bg-gray-50 py-8 shadow-lg dark:bg-gray-900 md:py-16'
     >
       <div className='container mx-auto px-4 md:px-6'>
@@ -101,17 +92,18 @@ const ConsumerInsights: React.FC<ConsumerInsightsProps> = ({}) => {
               </div>
 
               {/* --- Animated Number Display using react-odometerjs --- */}
-              <p
-                className='mb-2 text-4xl font-bold md:text-5xl' // Apply styling to the parent
+              {/* V V V V V V V V THIS IS THE FIX V V V V V V V */}
+              <div // Changed from <p>
+                className='mb-2 text-4xl font-bold md:text-5xl'
                 style={{ color: stat.color }}
               >
                 <Odometer
-                  value={isVisible ? stat.value : 0} // Animate from 0 to value when visible
-                  format='(,ddd)' // Example format: adds comma separators for thousands
-                  duration={1000} // Animation duration in milliseconds
-                  // animation="smooth" // Optional: control animation style via JS if needed, usually handled by CSS theme
+                  value={isVisible ? stat.value : 0}
+                  format='(,ddd)'
+                  duration={1000}
                 />
-              </p>
+              </div>
+              {/* ^ ^ ^ ^ ^ ^ ^ ^ THIS IS THE FIX ^ ^ ^ ^ ^ ^ ^ */}
 
               {/* Label */}
               <p className='mt-1 text-sm font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400'>

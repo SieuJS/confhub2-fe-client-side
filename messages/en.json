@@ -674,29 +674,25 @@
   "Go_To_Verification_Page": "Go to verification page",
   "Verify_Your_Email_Address": "Verify your email address",
   "Enter_Code_Sent_To_Email": "Enter the code sent to your email address",
-  "VerifyEmail": {
-    "instructions": "Enter the 6-digit code sent to {email}",
-    "codeLabel": "Verification Code",
-    "codePlaceholder": "Enter code",
-    "submitButton": "Verify Account",
-    "success": {
-      "message": "Account verified successfully! You can now log in."
-    },
+  "verifyEmail": {
+    "title": "Verify Your Email",
     "error": {
-      "missingCode": "Please enter the verification code.",
-      "invalidCodeFormat": "Verification code must be 6 digits.",
-      "backendFailed": "Verification failed. The code might be incorrect or expired.",
-      "network": "An error occurred. Please check your connection and try again."
+      "missingFields": "Please enter the verification code",
+      "invalidCodeFormat": "Verification code must be 6 digits",
+      "backendFailed": "Verification failed. Please check the code and try again.",
+      "network": "An error occurred during verification. Please try again later."
     },
-    "resend": {
-      "link": "Resend code",
-      "cooldown": "Resend available in {seconds}s",
-      "success": "A new verification code has been sent to your email.",
-      "errorGeneral": "Failed to resend code. Please try again later.",
-      "errorNetwork": "An error occurred while trying to resend the code."
+    "success": {
+      "message": "Verification successful! You can now log in."
     },
+    "codeLabel": "Verification Code",
+    "codePlaceholder": "Enter 6 digit code",
+    "verifying": "Verifying...",
+    "submitButton": "Verify Account",
+    "noCode": "Didn't receive the code yet?",
+    "resendLink": "Resend code",
     "backToLogin": "Go back to Login",
-    "returnToLoginButton": "Return to Login"
+    "returnToHomeButton": "Return to Home"
   },
   "Common": {
     "loading": "Loading...",
