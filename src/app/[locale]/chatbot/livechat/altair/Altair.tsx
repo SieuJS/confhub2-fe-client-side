@@ -69,7 +69,7 @@ function AltairComponent({ outputModality, selectedVoice }: AltairComponentProps
     const onToolCall = async (toolCall: ToolCall) => {
       console.log(`Got toolcall`, toolCall);
 
-      const BASE_URL = "http://confhub.engineer/api/v1";
+      const BASE_URL = process.env.NEXT_PUBLIC_DATABASE_URL + "/api/v1";
       console.log("Backend URL:", BASE_URL);
 
       const responses = [];

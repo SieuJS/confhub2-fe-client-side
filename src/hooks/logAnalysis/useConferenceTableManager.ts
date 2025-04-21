@@ -198,7 +198,7 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
     }, [selectedConferences, mainSaveStatus]);
 
     // handleBulkSave (logic bên trong không cần thay đổi nhiều, vì isSaveEnabled đã lọc trước)
-     const handleBulkSave = useCallback(async () => {
+     const handleBulkSave = async () => {
         if (!isSaveEnabled) return; // Guard đã bao gồm cả check warning
 
         setMainSaveStatus('saving');
@@ -266,27 +266,19 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
             }
         });
 
-        setRowSaveStatus({...finalRowStatus});
-        setRowSaveErrors({...finalRowErrors});
+        setRowSaveStatus(finalRowStatus);
+        setRowSaveErrors(finalRowErrors);
 
         if (overallSuccess) {
             setMainSaveStatus('success');
             console.log(`Bulk save completed successfully for ${successfulSaves} items.`);
             handleDeselectAll();
-            setTimeout(() => setMainSaveStatus('idle'), 3000);
+            // setTimeout(() => setMainSaveStatus('idle'), 3000);
         } else {
             setMainSaveStatus('error');
             console.error(`Bulk save completed with ${failedSaves} error(s) out of ${selectedTitles.length} selected items.`);
         }
-    }, [
-        isSaveEnabled,
-        selectedTitles,
-        selectedConferences,
-        conferenceDataArray, // Quan trọng: cần để filter itemsToSave
-        rowSaveStatus,
-        rowSaveErrors,
-        handleDeselectAll // Thêm handleDeselectAll vào dependencies
-    ]);
+    }
 
 
     // Mock Crawl Again Logic (giữ nguyên)

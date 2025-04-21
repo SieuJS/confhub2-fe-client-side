@@ -1,6 +1,8 @@
+'use_client'
 import { useState, useCallback } from 'react';
 import axios, { AxiosError } from 'axios';
 import { Conference, ApiCrawlResponse, CrawlProgress, SendToCrawlConference } from '../../models/logAnalysis/importConferenceCrawl'; // Điều chỉnh đường dẫn nếu cần
+import { appConfig } from '@/src/middleware';
 
 // --- Configuration ---
 const API_CONFERENCE_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/crawl-conferences`;
@@ -26,8 +28,8 @@ export interface UseConferenceCrawlReturn {
     crawlError: string | null;
     crawlProgress: CrawlProgress;
     crawlMessages: string[];
-    selectedRows: SendToCrawlConference[]; // Thêm selectedRows vào return
-    setSelectedRows: React.Dispatch<React.SetStateAction<SendToCrawlConference[]>>; // Thêm setSelectedRows vào return
+    selectedRows: string[]; // Thêm selectedRows vào return
+    setSelectedRows: React.Dispatch<React.SetStateAction<string[]>>; // Thêm setSelectedRows vào return
     handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     setEnableChunking: (enabled: boolean) => void;
     setChunkSize: (size: number) => void;
@@ -50,7 +52,7 @@ export const useConferenceCrawl = (): UseConferenceCrawlReturn => {
     const [crawlProgress, setCrawlProgress] = useState<CrawlProgress>({ current: 0, total: 0, status: 'idle' });
     const [crawlMessages, setCrawlMessages] = useState<string[]>([]);
 
-    const [selectedRows, setSelectedRows] = useState<SendToCrawlConference[]>([]); // State cho selected rows
+    const [selectedRows, setSelectedRows] = useState<string[]>([]); // State cho selected rows
 
     const uploadFileEndPoint = `${process.env.NEXT_PUBLIC_DATABASE_URL}/api/v1/admin-conference/upload-file-csv`;
 
@@ -158,7 +160,7 @@ export const useConferenceCrawl = (): UseConferenceCrawlReturn => {
 
 
     // --- Crawl Execution Logic ---
-    const startCrawl = useCallback(async () => {
+    const startCrawl = async () => {
         console.log(selectedRows.length)
         if (selectedRows.length === 0  || isCrawling) {
             console.warn("Cannot start crawl: No data parsed, data is empty, or already crawling.");
@@ -182,8 +184,15 @@ export const useConferenceCrawl = (): UseConferenceCrawlReturn => {
                 const description = `Chunk ${i + 1}/${totalChunks}`;
                 setCrawlProgress(prev => ({ ...prev, current: i + 1, currentChunkData: currentChunk })); // Cập nhật progress trước khi gửi
 
-                const success = await sendApiRequest(currentChunk, description);
-
+                const success = await fetch(
+                    appConfig.NEXT_PUBLIC_DATABASE_URL +"/api/v1/admin-conference/crawl-new" , {
+                        method : "POST" , 
+                        body : JSON.stringify(currentChunk),
+                        headers : {
+                            'Content-Type' : 'application/json'
+                        }
+                    })
+                
                 if (!success) {
                     console.error(`Crawl stopped due to error in ${description}.`);
                     setCrawlProgress(prev => ({ ...prev, status: 'stopped' }));
@@ -203,7 +212,15 @@ export const useConferenceCrawl = (): UseConferenceCrawlReturn => {
             console.log("Starting crawl in 'send all' mode.");
             setCrawlProgress({ current: 1, total: 1, status: 'crawling', currentChunkData: selectedRows }); // Progress là 1/1
             const description = "Entire List";
-            const success = await sendApiRequest(selectedRows, description);
+            
+            const success = await fetch(
+                appConfig.NEXT_PUBLIC_DATABASE_URL +"/api/v1/admin-conference/crawl-new" , {
+                    method : "POST" , 
+                    body : JSON.stringify(selectedRows),
+                    headers : {
+                        'Content-Type' : 'application/json'
+                    }
+                })
 
             if (success) {
                 console.log("Finished sending entire list successfully.");
@@ -218,7 +235,7 @@ export const useConferenceCrawl = (): UseConferenceCrawlReturn => {
 
         setIsCrawling(false); // Mark crawling as finished (success, error, or stopped)
 
-    }, [parsedData, isCrawling, enableChunking, chunkSize, sendApiRequest, selectedRows]);
+    }
 
     // --- Reset Function ---
      const resetCrawl = useCallback(() => {

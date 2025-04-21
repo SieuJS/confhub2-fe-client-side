@@ -4,12 +4,11 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import io, { Socket } from 'socket.io-client';
 import { Notification } from '../../models/response/user.response'; // Adjust path
 import { UserResponse } from '../../models/response/user.response';
-import { appConfig } from '@/src/middleware';
 interface UseSocketConnectionProps {
   loginStatus: string | null;
   user: UserResponse  | null;
 }
-const NEXT_PUBLIC_DATABASE_URL = appConfig.NEXT_PUBLIC_DATABASE_URL || "http://confhub.engineer"
+const NEXT_PUBLIC_DATABASE_URL = process.env.NEXT_PUBLIC_DATABASE_URL || "http://confhub.engineer"
 const socketInitializer = () => {
   // // Lấy URL cơ sở từ biến môi trường (nếu có, hoặc để trống nếu chỉ dùng origin hiện tại)
   // // Trong trường hợp này, vì NEXT_PUBLIC_DATABASE_URL chỉ là "/api", chúng ta không cần chỉ định URL cơ sở,
@@ -38,7 +37,7 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
     if (user?.id) {
       setIsLoadingNotifications(true);
       try {
-        const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/user`, {
+        const response = await fetch(`${NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/user`, {
           method: 'GET',
           headers : {
             "Authorization" : `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
@@ -65,7 +64,7 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
     if (!user?.id) return;
 
     try {
-      const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/mark-all-as-read`, {
+      const response = await fetch(`${NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/mark-all-as-read`, {
         method: 'PUT', // Use PUT or POST, depending on your API design
         headers: {
           'Content-Type': 'application/json',

@@ -21,8 +21,6 @@ export const ConferenceCrawlUploader: React.FC = () => {
         crawlError,
         crawlProgress,
         crawlMessages,
-        selectedRows,
-        setSelectedRows,
         handleFileChange,
         setEnableChunking,
         setChunkSize,
