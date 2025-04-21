@@ -1,10 +1,9 @@
 // Map.tsx
 'use client'
 
+import { appConfig } from '@/src/middleware'
 import React, { useEffect, useRef } from 'react'
 
-// WARNING: Do not embed API keys directly in code... (Keep the warning)
-const API_KEY = 'AIzaSyBg-9FAVGjxNmG_8UkmssL4MJ34iOSyTCE' // Replace with your key
 
 interface MapProps {
   location: string
@@ -12,7 +11,7 @@ interface MapProps {
 
 const Map: React.FC<MapProps> = ({ location }) => {
   const mapRef = useRef<HTMLDivElement>(null)
-
+  const API_KEY = appConfig.NEXT_PUBLIC_GOOGLE_MAP_API_KEY;
   useEffect(() => {
     if (!location || !mapRef.current) return
 

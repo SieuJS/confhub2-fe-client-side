@@ -100,8 +100,6 @@ const SidePanel: React.FC<SidePanelProps> = ({
         <div
             className={`flex-shrink-0 h-full bg-white text-gray-800 shadow-xl transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'w-72 opacity-100' : 'w-0 opacity-0'
                 }`}
-            aria-hidden={!isOpen}
-            aria-labelledby="sidepanel-title"
         >
             {/* Inner Content Wrapper */}
             <div className="flex h-full flex-col p-5 min-w-[18rem] overflow-y-auto">
