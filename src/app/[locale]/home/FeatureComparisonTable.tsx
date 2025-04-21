@@ -1,68 +1,73 @@
 // src/components/FeatureComparisonTable.tsx
-// (Single file, Internal Data, Tooltip *next to icon*, No Category Headers, Title, Increased Padding)
 
 import React, { useState, useMemo } from 'react'
+import { useTranslations } from 'next-intl' // Import useTranslations
 
 // --- Data Definitions (Interface) ---
+// Interface defining the structure for a single feature, using keys for translatable content
 interface Feature {
   id: string
-  name: string
-  description: string | string[]
+  nameKey: string // Key for the feature name in the translation file
+  descriptionKey: string | string[] // Key(s) for the feature description
   requiresLogin: boolean
   isNew?: boolean
 }
 
+// Interface defining the structure for a category of features
 interface FeatureCategory {
-  categoryName: string
+  categoryNameKey: string // Key for the category name
   features: Feature[]
 }
 
-// --- Static Data ---
-const featureData: FeatureCategory[] = [
+// --- Static Data Configuration (Using Keys) ---
+// This data structure uses keys that correspond to the en.json file.
+// It defines the features and their properties, linking them to translatable strings.
+const featureDataConfig: FeatureCategory[] = [
   {
-    categoryName: 'General User Functions',
+    categoryNameKey: 'FeatureComparisonTable.categories.general',
     features: [
       {
         id: 'auth',
-        name: 'Sign Up & Log In',
-        description:
-          'Log in using a registered account or via Google single sign-on.',
+        nameKey: 'FeatureComparisonTable.features.auth.name',
+        descriptionKey: 'FeatureComparisonTable.features.auth.description',
         requiresLogin: false
       },
       {
         id: 'search',
-        name: 'Conference Search & Filter',
-        description: [
-          'Search criteria:',
-          'Location',
-          'Conference date',
-          'Rank',
-          'Source',
-          'Organization type.'
+        nameKey: 'FeatureComparisonTable.features.search.name',
+        descriptionKey: [
+          // Array of keys for multi-line descriptions
+          'FeatureComparisonTable.features.search.description.0',
+          'FeatureComparisonTable.features.search.description.1',
+          'FeatureComparisonTable.features.search.description.2',
+          'FeatureComparisonTable.features.search.description.3',
+          'FeatureComparisonTable.features.search.description.4',
+          'FeatureComparisonTable.features.search.description.5'
         ],
         requiresLogin: false
       },
       {
         id: 'location_map',
-        name: 'Location Map',
-        description:
-          'A map showing the conference venue is available on the conference detail page.',
+        nameKey: 'FeatureComparisonTable.features.location_map.name',
+        descriptionKey:
+          'FeatureComparisonTable.features.location_map.description',
         requiresLogin: false
       },
       {
         id: 'journal_search',
-        name: 'Scientific Journal Search',
-        description: 'Search for scientific journals.',
+        nameKey: 'FeatureComparisonTable.features.journal_search.name',
+        descriptionKey:
+          'FeatureComparisonTable.features.journal_search.description',
         requiresLogin: false
       },
       {
         id: 'chatbot',
-        name: 'Chatbot Assistant',
-        description: [
-          'Answers questions about conference and journal information.',
-          'Provides guidance on using the application.',
-          'Redirects to relevant pages.',
-          'Supports text chat, voice chat, screen sharing, and video.'
+        nameKey: 'FeatureComparisonTable.features.chatbot.name',
+        descriptionKey: [
+          'FeatureComparisonTable.features.chatbot.description.0',
+          'FeatureComparisonTable.features.chatbot.description.1',
+          'FeatureComparisonTable.features.chatbot.description.2',
+          'FeatureComparisonTable.features.chatbot.description.3'
         ],
         requiresLogin: false,
         isNew: true
@@ -70,69 +75,69 @@ const featureData: FeatureCategory[] = [
     ]
   },
   {
-    categoryName: 'Logged-in User Functions',
+    categoryNameKey: 'FeatureComparisonTable.categories.loggedIn',
     features: [
       {
         id: 'follow',
-        name: 'Follow Conference',
-        description: 'Click the "Follow" button to track a conference.',
+        nameKey: 'FeatureComparisonTable.features.follow.name',
+        descriptionKey: 'FeatureComparisonTable.features.follow.description',
         requiresLogin: true
       },
       {
         id: 'feedback',
-        name: 'Conference Feedback',
-        description: 'Rate conferences (1-5 stars) and leave comments.',
+        nameKey: 'FeatureComparisonTable.features.feedback.name',
+        descriptionKey: 'FeatureComparisonTable.features.feedback.description',
         requiresLogin: true
       },
       {
         id: 'notes',
-        name: 'Personal Notes/Calendar',
-        description: [
-          'A calendar view shows events/notes for a selected day.',
-          'Users can add notes for any specific day using the "+" button.'
+        nameKey: 'FeatureComparisonTable.features.notes.name',
+        descriptionKey: [
+          'FeatureComparisonTable.features.notes.description.0',
+          'FeatureComparisonTable.features.notes.description.1'
         ],
         requiresLogin: true
       },
       {
         id: 'submit_conf',
-        name: 'Submit New Conference',
-        description:
-          'Enter complete conference details and submit. The conference will be added to a pending approval queue.',
+        nameKey: 'FeatureComparisonTable.features.submit_conf.name',
+        descriptionKey:
+          'FeatureComparisonTable.features.submit_conf.description',
         requiresLogin: true
       },
       {
         id: 'notifications',
-        name: 'Notifications',
-        description: [
-          'Receive notifications through the web application.',
-          'Receive notifications via registered email.'
+        nameKey: 'FeatureComparisonTable.features.notifications.name',
+        descriptionKey: [
+          'FeatureComparisonTable.features.notifications.description.0',
+          'FeatureComparisonTable.features.notifications.description.1'
         ],
         requiresLogin: true
       },
       {
         id: 'settings',
-        name: 'User Settings',
-        description: [
-          'Option to receive email notifications.',
-          'Option to automatically add followed events to personal notes.'
+        nameKey: 'FeatureComparisonTable.features.settings.name',
+        descriptionKey: [
+          'FeatureComparisonTable.features.settings.description.0',
+          'FeatureComparisonTable.features.settings.description.1'
         ],
         requiresLogin: true
       },
       {
         id: 'profile_update',
-        name: 'Update Personal Profile',
-        description: [
-          'Update display name.',
-          'Update password.',
-          'Update address.'
+        nameKey: 'FeatureComparisonTable.features.profile_update.name',
+        descriptionKey: [
+          'FeatureComparisonTable.features.profile_update.description.0',
+          'FeatureComparisonTable.features.profile_update.description.1',
+          'FeatureComparisonTable.features.profile_update.description.2'
         ],
         requiresLogin: true
       },
       {
         id: 'chart_visualization',
-        name: 'Data Visualization',
-        description:
-          'Provides capabilities to visualize conference information using charts.',
+        nameKey: 'FeatureComparisonTable.features.chart_visualization.name',
+        descriptionKey:
+          'FeatureComparisonTable.features.chart_visualization.description',
         requiresLogin: true,
         isNew: true
       }
@@ -140,8 +145,9 @@ const featureData: FeatureCategory[] = [
   }
 ]
 
-// --- Helper Components for Icons ---
+// --- Helper Components (Icons and Badge) ---
 
+// Check Icon Component
 const CheckIcon: React.FC<{ className?: string }> = ({ className = '' }) => (
   <svg
     xmlns='http://www.w3.org/2000/svg'
@@ -160,6 +166,7 @@ const CheckIcon: React.FC<{ className?: string }> = ({ className = '' }) => (
   </svg>
 )
 
+// Cross Icon Component
 const CrossIcon: React.FC<{ className?: string }> = ({ className = '' }) => (
   <svg
     xmlns='http://www.w3.org/2000/svg'
@@ -178,12 +185,17 @@ const CrossIcon: React.FC<{ className?: string }> = ({ className = '' }) => (
   </svg>
 )
 
-const NewBadge: React.FC = () => (
-  <span className='ml-2 inline-block rounded-full bg-blue-100 px-2.5 py-0.5 align-middle text-xs font-semibold text-blue-800'>
-    NEW
-  </span>
-)
+// "NEW" Badge Component - Uses translations
+const NewBadge: React.FC = () => {
+  const t = useTranslations('Common') // Access the 'Common' namespace for shared terms
+  return (
+    <span className='ml-2 inline-block rounded-full bg-blue-100 px-2.5 py-0.5 align-middle text-xs font-semibold text-blue-800'>
+      {t('new')} {/* Display the translated "NEW" text */}
+    </span>
+  )
+}
 
+// Information Icon Component
 const InformationCircleIcon: React.FC<{ className?: string }> = ({
   className = ''
 }) => (
@@ -205,128 +217,157 @@ const InformationCircleIcon: React.FC<{ className?: string }> = ({
 )
 
 // --- Tooltip Content Renderer ---
-const TooltipContent: React.FC<{ description: string | string[] }> = ({
-  description
-}) => {
-  if (Array.isArray(description)) {
+// Renders the description inside the tooltip, fetching translations based on keys.
+interface TooltipContentProps {
+  descriptionKey: string | string[] // Accepts a single key or an array of keys
+}
+
+const TooltipContent: React.FC<TooltipContentProps> = ({ descriptionKey }) => {
+  const t = useTranslations('') // Use the global namespace to access feature description keys
+
+  // If descriptionKey is an array, translate and render each key as a list item
+  if (Array.isArray(descriptionKey)) {
     return (
       <ul className='list-inside list-disc space-y-1 text-left text-xs'>
-        {description.map((item, index) => (
-          <li key={index}>{item}</li>
+        {descriptionKey.map((key, index) => (
+          <li key={index}>{t(key)}</li> // Translate each key
         ))}
       </ul>
     )
   }
-  return <p className='text-left text-xs'>{description}</p>
+  // If descriptionKey is a single string, translate and render it as a paragraph
+  return <p className='text-left text-xs'>{t(descriptionKey)}</p>
 }
 
 // --- Main Table Component ---
-
 const FeatureComparisonTable: React.FC = () => {
+  // Initialize translation hooks for different namespaces
+  const t = useTranslations('FeatureComparisonTable') // For table-specific text (title, headers, etc.)
+  const tg = useTranslations('') // Global namespace for feature names/descriptions accessed via keys
+
+  // State to manage which tooltip is currently active
   const [activeTooltipId, setActiveTooltipId] = useState<string | null>(null)
 
+  // Memoize the flattened list of all features from the config data
+  // This prevents recalculating on every render
   const allFeatures = useMemo(
     () =>
-      featureData.reduce(
+      featureDataConfig.reduce(
         (acc, category) => acc.concat(category.features),
-        [] as Feature[]
+        [] as Feature[] // Type assertion
       ),
-    [featureData]
+    [] // Dependency array is empty as featureDataConfig is static
   )
 
   return (
-    <div className='w-full p-0 md:p-12'>
+    <div className='w-full px-0 py-12 md:px-12'>
+      {/* Display the translated table title */}
       <h2 className='mb-4 text-center text-xl font-semibold text-gray-800'>
-        Feature Comparison: Guest vs. Logged-in Users
+        {t('title')}
       </h2>
       <div className='overflow-x-auto border border-gray-200 shadow-md sm:rounded-lg'>
         <table className='w-full text-left text-sm text-gray-700'>
+          {/* Table Head */}
           <thead className='bg-gray-100 text-xs uppercase text-gray-700'>
             <tr>
-              {/* Padding px-8 py-5 applied */}
+              {/* Display translated headers */}
               <th
                 scope='col'
                 className='w-2/4 border-b border-gray-300 px-8 py-5'
               >
-                Feature
+                {t('headers.feature')}
               </th>
               <th
                 scope='col'
                 className='border-b border-gray-300 px-8 py-5 text-center'
               >
-                Guest User<span className='sr-only'> Availability</span>
+                {t('headers.guest')}
+                {/* Screen reader text, also translated */}
+                <span className='sr-only'> {t('availability.available')}</span>
               </th>
               <th
                 scope='col'
                 className='border-b border-gray-300 px-8 py-5 text-center'
               >
-                Logged-in User<span className='sr-only'> Availability</span>
+                {t('headers.loggedIn')}
+                {/* Screen reader text, also translated */}
+                <span className='sr-only'> {t('availability.available')}</span>
               </th>
             </tr>
           </thead>
+          {/* Table Body */}
           <tbody>
+            {/* Map through each feature to create a table row */}
             {allFeatures.map((feature, featureIndex) => (
               <tr
                 key={feature.id}
-                className={`border-b border-gray-200 last:border-b-0 ${featureIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'} transition-colors duration-150 hover:bg-gray-100`}
+                className={`border-b border-gray-200 last:border-b-0 ${
+                  featureIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                } transition-colors duration-150 hover:bg-gray-100`}
               >
-                {/* Feature Name and Tooltip Trigger - Padding px-8 py-5 applied */}
+                {/* Feature Name Column */}
                 <td className='px-8 py-5 align-top'>
-                  {' '}
-                  {/* Removed relative positioning from td */}
                   <div className='flex items-center space-x-2'>
-                    {' '}
-                    {/* Main container for feature name + icon */}
+                    {/* Display the translated feature name */}
                     <span className='font-medium text-gray-900'>
-                      {feature.name}
+                      {tg(feature.nameKey)}
                     </span>
+                    {/* Conditionally render the "NEW" badge */}
                     {feature.isNew && <NewBadge />}
-                    {/* === Tooltip Trigger Area === */}
-                    {/* Added 'relative' here to make THIS the positioning context for the tooltip */}
+                    {/* Tooltip Trigger Area */}
                     <div
-                      className='relative flex cursor-help items-center' // Added relative and flex
+                      className='relative flex cursor-help items-center'
                       onMouseEnter={() => setActiveTooltipId(feature.id)}
                       onMouseLeave={() => setActiveTooltipId(null)}
                     >
                       <InformationCircleIcon className='text-gray-400 hover:text-blue-600' />
-
-                      {/* Tooltip Element - Now positioned relative to the icon's wrapper div */}
+                      {/* Conditionally render the tooltip */}
                       {activeTooltipId === feature.id && (
                         <div
-                          // Position adjusted: left-full (of icon div), centered vertically, small margin
                           className='absolute left-full top-1/2 z-20 ml-2 w-64 max-w-xs -translate-y-1/2 rounded-md bg-gray-800 p-3 text-white shadow-lg'
                           role='tooltip'
                         >
-                          <TooltipContent description={feature.description} />
+                          {/* Render tooltip content using the keys */}
+                          <TooltipContent
+                            descriptionKey={feature.descriptionKey}
+                          />
                         </div>
                       )}
                     </div>
-                    {/* === End Tooltip Trigger Area === */}
                   </div>
                 </td>
 
-                {/* Guest User Availability - Padding px-8 py-5 applied */}
+                {/* Guest User Availability Column */}
                 <td className='px-8 py-5 text-center align-middle'>
                   <div className='inline-flex h-full w-full items-center justify-center'>
                     {feature.requiresLogin ? (
                       <>
                         <CrossIcon />
-                        <span className='sr-only'>Not available</span>
+                        {/* Translated screen reader text for accessibility */}
+                        <span className='sr-only'>
+                          {t('availability.notAvailable')}
+                        </span>
                       </>
                     ) : (
                       <>
                         <CheckIcon />
-                        <span className='sr-only'>Available</span>
+                        {/* Translated screen reader text for accessibility */}
+                        <span className='sr-only'>
+                          {t('availability.available')}
+                        </span>
                       </>
                     )}
                   </div>
                 </td>
 
-                {/* Logged-in User Availability - Padding px-8 py-5 applied */}
+                {/* Logged-in User Availability Column */}
                 <td className='px-8 py-5 text-center align-middle'>
                   <div className='inline-flex h-full w-full items-center justify-center'>
                     <CheckIcon />
-                    <span className='sr-only'>Available</span>
+                    {/* Translated screen reader text for accessibility */}
+                    <span className='sr-only'>
+                      {t('availability.available')}
+                    </span>
                   </div>
                 </td>
               </tr>

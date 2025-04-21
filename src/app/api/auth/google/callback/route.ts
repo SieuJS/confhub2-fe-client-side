@@ -70,11 +70,11 @@ export async function GET(request: Request) {
     }
 
     const pathWithLocale = `/${localePrefix}`;
-    console.log("[Server - /api/v1/auth/google/callback] Redirecting to:",  new URL(pathWithLocale, process.env.BASE_URL)); // Log 7
+    console.log("[Server - /api/v1/auth/google/callback] Redirecting to:",  new URL(pathWithLocale, appConfig.NEXT_PUBLIC_FRONTEND_URL)); // Log 7
 
 
     // *** IMPORTANT CHANGE HERE ***
-    const redirectUrl = new URL(pathWithLocale, process.env.BASE_URL);
+    const redirectUrl = new URL(pathWithLocale, appConfig.NEXT_PUBLIC_FRONTEND_URL);
     const nextResponse = NextResponse.redirect(redirectUrl); // Create the response *first*
 
     nextResponse.cookies.set('user', JSON.stringify(data.user), { path: '/' });

@@ -62,16 +62,34 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
   // --- Define getAccessTypeColor ---
   const getAccessTypeColor = useCallback((accessType?: string): string => {
-    const upperAccessType = accessType?.toUpperCase() ?? ''
-    switch (upperAccessType) {
-      case 'ONLINE':
+    // const upperAccessType = accessType?.toUpperCase() ?? ''
+    switch (accessType) {
+      case 'Online':
         return 'bg-green-100 text-green-700 border border-green-300'
-      case 'OFFLINE':
+      case 'Offline':
         return 'bg-red-100 text-red-700 border border-red-300'
-      case 'HYBRID':
+      case 'Hybrid':
         return 'bg-blue-100 text-blue-700 border border-blue-300'
       default:
         return 'bg-gray-100 text-gray-600 border border-gray-300' // Added border for consistency
+    }
+  }, [])
+
+  // --- Define getRankColor --- (NEW)
+  const getRankColor = useCallback((rank?: string) => {
+    rank = rank?.toUpperCase()
+    switch (rank) {
+      case 'A*':
+        return 'bg-amber-100 text-amber-700 border border-amber-300' // Added border
+      case 'A':
+        return 'bg-green-100 text-green-700 border border-green-300' // Added border
+      case 'B':
+        return 'bg-sky-100 text-sky-700 border border-sky-300' // Added border
+      case 'C':
+        return 'bg-orange-100 text-orange-700 border border-orange-300' // Added border
+      default:
+        // Consider if a default rank needs a specific style or the gray one is fine
+        return 'bg-gray-100 text-gray-600 border border-gray-300' // Added border
     }
   }, [])
 
@@ -81,6 +99,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
       conferenceDataFromDB.organizations.length - 1
     ]
   const accessType = lastOrganization?.accessType
+  const firstRankData = conferenceDataFromDB?.ranks?.[0] // Get first rank data
 
   const transformDates = (dates: ImportantDate[] | null | undefined) => {
     if (!dates) {
@@ -353,21 +372,71 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                 {/* Text details container */}
                 <div className='w-full md:w-3/4 md:pl-6'>
                   {/* --- Warning Section (Keep logic if needed) --- */}
-                  {/* {isPotentiallyPredatory && ( ... )} */}
+                  {/* ====================== WARNING SECTION ====================== */}
+                  {conferenceDataFromDB?.ranks?.length === 0 && (
+                    <div
+                      className='mb-4 rounded-md border-l-4 border-yellow-500 bg-yellow-100 p-4 text-yellow-700 shadow-sm'
+                      role='alert'
+                    >
+                      <div className='flex items-center'>
+                        <svg
+                          xmlns='http://www.w3.org/2000/svg'
+                          className='mr-3 h-6 w-6 flex-shrink-0'
+                          fill='none'
+                          viewBox='0 0 24 24'
+                          stroke='currentColor'
+                          strokeWidth='2'
+                        >
+                          <path
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                            d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
+                          />
+                        </svg>
+                        <div>
+                          <p className='font-bold'>
+                            {t('Conference_Published_By_User')}
+                          </p>
+                          <p className='text-sm'>
+                            {t('Conference_Published_By_User_Description')}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {/* ============================================================ */}
 
-                  {/* --- Date and Access Type --- */}
-                  <div className='mb-1 flex items-center justify-between'>
+                  {/* --- Date, Rank, and Access Type --- */}
+                  <div className='mb-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-1'>
+                    {' '}
+                    {/* Main container */}
+                    {/* Left side: Date */}
                     <p className='text-sm font-semibold text-red-500'>
                       {dateDisplay || t('Date_TBA')}
                     </p>
-                    {/* --- Access Type Badge --- */}
-                    {accessType && (
-                      <span
-                        className={`rounded px-2 py-0.5 text-xs font-semibold ${getAccessTypeColor(accessType)}`}
-                      >
-                        {accessType.toUpperCase()}
-                      </span>
-                    )}
+                    {/* Right side: Container for Rank Badge and Access Type Badge */}
+                    <div className='flex items-center gap-x-2'>
+                      {' '}
+                      {/* Group rank and access type */}
+                      {/* --- Display Rank Badge (NEW) --- */}
+                      {firstRankData?.rank && ( // Check if rank exists in the first rank object
+                        <span
+                          className={`rounded px-2 py-0.5 text-xs font-semibold ${getRankColor(firstRankData.rank)}`} // Apply dynamic color
+                          title={`${t('Rank')}: ${firstRankData.rank}${firstRankData.source ? ` (${t('Source')}: ${firstRankData.source})` : ''}`} // Tooltip with Rank and Source (if exists)
+                        >
+                          {t('Rank')}: {firstRankData.rank} (
+                          {firstRankData.source})
+                        </span>
+                      )}
+                      {/* --- Access Type Badge --- */}
+                      {accessType && (
+                        <span
+                          className={`rounded px-2 py-0.5 text-xs font-semibold ${getAccessTypeColor(accessType)}`}
+                        >
+                          {accessType}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   {/* --- Title --- */}
@@ -388,61 +457,92 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
 
                   {/* --- Location and Publisher Links --- */}
                   <div className='mb-2 flex flex-wrap gap-x-4 gap-y-1'>
-                    {displayOrganization?.locations?.[0]?.address && (
-                      <a
-                        href='#map' // Make sure you have an element with id="map"
-                        className='flex items-center text-sm text-blue-600 hover:underline'
-                        title={displayOrganization.locations[0].address} // Add tooltip for full address
-                      >
-                        <svg
-                          xmlns='http://www.w3.org/2000/svg'
-                          width='16'
-                          height='16'
-                          viewBox='0 0 24 24'
-                          fill='none'
-                          stroke='currentColor'
-                          strokeWidth='1.5'
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                          className='lucide lucide-map-pin mr-1 flex-shrink-0' // Adjusted margin
+                    {
+                      // Kiểm tra xem có location đầu tiên tồn tại không
+                      displayOrganization?.locations?.[0] ? (
+                        // Nếu có, hiển thị link địa chỉ
+                        <a
+                          href='#map' // Đảm bảo bạn có một element với id="map"
+                          className='flex items-center text-sm text-blue-600 hover:underline'
+                          // Thêm tooltip cho địa chỉ đầy đủ (sử dụng optional chaining để an toàn)
+                          title={
+                            displayOrganization.locations[0]?.address ||
+                            t('View_map')
+                          }
                         >
-                          <path d='M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0' />
-                          <circle cx='12' cy='10' r='3' />
-                        </svg>
-                        {/* Show City/Country or a shorter version */}
-                        {displayOrganization.locations[0].cityStateProvince ||
-                          displayOrganization.locations[0].country ||
-                          t('Location_Available')}
-                      </a>
-                    )}
-                    {displayOrganization?.publisher && (
-                      <Link
-                        className='flex items-center text-sm text-blue-600 hover:underline'
-                        href={{
-                          pathname: `/conferences`,
-                          query: { publisher: displayOrganization.publisher }
-                        }}
-                      >
-                        <svg
-                          xmlns='http://www.w3.org/2000/svg'
-                          width='16'
-                          height='16'
-                          viewBox='0 0 24 24'
-                          fill='none'
-                          stroke='currentColor'
-                          strokeWidth='1.5'
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                          className='lucide lucide-book-type mr-1 flex-shrink-0' // Adjusted margin
+                          <svg
+                            xmlns='http://www.w3.org/2000/svg'
+                            width='16'
+                            height='16'
+                            viewBox='0 0 24 24'
+                            fill='none'
+                            stroke='currentColor'
+                            strokeWidth='1.5'
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                            className='lucide lucide-map-pin mr-1 flex-shrink-0' // Đã điều chỉnh margin
+                          >
+                            <path d='M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0' />
+                            <circle cx='12' cy='10' r='3' />
+                          </svg>
+                          {/* Hiển thị City/Country hoặc một phiên bản ngắn hơn (sử dụng optional chaining) */}
+                          {displayOrganization.locations[0]?.address ||
+                            displayOrganization.locations[0]
+                              ?.cityStateProvince ||
+                            displayOrganization.locations[0]?.country ||
+                            t('Location_Available')}
+                        </a>
+                      ) : (
+                        // Nếu không có location đầu tiên, hiển thị "No location"
+                        // Bạn có thể thêm class CSS để style cho phù hợp
+                        <span className='text-sm text-gray-500'>
+                          {t('No_location_available')}
+                        </span>
+                      )
+                    }
+                    {
+                      // Kiểm tra xem displayOrganization?.publisher có giá trị truthy không
+                      displayOrganization?.publisher ? (
+                        // Nếu có, hiển thị Link đến publisher
+                        <Link
+                          className='flex items-center text-sm text-blue-600 hover:underline'
+                          href={{
+                            pathname: `/conferences`,
+                            // Truyền publisher vào query params
+                            query: { publisher: displayOrganization.publisher }
+                          }}
                         >
-                          <path d='M10 13h4' />
-                          <path d='M12 6v7' />
-                          <path d='M16 8V6H8v2' />
-                          <path d='M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20' />
-                        </svg>
-                        {displayOrganization.publisher}
-                      </Link>
-                    )}
+                          <svg
+                            xmlns='http://www.w3.org/2000/svg'
+                            width='16'
+                            height='16'
+                            viewBox='0 0 24 24'
+                            fill='none'
+                            stroke='currentColor'
+                            strokeWidth='1.5'
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                            className='lucide lucide-book-type mr-1 flex-shrink-0' // Đã điều chỉnh margin
+                          >
+                            <path d='M10 13h4' />
+                            <path d='M12 6v7' />
+                            <path d='M16 8V6H8v2' />
+                            <path d='M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20' />
+                          </svg>
+                          {/* Hiển thị tên publisher */}
+                          {displayOrganization.publisher}
+                        </Link>
+                      ) : (
+                        // Nếu không có publisher, hiển thị "No publisher"
+                        <span className='flex items-center text-sm text-gray-500'>
+                          {' '}
+                          {/* Thêm flex items-center nếu muốn icon đi kèm */}
+                          {/* Bạn có thể thêm icon ở đây nếu muốn, giống như icon publisher nhưng màu xám chẳng hạn */}
+                          {/* <svg ... className='lucide lucide-book-type mr-1 flex-shrink-0 text-gray-400'>...</svg> */}
+                          {t('No_publisher_available')}
+                        </span>
+                      )
+                    }
                   </div>
 
                   {/* --- Followers Display --- */}

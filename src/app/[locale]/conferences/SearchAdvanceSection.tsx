@@ -5,12 +5,17 @@
 import React from 'react'
 import useSearchAdvanceForm from '../../../hooks/conferences/useSearchAdvanceForm'
 import { useTranslations } from 'next-intl'
+import DatePicker from 'react-datepicker' // Import DatePicker
+import 'react-datepicker/dist/react-datepicker.css' // Import CSS
 
 interface SearchAdvanceSectionProps {
   isAdvancedOptionsVisible: boolean
   toggleAdvancedOptionsVisibility: () => void
-  onSubmissionDateChange: (date: Date | null) => void
-  submissionDate: Date | null
+  // --- Updated Date Props ---
+  onSubmissionDateRangeChange: (dates: [Date | null, Date | null]) => void
+  submissionStartDate: Date | null
+  submissionEndDate: Date | null
+  // --- End Updated Date Props ---
   onRankChange: (rank: string | null) => void
   selectedRank: string | null
   onSourceChange: (source: string | null) => void
@@ -28,8 +33,11 @@ interface SearchAdvanceSectionProps {
 const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
   isAdvancedOptionsVisible,
   toggleAdvancedOptionsVisibility,
-  onSubmissionDateChange,
-  submissionDate,
+  // --- Use Updated Date Props ---
+  onSubmissionDateRangeChange,
+  submissionStartDate,
+  submissionEndDate,
+  // --- End Use Updated Date Props ---
   onRankChange,
   selectedRank,
   onSourceChange,
@@ -56,15 +64,16 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
     handleFieldOfResearchSuggestionClick,
     handleFieldOfResearchInputKeyDown,
     handleRemoveFieldOfResearch,
-    handleSubmissionDateInputChange,
+    // Remove handleSubmissionDateInputChange from here if it's not used elsewhere
     handleRankChangeInput,
     handleSourceChangeInput,
     handleAverageScoreChangeInput,
     handlePublisherInputChange,
     handlePublisherEnter
   } = useSearchAdvanceForm({
-    onSubmissionDateChange,
-    submissionDate,
+    // Remove date props from the hook if they are no longer managed there
+    // submissionDate: null, // Or however you structure the hook now
+    // onSubmissionDateChange: () => {},
     onRankChange,
     selectedRank,
     onSourceChange,
@@ -97,40 +106,39 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
         <div className='mt-2 rounded border p-4 shadow-md'>
           {/* Responsive grid layout */}
           <div className='mb-2 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5'>
+            {/* --- Date Picker Section --- */}
             <div className='col-span-1'>
               <label
                 className='mb-1 block text-sm font-bold'
-                htmlFor='submissionDate'
+                htmlFor='submissionDateRange' // Changed ID for clarity
               >
-                {' '}
-                {/* Reduced mb */}
                 {t('Submission_Date')}:
               </label>
-              <input
-                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none' // Reduced py and px
-                id='submissionDate'
-                type='date'
-                placeholder={t('Date')}
-                onChange={handleSubmissionDateInputChange}
-                value={
-                  submissionDate
-                    ? submissionDate.toISOString().split('T')[0]
-                    : ''
-                }
+              <DatePicker
+                selectsRange={true}
+                startDate={submissionStartDate}
+                endDate={submissionEndDate}
+                onChange={onSubmissionDateRangeChange}
+                isClearable={true} // Allows clearing the date range
+                placeholderText={t('Select_Date_Range') ?? 'Select Date Range'} // Use translation
+                dateFormat='yyyy/MM/dd' // Adjust date format as needed
+                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none' // Apply same styling
+                wrapperClassName='w-full' // Ensure wrapper takes full width if needed
+                id='submissionDateRange'
               />
             </div>
+            {/* --- End Date Picker Section --- */}
 
+            {/* Other fields remain the same */}
             <div className='col-span-1'>
               <label
                 className='mb-1 block text-sm font-bold'
                 htmlFor='publisher'
               >
-                {' '}
-                {/* Reduced mb */}
                 {t('Publisher')}:
               </label>
               <input
-                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none' // Reduced py and px
+                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none'
                 id='publisher'
                 type='text'
                 placeholder={t('Publisher')}
@@ -142,40 +150,38 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
 
             <div className='col-span-1'>
               <label className='mb-1 block text-sm font-bold' htmlFor='rank'>
-                {' '}
-                {/* Reduced mb */}
                 {t('Rank')}:
               </label>
               <select
-                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none' // Reduced py and px
+                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none'
                 id='rank'
                 value={selectedRank || ''}
                 onChange={handleRankChangeInput}
               >
                 <option value=''>{t('Rank')}</option>
+                {/* ... options */}
                 <option value='A*'>A*</option>
                 <option value='A'>A</option>
                 <option value='B'>B</option>
                 <option value='AustralasianB'>Australasian B</option>
                 <option value='C'>C</option>
                 <option value='AustralasianC'>Australasian C</option>
-                <option value='Other'>Other</option>
+                <option value='Unranked'>Unranked</option>
               </select>
             </div>
 
             <div className='col-span-1'>
               <label className='mb-1 block text-sm font-bold' htmlFor='source'>
-                {' '}
-                {/* Reduced mb */}
                 {t('Source')}:
               </label>
               <select
-                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none' // Reduced py and px
+                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none'
                 id='source'
                 value={selectedSource || ''}
                 onChange={handleSourceChangeInput}
               >
                 <option value=''>{t('Source')}</option>
+                {/* ... options */}
                 <option value='CORE2023'>CORE2023</option>
                 <option value='CORE2021'>CORE2021</option>
                 <option value='CORE2020'>CORE2020</option>
@@ -192,17 +198,16 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 className='mb-1 block text-sm font-bold'
                 htmlFor='averageScore'
               >
-                {' '}
-                {/* Reduced mb */}
                 Avg. Score (1-5):
               </label>
               <select
-                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none' // Reduced py and px
+                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none'
                 id='averageScore'
                 value={selectedAverageScore || ''}
                 onChange={handleAverageScoreChangeInput}
               >
                 <option value=''>Score</option>
+                {/* ... options */}
                 <option value='1'>1</option>
                 <option value='2'>2</option>
                 <option value='3'>3</option>
@@ -212,7 +217,9 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
             </div>
           </div>
 
+          {/* Topics and Field of Research sections remain the same */}
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+            {/* ... Topics Input ... */}
             <div className='relative col-span-1'>
               <label className='mb-1 block text-sm font-bold' htmlFor='topics'>
                 {' '}
@@ -276,7 +283,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 ))}
               </div>
             </div>
-
+            {/* ... Field of Research Input ... */}
             <div className='relative col-span-1'>
               <label
                 className='mb-1 block text-sm font-bold'

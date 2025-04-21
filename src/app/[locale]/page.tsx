@@ -9,6 +9,7 @@ import { Header } from './utils/Header'
 import IntroduceVisualization from './home/IntroduceVisualization'
 import SuperBanner from './home/SuperBanner'
 import FeatureComparisonTable from './home/FeatureComparisonTable'
+import SuperBannerTree from './home/SuperBannerTree'
 
 export default function HomePage({ locale }: { locale: string }) {
   const [isVisibleButton, setIsVisibleButton] = useState(false)
@@ -39,7 +40,8 @@ export default function HomePage({ locale }: { locale: string }) {
   return (
     <div className=''>
       <Header locale={locale} />
-      <SuperBanner />
+      {/* <SuperBanner /> */}
+      <SuperBannerTree />
       <PopularConferences />
       <ConsumerInsights />
       <IntroduceVisualization />

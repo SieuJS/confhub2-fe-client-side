@@ -177,7 +177,7 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
         {' '}
         {/* Thêm khoảng cách mt-6 và gap */}
         {/* === Left Column (Summary & Form/Prompt) === */}
-        <div className='w-full md:w-1/2 lg:w-1/3'>
+        <div className='w-full md:w-1/2'>
           {' '}
           {/* Điều chỉnh độ rộng cột */}
           <FeedbackSummary
@@ -215,7 +215,7 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
           </div>
         </div>
         {/* === Right Column (Comments List & Pagination) === */}
-        <div className='w-full md:w-1/2 lg:w-2/3'>
+        <div className='w-full md:w-1/2 '>
           {' '}
           {/* Điều chỉnh độ rộng cột */}
           {/* Feedback Comments List - Use *paginated* feedbacks */}

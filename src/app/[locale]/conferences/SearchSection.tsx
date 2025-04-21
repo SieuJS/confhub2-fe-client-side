@@ -14,7 +14,9 @@ interface SearchSectionProps {
     toDate?: Date | null
     location?: string | null
     type?: 'Online' | 'Offline' | 'Hybrid' | null
-    submissionDate?: Date | null
+    // submissionDate?: Date | null
+    submissionStartDate?: Date | null // NEW
+    submissionEndDate?: Date | null // NEW
     publisher?: string | null
     rank?: string | null
     source?: string | null
@@ -61,8 +63,8 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
     toggleLocationDropdown,
     toggleTypeDropdown,
     toggleAdvancedOptionsVisibility,
-    handleSubmissionDateChange,
-    submissionDate,
+    // handleSubmissionDateChange,
+    // submissionDate,
     handleRankChange,
     selectedRank,
     handleSourceChange,
@@ -75,6 +77,9 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
     selectedFieldsOfResearch,
     handlePublisherChange,
     selectedPublisher,
+    submissionStartDate,
+    submissionEndDate,
+    handleSubmissionDateRangeChange,
     handleClear // Get handleClear from the hook
   } = useSearchForm({ onSearch, onClear }) // Pass onClear to the hook
 
@@ -349,8 +354,8 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
       <SearchAdvanceSection
         isAdvancedOptionsVisible={isAdvancedOptionsVisible}
         toggleAdvancedOptionsVisibility={toggleAdvancedOptionsVisibility}
-        onSubmissionDateChange={handleSubmissionDateChange}
-        submissionDate={submissionDate}
+        // onSubmissionDateChange={handleSubmissionDateChange}
+        // submissionDate={submissionDate}
         onRankChange={handleRankChange}
         selectedRank={selectedRank}
         onSourceChange={handleSourceChange}
@@ -363,6 +368,9 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
         selectedFieldsOfResearch={selectedFieldsOfResearch}
         onPublisherChange={handlePublisherChange}
         selectedPublisher={selectedPublisher}
+        submissionStartDate={submissionStartDate}
+        submissionEndDate={submissionEndDate}
+        onSubmissionDateRangeChange={handleSubmissionDateRangeChange}
       />
     </div>
   )

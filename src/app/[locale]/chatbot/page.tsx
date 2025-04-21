@@ -6,6 +6,8 @@ import AIBanner from './landingChatbot/AIBanner'
 import AIFAQ from './landingChatbot/AIFAQ'
 import AIStatistics from './landingChatbot/AIStatistics'
 import ScrollToTopButton from '../utils/ScrollToTopButton'
+import UnifiedChatPage from './UnifiedChatPage'
+import LogoMode from './landingChatbot/LogoMode'
 
 export default function AILanding() {
   return (
@@ -16,6 +18,8 @@ export default function AILanding() {
       <AIStatistics />
       <AIFAQ />
       <ScrollToTopButton />
+      {/* <LogoMode /> */}
     </div>
+    // <UnifiedChatPage />
   )
 }

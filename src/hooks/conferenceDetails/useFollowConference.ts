@@ -80,6 +80,7 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
         },
+        
         body: JSON.stringify({ conferenceId, userId: user.id }),
       });
 
