@@ -46,7 +46,7 @@
              {!isOutputSettingsOpen && (
                  <button
                      onClick={() => setIsOutputSettingsOpen(true)}
-                     className="fixed left-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-600 shadow-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" // Keep fixed position
+                     className="fixed left-6 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-600 shadow-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" // Keep fixed position
                      title="Open settings"
                      aria-label="Open settings"
                      aria-expanded={isOutputSettingsOpen}
@@ -82,7 +82,7 @@
              <main className="flex-1 flex flex-col overflow-hidden transition-all duration-300 ease-in-out">
                 
                  {/* Chat Content */}
-                 <div className="flex-1 overflow-y-auto p-4">
+                 <div className="flex-1 overflow-y-auto py-2 px-4">
                      {children}
                  </div>
              </main>

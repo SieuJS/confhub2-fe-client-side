@@ -101,14 +101,14 @@ function RegularChat({ currentLanguage }: RegularChatProps) { // <<< Destructure
 
     // --- JSX Structure (No changes needed here for language logic) ---
     return (
-        <div className="flex flex-col h-[calc(100vh-4rem)] max-h-[800px] w-full max-w mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
+        <div className="flex flex-col h-[calc(100vh-1.5rem)] max-h-[900px] w-full max-w mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
 
             {/* Header */}
-            <div className="flex-shrink-0 p-4 border-b border-gray-200 bg-gray-50">
-                <h1 className="text-lg font-semibold text-center text-gray-800">
+            <div className="flex-shrink-0 p-2 border-b border-gray-200 bg-gray-50">
+                {/* <h1 className="text-lg font-semibold text-center text-gray-800">
                     AI Conference Assistant
-                </h1>
-                <div className="text-center text-xs text-gray-500 mt-1 flex items-center justify-center space-x-1">
+                </h1> */}
+                <div className="text-center text-xs text-gray-500 flex items-center justify-center space-x-1">
                     <span className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
                     <span>{isConnected ? 'Connected' : 'Disconnected'} {socketId ? `(ID: ${socketId.substring(0, 5)}...)` : ''}</span>
                 </div>
