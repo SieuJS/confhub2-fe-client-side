@@ -56,10 +56,6 @@ const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
     fetchUser();
   }, [conferenceData]);
 
-
-
-
-  // Function to handle the blacklist/unblacklist action
   const handleBlacklistClick = async () => {
     if (!conferenceData?.id) {
       setError("Conference ID is missing.");
