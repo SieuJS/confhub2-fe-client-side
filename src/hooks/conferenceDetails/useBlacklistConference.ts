@@ -4,7 +4,7 @@ import { ConferenceResponse } from '@/src/models/response/conference.response'; 
 import { UserResponse } from '@/src/models/response/user.response'; // Adjust path
 import { appConfig } from '@/src/middleware';
 
-const API_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/user`; // Base user endpoint
+const API_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/blacklist-conference`; // Base user endpoint
 
 const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
   const [isBlacklisted, setIsBlacklisted] = useState(false);
@@ -17,22 +17,29 @@ const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
       return;
     }
     const fetchUser = async () => {
-      setLoading(true);
-      setError(null);
-      const userData = localStorage.getItem('user');
-      if (!userData) {
-        setIsBlacklisted(false);
-        setLoading(false);
-        return;
-      }
+      // setLoading(true);
+      // setError(null);
+      // const userData = localStorage.getItem('user');
+      // if (!userData) {
+      //   setIsBlacklisted(false);
+      //   setLoading(false);
+      //   return;
+      // }
 
-      const user = JSON.parse(userData);
+      //const user = JSON.parse(userData);
       try {
-        const response = await fetch(`${API_ENDPOINT}/${user.id}`);
+        const response = await fetch(`${API_ENDPOINT}`, {
+          headers: {
+          'Content-Type': 'application/json',
+          'Authorization' : `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
+          }
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const userData: UserResponse = await response.json();
+        console.log('blacklist')
+        console.log(userData)
         setIsBlacklisted(
           userData.blacklist?.some(
             (blacklistConf) => blacklistConf.id === conferenceData.id
@@ -75,14 +82,14 @@ const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
     setError(null);
 
     try {
-      const response = await fetch(`${API_ENDPOINT}/blacklist`, {
+      const response = await fetch(`${API_ENDPOINT}/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           // Add Authorization header if you use token-based auth:
-          // 'Authorization': `Bearer ${your_auth_token}`
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({ conferenceId, userId: user.id }),
+        body: JSON.stringify({ conferenceId }),
       });
 
       if (!response.ok) {
