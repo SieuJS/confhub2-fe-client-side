@@ -8,7 +8,7 @@ interface UpdateNotificationsData {
 
 const API_UPDATE_NOTIFICATIONS_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1`;
 
-async function updateNotifications(userId: string, data: UpdateNotificationsData): Promise<void> {
+async function updateNotifications( data: UpdateNotificationsData): Promise<void> {
   try {
     const response = await fetch(`${API_UPDATE_NOTIFICATIONS_ENDPOINT}/notification/user`, {
       method: 'PUT', // Use PUT for updating existing resources
