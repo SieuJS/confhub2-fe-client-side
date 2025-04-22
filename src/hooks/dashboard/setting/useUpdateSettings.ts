@@ -5,7 +5,7 @@ import { updateUser } from '../../../app/api/user/updateUser'; // Adjust path if
 import { appConfig } from '@/src/middleware';
 
 interface UpdateUserResult {
-  updateUserSetting: (userId: string, updatedSetting: Partial<Setting>) => Promise<void>;
+  updateUserSetting: (updatedSetting: Partial<Setting>) => Promise<void>;
   updateUserProfile:(userId: string, updatedProfile: Partial<UserResponse>) => Promise<void>
   loading: boolean;
   error: string | null;
@@ -15,32 +15,24 @@ export const useUpdateUser = (): UpdateUserResult => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const updateUserSetting = async (userId: string, updatedSetting: Partial<Setting>) => {
+  const updateUserSetting = async (updatedSetting: Partial<Setting>) => {
     setLoading(true);
     setError(null);
     try {
-      // Fetch the current user data
-      const response =  await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/user/me`, {
+      const updateResponse = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/user/setting`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
         },
+        body: JSON.stringify({
+          settings: updatedSetting,
+        }),
       });
-      if (!response.ok) {
-          throw new Error(`Failed to fetch user data. Status: ${response.status}`);
+      if (!updateResponse.ok) {
+        throw new Error(`Failed to update user setting. Status: ${updateResponse.status}`);
       }
-      const currentUserData: UserResponse = await response.json();
 
-      // Merge current settings with the updated settings
-      const newSettings: Setting = {
-        ...currentUserData.setting,
-        ...updatedSetting,
-      }
-      const updatedData = {
-        ...currentUserData,
-        setting: newSettings
-      }
-       await updateUser(userId, updatedData);
 
     } catch (err: any) {
       setError(err.message || 'Failed to update user setting.');
@@ -65,3 +57,21 @@ export const useUpdateUser = (): UpdateUserResult => {
 
   return { updateUserSetting, updateUserProfile, loading, error };
 };
+
+export const getUserSettings = async (): Promise<Setting | null> => {
+  try {
+    const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/user/setting`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch user settings. Status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching user settings:', error);
+    return null;
+  }
+}

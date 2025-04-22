@@ -4,9 +4,11 @@ import { useTranslations } from 'next-intl'
 import { useLocalStorage } from 'usehooks-ts'
 import { useRouter, usePathname } from 'next/navigation'
 import deleteUser from '../../../../app/api/user/deleteUser' // Adjust path if needed
-import { useUpdateUser } from '../../../../hooks/dashboard/setting/useUpdateSettings' // Adjust path if needed
+import { getUserSettings, useUpdateUser } from '../../../../hooks/dashboard/setting/useUpdateSettings' // Adjust path if needed
 import { useGetUser } from '../../../../hooks/dashboard/setting/useGetUser' // Adjust path if needed
 import { Setting } from '@/src/models/response/user.response' // Adjust path if needed
+import { get } from 'lodash'
+import { updateNotifications } from '@/src/app/api/user/updateNotifications'
 
 // Helper type for setting keys used in toggles
 type ToggleSettingKey = keyof Pick<
@@ -19,6 +21,7 @@ type ToggleSettingKey = keyof Pick<
   | 'notificationWhenFollow'
   | 'notificationWhenAddTocalendar'
   | 'notificationWhenAddToBlacklist'
+  | 'notificationThroughEmail'
 >
 
 const SettingTab: React.FC = () => {
@@ -27,45 +30,46 @@ const SettingTab: React.FC = () => {
     'user',
     null
   )
-  const {
-    user,
-    loading: userLoading,
-    error: userError,
-    refetch
-  } = useGetUser(localUser?.id || null)
+
   const [setting, setSetting] = useState<Setting | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const router = useRouter()
+  const [loading, setLoading] = useState(false)
   const pathname = usePathname()
   const {
     updateUserSetting,
     loading: updateLoading,
     error: updateError
   } = useUpdateUser()
-
-  useEffect(() => {
-    if (user?.setting) {
-      setSetting(user.setting)
-    } else {
-      // Handle case where user exists but setting is null/undefined if that's possible
-      setSetting(null)
+  async function fetchUserSettings() {
+    setLoading(true)
+    const userSetting = await getUserSettings()
+    if (userSetting) {
+      setSetting(userSetting)
     }
-  }, [user])
+    setLoading(false)
+  }
+  useEffect(() => {
+    fetchUserSettings()
+  }, [])
 
   // Centralized toggle handler
   const handleToggle = async (settingKey: ToggleSettingKey) => {
-    if (user && setting) {
+    if ( setting) {
       const currentValue = setting[settingKey]
+
+      const newSetting = {
+        ...setting,
+        [settingKey]: !currentValue
+      }
       // Optimistic update locally first
       setSetting(prev =>
         prev ? { ...prev, [settingKey]: !currentValue } : null
       )
       try {
-        await updateUserSetting(user.id, {
-          [settingKey]: !currentValue
-        })
-        refetch() // Refetch to confirm state from backend
+        await updateUserSetting( newSetting)
+        await fetchUserSettings() // Refetch settings after update
       } catch (error) {
         // Revert optimistic update on error
         setSetting(prev =>
@@ -73,31 +77,6 @@ const SettingTab: React.FC = () => {
         )
         // Optional: Show error to user based on updateError from the hook
         console.error(`Failed to update setting ${settingKey}:`, error)
-      }
-    }
-  }
-
-  const handleDeliveryChange = async (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    if (user && setting) {
-      const newDeliveryMethod = event.target.value as 'System' | 'Email' | 'All'
-      const oldDeliveryMethod = setting.notificationThrough
-      // Optimistic update
-      setSetting(prev =>
-        prev ? { ...prev, notificationThrough: newDeliveryMethod } : null
-      )
-      try {
-        await updateUserSetting(user.id, {
-          notificationThrough: newDeliveryMethod
-        })
-        refetch()
-      } catch (error) {
-        // Revert optimistic update
-        setSetting(prev =>
-          prev ? { ...prev, notificationThrough: oldDeliveryMethod } : null
-        )
-        console.error('Failed to update delivery method:', error)
       }
     }
   }
@@ -148,19 +127,19 @@ const SettingTab: React.FC = () => {
   }
 
   // --- Render Logic ---
-  if (userLoading) {
+  if (loading) {
     return <div data-testid='loading-state'>{t('Loading_settings')}</div>
   }
 
-  if (userError) {
-    return (
-      <div data-testid='error-state'>
-        {t('Error')}: {userError}
-      </div>
-    )
-  }
+  // if (userError) {
+  //   return (
+  //     <div data-testid='error-state'>
+  //       {t('Error')}: {userError}
+  //     </div>
+  //   )
+  // }
 
-  if (!user || !setting) {
+  if ( !setting) {
     return <div data-testid='no-data-state'>{t('No_user_data_available')}</div>
   }
 
@@ -294,17 +273,25 @@ const SettingTab: React.FC = () => {
                 {t('Customize_notification_delivery_describe')}
               </p>
             </div>
-            <select
-              data-testid='select-notificationThrough'
-              className='rounded border border-button bg-background-secondary px-2 py-1 focus:border-2 focus:outline-none'
-              value={setting.notificationThrough}
-              onChange={handleDeliveryChange}
+            <button
+              data-testid='toggle-notificationWhenUpdateProfile'
+              className={`h-6 w-12 min-w-[3rem] rounded-full transition-colors duration-200 focus:outline-none ${
+                setting.notificationThroughEmail
+                  ? 'bg-button'
+                  : 'bg-background-secondary'
+              }`}
+              onClick={() => handleToggle('notificationThroughEmail')}
               disabled={updateLoading}
+              aria-pressed={setting.notificationThroughEmail}
             >
-              <option value='System'>{t('Notification_only')}</option>
-              <option value='Email'>{t('NOtification_email')}</option>
-              <option value='All'>{t('All')}</option>
-            </select>
+              <div
+                className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
+                  setting.notificationWhenUpdateProfile
+                    ? 'translate-x-7'
+                    : 'translate-x-1'
+                }`}
+              ></div>
+            </button>
           </div>
 
           {/* Option 6: Notification when update profile */}
