@@ -1,6 +1,6 @@
 // src/components/chatbot/EmailConfirmationDialog.tsx (or appropriate path)
 import React, { useState, useEffect, useRef } from 'react';
-import { useTranslations } from 'next-intl';
+// import { useTranslations } from 'next-intl'; // Removed
 import { ConfirmSendEmailAction } from '@/src/models/chatbot/chatbot'; // Adjust path
 
 interface EmailConfirmationDialogProps {
@@ -18,7 +18,7 @@ const EmailConfirmationDialog: React.FC<EmailConfirmationDialogProps> = ({
   onCancel,
   onClose,
 }) => {
-  const t = useTranslations('Chatbot.EmailConfirmationDialog'); // Namespace for translations
+  // const t = useTranslations('Chatbot.EmailConfirmationDialog'); // Removed
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -78,26 +78,26 @@ const EmailConfirmationDialog: React.FC<EmailConfirmationDialogProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
         <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
-          {t('title')}
+          Confirm Email Action
         </h2>
         <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-          {t('instruction')}
+          Please review the details below before confirming to send the email.
         </p>
 
         <div className="space-y-3 text-sm">
           <div>
-            <span className="font-medium text-gray-700 dark:text-gray-300">{t('subjectLabel')}:</span>
+            <span className="font-medium text-gray-700 dark:text-gray-300">Subject:</span>
             <span className="ml-2 text-gray-900 dark:text-white">{data.subject}</span>
           </div>
           <div>
-            <span className="font-medium text-gray-700 dark:text-gray-300">{t('typeLabel')}:</span>
+            <span className="font-medium text-gray-700 dark:text-gray-300">Type:</span>
             <span className="ml-2 text-gray-900 dark:text-white">
               {/* Translate the request type */}
-              {data.requestType === 'contact' ? t('typeContact') : t('typeReport')}
+              {data.requestType === 'contact' ? 'Contact Request' : 'Report'}
             </span>
           </div>
           <div>
-            <span className="font-medium text-gray-700 dark:text-gray-300">{t('messageLabel')}:</span>
+            <span className="font-medium text-gray-700 dark:text-gray-300">Message:</span>
             {/* Use pre-wrap to preserve formatting */}
             <p className="mt-1 whitespace-pre-wrap rounded bg-gray-100 p-2 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
               {data.message}
@@ -110,16 +110,16 @@ const EmailConfirmationDialog: React.FC<EmailConfirmationDialogProps> = ({
             onClick={handleConfirmClick}
             className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800"
           >
-            {t('confirmButton')}
+            Confirm
           </button>
           <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            {t('timerLabel', { seconds: timeLeft })} {/* Pass seconds to translation */}
+            {`Time left: ${timeLeft} seconds`} {/* Display timer directly */}
           </span>
           <button
             onClick={handleCancelClick}
             className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 dark:focus:ring-gray-700"
           >
-            {t('cancelButton')}
+            Cancel
           </button>
         </div>
       </div>
