@@ -1,17 +1,19 @@
 // src/hooks/useChatSocket.ts
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { usePathname } from 'next/navigation'; // Keep for locale/navigation
-import { Socket,  } from 'socket.io-client';
+import { usePathname } from 'next/navigation';
+import { Socket } from 'socket.io-client';
 
-// Import Models and Types
+// Import Models and Types (ensure ConfirmEmailSendPayload and EmailConfirmationResult are included)
 import {
     StatusUpdate, ResultUpdate, NavigationAction, OpenMapAction,
-    ErrorUpdate, ThoughtStep, ChatMessageType, LoadingState, ChatUpdate
-} from '@/src/models/chatbot/chatbot';
+    ErrorUpdate, ThoughtStep, ChatMessageType, LoadingState, ChatUpdate,
+    ConfirmSendEmailAction, // <-- Add
+    EmailConfirmationResult, // <-- Add
+    FrontendAction         // <-- Make sure this includes the confirm type
+} from '@/src/models/chatbot/chatbot'; // Adjust path
 import { Language } from '@/src/app/[locale]/chatbot/lib/types';
 import { appConfig } from '@/src/middleware';
 
-// Import Refactored Hooks and Utils
 import { useSocketConnection, SocketConnectionOptions, SocketEventHandlers } from './useSocketConnection';
 import { useStreamingTextAnimation } from './useStreamingTextAnimation';
 import { generateMessageId, constructNavigationUrl, openUrlInNewTab } from '@/src/app/[locale]/chatbot/utils/chatUtils'; // Adjust path
@@ -24,18 +26,28 @@ export interface UseChatSocketProps {
     onInitialConnectionError?: (error: Error) => void;
 }
 
+
+// --- CẬP NHẬT INTERFACE NÀY ---
 export interface ChatSocketControls {
     chatMessages: ChatMessageType[];
     loadingState: LoadingState;
     isConnected: boolean;
     sendMessage: (userInput: string, isStreaming: boolean, language: Language) => void;
     socketId: string | null;
+    // Thêm các thuộc tính còn thiếu vào interface
+    showConfirmationDialog: boolean;
+    confirmationData: ConfirmSendEmailAction | null; // Sử dụng type nhất quán (ví dụ: ConfirmEmailSendPayload)
+    handleConfirmSend: (confirmationId: string) => void; // Thêm định nghĩa hàm
+    handleCancelSend: (confirmationId: string) => void;  // Thêm định nghĩa hàm
+    closeConfirmationDialog: () => void;               // Thêm định nghĩa hàm
 }
+// -------------------------------
 
 /**
  * Orchestrates chat functionality using Socket.IO, managing messages,
  * connection state, loading indicators, and streaming text animation.
  */
+
 export function useChatSocket({
     socketUrl,
     onConnectionChange,
@@ -44,17 +56,19 @@ export function useChatSocket({
 
     const [chatMessages, setChatMessages] = useState<ChatMessageType[]>([]);
     const [loadingState, setLoadingState] = useState<LoadingState>({ isLoading: false, step: '', message: '' });
-    const [hasFatalError, setHasFatalError] = useState<boolean>(false); // <-- New state to track fatal errors
+    const [hasFatalError, setHasFatalError] = useState<boolean>(false);
     const isMountedRef = useRef(true);
     const BASE_WEB_URL = appConfig.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:8386";
     const pathname = usePathname();
     const currentLocale = pathname.split('/')[1] || 'en';
     const [authToken, setAuthToken] = useState<string | null>(null);
 
+    // --- NEW: State for Confirmation Dialog ---
+    const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
+    const [confirmationData, setConfirmationData] = useState<ConfirmSendEmailAction | null>(null);
+    // ----------------------------------------
 
-    // Effect to get token and manage mounted state
     useEffect(() => {
-        // Reset fatal error on mount or if token logic is re-run
         setHasFatalError(false);
         let storedToken: string | null = null;
         if (typeof window !== 'undefined') {
@@ -63,13 +77,12 @@ export function useChatSocket({
             console.log(`[useChatSocket] Auth token loaded: ${storedToken ? 'found' : 'not found'}`);
         } else {
             console.log("[useChatSocket] Cannot load token, not in browser environment.");
-            setAuthToken(null); // Ensure it's null server-side
+            setAuthToken(null);
         }
         isMountedRef.current = true;
         return () => { isMountedRef.current = false; };
-    }, []); // Runs once on mount
+    }, []);
 
-    // --- Streaming Animation Hook ---
     const handleContentUpdate = useCallback((messageId: string, newContent: string) => {
         if (!isMountedRef.current) return;
         setChatMessages(prev =>
@@ -79,7 +92,7 @@ export function useChatSocket({
                     : msg
             )
         );
-    }, []); // Empty dependency array ensures stability if no external deps needed
+    }, []);
     const animationControls = useStreamingTextAnimation(handleContentUpdate);
 
 
@@ -235,69 +248,81 @@ export function useChatSocket({
 
     }, [animationControls]); // Dependency: animationControls
 
+    // --- MODIFIED: handleResult to check for confirmEmailSend action ---
     const handleResult = useCallback((result: ResultUpdate) => {
         if (!isMountedRef.current) return;
         console.log("Socket Result Received:", result);
 
-        // 1. Mark stream as complete in animation hook (allows it to finish naturally)
         animationControls.completeStream();
-
-        // 2. Update loading state
         setLoadingState({ isLoading: false, step: 'result_received', message: '' });
 
-        // 3. Prepare the final message object
-        const finalMessageId = generateMessageId(); // Stable ID for the final message
-        const streamingId = animationControls.currentStreamingId; // Get the ID being streamed
+        const finalMessageId = generateMessageId();
+        const streamingId = animationControls.currentStreamingId;
 
-        const isNavigationAction = result.action?.type === 'navigate';
-        const isMapAction = result.action?.type === 'openMap';
-        const mapLocation = isMapAction ? (result.action as OpenMapAction).location : undefined;
-        const navigationUrl = isNavigationAction ? (result.action as NavigationAction).url : undefined;
+        // Check for specific actions BEFORE updating chat messages with final text
+        // Check for specific actions BEFORE updating chat messages with final text
+        const action = result.action; // Gán vào biến để dễ xử lý
+        const isNavigationAction = action?.type === 'navigate';
+        const isMapAction = action?.type === 'openMap';
+        const isConfirmEmailAction = action?.type === 'confirmEmailSend'; // <-- Check for new action
 
+        const mapLocation = isMapAction ? action.location : undefined; // An toàn vì đã check isMapAction
+        const navigationUrl = isNavigationAction ? action.url : undefined; // An toàn vì đã check isNavigationAction
+
+        // --- THAY ĐỔI Ở ĐÂY ---
+        let confirmPayload: ConfirmSendEmailAction | undefined = undefined;
+        if (isConfirmEmailAction && action) { // Kiểm tra action tồn tại và đúng type
+            // Bên trong khối if này, TypeScript biết action.type === 'confirmEmailSend'
+            // Do đó, việc truy cập action.payload là an toàn
+            confirmPayload = action.payload;
+        }
+        // ---------------------
         let finalMessageData: Partial<ChatMessageType> = {
-            message: result.message || '', // Default to empty string if null/undefined
+            message: result.message || '', // Default message
             thoughts: result.thoughts,
             isUser: false,
         };
 
+        // Determine message type based on action
         if (isMapAction && mapLocation) {
             finalMessageData.type = 'map';
             finalMessageData.location = mapLocation;
             finalMessageData.message = result.message || `Showing map for: ${mapLocation}`;
+        } else if (isConfirmEmailAction) {
+            // Message type remains 'text', the dialog is a separate UI element
+            finalMessageData.type = 'text';
+            finalMessageData.message = result.message || 'Please confirm the action.'; // Ensure there's text
         } else {
-            finalMessageData.type = 'text'; // Default to text
+            finalMessageData.type = 'text';
             if (isNavigationAction && !result.message) {
-                finalMessageData.message = `Okay, navigating...`; // Provide default text
+                finalMessageData.message = `Okay, navigating...`;
             }
         }
 
-        // 4. Update Chat History State (replace streaming placeholder)
+        // Update Chat History State (replace streaming placeholder or add new)
         setChatMessages(prevMessages => {
             const messageExistsIndex = streamingId
                 ? prevMessages.findIndex(msg => msg.id === streamingId)
                 : -1;
 
             if (messageExistsIndex !== -1) {
-                // Update the existing placeholder message
                 const updatedMessages = [...prevMessages];
                 updatedMessages[messageExistsIndex] = {
-                    ...prevMessages[messageExistsIndex], // Keep original structure
-                    ...finalMessageData, // Apply final data
-                    id: finalMessageId, // Use the new stable ID
-                    message: finalMessageData.message ?? '', // Ensure message is string
+                    ...prevMessages[messageExistsIndex],
+                    ...finalMessageData,
+                    id: finalMessageId,
+                    message: finalMessageData.message ?? '',
                 };
                 return updatedMessages;
             } else {
-                // Add as a new message if no streaming placeholder was found (fallback)
                 console.warn("No streaming placeholder found for ID:", streamingId, "Adding as new message.");
                 const newMessage: ChatMessageType = {
                     id: finalMessageId,
                     isUser: false,
-                    type: 'text', // Default type
-                    ...finalMessageData, // Apply final data
-                    message: finalMessageData.message ?? '', // Ensure message is string
+                    type: 'text',
+                    ...finalMessageData,
+                    message: finalMessageData.message ?? '',
                 };
-                // Avoid duplicates if somehow result arrives before placeholder is set
                 if (!prevMessages.some(msg => msg.id === finalMessageId)) {
                     return [...prevMessages, newMessage];
                 } else {
@@ -306,22 +331,59 @@ export function useChatSocket({
             }
         });
 
-        // 5. Execute Frontend Action (After state update is scheduled)
+        // --- Execute Frontend Action ---
         if (isNavigationAction && navigationUrl) {
             const finalUrl = constructNavigationUrl(BASE_WEB_URL, currentLocale, navigationUrl);
             openUrlInNewTab(finalUrl);
         } else if (isMapAction) {
             console.log(`[useChatSocket] Map action received for location: ${mapLocation}.`);
+            // Potentially trigger map display if needed differently
+        } else if (isConfirmEmailAction && confirmPayload) {
+            console.log(`[useChatSocket] ConfirmEmailSend action received. ID: ${confirmPayload.confirmationId}`);
+            // --- Trigger the confirmation dialog ---
+            setConfirmationData(confirmPayload);
+            setShowConfirmationDialog(true);
+            // -------------------------------------
         }
 
     }, [animationControls, BASE_WEB_URL, currentLocale]); // Dependencies
 
-      const handleChatErrorEvent = useCallback((errorData: any) => {
-         if (!isMountedRef.current) return;
-         console.log("[useChatSocket] Event: Chat Error", errorData);
+    const handleChatErrorEvent = useCallback((errorData: any) => {
+        if (!isMountedRef.current) return;
+        console.log("[useChatSocket] Event: Chat Error", errorData);
         const isFatal = errorData?.code === 'FATAL_SERVER_ERROR'; // Example check
         handleError(errorData, true, isFatal);
     }, [handleError]); // Keep dependency
+
+
+    // --- NEW: Handler for Email Confirmation Result Event ---
+    const handleEmailConfirmationResult = useCallback((result: EmailConfirmationResult) => {
+        if (!isMountedRef.current) return;
+        console.log("[useChatSocket] Event: Email Confirmation Result", result);
+
+        // Close the dialog if it's somehow still open (e.g., backend timed out first)
+        if (result.confirmationId === confirmationData?.confirmationId) {
+            setShowConfirmationDialog(false);
+            setConfirmationData(null);
+        }
+
+        // Display the result message from the backend in the chat
+        const resultMessage: ChatMessageType = {
+            id: generateMessageId(),
+            message: result.message, // Use the message from the backend
+            isUser: false,
+            type: result.status === 'success' ? 'text' : 'warning', // Or 'error' based on status
+            thoughts: undefined, // No thoughts usually with this event
+        };
+
+        setChatMessages(prev => [...prev, resultMessage]);
+
+        // Optionally update loading state or show a toast notification
+        setLoadingState({ isLoading: false, step: `email_${result.status}`, message: '' });
+
+    }, [confirmationData]); // Dependency on confirmationData to check ID
+    // -------------------------------------------------------
+
 
     // --- Socket Connection Hook Initialization ---
     // Memoize options
@@ -335,7 +397,14 @@ export function useChatSocket({
         // reconnectionDelayMax: 10000,
     }), [socketUrl, authToken]); // Re-evaluate only if URL or token changes
 
-    // Memoize handlers object - Ensure all functions below are stable via useCallback
+    const closeConfirmationDialog = useCallback(() => {
+        setShowConfirmationDialog(false);
+        // Optionally clear data too if desired on manual close
+        // setConfirmationData(null);
+    }, []); // Thêm useCallback nếu cần sự ổn định
+
+
+    // Add the new handler to the list
     const socketEventHandlers: SocketEventHandlers = useMemo(() => ({
         onConnect: handleConnect,
         onDisconnect: handleDisconnect,
@@ -345,18 +414,19 @@ export function useChatSocket({
         onChatUpdate: handlePartialResult,
         onChatResult: handleResult,
         onChatError: handleChatErrorEvent,
+        // --- Add the new event handler ---
+        onEmailConfirmationResult: handleEmailConfirmationResult,
+        // -------------------------------
     }), [ // Ensure all handler functions are stable
         handleConnect, handleDisconnect, handleConnectError, handleAuthError,
-        handleStatusUpdate, handlePartialResult, handleResult, handleChatErrorEvent
+        handleStatusUpdate, handlePartialResult, handleResult, handleChatErrorEvent,
+        handleEmailConfirmationResult // <-- Add new handler here
     ]);
 
-    // Instantiate the connection hook with stable options and handlers
     const connection = useSocketConnection(socketOptions, socketEventHandlers);
-
-    // Extract connection state and socketId
     const { isConnected, socketId } = connection;
-    // Keep socketRef if needed for direct emissions (like sendMessage)
     const socketRef = connection.socketRef;
+
 
 
     // --- Send Message Function (Adjusted) ---
@@ -395,13 +465,44 @@ export function useChatSocket({
     }, [isConnected, hasFatalError, handleError, animationControls, socketRef]); // Added socketRef dependency
 
 
+    // --- NEW: Callbacks for Dialog Actions ---
+    const handleConfirmSend = useCallback((confirmationId: string) => {
+        if (socketRef.current && isConnected) {
+            console.log(`[useChatSocket] Emitting 'user_confirm_email' for ID: ${confirmationId}`);
+            socketRef.current.emit('user_confirm_email', { confirmationId });
+            // Optional: Show visual feedback immediately
+            setLoadingState({ isLoading: true, step: 'confirming_email', message: 'Sending email...' })
+        } else {
+            handleError({ message: 'Cannot confirm: Not connected.', type: 'error' }, false, false);
+        }
+        // Dialog closes itself via its internal state/onClose prop
+    }, [socketRef, isConnected, handleError]);
+
+    const handleCancelSend = useCallback((confirmationId: string) => {
+        if (socketRef.current && isConnected) {
+            console.log(`[useChatSocket] Emitting 'user_cancel_email' for ID: ${confirmationId}`);
+            socketRef.current.emit('user_cancel_email', { confirmationId });
+        } else {
+            // Less critical if cancelling fails, maybe just log?
+            console.warn('[useChatSocket] Cannot cancel: Not connected.');
+        }
+        // Dialog closes itself via its internal state/onClose prop
+    }, [socketRef, isConnected]);
+    // ----------------------------------------
+
+    // --- Return Hook Controls ---
     // --- Return Hook Controls ---
     return {
         chatMessages,
         loadingState,
-        // Derive connected status considering the fatal error flag
         isConnected: isConnected && !hasFatalError,
         sendMessage,
-        socketId
+        socketId,
+        showConfirmationDialog,
+        confirmationData,
+        // Các hàm này giờ đã được khai báo trong interface ChatSocketControls
+        handleConfirmSend,
+        handleCancelSend,
+        closeConfirmationDialog
     };
 }

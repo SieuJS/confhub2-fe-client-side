@@ -60,15 +60,12 @@ export interface OpenMapAction {
     location: string; // The location string to search on Google Maps
 }
 
-// --- Update ChatAction Union Type ---
-export type ChatAction = NavigationAction | OpenMapAction; // <<< ADDED OpenMapAction
-
 // --- ResultUpdate (No change needed here, already has optional 'action') ---
 export interface ResultUpdate {
     type: 'result';
     message: string; // The text message to display
     thoughts?: ThoughtStep[];
-    action?: ChatAction; // Now includes NavigationAction or OpenMapAction
+    action?: FrontendAction; // Now includes NavigationAction or OpenMapAction
 }
 
 export interface ErrorUpdate {
@@ -103,3 +100,38 @@ export interface LoadingState {
 
 
 
+
+
+// Payload for the confirmation action from backend
+export interface ConfirmSendEmailAction {
+    confirmationId: string;
+    subject: string;
+    requestType: 'contact' | 'report';
+    message: string;
+    timeoutMs: number;
+}
+
+// Add to FrontendAction union type
+// Add the new action type to your FrontendAction union type
+export type FrontendAction =
+    | { type: 'navigate'; url: string }
+    | { type: 'openMap'; location: string }
+    | { type: 'confirmEmailSend'; payload: ConfirmSendEmailAction } // <-- Add this
+    // | { type: 'otherAction'; ... } // Add other existing actions
+    | undefined; // Keep undefined if it's used
+
+
+// Type for the result event from backend after confirmation/cancellation/timeout
+export interface EmailConfirmationResult {
+    confirmationId: string;
+    status: 'success' | 'cancelled' | 'timedout' | 'error';
+    message: string; // Message from backend explaining the outcome
+}
+
+// Update ResultUpdate if action is part of it
+export interface ResultUpdate {
+    type: 'result';
+    message: string; // Can be null if only action is present
+    thoughts?: ThoughtStep[];
+    action?: FrontendAction; // Ensure this includes the new type
+}
