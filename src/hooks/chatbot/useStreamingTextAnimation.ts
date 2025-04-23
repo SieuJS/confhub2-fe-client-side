@@ -1,4 +1,4 @@
-// src/hooks/useStreamingTextAnimation.ts
+// src/app/[locale]/chatbot/hooks/useStreamingTextAnimation.ts
 import { useState, useRef, useCallback, useEffect } from 'react';
 
 const ANIMATION_INTERVAL_MS = 10;

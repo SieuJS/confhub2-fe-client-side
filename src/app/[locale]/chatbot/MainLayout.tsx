@@ -9,7 +9,7 @@ import { LanguageOption, OutputModality, PrebuiltVoice, Language, ChatMode } fro
 import { AlignJustify, Settings } from 'lucide-react';
 // --- IMPORT THE CONTEXT HOOK ---
 import { useSharedChatSocket } from './context/ChatSocketContext';
-import { appConfig } from '@/src/middleware';
+// Removed appConfig import as it wasn't used here
 
 interface MainLayoutProps {
     children: React.ReactNode;
@@ -39,7 +39,7 @@ export default function MainLayout({
     availableLanguages
 }: MainLayoutProps) {
     const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true);
-    const [isRightPanelOpen, setIsRightPanelOpen] = useState(true);
+    const [isRightPanelOpen, setIsRightPanelOpen] = useState(true); // Default to true? Or false? Assuming true based on code.
 
     const { connected: isLiveConnected } = useConnection();
 
@@ -47,14 +47,17 @@ export default function MainLayout({
     const {
         conversationList,
         activeConversationId,
-        loadConversation, // Get function from shared context
-        startNewConversation, // Get function from shared context
+        loadConversation,
+        startNewConversation,
         isLoadingHistory,
-        // Get other values if needed by MainLayout itself
+        // --- Get NEW actions from context ---
+        deleteConversation,
+        clearConversation,
+        // ---
     } = useSharedChatSocket();
     // ------------------------------------
 
-    // Handlers now correctly use functions from the shared context
+    // Handlers using context functions (no changes needed here)
     const handleSelectConversation = useCallback((conversationId: string) => {
         console.log("[MainLayout] Selecting conversation:", conversationId);
         loadConversation(conversationId);
@@ -75,24 +78,24 @@ export default function MainLayout({
 
 
     return (
-        // Main flex container
         <div className="flex h-screen bg-gray-100 overflow-hidden">
 
-            {/* --- Toggle Button for Left Panel --- */}
+            {/* Toggle Button for Left Panel */}
             {!isLeftPanelOpen && (
                 <button
                     onClick={() => setIsLeftPanelOpen(true)}
                     className="fixed left-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-600 shadow-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    title="Open chat mode"
-                    aria-label="Open chat mode"
+                    title="Open chat mode & history" // Updated title
+                    aria-label="Open chat mode & history" // Updated label
                     aria-expanded={isLeftPanelOpen}
                     aria-controls="left-panel-title"
                 >
                     <AlignJustify className="h-5 w-5" />
-                    <span className="sr-only">Open chat mode</span>
+                    <span className="sr-only">Open chat mode & history</span>
                 </button>
             )}
-            {/* --- Left Panel (Đã cập nhật props) --- */}
+
+            {/* Left Panel - Pass down new props */}
             <LeftPanel
                 isOpen={isLeftPanelOpen}
                 onClose={() => setIsLeftPanelOpen(false)}
@@ -104,8 +107,11 @@ export default function MainLayout({
                 activeConversationId={activeConversationId}
                 onSelectConversation={handleSelectConversation}
                 onStartNewConversation={handleStartNewConversation}
-                isLoading={isLoadingHistory}
-            // ---------------------------
+                isLoadingConversations={isLoadingHistory}
+                // --- Pass down NEW props ---
+                onDeleteConversation={deleteConversation}
+                onClearConversation={clearConversation}
+                // ---
             />
 
 
@@ -116,7 +122,7 @@ export default function MainLayout({
                 </div>
             </main>
 
-            {/* --- Right Panel (Settings) --- */}
+            {/* Right Panel (Settings) */}
             <RightSettingsPanel
                 isOpen={isRightPanelOpen}
                 onClose={() => setIsRightPanelOpen(false)}
@@ -132,7 +138,7 @@ export default function MainLayout({
                 isLiveConnected={isLiveConnected}
             />
 
-            {/* --- Toggle Button for Right Panel --- */}
+            {/* Toggle Button for Right Panel */}
             {!isRightPanelOpen && (
                 <button
                     onClick={() => setIsRightPanelOpen(true)}
@@ -140,7 +146,7 @@ export default function MainLayout({
                     title="Open settings"
                     aria-label="Open settings"
                     aria-expanded={isRightPanelOpen}
-                    aria-controls="right-panel-title"
+                    aria-controls="right-panel-title" // Make sure RightSettingsPanel has an id="right-panel-title" on its main header/title element
                 >
                     <Settings className="h-5 w-5" />
                     <span className="sr-only">Open settings</span>

@@ -1,7 +1,7 @@
 // src/app/[locale]/chatbot/chat/ChatHistory.tsx
 import React from 'react';
 import ChatMessageDisplay from './ChatMessageDisplay'; // Ensure correct import path
-import { ChatMessageType } from '@/src/app/[locale]/chatbot/lib/regular-types.ts'; // Adjust path if needed
+import { ChatMessageType } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Adjust path if needed
 
 interface ChatHistoryProps {
     messages: ChatMessageType[];

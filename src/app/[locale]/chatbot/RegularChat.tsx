@@ -5,7 +5,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import ChatHistory from './regularchat/ChatHistory';
 import ChatInput from './regularchat/ChatInput';
 import LoadingIndicator from './regularchat/LoadingIndicator';
-import Introduction from './regularchat/ChatIntroduction';
+import ChatIntroductionDisplay from './regularchat/ChatIntroduction';
 import EmailConfirmationDialog from './EmailConfirmationDialog';
 import { useTimer } from '@/src/hooks/chatbot/useTimer';
 import { useSharedChatSocket } from './context/ChatSocketContext';
@@ -117,7 +117,10 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
             {/* Chat History Area */}
             <div ref={chatHistoryRef} className="flex-grow overflow-y-auto p-4 md:p-6 space-y-4 bg-gradient-to-b from-white to-gray-50">
                 {showIntroduction && (
-                    <Introduction onSuggestionClick={handleSuggestionClick} />
+                     <ChatIntroductionDisplay
+                     onSuggestionClick={handleSuggestionClick}
+                     language={currentLanguage} // Truyền prop language
+                 />
                 )}
                 <ChatHistory messages={chatMessages} />
             </div>

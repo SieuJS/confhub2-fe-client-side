@@ -26,7 +26,6 @@ export interface SocketEventHandlers {
     onChatResult: (data: ResultUpdate) => void;
     onChatError: (errorData: ErrorUpdate) => void;
     onEmailConfirmationResult?: (result: EmailConfirmationResult) => void;
-    // --- Bổ sung các handlers còn thiếu ---
     onConversationList?: (list: ConversationMetadata[]) => void;
     onInitialHistory?: (payload: InitialHistoryPayload) => void;
     onNewConversationStarted?: (payload: { conversationId: string }) => void;
