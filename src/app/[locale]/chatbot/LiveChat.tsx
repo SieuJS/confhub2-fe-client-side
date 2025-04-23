@@ -26,7 +26,7 @@ import useVolumeControl from './livechat/hooks/useVolumeControl';
 import useInteractionHandlers from './livechat/hooks/useInteractionHandlers';
 
 // Types and Constants
-import { OutputModality, PrebuiltVoice, Language } from './lib/types';
+import { OutputModality, PrebuiltVoice, Language } from './lib/live-chat.types';
 import { getSystemInstructions } from './lib/instructions';
 import { AudioRecorder } from './livechat/lib/audio-recorder';
 

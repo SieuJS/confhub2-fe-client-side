@@ -135,3 +135,46 @@ export interface ResultUpdate {
     thoughts?: ThoughtStep[];
     action?: FrontendAction; // Ensure this includes the new type
 }
+
+
+export interface InitialHistoryPayload {
+    conversationId: string;
+    messages: ChatMessageType[]; // Nhận luôn định dạng frontend
+}
+
+
+/**
+ * Payload for the result of a confirmation action (sent FROM backend TO frontend).
+ * Informs the client about the outcome of a 'confirmEmailSend' or similar action.
+ */
+export interface ConfirmationResultPayload {
+    confirmationId: string; // The ID of the original confirmation request
+    status:
+        | 'confirmed'      // User confirmed, action likely succeeded (e.g., email sent)
+        | 'cancelled'      // User cancelled the action
+        | 'timeout'        // The confirmation request timed out before user interaction
+        | 'not_found'      // The confirmation ID was not found (already processed or invalid)
+        | 'failed'         // User confirmed, but the action failed (e.g., email sending error)
+        | 'unauthorized'   // The user trying to confirm/cancel was not the original requester
+        | 'error';         // Generic error processing the confirmation/cancellation
+    message: string;       // A user-friendly message describing the outcome
+    details?: any;         // Optional: Additional details (e.g., error specifics if status is 'failed' or 'error')
+}
+
+
+    
+// Định nghĩa kiểu dữ liệu cho metadata trả về frontend
+export interface ConversationMetadata {
+    id: string; // Chính là _id của MongoDB
+    title: string; // Tin nhắn đầu tiên hoặc tiêu đề tự tạo
+    lastActivity: Date;
+}
+
+
+export type Language = 'en' | 'vi' | 'zh';
+export type ChatMode = 'live' | 'regular';
+export interface LanguageOption {
+    code: Language;
+    name: string;
+    flagCode: string;
+}

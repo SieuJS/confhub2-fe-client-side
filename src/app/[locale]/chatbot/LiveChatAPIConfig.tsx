@@ -1,4 +1,4 @@
-// src/components/LiveChatAPIConfig.tsx (Adjusted)
+// src/app/[locale]/chatbot/LiveChatAPIConfig.tsx
 "use client";
 import { useEffect, memo } from "react";
 import { useLiveAPIContext } from '@/src/app/[locale]/chatbot/livechat/contexts/LiveAPIContext';
@@ -6,14 +6,12 @@ import {
   english_getConferencesDeclaration,
   english_getJournalsDeclaration,
   english_getWebsiteInformationDeclaration, english_navigationDeclaration,
-  // drawChartDeclaration, // Keep commented if not used
   vietnam_getConferencesDeclaration, vietnam_getJournalsDeclaration, vietnam_getWebsiteInformationDeclaration, vietnam_drawChartDeclaration,
   china_getConferencesDeclaration, china_getJournalsDeclaration, china_getWebsiteInformationDeclaration, china_drawChartDeclaration,
-
-} from "./lib/functions"; // Adjust path
-import { OutputModality, PrebuiltVoice, Language, ToolCall } from '@/src/app/[locale]/chatbot/lib/types';
-import { transformConferenceData } from './utils/transformApiData'; // Adjust path
-import { appConfig } from "@/src/middleware"; // Adjust path
+} from "./lib/functions";
+import { OutputModality, PrebuiltVoice, Language, ToolCall } from '@/src/app/[locale]/chatbot/lib/live-chat.types';
+import { transformConferenceData } from './utils/transformApiData';
+import { appConfig } from "@/src/middleware";
 import { FunctionDeclaration, FunctionCall } from "@google/generative-ai";
 import { usePathname } from 'next/navigation';
 

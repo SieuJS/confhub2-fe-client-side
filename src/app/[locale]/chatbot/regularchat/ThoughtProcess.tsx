@@ -1,6 +1,6 @@
 // src/components/ThoughtProcess.tsx
 import React, { useState } from 'react';
-import { ThoughtStep } from '@/src/models/chatbot/chatbot'; // Adjust path if needed
+import { ThoughtStep } from '@/src/app/[locale]/chatbot/lib/regular-types.ts'; // Adjust path if needed
 import {
     FiDownloadCloud, // processing_input
     FiCpu,          // thinking

@@ -145,7 +145,7 @@ export const chineseSystemInstructions = `
 *   **网站信息：** 如果用户询问关于网站的问题（例如：“如何注册？”、“网站有哪些功能？”、“隐私政策是什么？”），请（用中文）根据 'getWebsiteInformation' 函数提供的网站描述来回答。如果找不到具体答案，请 清晰地说明这一点。
 `;
 
-import { Language } from "./types";
+import { Language } from "./live-chat.types";
 // --- Helper Function: getSystemInstructions ---
 /**
  * Retrieves the appropriate system instruction string based on the selected language.

@@ -1,4 +1,4 @@
-// src/utils/chatUtils.ts
+// src/app/[locale]/chatbot/utils/chatUtils.ts
 
 /**
  * Generates a unique message ID.

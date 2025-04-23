@@ -1,4 +1,4 @@
-// src/hooks/useChatSocket.ts
+// src/app/[locale]/hooks/chatbot/useChatSocket.ts
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { Socket } from 'socket.io-client';
@@ -9,9 +9,11 @@ import {
     ErrorUpdate, ThoughtStep, ChatMessageType, LoadingState, ChatUpdate,
     ConfirmSendEmailAction, // <-- Add
     EmailConfirmationResult, // <-- Add
-    FrontendAction         // <-- Make sure this includes the confirm type
-} from '@/src/models/chatbot/chatbot'; // Adjust path
-import { Language } from '@/src/app/[locale]/chatbot/lib/types';
+    FrontendAction,
+    InitialHistoryPayload,
+    ConversationMetadata        // <-- Make sure this includes the confirm type
+} from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Adjust path
+import { Language } from '@/src/app/[locale]/chatbot/lib/live-chat.types';
 import { appConfig } from '@/src/middleware';
 
 import { useSocketConnection, SocketConnectionOptions, SocketEventHandlers } from './useSocketConnection';
@@ -21,25 +23,35 @@ import { generateMessageId, constructNavigationUrl, openUrlInNewTab } from '@/sr
 // --- Interfaces (Keep definitions clear) ---
 export interface UseChatSocketProps {
     socketUrl: string;
-    // Optional callbacks for parent component interaction
     onConnectionChange?: (isConnected: boolean) => void;
     onInitialConnectionError?: (error: Error) => void;
+    onHistoryLoaded?: () => void; // <<< Callback mới
 }
 
 
 // --- CẬP NHẬT INTERFACE NÀY ---
+
+// Interface cho controls trả về (THÊM state và hàm mới)
+
+
 export interface ChatSocketControls {
     chatMessages: ChatMessageType[];
     loadingState: LoadingState;
     isConnected: boolean;
     sendMessage: (userInput: string, isStreaming: boolean, language: Language) => void;
     socketId: string | null;
-    // Thêm các thuộc tính còn thiếu vào interface
     showConfirmationDialog: boolean;
-    confirmationData: ConfirmSendEmailAction | null; // Sử dụng type nhất quán (ví dụ: ConfirmEmailSendPayload)
-    handleConfirmSend: (confirmationId: string) => void; // Thêm định nghĩa hàm
-    handleCancelSend: (confirmationId: string) => void;  // Thêm định nghĩa hàm
-    closeConfirmationDialog: () => void;               // Thêm định nghĩa hàm
+    confirmationData: ConfirmSendEmailAction | null;
+    handleConfirmSend: (confirmationId: string) => void;
+    handleCancelSend: (confirmationId: string) => void;
+    closeConfirmationDialog: () => void;
+    // --- Dữ liệu và hàm mới ---
+    conversationList: ConversationMetadata[];
+    activeConversationId: string | null;
+    loadConversation: (conversationId: string) => void;
+    startNewConversation: () => void;
+    isLoadingHistory: boolean; // <<< Thêm state loading cho history
+    // -------------------------
 }
 // -------------------------------
 
@@ -51,12 +63,17 @@ export interface ChatSocketControls {
 export function useChatSocket({
     socketUrl,
     onConnectionChange,
-    onInitialConnectionError
-}: UseChatSocketProps): ChatSocketControls {
+    onInitialConnectionError,
+    // onHistoryLoaded // <<< Callback này có thể không cần nữa nếu dùng isLoadingHistory
+}: UseChatSocketProps): ChatSocketControls { // <<< Cập nhật kiểu trả về
+
 
     const [chatMessages, setChatMessages] = useState<ChatMessageType[]>([]);
     const [loadingState, setLoadingState] = useState<LoadingState>({ isLoading: false, step: '', message: '' });
     const [hasFatalError, setHasFatalError] = useState<boolean>(false);
+    const [isHistoryLoaded, setIsHistoryLoaded] = useState<boolean>(false); // <<< State mới
+    const [isLoadingHistory, setIsLoadingHistory] = useState<boolean>(false); // <<< State loading mới
+
     const isMountedRef = useRef(true);
     const BASE_WEB_URL = appConfig.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:8386";
     const pathname = usePathname();
@@ -67,6 +84,11 @@ export function useChatSocket({
     const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
     const [confirmationData, setConfirmationData] = useState<ConfirmSendEmailAction | null>(null);
     // ----------------------------------------
+
+    // --- State mới cho danh sách và ID active ---
+    const [conversationList, setConversationList] = useState<ConversationMetadata[]>([]);
+    const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+    // -------------------------------------------
 
     useEffect(() => {
         setHasFatalError(false);
@@ -156,14 +178,16 @@ export function useChatSocket({
     // These are now passed to useSocketConnection and stored in its ref.
     // They need to be stable (useCallback) so the ref update isn't triggered unnecessarily.
 
+    // --- SIMPLIFY handleConnect ---
     const handleConnect = useCallback((socketId: string) => {
         if (!isMountedRef.current) return;
         console.log(`[useChatSocket] Event: Connected with ID ${socketId}`);
-        setHasFatalError(false); // Reset fatal error on successful connect
+        setHasFatalError(false);
         onConnectionChange?.(true);
-        // Reset loading state on successful connect
         setLoadingState({ isLoading: false, step: 'connected', message: 'Connected' });
+        // No need to request list here anymore
     }, [onConnectionChange]);
+    // ---------------------------
 
     const handleDisconnect = useCallback((reason: Socket.DisconnectReason) => {
         if (!isMountedRef.current) return;
@@ -217,6 +241,57 @@ export function useChatSocket({
         setLoadingState({ isLoading: false, step: 'auth_error', message: 'Auth Failed' });
     }, [handleError]);
 
+    // --- HANDLER MỚI: Nhận danh sách conversations ---
+    const handleConversationList = useCallback((list: ConversationMetadata[]) => {
+        if (!isMountedRef.current) return;
+        console.log(`[useChatSocket] Event: Received conversation list (${list?.length ?? 0} items)`);
+        setConversationList(list || []);
+        // Có thể dừng loading state cho danh sách ở đây
+    }, []);
+    // -----------------------------------------------
+
+
+    const handleInitialHistory = useCallback((payload: InitialHistoryPayload) => {
+        if (!isMountedRef.current) return;
+
+        console.log(`[useChatSocket] Event: Initial History Received for ConvID: ${payload.conversationId}, Messages: ${payload.messages?.length ?? 0}`);
+        setIsLoadingHistory(false);
+        setChatMessages(payload.messages || []);
+        setActiveConversationId(payload.conversationId);
+        setIsHistoryLoaded(true);
+
+        // --- Đảm bảo reset message trong loadingState ---
+        setLoadingState({
+            isLoading: false, // Không còn loading nữa
+            step: 'history_loaded',
+            message: '' // <<< SET MESSAGE VỀ RỖNG
+        });
+        // ---------------------------------------------
+
+    }, []); // Dependencies không đổi
+
+    // --- HANDLER MỚI: Nhận thông báo đã tạo conversation mới ---
+    const handleNewConversationStarted = useCallback((payload: { conversationId: string }) => {
+        if (!isMountedRef.current || !payload || !payload.conversationId) return;
+
+        console.log(`[useChatSocket] Event: New Conversation Started. ID: ${payload.conversationId}`);
+        setIsLoadingHistory(false); // Dừng loading nếu có
+
+        // Xóa messages cũ, đặt active ID mới
+        setChatMessages([]);
+        setActiveConversationId(payload.conversationId);
+        setIsHistoryLoaded(false); // Chưa có history nào được load cho conv mới này
+
+        // Reset loading state chung
+        setLoadingState({ isLoading: false, step: 'new_chat_ready', message: '' });
+
+        // Có thể cần fetch lại danh sách để hiển thị conv mới nhất lên đầu
+        if (socketRef.current) {
+            socketRef.current.emit('get_conversation_list');
+        }
+
+    }, []); // Không có deps đặc biệt
+
     const handleStatusUpdate = useCallback((update: StatusUpdate) => {
         if (!isMountedRef.current) return;
         // console.log("[useChatSocket] Event: Status Update", update);
@@ -231,6 +306,8 @@ export function useChatSocket({
         // If this is the first chunk of a new response
         if (!animationControls.isStreaming) {
             const newStreamingId = `streaming-${generateMessageId()}`;
+            console.log(`[handlePartialResult] Starting new stream. Placeholder ID: ${newStreamingId}`); // <<< LOG ID PLACEHOLDER
+
             const newStreamingMessage: ChatMessageType = {
                 id: newStreamingId,
                 message: '', // Start empty, animation hook will update via callback
@@ -249,6 +326,7 @@ export function useChatSocket({
     }, [animationControls]); // Dependency: animationControls
 
     // --- MODIFIED: handleResult to check for confirmEmailSend action ---
+    
     const handleResult = useCallback((result: ResultUpdate) => {
         if (!isMountedRef.current) return;
         console.log("Socket Result Received:", result);
@@ -257,8 +335,12 @@ export function useChatSocket({
         setLoadingState({ isLoading: false, step: 'result_received', message: '' });
 
         const finalMessageId = generateMessageId();
-        const streamingId = animationControls.currentStreamingId;
-
+        const streamingId = animationControls.currentStreamingId; // <<< Lấy ID placeholder
+    
+        // --- DEBUG LOGGING ---
+        console.log(`[handleResult] Trying to finalize stream. Streaming ID from controls: ${streamingId}`);
+        // --- END DEBUG LOGGING ---
+    
         // Check for specific actions BEFORE updating chat messages with final text
         // Check for specific actions BEFORE updating chat messages with final text
         const action = result.action; // Gán vào biến để dễ xử lý
@@ -299,23 +381,34 @@ export function useChatSocket({
             }
         }
 
-        // Update Chat History State (replace streaming placeholder or add new)
         setChatMessages(prevMessages => {
-            const messageExistsIndex = streamingId
-                ? prevMessages.findIndex(msg => msg.id === streamingId)
-                : -1;
-
+            const streamingId = animationControls.currentStreamingId;
+            const messageExistsIndex = streamingId ? prevMessages.findIndex(msg => msg.id === streamingId) : -1;
+        
+            console.log(`[handleResult setChatMessages] Found placeholder at index: ${messageExistsIndex}`);
+        
             if (messageExistsIndex !== -1) {
+                // *** THÊM KIỂM TRA NÀY ***
+                // Nếu message với ID cuối cùng ĐÃ tồn tại (do lần chạy StrictMode trước đó),
+                // thì không làm gì cả ở lần chạy thứ hai này.
+                if (prevMessages.some(msg => msg.id === finalMessageId)) {
+                     console.warn(`[handleResult setChatMessages] StrictMode double run? Final ID ${finalMessageId} already exists. Skipping replacement.`);
+                     return prevMessages; // Trả về state hiện tại, không thay đổi
+                }
+                // ***********************
+        
+                console.log(`[handleResult setChatMessages] Replacing placeholder ${streamingId} with final message ${finalMessageId}`);
                 const updatedMessages = [...prevMessages];
                 updatedMessages[messageExistsIndex] = {
                     ...prevMessages[messageExistsIndex],
                     ...finalMessageData,
-                    id: finalMessageId,
+                    id: finalMessageId, // ID mới
                     message: finalMessageData.message ?? '',
                 };
                 return updatedMessages;
             } else {
-                console.warn("No streaming placeholder found for ID:", streamingId, "Adding as new message.");
+                // --- ĐÂY LÀ NƠI GÂY LẶP ---
+                console.warn(`[handleResult setChatMessages] *** PLACEHOLDER NOT FOUND *** for ID: ${streamingId}. Adding final message ${finalMessageId} as new.`);
                 const newMessage: ChatMessageType = {
                     id: finalMessageId,
                     isUser: false,
@@ -326,6 +419,8 @@ export function useChatSocket({
                 if (!prevMessages.some(msg => msg.id === finalMessageId)) {
                     return [...prevMessages, newMessage];
                 } else {
+                    console.warn(`[handleResult setChatMessages] Final message ${finalMessageId} already exists? Skipping add.`);
+
                     return prevMessages;
                 }
             }
@@ -354,6 +449,8 @@ export function useChatSocket({
         const isFatal = errorData?.code === 'FATAL_SERVER_ERROR'; // Example check
         handleError(errorData, true, isFatal);
     }, [handleError]); // Keep dependency
+
+
 
 
     // --- NEW: Handler for Email Confirmation Result Event ---
@@ -404,7 +501,8 @@ export function useChatSocket({
     }, []); // Thêm useCallback nếu cần sự ổn định
 
 
-    // Add the new handler to the list
+
+    // --- Cập nhật Socket Event Handlers ---
     const socketEventHandlers: SocketEventHandlers = useMemo(() => ({
         onConnect: handleConnect,
         onDisconnect: handleDisconnect,
@@ -414,22 +512,29 @@ export function useChatSocket({
         onChatUpdate: handlePartialResult,
         onChatResult: handleResult,
         onChatError: handleChatErrorEvent,
-        // --- Add the new event handler ---
         onEmailConfirmationResult: handleEmailConfirmationResult,
-        // -------------------------------
-    }), [ // Ensure all handler functions are stable
+        onInitialHistory: handleInitialHistory, // <<< Vẫn dùng để load history cụ thể
+        onConversationList: handleConversationList, // <<< Handler mới cho danh sách
+        onNewConversationStarted: handleNewConversationStarted, // <<< Handler mới cho new chat
+    }), [
         handleConnect, handleDisconnect, handleConnectError, handleAuthError,
         handleStatusUpdate, handlePartialResult, handleResult, handleChatErrorEvent,
-        handleEmailConfirmationResult // <-- Add new handler here
+        handleEmailConfirmationResult, handleInitialHistory,
+        handleConversationList, handleNewConversationStarted // <<< Thêm các handler mới
     ]);
+    // ------------------------------------
+
 
     const connection = useSocketConnection(socketOptions, socketEventHandlers);
-    const { isConnected, socketId } = connection;
-    const socketRef = connection.socketRef;
+    const { isConnected, socketId, socketRef } = connection; // <<< Get socketRef here
 
 
 
-    // --- Send Message Function (Adjusted) ---
+    // -----------------------------------------
+
+
+
+    // --- SỬA ĐỔI: Send Message Function ---
     const sendMessage = useCallback((userInput: string, isStreaming: boolean, language: Language) => {
         const trimmedMessage = userInput.trim();
         if (!trimmedMessage) return;
@@ -454,16 +559,70 @@ export function useChatSocket({
         const newUserMessage: ChatMessageType = {
             id: generateMessageId(), message: trimmedMessage, isUser: true, type: 'text'
         };
+        // Thêm tin nhắn user vào state ngay lập tức
         setChatMessages(prevMessages => [...prevMessages, newUserMessage]);
 
-        console.log(`Emitting 'send_message' (Streaming: ${isStreaming}, Lang: ${language}). Socket ID: ${socketRef.current?.id}`);
+        // --- GỬI MESSAGE ---
+        // Backend sẽ tự xác định conversation ID dựa trên socket.data.currentConversationId
+        // Hoặc tạo mới nếu chưa có active ID nào được set trên socket data phía backend
+        console.log(`Emitting 'send_message' (Streaming: ${isStreaming}, Lang: ${language}). ActiveConvID on Frontend (for info): ${activeConversationId}. Socket ID: ${socketRef.current?.id}`);
         socketRef.current.emit('send_message', {
             userInput: trimmedMessage,
             isStreaming: isStreaming,
             language: language
+            // KHÔNG cần gửi conversationId từ đây nữa, backend tự quản lý active ID
         });
-    }, [isConnected, hasFatalError, handleError, animationControls, socketRef]); // Added socketRef dependency
+        // -----------------
 
+    }, [isConnected, hasFatalError, handleError, animationControls, socketRef, activeConversationId]); // Thêm activeConversationId vào deps để log cho đúng
+    // -----------------------------
+
+
+    // --- HÀM MỚI: Load conversation cụ thể ---
+    const loadConversation = useCallback((conversationId: string) => {
+        if (!socketRef.current || !isConnected) {
+            handleError({ message: 'Cannot load conversation: Not connected.', type: 'error' }, false, false);
+            return;
+        }
+        if (!conversationId) {
+            console.warn("[useChatSocket] Attempted to load conversation with invalid ID.");
+            return;
+        }
+        // Chỉ load nếu ID khác với ID đang active (tránh load lại vô ích)
+        if (conversationId === activeConversationId) {
+            console.log(`[useChatSocket] Conversation ${conversationId} is already active.`);
+            return;
+        }
+
+        console.log(`[useChatSocket] Requesting to load conversation ID: ${conversationId}`);
+        setIsLoadingHistory(true); // <<< Bắt đầu loading history
+        setChatMessages([]); // Xóa messages cũ trước khi load mới
+        setIsHistoryLoaded(false); // Reset trạng thái history loaded
+        setLoadingState({ isLoading: true, step: 'loading_history', message: 'Loading history...' }); // Cập nhật loading chung
+        socketRef.current.emit('load_conversation', { conversationId });
+
+    }, [socketRef, isConnected, handleError, activeConversationId]); // Thêm activeConversationId vào deps
+    // ----------------------------------------
+
+    // --- HÀM MỚI: Bắt đầu conversation mới ---
+    const startNewConversation = useCallback(() => {
+        if (!socketRef.current || !isConnected) {
+            handleError({ message: 'Cannot start new chat: Not connected.', type: 'error' }, false, false);
+            return;
+        }
+
+        console.log(`[useChatSocket] Requesting to start a new conversation...`);
+        setIsLoadingHistory(true); // Có thể coi như đang load trạng thái mới
+        // Xóa messages cũ, reset active ID và trạng thái load
+        setChatMessages([]);
+        setActiveConversationId(null);
+        setIsHistoryLoaded(false);
+        setLoadingState({ isLoading: true, step: 'starting_new_chat', message: 'Starting new chat...' }); // Loading state mới
+
+        socketRef.current.emit('start_new_conversation');
+
+    }, [socketRef, isConnected, handleError]);
+    // ---------------------------------------
 
     // --- NEW: Callbacks for Dialog Actions ---
     const handleConfirmSend = useCallback((confirmationId: string) => {
@@ -490,8 +649,7 @@ export function useChatSocket({
     }, [socketRef, isConnected]);
     // ----------------------------------------
 
-    // --- Return Hook Controls ---
-    // --- Return Hook Controls ---
+    // --- Return Hook Controls (THÊM state và hàm mới) ---
     return {
         chatMessages,
         loadingState,
@@ -500,9 +658,16 @@ export function useChatSocket({
         socketId,
         showConfirmationDialog,
         confirmationData,
-        // Các hàm này giờ đã được khai báo trong interface ChatSocketControls
         handleConfirmSend,
         handleCancelSend,
-        closeConfirmationDialog
+        closeConfirmationDialog,
+        // --- Trả về state và hàm mới ---
+        conversationList,
+        activeConversationId,
+        loadConversation,
+        startNewConversation,
+        isLoadingHistory, // <<< Trả về state loading
+        // -----------------------------
     };
 }
+

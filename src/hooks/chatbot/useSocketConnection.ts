@@ -1,7 +1,7 @@
-// src/hooks/useSocketConnection.ts
+// src/app/[locale]/hooks/chatbt/useSocketConnection.ts
 import { useState, useEffect, useRef, useCallback } from 'react';
 import io, { Socket, ManagerOptions, SocketOptions } from 'socket.io-client'; // Import ManagerOptions, SocketOptions if needed elsewhere
-import { EmailConfirmationResult, StatusUpdate, ResultUpdate, ErrorUpdate, ChatUpdate } from '@/src/models/chatbot/chatbot'; // Adjust path
+import { EmailConfirmationResult, StatusUpdate, ResultUpdate, ErrorUpdate, ChatUpdate, ConversationMetadata, InitialHistoryPayload } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Adjust path
 
 // Keep Interfaces the same, ensure EmailConfirmationResult is defined correctly in the model
 export interface SocketConnectionOptions {
@@ -14,18 +14,25 @@ export interface SocketConnectionOptions {
 }
 
 // Add the onEmailConfirmationResult to the handlers interface
+
+// Interface Handlers (Đảm bảo có đủ các handlers)
 export interface SocketEventHandlers {
     onConnect: (socketId: string) => void;
     onDisconnect: (reason: Socket.DisconnectReason) => void;
     onConnectError: (error: Error) => void;
-    onAuthError: (error: { message: string }) => void; // Specific auth error
-    onStatusUpdate: (data: StatusUpdate) => void; // Use specific types if available
-    onChatUpdate: (data: ChatUpdate) => void; // Use specific types
-    onChatResult: (data: ResultUpdate) => void; // Use specific types
-    onChatError: (errorData: ErrorUpdate) => void; // Use specific types
-    // Add the new optional handler
+    onAuthError: (error: { message: string }) => void;
+    onStatusUpdate: (data: StatusUpdate) => void;
+    onChatUpdate: (data: ChatUpdate) => void;
+    onChatResult: (data: ResultUpdate) => void;
+    onChatError: (errorData: ErrorUpdate) => void;
     onEmailConfirmationResult?: (result: EmailConfirmationResult) => void;
+    // --- Bổ sung các handlers còn thiếu ---
+    onConversationList?: (list: ConversationMetadata[]) => void;
+    onInitialHistory?: (payload: InitialHistoryPayload) => void;
+    onNewConversationStarted?: (payload: { conversationId: string }) => void;
+    // ----------------------------------
 }
+
 
 // SocketConnectionResult remains the same
 export interface SocketConnectionResult {
@@ -161,6 +168,16 @@ export function useSocketConnection(
         });
         // --------------------------------------
 
+        newSocket.on('conversation_list', (list) => latestHandlersRef.current.onConversationList?.(list)); // Assuming this exists from previous steps
+        newSocket.on('initial_history', (payload) => latestHandlersRef.current.onInitialHistory?.(payload)); // Assuming this exists
+
+        // --- REGISTER THE MISSING LISTENER ---
+        newSocket.on('new_conversation_started', (payload) => {
+            console.log("[useSocketConnection] Received 'new_conversation_started' event:", payload); // Add log for debugging
+            latestHandlersRef.current.onNewConversationStarted?.(payload);
+        });
+        // ------------------------------------
+
         // --- Cleanup Function ---
         return () => {
             console.log(`[useSocketConnection] Cleaning up socket instance ${newSocket.id}...`);
@@ -176,6 +193,13 @@ export function useSocketConnection(
             newSocket.off('auth_error');
             newSocket.off('email_confirmation_result'); // <-- Remove the new listener
 
+            newSocket.off('conversation_list'); // Make sure to remove all added listeners
+            newSocket.off('initial_history');
+
+            // --- REMOVE THE NEW LISTENER ---
+            newSocket.off('new_conversation_started');
+            // -------------------------------
+            
             // Only disconnect if this instance is still the one in the ref
             if (socketRef.current && socketRef.current.id === newSocket.id) {
                 console.log(`[useSocketConnection] Disconnecting socket ${newSocket.id} in cleanup.`);

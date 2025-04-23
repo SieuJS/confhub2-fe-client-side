@@ -1,7 +1,7 @@
 // src/components/chatbot/EmailConfirmationDialog.tsx (or appropriate path)
 import React, { useState, useEffect, useRef } from 'react';
 // import { useTranslations } from 'next-intl'; // Removed
-import { ConfirmSendEmailAction } from '@/src/models/chatbot/chatbot'; // Adjust path
+import { ConfirmSendEmailAction } from '@/src/app/[locale]/chatbot/lib/regular-types.ts'; // Adjust path
 
 interface EmailConfirmationDialogProps {
   isOpen: boolean;

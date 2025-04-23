@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import remarkBreaks from 'remark-breaks';
-import { ChatMessageType, MessageType, ThoughtStep } from '@/src/models/chatbot/chatbot';
+import { ChatMessageType, MessageType, ThoughtStep } from '@/src/app/[locale]/chatbot/lib/regular-types.ts';
 import { TriangleAlert, Copy, Pencil, Check } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Map from '../../conferences/detail/Map';
