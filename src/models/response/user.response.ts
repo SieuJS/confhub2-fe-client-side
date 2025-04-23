@@ -73,7 +73,7 @@ export type Setting = {
   autoAddFollowToCalendar?: boolean;
   notificationWhenConferencesChanges?: boolean;
   upComingEvent?: boolean;
-  notificationThrough?: "System" | "Email" | "All";
+  notificationThroughEmail?: boolean;
   notificationWhenUpdateProfile?: boolean;
   notificationWhenFollow?: boolean;
   notificationWhenAddTocalendar?: boolean;
