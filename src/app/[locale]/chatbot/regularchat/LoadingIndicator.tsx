@@ -1,4 +1,4 @@
-// src/components/LoadingIndicator.tsx (hoặc đường dẫn tương ứng)
+// src/app/[locale]/chatbot/regular/LoadingIndicator.tsx
 import React from 'react';
 import {
     FiDownloadCloud,
@@ -13,6 +13,7 @@ import {
     FiCheckSquare, // <<< Icon cho trạng thái sẵn sàng/đã load xong (tùy chọn)
     FiFilePlus, // <<< Icon cho việc bắt đầu chat mới
 } from 'react-icons/fi'; // Hoặc thư viện icon bạn đang dùng
+import { MdOutlineAltRoute } from "react-icons/md";
 
 /**
  * Ánh xạ các step chi tiết vào một IconComponent đại diện cho giai đoạn chính.
@@ -42,6 +43,10 @@ const getLoadingPhaseIcon = (step: string): React.ElementType => {
      }
     // ======================================================
 
+    // Routing Task
+    if (normalizedStep === 'routing_task') {
+        return MdOutlineAltRoute; 
+    }
     // --- Giai đoạn Xử lý Input ---
     if (normalizedStep === 'processing_input' || normalizedStep === 'sending') { // Thêm 'sending'
         return FiDownloadCloud;

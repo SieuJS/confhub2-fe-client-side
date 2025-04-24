@@ -1,6 +1,6 @@
 // src/components/ThoughtProcess.tsx
 import React, { useState } from 'react';
-import { ThoughtStep } from '@/src/app/[locale]/chatbot/lib/regular-types.ts'; // Adjust path if needed
+import { ThoughtStep } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Adjust path if needed
 import {
     FiDownloadCloud, // processing_input
     FiCpu,          // thinking
@@ -23,6 +23,7 @@ import {
     FiZap,           // action_prepared (generic)
     FiPlayCircle
 } from 'react-icons/fi'; // Example icons from Feather Icons
+import { MdOutlineAltRoute } from "react-icons/md";
 
 // --- Enhanced Step Icon Mapping ---
 // Using React Icon components directly
@@ -79,6 +80,7 @@ const stepIcons: { [key: string]: React.ElementType } = {
     max_turns_exceeded: FiAlertTriangle,
     unknown_handler_error: FiAlertTriangle,
 
+    routng_task: MdOutlineAltRoute,
     // --- Fallback ---
     default: FiHelpCircle,
 };
