@@ -14,7 +14,7 @@ import { appConfig } from '@/src/middleware'
 
 interface BlacklistTabProps {}
 
-const API_GET_USER_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/user`
+const API_GET_BLACKLIST_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/blacklist-conference`
 
 const BlacklistTab: React.FC<BlacklistTabProps> = () => {
   const t = useTranslations('')
@@ -41,41 +41,21 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
         return
       }
 
-      const user = JSON.parse(userData)
       setLoggedIn(true)
 
-      const userResponse = await fetch(`${API_GET_USER_ENDPOINT}/${user.id}`)
+      const userBlacklist = await fetch(`${API_GET_BLACKLIST_ENDPOINT}`, { // Use conferenceId in URL
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization' : `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
+        }})
 
-      if (!userResponse.ok) {
-        throw new Error(`HTTP error! status: ${userResponse.status}`)
+      if (!userBlacklist.ok) {
+        throw new Error(`HTTP error! status: ${userBlacklist.status}`)
       }
 
-      const userDetails: UserResponse = await userResponse.json()
-
-      // Check for blacklist
-      if ((userDetails.blacklist ?? []).length > 0) {
-        const conferencesData = await getListConferenceFromJSON()
-
-        // Filter and map based on blacklist
-        const blacklisted = conferencesData.payload
-          .filter((conf: ConferenceInfo) => conf.id !== null)
-          .filter((conf: ConferenceInfo) =>
-            (userDetails.blacklist ?? []).some(
-              (blacklistedConf: Blacklist) => blacklistedConf.id === conf.id
-            )
-          )
-          .map((conf: ConferenceInfo) => {
-            const blacklistConfInfo: Blacklist | undefined =
-              userDetails.blacklist?.find((bc: Blacklist) => bc.id === conf.id)
-            return {
-              ...conf,
-              blacklistedAt: blacklistConfInfo?.blacklistedAt // Store the blacklist timestamp
-            }
-          })
-        setBlacklistedConferences(blacklisted) // Update state with blacklisted conferences
-      } else {
-        setBlacklistedConferences([]) // Set to empty if none are blacklisted
-      }
+      const followed: any[] = await userBlacklist.json()
+      setBlacklistedConferences(followed)
     } catch (error) {
       console.error('Failed to fetch blacklist data:', error) // Updated error message
     } finally {
