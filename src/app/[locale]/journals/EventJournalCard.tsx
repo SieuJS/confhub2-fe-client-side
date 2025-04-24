@@ -66,7 +66,7 @@ const EventJournalCard: React.FC<EventJournalCardProps> = ({ journal }) => {
         {/* Details Button (wrapped in Link) */}
         <Button variant='primary' size='small' rounded className='px-3 py-1'>
           <Link
-            href={{ pathname: '/journals/detail', query: { id: journal.id } }}
+            href={{ pathname: '/journals/detail', query: { id: journal.Sourceid } }}
           >
             {t('detailsButton')} {/* Use translation key */}
           </Link>

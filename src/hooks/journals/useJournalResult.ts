@@ -2,7 +2,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { JournalResponse } from '../../models/response/journal.response';
-import journalsList from '../../models/data/journals-list.json'; // Nhập journals-list.json
+// import journalsList from '../../models/data/journals-list.json'; // Nhập journals-list.json
+import journalsList from '../../models/data/journal_data_1_300.json'; // Nhập journals-list.json
 
 type JournalSortOption = 'title' | 'issn' | 'publisher' | 'language' | 'impactFactor' | 'citeScore' | 'sjr' | 'overallRank' | 'hIndex';
 
@@ -149,7 +150,7 @@ const useJournalResults = ({ initialData }: UseJournalResultsProps = {}) => {
         };
 
         if (params.impactFactor) {
-            filteredJournals = filteredJournals.filter(journal => filterMetric(journal.bioxbio[0]?.Impact_factor, params.impactFactor)); // Use bioxbio[0]?.Impact_factor
+            filteredJournals = filteredJournals.filter(journal => filterMetric(journal.bioxbio[0].Impact_factor, params.impactFactor)); // Use bioxbio[0]?.Impact_factor
         }
         if (params.hIndex) {
             filteredJournals = filteredJournals.filter(journal => filterMetric(journal["H index"], params.hIndex)); // Use journal["H index"]
