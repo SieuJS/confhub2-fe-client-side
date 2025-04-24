@@ -1,7 +1,7 @@
 // src/app/[locale]/dashboard/logAnalysis/ConferenceTableRow.tsx
 import React from 'react';
 import { FaChevronDown, FaChevronUp, FaTimesCircle, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
-import { ConferenceTableData } from '../../../../../hooks/logAnalysis/useConferenceTableManager'; // Import shared data type
+import { ConferenceTableData } from '../../../../../hooks/crawl/useConferenceTableManager'; // Import shared data type
 import { StatusIcon } from '../StatusIcon'; // Adjust path if needed
 import { formatDuration } from '../utils/commonUtils'; // Adjust path if needed
 

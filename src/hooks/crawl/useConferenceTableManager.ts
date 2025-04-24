@@ -221,7 +221,7 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
         const savePromises = itemsToSave.map(conf =>
             // Giả sử API chỉ cần title và dữ liệu preview (hoặc toàn bộ conf nếu cần)
             // Đảm bảo API của bạn nhận đúng dữ liệu bạn muốn lưu
-             saveConferenceToJson(conf.title, conf.finalResultPreview || {}) // Ví dụ: chỉ lưu preview
+             saveConferenceToJson(conf.title, conf.finalResult || {}) // Ví dụ: chỉ lưu preview
            // saveConferenceToJson(conf.title, conf) // Hoặc lưu toàn bộ conf
         );
 

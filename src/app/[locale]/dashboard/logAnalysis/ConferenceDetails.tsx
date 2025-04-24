@@ -1,7 +1,7 @@
 // src/components/ConferenceDetails.tsx (Or wherever it resides)
 import React from 'react';
 import { ConferenceAnalysisDetail } from '@/src/models/logAnalysis/logAnalysis';
-import { useConferenceTableManager } from '@/src/hooks/logAnalysis/useConferenceTableManager';
+import { useConferenceTableManager } from '@/src/hooks/crawl/useConferenceTableManager';
 import { ConferenceTableControls } from './conferenceTable/ConferenceTableControls';
 import { ConferenceTable } from './conferenceTable/ConferenceTable';
 

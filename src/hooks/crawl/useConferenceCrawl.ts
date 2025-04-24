@@ -1,10 +1,12 @@
+// src/hooks/crawl/useConferenceCrawl.ts
 import { useState, useCallback } from 'react';
 import axios, { AxiosError } from 'axios';
 import Papa from 'papaparse';
 import { Conference, ApiCrawlResponse, CrawlProgress } from '../../models/logAnalysis/importConferenceCrawl'; // Điều chỉnh đường dẫn nếu cần
+import { appConfig } from '@/src/middleware';
 
 // --- Configuration ---
-const API_CONFERENCE_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/crawl-conferences`;
+const API_CONFERENCE_ENDPOINT = `${appConfig.NEXT_PUBLIC_BACKEND_URL}/api/v1/crawl-conferences`;
 
 // --- Utility Function ---
 function chunkArray<T>(array: T[], size: number): T[][] {
