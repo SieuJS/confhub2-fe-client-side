@@ -716,7 +716,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                       checkLoginAndRedirect(() => updateConference(id))
                     }
                     className={`flex flex-grow items-center justify-center gap-x-2 md:flex-grow-0 md:justify-start ${isUpdating ? 'cursor-not-allowed opacity-50' : ''}`}
-                    disabled={isUpdating || !id} // Disable if no id
+                    disabled={isUpdating || !id || !displayOrganization?.link} // Disable if no id
                     title={t('Update_this_conference')}
                   >
                     {/* Update SVG */}
