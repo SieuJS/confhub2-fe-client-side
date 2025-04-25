@@ -22,7 +22,7 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
 
   // State for blacklisted conferences
   const [blacklistedConferences, setBlacklistedConferences] = useState<
-    (ConferenceInfo & { blacklistedAt?: string })[] // Added blacklistedAt property
+    (ConferenceInfo & { blacklistedAt?: string, conferenceId: string })[] // Added blacklistedAt property
   >([])
   const [loading, setLoading] = useState(true)
   const [loggedIn, setLoggedIn] = useState(false)
@@ -97,7 +97,7 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
   const transformedConferences = blacklistedConferences.map(conf => {
     const conferenceDates = conf.dates
     return {
-      id: conf.id!,
+      id: conf.conferenceId!,
       title: conf.title,
       acronym: conf.acronym,
       location: conf.location
@@ -105,7 +105,7 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
         : '',
       fromDate: conferenceDates?.fromDate || undefined,
       toDate: conferenceDates?.toDate || undefined,
-      blacklistedAt: conf.blacklistedAt, // Use blacklistedAt timestamp
+      blacklistedAt: conf.createdAt, // Use blacklistedAt timestamp
       status: conf.status // Keep status if needed
     }
   })

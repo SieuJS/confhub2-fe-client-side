@@ -65,6 +65,7 @@ export type Notification = {
 
 export type Blacklist = {
   id: string;
+  conferenceId: string;
   blacklistedAt: string;
 }
 
