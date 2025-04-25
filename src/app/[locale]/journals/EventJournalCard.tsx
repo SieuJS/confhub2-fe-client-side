@@ -49,7 +49,7 @@ const EventJournalCard: React.FC<EventJournalCardProps> = ({ journal }) => {
         {' '}
         {/* Image container, chiếm 1/3 chiều rộng */}
         <img
-          src={journal.Image || '/default-journal.jpg'}
+          src={journal.Image || '/bg-2.jpg'}
           alt={journal.Title || t('defaultJournalAltText')} // Internationalize default alt text if image is missing
           style={{
             objectFit: 'cover',

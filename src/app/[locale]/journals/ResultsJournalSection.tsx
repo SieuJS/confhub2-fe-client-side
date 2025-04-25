@@ -1,7 +1,7 @@
 // ResultsJournalSection.tsx
 'use client' // This is required for useTranslations in Client Components
 
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import EventJournalCard from './EventJournalCard'
 import Pagination from '../utils/Pagination' // Ensure this Pagination component is also internationalized if it contains text
 import useJournalResult from '@/src/hooks/journals/useJournalResult'

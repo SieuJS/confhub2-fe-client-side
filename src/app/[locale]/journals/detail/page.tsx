@@ -1,53 +1,132 @@
-// Journals.tsx (hoặc tốt hơn là đổi tên file thành JournalDetails.tsx)
+// src/components/journals/details/JournalDetails.tsx (Ví dụ đường dẫn mới)
 "use client";
-import React from 'react';
-import JournalReport from './JournalReport';
-import { RecentlyAddedJournals } from './RecentlyAddedJournals';
-import { JournalTabs } from './JournalTabs';
-import { JournalResponse } from '../../../../models/response/journal.response';
-import { RecommendedJournals } from './RecommendedJournals';
-import journalData from '../../../../models/data/journal_data_1_500.json'; // Đảm bảo đường dẫn đúng
+import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import NotFoundPage from '../../utils/NotFoundPage';
+import { JournalResponse } from '../../../../models/response/journal.response';
 import { Header } from '../../utils/Header';
 import Footer from '../../utils/Footer';
+import NotFoundPage from '../../utils/NotFoundPage';
+import JournalReport from './JournalReport'; // Giả sử các component con nằm cùng thư mục
+import { JournalTabs } from './JournalTabs';
+import { RecommendedJournals } from './RecommendedJournals';
+import { RecentlyAddedJournals } from './RecentlyAddedJournals';
 
-// Đổi tên component cho khớp với mục đích
 const JournalDetails = ({ locale }: { locale: string }) => {
   const searchParams = useSearchParams();
-  const idFromQuery = searchParams.get('id'); // Lấy giá trị từ query param 'id' (thực chất là Sourceid)
+  const idFromQuery = searchParams.get('id'); // Lấy Sourceid từ query param 'id'
 
-  // Tìm kiếm journal dựa trên Sourceid
-  const journal: JournalResponse | undefined = journalData.find(
-    // So sánh idFromQuery với journal.Sourceid
-    (j) => j.Sourceid === idFromQuery
-  ) as JournalResponse | undefined; // Ép kiểu nếu cần, nhưng find đã trả về đúng type hoặc undefined
+  // State để lưu trữ journal tìm thấy, trạng thái loading và lỗi
+  const [journal, setJournal] = useState<JournalResponse | null | undefined>(undefined); // undefined: chưa fetch, null: không tìm thấy, object: tìm thấy
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!idFromQuery || !journal) { // Kiểm tra cả idFromQuery có tồn tại không
+  useEffect(() => {
+    // Hàm để fetch và tìm kiếm journal
+    const fetchAndFindJournal = async () => {
+      // Nếu không có id trong query param, không cần fetch
+      if (!idFromQuery) {
+        console.log("No 'id' (Sourceid) found in query parameters.");
+        setJournal(null); // Đánh dấu là không tìm thấy
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      setJournal(undefined); // Reset journal state trong khi fetch
+
+      try {
+        console.log(`Fetching all journals to find Sourceid: ${idFromQuery}...`);
+        const response = await fetch('/api/journal'); // Gọi API endpoint
+
+        if (!response.ok) {
+          throw new Error(`API call failed with status: ${response.status}`);
+        }
+
+        const allJournals: JournalResponse[] = await response.json();
+        console.log(`Received ${allJournals.length} journals from API. Searching for Sourceid: ${idFromQuery}`);
+
+        // Tìm kiếm journal trong danh sách trả về từ API
+        const foundJournal = allJournals.find(j => j.Sourceid === idFromQuery);
+
+        if (foundJournal) {
+          console.log(`Journal found:`, foundJournal.Title);
+          setJournal(foundJournal);
+        } else {
+          console.log(`Journal with Sourceid ${idFromQuery} not found in the fetched data.`);
+          setJournal(null); // Đánh dấu là không tìm thấy
+        }
+
+      } catch (err: any) {
+        console.error("Failed to fetch or find journal:", err);
+        setError(err.message || 'An unknown error occurred');
+        setJournal(null); // Đặt là null khi có lỗi
+      } finally {
+        setLoading(false); // Kết thúc loading
+      }
+    };
+
+    fetchAndFindJournal();
+
+    // Chạy lại effect khi idFromQuery thay đổi
+  }, [idFromQuery]);
+
+  // --- Render Logic ---
+
+  // Trường hợp đang loading
+  if (loading) {
     return (
-      // Có thể thêm Header/Footer vào trang NotFound nếu muốn
       <>
         <Header locale={locale} />
-        <NotFoundPage />
+        <div className="flex justify-center items-center min-h-screen">
+          <p>Loading journal details...</p> {/* Hoặc component spinner */}
+        </div>
         <Footer />
       </>
     );
   }
 
-  return (
-    <div className="">
-      <Header locale={locale} />
-      <div className="py-10 bg-background w-full">
-        {/* Có thể thêm tiêu đề trang hoặc breadcrumbs ở đây */}
+  // Trường hợp có lỗi fetch hoặc không tìm thấy journal (bao gồm cả không có id)
+  if (error || journal === null) {
+    return (
+      <>
+        <Header locale={locale} />
+        {error && <div className="text-red-500 text-center py-4">Error: {error}</div>}
+        <NotFoundPage/>
+        <Footer />
+      </>
+    );
+  }
+
+  // Trường hợp đã load xong và tìm thấy journal (journal không phải null/undefined)
+  if (journal) {
+    return (
+      <div className="">
+        <Header locale={locale} />
+        <div className="py-10 bg-background w-full">
+          {/* Có thể thêm tiêu đề trang hoặc breadcrumbs ở đây */}
+        </div>
+        {/* Truyền journal đã tìm thấy vào các component con */}
+        <JournalReport journal={journal} />
+        <JournalTabs journal={journal} />
+        {/* Các component này có thể cần logic fetch riêng hoặc nhận dữ liệu khác */}
+        <RecommendedJournals /* journal={journal} ??? */ />
+        <RecentlyAddedJournals /* journal={journal} ??? */ />
+        <Footer />
       </div>
-      {/* Truyền journal đã tìm thấy vào các component con */}
-      <JournalReport journal={journal} />
-      <JournalTabs journal={journal} />
-      <RecommendedJournals /> {/* Component này có cần dữ liệu journal không? */}
-      <RecentlyAddedJournals /> {/* Component này có cần dữ liệu journal không? */}
-      <Footer />
-    </div>
+    );
+  }
+
+  // Trường hợp mặc định (không nên xảy ra nếu logic trên đúng)
+  return (
+     <>
+        <Header locale={locale} />
+        <div className="flex justify-center items-center min-h-screen">
+          <p>Something went wrong.</p>
+        </div>
+        <Footer />
+      </>
   );
 };
 
-export default JournalDetails; // Đổi tên export nếu đổi tên component
+export default JournalDetails;

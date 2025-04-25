@@ -46,7 +46,7 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
               <div className="relative w-40 h-56 rounded-lg overflow-hidden"> {/* Make sure the container has w-full and h-full */}
 
                 <img
-                  src={journal.Image || "/journal.jpg"}
+                  src={journal.Image || "/bg-2.jpg"}
                   alt={journal.Title}
                   className="w-full h-full object-cover"
                 />
