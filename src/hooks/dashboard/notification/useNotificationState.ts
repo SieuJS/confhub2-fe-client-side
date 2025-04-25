@@ -17,7 +17,7 @@ const useNotificationState = (initialNotifications: Notification[], userId: stri
         async (updatedNotifications: Notification[]) => {
             // console.log('useNotificationState: updateUserNotifications called with:', updatedNotifications); // Log before update
             const updatedData = { notifications: updatedNotifications };
-            await updateNotifications(userId, updatedData);
+            await updateNotifications( updatedData);
             setNotifications(updatedNotifications);
             // console.log('useNotificationState: updateUserNotifications - State updated.'); // Log after update
         },
