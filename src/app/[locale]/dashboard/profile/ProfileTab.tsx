@@ -73,6 +73,17 @@ const ProfileTab: React.FC = () => {
   }, [userData?.dob, t]) // Thêm dependency t nếu bạn dùng trong chuỗi lỗi
   // --- END: Sửa lỗi Hydration ---
 
+  if (!localStorage.getItem('token')) {
+    if (loading) {
+      return <div className='container mx-auto p-4'>{t('Loading')}</div> // Show loading initially
+    }
+    return (
+      <div className='container mx-auto p-4'>
+        {t('Please_log_in_to_view_profile')}
+      </div>
+    )
+  }
+
   if (loading) {
     return (
       <div className='flex h-screen items-center justify-center'>

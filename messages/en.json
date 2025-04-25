@@ -897,5 +897,9 @@
     "sortBySJR": "SJR",
     "sortByOverallRank": "Overall Rank",
     "sortByHIndex": "H-index"
-  }
+  },
+  "Your_login_session_has_expired": "Your login session has expired.",
+  "Redirecting_to_homepage_in_seconds": "Redirecting to homepage in {seconds} seconds...",
+  "Session_Expired_Redirect_Home": "Session expired. Redirecting to home page...",
+  "Please_log_in_to_view_profile": "Please log in to view profile."
 }
