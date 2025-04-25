@@ -135,7 +135,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         </span>
       </button>
 
-      <div className='grid flex-1 grid-cols-[1fr_3fr_1fr] items-center gap-2'>
+      <div className='grid flex-1 grid-cols-[2fr_7fr_1fr] items-center gap-2'>
         {/* Column 1: Type (1fr) */}
         <div className='overflow-hidden text-ellipsis whitespace-nowrap'>
           <span className={`${!isSeen ? 'font-bold' : ''}`}>
