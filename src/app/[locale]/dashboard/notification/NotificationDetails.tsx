@@ -67,7 +67,9 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
             ★
           </span>
         </button>
-        <h2 className='text-lg font-semibold'>{notification.type}</h2>
+        <h2 className='text-lg font-semibold'>
+          {notification.type.replace(/_/g, ' ')}
+        </h2>
       </div>
       <div className='mb-4 border-b border-gray-300 pb-2 text-sm '>
         {formatDateFull(notification.createdAt, language)}
