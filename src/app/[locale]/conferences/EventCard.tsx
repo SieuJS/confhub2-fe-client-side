@@ -236,7 +236,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
             href={{ pathname: `/conferences/detail`, query: { id: event.id } }}
             className='group' // Group for hover effects if needed
           >
-            <h3 className='line-clamp-2 cursor-pointer text-left text-base font-bold text-gray-800 transition duration-300 group-hover:text-blue-600'>
+            <h3 className='cursor-pointer text-left text-base font-bold text-gray-800 transition duration-300 group-hover:text-blue-600'>
               {' '}
               {/* Adjusted size, added line-clamp */}
               {event.title} {event.acronym ? `(${event.acronym})` : ''}
