@@ -117,7 +117,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
       className={`
       flex w-full items-center p-1                   
       transition-all duration-200 ease-in-out 
-      focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500    
+      focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 rounded-full  
 
     `}
     >

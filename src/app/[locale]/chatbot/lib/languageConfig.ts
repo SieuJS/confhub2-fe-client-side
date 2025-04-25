@@ -23,7 +23,7 @@ import {
     // vietnameseSystemInstructions, vietnam_getConferencesDeclaration, vietnam_getJournalsDeclaration, vietnam_getWebsiteInfoDeclaration,
     // chineseSystemInstructions, china_getConferencesDeclaration, china_getJournalsDeclaration, china_getWebsiteInfoDeclaration, china_drawChartDeclaration,
 
-} from "./functionDeclarations";
+} from "./functions";
 
 // --- Define Agent IDs ---
 export type AgentId = 'HostAgent' | 'ConferenceAgent' | 'JournalAgent' | 'AdminContactAgent' | 'NavigationAgent' | 'WebsiteInfoAgent'; // <-- Add
