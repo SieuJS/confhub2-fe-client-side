@@ -1,7 +1,7 @@
 // Journals.tsx (hoặc tốt hơn là đổi tên file thành JournalDetails.tsx)
 "use client";
 import React from 'react';
-import JournalReport from '../JournalReport';
+import JournalReport from './JournalReport';
 import { RecentlyAddedJournals } from './RecentlyAddedJournals';
 import { JournalTabs } from './JournalTabs';
 import { JournalResponse } from '../../../../models/response/journal.response';

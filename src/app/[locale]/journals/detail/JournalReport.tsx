@@ -2,8 +2,8 @@
 
 // src/app/[locale]/journal/JournalReport.tsx
 import React, { useState } from 'react';
-import Button from '../utils/Button'; // Import the Button component
-import { JournalResponse } from '../../../models/response/journal.response'; // Import JournalResponse
+import Button from '../../utils/Button'; // Import the Button component
+import { JournalResponse } from '../../../../models/response/journal.response'; // Import JournalResponse
 
 interface JournalReportProps {
   journal: JournalResponse | undefined; // Make journal optional
@@ -25,6 +25,7 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
 
   // Safely access bioxbio array and its elements
   const latestImpactFactor = journal.bioxbio && journal.bioxbio.length > 0 ? journal.bioxbio[0].Impact_factor : "N/A";
+  const overalRanking = journal["Rank"];
   const hIndex = journal["H index"];
   const sjr = journal.SJR;
 
@@ -64,7 +65,7 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
                     </svg>
                     Overall Rank
                   </div>
-                  <div className="text-2xl font-bold">N/A</div> {/* Overall Rank not available in provided JSON */}
+                  <div className="text-2xl font-bold">{overalRanking}</div>
                 </div>
                 <div
                   className="flex flex-col items-center justify-center bg-green-100 text-green-700 text-lg font-medium rounded-lg p-5 shadow-md"
@@ -124,55 +125,54 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
 
         {/* Right Section */}
         {/* CHANGE: Reduced padding from p-6 to p-4 */}
-        <div className="md:w-2/5 bg-gradient-to-r from-background to-background-secondary p-4 rounded-lg shadow-md">
+        <div className="md:w-2/5 bg-gradient-to-r from-background to-background-secondary px-6 pt-6 rounded-lg shadow-md">
           <div className="overflow-x-auto relative">
             <table className="w-full text-md text-left border-collapse">
               <tbody>
-                {/* CHANGE: Reduced py-2 to py-1 in all td elements */}
+                {/* CHANGE: Reduced py-2 to py-2 in all td elements */}
                 <tr className="border-b  ">
-                  <td className="px-3 py-1 font-semibold">Title</td>
-                  <td className="px-3 py-1">{journal.Title}</td>
+                  <td className="px-3 py-2 font-semibold">Title</td>
+                  <td className="px-3 py-2">{journal.Title}</td>
                 </tr>
                 <tr className="border-b  ">
-                  <td className="px-3 py-1 font-semibold">Areas, Categories</td>
-                  <td className="px-3 py-1">
+                  <td className="px-3 py-2 font-semibold">Areas</td>
+                  <td className="px-3 py-2">
                     {journal["Subject Area and Category"] ? (
                       <>
                         {journal["Subject Area and Category"]["Field of Research"]}
-                        {journal["Subject Area and Category"].Topics.map((topic, index) => (
+                        {/* {journal["Subject Area and Category"].Topics.map((topic, index) => (
                           <span key={index}>
                             {index === 0 ? '; Categories: ' : ', '} {topic}
                           </span>
-                        ))}
+                        ))} */}
                       </>
                     ) : "N/A"}
                   </td>
                 </tr>
                 <tr className="border-b  ">
-                  <td className="px-3 py-1 font-semibold">Publisher</td>
-                  <td className="px-3 py-1">{journal.Publisher}</td> {/* Use journal.Publisher */}
+                  <td className="px-3 py-2 font-semibold">Publisher</td>
+                  <td className="px-3 py-2">{journal.Publisher}</td> {/* Use journal.Publisher */}
                 </tr>
                 <tr className="border-b  ">
-                  <td className="px-3 py-1 font-semibold">Country</td>
-                  <td className="px-3 py-1">{journal.Country}</td> {/* Use journal.Country */}
+                  <td className="px-3 py-2 font-semibold">Country</td>
+                  <td className="px-3 py-2">{journal.Country}</td> {/* Use journal.Country */}
                 </tr>
                 <tr className="border-b  ">
-                  <td className="px-3 py-1 font-semibold">ISSN</td>
-                  <td className="px-3 py-1">{journal.ISSN}</td> {/* Use journal.ISSN */}
+                  <td className="px-3 py-2 font-semibold">ISSN</td>
+                  <td className="px-3 py-2">{journal.ISSN}</td> {/* Use journal.ISSN */}
                 </tr>
                 <tr className="border-b  ">
-                  <td className="px-3 py-1 font-semibold">Best Quartile</td>
-                  <td className="px-3 py-1">Q1</td> {/* Best Quartile is always Q1 according to SupplementaryTable, hardcoded for now, improve logic if needed */}
+                  <td className="px-3 py-2 font-semibold">Best Quartile</td>
+                  <td className="px-3 py-2">Q1</td> {/* Best Quartile is always Q1 according to SupplementaryTable, hardcoded for now, improve logic if needed */}
                 </tr>
                 <tr className="border-b  ">
-                  <td className="px-3 py-1 font-semibold">Coverage History</td>
-                  <td className="px-3 py-1">1999 - 2023</td> {/* Coverage history based on SupplementaryTable years, hardcoded for now, improve logic if needed */}
+                  <td className="px-3 py-2 font-semibold">Coverage History</td>
+                  <td className="px-3 py-2">1999 - 2023</td> {/* Coverage history based on SupplementaryTable years, hardcoded for now, improve logic if needed */}
                 </tr>
               </tbody>
             </table>
-            {/* CHANGE: Reduced py-2 to py-1 and mt-4 to mt-2, removed mb-2 */}
             <Button
-              className="font-semibold py-1 mt-2 w-full text-center"
+              className="font-semibold py-2 mt-2 w-full text-center"
               variant="primary"
             >
               Follow

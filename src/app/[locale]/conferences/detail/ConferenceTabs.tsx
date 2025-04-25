@@ -272,7 +272,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
 
   // --- JSX Rendering ---
   return (
-    <div className='container mx-auto px-0 py-8 md:px-4'>
+    <div className='container mx-auto px-0 md:px-4'>
       {/* Navigation */}
       <nav
         ref={navRef}
