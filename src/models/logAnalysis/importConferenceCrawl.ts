@@ -21,10 +21,11 @@ export interface CrawlProgress {
     current: number;
     total: number;
     status: 'idle' | 'parsing' | 'crawling' | 'success' | 'error' | 'stopped';
-    currentChunkData?: string[]; // Thêm dữ liệu chunk hiện tại để hiển thị (optional)
+    currentChunkData?: SendToCrawlConference[]; // Thêm dữ liệu chunk hiện tại để hiển thị (optional)
 }
 
 export interface SendToCrawlConference {
+    id : string;
     Title : string;
     Acronym : string;
 }

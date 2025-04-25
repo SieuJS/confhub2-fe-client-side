@@ -1,8 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { useConferenceCrawl } from '../../../../hooks/logAnalysis/useConferenceCrawl'; // Điều chỉnh đường dẫn
+ // Điều chỉnh đường dẫn
 // src/app/[locale]/dashboard/logAnalysis/ConferenceCrawlUpoader.tsx
-import React from 'react';
-import { useConferenceCrawl } from '../../../../hooks/crawl/useConferenceCrawl'; // Điều chỉnh đường dẫn
+import { useConferenceCrawl } from '@/src/hooks/crawl/useConferenceCrawl';
 import { FaFileUpload, FaSpinner, FaPlay, FaStop, FaCheckCircle, FaTimesCircle, FaExclamationTriangle, FaRedo, FaTable } from 'react-icons/fa';
 import { Conference } from '@/src/models/logAnalysis/importConferenceCrawl';
 
@@ -43,6 +42,23 @@ export const ConferenceCrawlUploader: React.FC = () => {
         { field: "ranks" as keyof Conference, headerName: "Ranks", sortable: true, filter: true },
         { field: "researchFields" as keyof Conference, headerName: "Research Fields", sortable: true, filter: true },
         { field: "status" as keyof Conference, headerName: "Status", sortable: true, filter: true },
+        {
+            field : 'updatedAt' as keyof Conference,
+            headerName : 'Updated At',
+            sortable : true,
+            filter : true,
+            valueFormatter : (params : any) => {
+                const date = new Date(params.value);
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            }
+        }
     ]);
 
     const rowSelection = useMemo(() => {
