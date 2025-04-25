@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { JournalResponse } from '../../models/response/journal.response';
 // import journalsList from '../../models/data/journals-list.json'; // Nhập journals-list.json
-import journalsList from '../../models/data/journal_data_1_300.json'; // Nhập journals-list.json
+import journalsList from '../../models/data/journal_data_1_500.json'; // Nhập journals-list.json
 
 type JournalSortOption = 'title' | 'issn' | 'publisher' | 'language' | 'impactFactor' | 'citeScore' | 'sjr' | 'overallRank' | 'hIndex';
 

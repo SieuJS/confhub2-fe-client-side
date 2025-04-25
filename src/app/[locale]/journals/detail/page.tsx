@@ -6,7 +6,7 @@ import { RecentlyAddedJournals } from './RecentlyAddedJournals';
 import { JournalTabs } from './JournalTabs';
 import { JournalResponse } from '../../../../models/response/journal.response';
 import { RecommendedJournals } from './RecommendedJournals';
-import journalData from '../../../../models/data/journal_data_1_300.json'; // Đảm bảo đường dẫn đúng
+import journalData from '../../../../models/data/journal_data_1_500.json'; // Đảm bảo đường dẫn đúng
 import { useSearchParams } from 'next/navigation';
 import NotFoundPage from '../../utils/NotFoundPage';
 import { Header } from '../../utils/Header';
@@ -37,7 +37,7 @@ const JournalDetails = ({ locale }: { locale: string }) => {
   return (
     <div className="">
       <Header locale={locale} />
-      <div className="py-14 bg-background w-full">
+      <div className="py-10 bg-background w-full">
         {/* Có thể thêm tiêu đề trang hoặc breadcrumbs ở đây */}
       </div>
       {/* Truyền journal đã tìm thấy vào các component con */}

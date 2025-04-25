@@ -1,10 +1,9 @@
 "use client";
 
-// components/JournalReport.tsx
-import React, { useState, useEffect } from 'react';
+// src/app/[locale]/journal/JournalReport.tsx
+import React, { useState } from 'react';
 import Button from '../utils/Button'; // Import the Button component
 import { JournalResponse } from '../../../models/response/journal.response'; // Import JournalResponse
-import Image from 'next/image'; // Import the Image component from next/image
 
 interface JournalReportProps {
   journal: JournalResponse | undefined; // Make journal optional
@@ -24,19 +23,16 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
     setIsFullDescriptionVisible(!isFullDescriptionVisible);
   };
 
-  const scopeDescription = journal.Scope;
-  const fullDescription = journal.Scope; // Assuming full description is also in Scope, adjust if needed.
-
   // Safely access bioxbio array and its elements
   const latestImpactFactor = journal.bioxbio && journal.bioxbio.length > 0 ? journal.bioxbio[0].Impact_factor : "N/A";
   const hIndex = journal["H index"];
   const sjr = journal.SJR;
 
   return (
-    <div className="container mx-auto py-6 px-4  rounded-lg">
+    <div className="container mx-auto py-2 px-4  rounded-lg">
       <div className="flex flex-col md:flex-row gap-6">
         {/* Left section */}
-        <div className="md:w-2/3">
+        <div className="md:w-3/5">
           <h2 className="text-4xl font-bold mb-2">{journal.title}</h2>
           <p className="mb-4">
             Comprehensive information about the Journal, including Impact factor, H-index, subject Area, Category,
@@ -124,58 +120,22 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
               </div>
             </div>
           </div>
-
-          <div className="mb-4" id="description-container">
-            <p className="text-md mb-1">
-              <Strong>Scope</Strong>
-            </p>
-            <p>
-              {scopeDescription}
-            </p>
-            <div id="full-description" className={isFullDescriptionVisible ? '' : 'hidden'}>
-              <p className="mt-3">
-                {fullDescription}
-              </p>
-            </div>
-            <button
-              onClick={toggleDescription}
-              className="mt-2 hover:underline font-semibold flex items-center"
-            >
-              {isFullDescriptionVisible ? 'Hide' : 'Read more'}
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
-                stroke="currentColor" className="w-4 h-4 ml-1">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-              </svg>
-            </button>
-          </div>
         </div>
 
         {/* Right Section */}
-        <div className="md:w-1/3 bg-gradient-to-r from-background to-background-secondary p-6 rounded-lg shadow-md">
+        {/* CHANGE: Reduced padding from p-6 to p-4 */}
+        <div className="md:w-2/5 bg-gradient-to-r from-background to-background-secondary p-4 rounded-lg shadow-md">
           <div className="overflow-x-auto relative">
             <table className="w-full text-md text-left border-collapse">
-              <thead className="text-md ">
-                <tr className="border-b ">
-                  <th scope="col" className="px-3 py-3 font-semibold text-left">Title</th>
-                  <th scope="col" className="px-3 py-3 font-semibold text-left">Details</th>
-                </tr>
-              </thead>
               <tbody>
+                {/* CHANGE: Reduced py-2 to py-1 in all td elements */}
                 <tr className="border-b  ">
-                  <td className="px-3 py-2 font-semibold">Title</td>
-                  <td className="px-3 py-2">{journal.Title}</td> {/* Use journal.Title (Capitalized) */}
+                  <td className="px-3 py-1 font-semibold">Title</td>
+                  <td className="px-3 py-1">{journal.Title}</td>
                 </tr>
                 <tr className="border-b  ">
-                  <td className="px-3 py-2 font-semibold">Abbreviation</td>
-                  <td className="px-3 py-2">N/A</td> {/* Abbreviation not available in provided JSON */}
-                </tr>
-                <tr className="border-b  ">
-                  <td className="px-3 py-2 font-semibold">Publication Type</td>
-                  <td className="px-3 py-2">{journal.Type}</td> {/* Use journal.Type */}
-                </tr>
-                <tr className="border-b  ">
-                  <td className="px-3 py-2 font-semibold">Subject Area, Categories, Scope</td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-1 font-semibold">Areas, Categories</td>
+                  <td className="px-3 py-1">
                     {journal["Subject Area and Category"] ? (
                       <>
                         {journal["Subject Area and Category"]["Field of Research"]}
@@ -189,32 +149,33 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
                   </td>
                 </tr>
                 <tr className="border-b  ">
-                  <td className="px-3 py-2 font-semibold">Publisher</td>
-                  <td className="px-3 py-2">{journal.Publisher}</td> {/* Use journal.Publisher */}
+                  <td className="px-3 py-1 font-semibold">Publisher</td>
+                  <td className="px-3 py-1">{journal.Publisher}</td> {/* Use journal.Publisher */}
                 </tr>
                 <tr className="border-b  ">
-                  <td className="px-3 py-2 font-semibold">Country</td>
-                  <td className="px-3 py-2">{journal.Country}</td> {/* Use journal.Country */}
+                  <td className="px-3 py-1 font-semibold">Country</td>
+                  <td className="px-3 py-1">{journal.Country}</td> {/* Use journal.Country */}
                 </tr>
                 <tr className="border-b  ">
-                  <td className="px-3 py-2 font-semibold">ISSN</td>
-                  <td className="px-3 py-2">{journal.ISSN}</td> {/* Use journal.ISSN */}
+                  <td className="px-3 py-1 font-semibold">ISSN</td>
+                  <td className="px-3 py-1">{journal.ISSN}</td> {/* Use journal.ISSN */}
                 </tr>
                 <tr className="border-b  ">
-                  <td className="px-3 py-2 font-semibold">Best Quartile</td>
-                  <td className="px-3 py-2">Q1</td> {/* Best Quartile is always Q1 according to SupplementaryTable, hardcoded for now, improve logic if needed */}
+                  <td className="px-3 py-1 font-semibold">Best Quartile</td>
+                  <td className="px-3 py-1">Q1</td> {/* Best Quartile is always Q1 according to SupplementaryTable, hardcoded for now, improve logic if needed */}
                 </tr>
                 <tr className="border-b  ">
-                  <td className="px-3 py-2 font-semibold">Coverage History</td>
-                  <td className="px-3 py-2">1999 - 2023</td> {/* Coverage history based on SupplementaryTable years, hardcoded for now, improve logic if needed */}
+                  <td className="px-3 py-1 font-semibold">Coverage History</td>
+                  <td className="px-3 py-1">1999 - 2023</td> {/* Coverage history based on SupplementaryTable years, hardcoded for now, improve logic if needed */}
                 </tr>
               </tbody>
             </table>
+            {/* CHANGE: Reduced py-2 to py-1 and mt-4 to mt-2, removed mb-2 */}
             <Button
-              className="font-semibold  py-2 mb-2 mt-4 w-full text-center"
+              className="font-semibold py-1 mt-2 w-full text-center"
               variant="primary"
             >
-              Add to favorite
+              Follow
             </Button>
           </div>
         </div>
