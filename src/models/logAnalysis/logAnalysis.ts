@@ -1,6 +1,5 @@
 // src/models/logAnalysis/logAnalysis.ts
 
-/** Thông tin chi tiết về quá trình xử lý một conference cụ thể */
 export interface RequestLogData {
     logs: any[];
     startTime: number | null;
@@ -31,6 +30,7 @@ export interface ConferenceAnalysisDetail {
     durationSeconds: number | null;
     crawlEndTime?: string | null; // Optional: Track when the crawl/save phase finished
     crawlSucceededWithoutError?: boolean | null; // Optional: Track if crawl phase had errors
+    jsonlWriteSuccess?: boolean | null; // Track if the specific jsonl write event was seen
     csvWriteSuccess?: boolean | null; // Track if the specific CSV write event was seen
     steps: { // Theo dõi các bước chính
         search_attempted: boolean;
@@ -56,7 +56,7 @@ export interface ConferenceAnalysisDetail {
     validationIssues?: { field: string; value: any; action: string; timestamp: string }[];
 
     
-    finalResultPreview?: any; // Lưu kết quả cuối cùng nếu có log 'crawlConferences finished successfully'
+    finalResult?: any; // Lưu kết quả cuối cùng nếu có log 'crawlConferences finished successfully'
 }
 
 

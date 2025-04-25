@@ -1,7 +1,7 @@
 // src/app/[locale]/dashboard/logAnalysis/ConferenceTableRow.tsx
 import React from 'react';
 import { FaChevronDown, FaChevronUp, FaTimesCircle, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
-import { ConferenceTableData } from '../../../../../hooks/logAnalysis/useConferenceTableManager'; // Import shared data type
+import { ConferenceTableData } from '../../../../../hooks/crawl/useConferenceTableManager'; // Import shared data type
 import { StatusIcon } from '../StatusIcon'; // Adjust path if needed
 import { formatDuration } from '../utils/commonUtils'; // Adjust path if needed
 
@@ -28,7 +28,7 @@ export const ConferenceTableRow: React.FC<ConferenceTableRowProps> = ({
     saveError,   // Destructure new props
 }) => {
     // --- Lấy thêm dữ liệu validation ---
-    const { title, acronym, status, durationSeconds, steps, errors, finalResultPreview, errorCount, validationWarningCount, hasValidationWarnings, validationWarnings } = confData;
+    const { title, acronym, status, durationSeconds, steps, errors, finalResult, errorCount, validationWarningCount, hasValidationWarnings, validationWarnings } = confData;
     const hasErrors = errorCount > 0;
     // const hasValidationWarnings = validationWarningCount > 0; // Đã có từ confData
 
@@ -146,7 +146,7 @@ export const ConferenceTableRow: React.FC<ConferenceTableRowProps> = ({
                             <div>
                                 <h4 className="font-semibold mb-2 text-gray-800">Extracted Data Preview:</h4>
                                 <pre className="bg-gray-100 p-3 rounded text-xs overflow-auto max-h-80 border border-gray-200 custom-scrollbar">
-                                    {finalResultPreview ? JSON.stringify(finalResultPreview, null, 2) : 'No preview available.'}
+                                    {finalResult ? JSON.stringify(finalResult, null, 2) : 'No preview available.'}
                                 </pre>
                             </div>
                             {/* Errors & Steps Details & Validation Warnings */}

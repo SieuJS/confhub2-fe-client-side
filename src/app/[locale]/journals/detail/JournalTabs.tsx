@@ -84,8 +84,7 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                 <h2 className="text-3xl font-bold text-secondary mb-4">Overview</h2>
                 <div className=" text-lg">
                     {/* Use journal data for overview, if available */}
-                    {journal.Type === 'journal' ? `${journal.Title} is a leading academic journal.` : `${journal.Title} is a significant publication.`}
-                    <div>{journal.Scope}</div> {/* Using Scope from journal data */}
+                    <div>{journal.Scope ?? journal['Additional Info']?.slice(5)}</div> {/* Using Scope from journal data */}
                 </div>
             </section>
 

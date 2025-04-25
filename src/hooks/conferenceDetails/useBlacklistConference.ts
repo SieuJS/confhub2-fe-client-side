@@ -8,7 +8,7 @@ const API_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/blacklist-con
 
 const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
   const [isBlacklisted, setIsBlacklisted] = useState(false);
-  const [loading, setLoading] = useState(false); // Loading state specific to blacklist action
+  const [loading, setLoading] = useState(true); // Loading state specific to blacklist action
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -37,12 +37,12 @@ const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const userData: UserResponse = await response.json();
+        const userData = await response.json();
         console.log('blacklist')
         console.log(userData)
         setIsBlacklisted(
-          userData.blacklist?.some(
-            (blacklistConf) => blacklistConf.id === conferenceData.id
+          userData?.some(
+            (blacklistConf: any) => blacklistConf.conferenceId === conferenceData.id
           ) ?? false
         );
       } catch (err: any) {
@@ -56,10 +56,6 @@ const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
     fetchUser();
   }, [conferenceData]);
 
-
-
-
-  // Function to handle the blacklist/unblacklist action
   const handleBlacklistClick = async () => {
     if (!conferenceData?.id) {
       setError("Conference ID is missing.");
@@ -75,14 +71,11 @@ const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
       // Optionally trigger redirect to login here if needed
       return;
     }
-
-
-    const user = JSON.parse(userData);
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`${API_ENDPOINT}/add`, {
+      const response = await fetch(`${API_ENDPOINT}/${isBlacklisted ? 'remove' : 'add'}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,12 +94,13 @@ const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
         throw new Error(errorMsg);
       }
 
-      const updatedUser: UserResponse = await response.json();
+      const blacklistConference = await response.json();
 
       // Update state based on the response from the server
-      const nowBlacklisted = updatedUser.blacklist?.some(
-        (bc) => bc.id === conferenceId
-      ) ?? false;
+      let nowBlacklisted = blacklistConference?.conferenceId === conferenceId;
+      if(isBlacklisted) {
+        nowBlacklisted = !nowBlacklisted;
+      }
       setIsBlacklisted(nowBlacklisted);
 
     } catch (err: any) {

@@ -6,7 +6,7 @@ import {
     SortableColumn, // <-- Import từ hook
     SortDirection,  // <-- Import từ hook (nếu đã export)
     RowSaveStatus   // <-- Import từ hook (nếu đã export)
-} from '../../../../../hooks/logAnalysis/useConferenceTableManager'; // Điều chỉnh đường dẫn nếu cần
+} from '../../../../../hooks/crawl/useConferenceTableManager'; // Điều chỉnh đường dẫn nếu cần
 import { ConferenceTableHeader } from './ConferenceTableHeader';
 import { ConferenceTableRow } from './ConferenceTableRow';
 

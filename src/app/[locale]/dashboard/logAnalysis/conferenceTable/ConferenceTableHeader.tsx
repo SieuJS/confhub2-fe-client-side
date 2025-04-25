@@ -5,7 +5,7 @@ import { FaSort, FaSortUp, FaSortDown, FaTimesCircle, FaSave, FaExclamationCircl
 import {
     SortableColumn, // <-- Import từ hook
     SortDirection   // <-- Import từ hook (nếu đã export)
-} from '../../../../../hooks/logAnalysis/useConferenceTableManager'; // Điều chỉnh đường dẫn
+} from '../../../../../hooks/crawl/useConferenceTableManager'; // Điều chỉnh đường dẫn
 interface ConferenceTableHeaderProps {
     sortColumn: SortableColumn | null; // <-- Sử dụng kiểu đã import
     sortDirection: SortDirection;      // <-- Sử dụng kiểu đã import/định nghĩa

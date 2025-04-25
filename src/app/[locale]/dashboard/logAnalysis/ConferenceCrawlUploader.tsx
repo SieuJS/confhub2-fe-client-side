@@ -1,5 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useConferenceCrawl } from '../../../../hooks/logAnalysis/useConferenceCrawl'; // Điều chỉnh đường dẫn
+// src/app/[locale]/dashboard/logAnalysis/ConferenceCrawlUpoader.tsx
+import React from 'react';
+import { useConferenceCrawl } from '../../../../hooks/crawl/useConferenceCrawl'; // Điều chỉnh đường dẫn
 import { FaFileUpload, FaSpinner, FaPlay, FaStop, FaCheckCircle, FaTimesCircle, FaExclamationTriangle, FaRedo, FaTable } from 'react-icons/fa';
 import { Conference } from '@/src/models/logAnalysis/importConferenceCrawl';
 

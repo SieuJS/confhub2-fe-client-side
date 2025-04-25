@@ -1,4 +1,4 @@
-// src/app/chatbot/page.tsx
+// src/app/[locale]/chatbot/UnifiedChatPage.tsx
 "use client";
 
 import { useState } from 'react';
@@ -6,6 +6,7 @@ import { LiveAPIProvider } from '@/src/app/[locale]/chatbot/livechat/contexts/Li
 import MainLayout from './MainLayout';
 import LiveChatExperience from './LiveChat';
 import RegularChat from './RegularChat'; // Assuming this component exists
+import { ChatSocketProvider } from './context/ChatSocketContext';
 
 // Import constants and types
 import {
@@ -16,10 +17,12 @@ import {
     DEFAULT_MODALITY,
     DEFAULT_VOICE
 } from './lib/constants';
-import { OutputModality, PrebuiltVoice, Language, ChatMode } from './lib/types';
+import { OutputModality, PrebuiltVoice, Language, ChatMode } from './lib/live-chat.types';
+import { appConfig } from '@/src/middleware';
 
 // Get API Key - Ensure secure handling
 const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+const SOCKET_SERVER_URL = appConfig.NEXT_PUBLIC_BACKEND_URL;
 
 function UnifiedChatPage() {
     const [chatMode, setChatMode] = useState<ChatMode>('regular'); // Default to regular for easier testing
@@ -42,29 +45,32 @@ function UnifiedChatPage() {
 
     return (
         <LiveAPIProvider url={API_URI} apiKey={API_KEY}>
-            <MainLayout
-                currentChatMode={chatMode}
-                onChatModeChange={setChatMode}
-                currentModality={currentModality}
-                onModalityChange={handleModalityChange}
-                currentVoice={currentVoice}
-                onVoiceChange={handleVoiceChange}
-                availableVoices={AVAILABLE_VOICES}
-                currentLanguage={currentLanguage}
-                onLanguageChange={handleLanguageChange} // Pass handler
-                availableLanguages={AVAILABLE_LANGUAGES}
-            >
-                {chatMode === 'live' ? (
-                    <LiveChatExperience
-                        currentModality={currentModality}
-                        currentVoice={currentVoice}
-                        currentLanguage={currentLanguage}
-                    />
-                ) : (
-                    // Pass currentLanguage to RegularChat
-                    <RegularChat currentLanguage={currentLanguage} />
-                )}
-            </MainLayout>
+            {/* Wrap the part of the app that needs the chat state */}
+            <ChatSocketProvider socketUrl={SOCKET_SERVER_URL}>
+                <MainLayout
+                    currentChatMode={chatMode}
+                    onChatModeChange={setChatMode}
+                    currentModality={currentModality}
+                    onModalityChange={handleModalityChange}
+                    currentVoice={currentVoice}
+                    onVoiceChange={handleVoiceChange}
+                    availableVoices={AVAILABLE_VOICES}
+                    currentLanguage={currentLanguage}
+                    onLanguageChange={handleLanguageChange} // Pass handler
+                    availableLanguages={AVAILABLE_LANGUAGES}
+                >
+                    {chatMode === 'live' ? (
+                        <LiveChatExperience
+                            currentModality={currentModality}
+                            currentVoice={currentVoice}
+                            currentLanguage={currentLanguage}
+                        />
+                    ) : (
+                        // Pass currentLanguage to RegularChat
+                        <RegularChat currentLanguage={currentLanguage} />
+                    )}
+                </MainLayout>
+            </ChatSocketProvider>
         </LiveAPIProvider>
     );
 }

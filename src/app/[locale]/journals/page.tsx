@@ -4,7 +4,6 @@
 import { useTranslations } from 'next-intl';
 import SearchJournalSection from './SearchJournalSection';
 import ResultsJournalSection from './ResultsJournalSection';   // Import ResultsJournalSection
-import { useState } from 'react';
 import { Header } from '../utils/Header';
 import Footer from '../utils/Footer';
 import { useRouter } from 'next/navigation';

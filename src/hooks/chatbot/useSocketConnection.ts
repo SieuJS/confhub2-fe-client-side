@@ -1,27 +1,46 @@
-// src/hooks/useSocketConnection.ts
+// src/app/[locale]/hooks/chatbt/useSocketConnection.ts
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { io, Socket } from 'socket.io-client';
+import io, { Socket, ManagerOptions, SocketOptions } from 'socket.io-client'; // Import ManagerOptions, SocketOptions if needed elsewhere
+import { EmailConfirmationResult, StatusUpdate, ResultUpdate, ErrorUpdate, ChatUpdate, ConversationMetadata, InitialHistoryPayload } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Adjust path
 
-// Keep Interfaces the same
+// Keep Interfaces the same, ensure EmailConfirmationResult is defined correctly in the model
 export interface SocketConnectionOptions {
     socketUrl: string;
     authToken: string | null;
     reconnectionAttempts?: number;
     reconnectionDelay?: number;
     reconnectionDelayMax?: number;
-    // Add: Control whether connection attempt should happen
-    enabled?: boolean; // Defaults to true
+    enabled?: boolean; // Control whether connection attempt should happen
 }
 
+// Add the onEmailConfirmationResult to the handlers interface
+
+// Interface Handlers (Đảm bảo có đủ các handlers)
 export interface SocketEventHandlers {
-    onConnect: (socketId: string) => void; // Pass socketId on connect
+    onConnect: (socketId: string) => void;
     onDisconnect: (reason: Socket.DisconnectReason) => void;
     onConnectError: (error: Error) => void;
-    onStatusUpdate: (data: any) => void;
-    onChatUpdate: (data: any) => void;
-    onChatResult: (data: any) => void;
-    onChatError: (errorData: any) => void;
     onAuthError: (error: { message: string }) => void;
+    onStatusUpdate: (data: StatusUpdate) => void;
+    onChatUpdate: (data: ChatUpdate) => void;
+    onChatResult: (data: ResultUpdate) => void;
+    onChatError: (errorData: ErrorUpdate) => void;
+    onEmailConfirmationResult?: (result: EmailConfirmationResult) => void;
+    onConversationList?: (list: ConversationMetadata[]) => void;
+    onInitialHistory?: (payload: InitialHistoryPayload) => void;
+    onNewConversationStarted?: (payload: { conversationId: string }) => void;
+    // ----------------------------------
+}
+
+
+// SocketConnectionResult remains the same
+export interface SocketConnectionResult {
+    socketRef: React.MutableRefObject<Socket | null>;
+    isConnected: boolean;
+    socketId: string | null;
+    // Removing manual connect/disconnect from return type as they weren't implemented
+    // connect: () => void;
+    // disconnect: () => void;
 }
 
 /**
@@ -31,7 +50,7 @@ export interface SocketEventHandlers {
 export function useSocketConnection(
     options: SocketConnectionOptions,
     handlers: SocketEventHandlers // Passed-in handlers
-) {
+): SocketConnectionResult { // Updated return type if connect/disconnect removed
     const {
         socketUrl,
         authToken,
@@ -42,10 +61,8 @@ export function useSocketConnection(
     } = options;
 
     const [isConnected, setIsConnected] = useState<boolean>(false);
-    // Initialize socketId with null
     const [socketId, setSocketId] = useState<string | null>(null);
     const socketRef = useRef<Socket | null>(null);
-    // *** Store handlers in a ref to keep them up-to-date without triggering effect ***
     const latestHandlersRef = useRef(handlers);
 
     // Effect to update the ref whenever handlers change from the parent
@@ -54,143 +71,158 @@ export function useSocketConnection(
     }, [handlers]);
 
     // Effect for establishing and cleaning up the connection
-    // *** CRITICAL: Dependencies ONLY include parameters that REQUIRE a new connection ***
     useEffect(() => {
-        // Only attempt connection if enabled and we have a URL
         if (!enabled || !socketUrl) {
-            // If disabled ensure we cleanup any existing socket
             if (socketRef.current) {
                 console.log("[useSocketConnection] Connection disabled or URL missing. Disconnecting.");
                 socketRef.current.disconnect();
-                // State update handled by 'disconnect' event listener below
+                // State updates (isConnected, socketId) are handled by the disconnect listener
             }
-            return; // Do nothing further
+            return; // Exit if not enabled or no URL
         }
 
-        // Prevent connection if fatal error occurred previously (managed by parent)
-        // or if token is explicitly null when required by backend
-        // (Add specific logic here if needed, e.g., checking if authToken is null)
+        console.log("[useSocketConnection] Setting up connection...", { socketUrl, hasAuthToken: !!authToken });
 
-        console.log("[useSocketConnection] Attempting connection...", { socketUrl, hasAuthToken: !!authToken });
+        // Disconnect previous socket instance if dependencies change, before creating a new one
+        // This ensures we don't have stale connections lingering.
+        if (socketRef.current) {
+            console.log("[useSocketConnection] Disconnecting previous socket instance before creating new one.");
+            socketRef.current.disconnect();
+             socketRef.current.removeAllListeners(); // Clean up listeners from old socket immediately
+             socketRef.current = null; // Clear ref
+        }
+
 
         const newSocket = io(socketUrl, {
             reconnectionAttempts,
             reconnectionDelay,
             reconnectionDelayMax,
-            // Ensure auth object exists even if token is null,
-            // server side should handle null token appropriately.
+            // Use auth object for cleaner passing of credentials
             auth: { token: authToken },
-            // Important: Prevent autoConnect if we manage state manually based on 'enabled'
-            // autoConnect: false, // Consider this if you want more control, but requires manual socket.connect() call
+            // Consider forceNew: true if you absolutely need a fresh connection on dep change,
+            // but usually io() handles this well if the URL/auth changes.
+            // forceNew: true,
         });
-        socketRef.current = newSocket;
+        socketRef.current = newSocket; // Store the new socket instance immediately
+
+        // --- Define Stable Event Handlers ---
+        // These functions have stable identities and access the latest handlers via the ref.
 
         const handleConnect = () => {
-            if (!socketRef.current) return;
-            const currentSocketId = socketRef.current.id; // currentSocketId is string | undefined
-            console.log('Socket connected:', currentSocketId);
+            if (!socketRef.current || newSocket.id !== socketRef.current.id) {
+                 console.log(`[useSocketConnection] Ignoring connect event for potentially old socket ${newSocket.id}`);
+                 return; // Ignore events from sockets that are not the current one
+            }
+            const currentSocketId = newSocket.id;
+            console.log('[useSocketConnection] Socket connected:', currentSocketId);
             setIsConnected(true);
-            // Use the correct type: string | null for setSocketId
-            // We need to explicitly handle the 'undefined' case
-            if (currentSocketId !== undefined) {
-                setSocketId(currentSocketId); // Now we know currentSocketId is string
-                // Call the latest handler from the ref
-                latestHandlersRef.current.onConnect(currentSocketId);
+            if (currentSocketId) { // Check if ID is truthy (should be a string)
+                 setSocketId(currentSocketId);
+                 latestHandlersRef.current.onConnect?.(currentSocketId); // Use optional chaining
             } else {
-                // This case should ideally not happen if the socket is connected,
-                // but it's good practice to handle the undefined possibility from socket.id
-                console.error("Socket connected but id is undefined!");
-                setSocketId(null); // Set to null if for some reason id is undefined
-                // Decide how to handle the onConnect event in this edge case.
-                // Maybe call it with null or skip it. Calling with the expected type (string) is safer.
-                // Since the handler expects a string, we might skip the handler or throw an error.
-                // Skipping is safer than passing null if the handler strictly expects string.
-                // latestHandlersRef.current.onConnect(null as any); // Avoid this if possible
+                 console.error("[useSocketConnection] Socket connected but id is missing!");
+                 setSocketId(null);
+                // Don't call onConnect if ID is missing, as it expects a string
             }
         };
 
         const handleDisconnect = (reason: Socket.DisconnectReason) => {
-            // Check if the disconnect is for the socket we are currently managing
-            if (socketRef.current && newSocket.id !== socketRef.current.id) {
-                console.log(`[useSocketConnection] Ignoring disconnect event for old socket ${newSocket.id}`);
-                return;
-            }
-            console.warn('Socket disconnected:', reason);
+             if (!socketRef.current || newSocket.id !== socketRef.current.id) {
+                 console.log(`[useSocketConnection] Ignoring disconnect event for potentially old socket ${newSocket.id}`);
+                 return;
+             }
+            console.warn('[useSocketConnection] Socket disconnected:', reason);
             setIsConnected(false);
-            // Setting socketId to null on disconnect
             setSocketId(null);
-            // Call the latest handler from the ref
-            latestHandlersRef.current.onDisconnect(reason);
+            latestHandlersRef.current.onDisconnect?.(reason); // Use optional chaining
         };
 
         const handleConnectError = (err: Error) => {
-            console.error('Socket connection error:', err);
-            // Check if the error is for the socket we are currently managing
-            if (socketRef.current && newSocket.id !== socketRef.current.id) {
-                console.log(`[useSocketConnection] Ignoring connect_error event for old socket ${newSocket.id}`);
-                return;
-            }
-            setIsConnected(false);
-            // Setting socketId to null on connect error
+             if (!socketRef.current || newSocket.id !== socketRef.current.id) {
+                 console.log(`[useSocketConnection] Ignoring connect_error event for potentially old socket ${newSocket.id}`);
+                 return;
+             }
+            console.error('[useSocketConnection] Socket connection error:', err);
+            setIsConnected(false); // Assume disconnected on error
             setSocketId(null);
-            // Call the latest handler from the ref
-            latestHandlersRef.current.onConnectError(err);
+            latestHandlersRef.current.onConnectError?.(err); // Use optional chaining
         };
 
-        // Register listeners using these stable wrappers
+        // --- Register Listeners using Stable Handlers ---
         newSocket.on('connect', handleConnect);
         newSocket.on('disconnect', handleDisconnect);
         newSocket.on('connect_error', handleConnectError);
 
-        // Use wrappers for custom events too
-        newSocket.on('status_update', (data) => latestHandlersRef.current.onStatusUpdate(data));
-        newSocket.on('chat_update', (data) => latestHandlersRef.current.onChatUpdate(data));
-        newSocket.on('chat_result', (data) => latestHandlersRef.current.onChatResult(data));
-        newSocket.on('chat_error', (errorData) => latestHandlersRef.current.onChatError(errorData));
-        newSocket.on('auth_error', (error) => latestHandlersRef.current.onAuthError(error));
+        // Custom application events - Use wrappers that access the ref
+        newSocket.on('status_update', (data) => latestHandlersRef.current.onStatusUpdate?.(data));
+        newSocket.on('chat_update', (data) => latestHandlersRef.current.onChatUpdate?.(data));
+        newSocket.on('chat_result', (data) => latestHandlersRef.current.onChatResult?.(data));
+        newSocket.on('chat_error', (errorData) => latestHandlersRef.current.onChatError?.(errorData));
+        newSocket.on('auth_error', (error) => latestHandlersRef.current.onAuthError?.(error));
+
+        // --- Register the NEW event listener ---
+        newSocket.on('email_confirmation_result', (result: EmailConfirmationResult) => {
+            // Check if the handler exists before calling
+            latestHandlersRef.current.onEmailConfirmationResult?.(result);
+        });
+        // --------------------------------------
+
+        newSocket.on('conversation_list', (list) => latestHandlersRef.current.onConversationList?.(list)); // Assuming this exists from previous steps
+        newSocket.on('initial_history', (payload) => latestHandlersRef.current.onInitialHistory?.(payload)); // Assuming this exists
+
+        // --- REGISTER THE MISSING LISTENER ---
+        newSocket.on('new_conversation_started', (payload) => {
+            console.log("[useSocketConnection] Received 'new_conversation_started' event:", payload); // Add log for debugging
+            latestHandlersRef.current.onNewConversationStarted?.(payload);
+        });
+        // ------------------------------------
 
         // --- Cleanup Function ---
         return () => {
-            console.log(`[useSocketConnection] Cleaning up connection effect for socket ${newSocket.id}...`);
-            // --- Remove listeners ---
-            // It's crucial to remove the *specific wrapper functions* we added
+            console.log(`[useSocketConnection] Cleaning up socket instance ${newSocket.id}...`);
+
+            // Remove all listeners specifically for this instance
             newSocket.off('connect', handleConnect);
             newSocket.off('disconnect', handleDisconnect);
             newSocket.off('connect_error', handleConnectError);
-            newSocket.off('status_update'); // Simple removal if wrapper isn't stored
+            newSocket.off('status_update'); // Removing specific listeners is safer
             newSocket.off('chat_update');
             newSocket.off('chat_result');
             newSocket.off('chat_error');
             newSocket.off('auth_error');
+            newSocket.off('email_confirmation_result'); // <-- Remove the new listener
 
-            // --- Disconnect ---
-            // Only disconnect if this socket is still the "current" one
+            newSocket.off('conversation_list'); // Make sure to remove all added listeners
+            newSocket.off('initial_history');
+
+            // --- REMOVE THE NEW LISTENER ---
+            newSocket.off('new_conversation_started');
+            // -------------------------------
+            
+            // Only disconnect if this instance is still the one in the ref
             if (socketRef.current && socketRef.current.id === newSocket.id) {
-                console.log(`[useSocketConnection] Disconnecting socket ${newSocket.id} during cleanup.`);
+                console.log(`[useSocketConnection] Disconnecting socket ${newSocket.id} in cleanup.`);
                 newSocket.disconnect();
-                socketRef.current = null; // Clear the ref after disconnecting the managed socket
+                socketRef.current = null; // Clear the ref only when cleaning up the *current* socket
+                // State updates are handled by the disconnect event
             } else {
-                console.log(`[useSocketConnection] Socket ${newSocket.id} already replaced or disconnected, skipping disconnect in cleanup.`);
-                // If newSocket is not the current socket, it might have been disconnected
-                // already by a subsequent run of this effect (e.g., authToken changed).
-                // Ensure it's fully disconnected if it wasn't the current one.
-                if (newSocket.connected) {
+                 // If it's not the current socket, it might have been disconnected by a subsequent effect run.
+                 // Ensure it's fully closed just in case.
+                 if (newSocket.connected) {
+                    console.log(`[useSocketConnection] Disconnecting potentially stale socket ${newSocket.id} in cleanup.`);
                     newSocket.disconnect();
-                }
+                 }
             }
-            // DO NOT reset isConnected/socketId state here, the 'disconnect' event handles that naturally.
-
-            console.log(`[useSocketConnection] Cleanup complete for socket ${newSocket.id}.`);
         };
     }, [
-        // *** DEPENDENCIES THAT REQUIRE RECONNECTION ***
+        // Dependencies that require a *new connection instance*
         socketUrl,
         authToken,
         reconnectionAttempts,
         reconnectionDelay,
         reconnectionDelayMax,
-        enabled // Re-run effect if connection is enabled/disabled
-    ]); // Note: handlers object is NOT here!
+        enabled // Effect should re-run if 'enabled' status changes
+    ]); // handlers object is intentionally omitted
 
     return { socketRef, isConnected, socketId };
 }

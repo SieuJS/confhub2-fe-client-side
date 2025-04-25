@@ -1,5 +1,5 @@
 // src/lib/constants.ts
-import { LanguageOption, PrebuiltVoice, Language, OutputModality } from './types';
+import { LanguageOption, PrebuiltVoice, Language, OutputModality } from './live-chat.types';
 
 export const AVAILABLE_VOICES: PrebuiltVoice[] = ["Puck", "Charon", "Kore", "Fenrir", "Aoede", "Orus", "Zephyr"];
 

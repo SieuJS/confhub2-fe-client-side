@@ -4,8 +4,245 @@ import {
 } from "@google/generative-ai";
 
 
+
+export const  websiteInfo = `# Chatbot Training Data: Guide to Using the Global Conference & Journal Hub (GCJH)
+
+## PART 1: GENERAL WEBSITE OVERVIEW
+
+**1. Website Name:** Global Conference & Journal Hub (GCJH)
+
+**2. Website Overview:**
+GCJH is a comprehensive online platform designed to connect researchers, academics, and professionals with relevant conferences and journals across all disciplines globally. We provide a centralized, searchable database with detailed information to facilitate efficient research and networking opportunities. Our goal is to simplify the process of discovering and participating in relevant academic events and accessing high-quality scholarly publications.
+
+**3. Key Features:**
+*   **Comprehensive Database:** Includes thousands of conferences and journals covering diverse fields and geographic locations, updated regularly.
+    *   **Conferences:** Name, dates, location, organizers, submission deadlines, registration fees, call for papers, speakers, accepted papers, contact info, official website link.
+    *   **Journals:** Name, ISSN, publisher, impact factor, subject areas, open access status, indexing databases (Scopus, WoS), call for papers/submissions, editorial board info, official website link.
+*   **Advanced Search Functionality:** Search by keywords, subject area, dates, location, publication type, supports Boolean operators (AND, OR, NOT). (See details in Section 4.4)
+*   **Personalized Profile (for registered users):** Save search preferences, follow conferences/journals, receive notifications. (See Sections 4.9 and 4.8)
+*   **Calendar Integration:** Add conference dates to personal calendars (Google Calendar, Outlook, etc.). (See Section 4.5.3)
+*   **Alert System:** Set up alerts to receive notifications about new relevant conferences/journals. (Accessed via Notifications - Section 4.8.7, Settings - Section 4.8.9)
+*   **AI-Powered Chatbot:** Integrated virtual assistant providing instant support.
+    *   **Capabilities:** Answer FAQs, assist with searches (understand intent, suggest keywords/filters, handle Boolean operators), extract specific information (e.g., keynote speakers), summarize content (with disclaimers), provide multilingual support, offer personalized recommendations. (See chatbot usage guide in Section 4.12)
+*   **Data Visualization and Analysis (Dashboard):** For registered users, accessed via 'Analysis' (Section 4.8.2). Provides data visualization tools:
+    *   Conference trends (by time, field, location).
+    *   Journal impact (impact factor, citation trends).
+    *   Research field analysis (interactive maps, charts).
+    *   Personalized statistics (saved items, search history, alerts).
+    *   Customizable dashboard. (See usage guide for Visualize/Analysis page in Section 4.11)
+*   **Data Contribution:** Users can add new conference information. (See Section 4.10)
+*   **Contribution Management:** Users manage submitted conferences and track review status. (See Section 4.8.4)
+*   **Conference Following:** Save and manage a list of interesting conferences. (See Section 4.8.5)
+*   **Personal Schedule:** View important dates of followed conferences on a calendar. (See Section 4.8.6)
+*   **Community Forum (future development):** A place to connect, discuss, share information.
+
+## PART 2: DETAILED WEBSITE USAGE GUIDE
+
+**4. How to Use the Website:**
+
+    **4.1. Login (For users with an existing account)**
+        1.  Access Homepage: Open the Global Conference Hub website.
+        2.  Click Login Button: Find and click the 'Login' button in the top-right corner of the screen.
+        3.  Login Page: On the 'Welcome to Global Conference Hub' page, choose one of the methods:
+            *   **Login with Google:** Click the 'Continue with Google' button.
+            *   **Login with Email:**
+                *   Enter your Email address in the corresponding field.
+                *   Enter your Password in the field below.
+                *   Click the 'Sign In' button.
+            *   **Forgot Password?:** Click the 'Forgot Password?' link.
+
+    **4.2. Register a New Account (For users without an account)**
+        1.  Access Homepage: Open the Global Conference Hub website.
+        2.  Click Login Button: Click the 'Login' button in the top-right corner.
+        3.  Go to Registration Page: On the login page, find and click the 'Sign Up Now' link at the bottom.
+        4.  Fill Registration Information: On the 'Create your account' page, fill in all required information (fields marked with * are mandatory):
+            *   First Name *
+            *   Last Name *
+            *   Date of Birth *
+            *   Email *
+            *   Password *
+            *   Confirm Password *
+        5.  Create Account: Click the 'Create account' button.
+        6.  Verify Email:
+            *   Check your email for a 6-digit verification code (check Spam/Junk folders too).
+            *   Enter the code into the 'Verification Code' field.
+            *   Click the 'Verify Account' button.
+            *   If you didn't receive the code, click 'Resend code'.
+        7.  Complete Verification:
+            *   You will see a 'User verified' message.
+            *   Click the 'Return to home page' button.
+        8.  Login: Use the email and password you just created to log in following Section 4.1.
+
+    **4.3. General Navigation:** The website has a user-friendly interface and intuitive navigation. Browse by subject area, location, or use the search bar.
+
+    **4.4. Searching for Conferences:**
+        *   **4.4.1. Basic Search:**
+            *   **Main Search Bar:** Enter conference name, acronym, or field keywords into the 'Type a command or search...' box.
+            *   **Dates:** Select start (Start) and end (End) dates.
+            *   **Location:** Enter country/city into the 'Location' box.
+            *   **Type:** Select the event type (if available).
+            *   **Start Search:** Press the 'Search' button.
+            *   **Clear Filters:** Press the 'Clear' button.
+            *   **Results:** A list of conferences ('Conference Results') will be displayed.
+        *   **4.4.2. Advanced Search:**
+            *   **Show Filters:** Click the 'Show/Hide advanced search options' link.
+            *   **Fill Advanced Filters:** Submission Date, Publisher, Rank, Source, Avg. Score, Topics, Field of Research.
+            *   **Start Advanced Search:** Press the 'Search' button.
+            *   **Results:** The list will be filtered more precisely.
+
+    **4.5. Viewing Conference/Journal Details:**
+        *   **4.5.1. Accessing Detail Page:** Click on the conference/journal name from the search results list.
+        *   **4.5.2. Conference Detail Page Content:**
+            *   Warnings (if any).
+            *   Basic Information: Full name, image, rating, status.
+            *   Topics.
+            *   Information Tabs: Overview, Important Dates, Call for papers, Category and Topics, Source Rank, Map, Conference Feedback.
+        *   **4.5.3. Using Functions on Detail Page (Right Side):**
+            *   **Calendar:** Click to add events/deadlines to your personal calendar.
+            *   **Follow:** Click to add the conference to your 'Followed' list (See Section 4.8.5), receive updates.
+            *   **Update:** Click to request information refresh or suggest updates.
+            *   **Website:** Click to visit the conference's official homepage.
+            *   **Post Feedback:**
+                *   Scroll down to the 'Conference Feedback' section.
+                *   Select a star rating (1-5) under 'Rate the Conference:'.
+                *   Enter your feedback text into the empty box.
+                *   Click the 'Post Feedback' button.
+
+    **4.6. Saving & Following:** Use the 'Follow' button on the detail page (Section 4.5.3) and manage the list in your account menu (Section 4.8.5).
+
+    **4.7. Alerts:** Set up email alerts in 'Settings' (Section 4.8.9) and view notifications in 'Notifications' (Section 4.8.7).
+
+    **4.8. Navigating Your Personal Account (When Clicking Avatar):**
+    Dropdown menu when clicking your avatar in the top-right, or corresponding items in the left sidebar (if present):
+        *   4.8.1. **Hello [Username]:** Greeting.
+        *   4.8.2. **Analysis:** Access the data aggregation, analysis, and visualization page. (See detailed guide in Section 4.11).
+        *   4.8.3. **Profile:** View and edit personal information, password. (See details in Section 4.9).
+        *   4.8.4. **My Conferences:** This page is used to manage the conferences that you have added or submitted to the Global Conference Hub system. This is where you track the review status of the conferences you contributed.
+            *   **Access:** Click on 'My Conferences' in the navigation bar or from the avatar menu.
+            *   **Add New Conference:** Click the blue 'Add Conference' button to start the process of submitting new conference information (See Section 4.10).
+            *   **View Conference Status:**
+                *   Use the filter tabs: Pending, Approved, Rejected to view the list of conferences you added according to each status.
+                *   If there are no conferences in the selected status, you will see the message 'You do not have any conferences in this category yet.'
+            *   **Refresh Data:** Click the 'Refetch Data' link if you want to update the list.
+        *   4.8.5. **Followed:** This page displays the list of conferences you have chosen to 'follow' or 'save' on the website for easy updates.
+            *   **Access:** Click on 'Followed' in the navigation bar or from the avatar menu.
+            *   **View List:** Browse the list of conferences you are following. Each item usually includes an avatar, conference name, dates, location.
+            *   **View Details:** Click the 'Detail' button next to a conference to go to its full information page. On the detail page, you can find more information and possibly an option to unfollow.
+            *   **Refresh List:** Click the refresh icon (circular arrow) in the top-right corner to update the list.
+            *   **How to Add to List:** To add a conference to this list, you need to find and click the 'Follow' button on the general conference list or the detail page of that conference (See Section 4.5.3).
+        *   4.8.6. **Note:** This page functions as a personal calendar, automatically aggregating and displaying important dates (conference dates, submission deadlines, registration deadlines, etc.) of the conferences you are interested in or following.
+            *   **Access:** Click on 'Note' in the navigation bar or from the avatar menu.
+            *   **View Legend:** The top section explains the meaning of colors or markers on the calendar, corresponding to different types of dates (Conference, Submission, Notification, Camera Ready, Registration, Other, Your notes).
+            *   **View Upcoming Notes:** This area lists the nearest upcoming events or deadlines from the conferences you follow. Each item may show the conference name, location, date, and a button for more details.
+            *   **View Calendar:**
+                *   Displays the calendar monthly.
+                *   Days with conference-related events or deadlines will be marked.
+                *   Use the arrow buttons to switch between months/years or the button to return to the current day.
+                *   Use the search events field to find specific events in the calendar.
+        *   4.8.7. **Notifications:** View system notifications (e.g., updates on followed conferences).
+        *   4.8.8. **Blacklisted:** Manage the list of blocked/hidden conferences/journals.
+        *   4.8.9. **Setting:** Change password, email preferences, notification settings.
+        *   4.8.10. **Logout:** Log out of your account.
+
+    **4.9. Managing Profile:**
+        *   **4.9.1. Access:** Click Avatar -> Select 'Profile'.
+        *   **4.9.2. Edit Profile:**
+            *   Click the 'Edit Profile' button.
+            *   Change: Avatar, Background, First Name/Last Name, Date of Birth, Phone, Address, About me, Interested Topics.
+            *   Click 'Save' to save or 'Cancel' to discard changes.
+        *   **4.9.3. Change Password:**
+            *   Click the 'Change Password' button.
+            *   Enter 'Current Password', click 'Confirm'.
+            *   If correct, enter 'New Password' and 'Confirm New Password'.
+            *   Click the final 'Confirm' or 'Save'. Click 'Cancel' to abort.
+
+    **4.10. Add New Conference:**
+    3-step process to contribute conference information:
+        *   **Step 1: Enter Conference Information:**
+            Fill form: Conference name*, Acronym*, Link*, Type*, Location* (required if Offline/Hybrid), Important Dates (use 'Add Date' button), Topics (use 'Add' button), Image URL, Description. (* denotes required).
+        *   **Step 2: Review Information:**
+            Check the summary. Click 'Back' to edit, 'Next' to continue.
+        *   **Step 3: Confirmation and Terms Agreement:**
+            Read Terms. Check the 'I agree...' box. Click 'Back' if needed. Click 'Add Conference' to submit.
+
+    **4.11. Using the Data Visualization Page (Visualize / Analysis):**
+    This page (accessed via Avatar menu -> Analysis) allows creating custom charts.
+        *   **Interface:**
+            *   **Left Pane (FIELDS):** Contains data fields (Dimensions and Measures).
+            *   **Center Pane:** Displays the chart.
+            *   **Right Pane (CONFIGURATION):** Configure the chart (Chart Type, X-Axis*, Y-Axis*, Color/Group, Chart Options).
+        *   **How to Create a Basic Chart (Example: Record Count by Continent):**
+            1.  Select Chart Type.
+            2.  Drag 'Continent' (Dimensions) to 'X-Axis'.
+            3.  Drag 'Record Count' (Measures) to 'Y-Axis'.
+            4.  The chart will appear.
+            5.  (Optional) Drag another field to 'Color / Group'.
+            6.  (Optional) Change 'Chart Title', adjust display options.
+
+    **4.12. Using the Chatbot:**
+        *   **4.12.1. Chatbot Introduction Page:**
+            *   Purpose: General introduction.
+            *   Options: 'Chat Now' (text chat), 'Live Chat' (live/voice chat).
+        *   **4.12.2. Text Chat Page:**
+            *   Purpose: Interact by typing text.
+            *   Interface: Chat history frame, bot greeting/suggestions, input field, send button.
+            *   Functionality: Type questions/requests, bot responds in text.
+        *   **4.12.3. Live / Voice Chat Page:**
+            *   Purpose: Real-time interaction, possibly via voice.
+            *   Interface: Sidebar (Navigation, Output format: Audio/Text), Main Area (Microphone button, text input, send button).
+            *   Functionality: Speak requests (press microphone) or type text. Choose bot response format.
+
+    **4.13. Using the Contact Us / Support Page:**
+    Send requests, questions, feedback.
+        1.  **Subject *:** Enter a brief, clear title. (Required).
+        2.  **Request type *:** Select from the list. (Required).
+        3.  **Your message *:** Write detailed content. (Required).
+        4.  **Terms Agreement Checkbox:** Check the 'I agree...' box. (Required).
+        5.  **Send message:** Click this button to send.
+
+## PART 3: ACCOUNT INFORMATION AND OTHERS
+
+**5. Account Registration (Requirements Summary):**
+*   Free.
+*   Required: Email*, Password*.
+*   Optional: Name, Affiliation, Research Interests.
+
+**6. Account Benefits:**
+*   Personalized search results.
+*   Followed list for conferences/journals (Section 4.8.5).
+*   Email alerts (Sections 4.8.7 & 4.8.9).
+*   Personal calendar integration (Sections 4.5.3 & 4.8.6).
+*   Personal profile management (Section 4.9).
+*   Personalized AI Chatbot support (Section 4.12).
+*   Access to Data Visualization Dashboard (Sections 4.8.2 & 4.11).
+*   Ability to contribute new conference data (Section 4.10) and manage them (Section 4.8.4).
+
+**7. Additional Information:**
+*   **Contact Us:** Dedicated page with email, contact form (See Section 4.13).
+*   **FAQ:** Section with frequently asked questions.
+*   **Terms of Service:** This document outlines the legally binding conditions between you (the user) and GCJH when using the website and related services. Key contents include:
+    *   User rights and obligations (e.g., compliance with rules, providing accurate information).
+    *   GCJH rights and obligations (e.g., providing services, right to modify/discontinue services).
+    *   Content regulations (including user-generated content, copyright responsibility).
+    *   Intellectual property rights regarding the GCJH platform and content.
+    *   Limitation of GCJH's liability for information, events, or potential losses.
+    *   Applicable law and dispute resolution methods.
+    *   Acceptance of these terms is a condition for using the website. You should read them carefully before using or registering an account.
+*   **Privacy Policy:** This document explains how GCJH collects, uses, stores, shares, and protects your personal information when you use the website. Key contents include:
+    *   Types of personal information collected (e.g., account registration info, contact info, browsing data, cookies, information you provide using features).
+    *   Purposes of collecting and using information (e.g., to provide and improve services, personalize experience, send notifications, analyze trends, ensure security).
+    *   How information is shared (e.g., with service providers, partners, or when legally required).
+    *   Security measures implemented to protect your data.
+    *   Your rights regarding your personal information (e.g., right to access, correct, delete data).
+    *   Information about the use of cookies and similar tracking technologies.
+    *   GCJH is committed to protecting your privacy and complying with data protection laws. You should read this policy carefully to understand your rights and how your information is handled.
+*   **About Us:** Information about the mission, vision, development team, and partners (if any) of GCJH.
+*   **AI Limitations:** A clear statement outlining the limitations of the AI chatbot. This includes the possibility that the chatbot may provide information that is not entirely accurate or complete, especially with AI-generated summaries. Always emphasize the importance of consulting and verifying information from official sources (conference/journal websites, organizers).`
+
+
 // English
-export const english_getConferencesDeclaration: FunctionDeclaration = {
+
+export const EN_getConferencesDeclaration: FunctionDeclaration = {
     name: "getConferences",
     // Mô tả rõ mục đích là tạo query string
     description: "Generates a URL-encoded query string to search for conferences based on user-specified criteria. This query string will be used to fetch data from the backend API." +
@@ -69,7 +306,7 @@ export const english_getConferencesDeclaration: FunctionDeclaration = {
     }
 };
 
-export const english_getJournalsDeclaration: FunctionDeclaration = {
+export const EN_getJournalsDeclaration: FunctionDeclaration = {
     name: "getJournals",
     description: "Retrieves information about journals based on filtering criteria.",
     parameters: {
@@ -167,12 +404,12 @@ export const english_getJournalsDeclaration: FunctionDeclaration = {
     },
 };
 
-export const english_getWebsiteInformationDeclaration: FunctionDeclaration = {
-    name: "getWebsiteInformation",
+export const EN_getWebsiteInfoDeclaration: FunctionDeclaration = {
+    name: "getWebsiteInfo",
     description: "Retrieves information about websites. This function don't need parameters, just call it"
 };
 
-export const english_drawChartDeclaration: FunctionDeclaration = {
+export const EN_drawChartDeclaration: FunctionDeclaration = {
     name: "drawChart",
     description: "Draws a chart based on the provided data.",
     parameters: {
@@ -187,8 +424,6 @@ export const english_drawChartDeclaration: FunctionDeclaration = {
     },
 };
 
-// --- NEW Navigation Declaration ---
-// List of allowed internal paths (for the model's description)
 const internalPaths = [
     '/',
     '/conferences',
@@ -201,21 +436,21 @@ const internalPaths = [
     '/support',
     '/other',
     '/addconference',
-    '/conferences/detail', // Base path, model might need to know how to get full ID path if needed
-    '/journals/detail',    // Base path
+    // '/conferences/detail', 
+    // '/journals/detail',    
     '/auth/login',
     '/auth/register',
     '/auth/verify-email',
     '/auth/forgot-password',
     '/auth/reset-password',
-    '/updateconference' // Base path
+    // '/updateconference'
 ];
 
-export const english_navigationDeclaration: FunctionDeclaration = {
+export const EN_navigationDeclaration: FunctionDeclaration = {
     name: "navigation",
     description: `Navigates the user to a specified page within this website or to an external conference/journal website by opening a new browser tab.
     - For INTERNAL navigation: Provide the relative path starting with '/'. The system will automatically add the base URL and locale. Allowed internal paths are: ${internalPaths.join(', ')}. Example: {"url": "/conferences"}
-    - For EXTERNAL conference/journal sites: Provide the full, valid URL starting with 'http://' or 'https://'. The model should typically obtain this URL from functions like 'getConferences' or 'getJournals' before calling 'navigation'. Example: {"url": "https://2025.inlgmeeting.org/"}`,
+    - For EXTERNAL conference/journal sites: Provide the full, valid URL starting with 'http://' or 'https://'.`,
     parameters: {
         type: SchemaType.OBJECT,
         properties: {
@@ -228,9 +463,81 @@ export const english_navigationDeclaration: FunctionDeclaration = {
     }
 };
 
+export const EN_openGoogleMapDeclaration: FunctionDeclaration = {
+    name: "openGoogleMap",
+    description: "Opens Google Maps in a new browser tab directed to a specific location string (e.g., city, address, landmark). Use this ONLY AFTER obtaining the location string, often from the 'getConferences' or 'getJournals' functions.",
+    parameters: {
+        type: SchemaType.OBJECT,
+        properties: {
+            location: {
+                type: SchemaType.STRING,
+                description: "The geographical location string to search for on Google Maps (e.g., 'Delphi, Greece', 'Eiffel Tower, Paris', '1600 Amphitheatre Parkway, Mountain View, CA').",
+            },
+        },
+        required: ["location"],
+    },
+};
+
+export const EN_followUnfollowItemDeclaration: FunctionDeclaration = {
+    name: "followUnfollowItem",
+    description: "Follows or unfollows a specific conference or journal for the currently logged-in user. Requires identifying the item first (e.g., using getConferences/getJournals).",
+    parameters: {
+        type: SchemaType.OBJECT,
+        properties: {
+            itemType: {
+                type: SchemaType.STRING,
+                description: "The type of item.",
+                format: "enum",
+                enum: ["conference", "journal"]
+            },
+            identifier: {
+                type: SchemaType.STRING,
+                description: "A unique identifier for the item, such as its acronym or exact title, that was previously retrieved.",
+            },
+            identifierType: {
+                 type: SchemaType.STRING,
+                 description: "The type of the identifier provided.",
+                 format: "enum",
+                 enum: ["acronym", "title", "id"], // Allow Model to specify if it knows the type
+            },
+            action: {
+                type: SchemaType.STRING,
+                description: "The desired action to perform.",
+                format: "enum",
+                enum: ["follow", "unfollow"]
+            },
+        },
+        required: ["itemType", "identifier", "identifierType", "action"],
+    },
+};
+
+export const EN_sendEmailToAdminDeclaration: FunctionDeclaration = {
+    name: "sendEmailToAdmin",
+    description: "Sends an email to the website administrator on behalf of the user. Use this function when the user explicitly wants to contact the admin, report an issue, provide feedback, or request specific help that requires admin intervention. You should help the user formulate the subject, message, and confirm the request type ('contact' or 'report') before calling this function.",
+    parameters: {
+        type: SchemaType.OBJECT,
+        properties: {
+            subject: {
+                type: SchemaType.STRING,
+                description: "The subject line for the email to the admin. Should be concise and reflect the email's purpose.",
+            },
+            requestType: {
+                type: SchemaType.STRING,
+                description: "The type of request. Use 'contact' for general inquiries, feedback, or contact requests. Use 'report' for reporting issues, errors, or problems with the website or its content.",
+                format: "enum",
+                enum: ["contact", "report"], // Specify allowed values
+            },
+            message: {
+                type: SchemaType.STRING,
+                description: "The main body/content of the email message detailing the user's request, report, or feedback.",
+            },
+        },
+        required: ["subject", "requestType", "message"], // All fields are mandatory
+    },
+};
 
 // Vietnamese
-export const vietnam_getConferencesDeclaration: FunctionDeclaration = {
+export const VN_getConferencesDeclaration: FunctionDeclaration = {
     name: "getConferences",
     // Mô tả rõ mục đích là tạo query string
     description: "Tạo một chuỗi truy vấn được mã hóa URL để tìm kiếm hội nghị dựa trên tiêu chí do người dùng chỉ định. Chuỗi truy vấn này sẽ được sử dụng để lấy dữ liệu từ API backend." +
@@ -294,7 +601,7 @@ export const vietnam_getConferencesDeclaration: FunctionDeclaration = {
     }
 };
 
-export const vietnam_getJournalsDeclaration: FunctionDeclaration = {
+export const VN_getJournalsDeclaration: FunctionDeclaration = {
     name: "getJournals",
     description: "Truy xuất thông tin về các tạp chí dựa trên tiêu chí lọc.",
     parameters: {
@@ -392,12 +699,12 @@ export const vietnam_getJournalsDeclaration: FunctionDeclaration = {
     },
 };
 
-export const vietnam_getWebsiteInformationDeclaration: FunctionDeclaration = {
-    name: "getWebsiteInformation",
+export const VN_getWebsiteInfoDeclaration: FunctionDeclaration = {
+    name: "getWebsiteInfo",
     description: "Truy xuất thông tin về trang web. Hàm này không cần tham số, chỉ cần gọi nó."
 };
 
-export const vietnam_drawChartDeclaration: FunctionDeclaration = {
+export const VN_drawChartDeclaration: FunctionDeclaration = {
     name: "drawChart",
     description: "Vẽ biểu đồ dựa trên dữ liệu được cung cấp.",
     parameters: {
@@ -413,7 +720,7 @@ export const vietnam_drawChartDeclaration: FunctionDeclaration = {
 };
 
 // Chinese
-export const china_getConferencesDeclaration: FunctionDeclaration = {
+export const CN_getConferencesDeclaration: FunctionDeclaration = {
     name: "getConferences",
     // 描述：清晰说明目的是创建查询字符串
     description: "根据用户指定的标准生成用于搜索会议的 URL 编码查询字符串。此查询字符串将用于从后端 API 获取数据。" +
@@ -477,7 +784,7 @@ export const china_getConferencesDeclaration: FunctionDeclaration = {
     }
 };
 
-export const china_getJournalsDeclaration: FunctionDeclaration = {
+export const CN_getJournalsDeclaration: FunctionDeclaration = {
     name: "getJournals",
     description: "根据筛选条件检索期刊信息。",
     parameters: {
@@ -575,12 +882,12 @@ export const china_getJournalsDeclaration: FunctionDeclaration = {
     },
 };
 
-export const china_getWebsiteInformationDeclaration: FunctionDeclaration = {
-    name: "getWebsiteInformation",
+export const CN_getWebsiteInfoDeclaration: FunctionDeclaration = {
+    name: "getWebsiteInfo",
     description: "检索有关网站的信息。此函数不需要参数，直接调用即可。"
 };
 
-export const china_drawChartDeclaration: FunctionDeclaration = {
+export const CN_drawChartDeclaration: FunctionDeclaration = {
     name: "drawChart",
     description: "根据提供的数据绘制图表。",
     parameters: {
@@ -595,3 +902,310 @@ export const china_drawChartDeclaration: FunctionDeclaration = {
     },
 };
 
+
+// --- New Function Declaration for Host Agent ---
+export const EN_routeToAgentDeclaration: FunctionDeclaration = {
+    name: "routeToAgent",
+    description: "Routes a specific task to a designated specialist agent.",
+    parameters: {
+        type: SchemaType.OBJECT,
+        properties: {
+            targetAgent: {
+                type: SchemaType.STRING,
+                description: "The unique identifier of the specialist agent to route the task to (e.g., 'ConferenceAgent').",
+            },
+            taskDescription: {
+                type: SchemaType.STRING,
+                description: "A natural language description of the task for the target agent.",
+            },
+            inputData: {
+                type: SchemaType.STRING, // Or SchemaType.STRING if passing simple queries
+                description: "Full user question and require",
+            },
+        },
+        required: ["targetAgent", "taskDescription", "inputData"],
+    },
+};
+
+
+// --- Host Agent System Instructions (English)  ---
+export const EN_hostAgentSystemInstructions = `
+### ROLE ###
+You are HCMUS Orchestrator, an intelligent agent coordinator for the Global Conference & Journal Hub (GCJH). Your primary role is to understand user requests, determine the necessary steps (potentially multi-step involving different agents), route tasks to the appropriate specialist agents, and synthesize their responses for the user.
+
+### AVAILABLE SPECIALIST AGENTS ###
+1.  **ConferenceAgent:** Handles finding all information about conferences (including links, locations, dates, summary, call for papers, etc.) AND following/unfollowing conferences.
+2.  **JournalAgent:** Handles finding journal information (including links and locations) AND following/unfollowing journals.
+3.  **AdminContactAgent:** Handles initiating sending emails to the admin.
+4.  **NavigationAgent:** Handles the FINAL action of opening webpages (given a URL) and map locations (given a location string).
+5.  **WebsiteInfoAgent:** Provides general information about the GCJH website.
+
+### INSTRUCTIONS ###
+1.  Receive the user's request and conversation history.
+2.  Analyze the user's intent. Determine the primary subject and action.
+3.  **Routing Logic & Multi-Step Planning:** Based on the user's intent, you MUST choose the most appropriate specialist agent(s) and route the task(s) using the 'routeToAgent' function. Some requests require multiple steps:
+
+    *   **Finding Info (Conferences/Journals/Website):**
+        *   Conferences: Route to 'ConferenceAgent'.
+        *   Journals: Route to 'JournalAgent'.
+        *   Website Info: Route to 'WebsiteInfoAgent'.
+    *   **Following/Unfollowing (Conferences/Journals):**
+        *   Route to 'ConferenceAgent' or 'JournalAgent' respectively.
+    *   **Contacting Admin:**
+        *   Route to 'AdminContactAgent'.
+    *   **Navigation/Map Actions:**
+        *   **If User Provides Direct URL/Location:** Route DIRECTLY to 'NavigationAgent'.
+        *   **If User Provides Name (e.g., "Open website for conference XYZ", "Show map for journal ABC"):** This is a **TWO-STEP** process:
+            1.  **Step 1 (Find Info):** First, route to 'ConferenceAgent' or 'JournalAgent'.
+            2.  **Step 2 (Act):** WAIT for the response from Step 1. If response is returned, THEN route to 'NavigationAgent'. If Step 1 fails, inform the user.
+    *   **Ambiguous Requests:** If the intent, target agent, or required information (like item name for navigation) is unclear, ask the user for clarification before routing.
+
+4.  When routing, clearly state the task for the specialist agent in 'taskDescription' and provide comprehensive 'inputData' contain user questions and requires.
+5.  Wait for the result from the 'routeToAgent' call. Process the response. If a multi-step plan requires another routing action (like Step 2 for Navigation/Map), initiate it.
+6.  Extract the final information or confirmation provided by the specialist agent(s).
+7.  Synthesize a final, user-friendly response based on the overall outcome in Markdown format clearly.
+8.  Handle frontend actions (like 'navigate', 'openMap', 'confirmEmailSend') passed back from agents appropriately.
+9.  Respond ONLY in English. Prioritize clarity and helpfulness.
+10. If any step involving a specialist agent returns an error, inform the user politely.
+`;
+
+// --- Conference Agent System Instructions (English) ---
+ export const EN_conferenceAgentSystemInstructions = `
+### ROLE ###
+You are ConferenceAgent, a specialist handling conference information and follow/unfollow actions for conferences.
+
+### INSTRUCTIONS ###
+1.  You will receive task details including task description and inputData.
+2.  Analyze the task:
+    *   If the task is to find conferences, use 'getConferences' with query parameters from inputData.
+    *   If the task is to follow or unfollow, use 'followUnfollowItem' ensuring itemType is 'conference', using details from inputData.
+3.  Call the appropriate function ('getConferences' or 'followUnfollowItem').
+4.  Wait for the function result.
+5.  Return the exact result received. Do not reformat or add conversational text.
+`;
+
+// --- Journal Agent System Instructions (English) ---
+export const EN_journalAgentSystemInstructions = `
+### ROLE ###
+You are JournalAgent, a specialist focused solely on retrieving journal information and managing user follows for journals.
+
+### INSTRUCTIONS ###
+1.  You will receive task details including task description and inputData.
+2.  Analyze the task description and inputData to determine the required action:
+    *   If the task is to find journals, use the 'getJournals' function with the query parameters from inputData.
+    *   If the task is to follow or unfollow a journal, use the 'followUnfollowItem' function with the itemType='journal' and details from inputData (identifier, action).
+3.  Call the appropriate function.
+4.  Wait for the function result (data, confirmation, or error message).
+5.  Return the exact result received from the function. Do not reformat or add conversational text. If there's an error, return the error message.
+`;
+
+// --- Admin Contact Agent System Instructions (English) ---
+export const EN_adminContactAgentSystemInstructions = `
+### ROLE ###
+You are AdminContactAgent, responsible for initiating the process of sending emails to the administrator.
+
+### INSTRUCTIONS ###
+1.  You will receive task details including the email subject, message body, and request type ('contact' or 'report') in the taskDescription.
+2.  Your ONLY task is to call the 'sendEmailToAdmin' function with the exact details provided in taskDescription.
+3.  Wait for the function result. This result will contain a message for the Host Agent and potentially a frontend action ('confirmEmailSend').
+4.  Return the exact result (including message and frontend action) received from the 'sendEmailToAdmin' function. Do not add conversational text.
+`;
+
+
+// --- Navigation Agent System Instructions (English) ---
+export const EN_navigationAgentSystemInstructions = `
+### ROLE ###
+You are NavigationAgent, specializing in opening web pages and map locations.
+
+### INSTRUCTIONS ###
+1.  You will receive task details including task description.
+2.  Analyze the task:
+    *   If the task is to navigate to a URL or internal path (provided in inputData.url), use the 'navigation' function.
+    *   If the task is to open a map for a specific location (provided in inputData.location), use the 'openGoogleMap' function.
+3.  Call the appropriate function ('navigation' or 'openGoogleMap') with the data from inputData.
+4.  Wait for the function result (confirmation message and frontend action).
+5.  Return the exact result received from the function (including the frontend action). Do not add conversational text.
+`;
+
+export const EN_websiteInfoAgentSystemInstructions = `
+### ROLE ###
+You are WebsiteInfoAgent, providing general information about the GCJH website based on a predefined description.
+
+### INSTRUCTIONS ###
+1.  You will receive task details, likely a general question about the website. The specific query might be in taskDescription or inputData.
+2.  Your ONLY task is to call the 'getWebsiteInfo' function. You call it without specific arguments to get the general description.
+3.  Wait for the function result (the website information text or an error).
+4.  Return the exact result received from the function. Do not add conversational text.
+`;
+
+
+
+
+
+//English
+export const EN_SystemInstructions = `
+### ROLE ###
+You are HCMUS, a friendly and helpful chatbot specializing in conferences, journals information and the Global Conference & Journal Hub (GCJH) website. You will act as a helpful assistant that can filter information about conferences, journals, website information, help users navigate the site or external resources, show locations on a map, manage user preferences like following items, and **assist users in contacting the website administrator via email**.
+
+### INSTRUCTIONS ###
+1.  **ONLY use information returned by the provided functions ('getConferences', 'getJournals', 'getWebsiteInfo', 'navigation', 'openGoogleMap', 'followUnfollowItem', 'sendEmailToAdmin') to answer user requests.** Do not invent information or use outside knowledge. You will answer user queries based solely on provided data sources: a database of conferences, journals and a description of the GCJH website. Do not access external websites, search engines, or any other external knowledge sources, except when using the 'navigation' or 'openGoogleMap' functions based on data provided by the user or obtained from another function. Your responses should be concise, accurate, and draw only from the provided data or function confirmations. Do not make any assumptions about data not explicitly present in either data source.
+
+2.  **You MUST respond ONLY in English.**
+
+3.  To fulfill the user's request, you MUST choose the appropriate function: 'getConferences', 'getJournals', 'getWebsiteInfo', 'navigation', 'openGoogleMap', 'followUnfollowItem', or **'sendEmailToAdmin'**.
+    *   Use 'getConferences' or 'getJournals' to find specific information, including website links ('link') and locations ('location').
+    *   Use 'getWebsiteInfo' for general questions about the GCJH website.
+    *   Use 'navigation' to open a specific webpage URL in a new tab.
+    *   Use 'openGoogleMap' to open Google Maps centered on a specific location string in a new tab.
+    *   Use 'followUnfollowItem' to manage the user's followed conferences or journals.
+    *   **Use 'sendEmailToAdmin' when the user expresses a desire to contact the website administrator, report an issue, or provide feedback that needs to be sent via email.**
+
+4.  If the request is unclear, invalid, or cannot be fulfilled using the provided functions, provide a helpful explanation in English. Do not attempt to answer directly without function calls. If data is insufficient, state this limitation clearly in English.
+
+5.  **You MUST call ONLY ONE function at a time.** Multi-step processes require separate turns.
+
+6.  **You MUST wait for the result of a function call before responding or deciding the next step.**
+    *  For 'getConferences' / 'getJournals' / 'getWebsiteInfo' return data.
+    *  For 'navigation' / 'openGoogleMap' / 'followUnfollowItem' / **'sendEmailToAdmin'** return confirmations. Your response should reflect the outcome (e.g., "Okay, I've opened the map for that location...", "Okay, I have followed that conference for you.", "You are already following this journal.", **"Okay, I have sent your email to the administrator."**, **"Sorry, there was an error sending your email."**).
+
+7.  **Finding Information and Acting (Multi-Step Process):**
+    *   **For Website Navigation (by Title/Acronym):**
+        1.  **Step 1:** Call 'getConferences' or 'getJournals' to find the item and its 'link'. WAIT for the result.
+        2.  **Step 2:** If the result contains a valid 'link' URL, THEN make a *separate* call to 'navigation' using that URL.
+    *   **For Opening Map (by Title/Acronym/Request):**
+        1.  **Step 1:** Call 'getConferences' or 'getJournals' to find the item and its 'location' string (e.g., "Delphi, Greece"). WAIT for the result.
+        2.  **Step 2:** If the result contains a valid 'location' string, THEN make a *separate* call to 'openGoogleMap' using that location string in the 'location' argument (e.g., '{"location": "Delphi, Greece"}').
+    *   **Following/Unfollowing (by Title/Acronym/Request):**
+        1.  **Step 1: Identify Item:** If needed, call 'getConferences' or 'getJournals' to confirm the item details based on the user's request (e.g., using title or acronym). WAIT for the result. Note the identifier (like acronym or title).
+        2.  **Step 2: Perform Action:** Call 'followUnfollowItem' providing the 'itemType' ('conference' or 'journal'), the 'identifier' you noted (e.g., the acronym 'SIROCCO'), and the desired 'action' ('follow' or 'unfollow').
+    *   **Handling Missing Info:** If Step 1 fails or doesn't return the required 'link' or 'location', inform the user. Do NOT call 'navigation' or 'openGoogleMap'.
+
+8.  **Direct Actions:**
+    *   **Direct Navigation:** If the user provides a full URL (http/https) or an internal path (/dashboard), call 'navigation' directly.
+    *   **Direct Map:** If the user provides a specific location string and asks to see it on a map (e.g., "Show me Paris, France on the map"), call 'openGoogleMap' directly with '{"location": "Paris, France"}'.
+    *   **Direct Follow/Unfollow:** If the user clearly identifies an item they want to follow/unfollow (and you might already have context), you *might* skip Step 1 of point 7 and directly call 'followUnfollowItem', but ensure you provide a reliable 'identifier'.
+
+9.  **Using Function Parameters:**
+    *   **'navigation':** Use '/' for internal paths, full 'http(s)://' for external URLs.
+    *   **'openGoogleMap':** Provide the location string as accurately as possible (e.g., 'Delphi, Greece', 'Eiffel Tower, Paris').
+    *   **'followUnfollowItem':** Provide 'itemType', a clear 'identifier' (like acronym or title), and the 'action' ('follow'/'unfollow').
+    *   **'sendEmailToAdmin':** Ensure you collect or confirm the 'subject', 'requestType' ('contact' or 'report'), and the 'message' body before calling the function.
+
+10. **Handling Email Requests ('sendEmailToAdmin'):**
+    *   **Identify Intent:** Recognize when the user wants to contact the admin, report a problem, or send feedback.
+    *   **Gather Information:** Ask the user for the necessary details:
+        *   What is the email about? (Helps formulate the 'subject')
+        *   Is this a general contact/feedback or are you reporting an issue? (Determines 'requestType': 'contact' or 'report')
+        *   What message would you like to send? (Gets the 'message' body)
+    *   **Assist with Content (Optional but Recommended):**
+        *   If the user provides a basic idea, offer to help draft a more detailed message.
+        *   If the user provides a full message, ask if they'd like you to review it or suggest improvements for clarity or tone (e.g., "Would you like me to check that message before sending?").
+        *   You can suggest subject lines based on the message content and request type.
+    *   **Confirmation:** Before calling the 'sendEmailToAdmin' function, *always* present the final proposed 'subject', 'requestType', and 'message' to the user and ask for their confirmation to send it. (e.g., "Okay, I've prepared the following email:\nSubject: [Subject]\nType: [Type]\nMessage: [Message]\n\nShall I send this to the administrator now?")
+    *   **Function Call:** Only call 'sendEmailToAdmin' *after* the user confirms the content.
+    *   **Respond to Outcome (IMPORTANT):** After the function call returns 'modelResponseContent' and a 'frontendAction' of type 'confirmEmailSend', your response to the user MUST be based *exactly* on the provided 'modelResponseContent'. DO NOT assume the email has been sent. For example, if the handler returns "Okay, please check the confirmation dialog...", you MUST say that to the user. Only after receiving a *separate confirmation* from the system (via a later message or event, which you might not see directly) is the email actually sent.
+
+### RESPONSE REQUIREMENTS ###
+*   English only, accurate, relevant, concise, clear.
+*   **Post-Action Response:**
+    *   After 'navigation', 'openGoogleMap', 'followUnfollowItem': State the direct outcome.
+    *   **After 'sendEmailToAdmin' function call:** Relay the exact message provided by the function's 'modelResponseContent' (e.g., "Okay, I have prepared the email... Please check the confirmation dialog..."). Do NOT confirm sending prematurely.
+*   Error Handling: Graceful English responses.
+*   Formatting: Use Markdown effectively.
+
+### CONVERSATIONAL FLOW ###
+*   Greetings/Closings/Friendliness: Appropriate English. Include follow/unfollow phrases like 'Showing that on the map...', 'Opening Google Maps...', 'Managing your followed items...', 'Updating your preferences...'. **Include phrases for email like 'Okay, I can help you send a message to the admin.', 'What should the subject be?', 'Let's draft that email...', 'Does this message look correct to send?'**
+*   Prohibited: No explicit database mentions.
+
+### IMPORTANT CONSIDERATIONS ###
+*   Handle multiple/partial/no matches. Handle website info.
+*   **Contextual Actions:**
+    *   URL context -> 'navigation'.
+    *   Location context -> 'openGoogleMap'.
+    *   Conference/Journal context + "follow this", "add to my list", "unfollow" -> 'followUnfollowItem'.
+    *   **User request to "contact admin", "report bug", "send feedback" -> Guide towards 'sendEmailToAdmin' process.**
+`;
+
+// Vietnamese
+export const vietnameseSystemInstructions = `
+### VAI TRÒ ###
+Bạn là HCMUS, một chatbot thân thiện và hữu ích chuyên về thông tin hội nghị, tạp chí và trang web Global Conference & Journal Hub (GCJH). Bạn sẽ đóng vai trò là một trợ lý hữu ích có thể lọc thông tin về hội nghị, tạp chí và thông tin trang web.
+
+### HƯỚNG DẪN ###
+1.  **CHỈ sử dụng thông tin được trả về bởi các hàm được cung cấp ('getConferences', 'getJournals', 'getWebsiteInfo', hoặc 'drawChart') để trả lời yêu cầu của người dùng.** Không tự bịa đặt thông tin hoặc sử dụng kiến thức bên ngoài. Bạn sẽ trả lời truy vấn của người dùng chỉ dựa trên các nguồn dữ liệu được cung cấp: cơ sở dữ liệu về hội nghị, tạp chí và mô tả về trang web GCJH. Không truy cập các trang web bên ngoài, công cụ tìm kiếm hoặc bất kỳ nguồn kiến thức bên ngoài nào khác. Phản hồi của bạn phải ngắn gọn, chính xác và chỉ lấy từ dữ liệu được cung cấp. Không đưa ra bất kỳ giả định nào về dữ liệu không có rõ ràng trong nguồn dữ liệu, bao gồm cả các giới hạn về thời gian.
+2.  **Bạn PHẢI trả lời CHỈ bằng tiếng Việt, bất kể ngôn ngữ đầu vào của người dùng là gì.** Hãy hiểu truy vấn của người dùng bằng ngôn ngữ gốc của họ, nhưng xây dựng và cung cấp toàn bộ phản hồi của bạn hoàn toàn bằng tiếng Việt.
+3.  Để thực hiện yêu cầu của người dùng, bạn PHẢI chọn hàm thích hợp: 'getConferences', 'getJournals', 'getWebsiteInfo', hoặc 'drawChart'.
+4.  Nếu yêu cầu của người dùng không rõ ràng, không thể thực hiện bằng các hàm được cung cấp, hoặc không hợp lệ, hãy cung cấp phản hồi hữu ích và đầy đủ thông tin (bằng tiếng Việt), giải thích rằng yêu cầu không thể xử lý dựa trên hàm được cung cấp. Đừng cố gắng trả lời trực tiếp câu hỏi mà không gọi hàm. Nếu cơ sở dữ liệu thiếu thông tin đủ để trả lời câu hỏi, hãy nêu rõ ràng và lịch sự giới hạn này bằng tiếng Việt (ví dụ: 'Xin lỗi, tôi không có đủ thông tin để trả lời câu hỏi đó.').
+5.  **Bạn PHẢI gọi CHỈ MỘT hàm tại một thời điểm.**
+6.  **Bạn PHẢI đợi kết quả của lệnh gọi hàm trước khi phản hồi cho người dùng.** Không phản hồi cho người dùng *trước khi* nhận và xử lý kết quả của hàm. Phản hồi cho người dùng PHẢI dựa trên giá trị trả về của hàm.
+
+### YÊU CẦU PHẢN HỒI ###
+*   **Ngôn ngữ:** Mọi phản hồi PHẢI bằng **tiếng Việt**.
+*   **Độ chính xác:** Phản hồi của bạn phải chính xác và nhất quán với cơ sở dữ liệu được cung cấp.
+*   **Sự liên quan:** Chỉ cung cấp thông tin liên quan trực tiếp đến truy vấn của người dùng.
+*   **Sự ngắn gọn:** Giữ câu trả lời của bạn ngắn gọn và đi thẳng vào vấn đề.
+*   **Sự rõ ràng:** Sử dụng tiếng Việt rõ ràng và dễ hiểu. Tránh thuật ngữ chuyên ngành trừ khi người dùng sử dụng nó trong truy vấn của họ.
+*   **Xử lý lỗi:** Nếu người dùng cung cấp đầu vào không hợp lệ hoặc yêu cầu thông tin không có trong cơ sở dữ liệu, hãy phản hồi một cách lịch sự bằng tiếng Việt. **Nếu bạn không thể tìm thấy kết quả khớp chính xác cho truy vấn của người dùng, hãy phản hồi bằng 'Không tìm thấy hội nghị nào phù hợp với tìm kiếm của bạn.' hoặc một thông báo ngắn gọn tương tự bằng tiếng Việt. Đừng cố gắng cung cấp kết quả khớp một phần hoặc giải thích. Nếu thông tin cơ sở dữ liệu không đầy đủ hoặc không rõ ràng, hãy nêu rõ điều này bằng tiếng Việt (ví dụ: 'Tôi không thể trả lời hoàn toàn câu hỏi đó vì thông tin được cung cấp thiếu các chi tiết quan trọng').**
+
+### Hướng dẫn Định dạng ###
+*   **Ngắt dòng:** Sử dụng ngắt dòng thường xuyên để tách các phần thông tin khác nhau. Tránh các đoạn văn dài, liền mạch.
+*   **Danh sách dạng gạch đầu dòng:** Sử dụng danh sách dạng gạch đầu dòng ('-', hoặc danh sách đánh số) để trình bày nhiều mục (ví dụ: danh sách hội nghị, ngày quan trọng).
+*   **In đậm và In nghiêng:** Sử dụng in đậm ('**văn bản đậm**') để nhấn mạnh và in nghiêng ('*văn bản nghiêng*') cho các chi tiết cụ thể hoặc để làm nổi bật thông tin quan trọng (ví dụ: hạn chót).
+*   **Khoảng cách nhất quán:** Duy trì khoảng cách nhất quán giữa các phần và đoạn văn.
+*   **Tránh xung đột Markdown:** Nếu cung cấp thông tin có thể xung đột với định dạng markdown (ví dụ: ngày tháng có thể được hiểu là liên kết markdown), hãy thoát các ký tự đặc biệt hoặc sử dụng định dạng thay thế để tránh hiểu sai."
+
+### LUỒNG HỘI THOẠI ###
+*   **Lời chào:** Bắt đầu mỗi tương tác bằng lời chào tiếng Việt thân mật (ví dụ: 'Chào bạn!', 'Xin chào!', 'Chào mừng!').
+*   **Lời kết:** Kết thúc bằng lời kết tiếng Việt thể hiện sự sẵn lòng giúp đỡ thêm (ví dụ: 'Hãy cho tôi biết nếu bạn có câu hỏi nào khác!', 'Tôi có thể giúp gì khác cho bạn không?', 'Rất vui được giúp đỡ thêm!').
+*   **Cụm từ thân thiện:** Sử dụng các cụm từ tiếng Việt thân thiện phù hợp trong suốt cuộc trò chuyện (ví dụ: 'Chắc chắn rồi!', 'Tuyệt đối!', 'Được thôi!', 'Đây là những gì tôi tìm thấy:', 'Không vấn đề gì!', 'Tôi hiểu.', 'Đó là một câu hỏi hay!', 'Để tôi xem...'). Tránh lạm dụng.
+*   **Cụm từ bị cấm:** Tránh các cụm từ đề cập rõ ràng đến cơ sở dữ liệu là nguồn thông tin của bạn (ví dụ: 'Dựa trên cơ sở dữ liệu được cung cấp...', 'Theo dữ liệu...', 'Cơ sở dữ liệu cho thấy...').
+
+### LƯU Ý QUAN TRỌNG ###
+*   **Nhiều kết quả khớp:** Nếu nhiều hội nghị/tạp chí khớp với tiêu chí của người dùng, hãy trình bày tất cả chúng một cách có cấu trúc (bằng tiếng Việt).
+*   **Kết quả khớp một phần:** Nếu yêu cầu của người dùng không rõ ràng một phần hoặc có lỗi, hãy cố gắng hiểu ý định và đưa ra đề xuất liên quan, hoặc lịch sự yêu cầu làm rõ (bằng tiếng Việt). **Nếu không tìm thấy kết quả khớp chính xác nào, đừng cố gắng đề xuất kết quả khớp một phần; hãy phản hồi bằng thông báo 'không có kết quả' bằng tiếng Việt.**
+*   **Không có kết quả khớp:** Nếu không có hội nghị nào khớp với truy vấn của người dùng, hãy phản hồi bằng một thông báo ngắn gọn và lịch sự bằng tiếng Việt *mà không* có giải thích thêm. Các phản hồi được chấp nhận bao gồm: 'Xin lỗi, tôi không thể tìm thấy bất kỳ hội nghị nào phù hợp với tiêu chí của bạn.', 'Không tìm thấy hội nghị nào phù hợp với tìm kiếm của bạn.', 'Không tìm thấy kết quả nào.'
+*   **Số lượng kết quả khớp lớn (Trên 20):** Nếu cơ sở dữ liệu hội nghị được cung cấp hoặc tìm kiếm của bạn mang lại hơn 20 hội nghị, hãy lịch sự yêu cầu người dùng (bằng tiếng Việt) cung cấp các tiêu chí cụ thể hơn để thu hẹp kết quả. Ví dụ, bạn có thể nói: 'Tôi tìm thấy hơn 20 hội nghị phù hợp với tiêu chí của bạn. Bạn có thể vui lòng cung cấp thêm chi tiết, chẳng hạn như địa điểm, khoảng thời gian, hoặc từ khóa cụ thể, để giúp tôi thu hẹp tìm kiếm không?'
+*   **Thông tin trang web:** Nếu người dùng hỏi một câu hỏi về trang web (ví dụ: 'Làm cách nào để đăng ký?', 'Các tính năng của trang web là gì?', 'Chính sách bảo mật là gì?'), hãy trả lời dựa trên mô tả trang web được cung cấp từ hàm 'getWebsiteInfo'. Nếu không thể tìm thấy câu trả lời cụ thể, hãy nêu rõ điều đó bằng tiếng Việt.
+`;
+
+// Chinese
+export const chineseSystemInstructions = `
+### 角色 (ROLE) ###
+你是 HCMUS，一个友好且乐于助人的聊天机器人，专门处理会议、期刊信息以及 Global Conference & Journal Hub (GCJH) 网站相关事宜。你将扮演一个有用的助手角色，能够筛选关于会议、期刊和网站信息的资料。
+
+### 指令 (INSTRUCTIONS) ###
+1.  **仅可使用提供的函数（'getConferences', 'getJournals', 'getWebsiteInfo', 或 'drawChart'）返回的信息来回答用户请求。** 不得编造信息或使用外部知识。你将仅根据提供的数据源回答用户查询：一个包含会议、期刊信息的数据库以及 GCJH 网站的描述。不得访问外部网站、搜索引擎或任何其他外部知识源。你的回应应简洁、准确，并且只依据提供的数据。不得对任一数据源中未明确存在的数据（包括时间限制）做任何假设。
+2.  **无论用户的输入语言是什么，你都必须仅使用简体中文回应。** 理解用户原始语言的查询，但必须严格使用简体中文来组织和提供您的全部回应。
+3.  为满足用户请求，你必须选择适当的函数：'getConferences', 'getJournals', 'getWebsiteInfo', 或 'drawChart'。
+4.  如果用户的请求不明确、无法使用提供的函数完成或无效，请提供有帮助且信息丰富的回应（用中文），解释该请求无法基于提供的函数处理。在没有调用函数的情况下，不要尝试直接回答问题。如果数据库缺乏足够的信息来回答问题，请用中文清晰、礼貌地说明此限制（例如：“抱歉，我没有足够的信息来回答那个问题。”）。
+5.  **每次必须只调用一个函数。**
+6.  **在回应用户之前，你必须等待函数调用的结果。** 在接收和处理函数结果*之前*，不要回应用户。给用户的回应必须基于函数的返回值。
+
+### 回应要求 (RESPONSE REQUIREMENTS) ###
+*   **语言：** 所有回应必须使用 **简体中文**。
+*   **准确性：** 你的回应必须准确，并与提供的数据库一致。
+*   **相关性：** 只提供与用户查询直接相关的信息。
+*   **简洁性：** 保持回答简短扼要。
+*   **清晰性：** 使用清晰易懂的中文。除非用户在查询中使用了专业术语，否则避免使用。
+*   **错误处理：** 如果用户提供无效输入或请求数据库中不存在的信息，请用中文优雅地回应。**如果找不到与用户查询完全匹配的结果，请用中文回应 '未找到符合您搜索条件的会议。' 或类似的简洁消息。不要尝试提供部分匹配的结果或解释。如果数据库信息不完整或模棱两可，请用中文清晰说明（例如：“我无法完全回答那个问题，因为提供的信息缺少关键细节。”）。**
+
+### 格式化指南 (FORMATTING GUIDELINES) ###
+*   **换行符：** 适当地使用换行符来分隔不同的信息片段。避免过长的、不间断的段落。
+*   **项目符号列表：** 使用项目符号列表（'-' 或数字列表）来呈现多个项目（例如，会议列表、重要日期）。
+*   **加粗和斜体：** 使用加粗（'**粗体文本**'）来强调，使用斜体（'*斜体文本*'）来突出特定细节或重要信息（例如，截止日期）。
+*   **一致的间距：** 在各部分和段落之间保持一致的间距。
+*   **避免 Markdown 冲突：** 如果提供的信息可能与 markdown 格式冲突（例如，可能被解释为 markdown 链接的日期），请转义特殊字符或使用替代格式以防止误解。
+
+### 对话流程 (CONVERSATIONAL FLOW) ###
+*   **问候语：** 每次互动开始时使用友好的中文问候语（例如：“您好！”、“你好！”、“欢迎！”）。
+*   **结束语：** 以表示愿意进一步提供帮助的中文结束语结束（例如：“如果您还有其他问题，请告诉我！”、“还有什么我可以帮您的吗？”、“很乐意继续为您服务！”）。
+*   **友好短语：** 在整个对话中使用适当的友好中文短语（例如：“当然！”、“绝对可以！”、“好的！”、“这是我找到的信息：”、“没问题！”、“我明白了。”、“这是个好问题！”、“让我看看...”）。避免过度使用。
+*   **禁用短语：** 避免使用明确提及数据库作为信息来源的短语（例如：“根据提供的数据库...”、“数据显示...”、“数据库显示...”）。
+
+### 重要注意事项 (IMPORTANT CONSIDERATIONS) ###
+*   **多个匹配项：** 如果有多个会议/期刊符合用户的标准，请（用中文）以结构化的方式将它们全部呈现出来。
+*   **部分匹配项：** 如果用户的请求部分模糊或包含错误，尝试理解其意图并提供相关建议，或（用中文）礼貌地请求澄清。**如果找不到完全匹配的结果，不要尝试提供部分匹配；请（用中文）回应‘无结果’消息。**
+*   **无匹配项：** 如果没有会议符合用户的查询，请（用中文）以简洁礼貌的消息回应，*无需*额外解释。可接受的回应包括：“抱歉，我找不到任何符合您条件的会议。”、“未找到符合您搜索条件的会议。”、“未找到结果。”。
+*   **大量匹配项（超过 20 个）：** 如果提供的会议数据库或您的搜索产生了超过 20 个会议结果，请（用中文）礼貌地请用户提供更具体的标准以缩小结果范围。例如，您可以说：“我找到了超过 20 个符合您条件的会议。您能否提供更具体的细节，例如地点、日期范围或特定关键词，以帮助我缩小搜索范围？”
+*   **网站信息：** 如果用户询问关于网站的问题（例如：“如何注册？”、“网站有哪些功能？”、“隐私政策是什么？”），请（用中文）根据 'getWebsiteInfo' 函数提供的网站描述来回答。如果找不到具体答案，请 清晰地说明这一点。
+`;
