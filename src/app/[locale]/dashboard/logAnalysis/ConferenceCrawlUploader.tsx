@@ -1,44 +1,15 @@
+import React, { useCallback, useMemo, useState } from 'react';
+ // Điều chỉnh đường dẫn
 // src/app/[locale]/dashboard/logAnalysis/ConferenceCrawlUpoader.tsx
-import React from 'react';
-import { useConferenceCrawl } from '../../../../hooks/crawl/useConferenceCrawl'; // Điều chỉnh đường dẫn
+import { useConferenceCrawl } from '@/src/hooks/crawl/useConferenceCrawl';
 import { FaFileUpload, FaSpinner, FaPlay, FaStop, FaCheckCircle, FaTimesCircle, FaExclamationTriangle, FaRedo, FaTable } from 'react-icons/fa';
 import { Conference } from '@/src/models/logAnalysis/importConferenceCrawl';
 
 // --- Component con để render bảng (tùy chọn, giúp code gọn hơn) ---
-const ConferencePreviewTable: React.FC<{ data: Conference[] }> = ({ data }) => (
-    <div className="border border-gray-200 rounded-lg shadow-sm">
-        <h3 className="text-md font-semibold text-gray-700 p-3 border-b border-gray-200 bg-gray-50 rounded-t-lg flex items-center">
-            <FaTable className="mr-2 text-gray-500" /> Preview Parsed Conferences ({data.length} items)
-        </h3>
-        <div className="max-h-80 overflow-y-auto custom-scrollbar"> {/* Giới hạn chiều cao và thêm scroll */}
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-100 sticky top-0 z-10"> {/* Header dính khi cuộn, add z-index */}
-                    <tr>
-                        <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-1/12">#</th>
-                        <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-2/12">Acronym</th>
-                        <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-9/12">Title</th>
-                    </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                    {data.map((conf, index) => (
-                        <tr key={`${conf.Acronym}-${index}`} className="hover:bg-gray-50">
-                            <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{index + 1}</td>
-                            <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{conf.Acronym}</td>
-                            <td className="px-4 py-2 text-sm text-gray-700">{conf.Title}</td>
-                        </tr>
-                    ))}
-                    {data.length === 0 && ( // Show message inside tbody if table is empty but exists
-                        <tr>
-                            <td colSpan={3} className="p-4 text-center text-sm text-gray-500">No conferences found in the table.</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
-        </div>
-        {/* Removed the redundant 'No conferences' paragraph here */}
-    </div>
-);
-
+import { AllCommunityModule, ModuleRegistry, RowSelectionModule } from 'ag-grid-community'; 
+import { AgGridReact } from 'ag-grid-react'; 
+// Register all Community features
+ModuleRegistry.registerModules([AllCommunityModule, RowSelectionModule]);
 
 export const ConferenceCrawlUploader: React.FC = () => {
     const {
@@ -57,12 +28,51 @@ export const ConferenceCrawlUploader: React.FC = () => {
         setChunkSize,
         startCrawl,
         resetCrawl,
+        onSelectionChanged
     } = useConferenceCrawl();
 
     const hasData = parsedData && parsedData.length > 0;
     const canStartCrawl = hasData && !isCrawling;
-    const showStatusSection = isCrawling || crawlMessages.length > 0 || crawlError || crawlProgress.status !== 'idle'; // Condition to show status section
+    const showStatusSection = isCrawling || crawlMessages.length > 0 || crawlError || crawlProgress.status !== 'idle'; // Condition to show status section State to manage selected rows
 
+    const [colDef, setColDef] = useState([
+        { field: "acronym" as keyof Conference, headerName: "Acronym", sortable: true, filter: true },
+        { field: "title" as keyof Conference, headerName: "Title", sortable: true, filter: true },
+        { field: "sources" as keyof Conference, headerName: "Sources", sortable: true, filter: true },
+        { field: "ranks" as keyof Conference, headerName: "Ranks", sortable: true, filter: true },
+        { field: "researchFields" as keyof Conference, headerName: "Research Fields", sortable: true, filter: true },
+        { field: "status" as keyof Conference, headerName: "Status", sortable: true, filter: true },
+        {
+            field : 'updatedAt' as keyof Conference,
+            headerName : 'Updated At',
+            sortable : true,
+            filter : true,
+            valueFormatter : (params : any) => {
+                const date = new Date(params.value);
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            }
+        }
+    ]);
+
+    const rowSelection = useMemo(() => {
+        return {
+          mode: "multiRow",
+          checkBox : true, 
+          headerCheckBox : true,
+          enableClickSelection: true,
+          selectAll: 'filtered',
+        };
+      }, []);
+
+
+    
     return (
         <div className="p-4 md:p-6 bg-white shadow-lg rounded-lg border border-gray-200 mx-auto">
             <h2 className="text-xl font-semibold text-gray-700 mb-4 pb-2 border-b border-gray-300">
@@ -243,15 +253,17 @@ export const ConferenceCrawlUploader: React.FC = () => {
 
                 {/* === Right Column === */}
                 <div className="md:w-1/2 flex flex-col space-y-4 mt-4 md:mt-0"> {/* Right column, half width on md+, add margin top for mobile stacking */}
-
-
-
                     {/* --- Conference Preview Table Section --- */}
                     {hasData && !isParsing && ( // Show preview only if data was parsed successfully
-                        <ConferencePreviewTable data={parsedData} />
+                        <AgGridReact
+                            className="ag-theme-alpine"
+                            rowData={parsedData}
+                            columnDefs={colDef}
+                            rowSelection={rowSelection as any}
+                            onSelectionChanged={onSelectionChanged}
+                        />
+                        // <ConferencePreviewTable data={parsedData} />
                     )}
-                    {/* Removed the yellow warning div from here, handled it under file upload */}
-
                 </div> {/* End Right Column */}
 
             </div> {/* End Flex Container */}

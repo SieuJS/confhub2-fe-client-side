@@ -30,8 +30,6 @@ async function getListConferenceFromDB(): Promise<ConferenceListResponse> {
             }
         });
 
-      
-
       return responseData as ConferenceListResponse; // Return the original data
     } else {
       throw new Error('Invalid API response format or empty data.');
@@ -72,8 +70,7 @@ async function getListConferenceFromJSON(): Promise<ConferenceListResponse> {
             }
         });
 
-      
-
+    
       return responseData as ConferenceListResponse; // Return the original data
     } else {
       throw new Error('Invalid API response format or empty data.');

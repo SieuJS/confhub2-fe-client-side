@@ -1,7 +1,7 @@
 // src/app/api/logAnalysis/saveConferences.ts
 import axios, { AxiosError } from 'axios';
 
-const API_SAVE_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/conference/save-to-json`; // Or read from config
+const API_SAVE_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/save-conference`; // Or read from config
 
 interface SaveResult {
     title: string;
@@ -29,7 +29,7 @@ export const saveConferenceToJson = async (acronym: string, title: string | unde
         return Promise.reject<SaveError>({ title, success: false, message: errorMsg });
     }
 
-    console.log(`API Call: Saving ${acronym} - ${title}`);
+    console.log(`API Call: Saving ${title}`);
     try {
         // Explicitly define expected response structure
         const response = await axios.post<{ success: boolean; message: string }>(
