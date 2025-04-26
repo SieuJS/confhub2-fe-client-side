@@ -93,8 +93,8 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
 
       const follows: Follow[] = await response.json();
       console.log('follows', follows);
-
-      setIsFollowing(follows?.some(conf => conf.conferenceId === conferenceId) ?? false); // FIXED HERE
+      setIsFollowing(!isFollowing); 
+      // setIsFollowing(follows?.some(conf => conf.conferenceId === conferenceId) ?? false); // FIXED HERE
     } catch (err:any) {
       setError(err.message || 'Error following/unfollowing conference.');
       console.error('Error following/unfollowing conference:', err);
