@@ -816,11 +816,11 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                   </Button>
 
                   {/* Display blacklist error */}
-                  {blacklistError && (
+                  {/* {blacklistError && (
                     <p className='mt-1 w-full text-center text-xs text-red-500 md:text-left'>
                       {t('Error')}: {blacklistError}
                     </p>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
