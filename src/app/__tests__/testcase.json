@@ -5188,5 +5188,340 @@
     ],
     "tester": "",
     "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Navigation_006",
+    "testCaseName": "Chuyển hướng đến trang Conference từ Header",
+    "description": "Kiểm tra liên kết 'Conference' trên header hoạt động.",
+    "preconditions": [
+      "Người dùng đang ở bất kỳ trang nào có hiển thị header."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào liên kết 'Conference' trên header."
+      }
+    ],
+    "expectedResult": "Hệ thống chuyển hướng người dùng đến trang Conference.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_Nav_001_Conference"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Navigation_007",
+    "testCaseName": "Chuyển hướng đến trang Publish từ Header",
+    "description": "Kiểm tra liên kết 'Publish' trên header hoạt động.",
+    "preconditions": [
+      "Người dùng đang ở bất kỳ trang nào có hiển thị header."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào liên kết 'Publish' trên header."
+      }
+    ],
+    "expectedResult": "Hệ thống chuyển hướng người dùng đến trang Publish.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_Nav_001_Publish"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Navigation_008",
+    "testCaseName": "Chuyển hướng đến trang Chatbot từ Header",
+    "description": "Kiểm tra liên kết 'Chatbot' trên header hoạt động.",
+    "preconditions": [
+      "Người dùng đang ở bất kỳ trang nào có hiển thị header."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào liên kết 'Chatbot' trên header."
+      }
+    ],
+    "expectedResult": "Hệ thống chuyển hướng người dùng đến trang Chatbot.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_Nav_001_Chatbot"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Navigation_009",
+    "testCaseName": "Chuyển hướng đến trang Visualize từ Header",
+    "description": "Kiểm tra liên kết 'Visualize' trên header hoạt động.",
+    "preconditions": [
+      "Người dùng đang ở bất kỳ trang nào có hiển thị header."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào liên kết 'Visualize' trên header."
+      }
+    ],
+    "expectedResult": "Hệ thống chuyển hướng người dùng đến trang Visualize.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_Nav_001_Visualize"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Navigation_010",
+    "testCaseName": "Chuyển hướng đến trang Support từ Header",
+    "description": "Kiểm tra liên kết 'Support' trên header hoạt động.",
+    "preconditions": [
+      "Người dùng đang ở bất kỳ trang nào có hiển thị header."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào liên kết 'Support' trên header."
+      }
+    ],
+    "expectedResult": "Hệ thống chuyển hướng người dùng đến trang Support.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_Nav_001_Support"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Chatbot_015",
+    "testCaseName": "Tìm kiếm hội nghị theo địa điểm (REGULAR CHAT)",
+    "description": "Kiểm tra Chatbot ở chế độ REGULAR CHAT có thể tìm kiếm và trả lời các câu hỏi về hội nghị theo địa điểm yêu cầu.",
+    "preconditions": [
+      "Chatbot đang ở chế độ REGULAR CHAT và có thể truy cập/hiển thị.",
+      "Có dữ liệu về các hội nghị và địa điểm liên quan trong hệ thống."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập câu hỏi vào khung chat của Chatbot, ví dụ: 'list some conference in Vietnam'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào biểu tượng gửi tin nhắn (mũi tên)."
+      }
+    ],
+    "expectedResult": "Chatbot hiển thị danh sách (hoặc liên kết đến danh sách) các hội nghị liên quan đến địa điểm được hỏi (ví dụ: Vietnam), hoặc thông báo không tìm thấy nếu không có dữ liệu phù hợp.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_Chatbot_015_SearchLocation"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Chatbot_016",
+    "testCaseName": "Cung cấp chi tiết hội nghị cụ thể (REGULAR CHAT)",
+    "description": "Kiểm tra Chatbot ở chế độ REGULAR CHAT có thể cung cấp chi tiết về một hội nghị cụ thể khi được hỏi tên/mã.",
+    "preconditions": [
+      "Chatbot đang ở chế độ REGULAR CHAT và có thể truy cập/hiển thị.",
+      "Hội nghị được hỏi (ví dụ: MEDES) tồn tại trong hệ thống và có thông tin chi tiết."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập câu hỏi vào khung chat của Chatbot, ví dụ: 'can you give details of MEDES'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào biểu tượng gửi tin nhắn (mũi tên)."
+      }
+    ],
+    "expectedResult": "Chatbot cung cấp thông tin chi tiết về hội nghị được hỏi (ví dụ: tên đầy đủ, ngày, địa điểm, chủ đề tóm tắt) và cung cấp liên kết đến trang chi tiết của hội nghị đó.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_Chatbot_016_GetDetails"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Chatbot_017",
+    "testCaseName": "Mở bản đồ địa chỉ hội nghị (REGULAR CHAT)",
+    "description": "Kiểm tra Chatbot ở chế độ REGULAR CHAT có thể xử lý yêu cầu mở bản đồ địa chỉ của một hội nghị cụ thể.",
+    "preconditions": [
+      "Chatbot đang ở chế độ REGULAR CHAT và có thể truy cập/hiển thị.",
+      "Hội nghị được hỏi (ví dụ: SERA) tồn tại trong hệ thống và có thông tin địa chỉ hợp lệ."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập yêu cầu vào khung chat của Chatbot, ví dụ: 'Can you open a map showing the address of conference SERA'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào biểu tượng gửi tin nhắn (mũi tên)."
+      }
+    ],
+    "expectedResult": "Chatbot phản hồi bản đồ Google Maps với địa chỉ của hội nghị được hỏi.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_Chatbot_017_OpenMap"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Chatbot_018",
+    "testCaseName": "Chuyển hướng đến trang chi tiết hội nghị (REGULAR CHAT)",
+    "description": "Kiểm tra Chatbot ở chế độ REGULAR CHAT có thể chuyển hướng người dùng đến trang chi tiết của một hội nghị cụ thể.",
+    "preconditions": [
+      "Chatbot đang ở chế độ REGULAR CHAT và có thể truy cập/hiển thị.",
+      "Hội nghị được hỏi (ví dụ: SERA) tồn tại trong hệ thống và có trang chi tiết."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập yêu cầu vào khung chat của Chatbot, ví dụ: 'Can you direct me to the SERA conference details page?'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào biểu tượng gửi tin nhắn (mũi tên)."
+      }
+    ],
+    "expectedResult": "Chatbot phản hồi và mở cửa sổ chuyển hướng người dùng đến trang chính thức của hội nghị được hỏi.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_Chatbot_018_RedirectDetails"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Chatbot_019",
+    "testCaseName": "Hướng dẫn sử dụng tính năng Theo dõi (Follow) (REGULAR CHAT)",
+    "description": "Kiểm tra Chatbot ở chế độ REGULAR CHAT có thể cung cấp hướng dẫn về cách sử dụng tính năng Theo dõi hội nghị.",
+    "preconditions": [
+      "Chatbot đang ở chế độ REGULAR CHAT và có thể truy cập/hiển thị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập câu hỏi/yêu cầu vào khung chat của Chatbot, ví dụ: 'can you help me how to use follow conference feature'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào biểu tượng gửi tin nhắn (mũi tên)."
+      }
+    ],
+    "expectedResult": "Chatbot trả về hướng dẫn chi tiết (bằng văn bản, hoặc kèm hình ảnh/video nếu có) về cách người dùng có thể sử dụng tính năng Theo dõi (Follow) hội nghị trên website.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_Chatbot_019_Instructions"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Chatbot_020",
+    "testCaseName": "Chatbot Theo dõi hội nghị (Follow) (REGULAR CHAT)",
+    "description": "Kiểm tra Chatbot ở chế độ REGULAR CHAT có thể giúp người dùng Theo dõi hội nghị.",
+    "preconditions": [
+      "Chatbot đang ở chế độ REGULAR CHAT và có thể truy cập/hiển thị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập câu hỏi/yêu cầu vào khung chat của Chatbot, ví dụ: 'can you help me follow HNTD conference'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào biểu tượng gửi tin nhắn (mũi tên)."
+      }
+    ],
+    "expectedResult": "Chatbot trả về đã theo dõi hội nghị thành công và cung cấp thông báo xác nhận.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_Chatbot_020_FollowConference"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Chatbot_021",
+    "testCaseName": "Chatbot Hủy theo dõi hội nghị (UnFollow) (REGULAR CHAT)",
+    "description": "Kiểm tra Chatbot ở chế độ REGULAR CHAT có thể giúp người dùng Hủy theo dõi hội nghị.",
+    "preconditions": [
+      "Chatbot đang ở chế độ REGULAR CHAT và có thể truy cập/hiển thị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập câu hỏi/yêu cầu vào khung chat của Chatbot, ví dụ: 'can you help me unfollow HNTD conference'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào biểu tượng gửi tin nhắn (mũi tên)."
+      }
+    ],
+    "expectedResult": "Chatbot trả về đã hủy theo dõi hội nghị thành công và cung cấp thông báo xác nhận.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_Chatbot_021_UnFollowConference"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Chatbot_022",
+    "testCaseName": "Xử lý câu hỏi không rõ ràng/ngoài phạm vi (REGULAR CHAT)",
+    "description": "Kiểm tra Chatbot ở chế độ REGULAR CHAT có phản hồi phù hợp khi nhận câu hỏi không rõ ràng hoặc nằm ngoài phạm vi hỗ trợ.",
+    "preconditions": [
+      "Chatbot đang ở chế độ REGULAR CHAT và có thể truy cập/hiển thị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập một câu hỏi không liên quan đến hội nghị hoặc khó hiểu vào khung chat, ví dụ: 'What is the weather tomorrow?' hoặc 'Tell me a joke'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào biểu tượng gửi tin nhắn (mũi tên)."
+      }
+    ],
+    "expectedResult": "Chatbot phản hồi rằng nó không hiểu câu hỏi hoặc câu hỏi nằm ngoài phạm vi hỗ trợ, và có thể đề xuất các chủ đề mà nó có thể giúp (ví dụ: tìm kiếm hội nghị, chi tiết hội nghị...).",
+    "actualResult": "",
+    "status": "",
+    "priority": "Low",
+    "relatedRequirements": [
+      "YC_Chatbot_022_OutOfScope"
+    ],
+    "tester": "",
+    "executionDate": ""
   }
 ]
