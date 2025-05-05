@@ -22,7 +22,7 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
 
   // State for blacklisted conferences
   const [blacklistedConferences, setBlacklistedConferences] = useState<
-    (ConferenceInfo & { blacklistedAt?: string, conferenceId: string })[] // Added blacklistedAt property
+    (ConferenceInfo & { created_at?: string; conferenceId: string })[] // Assuming API returns created_at, adjusted type hint
   >([])
   const [loading, setLoading] = useState(true)
   const [loggedIn, setLoggedIn] = useState(false)
@@ -43,18 +43,24 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
 
       setLoggedIn(true)
 
-      const userBlacklist = await fetch(`${API_GET_BLACKLIST_ENDPOINT}`, { // Use conferenceId in URL
+      const userBlacklist = await fetch(`${API_GET_BLACKLIST_ENDPOINT}`, {
+        // Use conferenceId in URL
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization' : `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
-        }})
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}` // Add userId to the headers
+        }
+      })
 
       if (!userBlacklist.ok) {
         throw new Error(`HTTP error! status: ${userBlacklist.status}`)
       }
 
       const followed: any[] = await userBlacklist.json()
+      // Assuming the API response structure for a blacklisted item looks something like:
+      // { conferenceId: '...', title: '...', ..., createdAt: 'ISO_DATE_STRING' }
+      // We need to ensure the received data has a 'createdAt' or similar timestamp.
+      // Let's assume it's 'createdAt' as used later in the map.
       setBlacklistedConferences(followed)
     } catch (error) {
       console.error('Failed to fetch blacklist data:', error) // Updated error message
@@ -105,10 +111,24 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
         : '',
       fromDate: conferenceDates?.fromDate || undefined,
       toDate: conferenceDates?.toDate || undefined,
-      blacklistedAt: conf.createdAt, // Use blacklistedAt timestamp
+      // Use conf.createdAt directly if available, otherwise use conf.created_at
+      // Ensure your API response structure matches this assumption
+      createdAt: conf.createdAt || (conf as any).created_at, // Use the correct timestamp field from API
       status: conf.status // Keep status if needed
     }
   })
+
+  // --- ADD SORTING HERE ---
+  // Sort by createdAt timestamp, earliest first
+  transformedConferences.sort((a, b) => {
+    const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0 // Treat missing date as epoch or handle appropriately
+    const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0 // Treat missing date as epoch or handle appropriately
+
+    // Sort ascending (earliest first)
+    return dateB - dateA
+  })
+  // --- END SORTING ---
+
   // console.log('transformed Blacklisted Conferences:', transformedConferences); // Optional logging
 
   return (
@@ -151,6 +171,7 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
         // Updated empty state message
         <p>{t('You_have_not_blacklisted_any_conferences_yet')}</p>
       ) : (
+        // Map over the SORTED transformedConferences
         transformedConferences.map(conference => {
           // console.log('Rendering Blacklisted ConferenceItem:', conference); // Optional logging
           return (
@@ -161,11 +182,9 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
               <div className='flex'>
                 {/* Updated Label */}
                 <span className='mr-1'>{t('Blacklisted_Time')}: </span>
-                {/* Use blacklistedAt timestamp */}
-                <Tooltip
-                  text={formatDateFull(conference.blacklistedAt, language)}
-                >
-                  <span>{timeAgo(conference.blacklistedAt, language)}</span>
+                {/* Use createdAt timestamp */}
+                <Tooltip text={formatDateFull(conference.createdAt, language)}>
+                  <span>{timeAgo(conference.createdAt, language)}</span>
                 </Tooltip>
               </div>
               <ConferenceItem
@@ -177,7 +196,7 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
                   location: conference.location,
                   fromDate: conference.fromDate,
                   toDate: conference.toDate
-                  // No need to pass blacklistedAt to ConferenceItem unless it uses it
+                  // No need to pass createdAt to ConferenceItem unless it uses it
                 }}
               />
             </div>
