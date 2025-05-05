@@ -420,11 +420,13 @@ const useAuthApi = (): AuthApiResult => {
   const googleSignIn = async (): Promise<void> => {
     // Lấy URL đầy đủ bao gồm cả query params
     const fullUrl = `${window.location.pathname}${window.location.search}`;
+    
     console.log("[useAuthApi - googleSignIn] Storing return URL:", fullUrl);
     localStorage.setItem('returnUrl', fullUrl);
     console.log("[useAuthApi - googleSignIn] Redirecting to Google OAuth endpoint...");
     // Chuyển hướng đến API route xử lý Google OAuth phía backend/Next.js
-    window.location.href = `/api/auth/google`; // Điều chỉnh nếu API route khác
+    window.history.pushState(null, '', '/api/v1/auth/google');
+    
   };
 
   

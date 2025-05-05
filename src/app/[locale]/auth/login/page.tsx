@@ -19,7 +19,7 @@ const LoginPage= ({
       router.push(`/${locale}`);
     }
   }, [isLoggedIn, isLoading]); // Add isLoading and locale to dependencies
-  
+  const redirectUri = `${window.location.origin}/${locale}/auth/callback`;
 
   return (
     <>
@@ -27,7 +27,7 @@ const LoginPage= ({
     {console.log(isLoggedIn)}
     {!isLoading && !isLoggedIn &&
       <div className="min-h-screen bg-gradient-to-br from-background to-background-secondary">
-      <LoginForm />
+      <LoginForm redirectUri={redirectUri} />
       </div>
     }
     </>
