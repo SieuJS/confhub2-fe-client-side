@@ -4,9 +4,13 @@ import React, { useEffect, useState } from 'react'
 import { Link } from '@/src/navigation'
 import useLoginForm from '../../../../hooks/auth/useLoginForm'
 import { useTranslations } from 'next-intl'
-import Button from '../../utils/Button'
+import { appConfig } from '@/src/middleware'
 
-const LoginForm: React.FC = () => {
+type LoginFormProps = {
+  redirectUri: string
+}
+
+const LoginForm: React.FC<LoginFormProps> = ( props: LoginFormProps ) => {
   const t = useTranslations('')
 
   const {
@@ -15,7 +19,6 @@ const LoginForm: React.FC = () => {
     handleEmailChange,
     handlePasswordChange,
     handleSubmit,
-    handleGoogleLogin,
     error,
     isLoading
   } = useLoginForm()
@@ -39,9 +42,9 @@ const LoginForm: React.FC = () => {
             </div>
 
             <div className='space-y-4'>
-              <button
+              <a
                 type='button'
-                onClick={handleGoogleLogin}
+                href={`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/google?redirect=${props.redirectUri}`}
                 className='flex w-full items-center justify-center space-x-2 rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium  shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
               >
                 <svg className='h-5 w-5' viewBox='0 0 24 24'>
@@ -63,7 +66,7 @@ const LoginForm: React.FC = () => {
                   />
                 </svg>
                 <span>{t('Continue_with_Google')}</span>
-              </button>
+              </a>
             </div>
 
             <div className='relative'>
