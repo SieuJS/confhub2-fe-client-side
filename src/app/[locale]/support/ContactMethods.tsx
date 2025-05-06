@@ -90,7 +90,7 @@ const ContactMethods: React.FC = () => {
               href='tel:+16467865060'
               className='font-medium text-blue-600 hover:underline dark:text-blue-500'
             >
-              +1 (646) 786-5060
+              (+84) 123-456-7890
             </a>
           </div>
 

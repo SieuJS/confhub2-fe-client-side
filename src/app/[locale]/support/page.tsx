@@ -16,10 +16,10 @@ const FAQ = ({ locale }: { locale: string }) => {
   return (
     <>
       <Header locale={locale} />
-      <SupportForm />
-      <ContactMethods />
       <About />
       <Support />
+      <SupportForm />
+      <ContactMethods />
       <Footer />
     </>
   )

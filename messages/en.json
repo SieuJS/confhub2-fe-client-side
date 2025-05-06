@@ -121,12 +121,12 @@
   "All": "All",
   "AboutPage": {
     "hero": {
-      "title": "About HCMUS",
+      "title": "About Global Conference Hub",
       "subtitle": "A comprehensive platform for scientific conferences and journals."
     },
     "mission": {
       "title": "Our Mission",
-      "description": "HCMUS is built with the goal of helping researchers, scholars, and students easily find and access scientific events and publications relevant to their fields. We believe that connecting the research community is key to the advancement of science."
+      "description": "Global Conference Hub is built with the goal of helping researchers, scholars, and students easily find and access scientific events and publications relevant to their fields. We believe that connecting the research community is key to the advancement of science."
     },
     "features": {
       "title": "What We Offer",
@@ -159,7 +159,7 @@
   "searchPlaceholder": "You have the questions, we have the answers.",
   "AboutWebsite_name": "About the Website",
   "AboutWebsite_question1": "What is this website?",
-  "AboutWebsite_answer1": "HCMUS is a comprehensive platform that aggregates information about scientific conferences and journals worldwide. Our purpose is to help researchers, academics, and students easily find and access scientific events and publications relevant to their fields.",
+  "AboutWebsite_answer1": "Global Conference Hub is a comprehensive platform that aggregates information about scientific conferences and journals worldwide. Our purpose is to help researchers, academics, and students easily find and access scientific events and publications relevant to their fields.",
   "AboutWebsite_question2": "What types of scientific conferences/journals does the website provide information about?",
   "AboutWebsite_answer2": "We aggregate information from various scientific fields, including natural sciences, social sciences, engineering, medicine, and many other interdisciplinary fields.  The goal is to cover a wide range of research areas.",
   "AboutWebsite_question3": "How often is the information on the website updated?",
@@ -200,7 +200,7 @@
   "PostConference_question1": "Who can post conference information on the website?",
   "PostConference_answer1": "Currently, only users who have registered an account on the website can post conference information. This helps us manage the quality of information and limit inaccurate information.",
   "PostConference_question2": "Can you help me post my conference on the system?",
-  "PostConference_answer2": "HCMUS is a conference information aggregation platform, which means we are not involved in organizing any of the conferences listed on this website. If you want to post information about a conference on this website, you can use your account to access the Post Conference feature to post conference information on our website.",
+  "PostConference_answer2": "Global Conference Hub is a conference information aggregation platform, which means we are not involved in organizing any of the conferences listed on this website. If you want to post information about a conference on this website, you can use your account to access the Post Conference feature to post conference information on our website.",
   "PostConference_question3": "How do I post information about a conference?",
   "PostConference_answer3": "After logging in, you will see the \"Post Conference\" button on the homepage. Click on this button and fill out the conference posting form with all the required information.",
   "PostConference_question4": "What information is required to post a conference?",
@@ -712,13 +712,7 @@
       "northAmerica": "North America",
       "southAmerica": "South America",
       "africa": "Africa",
-      "oceania": "Oceania",
-      "Europe": "Europe",
-      "North America": "North America",
-      "Asia": "Asia",
-      "South America": "South America",
-      "Africa": "Africa",
-      "Oceania": "Oceania"
+      "oceania": "Oceania"
     },
     "valueLabel": "Value",
     "chartTypeBar": "Bar Chart",
@@ -901,5 +895,35 @@
   "Your_login_session_has_expired": "Your login session has expired.",
   "Redirecting_to_homepage_in_seconds": "Redirecting to homepage in {seconds} seconds...",
   "Session_Expired_Redirect_Home": "Session expired. Redirecting to home page...",
-  "Please_log_in_to_view_profile": "Please log in to view profile."
+  "Please_log_in_to_view_profile": "Please log in to view profile.",
+  "Chat_Mode_And_History": "Chat Mode & History",
+  "Close_panel": "Close panel",
+  "Open_Chat_Mode_and_hHstory": "Open Chat Mode & History",
+  "Open_settings": "Open settings",
+  "Stream_Response": "Stream Response",
+  "Settings": "Settings",
+  "Close_settings": "Close settings",
+  "Live_Stream_Output_Settings": "Live Stream Output Settings",
+  "Loading_history": "Loading history...",
+  "Starting_new_chat": "Starting new chat...",
+  "Sending": "Sending...",
+  "Chat_Mode": "Chat Mode",
+  "Live_Stream": "Live Stream",
+  "Regular_Chat": "Regular Chat",
+  "Chat_History": "Chat History",
+  "New_Chat": "New Chat",
+  "No_Conversations_Found": "No conversations found.",
+  "Select_language": "Select language",
+  "Output_Format": "Output Format",
+  "Audio": "Audio",
+  "Text": "Text",
+  "Voice": "Voice",
+  "Live_Chat_with_Our_Chatbot": "Live Chat with Our Chatbot",
+  "Engage_in_a_realtime_conversation_with_our_chatbot_using_voice": "Engage in a real-time conversation with our chatbot using voice.",
+  "Disconnected": "Disconnected",
+  "Connected": "Connected",
+  "Processing": "Processing...",
+  "Enter_message_Enter_to_send_Shift_Enter_to_go_to_new_line": "Enter message (Enter to send, Shift+Enter to go to new line)",
+  "Send_message": "Send message",
+  "Enter_message_Ctrl_Enter_to_send": "Enter message (Ctrl+Enter to send)"
 }

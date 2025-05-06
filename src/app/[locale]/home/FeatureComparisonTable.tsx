@@ -262,18 +262,16 @@ const FeatureComparisonTable: React.FC = () => {
   return (
     <div className='w-full px-0 py-12 md:px-12'>
       {/* Display the translated table title */}
-      <h2 className='mb-4 text-center text-xl font-semibold text-gray-800'>
-        {t('title')}
-      </h2>
+      <h2 className='mb-4 text-center text-xl font-semibold '>{t('title')}</h2>
       <div className='overflow-x-auto border border-gray-200 shadow-md sm:rounded-lg'>
-        <table className='w-full text-left text-sm text-gray-700'>
+        <table className='w-full text-left text-sm '>
           {/* Table Head */}
-          <thead className='bg-gray-100 text-xs uppercase text-gray-700'>
+          <thead className='bg-gray-100 text-xs uppercase dark:bg-gray-950 '>
             <tr>
               {/* Display translated headers */}
               <th
                 scope='col'
-                className='w-2/4 border-b border-gray-300 px-8 py-5'
+                className='w-2/4 border-b border-gray-300 px-8 py-5 '
               >
                 {t('headers.feature')}
               </th>
@@ -302,16 +300,16 @@ const FeatureComparisonTable: React.FC = () => {
               <tr
                 key={feature.id}
                 className={`border-b border-gray-200 last:border-b-0 ${
-                  featureIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                  featureIndex % 2 === 0
+                    ? 'bg-white dark:bg-black'
+                    : 'bg-gray-50 dark:bg-gray-800'
                 } transition-colors duration-150 hover:bg-gray-100`}
               >
                 {/* Feature Name Column */}
                 <td className='px-8 py-5 align-top'>
                   <div className='flex items-center space-x-2'>
                     {/* Display the translated feature name */}
-                    <span className='font-medium text-gray-900'>
-                      {tg(feature.nameKey)}
-                    </span>
+                    <span className='font-medium '>{tg(feature.nameKey)}</span>
                     {/* Conditionally render the "NEW" badge */}
                     {feature.isNew && <NewBadge />}
                     {/* Tooltip Trigger Area */}
@@ -320,11 +318,11 @@ const FeatureComparisonTable: React.FC = () => {
                       onMouseEnter={() => setActiveTooltipId(feature.id)}
                       onMouseLeave={() => setActiveTooltipId(null)}
                     >
-                      <InformationCircleIcon className='text-gray-400 hover:text-blue-600' />
+                      <InformationCircleIcon className=' hover:text-blue-600' />
                       {/* Conditionally render the tooltip */}
                       {activeTooltipId === feature.id && (
                         <div
-                          className='absolute left-full top-1/2 z-20 ml-2 w-64 max-w-xs -translate-y-1/2 rounded-md bg-gray-800 p-3 text-white shadow-lg'
+                          className='absolute left-full top-1/2 z-20 ml-2 w-64 max-w-xs -translate-y-1/2 rounded-md bg-gray-800 p-3  shadow-lg'
                           role='tooltip'
                         >
                           {/* Render tooltip content using the keys */}

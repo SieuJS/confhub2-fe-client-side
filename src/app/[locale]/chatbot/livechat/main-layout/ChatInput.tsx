@@ -5,6 +5,7 @@ import Button from '../../../utils/Button' // Assuming Button component path
 import { GrSend } from 'react-icons/gr'
 // Optional: Import a spinner component from a library
 // import { ClipLoader } from 'react-spinners'; // Example using react-spinners
+import { useTranslations } from 'next-intl'
 
 // --- Refined Tailwind Spinner SVG Component ---
 const SpinnerIcon = () => (
@@ -48,6 +49,8 @@ const ChatInput: React.FC<ChatInputProps> = ({
   disabled = false,
   isLoading = false
 }) => {
+  const t = useTranslations()
+
   const [message, setMessage] = useState<string>('')
   const inputRef = useRef<HTMLTextAreaElement>(null)
   // Không cần state isFocused nếu không sử dụng để thay đổi style phức tạp
@@ -115,15 +118,15 @@ const ChatInput: React.FC<ChatInputProps> = ({
     // --- Improved Styling ---
     <div
       className={`
-      flex w-full items-center p-1                   
-      transition-all duration-200 ease-in-out 
-      focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 rounded-full  
+      flex w-full items-center rounded-full                   
+      p-1 transition-all duration-200 
+      ease-in-out focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500  
 
     `}
     >
       <TextareaAutosize
         className='flex-grow resize-none bg-transparent px-4 py-2 text-sm text-gray-900 outline-none disabled:cursor-not-allowed' // Bỏ disabled:bg-gray-100 vì đã xử lý ở div cha
-        placeholder='Nhập tin nhắn (Ctrl+Enter để gửi)...'
+        placeholder={t('Enter_message_Ctrl_Enter_to_send')}
         value={message}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
@@ -142,7 +145,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
         rounded={true} // Giữ bo tròn
         onClick={handleSendMessage}
         disabled={isEffectivelyDisabled}
-        aria-label={isLoading ? 'Đang gửi...' : 'Gửi tin nhắn'}
+        aria-label={isLoading ? t('Sending') : t('Send_message')}
         className={`
          h-12                                
         `}

@@ -71,12 +71,10 @@ const ConsumerInsights: React.FC<ConsumerInsightsProps> = ({}) => {
           <h2 className='dark:text-button-dark mb-2 text-base font-semibold uppercase tracking-wider text-button'>
             {title}
           </h2>
-          <h3 className='mb-4 text-3xl font-bold leading-tight text-gray-900 dark:text-white md:text-4xl'>
+          <h3 className='mb-4 text-3xl font-bold leading-tight md:text-4xl'>
             {subtitle}
           </h3>
-          <p className='text-lg text-gray-600 dark:text-gray-300'>
-            {description}
-          </p>
+          <p className='text-lg'>{description}</p>
         </div>
 
         {/* Stats Cards Grid */}
@@ -106,7 +104,7 @@ const ConsumerInsights: React.FC<ConsumerInsightsProps> = ({}) => {
               {/* ^ ^ ^ ^ ^ ^ ^ ^ THIS IS THE FIX ^ ^ ^ ^ ^ ^ ^ */}
 
               {/* Label */}
-              <p className='mt-1 text-sm font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400'>
+              <p className='mt-1 text-sm font-medium uppercase tracking-wider '>
                 {stat.label}
               </p>
             </div>

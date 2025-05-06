@@ -712,13 +712,7 @@
       "northAmerica": "Bắc Mỹ",
       "southAmerica": "Nam Mỹ",
       "africa": "Châu Phi",
-      "oceania": "Châu Đại Dương",
-      "Europe": "Châu Âu",
-      "North America": "Bắc Mỹ",
-      "Asia": "Châu Á",
-      "South America": "Nam Mỹ",
-      "Africa": "Châu Phi",
-      "Oceania": "Châu Đại Dương"
+      "oceania": "Châu Đại Dương"
     },
     "valueLabel": "Giá trị",
     "chartTypeBar": "Biểu đồ cột",
