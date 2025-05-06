@@ -33,7 +33,7 @@ const LoginForm: React.FC<LoginFormProps> = (props: LoginFormProps) => {
       const accessToken = tokenResponse.access_token;
 
       // Step [3]: Send to backend
-      const res = await axios.post('http://localhost:3000/api/v1/auth/google', {
+      const res = await axios.post(appConfig.NEXT_PUBLIC_DATABASE_URL+'/api/v1/auth/google', {
         access_token: accessToken,
       });
 
