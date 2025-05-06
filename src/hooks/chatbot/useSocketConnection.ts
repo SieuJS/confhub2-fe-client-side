@@ -1,6 +1,6 @@
 // src/app/[locale]/hooks/chatbt/useSocketConnection.ts
-import { useState, useEffect, useRef, useCallback } from 'react';
-import io, { Socket, ManagerOptions, SocketOptions } from 'socket.io-client'; // Import ManagerOptions, SocketOptions if needed elsewhere
+import { useState, useEffect, useRef } from 'react';
+import io, { Socket } from 'socket.io-client'; // Import ManagerOptions, SocketOptions if needed elsewhere
 import { EmailConfirmationResult, StatusUpdate, ResultUpdate, ErrorUpdate, ChatUpdate, ConversationMetadata, InitialHistoryPayload } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Adjust path
 
 // Keep Interfaces the same, ensure EmailConfirmationResult is defined correctly in the model
