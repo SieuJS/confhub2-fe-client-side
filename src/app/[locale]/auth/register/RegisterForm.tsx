@@ -130,9 +130,9 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
 
   // --- Phần JSX (Bỏ phần hiển thị thông báo xác thực) ---
   return (
-    <div className='flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8'>
+    <div className='flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-12 dark:bg-gray-800 sm:px-6 lg:px-8'>
       <div className='w-full max-w-xl'>
-        <div className='bg-white px-8 py-10 shadow-xl sm:rounded-lg sm:px-16'>
+        <div className='bg-white px-8 py-10 shadow-xl dark:bg-gray-900 sm:rounded-lg sm:px-16'>
           {/* Chỉ hiển thị form đăng ký */}
           <div className='space-y-8'>
             <div className='space-y-2 text-center'>
@@ -148,7 +148,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
                 <div>
                   <label
                     htmlFor='firstname'
-                    className='block text-sm font-medium text-gray-700'
+                    className='block text-sm font-medium '
                   >
                     {t('First_Name')} <span className='text-red-500'>*</span>
                   </label>
@@ -168,7 +168,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
                 <div>
                   <label
                     htmlFor='lastname'
-                    className='block text-sm font-medium text-gray-700'
+                    className='block text-sm font-medium '
                   >
                     {t('Last_Name')} <span className='text-red-500'>*</span>
                   </label>
@@ -187,10 +187,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
                 </div>
               </div>
               <div>
-                <label
-                  htmlFor='dob'
-                  className='block text-sm font-medium text-gray-700'
-                >
+                <label htmlFor='dob' className='block text-sm font-medium '>
                   {t('Date_of_Birth')} <span className='text-red-500'>*</span>
                 </label>
                 <div className='mt-1'>
@@ -207,10 +204,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
                 </div>
               </div>
               <div>
-                <label
-                  htmlFor='email'
-                  className='block text-sm font-medium text-gray-700'
-                >
+                <label htmlFor='email' className='block text-sm font-medium '>
                   {t('Email')} <span className='text-red-500'>*</span>
                 </label>
                 <div className='mt-1'>
@@ -230,7 +224,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
               <div>
                 <label
                   htmlFor='password'
-                  className='block text-sm font-medium text-gray-700'
+                  className='block text-sm font-medium '
                 >
                   {t('Password')} <span className='text-red-500'>*</span>
                 </label>
@@ -250,7 +244,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
               <div>
                 <label
                   htmlFor='confirmPassword'
-                  className='block text-sm font-medium text-gray-700'
+                  className='block text-sm font-medium '
                 >
                   {t('Confirm_Password')}{' '}
                   <span className='text-red-500'>*</span>

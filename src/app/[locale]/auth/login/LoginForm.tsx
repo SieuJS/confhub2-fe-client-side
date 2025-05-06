@@ -10,7 +10,7 @@ type LoginFormProps = {
   redirectUri: string
 }
 
-const LoginForm: React.FC<LoginFormProps> = ( props: LoginFormProps ) => {
+const LoginForm: React.FC<LoginFormProps> = (props: LoginFormProps) => {
   const t = useTranslations('')
 
   const {
@@ -30,9 +30,9 @@ const LoginForm: React.FC<LoginFormProps> = ( props: LoginFormProps ) => {
   })
 
   return (
-    <div className='flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8'>
+    <div className='flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-12 dark:bg-gray-800 sm:px-6 lg:px-8'>
       <div className='w-full max-w-xl'>
-        <div className='bg-white px-8 py-10 shadow-xl sm:rounded-lg sm:px-16'>
+        <div className='bg-white px-8 py-10 shadow-xl dark:bg-gray-900 sm:rounded-lg sm:px-16'>
           <div className='space-y-8'>
             <div className='space-y-2 text-center'>
               <h1 className='mx-auto max-w-fit text-xl font-bold tracking-tight sm:text-2xl md:text-3xl'>
@@ -45,7 +45,7 @@ const LoginForm: React.FC<LoginFormProps> = ( props: LoginFormProps ) => {
               <a
                 type='button'
                 href={`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/google?redirect=${props.redirectUri}`}
-                className='flex w-full items-center justify-center space-x-2 rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium  shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
+                className='flex w-full items-center justify-center space-x-2 rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium shadow-sm  hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:bg-gray-800'
               >
                 <svg className='h-5 w-5' viewBox='0 0 24 24'>
                   <path
@@ -74,7 +74,9 @@ const LoginForm: React.FC<LoginFormProps> = ( props: LoginFormProps ) => {
                 <div className='w-full border-t border-gray-300' />
               </div>
               <div className='relative flex justify-center text-sm'>
-                <span className='bg-white px-2 '>{t('or')}</span>
+                <span className='bg-white px-2 dark:bg-gray-900 '>
+                  {t('or')}
+                </span>
               </div>
             </div>
 
