@@ -4,25 +4,25 @@ import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/src/navigation'
 import ReactECharts from 'echarts-for-react'
-import * as echarts from 'echarts/core' // Import core echarts
+import * as echarts from 'echarts/core'
 import { BarChart, PieChart, LineChart } from 'echarts/charts'
 import {
   TitleComponent,
   TooltipComponent,
   GridComponent,
-  LegendComponent,
-  MarkLineComponent // Import MarkLine if needed later, not strictly for basic charts
+  LegendComponent
+  // MarkLineComponent // Không cần thiết nếu không dùng
 } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
-import type { EChartsOption } from 'echarts' // Import EChartsOption type
+import type { EChartsOption } from 'echarts'
 
-// Register necessary components
+// Register necessary components (Giữ nguyên)
 echarts.use([
   TitleComponent,
   TooltipComponent,
   GridComponent,
   LegendComponent,
-  MarkLineComponent,
+  // MarkLineComponent, // Chỉ đăng ký nếu dùng
   BarChart,
   PieChart,
   LineChart,
@@ -31,7 +31,7 @@ echarts.use([
 
 // --- Định nghĩa interface và dữ liệu mẫu giữ nguyên ---
 interface ContinentData {
-  id: string
+  id: string // ID gốc (ví dụ: 'northAmerica')
   value: number
   colorHex: string
 }
@@ -91,6 +91,7 @@ const IntroduceVisualization: React.FC = () => {
     const intervalId = setInterval(() => {
       setCurrentChartTypeIndex(prevIndex => {
         const nextTypeIndex = (prevIndex + 1) % chartTypes.length
+        // Chỉ chuyển dataset khi hoàn thành 1 vòng lặp qua các loại biểu đồ
         if (nextTypeIndex === 0) {
           setCurrentDataSetIndex(
             prevDataIndex => (prevDataIndex + 1) % sampleDataSets.length
@@ -104,12 +105,17 @@ const IntroduceVisualization: React.FC = () => {
   }, [])
 
   // ----- Helper Function cho định dạng tên lục địa (Giữ nguyên) -----
+  // Hàm này nhận ID gốc và dịch
   const formatAxisTick = (tickItem: string): string => {
     try {
       // Sử dụng tên id làm key dịch
       return t(`continent.${tickItem}`)
     } catch (e) {
-      console.warn(`Missing translation for continent.${tickItem}`)
+      // Log cảnh báo rõ ràng hơn
+      console.warn(
+        `next-intl MISSING_MESSAGE: Could not resolve IntroduceVisualization.continent.${tickItem}. Check your messages file.`,
+        e
+      )
       return tickItem // Fallback về id nếu không có bản dịch
     }
   }
@@ -117,26 +123,33 @@ const IntroduceVisualization: React.FC = () => {
   // ----- Hàm tạo ECharts Option -----
   const getEchartsOption = (): EChartsOption => {
     const baseOption: EChartsOption = {
-      // Cấu hình cơ bản có thể áp dụng cho nhiều loại biểu đồ
       grid: {
         left: '3%',
         right: '4%',
-        bottom: chartType === 'pie' ? '15%' : '18%', // Tăng bottom cho Pie để chứa legend
+        bottom: chartType === 'pie' ? '15%' : '18%',
         top: '5%',
-        containLabel: true // Đảm bảo label không bị cắt
+        containLabel: true
       },
       tooltip: {
-        trigger: chartType === 'pie' ? 'item' : 'axis', // Trigger khác nhau cho Pie và các loại khác
+        trigger: chartType === 'pie' ? 'item' : 'axis',
+        // --- START: MODIFIED TOOLTIP FORMATTER ---
         formatter: (params: any) => {
-          // Echarts formatter nhận params khác Recharts
+          // Echarts formatter nhận params khác Recharts.
+          // Đối với trigger='axis', params là mảng. Đối với trigger='item', params là đối tượng.
           const param = Array.isArray(params) ? params[0] : params
           if (!param || param.value === undefined || param.value === null) {
             return ''
           }
-          const continentId = param.name || param.data?.id // Lấy id từ name (axis) hoặc data (pie)
-          const continentName = formatAxisTick(continentId)
+
+          // Lấy ID gốc từ data.id đã thêm vào series data points
+          const originalId = param.data?.id
+          // Sử dụng ID gốc để dịch
+          const continentName = originalId
+            ? t(`continent.${originalId}`)
+            : param.name || t('unknown')
+
           const value = param.value
-          const color = param.color || param.data?.itemStyle?.color // Lấy màu
+          const color = param.color || param.data?.itemStyle?.color // Lấy màu từ param.color (axis) hoặc param.data.itemStyle.color (item)
 
           // Tạo HTML tooltip đơn giản
           return `
@@ -149,11 +162,12 @@ const IntroduceVisualization: React.FC = () => {
             </div>
           `
         },
-        backgroundColor: 'transparent', // Để style bằng CSS class ở trên
+        // --- END: MODIFIED TOOLTIP FORMATTER ---
+        backgroundColor: 'transparent',
         borderColor: 'transparent',
-        padding: 0 // Bỏ padding mặc định của ECharts
+        padding: 0
       },
-      animationDuration: 500, // Giữ animation duration
+      animationDuration: 500,
       animationEasing: 'cubicInOut'
     }
 
@@ -161,25 +175,28 @@ const IntroduceVisualization: React.FC = () => {
     switch (chartType) {
       case 'bar': {
         const categories = chartData.map(item => formatAxisTick(item.id))
+        // --- START: MODIFIED BAR SERIES DATA ---
         const seriesData = chartData.map(item => ({
           value: item.value,
+          id: item.id, // Thêm ID gốc vào data point
           itemStyle: {
             color: item.colorHex,
-            borderRadius: [4, 4, 0, 0] // Tương đương radius của Recharts Bar
+            borderRadius: [4, 4, 0, 0]
           }
         }))
+        // --- END: MODIFIED BAR SERIES DATA ---
 
         return {
           ...baseOption,
           xAxis: {
             type: 'category',
-            data: categories,
+            data: categories, // Trục X hiển thị tên đã dịch
             axisLabel: {
-              interval: 0, // Hiển thị tất cả các label
-              rotate: -30, // Xoay label
+              interval: 0,
+              rotate: -30,
               fontSize: 10,
               color: '#6b7280',
-              margin: 12 // Khoảng cách từ label đến trục (tương đương dy)
+              margin: 12
             },
             axisTick: {
               alignWithLabel: true
@@ -192,7 +209,6 @@ const IntroduceVisualization: React.FC = () => {
               color: '#6b7280'
             },
             splitLine: {
-              // Tương đương CartesianGrid ngang
               lineStyle: {
                 type: 'dashed',
                 color: '#e5e7eb'
@@ -201,10 +217,10 @@ const IntroduceVisualization: React.FC = () => {
           },
           series: [
             {
-              name: t('valueLabel'), // Tên series (hiển thị trong tooltip nếu có nhiều series)
+              name: t('valueLabel'),
               type: 'bar',
-              data: seriesData,
-              barWidth: '60%' // Điều chỉnh độ rộng cột nếu cần
+              data: seriesData, // Dữ liệu series chứa cả value và id
+              barWidth: '60%'
             }
           ]
         }
@@ -212,12 +228,12 @@ const IntroduceVisualization: React.FC = () => {
 
       case 'pie': {
         const pieData = chartData.map(item => ({
-          name: formatAxisTick(item.id), // Tên hiển thị trong legend và tooltip
+          name: formatAxisTick(item.id), // Tên hiển thị (đã dịch)
           value: item.value,
-          id: item.id, // Giữ lại id gốc nếu cần tham chiếu
+          id: item.id, // Giữ lại id gốc - Cái này bạn đã làm đúng
           itemStyle: {
             color: item.colorHex,
-            borderColor: item.colorHex, // Thêm border để giống Recharts Cell
+            borderColor: item.colorHex,
             borderWidth: 1
           }
         }))
@@ -227,47 +243,39 @@ const IntroduceVisualization: React.FC = () => {
           tooltip: {
             // Override tooltip trigger for pie
             trigger: 'item',
-            formatter: !Array.isArray(baseOption.tooltip)
+            formatter: !Array.isArray(baseOption.tooltip) // Đảm bảo lấy đúng formatter đã sửa
               ? baseOption.tooltip?.formatter
-              : undefined // Sử dụng lại formatter đã định nghĩa nếu không phải là mảng
+              : undefined
           },
           legend: {
-            type: 'scroll', // Cho phép cuộn nếu legend quá dài
+            type: 'scroll',
             orient: 'horizontal',
-            bottom: '2%', // Đặt legend ở dưới cùng
+            bottom: '2%',
             left: 'center',
-            itemWidth: 10, // Kích thước icon legend
+            itemWidth: 10,
             itemHeight: 10,
-            icon: 'circle', // Hình dạng icon legend
+            icon: 'circle',
             textStyle: {
               fontSize: 10,
               color: '#6b7280'
             },
-            // ECharts tự động lấy data và màu từ series.data cho Pie
-            // Không cần formatter phức tạp như Recharts renderCustomLegend
             data: pieData.map(item => ({
+              // ECharts lấy tên legend từ series.data.name
               name: item.name,
-              itemStyle: { color: item.itemStyle.color } // Đảm bảo màu legend đúng
+              itemStyle: { color: item.itemStyle.color }
             }))
           },
           series: [
             {
               name: t('valueLabel'),
               type: 'pie',
-              radius: ['40%', '70%'], // Tương đương innerRadius, outerRadius
-              center: ['50%', '45%'], // Điều chỉnh vị trí tâm Pie
-              avoidLabelOverlap: true, // Tránh label chồng chéo (nếu hiển thị label)
+              radius: ['40%', '70%'],
+              center: ['50%', '45%'],
+              avoidLabelOverlap: true,
               label: {
-                show: false // Ẩn label mặc định trên lát bánh
-                // position: 'center' // Có thể hiển thị ở giữa nếu cần
+                show: false
               },
               emphasis: {
-                // Hiệu ứng khi hover
-                label: {
-                  // show: true, // Hiển thị label khi hover nếu muốn
-                  // fontSize: '14',
-                  // fontWeight: 'bold'
-                },
                 itemStyle: {
                   shadowBlur: 10,
                   shadowOffsetX: 0,
@@ -275,13 +283,12 @@ const IntroduceVisualization: React.FC = () => {
                 }
               },
               labelLine: {
-                show: false // Ẩn đường nối label
+                show: false
               },
-              data: pieData,
+              data: pieData, // Dữ liệu series chứa name (đã dịch) và id (gốc)
               itemStyle: {
-                // Thêm khoảng cách giữa các lát bánh
-                borderWidth: 2, // Điều chỉnh độ rộng khoảng cách
-                borderColor: '#ffffff' // Màu của khoảng cách (thường là màu nền)
+                borderWidth: 2,
+                borderColor: '#ffffff'
               }
             }
           ]
@@ -290,13 +297,23 @@ const IntroduceVisualization: React.FC = () => {
 
       case 'line': {
         const categories = chartData.map(item => formatAxisTick(item.id))
-        const seriesData = chartData.map(item => item.value)
+        // --- START: MODIFIED LINE SERIES DATA ---
+        // Line chart có thể dùng mảng giá trị, nhưng dùng mảng object tốt hơn cho tooltip
+        const seriesData = chartData.map(item => ({
+          value: item.value,
+          id: item.id, // Thêm ID gốc vào data point
+          itemStyle: {
+            // Thêm itemStyle để màu điểm có thể lấy từ đây
+            color: item.colorHex
+          }
+        }))
+        // --- END: MODIFIED LINE SERIES DATA ---
 
         return {
           ...baseOption,
           xAxis: {
             type: 'category',
-            data: categories,
+            data: categories, // Trục X hiển thị tên đã dịch
             axisLabel: {
               interval: 0,
               rotate: -30,
@@ -325,29 +342,28 @@ const IntroduceVisualization: React.FC = () => {
             {
               name: t('valueLabel'),
               type: 'line',
-              smooth: true, // Tương đương type='monotone' của Recharts
-              data: seriesData,
-              showSymbol: true, // Hiển thị các điểm (dot)
-              symbol: 'circle', // Hình dạng điểm
-              symbolSize: 6, // Kích thước điểm (tương đương r=3)
+              smooth: true,
+              data: seriesData, // Dữ liệu series chứa cả value và id
+              showSymbol: true,
+              symbol: 'circle',
+              symbolSize: 6,
               lineStyle: {
-                color: '#3b82f6', // Màu đường line
+                color: '#3b82f6', // Có thể lấy màu từ itemStyle nếu muốn mỗi điểm/đường 1 màu
                 width: 2
               },
               itemStyle: {
-                // Style cho điểm (dot)
-                color: '#3b82f6', // Màu nền điểm
-                borderColor: '#ffffff', // Màu viền điểm
+                // Style cho điểm (dot) - sử dụng màu từ data point nếu có
+                color: (params: any) =>
+                  params.data?.itemStyle?.color || '#3b82f6', // Sử dụng màu từ data point nếu có, fallback màu mặc định
+                borderColor: '#ffffff',
                 borderWidth: 1
               },
               emphasis: {
-                // Style khi hover (tương đương activeDot)
-                focus: 'series', // Làm nổi bật cả series khi hover
+                focus: 'series',
                 itemStyle: {
                   // symbolSize: 8,
                   borderWidth: 2,
                   borderColor: '#ffffff'
-                  // color: '#3b82f6' // Màu giữ nguyên
                 }
               }
             }
@@ -355,11 +371,11 @@ const IntroduceVisualization: React.FC = () => {
         }
       }
       default:
-        return baseOption // Trả về option cơ bản nếu không khớp loại nào
+        return baseOption
     }
   }
 
-  // ----- Render biểu đồ bằng ECharts -----
+  // --- Render biểu đồ (Giữ nguyên) ---
   const renderChart = () => {
     if (!isClient) {
       return (
@@ -373,14 +389,14 @@ const IntroduceVisualization: React.FC = () => {
 
     return (
       <div
-        key={chartType} // Key để trigger animation khi chartType thay đổi
-        className='animate-fade-simple h-full w-full' // Sử dụng lại class fade
+        key={chartType + '-' + currentDataSetIndex} // Thêm dataset index vào key để đảm bảo re-render khi dataset thay đổi
+        className='animate-fade-simple h-full w-full'
       >
         <ReactECharts
-          echarts={echarts} // Truyền instance echarts đã import
+          echarts={echarts}
           option={option}
-          notMerge={true} // Quan trọng: không merge option cũ và mới, thay thế hoàn toàn
-          lazyUpdate={true} // Cập nhật lazy để tối ưu performance
+          notMerge={true}
+          lazyUpdate={true}
           style={{ height: '100%', width: '100%' }}
         />
       </div>
@@ -399,7 +415,7 @@ const IntroduceVisualization: React.FC = () => {
   return (
     <section
       aria-labelledby='visualization-intro-heading'
-      className='m-0 rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 p-6 shadow-lg md:m-12 md:p-4'
+      className='m-0 rounded-xl border border-gray-200 bg-gray-50 p-6 shadow-lg dark:bg-gray-900 md:m-12 md:p-4'
     >
       {/* --- CSS Keyframes cho fade (Giữ nguyên) --- */}
       <style>{`
@@ -417,16 +433,14 @@ const IntroduceVisualization: React.FC = () => {
         <div className='text-center lg:w-1/2 lg:text-left'>
           <h2
             id='visualization-intro-heading'
-            className='mb-4 text-3xl font-bold text-gray-800 md:text-4xl'
+            className='mb-4 text-3xl font-bold  md:text-4xl'
           >
             {t('heading')}
           </h2>
-          <p className='mb-6 text-lg leading-relaxed text-gray-600'>
-            {t('description')}
-          </p>
+          <p className='mb-6 text-lg leading-relaxed '>{t('description')}</p>
           <Link
             href={`/visualization`}
-            className='group inline-flex items-center justify-center rounded-lg bg-button px-6 py-3 font-semibold text-white shadow-md transition duration-150 ease-in-out hover:bg-button focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+            className='group inline-flex items-center justify-center rounded-lg bg-button px-6 py-3 font-semibold  shadow-md transition duration-150 ease-in-out hover:bg-button focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
             aria-label={t('buttonAriaLabel')}
           >
             <span>{t('buttonText')}</span>
@@ -448,10 +462,9 @@ const IntroduceVisualization: React.FC = () => {
           </Link>
         </div>
 
-        {/* Phần hiển thị biểu đồ mô phỏng (Sử dụng ECharts) */}
+        {/* Phần hiển thị biểu đồ mô phỏng */}
         <div className='mt-8 w-full lg:mt-0 lg:w-1/2'>
           <div className='relative flex h-80 items-center justify-center overflow-hidden rounded-lg p-2 lg:h-96'>
-            {/* Render biểu đồ ECharts */}
             {renderChart()}
           </div>
           <p className='mt-3 text-center text-sm italic '>
