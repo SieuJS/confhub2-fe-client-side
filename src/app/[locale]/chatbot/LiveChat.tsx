@@ -207,11 +207,7 @@ export default function LiveChatExperience({
 
   // --- Context and Store Hooks ---
   const { client, volume, on, off, setConfig } = useLiveAPIContext()
-  const {
-    log,
-    clearLogs,
-    logs
-  } = useLoggerStore() // <-- Get logs array from store
+  const { log, clearLogs, logs } = useLoggerStore() // <-- Get logs array from store
 
   // --- State ---
   const loggerRef = useRef<HTMLDivElement>(null)
@@ -345,7 +341,7 @@ export default function LiveChatExperience({
   const shouldShowRestartButton = connectionStatusType === 'error'
 
   return (
-    <div className='relative flex h-full flex-col rounded-xl border-2 bg-white shadow-inner'>
+    <div className='relative flex h-full flex-col rounded-xl border-2 bg-white shadow-inner dark:bg-gray-800'>
       <LiveChatAPIConfig
         outputModality={currentModality}
         selectedVoice={currentVoice}
@@ -387,7 +383,7 @@ export default function LiveChatExperience({
         )}
       </div>
 
-      <div className='m-4 flex items-center gap-2 rounded-full border border-gray-300 bg-gray-100 p-1.5'>
+      <div className='m-4 flex items-center gap-2 rounded-full border border-gray-200 bg-gray-100 p-1.5 dark:border-gray-600 dark:bg-gray-950'>
         <ConnectionButton
           connected={connected}
           connect={connectWithPermissions}

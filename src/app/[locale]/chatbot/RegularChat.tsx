@@ -119,10 +119,10 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
 
   // --- JSX Structure ---
   return (
-    <div className='relative mx-auto flex h-full w-full flex-col rounded-xl border border-gray-200 bg-white shadow-xl'>
+    <div className='relative mx-auto flex h-full w-full flex-col rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-600 dark:bg-black'>
       {/* Header */}
-      <div className='flex-shrink-0 border-b border-gray-200 bg-gray-50 p-2'>
-        <div className='flex items-center justify-center space-x-1 text-center text-xs text-gray-500'>
+      <div className='flex-shrink-0 border-b border-gray-200 bg-gray-50 p-2 dark:border-gray-600 dark:bg-gray-900'>
+        <div className='flex items-center justify-center space-x-1 text-center text-xs '>
           <span
             className={`h-2 w-2 rounded-full ${isConnected ? 'animate-pulse bg-green-500' : 'bg-red-500'}`}
           ></span>
@@ -136,7 +136,7 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
       {/* Chat History Area */}
       <div
         ref={chatHistoryRef}
-        className='flex-grow space-y-4 overflow-y-auto bg-gradient-to-b from-white to-gray-50 p-4 md:p-6'
+        className='flex-grow space-y-4 overflow-y-auto bg-gray-50  p-4 dark:bg-gray-900 md:p-6'
       >
         {showIntroduction && (
           <ChatIntroductionDisplay
@@ -151,7 +151,7 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
       {/* Có thể muốn hiển thị loading indicator riêng khi isLoadingHistory */}
       {(loadingState.isLoading || isLoadingHistory) &&
         !showConfirmationDialog && (
-          <div className='flex-shrink-0 border-t border-gray-100 bg-gray-50 px-4 py-2'>
+          <div className='flex-shrink-0 border-t border-gray-200 bg-gray-50 px-4 py-2   dark:border-gray-600 dark:bg-gray-900'>
             <LoadingIndicator
               step={isLoadingHistory ? 'loading_history' : loadingState.step}
               message={
@@ -163,10 +163,10 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
         )}
 
       {/* Streaming Toggle UI - Disable while dialog is shown */}
-      <div className='flex flex-shrink-0 items-center justify-end space-x-2 border-t border-gray-100 bg-gray-50 px-4 pb-1 pt-2'>
+      <div className='flex flex-shrink-0 items-center justify-end space-x-2 border-t border-gray-200 bg-gray-50 px-4 pb-1  pt-2 dark:border-gray-600 dark:bg-gray-900'>
         <label
           htmlFor='streaming-toggle'
-          className={`text-sm text-gray-600 ${loadingState.isLoading || showConfirmationDialog ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+          className={`text-sm  ${loadingState.isLoading || showConfirmationDialog ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
         >
           {t('Stream_Response')}:
         </label>
@@ -183,7 +183,7 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
       </div>
 
       {/* Input Area - Disable while dialog is shown */}
-      <div className='flex-shrink-0 border-t border-gray-200 bg-gray-50 p-3 pt-2 md:p-4'>
+      <div className='flex-shrink-0 border-t border-gray-200 bg-gray-50  p-3 pt-2  dark:border-gray-600 dark:bg-gray-900 md:p-4'>
         <ChatInput
           onSendMessage={sendChatMessage}
           // Disable input when loading, disconnected, OR when confirmation dialog is shown

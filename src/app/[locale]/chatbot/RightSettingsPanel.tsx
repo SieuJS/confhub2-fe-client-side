@@ -55,7 +55,7 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
 
   return (
     <div
-      className={`h-full flex-shrink-0 overflow-hidden bg-white text-gray-800 shadow-xl transition-all duration-300 ease-in-out ${
+      className={`h-full flex-shrink-0 overflow-hidden bg-white shadow-xl transition-all duration-300 ease-in-out  dark:bg-gray-900 ${
         isOpen ? 'w-72 opacity-100' : 'w-0 opacity-0'
       }`}
       aria-hidden={!isOpen}
@@ -63,19 +63,16 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
       {/* Inner Content Wrapper */}
       <div className='flex h-full min-w-[18rem] flex-col overflow-y-auto p-5'>
         {/* Header for Right Panel */}
-        <div className='flex flex-shrink-0 items-center justify-between border-b border-gray-200 pb-4'>
+        <div className='flex flex-shrink-0 items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-600'>
           <div className='flex items-center space-x-2'>
-            <Settings size={20} className='text-gray-600' />
-            <h2
-              id='right-panel-title'
-              className='text-lg font-semibold text-gray-900'
-            >
+            <Settings size={20} className='' />
+            <h2 id='right-panel-title' className='text-lg font-semibold '>
               {t('Settings')}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className='flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1'
+            className='flex h-8 w-8 items-center justify-center rounded-full  hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:hover:bg-black dark:hover:text-gray-300'
             title='Close settings'
             aria-label='Close settings'
           >

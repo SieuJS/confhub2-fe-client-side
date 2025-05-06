@@ -22,7 +22,7 @@ const OutputFormatSelector: React.FC<OutputFormatSelectorProps> = ({
 
   return (
     <div>
-      <label className='mb-3 block text-sm font-medium text-gray-700'>
+      <label className='mb-3 block text-sm font-medium '>
         {t('Output_Format')}
       </label>
       <div className='grid grid-cols-2 gap-3'>
@@ -30,17 +30,17 @@ const OutputFormatSelector: React.FC<OutputFormatSelectorProps> = ({
           type='button'
           onClick={() => onModalityChange('audio')}
           disabled={disabled} // Apply disabled prop
-          className={`group flex flex-col items-center justify-center rounded-lg border p-3 transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 ${isAudioSelected ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50'}`}
+          className={`group flex flex-col items-center justify-center rounded-lg border p-3 transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 ${isAudioSelected ? 'border-blue-500 bg-gray-100 ring-1 ring-blue-500 dark:bg-gray-950' : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50 dark:bg-gray-900'}`}
           aria-pressed={isAudioSelected}
         >
           <Volume2
             stroke='currentColor'
-            className={`mb-1 h-6 w-6 ${isAudioSelected ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'}`}
+            className={`mb-1 h-6 w-6 ${isAudioSelected ? 'text-blue-600' : '0 group-hover:text-gray-500'}`}
             aria-hidden='true'
             size={24}
           />
           <span
-            className={`text-sm font-medium ${isAudioSelected ? 'text-blue-700' : 'text-gray-700 group-hover:text-gray-800'}`}
+            className={`text-sm font-medium ${isAudioSelected ? 'text-blue-700' : ' group-hover:text-gray-500'}`}
           >
             {' '}
             {t('Audio')}{' '}
@@ -50,17 +50,17 @@ const OutputFormatSelector: React.FC<OutputFormatSelectorProps> = ({
           type='button'
           onClick={() => onModalityChange('text')}
           disabled={disabled} // Apply disabled prop
-          className={`group flex flex-col items-center justify-center rounded-lg border p-3 transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 ${isTextSelected ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50'}`}
+          className={`group flex flex-col items-center justify-center rounded-lg border p-3 transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 ${isTextSelected ? 'border-blue-500 bg-gray-100 ring-1 ring-blue-500 dark:bg-gray-950' : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50 dark:bg-gray-900'}`}
           aria-pressed={isTextSelected}
         >
           <Text
             stroke='currentColor'
-            className={`mb-1 h-6 w-6 ${isTextSelected ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'}`}
+            className={`mb-1 h-6 w-6 ${isTextSelected ? 'text-blue-600' : ' group-hover:text-gray-500'}`}
             aria-hidden='true'
             size={24}
           />
           <span
-            className={`text-sm font-medium ${isTextSelected ? 'text-blue-700' : 'text-gray-700 group-hover:text-gray-800'}`}
+            className={`text-sm font-medium ${isTextSelected ? 'text-blue-700' : ' group-hover:text-gray-500'}`}
           >
             {' '}
             {t('Text')}{' '}

@@ -125,7 +125,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
     `}
     >
       <TextareaAutosize
-        className='flex-grow resize-none bg-transparent px-4 py-2 text-sm text-gray-900 outline-none disabled:cursor-not-allowed' // Bỏ disabled:bg-gray-100 vì đã xử lý ở div cha
+        className='flex-grow resize-none bg-transparent px-4 py-2 text-sm  outline-none disabled:cursor-not-allowed' // Bỏ disabled:bg-gray-100 vì đã xử lý ở div cha
         placeholder={t('Enter_message_Ctrl_Enter_to_send')}
         value={message}
         onChange={handleInputChange}

@@ -62,7 +62,7 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
     <div className='mb-6'>
       <label
         id='language-select-label'
-        className='mb-2 block text-sm font-medium text-gray-700'
+        className='mb-2 block text-sm font-medium '
       >
         {t('Language')}
       </label>
@@ -71,7 +71,7 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
           type='button'
           disabled={disabled}
           onClick={() => setIsOpen(!isOpen)}
-          className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:opacity-70'
+          className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:opacity-70 dark:bg-gray-900'
           aria-haspopup='listbox'
           aria-expanded={isOpen}
           aria-labelledby='language-select-label'
@@ -87,19 +87,15 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
                   className='mr-2 h-auto w-[20px] flex-shrink-0 rounded-sm'
                   loading='lazy'
                 />
-                <span className='block truncate text-gray-900'>
-                  {selectedLanguage.name}
-                </span>
+                <span className='block truncate '>{selectedLanguage.name}</span>
               </>
             ) : (
-              <span className='block truncate text-gray-500'>
-                {t('Select_language')}
-              </span>
+              <span className='block truncate '>{t('Select_language')}</span>
             )}
           </span>
           <span className='pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2'>
             <ChevronDown
-              className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+              className={`h-5 w-5  transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
               aria-hidden='true'
             />
           </span>
@@ -109,7 +105,7 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
           <div
             role='listbox'
             aria-labelledby='language-select-label'
-            className='absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm'
+            className='absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-900 sm:text-sm'
           >
             {availableLanguages.map(lang => (
               <button
@@ -119,10 +115,10 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
                 aria-selected={currentLanguage === lang.code}
                 onClick={() => handleSelect(lang.code)}
                 disabled={disabled} // Keep disabled state consistent
-                className={`relative w-full cursor-default select-none py-2 pl-3 pr-9 text-left hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50 ${
+                className={`relative w-full cursor-default select-none py-2 pl-3 pr-9 text-left hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700 ${
                   currentLanguage === lang.code
-                    ? 'bg-blue-50 font-semibold text-blue-700'
-                    : 'text-gray-900'
+                    ? 'bg-blue-50 font-semibold text-blue-700 dark:bg-gray-800'
+                    : ''
                 }`}
               >
                 <div className='flex items-center'>

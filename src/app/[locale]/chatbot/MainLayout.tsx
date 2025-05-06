@@ -89,12 +89,12 @@ export default function MainLayout({
   }
 
   return (
-    <div className='flex h-screen overflow-hidden bg-gray-100'>
+    <div className='flex h-screen overflow-hidden bg-gray-100 dark:bg-gray-800'>
       {/* Toggle Button for Left Panel */}
       {!isLeftPanelOpen && (
         <button
           onClick={() => setIsLeftPanelOpen(true)}
-          className='fixed left-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-600 shadow-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+          className='fixed left-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-gray-950 dark:hover:text-gray-600'
           title='Open chat mode & history' // Updated title
           aria-label='Open chat mode & history' // Updated label
           aria-expanded={isLeftPanelOpen}
@@ -149,7 +149,7 @@ export default function MainLayout({
       {!isRightPanelOpen && (
         <button
           onClick={() => setIsRightPanelOpen(true)}
-          className='fixed right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-600 shadow-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+          className='fixed right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-gray-950 dark:hover:text-gray-600'
           title='Open settings'
           aria-label='Open settings'
           aria-expanded={isRightPanelOpen}

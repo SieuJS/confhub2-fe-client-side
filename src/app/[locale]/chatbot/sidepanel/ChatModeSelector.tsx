@@ -19,7 +19,7 @@ const ChatModeSelector: React.FC<ChatModeSelectorProps> = ({
 
   return (
     <div className='mb-6'>
-      <label className='mb-3 block text-sm font-medium text-gray-700'>
+      <label className='mb-3 block text-sm font-medium '>
         {t('Chat_Mode')}
       </label>
       <div className='grid grid-cols-2 gap-3'>
@@ -29,17 +29,17 @@ const ChatModeSelector: React.FC<ChatModeSelectorProps> = ({
           disabled={disabled}
           className={`group flex flex-col items-center justify-center rounded-lg border p-3 transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 ${
             currentChatMode === 'live'
-              ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
-              : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50'
+              ? 'border-blue-500 bg-gray-100 ring-1 ring-blue-500 dark:bg-gray-950'
+              : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50 dark:bg-gray-900'
           }`}
           aria-pressed={currentChatMode === 'live'}
         >
           <Radio
             size={24}
-            className={`mb-1 ${currentChatMode === 'live' ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'}`}
+            className={`mb-1 ${currentChatMode === 'live' ? 'text-blue-600' : ' group-hover:text-gray-500'}`}
           />
           <span
-            className={`text-sm font-medium ${currentChatMode === 'live' ? 'text-blue-700' : 'text-gray-700 group-hover:text-gray-800'}`}
+            className={`text-sm font-medium ${currentChatMode === 'live' ? 'text-blue-700' : 'group-hover:text-gray-500'}`}
           >
             {t('Live_Stream')}
           </span>
@@ -50,17 +50,17 @@ const ChatModeSelector: React.FC<ChatModeSelectorProps> = ({
           disabled={disabled}
           className={`group flex flex-col items-center justify-center rounded-lg border p-3 transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 ${
             currentChatMode === 'regular'
-              ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
-              : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50'
+              ? 'border-blue-500 bg-gray-100 ring-1 ring-blue-500 dark:bg-gray-950'
+              : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50 dark:bg-gray-900'
           }`}
           aria-pressed={currentChatMode === 'regular'}
         >
           <Bot
             size={24}
-            className={`mb-1 ${currentChatMode === 'regular' ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'}`}
+            className={`mb-1 ${currentChatMode === 'regular' ? 'text-blue-600' : ' group-hover:text-gray-500'}`}
           />
           <span
-            className={`text-sm font-medium ${currentChatMode === 'regular' ? 'text-blue-700' : 'text-gray-700 group-hover:text-gray-800'}`}
+            className={`text-sm font-medium ${currentChatMode === 'regular' ? 'text-blue-700' : 'group-hover:text-gray-500'}`}
           >
             {t('Regular_Chat')}
           </span>

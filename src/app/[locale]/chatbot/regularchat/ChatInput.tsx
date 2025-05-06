@@ -91,9 +91,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
         // Use className for Tailwind styling
         className={`
                     max-h-32 flex-grow resize-none overflow-y-auto rounded-lg border
-                    border-gray-300 bg-white p-2 px-3
-                    text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500
-                    disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500
+                    border-gray-300 bg-white p-2 px-3 text-sm
+                    focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed
+                    disabled:bg-gray-100 disabled:text-gray-500 dark:bg-black
                 `}
         rows={1} // Start with one row, TextareaAutosize handles the rest
         disabled={disabled}

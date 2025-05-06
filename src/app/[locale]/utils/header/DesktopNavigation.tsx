@@ -25,12 +25,12 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
       <Link
         lang={locale}
         href={`/conferences`}
-        className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-selected md:mx-4 ${isActive(`/${locale}/conferences`) ? 'text-selected' : ''}`}
+        className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-button md:mx-4 ${isActive(`/${locale}/conferences`) ? 'text-button' : ''}`}
       >
         {/* Loại bỏ div */}
         {t('Conferences')}
         <span
-          className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ease-in-out ${
+          className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-button transition-transform duration-300 ease-in-out ${
             isActive('/conferences')
               ? 'scale-x-100'
               : 'scale-x-0 group-hover:scale-x-100'
@@ -41,12 +41,12 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
       <Link
         lang={locale}
         href={`/journals`}
-        className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-selected md:mx-4 ${isActive(`/${locale}/journals`) ? 'text-selected' : ''}`}
+        className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-button md:mx-4 ${isActive(`/${locale}/journals`) ? 'text-button' : ''}`}
       >
         {/* Loại bỏ div */}
         {t('Journals')}
         <span
-          className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ease-in-out ${
+          className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-button transition-transform duration-300 ease-in-out ${
             isActive('/journals')
               ? 'scale-x-100'
               : 'scale-x-0 group-hover:scale-x-100'
@@ -57,12 +57,12 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
       <Link
         lang={locale}
         href={`/visualization`}
-        className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-selected md:mx-4 ${isActive(`/${locale}/visualization`) ? 'text-selected' : ''}`}
+        className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-button md:mx-4 ${isActive(`/${locale}/visualization`) ? 'text-button' : ''}`}
       >
         {/* Loại bỏ div */}
         {t('Visualization')}
         <span
-          className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ease-in-out ${
+          className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-button transition-transform duration-300 ease-in-out ${
             isActive('/visualization')
               ? 'scale-x-100'
               : 'scale-x-0 group-hover:scale-x-100'
@@ -73,12 +73,12 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
       <Link
         lang={locale}
         href={`/chatbot`}
-        className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-selected md:mx-4 ${isActive(`/${locale}/chatbot`) ? 'text-selected' : ''}`}
+        className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-button md:mx-4 ${isActive(`/${locale}/chatbot`) ? 'text-button' : ''}`}
       >
         {/* Loại bỏ div */}
         {t('Chatbot')}
         <span
-          className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ease-in-out ${
+          className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-button transition-transform duration-300 ease-in-out ${
             isActive('/chatbot')
               ? 'scale-x-100'
               : 'scale-x-0 group-hover:scale-x-100'
@@ -89,12 +89,12 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
       <Link
         lang={locale}
         href={`/support`}
-        className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-selected md:mx-4 ${isActive(`/${locale}/support`) ? 'text-selected' : ''}`}
+        className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-button md:mx-4 ${isActive(`/${locale}/support`) ? 'text-button' : ''}`}
       >
         {/* Loại bỏ div */}
         {t('Support')}
         <span
-          className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-selected transition-transform duration-300 ease-in-out ${
+          className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-button transition-transform duration-300 ease-in-out ${
             isActive('/support')
               ? 'scale-x-100'
               : 'scale-x-0 group-hover:scale-x-100'

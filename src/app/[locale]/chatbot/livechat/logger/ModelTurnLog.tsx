@@ -1,54 +1,64 @@
 // ModelTurnLog.tsx
-import React, { memo } from 'react'; // Import memo
-import { ServerContentMessage, ModelTurn } from "../multimodal-live-types";
-import RenderPart from "./RenderPart";
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import remarkBreaks from 'remark-breaks';
-import rehypeRaw from "rehype-raw";
+import React, { memo } from 'react' // Import memo
+import { ServerContentMessage, ModelTurn } from '../multimodal-live-types'
+import RenderPart from './RenderPart'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import remarkBreaks from 'remark-breaks'
+import rehypeRaw from 'rehype-raw'
 type ModelTurnLogProps = {
-  message: ServerContentMessage;
-};
+  message: ServerContentMessage
+}
 
-const ModelTurnLog: React.FC<ModelTurnLogProps> = ({ message }): JSX.Element => {
-  const serverContent = message.serverContent;
-  const { modelTurn } = serverContent as ModelTurn;
-  const { parts } = modelTurn;
+const ModelTurnLog: React.FC<ModelTurnLogProps> = ({
+  message
+}): JSX.Element => {
+  const serverContent = message.serverContent
+  const { modelTurn } = serverContent as ModelTurn
+  const { parts } = modelTurn
 
   // Combine text parts into a single string, handling potential undefined values
   const combinedText = parts
-    .filter((part) => part.text !== undefined && part.text !== null && part.text !== "\n")
-    .map((part) => part.text)
-    .join("");
+    .filter(
+      part =>
+        part.text !== undefined && part.text !== null && part.text !== '\n'
+    )
+    .map(part => part.text)
+    .join('')
 
   return (
-    <div className="m-4 bg-green-100 rounded-lg p-4 shadow-md">
+    <div className='m-4 rounded-lg bg-green-100 p-4 shadow-md dark:bg-gray-900'>
       {/* <h4 className="text-lg font-semibold text-green-700 mb-2">Model</h4> */}
       {/* Render combined text using ReactMarkdown */}
       {combinedText && (
-
-
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkBreaks]} // Added remarkBreaks
           rehypePlugins={[rehypeRaw]}
-
-
           components={{
-
             // Customize components (optional, for more control)
-            p: ({ node, ...props }) => <p className='part part-text' {...props} />, // Add margin to paragraphs
+            p: ({ node, ...props }) => (
+              <p className='part part-text' {...props} />
+            ), // Add margin to paragraphs
             a: ({ ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
-              <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline" />
+              <a
+                {...props}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-blue-500 hover:underline'
+              />
             ),
             // Add more component overrides as needed (ul, ol, li, code, etc.)
             pre: ({ node, ...props }) => (
               <pre
-                className='overflow-x-auto rounded-md bg-gray-100 p-2'
+                className='overflow-x-auto rounded-md bg-gray-100 p-2 dark:bg-gray-900'
                 {...props}
               />
             ),
             code: ({ node, ...props }) => (
-              <code className='rounded bg-gray-100 px-1' {...props} />
+              <code
+                className='rounded bg-gray-100 px-1 dark:bg-gray-900'
+                {...props}
+              />
             ),
             h1: ({ node, ...props }) => (
               <h1 className='my-4 text-2xl font-bold' {...props} />
@@ -67,7 +77,6 @@ const ModelTurnLog: React.FC<ModelTurnLogProps> = ({ message }): JSX.Element => 
             ),
             li: ({ node, ...props }) => <li className='my-1' {...props} />
           }}
-
         >
           {combinedText}
         </ReactMarkdown>
@@ -79,7 +88,7 @@ const ModelTurnLog: React.FC<ModelTurnLogProps> = ({ message }): JSX.Element => 
           <RenderPart part={part} key={`model-turn-part-${j}`} />
         ))} */}
     </div>
-  );
-};
+  )
+}
 
-export default memo(ModelTurnLog);
+export default memo(ModelTurnLog)
