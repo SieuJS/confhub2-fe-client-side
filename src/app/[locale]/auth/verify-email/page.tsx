@@ -13,16 +13,14 @@ export default function VerifyEmailPage() {
   const t = useTranslations('') // t có thể dùng cho tiêu đề chung của trang
 
   return (
-    <div className='flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8'>
+    <div className='flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-12 dark:bg-gray-800 sm:px-6 lg:px-8'>
       <div className='w-full max-w-md'>
-        <div className='bg-white px-8 py-10 shadow-xl sm:rounded-lg sm:px-10'>
+        <div className='bg-white px-8 py-10 shadow-xl dark:bg-gray-900 sm:rounded-lg sm:px-10'>
           <div className='mb-8 space-y-2 text-center'>
-            <h1 className='text-2xl font-bold tracking-tight text-gray-900'>
+            <h1 className='text-2xl font-bold tracking-tight '>
               {t('Verify_Your_Email_Address')}
             </h1>
-            <p className='text-sm text-gray-600'>
-              {t('Enter_Code_Sent_To_Email')}
-            </p>
+            <p className='text-sm '>{t('Enter_Code_Sent_To_Email')}</p>
           </div>
           {/* --- Bọc component dùng searchParams bằng Suspense --- */}
           <Suspense

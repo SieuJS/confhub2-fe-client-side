@@ -4,7 +4,7 @@ import LoginForm from "./LoginForm";
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import useAuthApi from '@/src/hooks/auth/useAuthApi'; // Import useAuthApi
-
+import { GoogleOAuthProvider } from '@react-oauth/google';
 const LoginPage= ({
   params: { locale }
 }: {
@@ -23,13 +23,13 @@ const LoginPage= ({
 
   return (
     <>
-    {console.log(isLoading)}
-    {console.log(isLoggedIn)}
+    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GG_CLIENT_ID || ''}>
     {!isLoading && !isLoggedIn &&
       <div className="min-h-screen bg-gradient-to-br from-background to-background-secondary">
       <LoginForm redirectUri={redirectUri} />
       </div>
     }
+    </GoogleOAuthProvider>
     </>
   );
 }

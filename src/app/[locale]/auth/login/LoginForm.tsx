@@ -5,6 +5,9 @@ import { Link } from '@/src/navigation'
 import useLoginForm from '../../../../hooks/auth/useLoginForm'
 import { useTranslations } from 'next-intl'
 import { appConfig } from '@/src/middleware'
+import { useGoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
+import { useRouter } from 'next/navigation'
 
 type LoginFormProps = {
   redirectUri: string
@@ -22,6 +25,30 @@ const LoginForm: React.FC<LoginFormProps> = (props: LoginFormProps) => {
     error,
     isLoading
   } = useLoginForm()
+  const router = useRouter()
+
+  const login = useGoogleLogin({
+    onSuccess: async tokenResponse => {
+      // Step [2]: Get access token
+      const accessToken = tokenResponse.access_token;
+
+      // Step [3]: Send to backend
+      const res = await axios.post(appConfig.NEXT_PUBLIC_DATABASE_URL+'/api/v1/auth/google', {
+        access_token: accessToken,
+      });
+
+      // Receive your own backend-issued JWT
+      console.log('JWT from backend:', res.data.token);
+      const jwt = res.data.token;
+      localStorage.setItem('token', jwt);
+      // Step [4]: Redirect to the redirect
+      router.push('/')
+
+    },
+    onError: () => console.log('Login Failed'),
+    scope: 'openid profile email', 
+  });
+
 
   const [isClient, setIsClient] = useState(false)
 
@@ -42,9 +69,9 @@ const LoginForm: React.FC<LoginFormProps> = (props: LoginFormProps) => {
             </div>
 
             <div className='space-y-4'>
-              <a
+              <button
                 type='button'
-                href={`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/google?redirect=${props.redirectUri}`}
+                onClick={() => login()}
                 className='flex w-full items-center justify-center space-x-2 rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium shadow-sm  hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:bg-gray-800'
               >
                 <svg className='h-5 w-5' viewBox='0 0 24 24'>
@@ -66,7 +93,7 @@ const LoginForm: React.FC<LoginFormProps> = (props: LoginFormProps) => {
                   />
                 </svg>
                 <span>{t('Continue_with_Google')}</span>
-              </a>
+              </button>
             </div>
 
             <div className='relative'>
