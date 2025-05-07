@@ -174,15 +174,14 @@ import { AudioRecorder } from './lib/audio-recorder'
 import { useTranslations } from 'next-intl'
 import { useChatSettings } from '../context/ChatSettingsContext'
 
-
 export default function LiveChatExperience() {
   const {
-      currentModality,
-      currentVoice,
-      currentLanguage
-      // Có thể bạn cũng cần các setter nếu LiveChatExperience thay đổi chúng trực tiếp
-      // setCurrentModality, setCurrentVoice, setCurrentLanguage
-  } = useChatSettings();
+    currentModality,
+    currentVoice,
+    currentLanguage
+    // Có thể bạn cũng cần các setter nếu LiveChatExperience thay đổi chúng trực tiếp
+    // setCurrentModality, setCurrentVoice, setCurrentLanguage
+  } = useChatSettings()
 
   const t = useTranslations()
 
