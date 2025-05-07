@@ -15,7 +15,7 @@ interface UseChatActionsProps extends Pick<
     ChatStateSetters,
     'setChatMessages' | 'setLoadingState' | 'setActiveConversationId' |
     'setIsLoadingHistory' | 'setIsHistoryLoaded' | 'setIsSearching' |
-    'setSearchResults' // Add setSearchResults
+    'setSearchResults'  | 'setConversationList'
 > {
     socketRef: React.MutableRefObject<Socket | null>;
     isConnected: boolean;
@@ -50,16 +50,17 @@ export function useChatActions({
     handleError,
     setChatMessages,
     setLoadingState,
-    setActiveConversationId,
+    setActiveConversationId, // Cần setter này
     setIsLoadingHistory,
     setIsHistoryLoaded,
     isHistoryLoaded,
     animationControls,
-    activeConversationId,
+    activeConversationId, // Cần state này
     resetAwaitFlag,
     setIsSearching,
-    setSearchResults, // Destructure setter
-    conversationList, // Destructure conversationList
+    setSearchResults,
+    conversationList,
+    // setConversationList, // Thêm nếu bạn muốn cập nhật danh sách cục bộ ngay lập tức
 }: UseChatActionsProps): ChatActions {
 
     resetAwaitFlag();
@@ -159,20 +160,59 @@ export function useChatActions({
         console.log("[useChatActions] closeConfirmationDialog called");
     }, []);
 
-    const deleteConversation = useCallback((conversationId: string) => {
-        
+     const deleteConversation = useCallback(async (conversationIdToDelete: string) => {
         if (!isConnected || hasFatalError || !socketRef.current) {
             console.warn('Cannot delete conversation: Socket not connected or in fatal error state.');
             handleError({ message: 'Cannot delete conversation: Not connected.' }, false);
-            return;
+            return Promise.reject(new Error('Socket not connected or in fatal error state.')); // Trả về Promise bị reject
         }
-        if (!conversationId) {
+        if (!conversationIdToDelete) {
             console.warn('Cannot delete conversation: Invalid conversation ID.');
-            return;
+            return Promise.reject(new Error('Invalid conversation ID.')); // Trả về Promise bị reject
         }
-        console.log(`[useChatActions] Requesting to delete conversation: ${conversationId}`);
-        socketRef.current.emit('delete_conversation', { conversationId });
-    }, [isConnected, hasFatalError, socketRef, handleError]);
+
+        console.log(`[useChatActions] Requesting to delete conversation: ${conversationIdToDelete}`);
+
+        // Thực hiện cập nhật state cục bộ NẾU conversation bị xóa là active
+        // Điều này giúp UI phản ứng nhanh hơn trước khi server xác nhận
+        // và quan trọng cho logic điều hướng trong MainLayoutComponent
+        if (activeConversationId === conversationIdToDelete) {
+            console.log(`[useChatActions] Deleting active conversation (${conversationIdToDelete}). Resetting active state.`);
+            setActiveConversationId(null);
+            setChatMessages([]); // Xóa tin nhắn của conversation active
+            setIsHistoryLoaded(false); // Đặt lại trạng thái đã tải lịch sử
+            // Không cần setLoadingState ở đây vì MainLayout sẽ điều hướng
+        }
+
+        // Cân nhắc: Cập nhật conversationList cục bộ ngay lập tức
+        // setConversationList(prev => prev.filter(conv => conv.id !== conversationIdToDelete));
+        // Tuy nhiên, việc này thường được xử lý khi nhận sự kiện từ server để đảm bảo đồng bộ.
+        // Nếu bạn cập nhật ở đây, đảm bảo logic ở `useSocketEventHandlers` xử lý trùng lặp hoặc bỏ qua.
+
+        // Gửi sự kiện lên server
+        socketRef.current.emit('delete_conversation', { conversationId: conversationIdToDelete });
+
+        // Quan trọng: Trả về một Promise để MainLayoutComponent có thể `await`
+        // Nếu không có thao tác bất đồng bộ nào khác ở đây (ngoài emit),
+        // bạn có thể resolve ngay. Tuy nhiên, để "giả lập" việc chờ server,
+        // hoặc nếu bạn muốn đảm bảo emit đã được gửi trước khi điều hướng,
+        // việc trả về Promise là một good practice.
+        // Trong trường hợp này, vì MainLayout điều hướng ngay sau đó,
+        // và server sẽ gửi lại cập nhật danh sách, việc resolve ngay có thể chấp nhận được.
+        return Promise.resolve();
+
+    }, [
+        isConnected,
+        hasFatalError,
+        socketRef,
+        handleError,
+        activeConversationId, // Dependency
+        setActiveConversationId, // Dependency
+        setChatMessages,       // Dependency
+        setIsHistoryLoaded,    // Dependency
+        // setConversationList // Dependency nếu bạn cập nhật list cục bộ
+    ]);
+
 
     const clearConversation = useCallback((conversationId: string) => {
         

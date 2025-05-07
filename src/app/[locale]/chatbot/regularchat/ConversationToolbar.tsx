@@ -1,8 +1,7 @@
-// src/app/[locale]/chatbot/chat/regularchat/ConversationToolbar.tsx
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Pencil, Pin, PinOff, MoreVertical, Trash2, Eraser } from 'lucide-react' // Thêm icons
+import { Pencil, Pin, PinOff, Trash2, Eraser } from 'lucide-react' // Giữ lại icons cần thiết
 import { ConversationMetadata } from '../lib/regular-chat.types'
 import { useSharedChatSocket } from '../context/ChatSocketContext'
 import { useTranslations } from 'next-intl'
@@ -22,15 +21,14 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
     pinConversation,
     clearConversation,
     deleteConversation,
-    loadConversation, // Có thể cần để refresh sau khi xóa/clear nếu không tự động
-    startNewConversation
+    // Không cần loadConversation và startNewConversation ở đây trực tiếp
   } = useSharedChatSocket()
 
   const [currentTitle, setCurrentTitle] = useState('')
   const [isPinned, setIsPinned] = useState(false)
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [newTitleInput, setNewTitleInput] = useState('')
-  const [showMoreMenu, setShowMoreMenu] = useState(false)
+  // Không cần state showMoreMenu nữa
 
   const activeConversation = activeConversationId
     ? conversationList.find(conv => conv.id === activeConversationId)
@@ -46,7 +44,7 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
       setIsPinned(false)
     }
     setIsEditingTitle(false) // Reset editing state khi conversation thay đổi
-    setShowMoreMenu(false)
+    // Không cần reset showMoreMenu
   }, [activeConversation, t])
 
   const handleRename = () => {
@@ -70,10 +68,9 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
       )
     ) {
       clearConversation(activeConversationId)
-      // Có thể cần load lại conversation hoặc start new nếu muốn UI reset hoàn toàn
-      // startNewConversation(); // Ví dụ: hoặc để event handler tự xử lý
+      // Việc cập nhật UI sau khi clear thường được xử lý bởi socket event
     }
-    setShowMoreMenu(false)
+    // Không cần đóng menu
   }
 
   const handleDelete = () => {
@@ -86,7 +83,7 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
       deleteConversation(activeConversationId)
       // Sau khi xóa, activeConversationId sẽ bị clear, UI sẽ tự động về trạng thái intro
     }
-    setShowMoreMenu(false)
+    // Không cần đóng menu
   }
 
   if (!activeConversationId) {
@@ -117,6 +114,7 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
       </div>
 
       <div className='flex items-center space-x-2'>
+        {/* Rename Button */}
         <button
           onClick={() => setIsEditingTitle(true)}
           disabled={isEditingTitle}
@@ -125,6 +123,8 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
         >
           <Pencil size={18} />
         </button>
+
+        {/* Pin/Unpin Button */}
         <button
           onClick={handleTogglePin}
           className={`rounded-md p-1.5 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:bg-gray-700 ${
@@ -137,41 +137,24 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
           {isPinned ? <PinOff size={18} /> : <Pin size={18} />}
         </button>
 
-        {/* More Actions Menu */}
-        <div className='relative'>
-          <button
-            onClick={() => setShowMoreMenu(!showMoreMenu)}
-            className='rounded-md p-1.5  hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500  dark:hover:bg-gray-700 dark:hover:text-gray-200'
-            title={t('More_Actions')}
-          >
-            <MoreVertical size={18} />
-          </button>
-          {showMoreMenu && (
-            <div
-              className='absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700 dark:ring-gray-600'
-              role='menu'
-              aria-orientation='vertical'
-              aria-labelledby='menu-button'
-            >
-              <button
-                onClick={handleClear}
-                className='flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'
-                role='menuitem'
-              >
-                <Eraser size={16} className='mr-2' />
-                {t('Clear_Messages')}
-              </button>
-              <button
-                onClick={handleDelete}
-                className='flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-700 dark:hover:text-red-300'
-                role='menuitem'
-              >
-                <Trash2 size={16} className='mr-2' />
-                {t('Delete_Conversation')}
-              </button>
-            </div>
-          )}
-        </div>
+        {/* Clear Button (Di chuyển ra ngoài menu) */}
+        <button
+          onClick={handleClear}
+          className='rounded-md p-1.5  hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500  dark:hover:bg-gray-700 dark:hover:text-gray-200'
+          title={t('Clear_Messages')}
+        >
+          <Eraser size={18} />
+        </button>
+
+        {/* Delete Button (Di chuyển ra ngoài menu) */}
+        <button
+          onClick={handleDelete}
+          className='rounded-md p-1.5 text-red-600 hover:bg-red-50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 dark:text-red-400 dark:hover:bg-red-700 dark:hover:text-red-300'
+          title={t('Delete_Conversation')}
+        >
+          <Trash2 size={18} />
+        </button>
+
       </div>
     </div>
   )

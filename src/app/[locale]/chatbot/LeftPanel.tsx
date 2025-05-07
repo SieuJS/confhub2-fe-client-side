@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import ConversationList from './sidepanel/ConversationList'
 import { useTranslations } from 'next-intl'
-import { Link, usePathname } from '@/src/navigation' // Thêm usePathname
+import { Link, usePathname } from '@/src/navigation'
 import type { ComponentProps } from 'react'
 
 interface LeftPanelProps {
@@ -29,7 +29,6 @@ interface LeftPanelProps {
   onClearConversation: (conversationId: string) => void
   onRenameConversation: (conversationId: string, newTitle: string) => void
   onPinConversation: (conversationId: string, isPinned: boolean) => void
-  // onShowHistoryView: () => void; // <-- ĐÃ XÓA
   currentView: 'chat' | 'history' // Được xác định từ pathname trong MainLayoutComponent
 }
 
