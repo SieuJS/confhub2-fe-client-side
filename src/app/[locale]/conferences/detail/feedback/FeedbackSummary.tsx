@@ -47,13 +47,13 @@ const FeedbackSummary: React.FC<FeedbackSummaryProps> = ({
         <div className='w-full flex-1'>
           {[5, 4, 3, 2, 1].map(star => (
             <div key={star} className='mb-2 flex items-center'>
-              <div className='w-10 text-sm font-medium text-gray-700'>
+              <div className='w-10 text-sm font-medium '>
                 {star}{' '}
                 <span className='ml-1 inline-block text-xs text-yellow-500'>
                   ★
                 </span>
               </div>
-              <div className='relative mx-2 h-4 flex-1 rounded-sm bg-gray-200'>
+              <div className='relative mx-2 h-4 flex-1 rounded-sm bg-gray-200 dark:bg-gray-800'>
                 <div
                   className='absolute h-4 rounded-sm'
                   style={{
@@ -62,7 +62,7 @@ const FeedbackSummary: React.FC<FeedbackSummaryProps> = ({
                   }}
                 ></div>
               </div>
-              <div className='w-16 text-right text-sm text-gray-600'>
+              <div className='w-16 text-right text-sm '>
                 {ratingDistribution[star]}
               </div>
             </div>
@@ -70,7 +70,7 @@ const FeedbackSummary: React.FC<FeedbackSummaryProps> = ({
         </div>
       </div>
       {/* Feedback Description */}
-      <div className='hidden text-sm text-gray-700 md:block'>
+      <div className='hidden text-sm  md:block'>
         {t('Conference_feedback_helps_us')}{' '}
         {/* Keep description or make it a prop */}
       </div>

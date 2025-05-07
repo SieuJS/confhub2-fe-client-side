@@ -11,12 +11,10 @@ const SignInPrompt: React.FC<SignInPromptProps> = ({ onSignInClick }) => {
 
   return (
     <div className='border-t border-gray-200 pt-6 text-center sm:text-left'>
-      <p className='mb-2 text-gray-600'>{t('Want_to_share_your_feedback')}</p>
-      <p className='mb-4 text-gray-600'>
-        {t('Please_sign_in_to_post_your_feedback')}
-      </p>
+      <p className='mb-2 '>{t('Want_to_share_your_feedback')}</p>
+      <p className='mb-4 '>{t('Please_sign_in_to_post_your_feedback')}</p>
       <button
-        className='rounded-md bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600'
+        className='rounded-md bg-button px-4 py-2 font-semibold text-button-text hover:bg-blue-600'
         onClick={onSignInClick}
       >
         {t('Sign_In')}

@@ -276,7 +276,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
     // Assuming followBy comes directly from conferenceDataFromDB
     const followBy = conferenceDataFromDB?.followBy
     if (!followBy || followBy.length === 0) {
-      return <p className='text-sm text-gray-500'>{t('No_followers_yet')}</p>
+      return <p className='text-sm '>{t('No_followers_yet')}</p>
     }
 
     const maxVisibleFollowers = 5
@@ -300,7 +300,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
           />
         ))}
         {remainingFollowers > 0 && (
-          <span className='z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-gray-200 text-xs font-medium text-gray-600'>
+          <span className='z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-gray-200 text-xs font-medium dark:bg-gray-800'>
             +{remainingFollowers}
           </span>
         )}
@@ -334,7 +334,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   const totalReviews = conferenceDataFromDB?.feedbacks?.length || 0
 
   return (
-    <div className='flex min-h-screen flex-col bg-gray-50'>
+    <div className='flex min-h-screen flex-col bg-gray-50 dark:bg-gray-950'>
       <Header locale={locale} />
 
       <div className='container mx-auto flex-grow px-0 py-8 pt-20 md:px-4'>
@@ -349,7 +349,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         {/* Example: {followError && <Toast type="error" message={followError} />} */}
 
         {/* Main content wrapper */}
-        <div className='rounded-lg bg-white p-2 shadow-md md:p-4'>
+        <div className='rounded-lg bg-white p-2 shadow-md dark:bg-black  md:p-4'>
           <div className='flex flex-col gap-4 md:flex-row'>
             {/* Left Column */}
             <div className='md:w-4/5'>
@@ -445,11 +445,11 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                   </h1>
 
                   {/* --- Rating --- */}
-                  <div className='mb-2 flex items-center text-sm text-gray-600'>
+                  <div className='mb-2 flex items-center text-sm '>
                     <div className='mr-1 text-xl text-yellow-500'>★</div>
                     <strong>
                       {overallRating.toFixed(1)}{' '}
-                      <span className='ml-1 font-normal text-gray-500'>
+                      <span className='ml-1 font-normal '>
                         ({totalReviews} {t('Ratings')})
                       </span>
                     </strong>
@@ -567,15 +567,13 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                           query: { topics: topic }
                         }}
                       >
-                        <span className='cursor-pointer rounded-full bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-300'>
+                        <span className='cursor-pointer rounded-full bg-gray-200 px-3 py-1 text-sm font-medium hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-600'>
                           {topic}
                         </span>
                       </Link>
                     ))
                   ) : (
-                    <p className='text-sm text-gray-500'>
-                      {t('No_topics_listed')}
-                    </p>
+                    <p className='text-sm '>{t('No_topics_listed')}</p>
                   )}
                   {hasMoreTopics && (
                     <button
@@ -833,7 +831,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         </div>
 
         {/* Feedback Section */}
-        <div className='mt-8 rounded-lg bg-white p-4 shadow-md md:p-6'>
+        <div className='mt-8 rounded-lg bg-white p-4 shadow-md dark:bg-black md:p-6'>
           <ConferenceFeedback conferenceData={conferenceDataFromDB} />
         </div>
       </div>

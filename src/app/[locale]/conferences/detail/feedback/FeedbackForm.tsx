@@ -34,7 +34,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({
             className={`cursor-pointer transition-colors ${
               star !== null && starValue <= star
                 ? 'text-yellow-500'
-                : 'text-gray-300 hover:text-yellow-400'
+                : ' hover:text-yellow-400'
             }`}
             role='button'
             aria-label={`Rate ${starValue} stars`}
@@ -53,7 +53,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({
       />
       <div className='flex items-center justify-end'>
         <button
-          className='rounded-md bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50'
+          className='rounded-md bg-button px-4 py-2 font-semibold text-button-text hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50'
           onClick={onSubmit}
           disabled={loading || !star || !description.trim()}
         >

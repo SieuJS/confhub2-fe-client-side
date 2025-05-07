@@ -224,10 +224,10 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
             {/* Bỏ mb-8 ở đây vì đã có gap ở flex container */}
             {paginatedFeedbacks.length === 0 &&
             displayedFeedbacks.length === 0 ? ( // Chỉ hiển thị thông báo khi không có feedback nào cả (sau khi lọc)
-              <div className='pt-4 text-center text-gray-500'>{message}</div>
+              <div className='pt-4 text-center '>{message}</div>
             ) : paginatedFeedbacks.length === 0 &&
               displayedFeedbacks.length > 0 ? ( // Hiển thị nếu trang hiện tại rỗng nhưng có feedback ở trang khác
-              <div className='pt-4 text-center text-gray-500'>
+              <div className='pt-4 text-center '>
                 {t('no_feedback_on_page')}
               </div>
             ) : (
