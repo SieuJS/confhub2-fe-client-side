@@ -56,14 +56,14 @@ const SupportForm: React.FC = () => {
       </section>
 
       {/* Phần Form */}
-      <div className='bg-gray-50 pb-8 dark:bg-gray-900 lg:pb-16'>
-        <div className='relative z-20 mx-auto -mt-24 max-w-screen-md rounded-lg bg-white p-6 px-4 shadow-xl dark:bg-gray-800 sm:p-8 md:-mt-56 lg:p-10'>
+      <div className='bg-gray-5 pb-8  lg:pb-16'>
+        <div className='bg-white-pure relative z-20 mx-auto -mt-24 max-w-screen-md rounded-lg p-6 px-4 shadow-xl  sm:p-8 md:-mt-56 lg:p-10'>
           <form onSubmit={handleSubmit} className='space-y-6'>
             {/* Trường Chủ đề */}
             <div>
               <label
                 htmlFor='subject'
-                className='mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300'
+                className='mb-2 block text-sm font-medium '
               >
                 {/* Sử dụng key từ file dịch */}
                 {t('subjectLabel')} <span className='text-red-500'>*</span>
@@ -72,7 +72,7 @@ const SupportForm: React.FC = () => {
                 type='text'
                 id='subject'
                 name='subject'
-                className='dark:shadow-sm-light block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500'
+                className='dark:shadow-sm-light bg-gray-5 block w-full rounded-lg border border-gray-300 p-2.5 text-sm  shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600   dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500'
                 // Sử dụng key từ file dịch
                 placeholder={t('subjectPlaceholder')}
                 required
@@ -83,7 +83,7 @@ const SupportForm: React.FC = () => {
             <div>
               <label
                 htmlFor='type'
-                className='mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300'
+                className='mb-2 block text-sm font-medium  '
               >
                 {/* Sử dụng key từ file dịch */}
                 {t('typeLabel')} <span className='text-red-500'>*</span>
@@ -91,7 +91,7 @@ const SupportForm: React.FC = () => {
               <select
                 id='type'
                 name='type'
-                className='dark:shadow-sm-light block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500'
+                className='dark:shadow-sm-light bg-gray-5 block w-full rounded-lg border border-gray-300 p-2.5 text-sm  shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600   dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500'
                 required
                 defaultValue=''
               >
@@ -110,7 +110,7 @@ const SupportForm: React.FC = () => {
             <div className='sm:col-span-2'>
               <label
                 htmlFor='message'
-                className='mb-2 block text-sm font-medium text-gray-900 dark:text-gray-400'
+                className='mb-2 block text-sm font-medium  dark:text-gray-400'
               >
                 {/* Sử dụng key từ file dịch */}
                 {t('messageLabel')} <span className='text-red-500'>*</span>
@@ -119,7 +119,7 @@ const SupportForm: React.FC = () => {
                 id='message'
                 name='message'
                 rows={6}
-                className='block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500'
+                className='bg-gray-5 block w-full rounded-lg border border-gray-300 p-2.5 text-sm  shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600   dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500'
                 // Sử dụng key từ file dịch
                 placeholder={t('messagePlaceholder')}
                 required
@@ -137,14 +137,14 @@ const SupportForm: React.FC = () => {
                   checked={agreedToTerms}
                   onChange={e => setAgreedToTerms(e.target.checked)}
                   required
-                  className='focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600'
+                  className='focus:ring-3 bg-gray-5 h-4 w-4 rounded border border-gray-300 focus:ring-blue-300 dark:border-gray-600  dark:ring-offset-gray-800 dark:focus:ring-blue-600'
                 />
               </div>
               <div className='ml-3 text-sm'>
                 <label
                   htmlFor='terms'
                   id='terms-description' // Thêm id để aria-describedby hoạt động đúng
-                  className='font-light text-gray-500 dark:text-gray-300'
+                  className='font-light text-gray-500 '
                 >
                   {/* Sử dụng t.rich để nhúng Link vào text */}
                   {t.rich('termsLabel', {

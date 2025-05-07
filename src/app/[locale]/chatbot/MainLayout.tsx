@@ -17,16 +17,15 @@ interface MainLayoutComponentProps {
 
 type MainContentView = 'chat' | 'history'
 
-export default function MainLayoutComponent({ children }: MainLayoutComponentProps) {
+export default function MainLayoutComponent({
+  children
+}: MainLayoutComponentProps) {
   const t = useTranslations()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const {
-    chatMode,
-    handleChatModeNavigation
-  } = useChatSettings()
+  const { chatMode, handleChatModeNavigation } = useChatSettings()
 
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true)
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(true)
@@ -191,7 +190,7 @@ export default function MainLayoutComponent({ children }: MainLayoutComponentPro
 
 
   return (
-    <div className='flex h-screen overflow-hidden bg-gray-100 dark:bg-gray-800'>
+    <div className='bg-gray-10 flex h-screen overflow-hidden'>
       <LeftPanel
         isOpen={isLeftPanelOpen}
         onToggleOpen={() => setIsLeftPanelOpen(v => !v)}
@@ -223,7 +222,7 @@ export default function MainLayoutComponent({ children }: MainLayoutComponentPro
       {!isRightPanelOpen && (
         <button
           onClick={() => setIsRightPanelOpen(true)}
-          className='fixed right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500'
+          className='bg-white-pure hover:bg-gray-5 fixed right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
           title={t('Open_settings')}
           aria-label={t('Open_settings')}
         >

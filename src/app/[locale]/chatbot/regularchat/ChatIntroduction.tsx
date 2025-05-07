@@ -60,7 +60,7 @@ const ChatIntroductionDisplay: React.FC<ChatIntroductionProps> = ({
   const content = introductions[language] || introductions['en']
 
   return (
-    <div className='mb-4 rounded-lg border border-blue-100 bg-gray-50 p-6 text-center dark:bg-gray-800'>
+    <div className='bg-gray-5 0 mb-4 rounded-lg border border-blue-100 p-6 text-center'>
       <h2 className='mb-2 text-xl  font-semibold'>{content.greeting}</h2>
       <p className='mb-4  text-sm'>{content.description}</p>
       <div className='flex flex-wrap justify-center gap-2'>
@@ -68,7 +68,7 @@ const ChatIntroductionDisplay: React.FC<ChatIntroductionProps> = ({
           <button
             key={index}
             onClick={() => onSuggestionClick(text)}
-            className='rounded-full border border-gray-300 bg-white px-3 py-1 text-sm transition-colors  duration-150 hover:border-gray-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:bg-black'
+            className='bg-white-pure rounded-full border border-gray-300 px-3 py-1 text-sm transition-colors  duration-150 hover:border-gray-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-300 '
           >
             {text}
           </button>

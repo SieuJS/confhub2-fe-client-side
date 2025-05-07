@@ -30,7 +30,7 @@ const OutputFormatSelector: React.FC<OutputFormatSelectorProps> = ({
           type='button'
           onClick={() => onModalityChange('audio')}
           disabled={disabled} // Apply disabled prop
-          className={`group flex flex-col items-center justify-center rounded-lg border p-3 transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 ${isAudioSelected ? 'border-blue-500 bg-gray-100 ring-1 ring-blue-500 dark:bg-gray-950' : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50 dark:bg-gray-900'}`}
+          className={`group flex flex-col items-center justify-center rounded-lg border p-3 transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 ${isAudioSelected ? 'bg-gray-10 border-blue-500 ring-1 ring-blue-500 ' : 'bg-white-pure hover:bg-gray-5 border-gray-300 hover:border-gray-400 '}`}
           aria-pressed={isAudioSelected}
         >
           <Volume2
@@ -50,7 +50,7 @@ const OutputFormatSelector: React.FC<OutputFormatSelectorProps> = ({
           type='button'
           onClick={() => onModalityChange('text')}
           disabled={disabled} // Apply disabled prop
-          className={`group flex flex-col items-center justify-center rounded-lg border p-3 transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 ${isTextSelected ? 'border-blue-500 bg-gray-100 ring-1 ring-blue-500 dark:bg-gray-950' : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50 dark:bg-gray-900'}`}
+          className={`group flex flex-col items-center justify-center rounded-lg border p-3 transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 ${isTextSelected ? 'bg-gray-10 border-blue-500 ring-1 ring-blue-500 ' : 'bg-white-pure hover:bg-gray-5 border-gray-300 hover:border-gray-400 '}`}
           aria-pressed={isTextSelected}
         >
           <Text

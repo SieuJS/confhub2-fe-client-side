@@ -65,7 +65,7 @@ const VoiceDropdown: React.FC<VoiceDropdownProps> = ({
           type='button'
           disabled={disabled}
           onClick={() => setIsOpen(!isOpen)}
-          className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:opacity-70 dark:bg-gray-900'
+          className='bg-white-pure disabled:bg-gray-5 relative w-full cursor-default rounded-md border border-gray-300 py-2 pl-3 pr-10 text-left text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-70 '
           aria-haspopup='listbox'
           aria-expanded={isOpen}
           aria-labelledby='voice-select-label'
@@ -83,7 +83,7 @@ const VoiceDropdown: React.FC<VoiceDropdownProps> = ({
           <div
             role='listbox'
             aria-labelledby='voice-select-label'
-            className='absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-900 sm:text-sm'
+            className='bg-white-pure absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none  sm:text-sm'
           >
             {availableVoices.map(voice => (
               <button

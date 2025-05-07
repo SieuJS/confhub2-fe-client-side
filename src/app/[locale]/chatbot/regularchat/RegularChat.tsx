@@ -2,21 +2,21 @@
 'use client'
 
 import React, { useState, useRef, useCallback, useEffect } from 'react'
-import ChatHistory from './ChatHistory' 
-import ChatInput from './ChatInput'   
-import LoadingIndicator from './LoadingIndicator' 
-import ChatIntroductionDisplay from './ChatIntroduction' 
-import EmailConfirmationDialog from '../EmailConfirmationDialog' 
-import ConversationToolbar from './ConversationToolbar' 
-import { useTimer } from '@/src/hooks/chatbot/useTimer' 
-import { useSharedChatSocket } from '../context/ChatSocketContext' 
+import ChatHistory from './ChatHistory'
+import ChatInput from './ChatInput'
+import LoadingIndicator from './LoadingIndicator'
+import ChatIntroductionDisplay from './ChatIntroduction'
+import EmailConfirmationDialog from '../EmailConfirmationDialog'
+import ConversationToolbar from './ConversationToolbar'
+import { useTimer } from '@/src/hooks/chatbot/useTimer'
+import { useSharedChatSocket } from '../context/ChatSocketContext'
 import { useTranslations } from 'next-intl'
-import { useChatSettings } from '../context/ChatSettingsContext'; 
+import { useChatSettings } from '../context/ChatSettingsContext'
 
 function RegularChat() {
   const t = useTranslations()
   // --- LẤY SETTINGS TỪ CHATSETTINGSCONTEXT ---
-  const { currentLanguage, isStreamingEnabled } = useChatSettings(); // Lấy isStreamingEnabled
+  const { currentLanguage, isStreamingEnabled } = useChatSettings() // Lấy isStreamingEnabled
   // ------------------------------------------
   const { timeCounter, startTimer, stopTimer } = useTimer()
   const {
@@ -32,7 +32,7 @@ function RegularChat() {
     closeConfirmationDialog,
     activeConversationId,
     isLoadingHistory,
-    conversationList,
+    conversationList
   } = useSharedChatSocket()
 
   const [hasChatStarted, setHasChatStarted] = useState<boolean>(false)
@@ -74,7 +74,14 @@ function RegularChat() {
       // Sử dụng isStreamingEnabled từ context
       sendMessage(trimmedMessage, isStreamingEnabled, currentLanguage)
     },
-    [isConnected, hasChatStarted, startTimer, sendMessage, isStreamingEnabled, currentLanguage]
+    [
+      isConnected,
+      hasChatStarted,
+      startTimer,
+      sendMessage,
+      isStreamingEnabled,
+      currentLanguage
+    ]
   )
 
   const handleSetFillInput = useCallback((fillFunc: (text: string) => void) => {
@@ -98,9 +105,9 @@ function RegularChat() {
     !activeConversationId && chatMessages.length === 0 && !isLoadingHistory
 
   return (
-    <div className='relative mx-auto flex h-full w-full flex-col rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-600 dark:bg-black'>
+    <div className='bg-white-pure border-gray-20 relative mx-auto flex h-full w-full flex-col rounded-xl border shadow-xl '>
       {/* Connection Status Header */}
-      <div className='flex-shrink-0 border-b border-gray-200 bg-gray-50 p-2 dark:border-gray-600 dark:bg-gray-900'>
+      <div className='bg-gray-5 border-gray-20 flex-shrink-0 border-b p-2'>
         <div className='flex items-center justify-center space-x-1 text-center text-xs '>
           <span
             className={`h-2 w-2 rounded-full ${isConnected ? 'animate-pulse bg-green-500' : 'bg-red-500'}`}
@@ -121,7 +128,7 @@ function RegularChat() {
 
       <div
         ref={chatHistoryRef}
-        className='flex-grow space-y-4 overflow-y-auto bg-gray-50  p-4 dark:bg-gray-900 md:p-6'
+        className='bg-gray-5 flex-grow space-y-4 overflow-y-auto  p-4  md:p-6'
       >
         {showIntroduction && (
           <ChatIntroductionDisplay
@@ -134,11 +141,13 @@ function RegularChat() {
 
       {(loadingState.isLoading || isLoadingHistory) &&
         !showConfirmationDialog && (
-          <div className='flex-shrink-0 border-t border-gray-200 bg-gray-50 px-4 py-2   dark:border-gray-600 dark:bg-gray-900'>
+          <div className='bg-gray-5 flex-shrink-0 border-t border-gray-200 px-4 py-2   dark:border-gray-600 '>
             <LoadingIndicator
               step={isLoadingHistory ? 'loading_history' : loadingState.step}
               message={
-                isLoadingHistory ? t('Loading_Chat_History') : loadingState.message
+                isLoadingHistory
+                  ? t('Loading_Chat_History')
+                  : loadingState.message
               }
               timeCounter={isLoadingHistory ? undefined : timeCounter}
             />
@@ -151,8 +160,7 @@ function RegularChat() {
       </div> */}
       {/* -------------------------------------------- */}
 
-
-      <div className='flex-shrink-0 border-t border-gray-200 bg-gray-50  p-3 pt-2  dark:border-gray-600 dark:bg-gray-900 md:p-4'>
+      <div className='bg-gray-5 flex-shrink-0 border-t border-gray-200  p-3 pt-2  dark:border-gray-600  md:p-4'>
         <ChatInput
           onSendMessage={sendChatMessage}
           disabled={

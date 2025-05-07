@@ -79,8 +79,8 @@ const ChatInput: React.FC<ChatInputProps> = ({
     // Apply Tailwind classes directly for layout and styling
     // <div className='flex items-end space-x-2'>
     <div
-      className='flex w-full items-end rounded-3xl                   
-      bg-white px-2 py-1 transition-all 
+      className='bg-white-pure flex w-full items-end                   
+      rounded-3xl px-2 py-1 transition-all 
       duration-200 ease-in-out focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500'
     >
       {/* TextareaAutosize handles resizing automatically */}
@@ -96,10 +96,10 @@ const ChatInput: React.FC<ChatInputProps> = ({
         }
         // Use className for Tailwind styling
         className={`
-                    max-h-32 flex-grow resize-none overflow-y-auto rounded-2xl border
-                    border-gray-300 bg-white p-2 text-sm
+                    bg-white-pure max-h-32 flex-grow resize-none overflow-y-auto rounded-2xl
+                      p-2 text-sm
                     focus:border-transparent focus:outline-none  disabled:cursor-not-allowed
-                    disabled:bg-gray-100 disabled:text-gray-500 dark:bg-black
+                    disabled:bg-gray-100  
                 `}
         rows={1} // Start with one row, TextareaAutosize handles the rest
         disabled={disabled}
