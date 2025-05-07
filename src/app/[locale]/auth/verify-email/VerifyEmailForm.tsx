@@ -117,10 +117,7 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = () => {
 
           {/* Input Verification Code */}
           <div>
-            <label
-              htmlFor='code'
-              className='block text-sm font-medium text-gray-700'
-            >
+            <label htmlFor='code' className='block text-sm font-medium '>
               {t('verifyEmail.codeLabel')}
             </label>
             <div className='mt-1'>
