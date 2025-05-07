@@ -4,6 +4,7 @@
 
 import React, { useState } from 'react'
 import Image from 'next/image'
+// Make sure you're using the Link from your navigation setup (which seems to be the case)
 import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
@@ -144,8 +145,9 @@ const AIBanner: React.FC = () => {
 
         {/* --- Container cho các nút bấm --- */}
         <div className='flex items-stretch justify-center gap-4'>
-          {/* --- Nút Chat Now (với 2 Sparkle) --- */}
-          <Link href='/chatbot/livechat'>
+          {/* --- Nút Chat Now (Regular Chat) --- */}
+          {/* MODIFIED href below */}
+          <Link href='/chatbot/regularchat'>
             <motion.button
               // Giữ relative cho nút cha
               className='relative flex min-w-[180px] items-center justify-center gap-2 overflow-hidden rounded bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 font-bold text-white outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75'
@@ -198,7 +200,8 @@ const AIBanner: React.FC = () => {
             </motion.button>
           </Link>
 
-          {/* --- Nút Live Chat (với 2 Sparkle) --- */}
+          {/* --- Nút Live Chat --- */}
+          {/* MODIFIED href below */}
           <Link href='/chatbot/livechat'>
             <motion.button
               className='relative flex min-w-[180px] items-center justify-center gap-2 overflow-hidden rounded border border-white px-6 py-3 font-bold text-white outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75'

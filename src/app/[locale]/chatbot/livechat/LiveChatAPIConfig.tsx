@@ -242,9 +242,9 @@ import {
   websiteInfo,
   EN_followUnfollowItemDeclaration,
   EN_openGoogleMapDeclaration
-} from "./lib/functions"; // Adjust path
+} from "../lib/functions"; // Adjust path
 import { OutputModality, PrebuiltVoice, Language, ToolCall } from '@/src/app/[locale]/chatbot/lib/live-chat.types';
-import { transformConferenceData } from './utils/transformApiData'; // Adjust path
+import { transformConferenceData } from '../utils/transformApiData'; // Adjust path
 import { appConfig } from "@/src/middleware"; // Adjust path
 import { FunctionDeclaration, FunctionCall } from "@google/generative-ai";
 import { usePathname } from 'next/navigation';

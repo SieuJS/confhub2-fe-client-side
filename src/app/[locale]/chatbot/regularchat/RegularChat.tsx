@@ -1,30 +1,29 @@
-// src/app/[locale]/chatbot/chat/RegularChat.tsx
+// src/components/chatbot/RegularChat.tsx (hoặc path tương ứng)
 'use client'
 
 import React, { useState, useRef, useCallback, useEffect } from 'react'
-import ChatHistory from './regularchat/ChatHistory'
-import ChatInput from './regularchat/ChatInput'
-import LoadingIndicator from './regularchat/LoadingIndicator'
-import ChatIntroductionDisplay from './regularchat/ChatIntroduction'
-import EmailConfirmationDialog from './EmailConfirmationDialog'
-import ConversationToolbar from './regularchat/ConversationToolbar' // <-- IMPORT TOOLBAR
-import { useTimer } from '@/src/hooks/chatbot/useTimer'
-import { useSharedChatSocket } from './context/ChatSocketContext'
-import { Language } from './lib/live-chat.types'
+import ChatHistory from './ChatHistory' 
+import ChatInput from './ChatInput'   
+import LoadingIndicator from './LoadingIndicator' 
+import ChatIntroductionDisplay from './ChatIntroduction' 
+import EmailConfirmationDialog from '../EmailConfirmationDialog' 
+import ConversationToolbar from './ConversationToolbar' 
+import { useTimer } from '@/src/hooks/chatbot/useTimer' 
+import { useSharedChatSocket } from '../context/ChatSocketContext' 
 import { useTranslations } from 'next-intl'
+import { useChatSettings } from '../context/ChatSettingsContext'; 
 
-interface RegularChatProps {
-  currentLanguage: Language
-}
-
-function RegularChat({ currentLanguage }: RegularChatProps) {
+function RegularChat() {
   const t = useTranslations()
+  // --- LẤY SETTINGS TỪ CHATSETTINGSCONTEXT ---
+  const { currentLanguage, isStreamingEnabled } = useChatSettings(); // Lấy isStreamingEnabled
+  // ------------------------------------------
   const { timeCounter, startTimer, stopTimer } = useTimer()
   const {
     chatMessages,
     loadingState,
     isConnected,
-    sendMessage, // Đã có sendMessage từ context
+    sendMessage,
     socketId,
     showConfirmationDialog,
     confirmationData,
@@ -33,7 +32,7 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
     closeConfirmationDialog,
     activeConversationId,
     isLoadingHistory,
-    conversationList, // <-- LẤY conversationList TỪ CONTEXT
+    conversationList,
   } = useSharedChatSocket()
 
   const [hasChatStarted, setHasChatStarted] = useState<boolean>(false)
@@ -41,7 +40,7 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
     ((text: string) => void) | null
   >(null)
   const chatHistoryRef = useRef<HTMLDivElement>(null)
-  const [isStreamingEnabled, setIsStreamingEnabled] = useState<boolean>(true)
+  // const [isStreamingEnabled, setIsStreamingEnabled] = useState<boolean>(true); // <-- LOẠI BỎ STATE CỤC BỘ
 
   useEffect(() => {
     if (chatHistoryRef.current && !showConfirmationDialog) {
@@ -70,8 +69,9 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
         console.warn('Attempted to send message while disconnected.')
         return
       }
-      if (!hasChatStarted) setHasChatStarted(true) // Không cần check activeConversationId ở đây nữa
+      if (!hasChatStarted) setHasChatStarted(true)
       startTimer()
+      // Sử dụng isStreamingEnabled từ context
       sendMessage(trimmedMessage, isStreamingEnabled, currentLanguage)
     },
     [isConnected, hasChatStarted, startTimer, sendMessage, isStreamingEnabled, currentLanguage]
@@ -90,11 +90,9 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
     [fillInputFunction]
   )
 
-  const handleStreamingToggle = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setIsStreamingEnabled(event.target.checked)
-  }
+  // const handleStreamingToggle = (event: React.ChangeEvent<HTMLInputElement>) => { // <-- LOẠI BỎ
+  //   setIsStreamingEnabled(event.target.checked)
+  // }
 
   const showIntroduction =
     !activeConversationId && chatMessages.length === 0 && !isLoadingHistory
@@ -114,14 +112,12 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
         </div>
       </div>
 
-      {/* --- CONVERSATION TOOLBAR --- */}
-      {activeConversationId && ( // Chỉ hiển thị khi có conversation active
+      {activeConversationId && (
         <ConversationToolbar
           activeConversationId={activeConversationId}
           conversationList={conversationList}
         />
       )}
-      {/* --------------------------- */}
 
       <div
         ref={chatHistoryRef}
@@ -149,24 +145,12 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
           </div>
         )}
 
-      <div className='flex flex-shrink-0 items-center justify-end space-x-2 border-t border-gray-200 bg-gray-50 px-4 pb-1  pt-2 dark:border-gray-600 dark:bg-gray-900'>
-        <label
-          htmlFor='streaming-toggle'
-          className={`text-sm  ${loadingState.isLoading || showConfirmationDialog ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-        >
-          {t('Stream_Response')}:
-        </label>
-        <input
-          type='checkbox'
-          id='streaming-toggle'
-          checked={isStreamingEnabled}
-          onChange={handleStreamingToggle}
-          className={`form-checkbox h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${loadingState.isLoading || showConfirmationDialog ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-          disabled={
-            loadingState.isLoading || showConfirmationDialog || isLoadingHistory
-          }
-        />
-      </div>
+      {/* --- LOẠI BỎ STREAMING TOGGLE UI KHỎI ĐÂY --- */}
+      {/* <div className='flex flex-shrink-0 items-center justify-end space-x-2 border-t border-gray-200 bg-gray-50 px-4 pb-1  pt-2 dark:border-gray-600 dark:bg-gray-900'>
+        ...
+      </div> */}
+      {/* -------------------------------------------- */}
+
 
       <div className='flex-shrink-0 border-t border-gray-200 bg-gray-50  p-3 pt-2  dark:border-gray-600 dark:bg-gray-900 md:p-4'>
         <ChatInput

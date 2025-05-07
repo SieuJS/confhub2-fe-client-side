@@ -140,52 +140,50 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { useLiveAPIContext } from './livechat/contexts/LiveAPIContext'
+import { useLiveAPIContext } from './contexts/LiveAPIContext'
 // Import isServerContentMessage and related types from where they are defined
 import {
   isServerContentMessage,
   isModelTurn,
   isTurnComplete,
   isInterrupted
-} from './livechat/multimodal-live-types'
-import { useLoggerStore } from './livechat/lib/store-logger'
-import Logger from './livechat/logger/Logger'
-import ChatInput from './livechat/main-layout/ChatInput'
-import ConnectionButton from './livechat/main-layout/ConnectionButton'
-import MicButton from './livechat/main-layout/MicButton'
-import ChatIntroduction from './livechat/main-layout/ChatIntroduction'
-import ConnectionStatus from './livechat/main-layout/ConnectionStatus'
-import RestartStreamButton from './livechat/main-layout/RestartStreamButton'
+} from './multimodal-live-types'
+import { useLoggerStore } from './lib/store-logger'
+import Logger from './logger/Logger'
+import ChatInput from './main-layout/ChatInput'
+import ConnectionButton from './main-layout/ConnectionButton'
+import MicButton from './main-layout/MicButton'
+import ChatIntroduction from './main-layout/ChatIntroduction'
+import ConnectionStatus from './main-layout/ConnectionStatus'
+import RestartStreamButton from './main-layout/RestartStreamButton'
 import { LiveChatAPIConfig } from './LiveChatAPIConfig'
 
 // Hooks
-import useConnection from './livechat/hooks/useConnection'
-import useTimer from './livechat/hooks/useTimer'
-import useLoggerScroll from './livechat/hooks/useLoggerScroll'
-import useLoggerEvents from './livechat/hooks/useLoggerEvents'
-import useAudioRecorder from './livechat/hooks/useAudioRecorder'
-import useModelAudioResponse from './livechat/hooks/useModelAudioResponse'
-import useVolumeControl from './livechat/hooks/useVolumeControl'
-import useInteractionHandlers from './livechat/hooks/useInteractionHandlers'
+import useConnection from './hooks/useConnection'
+import useTimer from './hooks/useTimer'
+import useLoggerScroll from './hooks/useLoggerScroll'
+import useLoggerEvents from './hooks/useLoggerEvents'
+import useAudioRecorder from './hooks/useAudioRecorder'
+import useModelAudioResponse from './hooks/useModelAudioResponse'
+import useVolumeControl from './hooks/useVolumeControl'
+import useInteractionHandlers from './hooks/useInteractionHandlers'
 
 // Types and Constants
-import { OutputModality, PrebuiltVoice, Language } from './lib/live-chat.types'
-import { getSystemInstructions } from './lib/instructions'
-import { AudioRecorder } from './livechat/lib/audio-recorder'
+import { getSystemInstructions } from '../lib/instructions'
+import { AudioRecorder } from './lib/audio-recorder'
 import { useTranslations } from 'next-intl'
+import { useChatSettings } from '../context/ChatSettingsContext'
 
-// --- Props Interface ---
-interface LiveChatExperienceProps {
-  currentModality: OutputModality
-  currentVoice: PrebuiltVoice
-  currentLanguage: Language
-}
 
-export default function LiveChatExperience({
-  currentModality,
-  currentVoice,
-  currentLanguage
-}: LiveChatExperienceProps) {
+export default function LiveChatExperience() {
+  const {
+      currentModality,
+      currentVoice,
+      currentLanguage
+      // Có thể bạn cũng cần các setter nếu LiveChatExperience thay đổi chúng trực tiếp
+      // setCurrentModality, setCurrentVoice, setCurrentLanguage
+  } = useChatSettings();
+
   const t = useTranslations()
 
   // --- Connection & Timer Hooks ---

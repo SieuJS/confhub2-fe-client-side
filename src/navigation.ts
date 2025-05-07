@@ -12,10 +12,13 @@ export const pathnames = {
   '/conferences': '/conferences',
   '/dashboard': '/dashboard',
   '/journals': '/journals',
-  '/chatbot': '/chatbot',
-  '/visualization': '/visualization',
-  '/chatbot/chat': '/chatbot/chat',
+
+  '/chatbot/landingchatbot': '/chatbot/landingchatbot',
+  '/chatbot/regularchat': '/chatbot/regularchat',
   '/chatbot/livechat': '/chatbot/livechat',
+  '/chatbot/history': '/chatbot/history',
+
+  '/visualization': '/visualization',
   '/support': '/support',
   '/other': '/other',
   '/addconference': '/addconference',
