@@ -334,7 +334,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   const totalReviews = conferenceDataFromDB?.feedbacks?.length || 0
 
   return (
-    <div className='flex min-h-screen flex-col bg-gray-50 dark:bg-gray-950'>
+    <div className='bg-gray-5 flex min-h-screen flex-col '>
       <Header locale={locale} />
 
       <div className='container mx-auto flex-grow px-0 py-8 pt-20 md:px-4'>
@@ -349,7 +349,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         {/* Example: {followError && <Toast type="error" message={followError} />} */}
 
         {/* Main content wrapper */}
-        <div className='rounded-lg bg-white p-2 shadow-md dark:bg-black  md:p-4'>
+        <div className='bg-white-pure rounded-lg p-2 shadow-md   md:p-4'>
           <div className='flex flex-col gap-4 md:flex-row'>
             {/* Left Column */}
             <div className='md:w-4/5'>
@@ -495,7 +495,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                       ) : (
                         // Nếu không có location đầu tiên, hiển thị "No location"
                         // Bạn có thể thêm class CSS để style cho phù hợp
-                        <span className='text-sm text-gray-500'>
+                        <span className='text-sm '>
                           {t('No_location_available')}
                         </span>
                       )
@@ -534,7 +534,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                         </Link>
                       ) : (
                         // Nếu không có publisher, hiển thị "No publisher"
-                        <span className='flex items-center text-sm text-gray-500'>
+                        <span className='flex items-center text-sm '>
                           {' '}
                           {/* Thêm flex items-center nếu muốn icon đi kèm */}
                           {/* Bạn có thể thêm icon ở đây nếu muốn, giống như icon publisher nhưng màu xám chẳng hạn */}
@@ -567,7 +567,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
                           query: { topics: topic }
                         }}
                       >
-                        <span className='cursor-pointer rounded-full bg-gray-200 px-3 py-1 text-sm font-medium hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-600'>
+                        <span className='bg-gray-20 hover:bg-gray-30 cursor-pointer rounded-full px-3 py-1 text-sm font-medium '>
                           {topic}
                         </span>
                       </Link>
@@ -831,7 +831,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         </div>
 
         {/* Feedback Section */}
-        <div className='mt-8 rounded-lg bg-white p-4 shadow-md dark:bg-black md:p-6'>
+        <div className='bg-white-pure mt-8 rounded-lg p-4 shadow-md  md:p-6'>
           <ConferenceFeedback conferenceData={conferenceDataFromDB} />
         </div>
       </div>

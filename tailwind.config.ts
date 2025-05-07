@@ -42,6 +42,19 @@ const config = {
         dropdown: 'var(--dropdown)',
         dropdownHover: 'var(--dropdown-hover)',
         buttonSecondary: 'var(--button-secondary)',
+        'white-pure':'var(--white-pure)', 
+        'black-pure':'var(--black-pure)', 
+        'gray-5':'var(--gray-5)', 
+        'gray-10':'var(--gray-10)', 
+        'gray-20':'var(--gray-20)', 
+        'gray-30':'var(--gray-30)', 
+        'gray-40':'var(--gray-40)', 
+        'gray-50':'var(--gray-50)', 
+        'gray-60':'var(--gray-60)', 
+        'gray-70':'var(--gray-70)', 
+        'gray-80':'var(--gray-80)', 
+        'gray-90':'var(--gray-90)', 
+        'gray-95':'var(--gray-95)', 
 
 
 

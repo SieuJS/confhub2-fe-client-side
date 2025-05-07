@@ -33,7 +33,7 @@ const EventTable: React.FC<EventTableProps> = ({ events }) => {
   return (
     <div className='overflow-x-auto'>
       <table className='min-w-full divide-y divide-gray-200'>
-        <thead className='bg-gray-50 dark:bg-gray-950'>
+        <thead className='bg-gray-5'>
           <tr>
             <th
               scope='col'
@@ -73,7 +73,7 @@ const EventTable: React.FC<EventTableProps> = ({ events }) => {
             </th>
           </tr>
         </thead>
-        <tbody className='divide-y divide-gray-200 bg-white dark:bg-black'>
+        <tbody className='bg-white-pure divide-y divide-gray-200 '>
           {events.map(event => (
             <tr key={event.id}>
               <td className='whitespace-nowrap px-6 py-4 text-left text-sm font-medium '>

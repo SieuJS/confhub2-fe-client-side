@@ -226,6 +226,26 @@
     --logo-shadow: #000000;
     --logo-body: #ff0000;
     --span-bg: linear-gradient(to right, #ff0000, #ff0000, #ff0000);
+
+    /* QUANG TRỌNG LẮM NHA */
+    --white-pure: #000000;
+    --black-pure: #ffffff;
+    --gray-5: #030712;
+    --gray-10: #111827;
+    --gray-20: #1f2937;
+    --gray-30: #374151;
+    --gray-40: #4b5563;
+    --gray-50: #6b7280;
+    --gray-60: #9ca3af;
+    --gray-70: #d1d5db;
+    --gray-80: #e5e7eb;
+    --gray-90: #f3f4f6;
+    --gray-95: #f9fafb;
+    /* HẾT PHẦN QUANG TRỌNG */
+
+    --Neutral-30: #404040;
+    --Neutral-80: #e4e4e7;
+    --Neutral-20: #18181b;
   }
 
   .reddit {

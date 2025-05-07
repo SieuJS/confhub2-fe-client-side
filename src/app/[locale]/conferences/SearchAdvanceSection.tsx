@@ -109,7 +109,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
             {/* --- Date Picker Section --- */}
             <div className='col-span-1'>
               <label
-                className='mb-1 block text-sm font-bold'
+                className='mb-1 block text-sm font-bold '
                 htmlFor='submissionDateRange' // Changed ID for clarity
               >
                 {t('Submission_Date')}:
@@ -122,7 +122,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 isClearable={true} // Allows clearing the date range
                 placeholderText={t('Select_Date_Range') ?? 'Select Date Range'} // Use translation
                 dateFormat='yyyy/MM/dd' // Adjust date format as needed
-                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none' // Apply same styling
+                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow placeholder:text-primary focus:outline-none' // Apply same styling
                 wrapperClassName='w-full' // Ensure wrapper takes full width if needed
                 id='submissionDateRange'
               />
@@ -138,7 +138,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 {t('Publisher')}:
               </label>
               <input
-                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none'
+                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow placeholder:text-primary focus:outline-none'
                 id='publisher'
                 type='text'
                 placeholder={t('Publisher')}
@@ -198,7 +198,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 className='mb-1 block text-sm font-bold'
                 htmlFor='averageScore'
               >
-                Avg. Score (1-5):
+                {t('Average_Score')}:
               </label>
               <select
                 className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none'
@@ -206,7 +206,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 value={selectedAverageScore || ''}
                 onChange={handleAverageScoreChangeInput}
               >
-                <option value=''>Score</option>
+                <option value=''>{t('Score')}</option>
                 {/* ... options */}
                 <option value='1'>1</option>
                 <option value='2'>2</option>
@@ -232,15 +232,15 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 value={topicsInput}
                 onChange={handleTopicInputChange}
                 onKeyDown={handleTopicInputKeyDown}
-                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none' // Reduced py and px
+                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow placeholder:text-primary focus:outline-none' // Reduced py and px
                 placeholder={t('Enter_topics')}
               />
               {topicSuggestions.length > 0 && (
-                <ul className='absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded border border-gray-300 bg-white shadow-md'>
+                <ul className='bg-white-pure absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded border border-gray-300 shadow-md '>
                   {topicSuggestions.map((suggestion, index) => (
                     <li
                       key={index}
-                      className='cursor-pointer px-3 py-1 text-sm hover:bg-gray-100' // Reduced py and px
+                      className='hover:bg-gray-10 cursor-pointer px-3 py-1 text-sm ' // Reduced py and px
                       onClick={() => handleTopicSuggestionClick(suggestion)}
                     >
                       {suggestion}
@@ -254,7 +254,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 {selectedTopics.map((topic, index) => (
                   <div
                     key={index}
-                    className='flex items-center gap-1 rounded-full bg-gray-200 px-2 py-0.5 text-sm'
+                    className='bg-gray-20 flex items-center gap-1 rounded-full px-2 py-0.5 text-sm '
                   >
                     {' '}
                     {/* Reduced px and py */}
@@ -299,15 +299,15 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 value={fieldOfResearchInput}
                 onChange={handleFieldOfResearchInputChange}
                 onKeyDown={handleFieldOfResearchInputKeyDown}
-                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none' // Reduced py and px
-                placeholder='Enter fields of research'
+                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow placeholder:text-primary focus:outline-none' // Reduced py and px
+                placeholder={t('Enter_field_of_research')}
               />
               {fieldOfResearchSuggestions.length > 0 && (
-                <ul className='absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded border border-gray-300 bg-white shadow-md'>
+                <ul className='bg-white-pure absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded border border-gray-300 shadow-md '>
                   {fieldOfResearchSuggestions.map((suggestion, index) => (
                     <li
                       key={index}
-                      className='cursor-pointer px-3 py-1 text-sm hover:bg-gray-100' // Reduced py and px
+                      className='hover:bg-gray-10 cursor-pointer px-3 py-1 text-sm ' // Reduced py and px
                       onClick={() =>
                         handleFieldOfResearchSuggestionClick(suggestion)
                       }
@@ -323,7 +323,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 {selectedFieldsOfResearch.map((field, index) => (
                   <div
                     key={index}
-                    className='flex items-center gap-1 rounded-full bg-gray-200 px-2 py-0.5 text-sm'
+                    className='bg-gray-20 flex items-center gap-1 rounded-full px-2 py-0.5 text-sm '
                   >
                     {' '}
                     {/* Reduced px and py */}
