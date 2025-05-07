@@ -32,8 +32,12 @@ const ForgotPasswordForm = () => {
       })
       setSuccess(t('Reset_code_sent'))
       setStep('reset')
-    } catch (err) {
-      setError(t('Failed_to_send_reset_code'))
+    } catch (err: any) {
+      if (err.response?.data?.message && err.response?.status !== 500) {
+        setError(err.response.data.message)
+      } else {
+        setError(t('Failed_to_send_reset_code'))
+      }
     } finally {
       setIsLoading(false)
     }
@@ -56,8 +60,12 @@ const ForgotPasswordForm = () => {
       setTimeout(() => {
         window.location.href = `/${locale}/auth/login`
       }, 2000)
-    } catch (err) {
-      setError(t('Failed_to_reset_password'))
+    } catch (err: any) {
+      if (err.response?.data?.message && err.response?.status !== 500) {
+        setError(err.response.data.message)
+      } else {
+        setError(t('Failed_to_reset_password'))
+      }
     } finally {
       setIsLoading(false)
     }
