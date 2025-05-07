@@ -42,7 +42,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
   }
 
   return (
-    <div className='w-full rounded-lg bg-white p-4 shadow dark:bg-black'>
+    <div className='bg-white-pure w-full rounded-lg p-4 shadow '>
       <div className='mb-4 flex flex-col items-center justify-between sm:flex-row'>
         <h2 className='mb-2 text-xl font-semibold sm:mb-0'>
           {t('Conference_Results')} ({totalItems})
@@ -56,7 +56,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
             </label>
             <select
               id='sort-by'
-              className='rounded border bg-gray-50 px-2 py-1 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-950'
+              className='bg-gray-5 rounded border px-2 py-1 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 '
               value={sortBy}
               onChange={handleSortByChange}
               title='Select field to sort by'
@@ -73,7 +73,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
             </label>
             <select
               id='event-per-page'
-              className='rounded border bg-gray-50 px-2 py-1 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-950'
+              className='bg-gray-5 rounded border px-2 py-1 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 '
               value={eventsPerPage}
               onChange={handleEventPerPageChange}
               title='Select number of event per page'
@@ -87,7 +87,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
 
             <button
               onClick={handleSortOrderChange}
-              className='rounded bg-gray-200 px-1 py-1 text-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-950 dark:hover:bg-gray-800'
+              className='bg-gray-20 hover:bg-gray-30 rounded px-1 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500  '
               title={sortOrder === 'asc' ? 'Sort Ascending' : 'Sort Descending'}
             >
               {sortOrder === 'asc' ? (
@@ -137,7 +137,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
             onClick={() =>
               setViewType(prev => (prev === 'card' ? 'table' : 'card'))
             }
-            className='rounded bg-gray-200 px-1 py-1 text-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-950 dark:hover:bg-gray-800'
+            className='bg-gray-20 hover:bg-gray-30 rounded px-1 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 '
             title={
               viewType === 'card'
                 ? 'Switch to Table View'
@@ -187,7 +187,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
           {/* --- ADDED: Download CSV Button --- */}
           <button
             // onClick={handleDownloadCSV}
-            className='rounded bg-gray-200 px-1 py-1 text-sm  hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-950 dark:hover:bg-gray-800'
+            className='bg-gray-20 hover:bg-gray-30 rounded px-1 py-1  text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 '
             title='Download CSV'
           >
             <svg
