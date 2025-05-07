@@ -5,8 +5,8 @@ import { Link } from '@/src/navigation'
 import useLoginForm from '../../../../hooks/auth/useLoginForm'
 import { useTranslations } from 'next-intl'
 import { appConfig } from '@/src/middleware'
-import { useGoogleLogin } from '@react-oauth/google';
-import axios from 'axios';
+import { useGoogleLogin } from '@react-oauth/google'
+import axios from 'axios'
 import { useRouter } from 'next/navigation'
 
 type LoginFormProps = {
@@ -30,25 +30,26 @@ const LoginForm: React.FC<LoginFormProps> = (props: LoginFormProps) => {
   const login = useGoogleLogin({
     onSuccess: async tokenResponse => {
       // Step [2]: Get access token
-      const accessToken = tokenResponse.access_token;
+      const accessToken = tokenResponse.access_token
 
       // Step [3]: Send to backend
-      const res = await axios.post(appConfig.NEXT_PUBLIC_DATABASE_URL+'/api/v1/auth/google', {
-        access_token: accessToken,
-      });
+      const res = await axios.post(
+        appConfig.NEXT_PUBLIC_DATABASE_URL + '/api/v1/auth/google',
+        {
+          access_token: accessToken
+        }
+      )
 
       // Receive your own backend-issued JWT
-      console.log('JWT from backend:', res.data.token);
-      const jwt = res.data.token;
-      localStorage.setItem('token', jwt);
+      console.log('JWT from backend:', res.data.token)
+      const jwt = res.data.token
+      localStorage.setItem('token', jwt)
       // Step [4]: Redirect to the redirect
       router.push('/')
-
     },
     onError: () => console.log('Login Failed'),
-    scope: 'openid profile email', 
-  });
-
+    scope: 'openid profile email'
+  })
 
   const [isClient, setIsClient] = useState(false)
 
@@ -57,9 +58,9 @@ const LoginForm: React.FC<LoginFormProps> = (props: LoginFormProps) => {
   })
 
   return (
-    <div className='flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-12 dark:bg-gray-800 sm:px-6 lg:px-8'>
+    <div className='bg-gray-5 flex min-h-screen flex-col items-center justify-center px-4 py-12  sm:px-6 lg:px-8'>
       <div className='w-full max-w-xl'>
-        <div className='bg-white px-8 py-10 shadow-xl dark:bg-gray-900 sm:rounded-lg sm:px-16'>
+        <div className='bg-white-pure px-8 py-10 shadow-xl  sm:rounded-lg sm:px-16'>
           <div className='space-y-8'>
             <div className='space-y-2 text-center'>
               <h1 className='mx-auto max-w-fit text-xl font-bold tracking-tight sm:text-2xl md:text-3xl'>
@@ -72,7 +73,7 @@ const LoginForm: React.FC<LoginFormProps> = (props: LoginFormProps) => {
               <button
                 type='button'
                 onClick={() => login()}
-                className='flex w-full items-center justify-center space-x-2 rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium shadow-sm  hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:bg-gray-800'
+                className='bg-white-pure flex w-full items-center justify-center space-x-2 rounded-md border border-gray-300 px-4 py-2.5 text-sm font-medium shadow-sm  hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 '
               >
                 <svg className='h-5 w-5' viewBox='0 0 24 24'>
                   <path
@@ -101,9 +102,7 @@ const LoginForm: React.FC<LoginFormProps> = (props: LoginFormProps) => {
                 <div className='w-full border-t border-gray-300' />
               </div>
               <div className='relative flex justify-center text-sm'>
-                <span className='bg-white px-2 dark:bg-gray-900 '>
-                  {t('or')}
-                </span>
+                <span className='bg-white-pure px-2 '>{t('or')}</span>
               </div>
             </div>
 

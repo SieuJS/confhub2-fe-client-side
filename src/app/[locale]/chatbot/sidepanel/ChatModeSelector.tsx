@@ -29,8 +29,8 @@ const ChatModeSelector: React.FC<ChatModeSelectorProps> = ({
           disabled={disabled}
           className={`group flex flex-col items-center justify-center rounded-lg border p-3 transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 ${
             currentChatMode === 'live'
-              ? 'border-blue-500 bg-gray-100 ring-1 ring-blue-500 dark:bg-gray-950'
-              : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50 dark:bg-gray-900'
+              ? 'bg-gray-10 border-blue-500 ring-1 ring-blue-500 '
+              : 'bg-white-pure hover:bg-gray-5 border-gray-300 hover:border-gray-400 '
           }`}
           aria-pressed={currentChatMode === 'live'}
         >
@@ -50,8 +50,8 @@ const ChatModeSelector: React.FC<ChatModeSelectorProps> = ({
           disabled={disabled}
           className={`group flex flex-col items-center justify-center rounded-lg border p-3 transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 ${
             currentChatMode === 'regular'
-              ? 'border-blue-500 bg-gray-100 ring-1 ring-blue-500 dark:bg-gray-950'
-              : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50 dark:bg-gray-900'
+              ? 'bg-gray-10 border-blue-500 ring-1 ring-blue-500 '
+              : 'bg-white-pure hover:bg-gray-5 border-gray-300 hover:border-gray-400 '
           }`}
           aria-pressed={currentChatMode === 'regular'}
         >

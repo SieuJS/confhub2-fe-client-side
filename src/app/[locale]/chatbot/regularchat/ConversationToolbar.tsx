@@ -64,7 +64,11 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
 
   const handleClear = () => {
     if (!activeConversationId || !activeConversation) return
-    if (window.confirm(t('Confirm_Clear_Conversation', { title: activeConversation.title }))) {
+    if (
+      window.confirm(
+        t('Confirm_Clear_Conversation', { title: activeConversation.title })
+      )
+    ) {
       clearConversation(activeConversationId)
       // Có thể cần load lại conversation hoặc start new nếu muốn UI reset hoàn toàn
       // startNewConversation(); // Ví dụ: hoặc để event handler tự xử lý
@@ -74,21 +78,24 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
 
   const handleDelete = () => {
     if (!activeConversationId || !activeConversation) return
-    if (window.confirm(t('Confirm_Delete_Conversation', { title: activeConversation.title }))) {
+    if (
+      window.confirm(
+        t('Confirm_Delete_Conversation', { title: activeConversation.title })
+      )
+    ) {
       deleteConversation(activeConversationId)
       // Sau khi xóa, activeConversationId sẽ bị clear, UI sẽ tự động về trạng thái intro
     }
     setShowMoreMenu(false)
   }
 
-
   if (!activeConversationId) {
     return null // Không hiển thị toolbar nếu không có conversation nào active
   }
 
   return (
-    <div className='flex h-14 flex-shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-2 shadow-sm dark:border-gray-700 dark:bg-gray-800'>
-      <div className='flex items-center min-w-0'>
+    <div className='bg-white-pure flex h-14 flex-shrink-0 items-center justify-between border-b border-gray-200 px-4 py-2 shadow-sm dark:border-gray-700 '>
+      <div className='flex min-w-0 items-center'>
         {isEditingTitle ? (
           <input
             type='text'
@@ -101,7 +108,7 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
           />
         ) : (
           <h2
-            className='truncate text-base font-semibold text-gray-800 dark:text-gray-100'
+            className='truncate text-base font-semibold '
             title={currentTitle}
           >
             {currentTitle}
@@ -113,7 +120,7 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
         <button
           onClick={() => setIsEditingTitle(true)}
           disabled={isEditingTitle}
-          className='rounded-md p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200'
+          className='rounded-md p-1.5  hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500  dark:hover:bg-gray-700 dark:hover:text-gray-200'
           title={t('Rename_Conversation')}
         >
           <Pencil size={18} />
@@ -123,7 +130,7 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
           className={`rounded-md p-1.5 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:bg-gray-700 ${
             isPinned
               ? 'text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
-              : 'text-gray-500 dark:text-gray-400 dark:hover:text-gray-200'
+              : '  dark:hover:text-gray-200'
           }`}
           title={isPinned ? t('Unpin_Conversation') : t('Pin_Conversation')}
         >
@@ -134,7 +141,7 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
         <div className='relative'>
           <button
             onClick={() => setShowMoreMenu(!showMoreMenu)}
-            className='rounded-md p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200'
+            className='rounded-md p-1.5  hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500  dark:hover:bg-gray-700 dark:hover:text-gray-200'
             title={t('More_Actions')}
           >
             <MoreVertical size={18} />

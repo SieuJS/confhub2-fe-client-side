@@ -948,5 +948,7 @@
   "Last_Activity": "Last Activity",
   "Delete": "Delete",
   "No_Search_Results_Found": "No search results found.",
-  "Loading_Initial_History": "Loading initial history..."
+  "Loading_Initial_History": "Loading initial history...",
+  "Actions": "Actions",
+  "Open_panel": "Open panel"
 }

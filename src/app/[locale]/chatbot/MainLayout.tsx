@@ -17,16 +17,15 @@ interface MainLayoutComponentProps {
 
 type MainContentView = 'chat' | 'history'
 
-export default function MainLayoutComponent({ children }: MainLayoutComponentProps) {
+export default function MainLayoutComponent({
+  children
+}: MainLayoutComponentProps) {
   const t = useTranslations()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const {
-    chatMode,
-    handleChatModeNavigation
-  } = useChatSettings()
+  const { chatMode, handleChatModeNavigation } = useChatSettings()
 
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true)
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(true)
@@ -42,7 +41,7 @@ export default function MainLayoutComponent({ children }: MainLayoutComponentPro
     deleteConversation,
     clearConversation,
     renameConversation,
-    pinConversation,
+    pinConversation
   } = useSharedChatSocket()
 
   // 1) Xác định currentView theo URL
@@ -66,7 +65,8 @@ export default function MainLayoutComponent({ children }: MainLayoutComponentPro
         params.delete('id')
         shouldUpdate = true
       }
-    } else { // history view
+    } else {
+      // history view
       if (urlId) {
         params.delete('id')
         shouldUpdate = true
@@ -76,7 +76,9 @@ export default function MainLayoutComponent({ children }: MainLayoutComponentPro
     if (shouldUpdate) {
       const newQs = params.toString()
       // Use replace to avoid adding to browser history for URL param changes
-      router.replace(`${pathname}${newQs ? `?${newQs}` : ''}`, { scroll: false })
+      router.replace(`${pathname}${newQs ? `?${newQs}` : ''}`, {
+        scroll: false
+      })
     }
   }, [activeConversationId, currentView, pathname, router, searchParams])
 
@@ -90,18 +92,30 @@ export default function MainLayoutComponent({ children }: MainLayoutComponentPro
     // Logic `loadConversation` bên trong context nên xử lý việc ID không hợp lệ.
     if (currentView === 'chat' && urlId && !activeConversationId) {
       // Check if this urlId is a known conversation to prevent trying to load invalid IDs from stale URLs
-      const isValidInList = conversationList.some(conv => conv.id === urlId);
-      if (isValidInList) { // Or simply let loadConversation handle invalid IDs
-          loadConversation(urlId)
+      const isValidInList = conversationList.some(conv => conv.id === urlId)
+      if (isValidInList) {
+        // Or simply let loadConversation handle invalid IDs
+        loadConversation(urlId)
       } else if (conversationList.length > 0 && !isLoadingHistory) {
         // If list is loaded and ID is not in it, maybe clear the invalid ID from URL
-        console.warn(`URL ID ${urlId} not found in conversation list. Consider clearing it.`);
+        console.warn(
+          `URL ID ${urlId} not found in conversation list. Consider clearing it.`
+        )
         // const params = new URLSearchParams(searchParams.toString());
         // params.delete('id');
         // router.replace(`${pathname}${params.toString() ? `?${params.toString()}` : ''}`, { scroll: false });
       }
     }
-  }, [searchParams, currentView, activeConversationId, loadConversation, conversationList, isLoadingHistory, pathname, router]) // Added dependencies
+  }, [
+    searchParams,
+    currentView,
+    activeConversationId,
+    loadConversation,
+    conversationList,
+    isLoadingHistory,
+    pathname,
+    router
+  ]) // Added dependencies
 
   // Khi click vào 1 conversation trong danh sách
   const handleSelectConversation = useCallback(
@@ -109,8 +123,9 @@ export default function MainLayoutComponent({ children }: MainLayoutComponentPro
       loadConversation(conversationId)
       // Nếu đang ở trang history, chuyển về trang chat tương ứng
       if (currentView === 'history') {
-        const targetChatPath = chatMode === 'live' ? '/chatbot/livechat' : '/chatbot/regularchat';
-        router.push(targetChatPath); // ID sẽ được thêm vào URL bởi useEffect (2)
+        const targetChatPath =
+          chatMode === 'live' ? '/chatbot/livechat' : '/chatbot/regularchat'
+        router.push(targetChatPath) // ID sẽ được thêm vào URL bởi useEffect (2)
       }
     },
     [loadConversation, currentView, router, chatMode]
@@ -123,9 +138,10 @@ export default function MainLayoutComponent({ children }: MainLayoutComponentPro
     //    - Client-side: Đặt activeConversationId = null, xóa messages hiện tại.
     //    - Emits event lên server để tạo conversation mới.
     //    - Server sẽ trả về event onNewConversationStarted với ID mới, lúc đó activeConversationId mới được set.
-    startNewConversation();
+    startNewConversation()
 
-    const targetChatPath = chatMode === 'live' ? '/chatbot/livechat' : '/chatbot/regularchat';
+    const targetChatPath =
+      chatMode === 'live' ? '/chatbot/livechat' : '/chatbot/regularchat'
 
     // 2. Điều hướng để "làm sạch" URL và component chat.
     // Điều này quan trọng để tránh component chat cố gắng load dựa trên ID cũ từ URL.
@@ -133,17 +149,26 @@ export default function MainLayoutComponent({ children }: MainLayoutComponentPro
     // - Nếu đang ở trang chat (currentView === 'chat'):
     //    - Nếu path hiện tại không phải là targetChatPath (ví dụ, từ live sang regular hoặc ngược lại do lỗi state), điều hướng.
     //    - Nếu path hiện tại là targetChatPath NHƯNG CÓ `id` trong URL (đang xem chat cũ), điều hướng để xóa `id` đó.
-    if (currentView === 'history' || pathname !== targetChatPath || searchParams.has('id')) {
-      router.push(targetChatPath);
+    if (
+      currentView === 'history' ||
+      pathname !== targetChatPath ||
+      searchParams.has('id')
+    ) {
+      router.push(targetChatPath)
     }
     // Nếu đã ở targetChatPath và không có 'id' (ví dụ /chatbot/regularchat),
     // thì startNewConversation() đã reset state client.
     // Component chat sẽ chờ activeConversationId mới từ server.
     // useEffect (2) sẽ cập nhật URL với ID mới khi nó có.
     // Không cần router.push dư thừa trong trường hợp này.
-
-  }, [startNewConversation, router, chatMode, currentView, pathname, searchParams]);
-
+  }, [
+    startNewConversation,
+    router,
+    chatMode,
+    currentView,
+    pathname,
+    searchParams
+  ])
 
   // Chuyển giữa live/regular
   const internalHandleChatModeChange = (mode: typeof chatMode) => {
@@ -155,7 +180,7 @@ export default function MainLayoutComponent({ children }: MainLayoutComponentPro
   }
 
   return (
-    <div className='flex h-screen overflow-hidden bg-gray-100 dark:bg-gray-800'>
+    <div className='bg-gray-10 flex h-screen overflow-hidden'>
       <LeftPanel
         isOpen={isLeftPanelOpen}
         onToggleOpen={() => setIsLeftPanelOpen(v => !v)}
@@ -187,7 +212,7 @@ export default function MainLayoutComponent({ children }: MainLayoutComponentPro
       {!isRightPanelOpen && (
         <button
           onClick={() => setIsRightPanelOpen(true)}
-          className='fixed right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500'
+          className='bg-white-pure hover:bg-gray-5 fixed right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
           title={t('Open_settings')}
           aria-label={t('Open_settings')}
         >

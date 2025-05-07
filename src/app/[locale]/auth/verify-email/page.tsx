@@ -13,9 +13,9 @@ export default function VerifyEmailPage() {
   const t = useTranslations('') // t có thể dùng cho tiêu đề chung của trang
 
   return (
-    <div className='flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-12 dark:bg-gray-800 sm:px-6 lg:px-8'>
+    <div className='bg-gray-5 0 flex min-h-screen flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8'>
       <div className='w-full max-w-md'>
-        <div className='bg-white px-8 py-10 shadow-xl dark:bg-gray-900 sm:rounded-lg sm:px-10'>
+        <div className='bg-white-pure px-8 py-10 shadow-xl  sm:rounded-lg sm:px-10'>
           <div className='mb-8 space-y-2 text-center'>
             <h1 className='text-2xl font-bold tracking-tight '>
               {t('Verify_Your_Email_Address')}
