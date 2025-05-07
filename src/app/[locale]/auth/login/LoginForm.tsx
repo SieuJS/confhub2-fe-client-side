@@ -40,8 +40,6 @@ const LoginForm: React.FC<LoginFormProps> = (props: LoginFormProps) => {
         }
       )
 
-      // Receive your own backend-issued JWT
-      console.log('JWT from backend:', res.data.token)
       const jwt = res.data.token
       localStorage.setItem('token', jwt)
       // Step [4]: Redirect to the redirect
