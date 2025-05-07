@@ -6,7 +6,7 @@ import { EmailConfirmationResult, StatusUpdate, ResultUpdate, ErrorUpdate, ChatU
 // Keep Interfaces the same, ensure EmailConfirmationResult is defined correctly in the model
 export interface SocketConnectionOptions {
     socketUrl: string;
-    authToken: string | null;
+    authToken: string | null | undefined;
     reconnectionAttempts?: number;
     reconnectionDelay?: number;
     reconnectionDelayMax?: number;

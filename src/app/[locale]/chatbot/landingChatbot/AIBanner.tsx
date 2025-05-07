@@ -1,4 +1,5 @@
-// src/components/AIBanner.tsx
+// src/components/chatbot/AIBanner.tsx
+
 'use client'
 
 import React, { useState } from 'react'

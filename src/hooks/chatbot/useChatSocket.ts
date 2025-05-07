@@ -6,14 +6,13 @@ import { Socket } from 'socket.io-client';
 // State and Types
 import { useChatState, ChatState } from './useChatState';
 import {
-    ChatMessageType, ErrorUpdate, ThoughtStep, Language, // Added Language
-    ConversationMetadata // Added ConversationMetadata
+    ChatMessageType, ErrorUpdate, ThoughtStep
 } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
 import { appConfig } from '@/src/middleware';
 
 // Connection and Handlers/Actions
 import { useSocketConnection, SocketConnectionOptions } from './useSocketConnection';
-import { useSocketEventHandlers, SocketEventHandlers } from './useSocketEventHandlers'; // Import extended type
+import { useSocketEventHandlers, SocketEventHandlers, UseSocketEventHandlersProps } from './useSocketEventHandlers';
 import { useChatActions, ChatActions } from './useChatActions';
 
 // Other Hooks and Utils
@@ -31,9 +30,10 @@ export interface UseChatSocketProps {
 export interface ChatSocketControls extends Omit<ChatState, 'isMountedRef' | 'authToken'>, ChatActions {
     isConnected: boolean;
     socketId: string | null;
-    // Add specific methods not covered by ChatActions if needed
     closeConfirmationDialog: () => void;
+    // isSearching và searchResults đã có trong ChatState được spread (...)
 }
+
 
 export function useChatSocket({
     socketUrl,
@@ -41,13 +41,19 @@ export function useChatSocket({
     onInitialConnectionError,
 }: UseChatSocketProps): ChatSocketControls {
 
-    // 1. Initialize Core State
+    // 1. Initialize Core State (bao gồm searchResults và isSearching)
     const {
         chatMessages, loadingState, hasFatalError, isHistoryLoaded, isLoadingHistory,
         showConfirmationDialog, confirmationData, conversationList, activeConversationId,
-        authToken, isMountedRef, setChatMessages, setLoadingState, setHasFatalError,
+        authToken, isMountedRef,
+        // --- NEW STATES FROM useChatState ---
+        searchResults, isSearching,
+        // --- SETTERS ---
+        setChatMessages, setLoadingState, setHasFatalError,
         setIsHistoryLoaded, setIsLoadingHistory, setShowConfirmationDialog,
-        setConfirmationData, setConversationList, setActiveConversationId, setAuthToken
+        setConfirmationData, setConversationList, setActiveConversationId, setAuthToken,
+        // --- NEW SETTERS FROM useChatState ---
+        setSearchResults, setIsSearching,
     } = useChatState();
 
     // 2. Initialize UI-specific Hooks
@@ -148,26 +154,22 @@ export function useChatSocket({
     // 7. Initialize Socket Event Handlers
     const socketRefFromConnection = useRef<Socket | null>(null);
 
-    const socketEventHandlers: SocketEventHandlers = useSocketEventHandlers({
-        // Pass all required props, including the newly added one
+    // Truyền các setter mới vào useSocketEventHandlers
+    const socketEventHandlersProps: UseSocketEventHandlersProps = {
         isMountedRef,
         setChatMessages, setLoadingState, setHasFatalError, setIsHistoryLoaded,
         setIsLoadingHistory, setShowConfirmationDialog, setConfirmationData,
         setConversationList, setActiveConversationId,
-        animationControls,
-        handleError,
-        onConnectionChange,
-        onInitialConnectionError,
-        confirmationData,
-        BASE_WEB_URL,
-        currentLocale,
-        socketRef: socketRefFromConnection,
-        isAwaitingFinalResultRef,
-        activeConversationId,
-        resetAwaitFlag, // <--- ADD THIS LINE
-    });
+        animationControls, handleError, onConnectionChange, onInitialConnectionError,
+        confirmationData, BASE_WEB_URL, currentLocale, socketRef: socketRefFromConnection,
+        isAwaitingFinalResultRef, activeConversationId, resetAwaitFlag,
+        // --- NEW ---
+        setSearchResults, setIsSearching,
+    };
+    const socketEventHandlers: SocketEventHandlers = useSocketEventHandlers(socketEventHandlersProps);
 
-    // 8. Initialize Socket Connection
+
+    // 8. Initialize Socket Connection (giữ nguyên)
     const connection = useSocketConnection(socketOptions, socketEventHandlers);
     const { isConnected: rawIsConnected, socketId, socketRef } = connection;
 
@@ -181,7 +183,8 @@ export function useChatSocket({
         onConnectionChange?.(isEffectivelyConnected);
     }, [isEffectivelyConnected, onConnectionChange]);
 
-    // 9. Initialize Chat Actions
+
+    // 9. Initialize Chat Actions (truyền setter mới)
     const chatActions = useChatActions({
         socketRef,
         isConnected: isEffectivelyConnected,
@@ -192,15 +195,16 @@ export function useChatSocket({
         animationControls,
         activeConversationId,
         resetAwaitFlag,
+        // --- NEW ---
+        setIsSearching,
     });
 
-    // 10. Specific Action Implementations
+    // 10. Specific Action Implementations (giữ nguyên)
     const closeConfirmationDialog = useCallback(() => {
         setShowConfirmationDialog(false);
-        // setConfirmationData(null); // Keep data until backend confirms? Or clear here? Let's clear on backend confirm.
     }, [setShowConfirmationDialog]);
 
-    // 11. Mount/Unmount Logic
+    // 11. Mount/Unmount Logic (giữ nguyên)
     useEffect(() => {
         isMountedRef.current = true;
         return () => {
@@ -212,28 +216,27 @@ export function useChatSocket({
     // 12. Return Combined Controls
     return {
         // State
-        chatMessages,
-        loadingState,
-        hasFatalError,
-        isHistoryLoaded,
-        isLoadingHistory,
-        showConfirmationDialog,
-        confirmationData,
-        conversationList,
-        activeConversationId,
+        chatMessages, loadingState, hasFatalError, isHistoryLoaded, isLoadingHistory,
+        showConfirmationDialog, confirmationData, conversationList, activeConversationId,
+        // --- NEW STATES ---
+        searchResults, isSearching,
 
         // Connection Info
         isConnected: isEffectivelyConnected,
         socketId,
 
-        // Actions (includes new delete/clear actions from chatActions)
+        // Actions (bao gồm các actions mới từ chatActions)
         sendMessage: chatActions.sendMessage,
         loadConversation: chatActions.loadConversation,
         startNewConversation: chatActions.startNewConversation,
         handleConfirmSend: chatActions.handleConfirmSend,
         handleCancelSend: chatActions.handleCancelSend,
-        deleteConversation: chatActions.deleteConversation, // <-- New
-        clearConversation: chatActions.clearConversation,   // <-- New
+        deleteConversation: chatActions.deleteConversation,
+        clearConversation: chatActions.clearConversation,
+        // --- NEW ACTIONS ---
+        renameConversation: chatActions.renameConversation,
+        pinConversation: chatActions.pinConversation,
+        searchConversations: chatActions.searchConversations,
 
         // Specific Methods
         closeConfirmationDialog,

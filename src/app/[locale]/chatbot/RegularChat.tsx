@@ -7,27 +7,24 @@ import ChatInput from './regularchat/ChatInput'
 import LoadingIndicator from './regularchat/LoadingIndicator'
 import ChatIntroductionDisplay from './regularchat/ChatIntroduction'
 import EmailConfirmationDialog from './EmailConfirmationDialog'
+import ConversationToolbar from './regularchat/ConversationToolbar' // <-- IMPORT TOOLBAR
 import { useTimer } from '@/src/hooks/chatbot/useTimer'
 import { useSharedChatSocket } from './context/ChatSocketContext'
 import { Language } from './lib/live-chat.types'
 import { useTranslations } from 'next-intl'
 
-// Define props interface
 interface RegularChatProps {
   currentLanguage: Language
 }
 
 function RegularChat({ currentLanguage }: RegularChatProps) {
   const t = useTranslations()
-
-  // --- Use Hooks ---
   const { timeCounter, startTimer, stopTimer } = useTimer()
-  // --- Use the SHARED hook via context ---
   const {
     chatMessages,
     loadingState,
     isConnected,
-    sendMessage: sendMessageViaSocket,
+    sendMessage, // Đã có sendMessage từ context
     socketId,
     showConfirmationDialog,
     confirmationData,
@@ -36,10 +33,9 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
     closeConfirmationDialog,
     activeConversationId,
     isLoadingHistory,
-    sendMessage // Get the actual sendMessage from the shared hook
+    conversationList, // <-- LẤY conversationList TỪ CONTEXT
   } = useSharedChatSocket()
 
-  // --- Component Specific State ---
   const [hasChatStarted, setHasChatStarted] = useState<boolean>(false)
   const [fillInputFunction, setFillInputFunction] = useState<
     ((text: string) => void) | null
@@ -47,7 +43,6 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
   const chatHistoryRef = useRef<HTMLDivElement>(null)
   const [isStreamingEnabled, setIsStreamingEnabled] = useState<boolean>(true)
 
-  // --- Scroll to Bottom ---
   useEffect(() => {
     if (chatHistoryRef.current && !showConfirmationDialog) {
       setTimeout(() => {
@@ -58,9 +53,7 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
     }
   }, [chatMessages, showConfirmationDialog])
 
-  // --- Stop Timer Logic ---
   useEffect(() => {
-    // Stop timer if loading finishes OR if the confirmation dialog appears (pauses activity)
     if (
       (!loadingState.isLoading || showConfirmationDialog) &&
       timeCounter !== '0.0s'
@@ -69,25 +62,21 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
     }
   }, [loadingState.isLoading, showConfirmationDialog, stopTimer, timeCounter])
 
-  // --- Send Chat Message ---
   const sendChatMessage = useCallback(
     async (userMessage: string) => {
       const trimmedMessage = userMessage.trim()
       if (!trimmedMessage) return
       if (!isConnected) {
         console.warn('Attempted to send message while disconnected.')
-        // Optionally show a user-facing error message here
         return
       }
-      if (!hasChatStarted) setHasChatStarted(true)
+      if (!hasChatStarted) setHasChatStarted(true) // Không cần check activeConversationId ở đây nữa
       startTimer()
-      // Use the sendMessage function obtained from the context
       sendMessage(trimmedMessage, isStreamingEnabled, currentLanguage)
     },
-    [isConnected, startTimer, sendMessage, isStreamingEnabled, currentLanguage]
+    [isConnected, hasChatStarted, startTimer, sendMessage, isStreamingEnabled, currentLanguage]
   )
 
-  // --- Input Interaction Logic ---
   const handleSetFillInput = useCallback((fillFunc: (text: string) => void) => {
     setFillInputFunction(() => fillFunc)
   }, [])
@@ -101,26 +90,18 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
     [fillInputFunction]
   )
 
-  // --- Handle Toggle Change ---
   const handleStreamingToggle = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setIsStreamingEnabled(event.target.checked)
   }
 
-  // --- QUYẾT ĐỊNH HIỂN THỊ INTRODUCTION ---
-  // Hiển thị Intro khi:
-  // 1. Không có conversation nào đang active (activeConversationId là null)
-  // 2. Mảng chatMessages rỗng
-  // 3. Không đang trong quá trình loading history
   const showIntroduction =
     !activeConversationId && chatMessages.length === 0 && !isLoadingHistory
-  // ---------------------------------------
 
-  // --- JSX Structure ---
   return (
     <div className='relative mx-auto flex h-full w-full flex-col rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-600 dark:bg-black'>
-      {/* Header */}
+      {/* Connection Status Header */}
       <div className='flex-shrink-0 border-b border-gray-200 bg-gray-50 p-2 dark:border-gray-600 dark:bg-gray-900'>
         <div className='flex items-center justify-center space-x-1 text-center text-xs '>
           <span
@@ -133,7 +114,15 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
         </div>
       </div>
 
-      {/* Chat History Area */}
+      {/* --- CONVERSATION TOOLBAR --- */}
+      {activeConversationId && ( // Chỉ hiển thị khi có conversation active
+        <ConversationToolbar
+          activeConversationId={activeConversationId}
+          conversationList={conversationList}
+        />
+      )}
+      {/* --------------------------- */}
+
       <div
         ref={chatHistoryRef}
         className='flex-grow space-y-4 overflow-y-auto bg-gray-50  p-4 dark:bg-gray-900 md:p-6'
@@ -141,28 +130,25 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
         {showIntroduction && (
           <ChatIntroductionDisplay
             onSuggestionClick={handleSuggestionClick}
-            language={currentLanguage} // Truyền prop language
+            language={currentLanguage}
           />
         )}
         <ChatHistory messages={chatMessages} />
       </div>
 
-      {/* Loading Indicator Area */}
-      {/* Có thể muốn hiển thị loading indicator riêng khi isLoadingHistory */}
       {(loadingState.isLoading || isLoadingHistory) &&
         !showConfirmationDialog && (
           <div className='flex-shrink-0 border-t border-gray-200 bg-gray-50 px-4 py-2   dark:border-gray-600 dark:bg-gray-900'>
             <LoadingIndicator
               step={isLoadingHistory ? 'loading_history' : loadingState.step}
               message={
-                isLoadingHistory ? 'Loading chat...' : loadingState.message
+                isLoadingHistory ? t('Loading_Chat_History') : loadingState.message
               }
               timeCounter={isLoadingHistory ? undefined : timeCounter}
             />
           </div>
         )}
 
-      {/* Streaming Toggle UI - Disable while dialog is shown */}
       <div className='flex flex-shrink-0 items-center justify-end space-x-2 border-t border-gray-200 bg-gray-50 px-4 pb-1  pt-2 dark:border-gray-600 dark:bg-gray-900'>
         <label
           htmlFor='streaming-toggle'
@@ -182,11 +168,9 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
         />
       </div>
 
-      {/* Input Area - Disable while dialog is shown */}
       <div className='flex-shrink-0 border-t border-gray-200 bg-gray-50  p-3 pt-2  dark:border-gray-600 dark:bg-gray-900 md:p-4'>
         <ChatInput
           onSendMessage={sendChatMessage}
-          // Disable input when loading, disconnected, OR when confirmation dialog is shown
           disabled={
             loadingState.isLoading ||
             !isConnected ||
@@ -197,7 +181,6 @@ function RegularChat({ currentLanguage }: RegularChatProps) {
         />
       </div>
 
-      {/* --- Conditionally Render the Confirmation Dialog --- */}
       <EmailConfirmationDialog
         isOpen={showConfirmationDialog}
         data={confirmationData}

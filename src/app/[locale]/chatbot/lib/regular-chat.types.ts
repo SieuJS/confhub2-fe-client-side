@@ -162,14 +162,6 @@ export interface ConfirmationResultPayload {
 }
 
 
-    
-// Định nghĩa kiểu dữ liệu cho metadata trả về frontend
-export interface ConversationMetadata {
-    id: string; // Chính là _id của MongoDB
-    title: string; // Tin nhắn đầu tiên hoặc tiêu đề tự tạo
-    lastActivity: Date;
-}
-
 
 export type Language = 'en' | 'vi' | 'zh';
 export type ChatMode = 'live' | 'regular';
@@ -178,3 +170,55 @@ export interface LanguageOption {
     name: string;
     flagCode: string;
 }
+
+
+
+// --- Payload Types for New Events ---
+export interface ConversationDeletedPayload {
+    conversationId: string;
+}
+
+export interface ConversationClearedPayload {
+    conversationId: string;
+}
+export interface ConversationRenamedPayload {
+    conversationId: string;
+    newTitle: string; // Tiêu đề đã được chuẩn hóa bởi backend
+}
+
+export interface ConversationPinStatusChangedPayload {
+    conversationId: string;
+    isPinned: boolean;
+}
+
+// --- Payload Types for Emitting New Events to Backend ---
+export interface RenameConversationClientData {
+    conversationId: string;
+    newTitle: string;
+}
+
+export interface PinConversationClientData {
+    conversationId: string;
+    isPinned: boolean;
+}
+
+export interface SearchConversationsClientData {
+    searchTerm: string;
+    limit?: number;
+}
+
+// --- Conversation Metadata (đảm bảo có các trường cần thiết) ---
+// Nếu bạn đã có ClientConversationMetadata, hãy đảm bảo nó có các trường này
+export interface ConversationMetadata { // Hoặc ClientConversationMetadata
+    id: string;
+    title: string;       // Sẽ là customTitle nếu có, nếu không là auto-generated
+    lastActivity: Date;  // Hoặc string nếu bạn parse ở client
+    isPinned: boolean;
+    // customTitle?: string; // Tùy chọn: Client có thể muốn biết đây là custom title hay không
+    // snippet?: string; // Cho kết quả tìm kiếm
+}
+
+// --- Payload cho sự kiện kết quả tìm kiếm từ backend ---
+// Backend trả về một mảng ConversationMetadata
+// export type ConversationSearchResultsPayload = ConversationMetadata[];
+// Không cần type riêng, vì nó là mảng ConversationMetadata

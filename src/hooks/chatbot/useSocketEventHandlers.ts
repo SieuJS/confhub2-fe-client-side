@@ -1,31 +1,28 @@
 // src/app/[locale]/hooks/chatbot/useSocketEventHandlers.ts
-import { useCallback, useMemo, useRef, MutableRefObject } from 'react';
+import { useCallback, useMemo, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
 import {
-    StatusUpdate, ResultUpdate, NavigationAction, OpenMapAction,
-    ErrorUpdate, ThoughtStep, ChatMessageType, LoadingState, ChatUpdate,
-    ConfirmSendEmailAction, EmailConfirmationResult, FrontendAction,
-    InitialHistoryPayload, ConversationMetadata
-} from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Adjust path
-import { SocketEventHandlers as BaseSocketEventHandlers } from './useSocketConnection'; // Assuming this is exported
-import { StreamingTextAnimationControls } from './useStreamingTextAnimation'; // Assuming this type is exported
-import { generateMessageId, constructNavigationUrl, openUrlInNewTab } from '@/src/app/[locale]/chatbot/utils/chatUtils'; // Adjust path
-import { ChatStateSetters } from './useChatState'; // Import setters type
+    StatusUpdate, ResultUpdate,
+    ErrorUpdate, ChatMessageType, ChatUpdate,
+    ConfirmSendEmailAction, EmailConfirmationResult,
+    InitialHistoryPayload, ConversationMetadata,
+    ConversationDeletedPayload,
+    ConversationClearedPayload,
+    ConversationRenamedPayload,
+    ConversationPinStatusChangedPayload,
+} from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
+import { SocketEventHandlers as BaseSocketEventHandlers } from './useSocketConnection';
+import { StreamingTextAnimationControls } from './useStreamingTextAnimation';
+import { generateMessageId, constructNavigationUrl, openUrlInNewTab } from '@/src/app/[locale]/chatbot/utils/chatUtils';
+import { ChatStateSetters } from './useChatState';
 
-// --- Payload Types for New Events ---
-interface ConversationDeletedPayload {
-    conversationId: string;
-}
 
-interface ConversationClearedPayload {
-    conversationId: string;
-}
 
 // --- Interface for Props passed TO useSocketEventHandlers hook ---
 /**
  * Defines the properties required by the useSocketEventHandlers hook.
  */
-export interface UseSocketEventHandlersProps extends Omit<ChatStateSetters, 'setAuthToken'> {
+export interface UseSocketEventHandlersProps extends Omit<ChatStateSetters, 'setAuthToken' | 'setSearchResults' | 'setIsSearching'> {
     /** Reference to check if the component is still mounted. */
     isMountedRef: React.MutableRefObject<boolean>;
     /** Controls for the streaming text animation. */
@@ -50,6 +47,9 @@ export interface UseSocketEventHandlersProps extends Omit<ChatStateSetters, 'set
     activeConversationId: string | null;
     /** Function to manually reset the isAwaitingFinalResultRef flag. */
     resetAwaitFlag: () => void;
+
+    setSearchResults: ChatStateSetters['setSearchResults']; // Truyền setter riêng
+    setIsSearching: ChatStateSetters['setIsSearching'];     // Truyền setter riêng
 }
 
 
@@ -93,7 +93,10 @@ export interface SocketEventHandlers extends BaseSocketEventHandlers {
     /** Handler for when a conversation clearing is confirmed by the backend. */
     onConversationCleared: (payload: ConversationClearedPayload) => void;
 
-    // Add any other custom events your application might define
+    // --- NEW EVENT HANDLERS ---
+    onConversationRenamed: (payload: ConversationRenamedPayload) => void;
+    onConversationPinStatusChanged: (payload: ConversationPinStatusChangedPayload) => void;
+    onConversationSearchResults: (results: ConversationMetadata[]) => void; // Backend trả về mảng metadata
 }
 
 
@@ -115,10 +118,11 @@ export function useSocketEventHandlers({
     confirmationData,
     BASE_WEB_URL,
     currentLocale,
-    socketRef,
     isAwaitingFinalResultRef, // Destructure the ref
     activeConversationId, // <-- Destructure new prop
-    resetAwaitFlag // <--- ADD THIS LINE
+    resetAwaitFlag, // <--- ADD THIS LINE
+    setSearchResults,
+    setIsSearching,
 
 }: UseSocketEventHandlersProps): SocketEventHandlers { // <-- Return extended type
 
@@ -353,7 +357,50 @@ export function useSocketEventHandlers({
     }, [isMountedRef, activeConversationId, setLoadingState]);
 
 
-    // Memoize the handlers object including the new ones
+     // --- NEW: Handler for Conversation Renamed Event ---
+     const handleConversationRenamed = useCallback((payload: ConversationRenamedPayload) => {
+        if (!isMountedRef.current || !payload || !payload.conversationId) return;
+        const { conversationId, newTitle } = payload;
+        console.log(`[useSocketEventHandlers] Event: Conversation Renamed. ID: ${conversationId}, New Title: ${newTitle}`);
+
+        setConversationList(prevList =>
+            prevList.map(conv =>
+                conv.id === conversationId ? { ...conv, title: newTitle } : conv
+            )
+        );
+        // Nếu conversation đang active, cập nhật title của nó trong UI (nếu có hiển thị)
+        // Điều này thường được xử lý bởi component hiển thị danh sách conversation.
+    }, [isMountedRef, setConversationList]);
+
+    // --- NEW: Handler for Conversation Pin Status Changed Event ---
+    const handleConversationPinStatusChanged = useCallback((payload: ConversationPinStatusChangedPayload) => {
+        if (!isMountedRef.current || !payload || !payload.conversationId) return;
+        const { conversationId, isPinned } = payload;
+        console.log(`[useSocketEventHandlers] Event: Pin Status Changed. ID: ${conversationId}, IsPinned: ${isPinned}`);
+
+        setConversationList(prevList =>
+            prevList.map(conv =>
+                conv.id === conversationId ? { ...conv, isPinned: isPinned } : conv
+            )
+            // Sắp xếp lại danh sách nếu cần (ghim lên đầu)
+            // Hoặc để component hiển thị danh sách tự sắp xếp dựa trên isPinned và lastActivity
+            .sort((a, b) => {
+                if (a.isPinned && !b.isPinned) return -1;
+                if (!a.isPinned && b.isPinned) return 1;
+                return new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime();
+            })
+        );
+    }, [isMountedRef, setConversationList]);
+
+    // --- NEW: Handler for Conversation Search Results Event ---
+    const handleConversationSearchResults = useCallback((results: ConversationMetadata[]) => {
+        if (!isMountedRef.current) return;
+        console.log(`[useSocketEventHandlers] Event: Conversation Search Results Received (${results?.length ?? 0} items)`);
+        setSearchResults(Array.isArray(results) ? results : []);
+        setIsSearching(false); // Kết thúc trạng thái tìm kiếm
+    }, [isMountedRef, setSearchResults, setIsSearching]);
+
+
     const socketEventHandlers: SocketEventHandlers = useMemo(() => ({
         onConnect: handleConnect,
         onDisconnect: handleDisconnect,
@@ -367,18 +414,20 @@ export function useSocketEventHandlers({
         onInitialHistory: handleInitialHistory,
         onConversationList: handleConversationList,
         onNewConversationStarted: handleNewConversationStarted,
-        // --- NEW ---
         onConversationDeleted: handleConversationDeleted,
         onConversationCleared: handleConversationCleared,
-        // ---
+        // --- NEW ---
+        onConversationRenamed: handleConversationRenamed,
+        onConversationPinStatusChanged: handleConversationPinStatusChanged,
+        onConversationSearchResults: handleConversationSearchResults,
     }), [
         handleConnect, handleDisconnect, handleConnectError, handleAuthError,
         handleStatusUpdate, handlePartialResult, handleResult, handleChatErrorEvent,
         handleEmailConfirmationResult, handleInitialHistory,
         handleConversationList, handleNewConversationStarted,
-        // --- NEW ---
         handleConversationDeleted, handleConversationCleared,
-        // ---
+        // --- NEW ---
+        handleConversationRenamed, handleConversationPinStatusChanged, handleConversationSearchResults,
     ]);
 
     return socketEventHandlers;

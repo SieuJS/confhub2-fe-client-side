@@ -1,5 +1,5 @@
 // src/app/[locale]/hooks/chatbot/useChatState.ts
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef } from 'react';
 import {
     ChatMessageType, LoadingState, ConfirmSendEmailAction,
     ConversationMetadata
@@ -15,8 +15,10 @@ export interface ChatState {
     confirmationData: ConfirmSendEmailAction | null;
     conversationList: ConversationMetadata[];
     activeConversationId: string | null;
-    authToken: string | null;
+    authToken: string | null | undefined; // undefined là trạng thái ban đầu chưa load
     isMountedRef: React.MutableRefObject<boolean>;
+    searchResults: ConversationMetadata[]; // Lưu kết quả tìm kiếm
+    isSearching: boolean;                  // Cờ báo đang tìm kiếm
 }
 
 export interface ChatStateSetters {
@@ -29,7 +31,9 @@ export interface ChatStateSetters {
     setConfirmationData: React.Dispatch<React.SetStateAction<ConfirmSendEmailAction | null>>;
     setConversationList: React.Dispatch<React.SetStateAction<ConversationMetadata[]>>;
     setActiveConversationId: React.Dispatch<React.SetStateAction<string | null>>;
-    setAuthToken: React.Dispatch<React.SetStateAction<string | null>>;
+    setAuthToken: React.Dispatch<React.SetStateAction<string | null | undefined>>;
+    setSearchResults: React.Dispatch<React.SetStateAction<ConversationMetadata[]>>;
+    setIsSearching: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function useChatState(): ChatState & ChatStateSetters {
@@ -42,8 +46,10 @@ export function useChatState(): ChatState & ChatStateSetters {
     const [confirmationData, setConfirmationData] = useState<ConfirmSendEmailAction | null>(null);
     const [conversationList, setConversationList] = useState<ConversationMetadata[]>([]);
     const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
-    const [authToken, setAuthToken] = useState<string | null>(null);
+    const [authToken, setAuthToken] = useState<string | null | undefined>(undefined); // Initial undefined state
     const isMountedRef = useRef(true); // Keep mounted ref logic if needed across modules
+    const [searchResults, setSearchResults] = useState<ConversationMetadata[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
 
     // Optional: Add initialization logic for auth token here if desired
     // useEffect(() => { ... load token ... }, []);
@@ -55,26 +61,18 @@ export function useChatState(): ChatState & ChatStateSetters {
     // }, []);
 
     return {
-        chatMessages,
-        loadingState,
-        hasFatalError,
-        isHistoryLoaded,
-        isLoadingHistory,
-        showConfirmationDialog,
-        confirmationData,
-        conversationList,
-        activeConversationId,
-        authToken,
+        chatMessages, setChatMessages,
+        loadingState, setLoadingState,
+        hasFatalError, setHasFatalError,
+        isHistoryLoaded, setIsHistoryLoaded,
+        isLoadingHistory, setIsLoadingHistory,
+        showConfirmationDialog, setShowConfirmationDialog,
+        confirmationData, setConfirmationData,
+        conversationList, setConversationList,
+        activeConversationId, setActiveConversationId,
+        authToken, setAuthToken,
         isMountedRef,
-        setChatMessages,
-        setLoadingState,
-        setHasFatalError,
-        setIsHistoryLoaded,
-        setIsLoadingHistory,
-        setShowConfirmationDialog,
-        setConfirmationData,
-        setConversationList,
-        setActiveConversationId,
-        setAuthToken,
+        searchResults, setSearchResults,
+        isSearching, setIsSearching,
     };
 }

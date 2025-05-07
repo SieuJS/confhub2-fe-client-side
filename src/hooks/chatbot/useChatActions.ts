@@ -1,21 +1,24 @@
 // src/app/[locale]/hooks/chatbot/useChatActions.ts
 import { useCallback } from 'react';
 import { Socket } from 'socket.io-client';
-import { Language } from '@/src/app/[locale]/chatbot/lib/live-chat.types'; // Adjust path
-import { ChatMessageType } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Adjust path
-import { generateMessageId } from '@/src/app/[locale]/chatbot/utils/chatUtils'; // Adjust path
-import { StreamingTextAnimationControls } from './useStreamingTextAnimation'; // Assuming export
-import { ChatStateSetters } from './useChatState'; // Import setters type
+import { Language } from '@/src/app/[locale]/chatbot/lib/live-chat.types';
+import { ChatMessageType, RenameConversationClientData, PinConversationClientData, SearchConversationsClientData } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
+import { generateMessageId } from '@/src/app/[locale]/chatbot/utils/chatUtils';
+import { StreamingTextAnimationControls } from './useStreamingTextAnimation';
+import { ChatStateSetters } from './useChatState';
 
-interface UseChatActionsProps extends Pick<ChatStateSetters, 'setChatMessages' | 'setLoadingState' | 'setActiveConversationId' | 'setIsLoadingHistory' | 'setIsHistoryLoaded'> {
+interface UseChatActionsProps extends Pick<
+    ChatStateSetters,
+    'setChatMessages' | 'setLoadingState' | 'setActiveConversationId' |
+    'setIsLoadingHistory' | 'setIsHistoryLoaded' | 'setIsSearching' // Thêm setIsSearching
+> {
     socketRef: React.MutableRefObject<Socket | null>;
-    isConnected: boolean; // The *effective* connection state (including fatal errors)
-    hasFatalError: boolean; // Pass the fatal error flag
+    isConnected: boolean;
+    hasFatalError: boolean;
     handleError: (error: any, stopLoading?: boolean, isFatal?: boolean) => void;
     animationControls: StreamingTextAnimationControls;
-    activeConversationId: string | null; // Pass current active ID
-    resetAwaitFlag: () => void; // Add this prop
-
+    activeConversationId: string | null;
+    resetAwaitFlag: () => void;
 }
 
 export interface ChatActions {
@@ -24,9 +27,13 @@ export interface ChatActions {
     startNewConversation: () => void;
     handleConfirmSend: (confirmationId: string) => void;
     handleCancelSend: (confirmationId: string) => void;
-    closeConfirmationDialog: () => void; // Keep this simple action here or in useChatSocket
+    closeConfirmationDialog: () => void;
     deleteConversation: (conversationId: string) => void;
     clearConversation: (conversationId: string) => void;
+    // --- NEW ACTIONS ---
+    renameConversation: (conversationId: string, newTitle: string) => void;
+    pinConversation: (conversationId: string, isPinned: boolean) => void;
+    searchConversations: (searchTerm: string, limit?: number) => void;
 }
 
 export function useChatActions({
@@ -41,8 +48,8 @@ export function useChatActions({
     setIsHistoryLoaded,
     animationControls,
     activeConversationId,
-    resetAwaitFlag, // Destructure the new prop
-
+    resetAwaitFlag,
+    setIsSearching, // Destructure setter mới
 }: UseChatActionsProps): ChatActions {
 
     resetAwaitFlag(); // <<< Call the reset function before emitting
@@ -187,6 +194,50 @@ export function useChatActions({
 
     }, [isConnected, hasFatalError, socketRef, handleError, setLoadingState]); // Add setLoadingState if used
 
+     // --- NEW: Rename Conversation Action ---
+     const renameConversation = useCallback((conversationId: string, newTitle: string) => {
+        if (!isConnected || hasFatalError || !socketRef.current) {
+            handleError({ message: 'Cannot rename: Not connected or critical error.' }, false);
+            return;
+        }
+        if (!conversationId || typeof newTitle !== 'string') { // newTitle có thể rỗng nếu backend cho phép reset
+            console.warn('Cannot rename: Invalid conversation ID or title.');
+            return;
+        }
+        console.log(`[useChatActions] Requesting to rename conversation ${conversationId} to "${newTitle.substring(0,30)}..."`);
+        const payload: RenameConversationClientData = { conversationId, newTitle };
+        socketRef.current.emit('rename_conversation', payload);
+        // Optional: Set a specific loading state for renaming if UI needs it
+    }, [isConnected, hasFatalError, socketRef, handleError]);
+
+    // --- NEW: Pin Conversation Action ---
+    const pinConversation = useCallback((conversationId: string, isPinned: boolean) => {
+        if (!isConnected || hasFatalError || !socketRef.current) {
+            handleError({ message: 'Cannot pin/unpin: Not connected or critical error.' }, false);
+            return;
+        }
+        if (!conversationId || typeof isPinned !== 'boolean') {
+            console.warn('Cannot pin/unpin: Invalid conversation ID or pin status.');
+            return;
+        }
+        console.log(`[useChatActions] Requesting to set pin status for ${conversationId} to ${isPinned}`);
+        const payload: PinConversationClientData = { conversationId, isPinned };
+        socketRef.current.emit('pin_conversation', payload);
+    }, [isConnected, hasFatalError, socketRef, handleError]);
+
+    // --- NEW: Search Conversations Action ---
+    const searchConversations = useCallback((searchTerm: string, limit?: number) => {
+        if (!isConnected || hasFatalError || !socketRef.current) {
+            handleError({ message: 'Cannot search: Not connected or critical error.' }, false);
+            return;
+        }
+        // Cho phép searchTerm rỗng, backend sẽ xử lý (trả về danh sách trống hoặc toàn bộ)
+        console.log(`[useChatActions] Requesting to search conversations with term: "${searchTerm.substring(0,30)}..."`);
+        setIsSearching(true); // Đặt cờ đang tìm kiếm
+        const payload: SearchConversationsClientData = { searchTerm: searchTerm.trim(), limit };
+        socketRef.current.emit('search_conversations', payload);
+    }, [isConnected, hasFatalError, socketRef, handleError, setIsSearching]);
+
 
     return {
         sendMessage,
@@ -197,5 +248,9 @@ export function useChatActions({
         closeConfirmationDialog,
         deleteConversation,
         clearConversation,
+        // --- NEW ---
+        renameConversation,
+        pinConversation,
+        searchConversations,
     };
 }
