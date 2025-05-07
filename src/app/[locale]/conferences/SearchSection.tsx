@@ -86,7 +86,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
   return (
     <div className='container mx-auto px-4 text-base'>
       {/* Use flex-wrap and justify-center for responsiveness */}
-      <div className='flex flex-wrap items-center justify-between  rounded-3xl border border-black px-2 py-2 shadow-md'>
+      <div className='border-black-pure flex flex-wrap items-center  justify-between rounded-3xl border px-2 py-2 shadow-md'>
         <div
           className='flex w-40 flex-grow basis-full items-center  md:max-w-[500px] md:basis-auto'
           ref={searchTypeDropdownRef}
@@ -106,7 +106,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
           <input
             type='text'
             placeholder={t('Type_a_command_or_search')}
-            className='w-full bg-transparent text-sm outline-none'
+            className='w-full bg-transparent text-sm outline-none placeholder:text-primary'
             value={confKeyword}
             onChange={handleKeywordChange}
             onKeyDown={handleKeyPress}
@@ -141,7 +141,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
               </svg>
             </button>
             {isSearchTypeDropdownOpen && (
-              <div className='absolute left-0 z-10 mt-2 w-32 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
+              <div className='bg-white-pure absolute left-0 z-10 mt-2 w-32 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none '>
                 <div
                   className='py-1'
                   role='menu'
@@ -150,19 +150,19 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
                 >
                   <button
                     onClick={() => handleSearchTypeChange('keyword')}
-                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    className="role='menuitem' hover:bg-gray-10 hover:text-gray-90 block w-full px-4 py-2  text-left text-sm"
                   >
                     {t('Keyword')}
                   </button>
                   <button
                     onClick={() => handleSearchTypeChange('title')}
-                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    className="role='menuitem' hover:bg-gray-10 hover:text-gray-90 block w-full px-4 py-2  text-left text-sm"
                   >
                     {t('Title')}
                   </button>
                   <button
                     onClick={() => handleSearchTypeChange('acronym')}
-                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    className="role='menuitem' hover:bg-gray-10 hover:text-gray-90 block w-full px-4 py-2  text-left text-sm"
                   >
                     {t('Acronym')}
                   </button>
@@ -173,7 +173,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
         </div>
 
         {/* Use hidden and block with media queries for dividers */}
-        <div className='mx-2 hidden h-6 border-l border-gray-300 md:block'></div>
+        <div className='border-gray-30 mx-2 hidden h-6 border-l md:block'></div>
 
         <div className='flex items-center space-x-2 px-2'>
           <label htmlFor='fromDate' className='text-sm'>
@@ -234,7 +234,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
           </button>
 
           {isLocationDropdownOpen && (
-            <div className='absolute left-0 z-10 mt-2 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
+            <div className='bg-white-pure absolute left-0 z-10 mt-2 w-48 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none '>
               <div
                 className='max-h-48 overflow-y-scroll py-1'
                 role='menu'
@@ -244,14 +244,14 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
                 <input
                   type='text'
                   placeholder={t('Search_location')}
-                  className='block w-full px-4 py-2 text-sm text-gray-700 focus:outline-none'
+                  className='bg-white-pure block w-full px-4 py-2 text-sm placeholder:text-primary focus:outline-none'
                   onChange={handleLocationSearchChange}
                   onClick={e => e.stopPropagation()}
                 />
                 <button
                   key='all'
                   onClick={() => handleLocationClick('')}
-                  className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                  className="role='menuitem' hover:bg-gray-10 hover:text-gray-90 block w-full px-4 py-2  text-left text-sm"
                 >
                   {t('All_Locations')}
                 </button>
@@ -259,7 +259,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
                   <button
                     key={location}
                     onClick={() => handleLocationClick(location)}
-                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    className="role='menuitem' hover:bg-gray-10 hover:text-gray-90 block w-full px-4 py-2  text-left text-sm"
                   >
                     {location}
                   </button>
@@ -298,7 +298,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
 
           {isTypeDropdownOpen && (
             <div
-              className='absolute left-0 z-10 mt-2 w-28 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'
+              className='bg-white-pure absolute left-0 z-10 mt-2 w-28 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none '
               tabIndex={0}
             >
               <div
@@ -310,7 +310,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
                 <button
                   key='all'
                   onClick={() => handleTypeClick('')}
-                  className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                  className="role='menuitem' hover:bg-gray-10 hover:text-gray-90 block w-full px-4 py-2  text-left text-sm"
                 >
                   {t('All_Types')}
                 </button>
@@ -318,7 +318,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
                   <button
                     key={type}
                     onClick={() => handleTypeClick(type)}
-                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    className="role='menuitem' hover:bg-gray-10 hover:text-gray-90 block w-full px-4 py-2  text-left text-sm"
                   >
                     {type}
                   </button>

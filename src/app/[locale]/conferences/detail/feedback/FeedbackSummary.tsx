@@ -53,7 +53,7 @@ const FeedbackSummary: React.FC<FeedbackSummaryProps> = ({
                   ★
                 </span>
               </div>
-              <div className='relative mx-2 h-4 flex-1 rounded-sm bg-gray-200 dark:bg-gray-800'>
+              <div className='bg-gray-20 relative mx-2 h-4 flex-1 rounded-sm '>
                 <div
                   className='absolute h-4 rounded-sm'
                   style={{

@@ -17,7 +17,7 @@ const FeedbackItem: React.FC<FeedbackItemProps> = ({ feedback }) => {
   return (
     <div
       key={feedback.id}
-      className='rounded-md border border-gray-200 bg-white p-4 dark:bg-black'
+      className='bg-white-pure rounded-md border border-gray-200 p-4 '
     >
       <div className='mb-2 flex flex-col items-start justify-between space-y-2 sm:flex-row sm:items-center sm:space-y-0'>
         <div className='flex items-center'>
@@ -26,7 +26,7 @@ const FeedbackItem: React.FC<FeedbackItemProps> = ({ feedback }) => {
             alt={`${feedback.firstName || 'User'}'s Avatar`}
             width={30}
             height={30}
-            className='mr-2 h-8 w-8 rounded-full bg-gray-200 object-cover dark:bg-gray-800'
+            className='bg-gray-20 mr-2 h-8 w-8 rounded-full object-cover'
             onError={e => {
               // Optional: More robust error handling if needed
               const target = e.target as HTMLImageElement

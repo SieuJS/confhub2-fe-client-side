@@ -138,7 +138,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
       case 'HYBRID':
         return 'bg-blue-100 text-blue-700 border border-blue-300'
       default:
-        return 'bg-gray-100 text-gray-600 border border-gray-300'
+        return 'bg-gray-10 text-gray-600 border border-gray-300'
     }
   }, [])
 
@@ -186,7 +186,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
   // --- Render ---
   return (
     <div
-      className={`flex flex-col overflow-hidden rounded-lg bg-white shadow-lg transition duration-300 ease-in-out hover:shadow-xl dark:bg-black ${className}`}
+      className={`bg-white-pure flex flex-col overflow-hidden rounded-lg shadow-lg transition duration-300 ease-in-out hover:shadow-xl  ${className}`}
     >
       {/* Image Section with Badges */}
       <div className='relative hover:opacity-90'>
@@ -314,7 +314,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
                     }}
                   >
                     <span
-                      className='inline-block max-w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium transition  duration-200 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-600' /* Adjusted padding */
+                      className='bg-gray-10 hover:bg-gray-20 inline-block max-w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium  transition duration-200 ' /* Adjusted padding */
                       title={topic} // Add tooltip for full topic name
                     >
                       {topic}
@@ -324,7 +324,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
                 {event.topics.length > 3 && (
                   <span
                     key='more-topics'
-                    className='inline-block max-w-full cursor-default overflow-hidden text-ellipsis whitespace-nowrap rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium dark:bg-gray-800 dark:hover:bg-gray-600'
+                    className='bg-gray-10 inline-block max-w-full cursor-default overflow-hidden text-ellipsis whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium '
                     title={`${event.topics.length - 3} more topics`}
                   >
                     +{event.topics.length - 3} {t('more')}
@@ -337,7 +337,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
           </div>
         </div>
         {/* Action Buttons */}
-        <div className='mt-auto flex items-center justify-end border-t border-gray-100 pt-2 dark:border-gray-600'>
+        <div className='border-gray-10 mt-auto flex items-center justify-end border-t pt-2 '>
           {' '}
           {/* Added border top */}
           <div className='flex space-x-2'>
@@ -347,7 +347,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
                 onClick={e => handleGoToWebsite(e, event.link || '')}
                 onMouseEnter={() => setShowWebsiteTooltip(true)}
                 onMouseLeave={() => setShowWebsiteTooltip(false)}
-                className='flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 p-2 transition hover:bg-gray-200  hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:opacity-50 dark:bg-gray-800 dark:hover:bg-gray-600'
+                className='bg-gray-10 hover:bg-gray-20 hover:text-gray-80 flex h-9 w-9 items-center justify-center rounded-full p-2  transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:opacity-50 '
                 disabled={!event.link} // Disable if no link
                 title={t('Go_to_Website')}
               >
@@ -376,10 +376,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
                 onClick={handleAddCalendarClick}
                 onMouseEnter={() => setShowAddCalendarTooltip(true)}
                 onMouseLeave={() => setShowAddCalendarTooltip(false)}
-                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 p-2 transition hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-800 dark:hover:bg-gray-600 ${
+                className={`bg-gray-10 hover:bg-gray-20 flex h-9 w-9 items-center justify-center rounded-full p-2 transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50  ${
                   isAddToCalendar
                     ? 'text-blue-600 hover:text-blue-700'
-                    : ' hover:text-gray-800'
+                    : ' hover:text-gray-80'
                 }`}
                 style={{ minWidth: '36px', minHeight: '36px' }} // Ensure minimum size
                 disabled={isLoading} // Disable during loading
@@ -424,11 +424,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
                 onClick={handleFavoriteClick}
                 onMouseEnter={() => setShowFavoriteTooltip(true)}
                 onMouseLeave={() => setShowFavoriteTooltip(false)}
-                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 p-2 transition hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-800 dark:hover:bg-gray-600 ${
+                className={`bg-gray-10 hover:bg-gray-20 flex h-9 w-9 items-center justify-center rounded-full p-2 transition focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50  ${
                   // Changed focus ring color
                   isFollowing
                     ? 'text-yellow-500 hover:text-yellow-600'
-                    : ' hover:text-gray-800'
+                    : ' hover:text-gray-80'
                 }`}
                 style={{ minWidth: '36px', minHeight: '36px' }} // Ensure minimum size
                 disabled={isLoading} // Disable during loading

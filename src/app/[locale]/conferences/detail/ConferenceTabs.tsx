@@ -276,7 +276,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       {/* Navigation */}
       <nav
         ref={navRef}
-        className='sticky top-14 z-30 flex overflow-x-auto whitespace-nowrap border-b border-gray-200 bg-white bg-opacity-95 py-2 dark:bg-black'
+        className='bg-white-pure sticky top-14 z-30 flex overflow-x-auto whitespace-nowrap border-b border-gray-200 bg-opacity-95 py-2 '
       >
         {/* ... (Navigation mapping remains the same) ... */}
         {sectionKeys.map(sectionKey => {
@@ -287,7 +287,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
             <a
               key={sectionKey}
               href={href}
-              className={`rounded-lg px-2 py-2 font-medium transition-colors duration-200 md:px-4 ${activeSection === sectionKey ? 'bg-gray-100 text-blue-600 dark:bg-gray-900' : ' hover:bg-gray-100 hover:text-blue-600 dark:hover:bg-gray-900'}`}
+              className={`rounded-lg px-2 py-2 font-medium transition-colors duration-200 md:px-4 ${activeSection === sectionKey ? 'bg-gray-10 text-blue-600 ' : ' hover:bg-gray-10 hover:text-blue-600 '}`}
             >
               {t(translationKey)}
             </a>
@@ -298,7 +298,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       {/* Overview Section */}
       <section
         id='overview'
-        className='mt-4 rounded-lg bg-white px-2 py-4 shadow-md dark:bg-black md:px-4'
+        className='bg-white-pure mt-4 rounded-lg px-2 py-4 shadow-md  md:px-4'
       >
         {/* ... (Overview section remains the same) ... */}
         <h2 className='mb-4 text-xl font-semibold md:text-2xl '>
@@ -312,7 +312,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       {/* Important Dates Section */}
       <section
         id='important-dates'
-        className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md dark:bg-black md:px-4'
+        className='bg-white-pure mt-6 rounded-lg px-2 py-4 shadow-md  md:px-4'
       >
         <h2 className='mb-6 text-xl font-semibold md:text-2xl '>
           {t('Important_Dates')}
@@ -321,8 +321,8 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
           <p className=''>{t('No_Important_Dates_Available')}</p>
         ) : (
           <div className='overflow-x-auto'>
-            <table className='min-w-full border border-gray-300 bg-white text-sm dark:bg-black'>
-              <thead className='bg-gray-100 dark:bg-gray-900'>
+            <table className='bg-white-pure min-w-full border border-gray-300 text-sm '>
+              <thead className='bg-gray-10 '>
                 <tr>
                   <th className='border-b border-gray-300 px-2 py-3 text-left md:px-4'>
                     {t('Name')}
@@ -337,10 +337,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
               </thead>
               <tbody>
                 {groupedDates.map(groupInfo => (
-                  <tr
-                    key={groupInfo.name}
-                    className='hover:bg-gray-50 dark:hover:bg-gray-950'
-                  >
+                  <tr key={groupInfo.name} className='hover:bg-gray-5'>
                     {/* --- MODIFIED TD --- */}
                     <td className='border-b border-gray-300 px-2 py-4 font-medium md:px-4'>
                       {groupInfo.name}
@@ -406,7 +403,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       {/* Call for Papers Section */}
       <section
         id='call-for-papers'
-        className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md dark:bg-black md:px-4'
+        className='bg-white-pure mt-6 rounded-lg px-2 py-4 shadow-md  md:px-4'
       >
         {/* ... (Call for Papers section remains the same) ... */}
         <h2 className='mb-4 text-xl font-semibold md:text-2xl '>
@@ -427,15 +424,12 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
             ),
             pre: ({ node, ...props }) => (
               <pre
-                className='overflow-x-auto rounded-md bg-gray-100 p-2 dark:bg-gray-900'
+                className='bg-gray-10 overflow-x-auto rounded-md p-2 '
                 {...props}
               />
             ),
             code: ({ node, ...props }) => (
-              <code
-                className='rounded bg-gray-100 px-1 dark:bg-gray-900'
-                {...props}
-              />
+              <code className='bg-gray-10 rounded px-1 ' {...props} />
             ),
             h1: ({ node, ...props }) => (
               <h1 className='my-4 text-2xl font-bold' {...props} />
@@ -462,7 +456,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       {/* Field of Research and Topics Section */}
       <section
         id='fieldOfResearch-topics'
-        className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md dark:bg-black md:px-4'
+        className='bg-white-pure mt-6 rounded-lg px-2 py-4 shadow-md  md:px-4'
       >
         {/* ... (Field of Research and Topics section remains the same) ... */}
         <h2 className='mb-6 text-xl font-semibold md:text-2xl '>
@@ -519,7 +513,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       {processedRanks.length > 0 && (
         <section
           id='source-rank'
-          className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md dark:bg-black md:px-4'
+          className='bg-white-pure mt-6 rounded-lg px-2 py-4 shadow-md  md:px-4'
         >
           <h2 className='mb-6 text-xl font-semibold md:text-2xl '>
             {t('Source_Rank')}
@@ -555,7 +549,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       {/* Map Section */}
       <section
         id='map'
-        className='mt-6 rounded-lg bg-white px-2 py-4 shadow-md dark:bg-black md:px-4'
+        className='bg-white-pure mt-6 rounded-lg px-2 py-4 shadow-md  md:px-4'
       >
         {/* ... (Map section remains the same) ... */}
         <h2 className='mb-4 text-xl font-semibold md:text-2xl '>{t('Map')}</h2>
