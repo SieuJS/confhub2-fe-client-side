@@ -8,7 +8,7 @@ import useConnection from './livechat/hooks/useConnection'
 import { Settings } from 'lucide-react'
 import { useSharedChatSocket } from './context/ChatSocketContext'
 import { useTranslations } from 'next-intl'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation' // Corrected import for next/navigation
 import { useChatSettings } from './context/ChatSettingsContext'
 
 interface MainLayoutComponentProps {
@@ -75,36 +75,75 @@ export default function MainLayoutComponent({ children }: MainLayoutComponentPro
 
     if (shouldUpdate) {
       const newQs = params.toString()
-      router.replace(`${pathname}${newQs ? `?${newQs}` : ''}`)
+      // Use replace to avoid adding to browser history for URL param changes
+      router.replace(`${pathname}${newQs ? `?${newQs}` : ''}`, { scroll: false })
     }
   }, [activeConversationId, currentView, pathname, router, searchParams])
 
-  // 3) Load từ URL -> state (chỉ khi activeConversationId chưa có)
+  // 3) Load từ URL -> state (chỉ khi activeConversationId chưa có VÀ urlId hợp lệ)
   useEffect(() => {
     const urlId = searchParams.get('id')
+    // Chỉ load từ URL nếu đang ở view chat, có urlId, và activeConversationId chưa được set (tránh ghi đè).
+    // Và quan trọng là urlId này phải có trong conversationList (hoặc có cơ chế kiểm tra hợp lệ khác)
+    // để tránh load một ID không tồn tại hoặc không thuộc về user.
+    // Tuy nhiên, việc kiểm tra conversationList ở đây có thể phức tạp nếu list chưa load xong.
+    // Logic `loadConversation` bên trong context nên xử lý việc ID không hợp lệ.
     if (currentView === 'chat' && urlId && !activeConversationId) {
-      loadConversation(urlId)
+      // Check if this urlId is a known conversation to prevent trying to load invalid IDs from stale URLs
+      const isValidInList = conversationList.some(conv => conv.id === urlId);
+      if (isValidInList) { // Or simply let loadConversation handle invalid IDs
+          loadConversation(urlId)
+      } else if (conversationList.length > 0 && !isLoadingHistory) {
+        // If list is loaded and ID is not in it, maybe clear the invalid ID from URL
+        console.warn(`URL ID ${urlId} not found in conversation list. Consider clearing it.`);
+        // const params = new URLSearchParams(searchParams.toString());
+        // params.delete('id');
+        // router.replace(`${pathname}${params.toString() ? `?${params.toString()}` : ''}`, { scroll: false });
+      }
     }
-  }, [searchParams, currentView, activeConversationId, loadConversation])
+  }, [searchParams, currentView, activeConversationId, loadConversation, conversationList, isLoadingHistory, pathname, router]) // Added dependencies
 
   // Khi click vào 1 conversation trong danh sách
   const handleSelectConversation = useCallback(
     (conversationId: string) => {
       loadConversation(conversationId)
+      // Nếu đang ở trang history, chuyển về trang chat tương ứng
       if (currentView === 'history') {
-        router.push('/chatbot')
+        const targetChatPath = chatMode === 'live' ? '/chatbot/livechat' : '/chatbot/regularchat';
+        router.push(targetChatPath); // ID sẽ được thêm vào URL bởi useEffect (2)
       }
     },
-    [loadConversation, currentView, router]
+    [loadConversation, currentView, router, chatMode]
   )
 
   // Tạo cuộc chat mới
   const handleStartNewConversation = useCallback(() => {
-    startNewConversation()
-    if (currentView === 'history') {
-      router.push('/chatbot')
+    // 1. Gọi hàm startNewConversation từ context.
+    // Hàm này sẽ:
+    //    - Client-side: Đặt activeConversationId = null, xóa messages hiện tại.
+    //    - Emits event lên server để tạo conversation mới.
+    //    - Server sẽ trả về event onNewConversationStarted với ID mới, lúc đó activeConversationId mới được set.
+    startNewConversation();
+
+    const targetChatPath = chatMode === 'live' ? '/chatbot/livechat' : '/chatbot/regularchat';
+
+    // 2. Điều hướng để "làm sạch" URL và component chat.
+    // Điều này quan trọng để tránh component chat cố gắng load dựa trên ID cũ từ URL.
+    // - Nếu đang ở trang history, luôn điều hướng.
+    // - Nếu đang ở trang chat (currentView === 'chat'):
+    //    - Nếu path hiện tại không phải là targetChatPath (ví dụ, từ live sang regular hoặc ngược lại do lỗi state), điều hướng.
+    //    - Nếu path hiện tại là targetChatPath NHƯNG CÓ `id` trong URL (đang xem chat cũ), điều hướng để xóa `id` đó.
+    if (currentView === 'history' || pathname !== targetChatPath || searchParams.has('id')) {
+      router.push(targetChatPath);
     }
-  }, [startNewConversation, currentView, router])
+    // Nếu đã ở targetChatPath và không có 'id' (ví dụ /chatbot/regularchat),
+    // thì startNewConversation() đã reset state client.
+    // Component chat sẽ chờ activeConversationId mới từ server.
+    // useEffect (2) sẽ cập nhật URL với ID mới khi nó có.
+    // Không cần router.push dư thừa trong trường hợp này.
+
+  }, [startNewConversation, router, chatMode, currentView, pathname, searchParams]);
+
 
   // Chuyển giữa live/regular
   const internalHandleChatModeChange = (mode: typeof chatMode) => {
@@ -112,7 +151,7 @@ export default function MainLayoutComponent({ children }: MainLayoutComponentPro
       console.warn('Cannot switch from live chat while connected.')
       return
     }
-    handleChatModeNavigation(mode)
+    handleChatModeNavigation(mode) // This function in ChatSettingsContext should handle navigation
   }
 
   return (
@@ -126,7 +165,7 @@ export default function MainLayoutComponent({ children }: MainLayoutComponentPro
         conversationList={conversationList}
         activeConversationId={activeConversationId}
         onSelectConversation={handleSelectConversation}
-        onStartNewConversation={handleStartNewConversation}
+        onStartNewConversation={handleStartNewConversation} // Truyền hàm đã cập nhật
         isLoadingConversations={isLoadingHistory}
         onDeleteConversation={deleteConversation}
         onClearConversation={clearConversation}

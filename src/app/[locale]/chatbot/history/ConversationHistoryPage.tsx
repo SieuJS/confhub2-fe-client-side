@@ -1,17 +1,16 @@
-// src/app/[locale]/chatbot/ConversationHistoryPage.tsx
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { useSharedChatSocket } from '../context/ChatSocketContext'
 import { ConversationMetadata } from '../lib/regular-chat.types'
-import { Loader2, Search, Trash2, Eraser, Pencil, Pin, PinOff, MessageSquarePlus } from 'lucide-react'
+import { Loader2, Trash2, Eraser, Pencil, Pin, PinOff, MessageSquarePlus } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { useTranslations } from 'next-intl'
-import { useRouter } from '@/src/navigation'; // Sử dụng useRouter từ next-intl cho điều hướng với locale
+import { useRouter } from '@/src/navigation';
 
-const ConversationHistoryPage: React.FC = () => { // Đổi tên component
+const ConversationHistoryPage: React.FC = () => {
   const t = useTranslations()
-  const router = useRouter(); // Router để điều hướng về trang chat
+  const router = useRouter();
 
   const {
     conversationList: initialList,
@@ -33,34 +32,30 @@ const ConversationHistoryPage: React.FC = () => { // Đổi tên component
   const [newTitleInput, setNewTitleInput] = useState('')
 
   useEffect(() => {
+    searchConversations(searchTerm)
+  }, [searchTerm, searchConversations])
+
+  useEffect(() => {
     if (searchTerm.trim() !== '') {
       setDisplayedConversations(searchResults)
     } else {
       const sortedInitialList = [...initialList].sort((a, b) => {
         if (a.isPinned && !b.isPinned) return -1;
         if (!a.isPinned && b.isPinned) return 1;
-        // Sắp xếp theo lastActivity giảm dần nếu cả hai không pinned hoặc cả hai đều pinned
         return new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime();
       });
       setDisplayedConversations(sortedInitialList)
     }
   }, [searchTerm, searchResults, initialList])
 
-  const handleSearch = (e?: React.FormEvent<HTMLFormElement>) => {
-    e?.preventDefault()
-    searchConversations(searchTerm)
-  }
-
   const handleSelectAndGoToChat = useCallback((conversationId: string) => {
     loadConversation(conversationId);
-    // Sau khi load, MainLayoutComponent sẽ tự động cập nhật URL với ?id=...
-    // và chuyển view. Chỉ cần điều hướng đến path của chat.
-    router.push('/chatbot/regularchat'); // Điều hướng đến trang chat chính (ví dụ: /en/chatbot/regularchat)
+    router.push('/chatbot/regularchat');
   }, [loadConversation, router]);
 
   const handleStartNewAndGoToChat = useCallback(() => {
     startNewConversation();
-    router.push('/chatbot/regularchat'); // Điều hướng đến trang chat chính
+    router.push('/chatbot/regularchat');
   }, [startNewConversation, router]);
 
   const handleDeleteClick = (id: string, title: string) => {
@@ -82,9 +77,7 @@ const ConversationHistoryPage: React.FC = () => { // Đổi tên component
 
   const handleSaveRename = (id: string) => {
     if (newTitleInput.trim() === '') {
-        // Nếu muốn hủy khi input rỗng, gọi setEditingConvId(null)
-        // Hoặc không làm gì cả và giữ nguyên editing state
-        // setEditingConvId(null);
+        setEditingConvId(null);
         return;
     }
     renameConversation(id, newTitleInput.trim())
@@ -95,7 +88,6 @@ const ConversationHistoryPage: React.FC = () => { // Đổi tên component
     pinConversation(id, !currentPinStatus)
   }
 
-  // JSX cho UI (giữ nguyên phần lớn, chỉ cập nhật tên hàm nếu cần)
   return (
     <div className='flex h-full flex-col bg-gray-50 p-4 dark:bg-gray-900 md:p-6'>
       <div className='mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row'>
@@ -111,7 +103,7 @@ const ConversationHistoryPage: React.FC = () => { // Đổi tên component
         </button>
       </div>
 
-      <form onSubmit={handleSearch} className='mb-6 flex gap-2'>
+      <div className='mb-6 flex gap-2'>
         <input
           type='text'
           value={searchTerm}
@@ -119,112 +111,131 @@ const ConversationHistoryPage: React.FC = () => { // Đổi tên component
           placeholder={t('Search_Conversations_Placeholder')}
           className='flex-grow rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400'
         />
-        <button
-          type='submit'
-          disabled={isSearching}
-          className='flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 dark:focus:ring-offset-gray-900'
-        >
-          {isSearching ? (
-            <Loader2 size={18} className='animate-spin' />
-          ) : (
-            <Search size={18} />
-          )}
-          <span className='ml-2 hidden sm:inline'>{t('Search')}</span>
-        </button>
-      </form>
+        {isSearching && (
+            <div className="flex items-center justify-center px-2">
+                <Loader2 size={18} className='animate-spin text-gray-500 dark:text-gray-400' />
+            </div>
+        )}
+      </div>
 
-      {isLoadingHistory && displayedConversations.length === 0 && !isSearching && (
+      {isLoadingHistory && displayedConversations.length === 0 && !isSearching && searchTerm.trim() === '' && (
          <div className='flex flex-1 items-center justify-center text-gray-700 dark:text-gray-300'>
             <Loader2 size={24} className='mr-2 animate-spin' />
             <span>{t('Loading_Initial_History')}</span>
         </div>
       )}
 
-      {!isLoadingHistory && displayedConversations.length === 0 && !isSearching && (
+      {(!isLoadingHistory || searchTerm.trim() !== '') && displayedConversations.length === 0 && (
         <div className='flex flex-1 items-center justify-center text-center text-gray-500 dark:text-gray-400'>
           {searchTerm.trim() !== '' ? t('No_Search_Results_Found') : t('No_Conversations_Found_Yet')}
         </div>
       )}
 
       {displayedConversations.length > 0 && (
-        <div className='flex-grow space-y-3 overflow-y-auto pb-4 pr-1'>
-          {displayedConversations.map(conv => (
-            <div
-              key={conv.id}
-              className='rounded-lg border bg-white p-4 shadow-sm transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-800'
-            >
-              <div className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
-                <div className='min-w-0 flex-1'>
-                  {editingConvId === conv.id ? (
-                    <div className='flex items-center gap-2'>
-                      <input
-                        type='text'
-                        value={newTitleInput}
-                        onChange={e => setNewTitleInput(e.target.value)}
-                        onKeyDown={e => {
-                            if (e.key === 'Enter') handleSaveRename(conv.id);
-                            if (e.key === 'Escape') setEditingConvId(null);
-                        }}
-                        onBlur={() => {
-                            if (newTitleInput.trim() !== '') handleSaveRename(conv.id);
-                            else setEditingConvId(null); // Hủy nếu blur với input rỗng
-                        }}
-                        className='flex-grow rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-                        autoFocus
-                      />
-                       <button onClick={() => setEditingConvId(null)} className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">{t('Cancel')}</button>
+        <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                >
+                  {t('Title')}
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                >
+                  {t('Last_Activity')}
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                >
+                  {t('Actions')}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
+              {displayedConversations.map(conv => (
+                <tr key={conv.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="min-w-0 flex-1">
+                        {editingConvId === conv.id ? (
+                          <div className='flex items-center gap-2'>
+                            <input
+                              type='text'
+                              value={newTitleInput}
+                              onChange={e => setNewTitleInput(e.target.value)}
+                              onKeyDown={e => {
+                                  if (e.key === 'Enter') handleSaveRename(conv.id);
+                                  if (e.key === 'Escape') setEditingConvId(null);
+                              }}
+                              onBlur={() => {
+                                  if (newTitleInput.trim() !== '') handleSaveRename(conv.id);
+                                  else setEditingConvId(null);
+                              }}
+                              className='w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+                              autoFocus
+                            />
+                            <button onClick={() => setEditingConvId(null)} className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 flex-shrink-0">{t('Cancel')}</button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => handleSelectAndGoToChat(conv.id)}
+                            className='block w-full truncate text-left text-sm font-medium text-blue-600 hover:underline dark:text-blue-400'
+                            title={conv.title || t('Untitled_Conversation')}
+                          >
+                            {conv.isPinned && <Pin size={14} className='mr-1.5 inline-block align-text-bottom text-blue-500 dark:text-blue-400' />}
+                            {conv.title || t('Untitled_Conversation')}
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  ) : (
-                    <button
-                      onClick={() => handleSelectAndGoToChat(conv.id)}
-                      className='block w-full truncate text-left text-lg font-semibold text-blue-600 hover:underline dark:text-blue-400'
-                      title={conv.title || t('Untitled_Conversation')}
-                    >
-                      {conv.isPinned && <Pin size={16} className='mr-1.5 inline-block align-text-bottom text-blue-500 dark:text-blue-400' />}
-                      {conv.title || t('Untitled_Conversation')}
-                    </button>
-                  )}
-                  <p className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
-                    {t('Last_Activity')}: {formatDistanceToNow(new Date(conv.lastActivity), { addSuffix: true })}
-                  </p>
-                </div>
-
-                <div className='mt-2 flex flex-shrink-0 flex-wrap items-center gap-1.5 sm:mt-0 sm:items-start'>
-                  <button
-                    onClick={() => handleRenameClick(conv.id, conv.title || '')}
-                    disabled={editingConvId === conv.id}
-                    className='rounded-md p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-400 disabled:opacity-50 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200'
-                    title={t('Rename')}
-                  >
-                    <Pencil size={16} />
-                  </button>
-                  <button
-                    onClick={() => handleTogglePinClick(conv.id, conv.isPinned)}
-                    className={`rounded-md p-1.5 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:hover:bg-gray-700 ${
-                      conv.isPinned ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'
-                    }`}
-                    title={conv.isPinned ? t('Unpin') : t('Pin')}
-                  >
-                    {conv.isPinned ? <PinOff size={16} /> : <Pin size={16} />}
-                  </button>
-                  <button
-                    onClick={() => handleClearClick(conv.id, conv.title || '')}
-                    className='rounded-md p-1.5 text-yellow-600 hover:bg-yellow-100 focus:outline-none focus:ring-1 focus:ring-yellow-500 dark:text-yellow-400 dark:hover:bg-yellow-700'
-                    title={t('Clear_Messages')}
-                  >
-                    <Eraser size={16} />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteClick(conv.id, conv.title || '')}
-                    className='rounded-md p-1.5 text-red-600 hover:bg-red-100 focus:outline-none focus:ring-1 focus:ring-red-500 dark:text-red-400 dark:hover:bg-red-700'
-                    title={t('Delete')}
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {formatDistanceToNow(new Date(conv.lastActivity), { addSuffix: true })}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className='flex items-center space-x-1.5'>
+                      <button
+                        onClick={() => handleRenameClick(conv.id, conv.title || '')}
+                        disabled={editingConvId === conv.id}
+                        className='rounded-md p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-400 disabled:opacity-50 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200'
+                        title={t('Rename')}
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleTogglePinClick(conv.id, conv.isPinned)}
+                        className={`rounded-md p-1.5 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:hover:bg-gray-700 ${
+                          conv.isPinned ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'
+                        }`}
+                        title={conv.isPinned ? t('Unpin') : t('Pin')}
+                      >
+                        {conv.isPinned ? <PinOff size={16} /> : <Pin size={16} />}
+                      </button>
+                      <button
+                        onClick={() => handleClearClick(conv.id, conv.title || '')}
+                        className='rounded-md p-1.5 text-yellow-600 hover:bg-yellow-100 focus:outline-none focus:ring-1 focus:ring-yellow-500 dark:text-yellow-400 dark:hover:bg-yellow-700'
+                        title={t('Clear_Messages')}
+                      >
+                        <Eraser size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(conv.id, conv.title || '')}
+                        className='rounded-md p-1.5 text-red-600 hover:bg-red-100 focus:outline-none focus:ring-1 focus:ring-red-500 dark:text-red-400 dark:hover:bg-red-700'
+                        title={t('Delete')}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

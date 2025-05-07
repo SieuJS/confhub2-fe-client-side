@@ -26,12 +26,10 @@ export interface UseChatSocketProps {
     onInitialConnectionError?: (error: Error) => void;
 }
 
-// Interface for the final returned controls - extends ChatActions now includes new actions
 export interface ChatSocketControls extends Omit<ChatState, 'isMountedRef' | 'authToken'>, ChatActions {
     isConnected: boolean;
     socketId: string | null;
     closeConfirmationDialog: () => void;
-    // isSearching và searchResults đã có trong ChatState được spread (...)
 }
 
 
@@ -41,21 +39,19 @@ export function useChatSocket({
     onInitialConnectionError,
 }: UseChatSocketProps): ChatSocketControls {
 
-    // 1. Initialize Core State (bao gồm searchResults và isSearching)
+    // 1. Initialize Core State
     const {
         chatMessages, loadingState, hasFatalError, isHistoryLoaded, isLoadingHistory,
         showConfirmationDialog, confirmationData, conversationList, activeConversationId,
         authToken, isMountedRef,
-        // --- NEW STATES FROM useChatState ---
         searchResults, isSearching,
-        // --- SETTERS ---
         setChatMessages, setLoadingState, setHasFatalError,
         setIsHistoryLoaded, setIsLoadingHistory, setShowConfirmationDialog,
         setConfirmationData, setConversationList, setActiveConversationId, setAuthToken,
-        // --- NEW SETTERS FROM useChatState ---
         setSearchResults, setIsSearching,
     } = useChatState();
 
+    // ... (sections 2-5 remain the same)
     // 2. Initialize UI-specific Hooks
     const handleContentUpdate = useCallback((messageId: string, newContent: string) => {
         if (!isMountedRef.current) return;
@@ -124,9 +120,7 @@ export function useChatSocket({
 
         setChatMessages(prev => {
             const lastMsg = prev[prev.length - 1];
-            // Avoid duplicate errors shown in quick succession
             if (lastMsg && !lastMsg.isUser && lastMsg.message === message && lastMsg.type === type) {
-                // Only suppress if the *very last* message is identical
                 if (prev.length > 0 && prev[prev.length - 1].id === lastMsg.id) {
                     console.warn("Duplicate error/warning message suppressed:", message);
                     return prev;
@@ -144,6 +138,7 @@ export function useChatSocket({
 
     }, [isMountedRef, animationControls, setLoadingState, setChatMessages, setHasFatalError, onConnectionChange]);
 
+
     // 6. Prepare Socket Connection Options
     const socketOptions: SocketConnectionOptions = useMemo(() => ({
         socketUrl,
@@ -154,7 +149,8 @@ export function useChatSocket({
     // 7. Initialize Socket Event Handlers
     const socketRefFromConnection = useRef<Socket | null>(null);
 
-    // Truyền các setter mới vào useSocketEventHandlers
+    // Pass necessary setters to useSocketEventHandlers
+    // setSearchResults and setIsSearching are NOT needed here for search event handling anymore
     const socketEventHandlersProps: UseSocketEventHandlersProps = {
         isMountedRef,
         setChatMessages, setLoadingState, setHasFatalError, setIsHistoryLoaded,
@@ -163,13 +159,13 @@ export function useChatSocket({
         animationControls, handleError, onConnectionChange, onInitialConnectionError,
         confirmationData, BASE_WEB_URL, currentLocale, socketRef: socketRefFromConnection,
         isAwaitingFinalResultRef, activeConversationId, resetAwaitFlag,
-        // --- NEW ---
-        setSearchResults, setIsSearching,
+        // setSearchResults and setIsSearching are removed as props for event handlers
+        // because the search result event is being removed.
     };
     const socketEventHandlers: SocketEventHandlers = useSocketEventHandlers(socketEventHandlersProps);
 
 
-    // 8. Initialize Socket Connection (giữ nguyên)
+    // 8. Initialize Socket Connection
     const connection = useSocketConnection(socketOptions, socketEventHandlers);
     const { isConnected: rawIsConnected, socketId, socketRef } = connection;
 
@@ -184,7 +180,7 @@ export function useChatSocket({
     }, [isEffectivelyConnected, onConnectionChange]);
 
 
-    // 9. Initialize Chat Actions (truyền setter mới)
+    // 9. Initialize Chat Actions (Pass conversationList and setSearchResults)
     const chatActions = useChatActions({
         socketRef,
         isConnected: isEffectivelyConnected,
@@ -195,16 +191,19 @@ export function useChatSocket({
         animationControls,
         activeConversationId,
         resetAwaitFlag,
-        // --- NEW ---
-        setIsSearching,
+        // --- MODIFIED ---
+        setIsSearching,    // Pass setIsSearching
+        setSearchResults,  // Pass setSearchResults
+        conversationList,  // Pass conversationList
     });
 
-    // 10. Specific Action Implementations (giữ nguyên)
+    // ... (sections 10-12 remain the same)
+    // 10. Specific Action Implementations
     const closeConfirmationDialog = useCallback(() => {
         setShowConfirmationDialog(false);
     }, [setShowConfirmationDialog]);
 
-    // 11. Mount/Unmount Logic (giữ nguyên)
+    // 11. Mount/Unmount Logic
     useEffect(() => {
         isMountedRef.current = true;
         return () => {
@@ -218,14 +217,13 @@ export function useChatSocket({
         // State
         chatMessages, loadingState, hasFatalError, isHistoryLoaded, isLoadingHistory,
         showConfirmationDialog, confirmationData, conversationList, activeConversationId,
-        // --- NEW STATES ---
         searchResults, isSearching,
 
         // Connection Info
         isConnected: isEffectivelyConnected,
         socketId,
 
-        // Actions (bao gồm các actions mới từ chatActions)
+        // Actions
         sendMessage: chatActions.sendMessage,
         loadConversation: chatActions.loadConversation,
         startNewConversation: chatActions.startNewConversation,
@@ -233,7 +231,6 @@ export function useChatSocket({
         handleCancelSend: chatActions.handleCancelSend,
         deleteConversation: chatActions.deleteConversation,
         clearConversation: chatActions.clearConversation,
-        // --- NEW ACTIONS ---
         renameConversation: chatActions.renameConversation,
         pinConversation: chatActions.pinConversation,
         searchConversations: chatActions.searchConversations,
