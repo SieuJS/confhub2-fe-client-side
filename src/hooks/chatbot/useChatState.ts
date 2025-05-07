@@ -19,6 +19,8 @@ export interface ChatState {
     isMountedRef: React.MutableRefObject<boolean>;
     searchResults: ConversationMetadata[]; // Lưu kết quả tìm kiếm
     isSearching: boolean;                  // Cờ báo đang tìm kiếm
+    isServerReadyForCommands: boolean; // THÊM MỚI
+
 }
 
 export interface ChatStateSetters {
@@ -34,6 +36,8 @@ export interface ChatStateSetters {
     setAuthToken: React.Dispatch<React.SetStateAction<string | null | undefined>>;
     setSearchResults: React.Dispatch<React.SetStateAction<ConversationMetadata[]>>;
     setIsSearching: React.Dispatch<React.SetStateAction<boolean>>;
+    setIsServerReadyForCommands: React.Dispatch<React.SetStateAction<boolean>>; // THÊM MỚI
+
 }
 
 export function useChatState(): ChatState & ChatStateSetters {
@@ -50,6 +54,8 @@ export function useChatState(): ChatState & ChatStateSetters {
     const isMountedRef = useRef(true); // Keep mounted ref logic if needed across modules
     const [searchResults, setSearchResults] = useState<ConversationMetadata[]>([]);
     const [isSearching, setIsSearching] = useState(false);
+    const [isServerReadyForCommands, setIsServerReadyForCommands] = useState<boolean>(false); // THÊM MỚI
+
 
     // Optional: Add initialization logic for auth token here if desired
     // useEffect(() => { ... load token ... }, []);
@@ -74,5 +80,7 @@ export function useChatState(): ChatState & ChatStateSetters {
         isMountedRef,
         searchResults, setSearchResults,
         isSearching, setIsSearching,
+        isServerReadyForCommands, setIsServerReadyForCommands, // THÊM MỚI
+
     };
 }

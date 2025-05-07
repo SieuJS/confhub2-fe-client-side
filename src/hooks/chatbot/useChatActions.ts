@@ -25,6 +25,8 @@ interface UseChatActionsProps extends Pick<
     activeConversationId: string | null;
     resetAwaitFlag: () => void;
     conversationList: ConversationMetadata[]; // Add conversationList to props
+    isHistoryLoaded: boolean; // <--- THÊM
+
 }
 
 export interface ChatActions {
@@ -51,6 +53,7 @@ export function useChatActions({
     setActiveConversationId,
     setIsLoadingHistory,
     setIsHistoryLoaded,
+    isHistoryLoaded,
     animationControls,
     activeConversationId,
     resetAwaitFlag,
@@ -101,7 +104,7 @@ export function useChatActions({
             console.warn("[useChatActions] Attempted to load conversation with invalid ID.");
             return;
         }
-        if (conversationId === activeConversationId) {
+        if (conversationId === activeConversationId  && isHistoryLoaded) {
             console.log(`[useChatActions] Conversation ${conversationId} is already active.`);
             return;
         }
@@ -112,7 +115,7 @@ export function useChatActions({
         setIsHistoryLoaded(false);
         setLoadingState({ isLoading: true, step: 'loading_history', message: 'Loading history...' });
         socketRef.current.emit('load_conversation', { conversationId });
-    }, [socketRef, isConnected, handleError, activeConversationId, setIsLoadingHistory, setChatMessages, setIsHistoryLoaded, setLoadingState]);
+    }, [socketRef, isConnected, handleError, activeConversationId, setIsLoadingHistory, setChatMessages, setIsHistoryLoaded, setLoadingState, isHistoryLoaded ]);
 
     const startNewConversation = useCallback(() => {
         

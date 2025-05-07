@@ -38,8 +38,8 @@ export interface UseSocketEventHandlersProps extends Omit<ChatStateSetters,
     isAwaitingFinalResultRef: MutableRefObject<boolean>;
     activeConversationId: string | null;
     resetAwaitFlag: () => void;
-    // setSearchResults and setIsSearching are removed as they are not used by event handlers anymore
-    // for the purpose of handling a 'search_results' event.
+    onConnectionReady?: (payload: { userId: string, email: string }) => void; // THÊM MỚI
+
 }
 
 
@@ -61,6 +61,8 @@ export interface SocketEventHandlers extends BaseSocketEventHandlers {
     onConversationCleared: (payload: ConversationClearedPayload) => void;
     onConversationRenamed: (payload: ConversationRenamedPayload) => void;
     onConversationPinStatusChanged: (payload: ConversationPinStatusChangedPayload) => void;
+    onConnectionReady?: (payload: { userId: string, email: string }) => void; // THÊM MỚI
+
 }
 
 
@@ -85,9 +87,16 @@ export function useSocketEventHandlers({
     isAwaitingFinalResultRef,
     activeConversationId,
     resetAwaitFlag,
+    onConnectionReady, // THÊM MỚI
+
 }: UseSocketEventHandlersProps): SocketEventHandlers {
 
-    // ... (handleConnect, handleDisconnect, handleConnectError, handleAuthError remain the same)
+    const handleConnectionReady = useCallback((payload: { userId: string, email: string }) => { // THÊM MỚI
+        if (!isMountedRef.current) return;
+        console.log(`[useSocketEventHandlers] Event: Connection Ready. UserID: ${payload.userId}`);
+        onConnectionReady?.(payload);
+    }, [isMountedRef, onConnectionReady]);
+
     const handleConnect = useCallback((socketId: string) => {
         if (!isMountedRef.current) return;
         console.log(`[useSocketEventHandlers] Event: Connected with ID ${socketId}`);
@@ -131,8 +140,9 @@ export function useSocketEventHandlers({
     }, [isMountedRef, setConversationList]);
 
     const handleInitialHistory = useCallback((payload: InitialHistoryPayload) => {
-        if (!isMountedRef.current) return;
+        if (!isMountedRef.current) return; // isMountedRef.current không thay đổi thường xuyên
         console.log(`[useSocketEventHandlers] Event: Initial History Received for ConvID: ${payload.conversationId}, Messages: ${payload.messages?.length ?? 0}`);
+        // Các hàm setXXX từ useState thường có tham chiếu ổn định
         setIsLoadingHistory(false);
         setChatMessages(Array.isArray(payload.messages) ? payload.messages : []);
         setActiveConversationId(payload.conversationId);
@@ -303,11 +313,11 @@ export function useSocketEventHandlers({
             prevList.map(conv =>
                 conv.id === conversationId ? { ...conv, isPinned: isPinned } : conv
             )
-            .sort((a, b) => {
-                if (a.isPinned && !b.isPinned) return -1;
-                if (!a.isPinned && b.isPinned) return 1;
-                return new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime();
-            })
+                .sort((a, b) => {
+                    if (a.isPinned && !b.isPinned) return -1;
+                    if (!a.isPinned && b.isPinned) return 1;
+                    return new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime();
+                })
         );
     }, [isMountedRef, setConversationList]);
 
@@ -320,32 +330,36 @@ export function useSocketEventHandlers({
     // }, [isMountedRef, setSearchResults, setIsSearching]);
 
 
-    const socketEventHandlers: SocketEventHandlers = useMemo(() => ({
-        onConnect: handleConnect,
-        onDisconnect: handleDisconnect,
-        onConnectError: handleConnectError,
-        onAuthError: handleAuthError,
-        onStatusUpdate: handleStatusUpdate,
-        onChatUpdate: handlePartialResult,
-        onChatResult: handleResult,
-        onChatError: handleChatErrorEvent,
-        onEmailConfirmationResult: handleEmailConfirmationResult,
-        onInitialHistory: handleInitialHistory,
-        onConversationList: handleConversationList,
-        onNewConversationStarted: handleNewConversationStarted,
-        onConversationDeleted: handleConversationDeleted,
-        onConversationCleared: handleConversationCleared,
-        onConversationRenamed: handleConversationRenamed,
-        onConversationPinStatusChanged: handleConversationPinStatusChanged,
-        // onConversationSearchResults: handleConversationSearchResults, // REMOVE THIS
-    }), [
+    const socketEventHandlers: SocketEventHandlers = useMemo(() => {
+        // THÊM LOG Ở ĐÂY
+        console.log('[useSocketEventHandlers DEBUG] Creating socketEventHandlers object. typeof handleInitialHistory:', typeof handleInitialHistory);
+        return {
+            onConnect: handleConnect,
+            onDisconnect: handleDisconnect,
+            onConnectError: handleConnectError,
+            onAuthError: handleAuthError,
+            onStatusUpdate: handleStatusUpdate,
+            onChatUpdate: handlePartialResult,
+            onChatResult: handleResult,
+            onChatError: handleChatErrorEvent,
+            onEmailConfirmationResult: handleEmailConfirmationResult,
+            onInitialHistory: handleInitialHistory,
+            onConversationList: handleConversationList,
+            onNewConversationStarted: handleNewConversationStarted,
+            onConversationDeleted: handleConversationDeleted,
+            onConversationCleared: handleConversationCleared,
+            onConversationRenamed: handleConversationRenamed,
+            onConversationPinStatusChanged: handleConversationPinStatusChanged,
+            onConnectionReady: handleConnectionReady, // THÊM MỚI
+        };
+    }, [
         handleConnect, handleDisconnect, handleConnectError, handleAuthError,
         handleStatusUpdate, handlePartialResult, handleResult, handleChatErrorEvent,
         handleEmailConfirmationResult, handleInitialHistory,
         handleConversationList, handleNewConversationStarted,
         handleConversationDeleted, handleConversationCleared,
         handleConversationRenamed, handleConversationPinStatusChanged,
-        // handleConversationSearchResults, // REMOVE THIS
+        handleConnectionReady, // THÊM MỚI
     ]);
 
     return socketEventHandlers;

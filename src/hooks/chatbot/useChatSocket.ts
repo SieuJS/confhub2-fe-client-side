@@ -13,7 +13,7 @@ import { appConfig } from '@/src/middleware';
 // Connection and Handlers/Actions
 import { useSocketConnection, SocketConnectionOptions } from './useSocketConnection';
 import { useSocketEventHandlers, SocketEventHandlers, UseSocketEventHandlersProps } from './useSocketEventHandlers';
-import { useChatActions, ChatActions } from './useChatActions';
+import { useChatActions, ChatActions } from './useChatActions'; // Đảm bảo ChatActions và UseChatActionsProps trong useChatActions.ts đã được cập nhật
 
 // Other Hooks and Utils
 import { useStreamingTextAnimation } from './useStreamingTextAnimation';
@@ -27,9 +27,11 @@ export interface UseChatSocketProps {
 }
 
 export interface ChatSocketControls extends Omit<ChatState, 'isMountedRef' | 'authToken'>, ChatActions {
-    isConnected: boolean;
+    isConnected: boolean; // isEffectivelyConnected sẽ được trả về như là isConnected
     socketId: string | null;
     closeConfirmationDialog: () => void;
+    isServerReadyForCommands: boolean; // THÊM MỚI
+
 }
 
 
@@ -41,7 +43,7 @@ export function useChatSocket({
 
     // 1. Initialize Core State
     const {
-        chatMessages, loadingState, hasFatalError, isHistoryLoaded, isLoadingHistory,
+        chatMessages, loadingState, hasFatalError, isHistoryLoaded, isLoadingHistory, // isHistoryLoaded đã có ở đây
         showConfirmationDialog, confirmationData, conversationList, activeConversationId,
         authToken, isMountedRef,
         searchResults, isSearching,
@@ -49,9 +51,21 @@ export function useChatSocket({
         setIsHistoryLoaded, setIsLoadingHistory, setShowConfirmationDialog,
         setConfirmationData, setConversationList, setActiveConversationId, setAuthToken,
         setSearchResults, setIsSearching,
+        isServerReadyForCommands, // THÊM MỚI
+        setIsServerReadyForCommands, // THÊM MỚI
     } = useChatState();
 
-    // ... (sections 2-5 remain the same)
+
+    const handleServerReady = useCallback((payload: { userId: string, email: string }) => { // Payload từ onConnectionReady
+        if (!isMountedRef.current) {
+            console.log("[useChatSocket] handleServerReady called but component not mounted.");
+            return;
+        }
+        console.log("[useChatSocket] Server is ready for commands. Payload:", payload);
+        setIsServerReadyForCommands(true);
+    }, [isMountedRef, setIsServerReadyForCommands]); // Dependencies chính xác
+
+
     // 2. Initialize UI-specific Hooks
     const handleContentUpdate = useCallback((messageId: string, newContent: string) => {
         if (!isMountedRef.current) return;
@@ -121,8 +135,9 @@ export function useChatSocket({
         setChatMessages(prev => {
             const lastMsg = prev[prev.length - 1];
             if (lastMsg && !lastMsg.isUser && lastMsg.message === message && lastMsg.type === type) {
-                if (prev.length > 0 && prev[prev.length - 1].id === lastMsg.id) {
-                    console.warn("Duplicate error/warning message suppressed:", message);
+                // Simple duplicate suppression for consecutive identical error/warning messages from bot
+                if (prev.length > 0 && prev[prev.length - 1].id === lastMsg.id) { // Check if it's literally the same message object
+                    console.warn("Duplicate error/warning message object suppressed:", message); // This check might be too strict
                     return prev;
                 }
             }
@@ -133,7 +148,7 @@ export function useChatSocket({
         if (isFatal) {
             console.warn(`[useChatSocket] Fatal error detected (${message}). Setting fatal error flag.`);
             setHasFatalError(true);
-            onConnectionChange?.(false);
+            onConnectionChange?.(false); // Reflect fatal error in connection status
         }
 
     }, [isMountedRef, animationControls, setLoadingState, setChatMessages, setHasFatalError, onConnectionChange]);
@@ -143,14 +158,12 @@ export function useChatSocket({
     const socketOptions: SocketConnectionOptions = useMemo(() => ({
         socketUrl,
         authToken,
-        enabled: !!socketUrl && authToken !== undefined,
+        enabled: !!socketUrl && authToken !== undefined, // Socket only enabled if URL and token (even if null) are determined
     }), [socketUrl, authToken]);
 
     // 7. Initialize Socket Event Handlers
     const socketRefFromConnection = useRef<Socket | null>(null);
 
-    // Pass necessary setters to useSocketEventHandlers
-    // setSearchResults and setIsSearching are NOT needed here for search event handling anymore
     const socketEventHandlersProps: UseSocketEventHandlersProps = {
         isMountedRef,
         setChatMessages, setLoadingState, setHasFatalError, setIsHistoryLoaded,
@@ -159,8 +172,8 @@ export function useChatSocket({
         animationControls, handleError, onConnectionChange, onInitialConnectionError,
         confirmationData, BASE_WEB_URL, currentLocale, socketRef: socketRefFromConnection,
         isAwaitingFinalResultRef, activeConversationId, resetAwaitFlag,
-        // setSearchResults and setIsSearching are removed as props for event handlers
-        // because the search result event is being removed.
+        onConnectionReady: handleServerReady, // Đảm bảo truyền vào đây
+        setIsServerReadyForCommands
     };
     const socketEventHandlers: SocketEventHandlers = useSocketEventHandlers(socketEventHandlersProps);
 
@@ -169,38 +182,46 @@ export function useChatSocket({
     const connection = useSocketConnection(socketOptions, socketEventHandlers);
     const { isConnected: rawIsConnected, socketId, socketRef } = connection;
 
+    // Sync the socketRef to be used by event handlers if needed (though event handlers get it directly now)
     useEffect(() => {
         socketRefFromConnection.current = socketRef.current;
     }, [socketRef]);
 
+    // Effective connection status considers both raw socket connection and fatal errors
     const isEffectivelyConnected = rawIsConnected && !hasFatalError;
 
+    // Propagate effective connection changes
     useEffect(() => {
         onConnectionChange?.(isEffectivelyConnected);
     }, [isEffectivelyConnected, onConnectionChange]);
 
 
-    // 9. Initialize Chat Actions (Pass conversationList and setSearchResults)
+    // 9. Initialize Chat Actions
     const chatActions = useChatActions({
-        socketRef,
+        socketRef, // Pass the socketRef from useSocketConnection
         isConnected: isEffectivelyConnected,
         hasFatalError,
         handleError,
-        setChatMessages, setLoadingState, setActiveConversationId,
-        setIsLoadingHistory, setIsHistoryLoaded,
+        setChatMessages,
+        setLoadingState,
+        setActiveConversationId,
+        setIsLoadingHistory,
+        setIsHistoryLoaded, // Setter
+        isHistoryLoaded,    // <--- THÊM STATE isHistoryLoaded VÀO ĐÂY
         animationControls,
         activeConversationId,
         resetAwaitFlag,
-        // --- MODIFIED ---
-        setIsSearching,    // Pass setIsSearching
-        setSearchResults,  // Pass setSearchResults
-        conversationList,  // Pass conversationList
+        setIsSearching,
+        setSearchResults,
+        conversationList,
     });
 
-    // ... (sections 10-12 remain the same)
-    // 10. Specific Action Implementations
+    // 10. Specific Action Implementations (like closeConfirmationDialog)
     const closeConfirmationDialog = useCallback(() => {
         setShowConfirmationDialog(false);
+        // Optionally, if there's a pending action tied to the confirmation,
+        // you might want to emit a cancellation event to the server here.
+        // For now, it just closes the dialog.
     }, [setShowConfirmationDialog]);
 
     // 11. Mount/Unmount Logic
@@ -209,21 +230,39 @@ export function useChatSocket({
         return () => {
             isMountedRef.current = false;
             console.log("[useChatSocket] Unmounted.");
+            // Consider if socketRef.current?.disconnect() is needed here,
+            // though useSocketConnection should handle its own cleanup.
         };
-    }, [isMountedRef]);
+    }, [isMountedRef]); // Chỉ phụ thuộc vào isMountedRef
+
+
+    // Log khi isServerReadyForCommands thay đổi
+    useEffect(() => {
+        console.log(`[useChatSocket] isServerReadyForCommands changed to: ${isServerReadyForCommands}`);
+    }, [isServerReadyForCommands]);
+
 
     // 12. Return Combined Controls
     return {
         // State
-        chatMessages, loadingState, hasFatalError, isHistoryLoaded, isLoadingHistory,
-        showConfirmationDialog, confirmationData, conversationList, activeConversationId,
-        searchResults, isSearching,
+        chatMessages,
+        loadingState,
+        hasFatalError,
+        isHistoryLoaded,
+        isLoadingHistory,
+        showConfirmationDialog,
+        confirmationData,
+        conversationList,
+        activeConversationId,
+        searchResults,
+        isSearching,
+        isServerReadyForCommands, // THÊM MỚI
 
         // Connection Info
-        isConnected: isEffectivelyConnected,
+        isConnected: isEffectivelyConnected, // Trả về trạng thái kết nối hiệu quả
         socketId,
 
-        // Actions
+        // Actions from useChatActions
         sendMessage: chatActions.sendMessage,
         loadConversation: chatActions.loadConversation,
         startNewConversation: chatActions.startNewConversation,
@@ -235,7 +274,7 @@ export function useChatSocket({
         pinConversation: chatActions.pinConversation,
         searchConversations: chatActions.searchConversations,
 
-        // Specific Methods
+        // Specific Methods from this hook
         closeConfirmationDialog,
     };
 }

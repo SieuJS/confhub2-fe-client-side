@@ -29,6 +29,8 @@ export interface SocketEventHandlers {
     onConversationList?: (list: ConversationMetadata[]) => void;
     onInitialHistory?: (payload: InitialHistoryPayload) => void;
     onNewConversationStarted?: (payload: { conversationId: string }) => void;
+    onConnectionReady?: (payload: { userId: string, email: string }) => void; // THÊM MỚI
+
     // ----------------------------------
 }
 
@@ -168,14 +170,27 @@ export function useSocketConnection(
         // --------------------------------------
 
         newSocket.on('conversation_list', (list) => latestHandlersRef.current.onConversationList?.(list)); // Assuming this exists from previous steps
-        newSocket.on('initial_history', (payload) => latestHandlersRef.current.onInitialHistory?.(payload)); // Assuming this exists
-
+        newSocket.on('initial_history', (payload) => {
+            // THÊM LOG Ở ĐÂY
+            console.log('[useSocketConnection DEBUG] Received "initial_history" event from socket. Payload:', payload);
+            if (latestHandlersRef.current.onInitialHistory) {
+                console.log('[useSocketConnection DEBUG] "onInitialHistory" handler IS defined. Calling it.');
+                latestHandlersRef.current.onInitialHistory(payload);
+            } else {
+                console.error('[useSocketConnection DEBUG] "onInitialHistory" handler IS UNDEFINED on latestHandlersRef.current!');
+            }
+        });
         // --- REGISTER THE MISSING LISTENER ---
         newSocket.on('new_conversation_started', (payload) => {
             console.log("[useSocketConnection] Received 'new_conversation_started' event:", payload); // Add log for debugging
             latestHandlersRef.current.onNewConversationStarted?.(payload);
         });
         // ------------------------------------
+
+        newSocket.on('connection_ready', (payload) => { // THÊM MỚI
+            console.log('[useSocketConnection] Received "connection_ready" event from socket. Payload:', payload);
+            latestHandlersRef.current.onConnectionReady?.(payload);
+        });
 
         // --- Cleanup Function ---
         return () => {
@@ -198,6 +213,9 @@ export function useSocketConnection(
             // --- REMOVE THE NEW LISTENER ---
             newSocket.off('new_conversation_started');
             // -------------------------------
+
+            newSocket.off('connection_ready'); // THÊM MỚI cleanup
+
             
             // Only disconnect if this instance is still the one in the ref
             if (socketRef.current && socketRef.current.id === newSocket.id) {
