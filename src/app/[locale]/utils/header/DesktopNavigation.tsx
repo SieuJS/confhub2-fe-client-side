@@ -27,7 +27,6 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
         href={`/conferences`}
         className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-button md:mx-4 ${isActive(`/${locale}/conferences`) ? 'text-button' : ''}`}
       >
-        {/* Loại bỏ div */}
         {t('Conferences')}
         <span
           className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-button transition-transform duration-300 ease-in-out ${
@@ -43,7 +42,6 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
         href={`/journals`}
         className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-button md:mx-4 ${isActive(`/${locale}/journals`) ? 'text-button' : ''}`}
       >
-        {/* Loại bỏ div */}
         {t('Journals')}
         <span
           className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-button transition-transform duration-300 ease-in-out ${
@@ -59,7 +57,6 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
         href={`/visualization`}
         className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-button md:mx-4 ${isActive(`/${locale}/visualization`) ? 'text-button' : ''}`}
       >
-        {/* Loại bỏ div */}
         {t('Visualization')}
         <span
           className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-button transition-transform duration-300 ease-in-out ${
@@ -75,8 +72,11 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
         href={`/chatbot/landingchatbot`}
         className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-button md:mx-4 ${isActive(`/${locale}/chatbot`) ? 'text-button' : ''}`}
       >
-        {/* Loại bỏ div */}
         {t('Chatbot')}
+        {/* Thêm thẻ span cho chữ NEW */}
+        <span className='mb-1 ml-1 inline-block rounded bg-button px-1.5 py-0.5 align-middle text-xs font-semibold text-button-text'>
+          {t('NEW')}
+        </span>
         <span
           className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-button transition-transform duration-300 ease-in-out ${
             isActive('/chatbot')
@@ -91,7 +91,6 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
         href={`/support`}
         className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-button md:mx-4 ${isActive(`/${locale}/support`) ? 'text-button' : ''}`}
       >
-        {/* Loại bỏ div */}
         {t('Support')}
         <span
           className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-button transition-transform duration-300 ease-in-out ${

@@ -320,7 +320,7 @@ const FeatureComparisonTable: React.FC = () => {
                       {/* Conditionally render the tooltip */}
                       {activeTooltipId === feature.id && (
                         <div
-                          className='absolute left-full top-1/2 z-20 ml-2 w-64 max-w-xs -translate-y-1/2 rounded-md bg-gray-80 p-3  shadow-lg'
+                          className='absolute left-full top-1/2 z-20 ml-2 w-64 max-w-xs -translate-y-1/2 rounded-md  bg-white-pure p-3 shadow-lg'
                           role='tooltip'
                         >
                           {/* Render tooltip content using the keys */}
