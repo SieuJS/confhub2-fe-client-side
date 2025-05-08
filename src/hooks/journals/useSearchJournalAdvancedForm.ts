@@ -63,8 +63,33 @@ const useSearchJournalAdvanceForm = ({
 
   // Example lists - replace with your actual lists
   const availableSubjectAreas = [
-    "Oncology", "Computer Science", "Economics", "Environmental Science", "Physics", "Chemistry", "Biology",
-    "Mathematics", "Engineering", "Medicine", "Psychology", "Sociology", "History", "Literature", "Art"
+    "Agricultural and Biological Sciences",
+    "Arts and Humanities",
+    "Biochemistry, Genetics and Molecular Biology",
+    "Business, Management and Accounting",
+    "Chemical Engineering",
+    "Chemistry",
+    "Computer Science",
+    "Decision Sciences",
+    "Dentistry",
+    "Earth and Planetary Sciences",
+    "Economics, Econometrics and Finance",
+    "Energy",
+    "Engineering",
+    "Environmental Science",
+    "Health Professions",
+    "Immunology and Microbiology",
+    "Materials Science",
+    "Mathematics",
+    "Medicine",
+    "Multidisciplinary",
+    "Neuroscience",
+    "Nursing",
+    "Pharmacology, Toxicology and Pharmaceutics",
+    "Physics and Astronomy",
+    "Psychology",
+    "Social Sciences",
+    "Veterinary",
   ];
   const availableOpenAccessTypes = [
     "Gold Open Access", "Green Open Access", "Hybrid Open Access", "Diamond Open Access", "Closed Access"

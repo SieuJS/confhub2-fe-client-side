@@ -86,6 +86,10 @@ const config = {
             transform: 'translateY(-3.5px)'
           }
         },
+        scrollLeft: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -94,7 +98,7 @@ const config = {
         'pulse-ripple': 'pulse-ripple 1s linear infinite', // Continuous pulse ripple for div
         'float-up-down': 'floatUpDown 2s ease-in-out infinite', // Định nghĩa animation sử dụng keyframes 'floatUpDown'
         hover: 'hover 1.4s infinite alternate ease-in-out',
-
+        'scroll-left': 'scrollLeft var(--scroll-speed) linear infinite',
       },
 
 

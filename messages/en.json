@@ -714,6 +714,7 @@
       "africa": "Africa",
       "oceania": "Oceania"
     },
+    "Loading_Chart": "Loading Chart...",
     "valueLabel": "Value",
     "chartTypeBar": "Bar Chart",
     "chartTypePie": "Pie Chart",
@@ -981,5 +982,11 @@
   "YAxis_Value_Measure": "Y-Axis (Value/Measure)",
   "Slices_Color_Dimension": "Slices Color (Dimension)",
   "Color_Group_Dimension": "Color Group (Dimension)",
-  "Select_Chart_Type": "Select Chart Type"
+  "Select_Chart_Type": "Select Chart Type",
+  "Enter_your_email_to_reset_password": "Enter your email to reset password",
+  "Send_Reset_Code": "Send Reset Code",
+  "Back_to_Login": "Back to Login",
+  "Back_to_Home": "Back to Home",
+  "Subject_areas_journals": "Subject areas journals",
+  "No_images_available_to_scroll": "No images available to scroll"
 }
