@@ -10,7 +10,7 @@ import {
     ConversationClearedPayload,
     ConversationRenamedPayload,
     ConversationPinStatusChangedPayload,
-    // No longer need ConversationSearchResultsPayload if it was defined
+    LoadingState // Import LoadingState
 } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
 import { SocketEventHandlers as BaseSocketEventHandlers } from './useSocketConnection';
 import { StreamingTextAnimationControls } from './useStreamingTextAnimation';
@@ -22,9 +22,8 @@ import { ChatStateSetters } from './useChatState';
 /**
  * Defines the properties required by the useSocketEventHandlers hook.
  */
-// Remove setSearchResults and setIsSearching from props if they were only for search results event
 export interface UseSocketEventHandlersProps extends Omit<ChatStateSetters,
-    'setAuthToken' | 'setSearchResults' | 'setIsSearching'
+    'setAuthToken' | 'setSearchResults' | 'setIsSearching' | 'setIsServerReadyForCommands' // Removed setIsServerReadyForCommands
 > {
     isMountedRef: React.MutableRefObject<boolean>;
     animationControls: StreamingTextAnimationControls;
@@ -38,8 +37,8 @@ export interface UseSocketEventHandlersProps extends Omit<ChatStateSetters,
     isAwaitingFinalResultRef: MutableRefObject<boolean>;
     activeConversationId: string | null;
     resetAwaitFlag: () => void;
-    onConnectionReady?: (payload: { userId: string, email: string }) => void; // THÊM MỚI
-
+    loadingState: LoadingState; // Added loadingState
+    onConnectionReady?: (payload: { userId: string, email: string }) => void;
 }
 
 
@@ -61,8 +60,7 @@ export interface SocketEventHandlers extends BaseSocketEventHandlers {
     onConversationCleared: (payload: ConversationClearedPayload) => void;
     onConversationRenamed: (payload: ConversationRenamedPayload) => void;
     onConversationPinStatusChanged: (payload: ConversationPinStatusChangedPayload) => void;
-    onConnectionReady?: (payload: { userId: string, email: string }) => void; // THÊM MỚI
-
+    onConnectionReady?: (payload: { userId: string, email: string }) => void;
 }
 
 
@@ -87,13 +85,13 @@ export function useSocketEventHandlers({
     isAwaitingFinalResultRef,
     activeConversationId,
     resetAwaitFlag,
-    onConnectionReady, // THÊM MỚI
-
+    loadingState, // Destructure loadingState
+    onConnectionReady,
 }: UseSocketEventHandlersProps): SocketEventHandlers {
 
-    const handleConnectionReady = useCallback((payload: { userId: string, email: string }) => { // THÊM MỚI
+    const handleActualConnectionReady = useCallback((payload: { userId: string, email: string }) => {
         if (!isMountedRef.current) return;
-        console.log(`[useSocketEventHandlers] Event: Connection Ready. UserID: ${payload.userId}`);
+        console.log(`[useSocketEventHandlers] Event: Connection Ready (actual). UserID: ${payload.userId}`);
         onConnectionReady?.(payload);
     }, [isMountedRef, onConnectionReady]);
 
@@ -140,9 +138,8 @@ export function useSocketEventHandlers({
     }, [isMountedRef, setConversationList]);
 
     const handleInitialHistory = useCallback((payload: InitialHistoryPayload) => {
-        if (!isMountedRef.current) return; // isMountedRef.current không thay đổi thường xuyên
+        if (!isMountedRef.current) return;
         console.log(`[useSocketEventHandlers] Event: Initial History Received for ConvID: ${payload.conversationId}, Messages: ${payload.messages?.length ?? 0}`);
-        // Các hàm setXXX từ useState thường có tham chiếu ổn định
         setIsLoadingHistory(false);
         setChatMessages(Array.isArray(payload.messages) ? payload.messages : []);
         setActiveConversationId(payload.conversationId);
@@ -151,14 +148,34 @@ export function useSocketEventHandlers({
     }, [isMountedRef, setIsLoadingHistory, setChatMessages, setActiveConversationId, setIsHistoryLoaded, setLoadingState]);
 
     const handleNewConversationStarted = useCallback((payload: { conversationId: string }) => {
-        if (!isMountedRef.current || !payload || !payload.conversationId) return;
-        console.log(`[useSocketEventHandlers] Event: New Conversation Started. ID: ${payload.conversationId}`);
-        setIsLoadingHistory(false);
-        setChatMessages([]);
+        if (!isMountedRef.current || !payload || !payload.conversationId) {
+            console.warn('[handleNewConversationStarted] Aborted: Not mounted or invalid payload.', { payload });
+            return;
+        }
+
+        console.log(`[handleNewConversationStarted FRONTEND] Event received! New Conversation ID: ${payload.conversationId}.`);
+
         setActiveConversationId(payload.conversationId);
         setIsHistoryLoaded(false);
-        setLoadingState({ isLoading: false, step: 'new_chat_ready', message: '' });
-    }, [isMountedRef, setIsLoadingHistory, setChatMessages, setActiveConversationId, setIsHistoryLoaded, setLoadingState]);
+        setIsLoadingHistory(false); // For LeftPanel conversation list loading
+
+        // Conditional loading state update for the main chat panel
+        if (loadingState.step === 'starting_new_chat') {
+            // This was an explicit "New Chat" button click
+            console.log('[handleNewConversationStarted FRONTEND] Explicit new chat. Setting loadingState to new_chat_ready.');
+            setLoadingState({ isLoading: false, step: 'new_chat_ready', message: '' });
+        } else {
+            // Implicit new chat (e.g., from sending a message when no chat is active)
+            // or some other scenario. The current loadingState (e.g., 'sending') should persist.
+            console.log(`[handleNewConversationStarted FRONTEND] Implicit new chat or other scenario (current step: ${loadingState.step}). Not setting loadingState to idle here.`);
+        }
+    }, [
+        isMountedRef,
+        setActiveConversationId,
+        setIsHistoryLoaded,
+        setIsLoadingHistory,
+        setLoadingState, loadingState, // Added loadingState to dependencies
+    ]);
 
     const handleStatusUpdate = useCallback((update: StatusUpdate) => {
         if (!isMountedRef.current) return;
@@ -252,7 +269,7 @@ export function useSocketEventHandlers({
         if (!isMountedRef.current) return;
         console.log("[useSocketEventHandlers] Event: Chat Error received from server:", errorData);
         isAwaitingFinalResultRef.current = false;
-        animationControls.stopStreaming(); // Thêm dòng này để đảm bảo dừng streaming khi có lỗi
+        animationControls.stopStreaming();
 
         const errorStep = errorData?.step;
         const errorMessage = errorData?.message || "Unknown error";
@@ -260,37 +277,29 @@ export function useSocketEventHandlers({
         const historyLoadErrorSteps = [
             'history_not_found_load',
             'history_load_fail_server',
-            'auth_required_load', // Giả sử có step này nếu lỗi auth khi load
+            'auth_required_load',
             'invalid_request_load',
-            // Thêm các error codes/steps mà server trả về khi không load được conversation
-            // Ví dụ: 'CONVERSATION_NOT_FOUND', 'ACCESS_DENIED'
         ];
 
-        // Nếu lỗi là do không tìm thấy conversation (thường activeConversationId sẽ là ID không hợp lệ)
-        // hoặc lỗi tải chung
         if (historyLoadErrorSteps.includes(errorStep) ||
-            (errorData?.code === 'CONVERSATION_NOT_FOUND' && errorData?.details?.conversationId === activeConversationId) || // Server báo rõ ID không tìm thấy
+            (errorData?.code === 'CONVERSATION_NOT_FOUND' && errorData?.details?.conversationId === activeConversationId) ||
             (errorData?.code === 'ACCESS_DENIED' && errorData?.details?.conversationId === activeConversationId)
         ) {
             console.log(`[useSocketEventHandlers] Chat error (${errorStep || errorData?.code}: "${errorMessage}") is related to current active conversation or history loading. Resetting active state.`);
-            setActiveConversationId(null);  // Quan trọng: ID này không còn hợp lệ
+            setActiveConversationId(null);
             setChatMessages([]);
             setIsHistoryLoaded(false);
-            setIsLoadingHistory(false);     // Tắt cờ loading của danh sách/panel
-            // setLoadingState có thể được handleError xử lý, nhưng đảm bảo isLoadingHistory là false
+            setIsLoadingHistory(false);
         }
-        // else if (errorData?.code === 'SOME_OTHER_CRITICAL_HISTORY_ERROR') {
-        //    // Xử lý tương tự
-        // }
 
-        const isFatal = errorData?.code === 'FATAL_SERVER_ERROR' || errorStep === 'auth_required'; // Lỗi auth cũng nên coi là fatal cho session này
-        handleError(errorData, true, isFatal); // handleError sẽ set loadingState và thêm message lỗi
+        const isFatal = errorData?.code === 'FATAL_SERVER_ERROR' || errorStep === 'auth_required';
+        handleError(errorData, true, isFatal);
     }, [
         isMountedRef,
         handleError,
         isAwaitingFinalResultRef,
-        animationControls, // Thêm
-        activeConversationId, // Thêm
+        animationControls,
+        activeConversationId,
         setActiveConversationId,
         setChatMessages,
         setIsHistoryLoaded,
@@ -314,31 +323,29 @@ export function useSocketEventHandlers({
         const deletedId = payload.conversationId;
         console.log(`[useSocketEventHandlers] Event: Conversation Deleted. ID: ${deletedId}`);
 
-        // Cập nhật danh sách conversationList TRƯỚC KHI kiểm tra activeId
-        // Điều này đảm bảo danh sách là mới nhất
         setConversationList(prevList => prevList.filter(conv => conv.id !== deletedId));
 
         if (activeConversationId === deletedId) {
             console.log(`[useSocketEventHandlers] Active conversation (${deletedId}) was deleted. Resetting chat view.`);
             setActiveConversationId(null);
             setChatMessages([]);
-            setIsHistoryLoaded(false); // Đánh dấu chưa tải
-            setIsLoadingHistory(false); // Không còn đang tải nữa
-            setLoadingState({ isLoading: false, step: 'idle', message: '' }); // Trạng thái chung của chat
-            animationControls.stopStreaming(); // Dừng streaming nếu có
-            resetAwaitFlag(); // Reset cờ chờ kết quả
+            setIsHistoryLoaded(false);
+            setIsLoadingHistory(false);
+            setLoadingState({ isLoading: false, step: 'idle', message: '' });
+            animationControls.stopStreaming();
+            resetAwaitFlag();
         }
     }, [
         isMountedRef,
-        activeConversationId, // State
-        setActiveConversationId, // Setter
-        setChatMessages,       // Setter
-        setIsHistoryLoaded,    // Setter
-        setIsLoadingHistory,   // Setter
-        setLoadingState,       // Setter
-        animationControls,     // Object
-        resetAwaitFlag,        // Function
-        setConversationList    // Setter
+        activeConversationId,
+        setActiveConversationId,
+        setChatMessages,
+        setIsHistoryLoaded,
+        setIsLoadingHistory,
+        setLoadingState,
+        animationControls,
+        resetAwaitFlag,
+        setConversationList
     ]);
 
     const handleConversationCleared = useCallback((payload: ConversationClearedPayload) => {
@@ -347,15 +354,9 @@ export function useSocketEventHandlers({
         console.log(`[useSocketEventHandlers] Event: Conversation Cleared. ID: ${clearedId}`);
         if (activeConversationId === clearedId) {
             console.log(`[useSocketEventHandlers] Active conversation (${clearedId}) was cleared.`);
-            // Nếu server KHÔNG tự động gửi 'initial_history' sau khi clear:
-            // setChatMessages([]);
-            // setIsHistoryLoaded(true); // Vẫn là loaded, nhưng messages trống
-            // setLoadingState({ isLoading: false, step: 'history_loaded', message: '' }); // Hoặc 'cleared'
-            // Ngược lại, nếu server GỬI 'initial_history', thì handler đó sẽ cập nhật state.
-            // Chỉ cần đảm bảo setLoadingState ở đây để tắt spinner nếu có.
             setLoadingState(prev => ({ ...prev, isLoading: false, step: 'idle' }));
         }
-    }, [isMountedRef, activeConversationId, setLoadingState /*, setChatMessages, setIsHistoryLoaded */]);
+    }, [isMountedRef, activeConversationId, setLoadingState]);
 
 
     const handleConversationRenamed = useCallback((payload: ConversationRenamedPayload) => {
@@ -385,17 +386,7 @@ export function useSocketEventHandlers({
         );
     }, [isMountedRef, setConversationList]);
 
-    // --- REMOVE: Handler for Conversation Search Results Event ---
-    // const handleConversationSearchResults = useCallback((results: ConversationMetadata[]) => {
-    //     if (!isMountedRef.current) return;
-    //     console.log(`[useSocketEventHandlers] Event: Conversation Search Results Received (${results?.length ?? 0} items)`);
-    //     setSearchResults(Array.isArray(results) ? results : []);
-    //     setIsSearching(false);
-    // }, [isMountedRef, setSearchResults, setIsSearching]);
-
-
     const socketEventHandlers: SocketEventHandlers = useMemo(() => {
-        // THÊM LOG Ở ĐÂY
         console.log('[useSocketEventHandlers DEBUG] Creating socketEventHandlers object. typeof handleInitialHistory:', typeof handleInitialHistory);
         return {
             onConnect: handleConnect,
@@ -414,7 +405,7 @@ export function useSocketEventHandlers({
             onConversationCleared: handleConversationCleared,
             onConversationRenamed: handleConversationRenamed,
             onConversationPinStatusChanged: handleConversationPinStatusChanged,
-            onConnectionReady: handleConnectionReady, // THÊM MỚI
+            onConnectionReady: handleActualConnectionReady,
         };
     }, [
         handleConnect, handleDisconnect, handleConnectError, handleAuthError,
@@ -423,7 +414,7 @@ export function useSocketEventHandlers({
         handleConversationList, handleNewConversationStarted,
         handleConversationDeleted, handleConversationCleared,
         handleConversationRenamed, handleConversationPinStatusChanged,
-        handleConnectionReady, // THÊM MỚI
+        handleActualConnectionReady,
     ]);
 
     return socketEventHandlers;

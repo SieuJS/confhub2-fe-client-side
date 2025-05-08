@@ -214,16 +214,16 @@ export const useConferenceCrawl = (): UseConferenceCrawlReturn => {
             setCrawlProgress({ current: 1, total: 1, status: 'crawling', currentChunkData: selectedRows }); // Progress là 1/1
             const description = "Entire List";
             
-            const success = await fetch(
-                appConfig.NEXT_PUBLIC_BACKEND_URL +"/api/v1/crawl-conferences" , {
+            const params = { dataSource: 'client' };
+            const response = await axios.post<ApiCrawlResponse>(API_CONFERENCE_ENDPOINT, selectedRows , {
+                    params: params,
                     method : "POST" , 
-                    body : JSON.stringify(selectedRows),
                     headers : {
                         'Content-Type' : 'application/json'
                     }
                 })
 
-            if (success) {
+            if (response.status === 200) {
                 console.log("Finished sending entire list successfully.");
                 setCrawlProgress({ current: 1, total: 1, status: 'success' });
                 setCrawlMessages(prev => [...prev, `Successfully processed the entire list.`]);

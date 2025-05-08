@@ -1,5 +1,5 @@
 // src/app/[locale]/chatbot/LeftPanel.tsx
-import React from 'react'
+import React from 'react' // <--- Đảm bảo React được import
 import { ChatMode, ConversationMetadata } from './lib/regular-chat.types'
 import {
   X,
@@ -24,7 +24,7 @@ interface LeftPanelProps {
   activeConversationId: string | null
   onSelectConversation: (conversationId: string) => void
   onStartNewConversation: () => void
-  isLoadingConversations: boolean
+  isLoadingConversations: boolean // <--- PROP QUAN TRỌNG
   onDeleteConversation: (conversationId: string) => void
   onClearConversation: (conversationId: string) => void
   onRenameConversation: (conversationId: string, newTitle: string) => void
@@ -60,13 +60,14 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
   activeConversationId,
   onSelectConversation,
   onStartNewConversation,
-  isLoadingConversations,
+  isLoadingConversations, // <--- PROP QUAN TRỌNG
   onDeleteConversation,
   onClearConversation,
   onRenameConversation,
   onPinConversation,
   currentView
 }) => {
+  
   const t = useTranslations()
   const currentPathname = usePathname() // Unlocalized pathname
   const disableChatModeSelection = isLiveConnected
@@ -84,25 +85,19 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
       id: 'regularChat',
       label: t('Regular_Chat'),
       icon: Bot,
-      // action nên điều hướng hoặc gọi hàm điều hướng từ context
-      // onChatModeChange trong MainLayout đã gọi handleChatModeNavigation (điều hướng)
-      // action: () => onChatModeChange('regular'),
-      // isActive: currentView === 'chat' && currentChatMode === 'regular',
-      href: { pathname: '/chatbot/regularchat' }, // Thay action bằng href
+      href: { pathname: '/chatbot/regularchat' },
       isActive:
         currentView === 'chat' &&
         currentChatMode === 'regular' &&
         currentPathname === '/chatbot/regularchat',
       disabled: disableChatModeSelection,
-      type: 'link' // Giữ button nếu action xử lý điều hướng qua context
+      type: 'link'
     },
     {
       id: 'liveStream',
       label: t('Live_Stream'),
       icon: Radio,
-      // action: () => onChatModeChange('live'),
-      // isActive: currentView === 'chat' && currentChatMode === 'live',
-      href: { pathname: '/chatbot/livechat' }, // Thay action bằng href
+      href: { pathname: '/chatbot/livechat' },
       isActive:
         currentView === 'chat' &&
         currentChatMode === 'live' &&
@@ -114,8 +109,8 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
       id: 'chatHistory',
       label: t('Chat_History'),
       icon: HistoryIcon,
-      href: { pathname: '/chatbot/history' }, // Sử dụng object href cho next-intl Link
-      isActive: currentView === 'history', // currentView đã được xác định là 'history' nếu ở /chatbot/history
+      href: { pathname: '/chatbot/history' },
+      isActive: currentView === 'history',
       type: 'link'
     }
   ]
@@ -229,19 +224,26 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
 
         {isOpen && <div className='border-gray-20 mx-3 my-2 border-t '></div>}
 
+        {/*
+          Điều kiện hiển thị ConversationList:
+          1. LeftPanel đang mở (isOpen)
+          2. View hiện tại là 'chat' (currentView === 'chat')
+          Nếu cả hai điều kiện này đúng, ConversationList sẽ được render.
+          Prop `isLoading` của ConversationList sẽ nhận giá trị của `isLoadingConversations`.
+        */}
         {isOpen &&
-          currentView === 'chat' && ( // Chỉ hiển thị ConversationList khi ở view 'chat'
+          currentView === 'chat' && (
             <ConversationList
               conversationList={conversationList}
               activeConversationId={activeConversationId}
               onSelectConversation={onSelectConversation}
               onStartNewConversation={onStartNewConversation}
-              isLoading={isLoadingConversations}
+              isLoading={isLoadingConversations} // <--- SPINNER TRONG ConversationList SẼ DÙNG PROP NÀY
               onDeleteConversation={onDeleteConversation}
               onClearConversation={onClearConversation}
               onRenameConversation={onRenameConversation}
               onPinConversation={onPinConversation}
-              currentView={currentView} // Truyền currentView để ConversationList có thể xử lý khác nếu cần
+              currentView={currentView}
             />
           )}
       </div>

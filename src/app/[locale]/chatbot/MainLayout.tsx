@@ -1,3 +1,5 @@
+
+
 // src/components/chatbot/MainLayout.tsx
 'use client'
 
@@ -38,6 +40,8 @@ export default function MainLayoutComponent({
   const pathname = usePathname()
   const searchParamsHook = useSearchParams()
 
+
+  
   const { chatMode, handleChatModeNavigation } = useChatSettings()
 
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true)
@@ -62,6 +66,13 @@ export default function MainLayoutComponent({
 
   const [currentView, setCurrentView] = useState<MainContentView>('chat')
   const didAttemptLoadFromUrlRef = useRef(false);
+
+  useEffect(() => {
+    console.log(
+      `[MainLayout DEBUG isLoadingHistory] isLoadingHistory: ${isLoadingHistory}, activeId: ${activeConversationId}, urlId: ${searchParamsHook.get('id')}, isServerReady: ${isServerReadyForCommands}, isConnected: ${isConnected}`
+    );
+  }, [isLoadingHistory, activeConversationId, searchParamsHook, isServerReadyForCommands, isConnected]); // Add all relevant states
+
 
   // 1) Xác định currentView theo URL
   useEffect(() => {
@@ -147,33 +158,43 @@ export default function MainLayoutComponent({
       return; // Pause load from URL if a deletion is in progress
     }
 
-    console.log(`[MainLayout Effect 3 Check] urlId: ${urlId}, currentView: ${currentView}, activeId: ${activeConversationId}, isLoadingHistory: ${isLoadingHistory}, isConnected: ${isConnected}, isServerReady: ${isServerReadyForCommands}, didAttemptLoad: ${didAttemptLoadFromUrlRef.current}`);
+    // If activeConversationId is null AND we are on a chat page,
+    // it usually means a "new chat" was started or we are landing on /regularchat.
+    // In the "new chat" case, we don't want to immediately try loading a urlId
+    // that might be stale from the *previous* page state.
+    // The didAttemptLoadFromUrlRef helps, but let's be more explicit.
+    const isStartingNewChatOptimistically = activeConversationId === null && currentView === 'chat';
 
     if (
       currentView === 'chat' &&
       urlId &&
-      !activeConversationId && // If no active one is set yet
-      !isLoadingHistory &&
+      !activeConversationId && // No active one set YET by an explicit load or new chat server response
+      !isLoadingHistory &&    // Not already loading something
       isConnected &&
       isServerReadyForCommands &&
-      !didAttemptLoadFromUrlRef.current
+      !didAttemptLoadFromUrlRef.current // Haven't tried loading this urlId yet
+      // !isStartingNewChatOptimistically // Add this? If activeId is null, maybe don't load from URL immediately
+      // This might be too restrictive if user directly lands with an ID and no activeId yet.
+      // The didAttemptLoadFromUrlRef is probably the better guard here.
     ) {
+      // If activeConversationId is null (e.g. after clicking "New Chat")
+      // but urlId still exists from a previous state before router.push fully updates searchParamsHook,
+      // we might re-load the old chat.
+      // The check `!activeConversationId` is meant to prevent loading if one is already active.
+      // The `handleStartNewConversation` in MainLayout now does `didAttemptLoadFromUrlRef.current = false;`
+      // which is good.
+
       console.log(`[MainLayout Effect 3 ACTION] Attempting to load conversation ${urlId} from URL. Setting didAttemptLoadFromUrlRef.`);
       didAttemptLoadFromUrlRef.current = true;
       loadConversation(urlId);
     } else if (currentView === 'chat' && urlId && !activeConversationId && !isLoadingHistory && (!isConnected || !isServerReadyForCommands)) {
-      console.log(`[MainLayout Effect 3 INFO] Holding off load for ${urlId}: Socket/Server not ready. (isConnected: ${isConnected}, isServerReady: ${isServerReadyForCommands})`);
+      console.log(`[MainLayout Effect 3 INFO] Holding off load for ${urlId}: Socket/Server not ready.`);
+    } else if (isStartingNewChatOptimistically && urlId) {
+      console.log(`[MainLayout Effect 3 INFO] New chat started (activeId is null), ignoring potentially stale urlId ${urlId} for now.`);
     }
   }, [
-    searchParamsHook,
-    currentView,
-    activeConversationId,
-    loadConversation,
-    isLoadingHistory,
-    pathname,
-    isConnected,
-    isServerReadyForCommands,
-    isProcessingDeletion // <-- ADD DEPENDENCY
+    searchParamsHook, currentView, activeConversationId, loadConversation,
+    isLoadingHistory, pathname, isConnected, isServerReadyForCommands, isProcessingDeletion
   ]);
 
   const handleSelectConversation = useCallback(
@@ -193,21 +214,32 @@ export default function MainLayoutComponent({
   );
 
   const handleStartNewConversation = useCallback(() => {
-    if (!isConnected) {
-      console.warn("[MainLayout] Cannot start new conversation: Socket not connected.");
+    // Check full readiness before starting
+    if (!isConnected || !isServerReadyForCommands) { // <--- ADD isServerReadyForCommands CHECK
+      console.warn("[MainLayout] Cannot start new conversation: Socket not connected or server not ready.");
       return;
     }
-    didAttemptLoadFromUrlRef.current = false;
-    startNewConversation();
+    didAttemptLoadFromUrlRef.current = false; // Reset this flag
+
+    console.log("[MainLayout] handleStartNewConversation called. Calling startNewConversation action."); // Add log
+    startNewConversation(); // This is the action from useSharedChatSocket
 
     const targetChatPath = chatMode === 'live' ? CHATBOT_LIVECHAT_PATH : CHATBOT_REGULARCHAT_PATH;
-    const isAlreadyOnTargetChatPageWithoutId = pathname === targetChatPath && !searchParamsHook.has('id');
+    // We always want to navigate to the base path for a new chat, ensuring no 'id' param.
+    // The existing logic for isAlreadyOnTargetChatPageWithoutId seems fine, but the key is the push.
+    console.log(`[MainLayout] Navigating to new chat. Target base path: ${targetChatPath}`);
+    router.push(targetChatPath); // This will clear the 'id' from URL
 
-    if (currentView === 'history' || !isAlreadyOnTargetChatPageWithoutId) {
-      console.log(`[MainLayout] Navigating to new chat. Target base path: ${targetChatPath}`);
-      router.push(targetChatPath);
-    }
-  }, [startNewConversation, router, chatMode, currentView, pathname, searchParamsHook, isConnected]);
+  }, [
+    startNewConversation,
+    router,
+    chatMode,
+    // currentView, // Not strictly needed for the core logic of starting, but for navigation decision
+    // pathname, // Not strictly needed
+    // searchParamsHook, // Not strictly needed
+    isConnected,
+    isServerReadyForCommands // <--- ADD DEPENDENCY
+  ]);
 
   const internalHandleChatModeChange = (mode: typeof chatMode) => {
     if (isLiveChatServiceConnected && mode !== 'live') {
@@ -217,8 +249,8 @@ export default function MainLayoutComponent({
     handleChatModeNavigation(mode);
   }
 
-   // MODIFIED: Hàm xử lý xóa conversation và sau đó điều hướng
-   const handleDeleteConversationAndRedirect = useCallback(
+  // MODIFIED: Hàm xử lý xóa conversation và sau đó điều hướng
+  const handleDeleteConversationAndRedirect = useCallback(
     async (conversationIdToDelete: string) => {
       if (!isConnected) {
         console.warn("[MainLayout] Cannot delete conversation: Socket not connected.");
@@ -241,8 +273,8 @@ export default function MainLayoutComponent({
         // If the deleted conversation was the active one and matched the ID in the URL,
         // clean the URL by replacing the current history entry.
         // This ensures the "back" button from the history page won't land on a URL with the deleted ID.
-        if (wasActive && currentUrlId === conversationIdToDelete && 
-            (pathname === CHATBOT_REGULARCHAT_PATH || pathname === CHATBOT_LIVECHAT_PATH)
+        if (wasActive && currentUrlId === conversationIdToDelete &&
+          (pathname === CHATBOT_REGULARCHAT_PATH || pathname === CHATBOT_LIVECHAT_PATH)
         ) {
           console.log(`[MainLayout] Deletion: Actively deleted conv ${conversationIdToDelete} was on URL. Replacing URL before history push.`);
           const params = new URLSearchParams(searchParamsHook.toString());
@@ -253,7 +285,7 @@ export default function MainLayoutComponent({
           );
           // The URL is now clean for the current history entry.
         }
-        
+
         console.log(`[MainLayout] Redirecting to history view: ${CHATBOT_HISTORY_PATH}`);
         // Navigating to history. The isProcessingDeletion flag will be reset by the effect below
         // once navigation is complete (pathname changes).
@@ -265,7 +297,7 @@ export default function MainLayoutComponent({
         // If navigation is attempted, let the effect handle reset.
         const currentPathAfterError = pathname; // Capture current path
         if (currentPathAfterError !== CHATBOT_HISTORY_PATH) {
-            setIsProcessingDeletion(false);
+          setIsProcessingDeletion(false);
         }
       }
       // No finally block to reset setIsProcessingDeletion(false) here;
@@ -306,10 +338,11 @@ export default function MainLayoutComponent({
 
 
   return (
-    <div className='bg-gray-10 flex h-screen overflow-hidden'>
+    <div className='bg-gray-10 flex h-screen overflow-hidden' >
       <LeftPanel
         isOpen={isLeftPanelOpen}
-        onToggleOpen={() => setIsLeftPanelOpen(v => !v)}
+        onToggleOpen={() => setIsLeftPanelOpen(v => !v)
+        }
         currentChatMode={chatMode}
         onChatModeChange={internalHandleChatModeChange}
         isLiveConnected={isLiveChatServiceConnected}
@@ -325,11 +358,11 @@ export default function MainLayoutComponent({
         currentView={currentView}
       />
 
-      <main className='relative flex-1 overflow-hidden transition-all duration-300 ease-in-out'>
-        <div className='h-full w-full'>{children}</div>
+      <main className='relative flex-1 overflow-hidden transition-all duration-300 ease-in-out' >
+        <div className='h-full w-full' > {children} </div>
       </main>
 
-      <RightSettingsPanel
+      < RightSettingsPanel
         isOpen={isRightPanelOpen}
         onClose={() => setIsRightPanelOpen(false)}
         isLiveConnected={isLiveChatServiceConnected}
@@ -344,7 +377,8 @@ export default function MainLayoutComponent({
         >
           <Settings className='h-5 w-5' />
         </button>
-      )}
-    </div>
+      )
+      }
+    </div >
   )
 }

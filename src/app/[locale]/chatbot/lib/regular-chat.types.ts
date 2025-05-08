@@ -88,7 +88,7 @@ export interface ChatMessageType {
     type: MessageType; // <<< Use the updated type
     thoughts?: ThoughtStep[];
     location?: string; // <<< ADDED: Optional location for map messages
-    // Add other potential properties if needed
+    timestamp?: string;
 }
 
 

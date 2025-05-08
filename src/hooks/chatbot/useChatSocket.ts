@@ -43,7 +43,7 @@ export function useChatSocket({
 
     // 1. Initialize Core State
     const {
-        chatMessages, loadingState, hasFatalError, isHistoryLoaded, isLoadingHistory, // isHistoryLoaded đã có ở đây
+        chatMessages, loadingState, hasFatalError, isHistoryLoaded, isLoadingHistory,
         showConfirmationDialog, confirmationData, conversationList, activeConversationId,
         authToken, isMountedRef,
         searchResults, isSearching,
@@ -51,8 +51,8 @@ export function useChatSocket({
         setIsHistoryLoaded, setIsLoadingHistory, setShowConfirmationDialog,
         setConfirmationData, setConversationList, setActiveConversationId, setAuthToken,
         setSearchResults, setIsSearching,
-        isServerReadyForCommands, // THÊM MỚI
-        setIsServerReadyForCommands, // THÊM MỚI
+        isServerReadyForCommands,
+        setIsServerReadyForCommands,
     } = useChatState();
 
 
@@ -165,15 +165,15 @@ export function useChatSocket({
     const socketRefFromConnection = useRef<Socket | null>(null);
 
     const socketEventHandlersProps: UseSocketEventHandlersProps = {
-        isMountedRef,
+        isMountedRef, loadingState, // Pass loadingState
         setChatMessages, setLoadingState, setHasFatalError, setIsHistoryLoaded,
         setIsLoadingHistory, setShowConfirmationDialog, setConfirmationData,
         setConversationList, setActiveConversationId,
         animationControls, handleError, onConnectionChange, onInitialConnectionError,
         confirmationData, BASE_WEB_URL, currentLocale, socketRef: socketRefFromConnection,
         isAwaitingFinalResultRef, activeConversationId, resetAwaitFlag,
-        onConnectionReady: handleServerReady, // Đảm bảo truyền vào đây
-        setIsServerReadyForCommands
+        onConnectionReady: handleServerReady,
+        // setIsServerReadyForCommands is handled by onConnectionReady (handleServerReady)
     };
     const socketEventHandlers: SocketEventHandlers = useSocketEventHandlers(socketEventHandlersProps);
 
@@ -204,16 +204,17 @@ export function useChatSocket({
         handleError,
         setChatMessages,
         setLoadingState,
-        setActiveConversationId,
+        setActiveConversationId, isServerReadyForCommands, // Pass isServerReadyForCommands
         setIsLoadingHistory,
         setIsHistoryLoaded, // Setter
-        isHistoryLoaded,    // <--- THÊM STATE isHistoryLoaded VÀO ĐÂY
+        isHistoryLoaded,
         animationControls,
         activeConversationId,
         resetAwaitFlag,
         setIsSearching,
         setSearchResults,
         conversationList,
+        setConversationList
     });
 
     // 10. Specific Action Implementations (like closeConfirmationDialog)
@@ -256,7 +257,7 @@ export function useChatSocket({
         activeConversationId,
         searchResults,
         isSearching,
-        isServerReadyForCommands, // THÊM MỚI
+        isServerReadyForCommands,
 
         // Connection Info
         isConnected: isEffectivelyConnected, // Trả về trạng thái kết nối hiệu quả

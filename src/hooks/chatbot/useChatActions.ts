@@ -4,8 +4,7 @@ import { Socket } from 'socket.io-client';
 import { Language } from '@/src/app/[locale]/chatbot/lib/live-chat.types';
 import {
     ChatMessageType, RenameConversationClientData, PinConversationClientData,
-    // SearchConversationsClientData, // No longer needed for client-side search
-    ConversationMetadata // Import ConversationMetadata
+    ConversationMetadata
 } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
 import { generateMessageId } from '@/src/app/[locale]/chatbot/utils/chatUtils';
 import { StreamingTextAnimationControls } from './useStreamingTextAnimation';
@@ -15,7 +14,7 @@ interface UseChatActionsProps extends Pick<
     ChatStateSetters,
     'setChatMessages' | 'setLoadingState' | 'setActiveConversationId' |
     'setIsLoadingHistory' | 'setIsHistoryLoaded' | 'setIsSearching' |
-    'setSearchResults'  | 'setConversationList'
+    'setSearchResults' | 'setConversationList'
 > {
     socketRef: React.MutableRefObject<Socket | null>;
     isConnected: boolean;
@@ -24,9 +23,9 @@ interface UseChatActionsProps extends Pick<
     animationControls: StreamingTextAnimationControls;
     activeConversationId: string | null;
     resetAwaitFlag: () => void;
-    conversationList: ConversationMetadata[]; // Add conversationList to props
-    isHistoryLoaded: boolean; // <--- THÊM
-
+    conversationList: ConversationMetadata[];
+    isServerReadyForCommands: boolean; // Added
+    isHistoryLoaded: boolean;
 }
 
 export interface ChatActions {
@@ -40,7 +39,7 @@ export interface ChatActions {
     clearConversation: (conversationId: string) => void;
     renameConversation: (conversationId: string, newTitle: string) => void;
     pinConversation: (conversationId: string, isPinned: boolean) => void;
-    searchConversations: (searchTerm: string) => void; // Removed limit, as it's frontend now
+    searchConversations: (searchTerm: string) => void;
 }
 
 export function useChatActions({
@@ -50,23 +49,23 @@ export function useChatActions({
     handleError,
     setChatMessages,
     setLoadingState,
-    setActiveConversationId, // Cần setter này
+    setActiveConversationId,
     setIsLoadingHistory,
     setIsHistoryLoaded,
     isHistoryLoaded,
     animationControls,
-    activeConversationId, // Cần state này
+    activeConversationId,
     resetAwaitFlag,
     setIsSearching,
     setSearchResults,
+    isServerReadyForCommands, // Destructure
     conversationList,
-    // setConversationList, // Thêm nếu bạn muốn cập nhật danh sách cục bộ ngay lập tức
+    // setConversationList,
 }: UseChatActionsProps): ChatActions {
 
     resetAwaitFlag();
 
     const sendMessage = useCallback((userInput: string, isStreaming: boolean, language: Language) => {
-        
         const trimmedMessage = userInput.trim();
         if (!trimmedMessage) return;
 
@@ -74,8 +73,8 @@ export function useChatActions({
             handleError({ message: "Cannot send message: A critical connection error occurred. Please refresh or log in again.", type: 'error' }, false, false);
             return;
         }
-        if (!socketRef.current || !isConnected) { // Check effective connection state
-            handleError({ message: "Cannot send message: Not connected.", type: 'error' }, false, false);
+        if (!socketRef.current || !isConnected || !isServerReadyForCommands) { // Added !isServerReadyForCommands
+            handleError({ message: "Cannot send message: Not connected or server not ready.", type: 'error' }, false, false);
             return;
         }
 
@@ -83,7 +82,7 @@ export function useChatActions({
         setLoadingState({ isLoading: true, step: 'sending', message: 'Sending...' });
 
         const newUserMessage: ChatMessageType = {
-            id: generateMessageId(), message: trimmedMessage, isUser: true, type: 'text'
+            id: generateMessageId(), message: trimmedMessage, isUser: true, type: 'text', timestamp: new Date().toISOString(),
         };
         setChatMessages(prevMessages => [...prevMessages, newUserMessage]);
 
@@ -93,10 +92,9 @@ export function useChatActions({
             isStreaming: isStreaming,
             language: language
         });
-    }, [isConnected, hasFatalError, handleError, animationControls, socketRef, setChatMessages, setLoadingState, activeConversationId]);
+    }, [isConnected, hasFatalError, handleError, animationControls, socketRef, setChatMessages, setLoadingState, activeConversationId, isServerReadyForCommands]);
 
     const loadConversation = useCallback((conversationId: string) => {
-        
         if (!socketRef.current || !isConnected) {
             handleError({ message: 'Cannot load conversation: Not connected.', type: 'error' }, false, false);
             return;
@@ -105,7 +103,7 @@ export function useChatActions({
             console.warn("[useChatActions] Attempted to load conversation with invalid ID.");
             return;
         }
-        if (conversationId === activeConversationId  && isHistoryLoaded) {
+        if (conversationId === activeConversationId && isHistoryLoaded) {
             console.log(`[useChatActions] Conversation ${conversationId} is already active.`);
             return;
         }
@@ -116,26 +114,44 @@ export function useChatActions({
         setIsHistoryLoaded(false);
         setLoadingState({ isLoading: true, step: 'loading_history', message: 'Loading history...' });
         socketRef.current.emit('load_conversation', { conversationId });
-    }, [socketRef, isConnected, handleError, activeConversationId, setIsLoadingHistory, setChatMessages, setIsHistoryLoaded, setLoadingState, isHistoryLoaded ]);
+    }, [socketRef, isConnected, handleError, activeConversationId, setIsLoadingHistory, setChatMessages, setIsHistoryLoaded, setLoadingState, isHistoryLoaded]);
 
     const startNewConversation = useCallback(() => {
-        
-        if (!socketRef.current || !isConnected) {
-            handleError({ message: 'Cannot start new chat: Not connected.', type: 'error' }, false, false);
+        if (!isConnected) { // isServerReadyForCommands is checked by MainLayout before calling this, or in sendMessage
+            handleError({ message: 'Cannot start new conversation: Not connected.' });
+            return;
+        }
+        if (!socketRef.current) {
+            handleError({ message: 'Cannot start new conversation: Socket not available.' });
             return;
         }
 
-        console.log(`[useChatActions] Requesting to start a new conversation...`);
-        setIsLoadingHistory(true);
+        console.log('[useChatActions] STARTING NEW CONVERSATION (explicit).');
+
         setChatMessages([]);
-        setActiveConversationId(null); // Reset active ID immediately on frontend
+        setActiveConversationId(null);
         setIsHistoryLoaded(false);
-        setLoadingState({ isLoading: true, step: 'starting_new_chat', message: 'Starting new chat...' });
-        socketRef.current.emit('start_new_conversation');
-    }, [socketRef, isConnected, handleError, setIsLoadingHistory, setChatMessages, setActiveConversationId, setIsHistoryLoaded, setLoadingState]);
+        animationControls.stopStreaming();
+        resetAwaitFlag();
+
+        setIsLoadingHistory(true);
+        setLoadingState({ isLoading: true, step: 'starting_new_chat', message: 'Preparing new chat...' });
+
+        socketRef.current.emit('start_new_conversation', {});
+    }, [
+        isConnected,
+        socketRef,
+        setChatMessages,
+        setActiveConversationId,
+        setIsHistoryLoaded,
+        animationControls,
+        resetAwaitFlag,
+        setIsLoadingHistory,
+        setLoadingState,
+        handleError,
+    ]);
 
     const handleConfirmSend = useCallback((confirmationId: string) => {
-        
         if (socketRef.current && isConnected) {
             console.log(`[useChatActions] Emitting 'user_confirm_email' for ID: ${confirmationId}`);
             socketRef.current.emit('user_confirm_email', { confirmationId });
@@ -146,7 +162,6 @@ export function useChatActions({
     }, [socketRef, isConnected, handleError, setLoadingState]);
 
     const handleCancelSend = useCallback((confirmationId: string) => {
-        
         if (socketRef.current && isConnected) {
             console.log(`[useChatActions] Emitting 'user_cancel_email' for ID: ${confirmationId}`);
             socketRef.current.emit('user_cancel_email', { confirmationId });
@@ -156,66 +171,43 @@ export function useChatActions({
     }, [socketRef, isConnected]);
 
     const closeConfirmationDialog = useCallback(() => {
-        
         console.log("[useChatActions] closeConfirmationDialog called");
     }, []);
 
-     const deleteConversation = useCallback(async (conversationIdToDelete: string) => {
+    const deleteConversation = useCallback(async (conversationIdToDelete: string) => {
         if (!isConnected || hasFatalError || !socketRef.current) {
             console.warn('Cannot delete conversation: Socket not connected or in fatal error state.');
             handleError({ message: 'Cannot delete conversation: Not connected.' }, false);
-            return Promise.reject(new Error('Socket not connected or in fatal error state.')); // Trả về Promise bị reject
+            return Promise.reject(new Error('Socket not connected or in fatal error state.'));
         }
         if (!conversationIdToDelete) {
             console.warn('Cannot delete conversation: Invalid conversation ID.');
-            return Promise.reject(new Error('Invalid conversation ID.')); // Trả về Promise bị reject
+            return Promise.reject(new Error('Invalid conversation ID.'));
         }
 
         console.log(`[useChatActions] Requesting to delete conversation: ${conversationIdToDelete}`);
 
-        // Thực hiện cập nhật state cục bộ NẾU conversation bị xóa là active
-        // Điều này giúp UI phản ứng nhanh hơn trước khi server xác nhận
-        // và quan trọng cho logic điều hướng trong MainLayoutComponent
         if (activeConversationId === conversationIdToDelete) {
             console.log(`[useChatActions] Deleting active conversation (${conversationIdToDelete}). Resetting active state.`);
             setActiveConversationId(null);
-            setChatMessages([]); // Xóa tin nhắn của conversation active
-            setIsHistoryLoaded(false); // Đặt lại trạng thái đã tải lịch sử
-            // Không cần setLoadingState ở đây vì MainLayout sẽ điều hướng
+            setChatMessages([]);
+            setIsHistoryLoaded(false);
         }
 
-        // Cân nhắc: Cập nhật conversationList cục bộ ngay lập tức
-        // setConversationList(prev => prev.filter(conv => conv.id !== conversationIdToDelete));
-        // Tuy nhiên, việc này thường được xử lý khi nhận sự kiện từ server để đảm bảo đồng bộ.
-        // Nếu bạn cập nhật ở đây, đảm bảo logic ở `useSocketEventHandlers` xử lý trùng lặp hoặc bỏ qua.
-
-        // Gửi sự kiện lên server
         socketRef.current.emit('delete_conversation', { conversationId: conversationIdToDelete });
-
-        // Quan trọng: Trả về một Promise để MainLayoutComponent có thể `await`
-        // Nếu không có thao tác bất đồng bộ nào khác ở đây (ngoài emit),
-        // bạn có thể resolve ngay. Tuy nhiên, để "giả lập" việc chờ server,
-        // hoặc nếu bạn muốn đảm bảo emit đã được gửi trước khi điều hướng,
-        // việc trả về Promise là một good practice.
-        // Trong trường hợp này, vì MainLayout điều hướng ngay sau đó,
-        // và server sẽ gửi lại cập nhật danh sách, việc resolve ngay có thể chấp nhận được.
         return Promise.resolve();
-
     }, [
         isConnected,
         hasFatalError,
         socketRef,
         handleError,
-        activeConversationId, // Dependency
-        setActiveConversationId, // Dependency
-        setChatMessages,       // Dependency
-        setIsHistoryLoaded,    // Dependency
-        // setConversationList // Dependency nếu bạn cập nhật list cục bộ
+        activeConversationId,
+        setActiveConversationId,
+        setChatMessages,
+        setIsHistoryLoaded,
     ]);
 
-
     const clearConversation = useCallback((conversationId: string) => {
-        
         if (!isConnected || hasFatalError || !socketRef.current) {
             console.warn('Cannot clear conversation: Socket not connected or in fatal error state.');
             handleError({ message: 'Cannot clear conversation: Not connected.' }, false);
@@ -230,7 +222,6 @@ export function useChatActions({
     }, [isConnected, hasFatalError, socketRef, handleError]);
 
     const renameConversation = useCallback((conversationId: string, newTitle: string) => {
-        
         if (!isConnected || hasFatalError || !socketRef.current) {
             handleError({ message: 'Cannot rename: Not connected or critical error.' }, false);
             return;
@@ -239,13 +230,12 @@ export function useChatActions({
             console.warn('Cannot rename: Invalid conversation ID or title.');
             return;
         }
-        console.log(`[useChatActions] Requesting to rename conversation ${conversationId} to "${newTitle.substring(0,30)}..."`);
+        console.log(`[useChatActions] Requesting to rename conversation ${conversationId} to "${newTitle.substring(0, 30)}..."`);
         const payload: RenameConversationClientData = { conversationId, newTitle };
         socketRef.current.emit('rename_conversation', payload);
     }, [isConnected, hasFatalError, socketRef, handleError]);
 
     const pinConversation = useCallback((conversationId: string, isPinned: boolean) => {
-        
         if (!isConnected || hasFatalError || !socketRef.current) {
             handleError({ message: 'Cannot pin/unpin: Not connected or critical error.' }, false);
             return;
@@ -259,7 +249,6 @@ export function useChatActions({
         socketRef.current.emit('pin_conversation', payload);
     }, [isConnected, hasFatalError, socketRef, handleError]);
 
-    // --- MODIFIED: Search Conversations Action (Frontend Search) ---
     const searchConversations = useCallback((searchTerm: string) => {
         console.log(`[useChatActions] Searching conversations locally with term: "${searchTerm.substring(0, 30)}..."`);
         setIsSearching(true);
@@ -267,22 +256,18 @@ export function useChatActions({
         const trimmedSearchTerm = searchTerm.trim().toLowerCase();
 
         if (!trimmedSearchTerm) {
-            // If search term is empty, show all conversations or an empty list,
-            // depending on desired behavior. Here, we show all.
-            // Or, you might want to set it to an empty array: setSearchResults([]);
             setSearchResults(conversationList);
             setIsSearching(false);
             return;
         }
 
         const filteredConversations = conversationList.filter(conv => {
-            // Search in title. Add more fields if needed (e.g., a snippet of last message if available)
             return conv.title.toLowerCase().includes(trimmedSearchTerm);
         });
 
         setSearchResults(filteredConversations);
         setIsSearching(false);
-    }, [conversationList, setSearchResults, setIsSearching]); // Dependencies: conversationList, setSearchResults, setIsSearching
+    }, [conversationList, setSearchResults, setIsSearching]);
 
     return {
         sendMessage,

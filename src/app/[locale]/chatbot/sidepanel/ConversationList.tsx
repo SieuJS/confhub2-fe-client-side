@@ -95,7 +95,9 @@ const ConversationList: React.FC<ConversationListProps> = ({
             {t('Chat_History')}
         </span>
         {/* ------------------------------------ */}
+
         <button
+        
           onClick={onStartNewConversation}
           disabled={isLoading}
           className='flex items-center space-x-1 rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50 dark:text-blue-400 dark:hover:bg-blue-900/50'
