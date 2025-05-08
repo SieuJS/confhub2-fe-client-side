@@ -46,7 +46,7 @@ const Analysis: React.FC = () => {
     // --- Fetch Data ---
     // Assume useLogAnalysisData fetches ALL relevant analysis data (overall, conference, journal)
     // Or modify the hook if it needs to fetch selectively based on a parameter
-    const { data, loading, error, isConnected, refetchData } = useLogAnalysisData(filterStartTime, filterEndTime);
+    const { data, loading, error, isConnectedToSocket, refetchData } = useLogAnalysisData(filterStartTime, filterEndTime);
 
     // --- Handlers ---
     const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -60,24 +60,43 @@ const Analysis: React.FC = () => {
     };
 
     // --- Render Logic ---
-
-    // 1. Initial Loading / Error States (remain the same)
+    // 1. Initial Loading / Error States
     if (loading && !data) {
         return (
             <div className="p-4 md:p-6 lg:p-8 bg-gradient-to-br from-gray-100 to-blue-50 min-h-screen font-sans">
-                <AnalysisHeader loading={true} error={null} isConnected={isConnected} data={null} timeFilterOption={timeFilterOption} handleFilterChange={handleFilterChange} refetchData={refetchData} />
+                <AnalysisHeader
+                    loading={true}
+                    error={null}
+                    isConnected={isConnectedToSocket} // <--- SỬA Ở ĐÂY
+                    data={null}
+                    timeFilterOption={timeFilterOption}
+                    handleFilterChange={handleFilterChange}
+                    refetchData={refetchData} />
                 <div className="flex justify-center items-center h-[calc(100vh-200px)] text-gray-600"><FaSyncAlt className="mr-2 animate-spin" /> Loading Analysis Data...</div>
             </div>
         );
     }
     if (error && !data) {
         return (
-             <div className="p-4 md:p-6 lg:p-8 bg-gradient-to-br from-gray-100 to-red-50 min-h-screen font-sans">
-                 <AnalysisHeader loading={false} error={error} isConnected={isConnected} data={null} timeFilterOption={timeFilterOption} handleFilterChange={handleFilterChange} refetchData={refetchData} />
-                 <div className="flex flex-col justify-center items-center h-[calc(100vh-200px)] text-red-600 font-semibold"><FaExclamationTriangle size={32} className="mb-4 text-red-500" />Error loading analysis data: <p className="text-sm mt-2 text-center max-w-md">{error}</p><span className="text-xs text-gray-500 mt-4">(Check console or try refreshing)</span></div>
+            <div className="p-4 md:p-6 lg:p-8 bg-gradient-to-br from-gray-100 to-red-50 min-h-screen font-sans">
+                <AnalysisHeader
+                    loading={false}
+                    error={error}
+                    isConnected={isConnectedToSocket} // <--- SỬA Ở ĐÂY
+                    data={null}
+                    timeFilterOption={timeFilterOption}
+                    handleFilterChange={handleFilterChange}
+                    refetchData={refetchData} />
+                <div className="flex flex-col justify-center items-center h-[calc(100vh-200px)] text-red-600 font-semibold">
+                    <FaExclamationTriangle size={32} className="mb-4 text-red-500" />
+                    Error loading analysis data:
+                    <p className="text-sm mt-2 text-center max-w-md">{error}</p>
+                    <span className="text-xs text-gray-500 mt-4">(Check console or try refreshing)</span>
+                </div>
             </div>
         );
     }
+
 
     // 3. Has Data or No Data State
     // Check if there's *any* overall data to potentially show header/summary
@@ -104,7 +123,7 @@ const Analysis: React.FC = () => {
                     <div className="p-4">
                         {/* Conference/Journal Toggle */}
                         <div className="flex border-b border-gray-200 mb-4">
-                             <button onClick={() => setActiveCrawler('conference')} className={`flex items-center py-2 px-4 text-sm font-medium border-b-2 focus:outline-none transition-colors duration-150 ${activeCrawler === 'conference' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
+                            <button onClick={() => setActiveCrawler('conference')} className={`flex items-center py-2 px-4 text-sm font-medium border-b-2 focus:outline-none transition-colors duration-150 ${activeCrawler === 'conference' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
                                 <FaTable className="mr-2" /> Crawl Conferences
                             </button>
                             <button onClick={() => setActiveCrawler('journal')} className={`flex items-center py-2 px-4 text-sm font-medium border-b-2 focus:outline-none transition-colors duration-150 ${activeCrawler === 'journal' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
@@ -125,7 +144,7 @@ const Analysis: React.FC = () => {
             <AnalysisHeader
                 loading={loading && !hasOverallData} // Show header loading only if NO data exists yet
                 error={error} // Show error if fetch failed
-                isConnected={isConnected}
+                isConnected={isConnectedToSocket} // Truyền giá trị đúng
                 data={data} // Pass data for potential header info
                 timeFilterOption={timeFilterOption}
                 handleFilterChange={handleFilterChange}
@@ -142,13 +161,13 @@ const Analysis: React.FC = () => {
                 />
             ) : (
                 // Show message if loading finished but no data at all was found
-                 !loading && (
-                     <div className="mt-6 text-center text-gray-500 bg-white p-6 rounded-lg shadow border border-gray-200">
-                         No analysis results found for the selected time period or current logs.
-                         <br />
-                         {error && <span className='text-red-500 text-sm'>(Last fetch attempt failed: {error})</span>}
-                     </div>
-                 )
+                !loading && (
+                    <div className="mt-6 text-center text-gray-500 bg-white p-6 rounded-lg shadow border border-gray-200">
+                        No analysis results found for the selected time period or current logs.
+                        <br />
+                        {error && <span className='text-red-500 text-sm'>(Last fetch attempt failed: {error})</span>}
+                    </div>
+                )
             )}
 
             {/* --- Dynamically Render Details Based on activeCrawler --- */}
@@ -164,11 +183,11 @@ const Analysis: React.FC = () => {
 
             {/* Show specific 'No Data' message if the active section lacks data but overall data might exist */}
             {activeCrawler === 'conference' && hasOverallData && !hasConferenceDetailsData && !loading && (
-                 <div className="mt-6 text-center text-gray-500 bg-white p-4 rounded-lg shadow border border-gray-200">
-                     No specific Conference analysis data available for this period.
-                 </div>
+                <div className="mt-6 text-center text-gray-500 bg-white p-4 rounded-lg shadow border border-gray-200">
+                    No specific Conference analysis data available for this period.
+                </div>
             )}
-             {/* {activeCrawler === 'journal' && hasOverallData && !hasJournalDetailsData && !loading && (
+            {/* {activeCrawler === 'journal' && hasOverallData && !hasJournalDetailsData && !loading && (
                  <div className="mt-6 text-center text-gray-500 bg-white p-4 rounded-lg shadow border border-gray-200">
                       No specific Journal analysis data available for this period.
                  </div>
