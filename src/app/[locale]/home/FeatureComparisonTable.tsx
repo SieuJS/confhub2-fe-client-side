@@ -263,21 +263,21 @@ const FeatureComparisonTable: React.FC = () => {
     <div className='w-full px-0 py-12 md:px-12'>
       {/* Display the translated table title */}
       <h2 className='mb-4 text-center text-xl font-semibold '>{t('title')}</h2>
-      <div className='overflow-x-auto border border-gray-200 shadow-md sm:rounded-lg'>
+      <div className='overflow-x-auto border border-gray-20 shadow-md sm:rounded-lg'>
         <table className='w-full text-left text-sm '>
           {/* Table Head */}
-          <thead className='bg-gray-100 text-xs uppercase dark:bg-gray-950 '>
+          <thead className='bg-gray-10 text-xs uppercase  '>
             <tr>
               {/* Display translated headers */}
               <th
                 scope='col'
-                className='w-2/4 border-b border-gray-300 px-8 py-5 '
+                className='w-2/4 border-b border-gray-30 px-8 py-5 '
               >
                 {t('headers.feature')}
               </th>
               <th
                 scope='col'
-                className='border-b border-gray-300 px-8 py-5 text-center'
+                className='border-b border-gray-30 px-8 py-5 text-center'
               >
                 {t('headers.guest')}
                 {/* Screen reader text, also translated */}
@@ -285,7 +285,7 @@ const FeatureComparisonTable: React.FC = () => {
               </th>
               <th
                 scope='col'
-                className='border-b border-gray-300 px-8 py-5 text-center'
+                className='border-b border-gray-30 px-8 py-5 text-center'
               >
                 {t('headers.loggedIn')}
                 {/* Screen reader text, also translated */}
@@ -320,7 +320,7 @@ const FeatureComparisonTable: React.FC = () => {
                       {/* Conditionally render the tooltip */}
                       {activeTooltipId === feature.id && (
                         <div
-                          className='absolute left-full top-1/2 z-20 ml-2 w-64 max-w-xs -translate-y-1/2 rounded-md bg-gray-800 p-3  shadow-lg'
+                          className='absolute left-full top-1/2 z-20 ml-2 w-64 max-w-xs -translate-y-1/2 rounded-md bg-gray-80 p-3  shadow-lg'
                           role='tooltip'
                         >
                           {/* Render tooltip content using the keys */}
