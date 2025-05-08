@@ -299,9 +299,9 @@ const FeatureComparisonTable: React.FC = () => {
             {allFeatures.map((feature, featureIndex) => (
               <tr
                 key={feature.id}
-                className={`border-b border-gray-200 last:border-b-0 ${
+                className={`border-b border-gray-20 last:border-b-0 ${
                   featureIndex % 2 === 0 ? 'bg-white-pure ' : 'bg-gray-5 '
-                } transition-colors duration-150 hover:bg-gray-100`}
+                } transition-colors duration-150 hover:bg-gray-10`}
               >
                 {/* Feature Name Column */}
                 <td className='px-8 py-5 align-top'>

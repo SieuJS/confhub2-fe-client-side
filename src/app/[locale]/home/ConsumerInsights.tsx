@@ -63,7 +63,7 @@ const ConsumerInsights: React.FC<ConsumerInsightsProps> = ({}) => {
     <section
       id='consumer-insights'
       ref={componentRef}
-      className='mx-0 my-12 overflow-hidden rounded-lg bg-gray-50 py-8 shadow-lg dark:bg-gray-900 md:mx-12 md:py-16'
+      className='mx-0 my-12 overflow-hidden rounded-lg bg-gray-5 py-8 shadow-lg  md:mx-12 md:py-16'
     >
       <div className='container mx-auto px-4 md:px-6'>
         {/* Content Wrapper */}
@@ -82,7 +82,7 @@ const ConsumerInsights: React.FC<ConsumerInsightsProps> = ({}) => {
           {statsData.map((stat, index) => (
             <div
               key={index}
-              className='flex flex-col items-center rounded-xl bg-white p-6 text-center shadow-md transition-shadow duration-300 hover:shadow-lg dark:bg-gray-800'
+              className='flex flex-col items-center rounded-xl bg-white-pure p-6 text-center shadow-md transition-shadow duration-300 hover:shadow-lg '
             >
               {/* Icon */}
               <div className='mb-4 text-4xl' style={{ color: stat.color }}>

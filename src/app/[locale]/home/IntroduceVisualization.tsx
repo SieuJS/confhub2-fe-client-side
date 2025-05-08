@@ -153,7 +153,7 @@ const IntroduceVisualization: React.FC = () => {
 
           // Tạo HTML tooltip đơn giản
           return `
-            <div class='rounded border border-gray-200 bg-white/90 p-2 text-sm shadow-lg backdrop-blur-sm'>
+            <div class='rounded border border-gray-20 bg-white-pure p-2 text-sm shadow-lg backdrop-blur-sm'>
               <p class='font-semibold'>${continentName}</p>
               <p style='color: ${color}'>
                 <span style='display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:${color};'></span>
@@ -257,7 +257,7 @@ const IntroduceVisualization: React.FC = () => {
             icon: 'circle',
             textStyle: {
               fontSize: 10,
-              color: '#6b7280'
+              color: 'var(--primary)'
             },
             data: pieData.map(item => ({
               // ECharts lấy tên legend từ series.data.name
@@ -379,8 +379,8 @@ const IntroduceVisualization: React.FC = () => {
   const renderChart = () => {
     if (!isClient) {
       return (
-        <div className='flex h-full items-center justify-center text-gray-400'>
-          Loading Chart...
+        <div className='flex h-full items-center justify-center '>
+          {t('Loading_Chart')}
         </div>
       )
     }
@@ -415,7 +415,7 @@ const IntroduceVisualization: React.FC = () => {
   return (
     <section
       aria-labelledby='visualization-intro-heading'
-      className='m-0 rounded-xl border border-gray-200 bg-gray-50 p-6 shadow-lg dark:bg-gray-900 md:m-12 md:p-4'
+      className='m-0 rounded-xl border border-gray-20 bg-gray-5 p-6 shadow-lg  md:m-12 md:p-4'
     >
       {/* --- CSS Keyframes cho fade (Giữ nguyên) --- */}
       <style>{`
@@ -440,7 +440,7 @@ const IntroduceVisualization: React.FC = () => {
           <p className='mb-6 text-lg leading-relaxed '>{t('description')}</p>
           <Link
             href={`/visualization`}
-            className='group inline-flex items-center justify-center rounded-lg bg-button px-6 py-3 font-semibold  shadow-md transition duration-150 ease-in-out hover:bg-button focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+            className='group inline-flex items-center justify-center rounded-lg bg-button px-6 py-3 font-semibold text-button-text  shadow-md transition duration-150 ease-in-out hover:bg-button focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
             aria-label={t('buttonAriaLabel')}
           >
             <span>{t('buttonText')}</span>
