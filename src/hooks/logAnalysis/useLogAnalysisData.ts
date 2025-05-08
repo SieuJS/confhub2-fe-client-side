@@ -44,105 +44,118 @@ export const useLogAnalysisData = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filterStartTime, filterEndTime]);
 
+    
     useEffect(() => {
         let socket: Socket | null = null;
 
-        // Fetch dữ liệu lần đầu và mỗi khi bộ lọc thay đổi
-        fetchData(false); // Gọi fetchData khi mount hoặc khi filter thay đổi
+        fetchData(false);
 
-        // --- Thiết lập Socket.IO ---
+        // Lấy token từ nơi bạn lưu trữ (ví dụ: localStorage)
+        // Thay 'authToken' bằng key bạn sử dụng để lưu token
+        const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+
+        if (!SOCKET_URL) {
+            console.error("Socket URL is not defined. Check NEXT_PUBLIC_BACKEND_URL environment variable.");
+            setError("Socket URL is not defined.");
+            // setLoading(false); // fetchData sẽ tự xử lý loading
+            return;
+        }
+
+        // QUAN TRỌNG: Chỉ kết nối socket nếu có token
+        // Nếu route này không yêu cầu xác thực thì server không nên ngắt kết nối khi không có token
+        if (!authToken) {
+            console.warn('No auth token found in localStorage. Socket.IO connection for log analysis will not be established.');
+            setError(prev => {
+                const noTokenMsg = 'Real-time updates disabled: Authentication token not found.';
+                if (prev && !prev.includes("token not found")) return `${prev}, ${noTokenMsg}`;
+                return noTokenMsg;
+            });
+            setIsConnected(false);
+            // setLoading(false); // fetchData đã xử lý
+            return; // Không kết nối socket nếu không có token
+        }
+
         try {
-            // Đảm bảo SOCKET_URL có giá trị hợp lệ
-            if (!SOCKET_URL) {
-                 throw new Error("Socket URL is not defined. Check NEXT_PUBLIC_BACKEND_URL environment variable.");
-            }
             socket = io(SOCKET_URL, {
                 transports: ['websocket'],
-                reconnectionAttempts: 5, // Giới hạn số lần thử kết nối lại
-                reconnectionDelay: 1000, // Thời gian chờ giữa các lần thử
+                reconnectionAttempts: 5,
+                reconnectionDelay: 1000,
+                auth: { // <<< THÊM DÒNG NÀY ĐỂ GỬI TOKEN
+                    token: authToken
+                }
             });
 
             socket.on('connect', () => {
                 console.log('Socket.IO Connected:', socket?.id);
                 setIsConnected(true);
-                // Có thể fetch lại dữ liệu khi kết nối thành công để đảm bảo đồng bộ?
-                // fetchData(false);
             });
 
             socket.on('disconnect', (reason) => {
                 console.log('Socket.IO Disconnected:', reason);
                 setIsConnected(false);
                 if (reason === 'io server disconnect') {
-                    // server chủ động ngắt kết nối, có thể không cần thử lại
-                    socket?.connect(); // thử kết nối lại thủ công nếu muốn
+                    // Server chủ động ngắt, kiểm tra log server. Có thể do token hết hạn hoặc không hợp lệ.
+                    // Nếu client vẫn còn token cũ và server báo lỗi, client có thể cần xử lý logout/refresh token.
+                    // Hiện tại, không tự động connect lại nếu server chủ động ngắt
+                    // socket?.connect(); // Bỏ dòng này nếu server ngắt là do lỗi auth
                 }
-                // reason === 'io client disconnect' -> client gọi socket.disconnect()
-                // reason === 'ping timeout' -> mạng có vấn đề
-                // reason === 'transport close' -> kết nối bị mất
-                // reason === 'transport error' -> lỗi kết nối
             });
 
             socket.on('connect_error', (err) => {
                  console.error('Socket.IO Connection Error:', err);
                  setIsConnected(false);
-                 // Cập nhật lỗi, nhưng không ghi đè lỗi fetch dữ liệu nếu có
+                 // Lỗi này thường xảy ra TRƯỚC khi 'disconnect' với reason 'io server disconnect' nếu là lỗi auth từ middleware
+                 // err.message có thể là "Authentication error: Invalid or expired token."
                  setError(prev => {
-                     const socketErrorMsg = `Socket Error: ${err.message}`;
-                     if (prev && !prev.includes("Socket Error:")) {
+                     const socketErrorMsg = `Socket Connection Error: ${err.message}`;
+                     // Nếu lỗi là do middleware (err.data.code === 'AUTH_FAILED') thì đây là lỗi xác thực
+                     // @ts-ignore
+                     if (err.data && err.data.code === 'AUTH_FAILED') {
+                         return `Authentication failed: ${err.message}. Please try logging in again.`;
+                     }
+                     if (prev && !prev.includes("Socket Connection Error:")) {
                          return `${prev}, ${socketErrorMsg}`;
                      }
                      return socketErrorMsg;
                  });
             });
 
-            // Lắng nghe sự kiện update từ backend
-            // QUAN TRỌNG: Xem xét lại logic này. Socket push thường gửi dữ liệu TỔNG THỂ mới nhất.
-            // Việc này có thể ghi đè dữ liệu ĐÃ LỌC của bạn.
-            // Tùy chọn:
-            // 1. Chấp nhận: Socket update hiển thị dữ liệu tổng thể, bộ lọc chỉ áp dụng khi fetch/refresh.
-            // 2. Bỏ qua socket update: Chỉ dựa vào refresh/filter change.
-            // 3. Backend gửi kèm filter: Backend gửi { filterUsed: {start, end}, data: ... }, frontend chỉ cập nhật nếu filter khớp (phức tạp).
-            // 4. Frontend tự fetch lại khi có tín hiệu: Backend chỉ gửi tín hiệu 'new_log_data_available', frontend gọi fetchData() với filter hiện tại. (Khả thi)
-
-            // --- Lựa chọn 1 (Đơn giản nhất): Cập nhật data từ socket, có thể không khớp filter ---
             socket.on('log_analysis_update', (updatedData: LogAnalysisResult) => {
-                console.log('Received log_analysis_update event via Socket (Data might be unfiltered)');
-                // Chỉ cập nhật nếu người dùng đang xem 'All Time' hoặc không có filter?
-                // Hoặc cứ cập nhật, người dùng biết socket là live data tổng thể?
-                // Hiện tại: Cập nhật bất kể filter nào đang chọn.
+                console.log('Received log_analysis_update event via Socket');
                 setData(updatedData);
-                setError(null); // Xóa lỗi nếu socket gửi data thành công
+                setError(null);
                 setLoading(false);
             });
 
-            // --- Lựa chọn 4 (Thay thế lựa chọn 1): Fetch lại khi có tín hiệu ---
-            /*
-            socket.on('new_log_data_available', () => {
-                 console.log('Signal received: new_log_data_available. Refetching with current filters...');
-                 fetchData(false); // Gọi lại hàm fetch với filter hiện tại
+            // Lắng nghe lỗi xác thực từ server (do handleConnection gửi)
+            socket.on('auth_error', (authError: { message: string }) => {
+                console.error('Socket.IO Authentication Error from server:', authError.message);
+                setError(`Authentication Error: ${authError.message}. Please log in again.`);
+                setIsConnected(false);
+                // Có thể thực hiện logout người dùng tại đây nếu cần
             });
-            */
+
 
         } catch (socketError: any) {
              console.error("Failed to initialize Socket.IO:", socketError);
              setError(prev => prev ? `${prev}, Socket Init Error: ${socketError.message}` : `Socket Init Error: ${socketError.message}`);
         }
 
-        // --- Cleanup ---
         return () => {
             if (socket) {
-                console.log('Disconnecting Socket.IO...');
+                console.log('Disconnecting Socket.IO in cleanup...');
                 socket.off('connect');
                 socket.off('disconnect');
                 socket.off('connect_error');
-                socket.off('log_analysis_update'); // Hoặc 'new_log_data_available' nếu dùng Lựa chọn 4
+                socket.off('log_analysis_update');
+                socket.off('auth_error');
                 socket.disconnect();
             }
         };
-    // fetchData là dependency chính chứa các filter.
-    // Thêm filterStartTime, filterEndTime vào đây để useEffect chạy lại khi filter thay đổi.
-    }, [fetchData, filterStartTime, filterEndTime]);
+    // fetchData là dependency chính. `authToken` cũng nên là dependency nếu nó có thể thay đổi
+    // và bạn muốn hook tự động kết nối lại.
+    // }, [fetchData, filterStartTime, filterEndTime, authToken]); // Nếu authToken là state/prop
+    }, [fetchData, filterStartTime, filterEndTime]); // Giữ nguyên nếu authToken chỉ lấy 1 lần khi mount
 
-    // Trả về hàm refetchData không cần tham số, vì nó sẽ dùng filter từ state của hook
     return { data, loading, error, isConnected, refetchData: () => fetchData(true) };
 };
