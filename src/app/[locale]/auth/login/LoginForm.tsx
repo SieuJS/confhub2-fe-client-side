@@ -56,7 +56,7 @@ const LoginForm: React.FC<LoginFormProps> = (props: LoginFormProps) => {
   })
 
   return (
-    <div className='bg-gray-5 flex min-h-screen flex-col items-center justify-center px-4 py-12  sm:px-6 lg:px-8'>
+    <div className='flex min-h-screen flex-col items-center justify-center bg-gray-5 px-4 py-12  sm:px-6 lg:px-8'>
       <div className='w-full max-w-xl'>
         <div className='bg-white-pure px-8 py-10 shadow-xl  sm:rounded-lg sm:px-16'>
           <div className='space-y-8'>
@@ -71,7 +71,7 @@ const LoginForm: React.FC<LoginFormProps> = (props: LoginFormProps) => {
               <button
                 type='button'
                 onClick={() => login()}
-                className='bg-white-pure flex w-full items-center justify-center space-x-2 rounded-md border border-gray-300 px-4 py-2.5 text-sm font-medium shadow-sm  hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 '
+                className='flex w-full items-center justify-center space-x-2 rounded-md border border-gray-300 bg-white-pure px-4 py-2.5 text-sm font-medium shadow-sm  hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 '
               >
                 <svg className='h-5 w-5' viewBox='0 0 24 24'>
                   <path
@@ -224,6 +224,14 @@ const LoginForm: React.FC<LoginFormProps> = (props: LoginFormProps) => {
                   className='hover:text-button/80 font-medium text-button'
                 >
                   {t('Sign_Up_Now')}
+                </Link>
+              </div>
+              <div className='flex items-center justify-center space-x-1'>
+                <Link
+                  href='/'
+                  className='hover:text-button/80 font-medium text-button'
+                >
+                  {t('Back_to_Home')}
                 </Link>
               </div>
             </div>

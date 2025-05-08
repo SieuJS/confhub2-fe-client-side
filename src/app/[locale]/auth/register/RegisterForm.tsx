@@ -130,7 +130,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
 
   // --- Phần JSX (Bỏ phần hiển thị thông báo xác thực) ---
   return (
-    <div className='bg-gray-5 flex min-h-screen flex-col items-center justify-center px-4 py-12  sm:px-6 lg:px-8'>
+    <div className='flex min-h-screen flex-col items-center justify-center bg-gray-5 px-4 py-12  sm:px-6 lg:px-8'>
       <div className='w-full max-w-xl'>
         <div className='bg-white-pure px-8 py-10 shadow-xl  sm:rounded-lg sm:px-16'>
           {/* Chỉ hiển thị form đăng ký */}
@@ -333,6 +333,14 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
                   className='hover:text-button/80 font-medium text-button'
                 >
                   {t('Sign_In')}
+                </Link>
+              </div>
+              <div className='flex items-center justify-center space-x-1'>
+                <Link
+                  href='/'
+                  className='hover:text-button/80 font-medium text-button'
+                >
+                  {t('Back_to_Home')}
                 </Link>
               </div>
             </div>

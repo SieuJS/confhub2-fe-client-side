@@ -7,9 +7,9 @@ import Footer from './utils/Footer'
 import ConsumerInsights from './home/ConsumerInsights'
 import { Header } from './utils/Header'
 import IntroduceVisualization from './home/IntroduceVisualization'
-import SuperBanner from './home/SuperBanner'
 import FeatureComparisonTable from './home/FeatureComparisonTable'
 import SuperBannerTree from './home/SuperBannerTree'
+import SubjectAreasJournals from './home/SubjectAreasJournals'
 
 export default function HomePage({ locale }: { locale: string }) {
   const [isVisibleButton, setIsVisibleButton] = useState(false)
@@ -43,6 +43,12 @@ export default function HomePage({ locale }: { locale: string }) {
       {/* <SuperBanner /> */}
       <SuperBannerTree />
       <PopularConferences />
+      <SubjectAreasJournals
+        speed='90s' // You can still customize other props
+        imageHeight='h-60'
+        imageWidth='w-40'
+        innerClasses='space-x-6 py-4'
+      />
       <ConsumerInsights />
       <IntroduceVisualization />
       <FeatureComparisonTable />
