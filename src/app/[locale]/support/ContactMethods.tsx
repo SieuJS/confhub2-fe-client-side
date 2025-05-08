@@ -15,19 +15,19 @@ const ContactMethods: React.FC = () => {
     'M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z'
 
   return (
-    <section className='bg-white py-8 dark:bg-gray-900 lg:py-16'>
+    <section className='bg-gray-5 py-8  lg:py-16'>
       <div className='mx-auto max-w-screen-xl px-4'>
         <div className='grid grid-cols-1 gap-8 text-center md:grid-cols-3'>
           {/* Email Us */}
           <div className='flex flex-col items-center'>
-            <div className='mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800'>
+            <div className='mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-gray-10 '>
               <svg
                 xmlns='http://www.w3.org/2000/svg'
                 fill='none'
                 viewBox='0 0 24 24'
                 strokeWidth={1.5}
                 stroke='currentColor'
-                className='h-6 w-6 text-gray-600 dark:text-gray-400'
+                className='h-6 w-6 '
                 // 5. Thêm aria-label và dịch
                 aria-label={t('emailIconLabel')}
                 role='img' // Thêm role để rõ ràng hơn về mặt ngữ nghĩa
@@ -40,13 +40,9 @@ const ContactMethods: React.FC = () => {
               </svg>
             </div>
             {/* 4. Thay thế text cứng */}
-            <h3 className='mb-2 text-xl font-bold dark:text-white'>
-              {t('emailTitle')}
-            </h3>
+            <h3 className='mb-2 text-xl font-bold '>{t('emailTitle')}</h3>
             {/* 4. Thay thế text cứng */}
-            <p className='mb-3 px-4 text-sm text-gray-500 dark:text-gray-400'>
-              {t('emailDescription')}
-            </p>
+            <p className='mb-3 px-4 text-sm  '>{t('emailDescription')}</p>
             {/* Email thường không cần dịch, giữ nguyên */}
             <a
               href='mailto:hello@flowbite.com'
@@ -58,14 +54,14 @@ const ContactMethods: React.FC = () => {
 
           {/* Call Us */}
           <div className='flex flex-col items-center'>
-            <div className='mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800'>
+            <div className='mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-gray-10 '>
               <svg
                 xmlns='http://www.w3.org/2000/svg'
                 fill='none'
                 viewBox='0 0 24 24'
                 strokeWidth={1.5}
                 stroke='currentColor'
-                className='h-6 w-6 text-gray-600 dark:text-gray-400'
+                className='h-6 w-6 '
                 // 5. Thêm aria-label và dịch
                 aria-label={t('phoneIconLabel')}
                 role='img'
@@ -78,13 +74,9 @@ const ContactMethods: React.FC = () => {
               </svg>
             </div>
             {/* 4. Thay thế text cứng */}
-            <h3 className='mb-2 text-xl font-bold dark:text-white'>
-              {t('callTitle')}
-            </h3>
+            <h3 className='mb-2 text-xl font-bold '>{t('callTitle')}</h3>
             {/* 4. Thay thế text cứng */}
-            <p className='mb-3 px-4 text-sm text-gray-500 dark:text-gray-400'>
-              {t('callDescription')}
-            </p>
+            <p className='mb-3 px-4 text-sm '>{t('callDescription')}</p>
             {/* Số điện thoại thường không cần dịch, giữ nguyên */}
             <a
               href='tel:+16467865060'
@@ -96,14 +88,14 @@ const ContactMethods: React.FC = () => {
 
           {/* Support */}
           <div className='flex flex-col items-center'>
-            <div className='mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800'>
+            <div className='mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-gray-10 '>
               <svg
                 xmlns='http://www.w3.org/2000/svg'
                 fill='none'
                 viewBox='0 0 24 24'
                 strokeWidth={1.5}
                 stroke='currentColor'
-                className='h-6 w-6 text-gray-600 dark:text-gray-400'
+                className='h-6 w-6 '
                 // 5. Thêm aria-label và dịch
                 aria-label={t('supportIconLabel')}
                 role='img'
@@ -116,13 +108,9 @@ const ContactMethods: React.FC = () => {
               </svg>
             </div>
             {/* 4. Thay thế text cứng */}
-            <h3 className='mb-2 text-xl font-bold dark:text-white'>
-              {t('supportTitle')}
-            </h3>
+            <h3 className='mb-2 text-xl font-bold '>{t('supportTitle')}</h3>
             {/* 4. Thay thế text cứng (Lưu ý: text này giống phần Email) */}
-            <p className='mb-3 px-4 text-sm text-gray-500 dark:text-gray-400'>
-              {t('supportDescription')}
-            </p>
+            <p className='mb-3 px-4 text-sm '>{t('supportDescription')}</p>
             {/* Thay thẻ <a> bằng <Link> nếu là link nội bộ */}
             <Link
               href='/support' // Đường dẫn tới trang support
