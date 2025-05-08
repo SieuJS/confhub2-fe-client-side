@@ -13,6 +13,7 @@ import LoadingIndicator from './header/LoadingIndicator'
 import { MenuIcon, CloseIcon } from './header/Icon'
 import Button from './Button'
 import useAuthApi from '../../../hooks/auth/useAuthApi'
+import GlobeIcon from '../../icons/globe'
 
 interface Props {
   locale: string
@@ -68,7 +69,8 @@ export const Header: FC<Props> = ({ locale }) => {
       <Link href='/' locale={locale}>
         <div className='flex flex-row items-center '>
           <div className='mb-2 h-10 w-10'>
-            <LogoIcon />
+            {/* <LogoIcon /> */}
+            <GlobeIcon />
           </div>
           <strong className='mx-2 hidden select-none md:block'>
             Global Conference Hub

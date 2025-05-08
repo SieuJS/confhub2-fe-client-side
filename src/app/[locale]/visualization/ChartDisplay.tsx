@@ -159,7 +159,7 @@ const ChartDisplay: React.FC<ChartDisplayProps> = ({
       )}
       {/* Placeholder/Instructions */}
       {!isLoading && !isReady && (
-        <div className='flex h-full flex-col items-center justify-center text-center '>
+        <div className='flex h-full flex-col items-center justify-center text-center  '>
           <p className='mb-2'>{getPlaceholderMessage()}</p>
           <p className='text-sm '>
             {t(
