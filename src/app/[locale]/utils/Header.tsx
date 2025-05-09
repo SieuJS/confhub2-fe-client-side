@@ -68,7 +68,7 @@ export const Header: FC<Props> = ({ locale }) => {
     >
       <Link href='/' locale={locale}>
         <div className='flex flex-row items-center '>
-          <div className='mb-2 h-10 w-10'>
+          <div className='mb-2 h-8 w-8'>
             {/* <LogoIcon /> */}
             <GlobeIcon />
           </div>

@@ -170,25 +170,25 @@ const NotificationsTab: React.FC = () => {
         {/* Sử dụng flex-wrap và gap cho responsive */}
         <button
           onClick={() => setFilter('all')}
-          className={`rounded px-3 py-1 text-sm md:px-4 md:py-2 ${filter === 'all' ? 'bg-button text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+          className={`rounded px-3 py-1 text-sm md:px-4 md:py-2 ${filter === 'all' ? 'bg-button text-white' : 'bg-gray-20 hover:bg-gray-30'}`}
         >
           {t('All')}
         </button>
         <button
           onClick={() => setFilter('unread')}
-          className={`rounded px-3 py-1 text-sm md:px-4 md:py-2 ${filter === 'unread' ? 'bg-button text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+          className={`rounded px-3 py-1 text-sm md:px-4 md:py-2 ${filter === 'unread' ? 'bg-button text-white' : 'bg-gray-20 hover:bg-gray-30'}`}
         >
           {t('Unread')}
         </button>
         <button
           onClick={() => setFilter('read')}
-          className={`rounded px-3 py-1 text-sm md:px-4 md:py-2 ${filter === 'read' ? 'bg-button text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+          className={`rounded px-3 py-1 text-sm md:px-4 md:py-2 ${filter === 'read' ? 'bg-button text-white' : 'bg-gray-20 hover:bg-gray-30'}`}
         >
           {t('Read')}
         </button>
         <button
           onClick={() => setFilter('important')}
-          className={`rounded px-3 py-1 text-sm md:px-4 md:py-2 ${filter === 'important' ? 'bg-button text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+          className={`rounded px-3 py-1 text-sm md:px-4 md:py-2 ${filter === 'important' ? 'bg-button text-white' : 'bg-gray-20 hover:bg-gray-30'}`}
         >
           {t('Important')}
         </button>
@@ -204,7 +204,7 @@ const NotificationsTab: React.FC = () => {
           <input
             type='checkbox'
             id='select-all'
-            className='ml-4 mr-2 h-4 w-4 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-button'
+            className='ml-4 mr-2 h-4 w-4 cursor-pointer rounded border-gray-30 text-blue-600 focus:ring-button'
             checked={selectAllChecked}
             onChange={handleSelectAllChange}
             aria-label='Select all notifications'
@@ -355,11 +355,11 @@ const NotificationsTab: React.FC = () => {
       </div>
 
       {/* Danh sách thông báo */}
-      <div className='overflow-hidden rounded border bg-white shadow'>
+      <div className='overflow-hidden rounded border bg-white-pure shadow'>
         {' '}
         {/* Thêm border và rounded */}
         {displayedNotifications.length === 0 ? (
-          <p className='p-4 text-center text-gray-500'>
+          <p className='p-4 text-center '>
             {t('You_have_no_notifications_matching_criteria') ||
               'No notifications match your current filters.'}
           </p>

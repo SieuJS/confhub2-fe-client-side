@@ -1,5 +1,5 @@
 // src/components/ProfileTab.tsx
-import React, { useState, useEffect } from 'react' // <--- Thêm useEffect
+import React, { useState, useEffect } from 'react' // <--- useEffect already here
 import Image from 'next/image'
 import Button from '../../utils/Button'
 import { useTranslations } from 'next-intl'
@@ -11,6 +11,8 @@ import ChangePasswordForm from './ChangePasswordForm'
 
 const ProfileTab: React.FC = () => {
   const t = useTranslations('')
+
+  // Use the hook to get loading, error, and data states
   const { userData, loading, error } = useUserData()
 
   const {
@@ -22,7 +24,7 @@ const ProfileTab: React.FC = () => {
     handleCancelClick,
     handleInputChange,
     handleInterestedTopicsChange
-  } = useEditProfile(userData)
+  } = useEditProfile(userData) // Pass userData to the hook
 
   const {
     showModal: showAvatarModal,
@@ -47,7 +49,8 @@ const ProfileTab: React.FC = () => {
   ]
 
   const [showChangePasswordForm, setShowChangePasswordForm] = useState(false)
-  // --- START: Sửa lỗi Hydration cho Date of Birth ---
+
+  // --- START: Sửa lỗi Hydration cho Date of Birth (Giữ nguyên, cái này đúng) ---
   const [formattedDob, setFormattedDob] = useState<string | null>(null) // State để lưu ngày sinh đã định dạng
 
   useEffect(() => {
@@ -58,6 +61,9 @@ const ProfileTab: React.FC = () => {
         const date = new Date(userData.dob)
         // Kiểm tra xem date có hợp lệ không trước khi định dạng
         if (!isNaN(date.getTime())) {
+          // Sử dụng một định dạng chuẩn hoặc locale-aware để tránh lỗi hydration nếu có
+          // Ví dụ: 'YYYY-MM-DD' hoặc toLocaleDateString()
+          // toLocaleDateString() là an toàn vì nó chạy sau hydrate
           setFormattedDob(date.toLocaleDateString())
         } else {
           console.error('Invalid date format received for dob:', userData.dob)
@@ -73,6 +79,9 @@ const ProfileTab: React.FC = () => {
   }, [userData?.dob, t]) // Thêm dependency t nếu bạn dùng trong chuỗi lỗi
   // --- END: Sửa lỗi Hydration ---
 
+  // --- START: REMOVE THE PROBLEMATIC LOCALSTORAGE CHECK ---
+  // Remove this entire block:
+  /*
   if (!localStorage.getItem('token')) {
     if (loading) {
       return <div className='container mx-auto p-4'>{t('Loading')}</div> // Show loading initially
@@ -83,7 +92,12 @@ const ProfileTab: React.FC = () => {
       </div>
     )
   }
+  */
+  // --- END: REMOVE ---
 
+  // --- Now, rely solely on the state from the useUserData hook ---
+
+  // Handle loading state from the hook
   if (loading) {
     return (
       <div className='flex h-screen items-center justify-center'>
@@ -92,13 +106,32 @@ const ProfileTab: React.FC = () => {
     )
   }
 
+  // Handle error state from the hook (This should now cover the "no token" case if the hook is implemented correctly)
   if (error) {
+    // The hook should set error if no token is found or fetching fails.
+    // Display the error message provided by the hook.
     return <div className='py-4 text-center text-red-500'>{error}</div>
   }
 
+  // Handle the case where loading is false, no error, but no user data is returned (e.g., token invalid, or API issue)
+  // This might be redundant if the hook always sets an error for these cases, but good as a fallback.
   if (!userData) {
-    return <div className='py-4 text-center'>No user data found.</div>
+    // If the error message from the hook isn't specific enough for "not logged in",
+    // you could potentially add a check here if you can determine *why* userData is null
+    // (e.g., if the hook returns a specific type of error).
+    // For now, assume the hook sets an appropriate error message like "Please log in"
+    // if the token is missing or invalid. If not, you might need to adjust the hook
+    // or add a client-side check *after* loading is false and before rendering userData.
+    // However, relying *only* on the hook's states is the cleaner approach.
+    return (
+      <div className='py-4 text-center'>
+        {t('No_user_data_found_or_not_logged_in')}
+      </div>
+    )
   }
+
+  // If we reach here, loading is false, no error, and userData exists.
+  // Proceed with rendering the profile UI.
 
   const displayAvatarUrl =
     editedData.avatar || userData.avatar || '/avatar1.jpg'
@@ -111,14 +144,17 @@ const ProfileTab: React.FC = () => {
 
   return (
     <div className='w-full overflow-hidden rounded-lg bg-background shadow-md md:px-12 md:py-8'>
+      {/* Rest of your rendering logic remains the same */}
+
       {/* Cover Photo */}
       <div className='relative h-60 overflow-hidden rounded-lg md:h-80'>
+        {/* ... Image and Change Background Button ... */}
         <Image
           src={displayBackgroundUrl}
           alt='Cover Photo'
           fill
           style={{ objectFit: 'cover' }}
-          sizes='100vw, 100vw' // Sửa sizes cho hợp lệ hơn
+          sizes='100vw' // Use a more specific size if possible, but 100vw is a common fallback
           priority
         />
         {isEditing && (
@@ -138,7 +174,7 @@ const ProfileTab: React.FC = () => {
           <img
             src={displayAvatarUrl}
             alt={`Avatar of ${userData.firstName} ${userData.lastName}`}
-            className='h-full w-full object-cover' // Dùng className thay vì style inline nếu có thể
+            className='h-full w-full object-cover'
           />
           {isEditing && (
             <button
@@ -160,14 +196,9 @@ const ProfileTab: React.FC = () => {
             <p className='text-center text-sm md:text-left'>
               <span className='text-base font-semibold'>{t('About_me')}:</span>{' '}
               {userData.aboutme.split(' ').map((word, index) => (
+                // Using index in key is okay here as the list is static
                 <React.Fragment key={index}>{word} </React.Fragment>
               ))}
-            </p>
-          )}
-          {userData.address && (
-            <p className='text-center text-sm md:text-left'>
-              <span className='text-base font-semibold'>{t('Address')}:</span>{' '}
-              {userData.address}
             </p>
           )}
         </div>
@@ -176,7 +207,7 @@ const ProfileTab: React.FC = () => {
       {/* Avatar Modal */}
       {showAvatarModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
-          {/* Nội dung Modal không thay đổi */}
+          {/* ... Modal content ... */}
           <div className='w-full max-w-md rounded-lg bg-background p-6 shadow-lg'>
             <h2 className='mb-4 text-lg font-semibold'>
               {t('Select_an_Avatar')}
@@ -194,7 +225,7 @@ const ProfileTab: React.FC = () => {
                     width={100}
                     height={100}
                     className='h-full w-full object-cover'
-                    priority // Chỉ dùng priority cho ảnh quan trọng nhất, LCP
+                    // priority // Only use priority for the main LCP image if necessary
                   />
                 </button>
               ))}
@@ -213,7 +244,7 @@ const ProfileTab: React.FC = () => {
       {/* Background Modal */}
       {showBackgroundModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
-          {/* Nội dung Modal không thay đổi */}
+          {/* ... Modal content ... */}
           <div className='w-full max-w-lg rounded-lg bg-background p-6 shadow-lg'>
             <h2 className='mb-4 text-lg font-semibold'>
               {t('Select_a_Background')}
@@ -228,10 +259,10 @@ const ProfileTab: React.FC = () => {
                   <Image
                     src={backgroundUrl}
                     alt='Background Option'
-                    width={300}
-                    height={200} // Đảm bảo tỷ lệ khung hình nếu dùng width/height
+                    width={300} // Add dimensions for better layout and performance
+                    height={200} // Keep aspect ratio if possible
                     className='h-full w-full object-cover'
-                    priority // Chỉ dùng priority cho ảnh quan trọng nhất, LCP
+                    // priority // Only use priority for the main LCP image if necessary
                   />
                 </button>
               ))}
@@ -250,9 +281,9 @@ const ProfileTab: React.FC = () => {
       {/* Edit/Display Section */}
       <div className='border-t border-background p-6'>
         {isEditing ? (
-          // Edit Form (Nội dung không thay đổi)
+          // Edit Form
           <div className='space-y-6 py-2'>
-            {/* Các input fields giữ nguyên */}
+            {/* ... Edit form fields ... */}
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
               <div>
                 <label
@@ -291,42 +322,14 @@ const ProfileTab: React.FC = () => {
                   {t('Date_of_Birth')}
                 </label>
                 <input
-                  type='date' // input type date thường trả về YYYY-MM-DD
+                  type='date'
                   id='dob'
                   name='dob'
-                  // Lấy phần date nếu dob từ server có dạng ISO string
-                  value={editedData.dob?.split('T')[0] || ''}
+                  value={editedData.dob?.split('T')[0] || ''} // Assuming dob is an ISO string
                   onChange={handleInputChange}
                   className='focus:ring-none mt-1 block w-full rounded-md border-button bg-opacity-70 p-2 shadow-md focus:border-2 focus:outline-none focus:ring-button'
                 />
               </div>
-              <div>
-                <label htmlFor='phone' className='block text-sm font-medium'>
-                  {t('Phone')}
-                </label>
-                <input
-                  type='text'
-                  id='phone'
-                  name='phone'
-                  value={editedData.phone || ''}
-                  onChange={handleInputChange}
-                  className='focus:ring-none mt-1 block w-full rounded-md border-button bg-opacity-70 p-2 shadow-md focus:border-2 focus:outline-none focus:ring-button'
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor='address' className='block text-sm font-medium'>
-                {t('Address')}
-              </label>
-              <input
-                type='text'
-                id='address'
-                name='address'
-                value={editedData.address || ''}
-                onChange={handleInputChange}
-                className='focus:ring-none mt-1 block w-full rounded-md border-button bg-opacity-70 p-2 shadow-md focus:border-2 focus:outline-none focus:ring-button'
-              />
             </div>
 
             <div>
@@ -358,7 +361,7 @@ const ProfileTab: React.FC = () => {
                   ).includes(topic)
                   return (
                     <span
-                      key={topic}
+                      key={topic} // Use topic as key
                       onClick={() => handleInterestedTopicsChange(topic)}
                       className={`cursor-pointer rounded-full px-4 py-2 text-sm transition duration-200  ${
                         isSelected
@@ -416,37 +419,25 @@ const ProfileTab: React.FC = () => {
                 <a className='text-button hover:underline'>{userData.email}</a>
               </p>
 
-              {/* --- START: Sử dụng state đã định dạng --- */}
-              {/* Chỉ hiển thị khi formattedDob không phải null (tức là có dob và đã định dạng) */}
+              {/* --- Sử dụng state đã định dạng --- */}
               {formattedDob && (
                 <p>
                   <span className='font-semibold'>{t('Date_of_Birth')}:</span>{' '}
-                  {formattedDob} {/* <--- Thay thế ở đây */}
+                  {formattedDob}
                 </p>
               )}
-              {/* --- END: Sử dụng state đã định dạng --- */}
-
-              {userData.phone && (
-                <p>
-                  <span className='font-semibold'>{t('Phone')}:</span>{' '}
-                  {userData.phone}
-                </p>
-              )}
+              {/* --- End sử dụng state đã định dạng --- */}
 
               {userData.interestedTopics &&
-                userData.interestedTopics.length > 0 && ( // Kiểm tra mảng không rỗng
+                userData.interestedTopics.length > 0 && (
                   <div className='pt-2'>
-                    {' '}
-                    {/* Thêm padding top */}
                     <span className='mb-2 block font-semibold'>
-                      {' '}
-                      {/* Dùng block và margin bottom */}
                       {t('Interested_Topics')}:
                     </span>
                     <div className='flex flex-wrap gap-2'>
                       {userData.interestedTopics.map(topic => (
                         <Link
-                          key={topic}
+                          key={topic} // Use topic as key
                           href={{
                             pathname: `/conferences`,
                             query: { topics: topic }
@@ -468,7 +459,7 @@ const ProfileTab: React.FC = () => {
 
       {showChangePasswordForm && (
         <ChangePasswordForm
-          userId={userData.id}
+          userId={userData.id} // userData is guaranteed to exist here
           onClose={() => setShowChangePasswordForm(false)}
         />
       )}

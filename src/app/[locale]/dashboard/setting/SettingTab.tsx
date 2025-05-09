@@ -4,7 +4,10 @@ import { useTranslations } from 'next-intl'
 import { useLocalStorage } from 'usehooks-ts'
 import { useRouter, usePathname } from 'next/navigation'
 import deleteUser from '../../../../app/api/user/deleteUser' // Adjust path if needed
-import { getUserSettings, useUpdateUser } from '../../../../hooks/dashboard/setting/useUpdateSettings' // Adjust path if needed
+import {
+  getUserSettings,
+  useUpdateUser
+} from '../../../../hooks/dashboard/setting/useUpdateSettings' // Adjust path if needed
 import { useGetUser } from '../../../../hooks/dashboard/setting/useGetUser' // Adjust path if needed
 import { Setting } from '@/src/models/response/user.response' // Adjust path if needed
 import { get } from 'lodash'
@@ -56,7 +59,7 @@ const SettingTab: React.FC = () => {
 
   // Centralized toggle handler
   const handleToggle = async (settingKey: ToggleSettingKey) => {
-    if ( setting) {
+    if (setting) {
       const currentValue = setting[settingKey]
 
       const newSetting = {
@@ -68,7 +71,7 @@ const SettingTab: React.FC = () => {
         prev ? { ...prev, [settingKey]: !currentValue } : null
       )
       try {
-        await updateUserSetting( newSetting)
+        await updateUserSetting(newSetting)
         await fetchUserSettings() // Refetch settings after update
       } catch (error) {
         // Revert optimistic update on error
@@ -139,7 +142,7 @@ const SettingTab: React.FC = () => {
   //   )
   // }
 
-  if ( !setting) {
+  if (!setting) {
     return <div data-testid='no-data-state'>{t('No_user_data_available')}</div>
   }
 
@@ -419,9 +422,6 @@ const SettingTab: React.FC = () => {
 
         {/* Delete Account */}
         <section>
-          <h3 className='mb-2 text-lg font-semibold text-red-600'>
-            {t('Danger_Zone')}
-          </h3>
           <button
             data-testid='delete-account-button'
             onClick={handleDeleteAccount}
@@ -439,7 +439,7 @@ const SettingTab: React.FC = () => {
               {deleteError}
             </p>
           )}
-          <p className='mt-2 text-sm text-gray-600'>
+          <p className='mt-2 text-sm text-red-600'>
             {t('Delete_Account_describe')}
           </p>
         </section>

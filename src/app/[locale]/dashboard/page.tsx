@@ -3,8 +3,10 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
-import { Link } from '@/src/navigation'
+import { Link } from '@/src/navigation' // Assuming this is your next-intl Link
 import Analysis from './logAnalysis/Analysis'
+import Moderation from './moderation/Moderation'
+import RequestAdminTab from './requestAdminTab/RequestAdminTab'
 import SettingTab from './setting/SettingTab'
 import NotificationsTab from './notification/NotificationsTab'
 import FollowedTab from './follow/FollowedTab'
@@ -12,29 +14,19 @@ import BlacklistTab from './blacklist/BlacklistTab'
 import ProfileTab from './profile/ProfileTab'
 import NoteTab from './note/NoteTab'
 import MyConferencesTab from './myConferences/MyConferencesTab'
-import { Header } from '../utils/Header'
-import { useMediaQuery } from 'react-responsive'
+import { Header } from '../utils/Header' // Assuming Header component handles its own width/centering
 
 export default function Dashboard({ locale }: { locale: string }) {
   const t = useTranslations('')
   const searchParams = useSearchParams()
   const [activePage, setActivePage] = useState<string>('')
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false) // Giữ nguyên init là false
+  // Sidebar starts closed on small screens, open on large screens
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
-  // --- Thêm state để kiểm tra client ---
-  const [isClient, setIsClient] = useState(false)
-  const isMobile = useMediaQuery({ maxWidth: 768 }) // Vẫn gọi hook
-
+  // Logic cập nhật activePage dựa trên searchParams (giữ nguyên)
   useEffect(() => {
-    // Chỉ chạy ở client sau khi mount
-    setIsClient(true)
-  }, [])
-  // --------------------------------------
-
-  useEffect(() => {
-    // Logic cập nhật activePage dựa trên searchParams (giữ nguyên)
     const tab = searchParams.get('tab')
-    let initialPage = 'analysis' // Mặc định là Profile nếu không có tab hợp lệ
+    let initialPage = 'Analysis' // Default
     if (tab === 'followed') initialPage = 'Followed'
     else if (tab === 'profile') initialPage = 'Profile'
     else if (tab === 'myconferences') initialPage = 'My Conferences'
@@ -42,13 +34,32 @@ export default function Dashboard({ locale }: { locale: string }) {
     else if (tab === 'notifications') initialPage = 'Notifications'
     else if (tab === 'blacklisted') initialPage = 'Blacklisted'
     else if (tab === 'setting') initialPage = 'Setting'
-    // Không cần else if (tab === 'profile') vì đã là mặc định
+    else if (tab === 'moderation') initialPage = 'Moderation'
+    else if (tab === 'requestadmintab') initialPage = 'RequestAdminTab'
+    else if (tab === 'analysis') initialPage = 'Analysis' // Ensure 'analysis' param works
+
     setActivePage(initialPage)
-  }, [searchParams]) // Phụ thuộc vào searchParams
+
+    // Optional: On mobile, assume sidebar should be closed by default on navigation
+    // and needs a separate toggle (likely in the header).
+    // On desktop, maybe default to open? Or let state manage it.
+    // The current state manages it, initial is false. Let's keep it simple.
+    // If you want it open by default on desktop, you'd need a client-side check here.
+    // Example: if (typeof window !== 'undefined' && window.innerWidth > 768) { setIsSidebarOpen(true); }
+    // But this can cause hydration issues. Better to manage state or rely on user interaction.
+  }, [searchParams])
+
+  // Set initial sidebar state based on screen size after mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Open sidebar by default on desktop sizes (md breakpoint)
+      if (window.innerWidth >= 768) {
+        setIsSidebarOpen(true)
+      }
+    }
+  }, [])
 
   const renderPage = () => {
-    // Chỉ render nội dung tab KHI activePage đã được set (hoặc dùng giá trị mặc định)
-    // Không cần thay đổi nhiều ở đây, vì activePage được set trong useEffect
     switch (activePage) {
       case 'Setting':
         return <SettingTab />
@@ -66,17 +77,78 @@ export default function Dashboard({ locale }: { locale: string }) {
         return <ProfileTab />
       case 'Analysis':
         return <Analysis />
-      default: // Render ProfileTab trong lần đầu hoặc nếu activePage không hợp lệ
-        return <Analysis />
+      case 'Moderation':
+        return <Moderation />
+      case 'RequestAdminTab':
+        return <RequestAdminTab />
+      default:
+        return <Analysis /> // Fallback
     }
   }
 
+  // Menu items remains the same
   const menuItems = [
     {
       page: 'Analysis',
       label: t('Analysis'),
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#525252" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-airplay-icon lucide-airplay"><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"/><path d="m12 15 5 6H7Z"/></svg>
+        <svg
+          xmlns='http://www.w3.org/2000/svg'
+          width='24'
+          height='24'
+          viewBox='0 0 24 24'
+          fill='none'
+          stroke='#525252'
+          strokeWidth='1.5'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+          className='lucide lucide-airplay-icon lucide-airplay'
+        >
+          <path d='M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1' />
+          <path d='m12 15 5 6H7Z' />
+        </svg>
+      )
+    },
+    {
+      page: 'Moderation',
+      label: t('Moderation'),
+      icon: (
+        <svg
+          xmlns='http://www.w3.org/2000/svg'
+          width='24'
+          height='24'
+          viewBox='0 0 24 24'
+          fill='none'
+          stroke='#525252'
+          strokeWidth='1.5'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+          className='lucide lucide-airplay-icon lucide-airplay'
+        >
+          <path d='M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1' />
+          <path d='m12 15 5 6H7Z' />
+        </svg>
+      )
+    },
+    {
+      page: 'RequestAdminTab',
+      label: t('Request_Admin_Tab'),
+      icon: (
+        <svg
+          xmlns='http://www.w3.org/2000/svg'
+          width='24'
+          height='24'
+          viewBox='0 0 24 24'
+          fill='none'
+          stroke='#525252'
+          strokeWidth='1.5'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+          className='lucide lucide-airplay-icon lucide-airplay'
+        >
+          <path d='M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1' />
+          <path d='m12 15 5 6H7Z' />
+        </svg>
       )
     },
     {
@@ -117,7 +189,7 @@ export default function Dashboard({ locale }: { locale: string }) {
           strokeLinejoin='round'
           className='lucide lucide-star'
         >
-          <path d='M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1 -.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z' />
+          <path d='M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z' />
         </svg>
       )
     },
@@ -238,14 +310,17 @@ export default function Dashboard({ locale }: { locale: string }) {
           strokeLinejoin='round'
           className='lucide lucide-settings'
         >
-          <path d='M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z' />
+          <path d='M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15-.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z' />
           <circle cx='12' cy='12' r='3' />
         </svg>
       )
     }
   ]
 
-  // Toggle icons
+  // Header height constant (adjust as needed)
+  const HEADER_HEIGHT_PX = 72 // Example height, adjust based on your Header
+
+  // Toggle icons (keep these)
   const openIcon = (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -283,140 +358,113 @@ export default function Dashboard({ locale }: { locale: string }) {
   )
 
   const toggleSidebar = () => {
-    // Chỉ toggle khi đã ở client (an toàn hơn)
-    if (isClient) {
-      setIsSidebarOpen(!isSidebarOpen)
-    }
+    setIsSidebarOpen(!isSidebarOpen)
   }
 
-  // --- Điều chỉnh phần return ---
-
-  // Render placeholder hoặc null trong khi chưa mount client
-  // để đảm bảo server và client render giống nhau ban đầu
-  if (!isClient) {
-    return (
-      <>
-        <Header locale={locale} />
-        {/* Có thể thêm một skeleton loader đơn giản ở đây nếu muốn */}
-        <div className='relative justify-center'>
-          <div className='w-full bg-background py-8'></div>
-          <div className='flex'>
-            {/* Render trống hoặc skeleton cho sidebar và content */}
-            <div className='min-h-screen flex-1'>
-              {' '}
-              {/* Div placeholder */}
-              {/* Loading indicator or skeleton */}
-            </div>
-          </div>
-        </div>
-      </>
-    )
-  }
-
-  // --- Khi đã ở client (isClient = true) ---
-  // Bây giờ có thể sử dụng isMobile và isSidebarOpen một cách an toàn
+  // Render chính
   return (
     <>
+      {/* Header component - Assume it's sticky/fixed and has its own width/centering */}
+      {/* The Header should likely also be contained, aligning with the container used below */}
       <Header locale={locale} />
-      <div className='relative justify-center'>
-        <div className='w-full bg-background py-8'></div>
-        <div className='flex'>
-          {/* Sidebar: Chỉ render khi ở client VÀ không phải mobile */}
-          {!isMobile && (
-            <aside
-              className={`
-                fixed flex flex-col bg-background transition-all ease-in-out
-                ${isSidebarOpen ? 'w-50' : 'w-16'} // Sử dụng isSidebarOpen
-              `}
-              style={{
-                height: 'calc(100vh - 72px)',
-                overflowY: 'auto'
-              }}
-            >
-              <nav className='w-full flex-grow'>
-                <ul className='w-full'>
-                  {/* Toggle Button */}
-                  <li className='w-full'>
-                    <button
-                      onClick={toggleSidebar}
-                      className={`
-                      duration-600
-                      flex
-                      w-full
-                      items-center  
-                      px-4
-                      py-2
-                      transition-colors
-                      ease-in-out
-                      hover:bg-button
-                      hover:opacity-60
-                      focus:outline-none
-                      active:bg-blue-700
-                      ${isSidebarOpen ? 'justify-start' : 'justify-center'}
-                    `}
-                    >
-                      {/* Conditional margin on toggle icon */}
-                      <span className={isSidebarOpen ? 'mr-4' : ''}>
-                        {isSidebarOpen ? closeIcon : openIcon}
-                      </span>
-                      {isSidebarOpen && <span>{t('Close')}</span>}
-                    </button>
-                  </li>
 
-                  {menuItems.map(item => {
-                    const tabValue = item.page.toLowerCase().replace(/ /g, '')
-                    return (
-                      <li className='w-full' key={item.page}>
-                        <Link
-                          href={{
-                            pathname: '/dashboard',
-                            query: { tab: tabValue }
-                          }}
-                          className={`
-                          duration-600
-                          flex
-                          items-center 
-                          px-4
-                          py-2
-                          transition-colors
-                          ease-in-out
-                          hover:bg-button
-                          hover:opacity-60
-                          focus:outline-none
-                          ${activePage === item.page
+      {/* Container cho Sidebar và Main Content */}
+      {/* Added container mx-auto to center this section */}
+      {/* Used flex to place sidebar and content side-by-side */}
+      <div
+        className='container mx-0 flex min-h-screen px-0'
+        style={{ paddingTop: `${HEADER_HEIGHT_PX}px` }} // Add padding equal to header height
+      >
+        {/* Sidebar - Now a flex item */}
+        <aside
+          className={`
+            h-full flex-shrink-0 overflow-y-auto transition-all 
+            duration-300 ease-in-out scrollbar
+            ${isSidebarOpen ? 'w-52' : 'w-0 md:w-16'} 
+            ${!isSidebarOpen && 'md:overflow-hidden'} 
+            // Added background color class bg-background
+          `}
+        >
+          <nav className='w-full'>
+            <ul className='w-full'>
+              {/* Toggle Button */}
+              {/* Ẩn button trên mobile (w-0 state) */}
+              <li className='w-full'>
+                {' '}
+                {/* Keep as li for consistency */}
+                <button
+                  onClick={toggleSidebar}
+                  className={`
+                      flex w-full items-center py-2
+                      transition-colors duration-500 ease-in-out
+                      hover:bg-button hover:opacity-60 focus:outline-none active:bg-blue-700
+                      ${isSidebarOpen ? 'justify-start px-4' : 'justify-center px-0 md:px-4'} /* Adjust padding */
+                    `}
+                >
+                  {/* Icon and spacing */}
+                  {/* Icon is always visible on md+ when closed (w-16) */}
+                  <span className={isSidebarOpen ? 'mr-4' : ''}>
+                    {isSidebarOpen ? closeIcon : openIcon}
+                  </span>
+                  {/* Only show text when sidebar open AND not on mobile (w-0) */}
+                  {isSidebarOpen && (
+                    <span className='whitespace-nowrap'>{t('Close')}</span>
+                  )}
+                  {/* For desktop closed (w-16), the button text is hidden by overflow-hidden */}
+                </button>
+              </li>
+
+              {/* Menu Items */}
+              {menuItems.map(item => {
+                const tabValue = item.page.toLowerCase().replace(/ /g, '')
+                return (
+                  <li className='w-full' key={item.page}>
+                    <Link
+                      href={{
+                        pathname: '/dashboard',
+                        query: { tab: tabValue }
+                      }}
+                      className={`
+                          flex h-12 w-full items-center py-2
+                          transition-colors duration-500 ease-in-out
+                          hover:bg-button hover:opacity-60 focus:outline-none
+                          ${
+                            activePage === item.page
                               ? 'bg-button text-button-text hover:bg-secondary'
                               : ''
-                            }
-                          ${isSidebarOpen
-                              ? 'w-50 h-12 justify-start'
-                              : 'h-12 w-16 justify-center'
-                            }
+                          }
+                           ${isSidebarOpen ? 'justify-start px-4' : 'justify-center px-0 md:px-4'} /* Adjust padding */
                         `}
-                        >
-                          {/* Conditional margin on menu item icons */}
-                          <span className={isSidebarOpen ? 'mr-4' : ''}>
-                            {item.icon}
-                          </span>
-                          {isSidebarOpen && <span>{item.label}</span>}
-                        </Link>
-                      </li>
-                    )
-                  })}
-                </ul>
-              </nav>
-            </aside>
-          )}
+                    >
+                      {/* Icon and spacing */}
+                      <span className={isSidebarOpen ? 'mr-4' : ''}>
+                        {item.icon}
+                      </span>
+                      {/* Only display text when sidebar is open */}
+                      {isSidebarOpen && (
+                        <span className='whitespace-nowrap'>{item.label}</span>
+                      )}
+                      {/* When closed on desktop (md:w-16), text is hidden by parent overflow */}
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+          </nav>
+        </aside>
 
-          {/* Main Content: Render div và áp dụng margin nếu cần (ở client và không mobile) */}
-          <div
-            className={`
-              min-h-screen flex-1 transition-all duration-100 ease-in-out
-              ${!isMobile && (isSidebarOpen ? 'ml-48' : 'ml-16')} 
+        {/* Main Content Area - Takes remaining space */}
+        {/* Removed margin-left, flex handles spacing */}
+        {/* Added padding for content spacing */}
+        <div
+          className={`
+              /* removed here, 
+              handled by parent
+              */ container flex min-h-screen flex-1 overflow-y-auto p-4 transition-all duration-300 ease-in-out
             `}
-          >
-            {/* Render page dựa trên activePage */}
-            {renderPage()}
-          </div>
+        >
+          {/* Render page based on activePage */}
+          {renderPage()}
         </div>
       </div>
       {/* <Footer /> */}
