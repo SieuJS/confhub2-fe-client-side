@@ -116,7 +116,7 @@ const AIStatistics = () => {
         {' '}
         {/* Thêm relative và z-10 để nội dung nằm trên ảnh */}
         <h1 className='mb-6 text-center text-3xl font-semibold text-gray-100'>
-          AI Statistics
+          {t('AI_Statistics')}
         </h1>
         <div className='grid grid-cols-1 gap-8 md:grid-cols-2'>
           {statistics.map((stat, index) => (
