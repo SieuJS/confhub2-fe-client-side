@@ -83,8 +83,8 @@ interface SubjectAreasJournalsProps {
 }
 
 const SubjectAreasJournals: React.FC<SubjectAreasJournalsProps> = ({
-  speed = '100s', // Default animation duration
-  imageHeight = 'h-40', // Default image container height
+  speed = '90s', // Default animation duration
+  imageHeight = 'h-60', // Default image container height
   imageWidth = 'w-40', // Default image container width
   innerClasses = 'space-x-4 py-4' // Default inner spacing/padding
 }) => {
@@ -120,7 +120,7 @@ const SubjectAreasJournals: React.FC<SubjectAreasJournalsProps> = ({
       </h1>
       <div className={`relative w-full overflow-hidden px-4`}>
         <div
-          className={`animate-scroll-left group flex w-max ${innerClasses}`}
+          className={`group flex w-max animate-scroll-left ${innerClasses}`}
           style={{ '--scroll-speed': speed } as React.CSSProperties}
         >
           {duplicatedImages.map((imageUrl, index) => {

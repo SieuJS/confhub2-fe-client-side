@@ -5,6 +5,8 @@ import { useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 import { Link } from '@/src/navigation' // Assuming this is your next-intl Link
 import Analysis from './logAnalysis/Analysis'
+import Moderation from './moderation/Moderation'
+import RequestAdminTab from './requestAdminTab/RequestAdminTab'
 import SettingTab from './setting/SettingTab'
 import NotificationsTab from './notification/NotificationsTab'
 import FollowedTab from './follow/FollowedTab'
@@ -34,6 +36,8 @@ export default function Dashboard({ locale }: { locale: string }) {
     else if (tab === 'notifications') initialPage = 'Notifications'
     else if (tab === 'blacklisted') initialPage = 'Blacklisted'
     else if (tab === 'setting') initialPage = 'Setting'
+    else if (tab === 'moderation') initialPage = 'Moderation'
+    else if (tab === 'requestadmintab') initialPage = 'RequestAdminTab'
     // Nếu tab không khớp với bất kỳ trường hợp nào trên, nó vẫn giữ giá trị mặc định là 'Analysis'.
     // Bạn có thể thêm một trường hợp else cuối cùng nếu muốn một tab mặc định khác khi không có tab nào được cung cấp hoặc không hợp lệ.
     // Ví dụ: else { initialPage = 'Profile'; }
@@ -67,6 +71,10 @@ export default function Dashboard({ locale }: { locale: string }) {
         return <ProfileTab />
       case 'Analysis':
         return <Analysis />
+      case 'Moderation':
+        return <Moderation />
+      case 'RequestAdminTab':
+        return <RequestAdminTab />
       default:
         // Render tab mặc định hoặc Analysis nếu activePage không hợp lệ
         return <Analysis /> // Hoặc <ProfileTab />
@@ -78,6 +86,48 @@ export default function Dashboard({ locale }: { locale: string }) {
     {
       page: 'Analysis',
       label: t('Analysis'),
+      icon: (
+        <svg
+          xmlns='http://www.w3.org/2000/svg'
+          width='24'
+          height='24'
+          viewBox='0 0 24 24'
+          fill='none'
+          stroke='#525252'
+          strokeWidth='1.5'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+          className='lucide lucide-airplay-icon lucide-airplay'
+        >
+          <path d='M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1' />
+          <path d='m12 15 5 6H7Z' />
+        </svg>
+      )
+    },
+    {
+      page: 'Moderation',
+      label: t('Moderation'),
+      icon: (
+        <svg
+          xmlns='http://www.w3.org/2000/svg'
+          width='24'
+          height='24'
+          viewBox='0 0 24 24'
+          fill='none'
+          stroke='#525252'
+          strokeWidth='1.5'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+          className='lucide lucide-airplay-icon lucide-airplay'
+        >
+          <path d='M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1' />
+          <path d='m12 15 5 6H7Z' />
+        </svg>
+      )
+    },
+    {
+      page: 'RequestAdminTab',
+      label: t('Request_Admin_Tab'),
       icon: (
         <svg
           xmlns='http://www.w3.org/2000/svg'

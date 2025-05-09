@@ -995,5 +995,10 @@
   "Back_to_Home": "Back to Home",
   "Subject_areas_journals": "Subject areas journals",
   "No_images_available_to_scroll": "No images available to scroll",
-  "AI_Statistics": "AI Statistics"
+  "AI_Statistics": "AI Statistics",
+  "Loading_journal_details": "Loading journal details...",
+  "Something_went_wrong": "Something went wrong",
+  "Journal_not_found": "Journal not found",
+  "Moderation": "Moderation",
+  "Request_Admin_Tab": "Request Admin Tab"
 }
