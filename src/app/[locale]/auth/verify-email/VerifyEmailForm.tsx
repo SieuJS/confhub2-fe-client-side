@@ -2,10 +2,8 @@
 'use client'
 
 import React, { useState, useEffect, FormEvent } from 'react'
-import {
-  useSearchParams //
-} from 'next/navigation'
-import { Link } from '@/src/navigation' // <<< Import Link của next-intl
+import { useSearchParams } from 'next/navigation'
+import { Link } from '@/src/navigation'
 import { appConfig } from '@/src/middleware'
 import { useTranslations } from 'next-intl'
 
@@ -14,24 +12,44 @@ interface VerifyEmailFormProps {
   // t: (key: string) => string;
 }
 
+// Define the cooldown duration in seconds
+const RESEND_COOLDOWN_SECONDS = 60
+
 const VerifyEmailForm: React.FC<VerifyEmailFormProps> = () => {
-  // Nhận t nếu bạn dùng i18n
   const t = useTranslations('')
   const searchParams = useSearchParams()
-  // const router = useRouter(); // <<< Không cần router.push nữa
-  // const pathname = usePathname(); // <<< Không cần pathname nữa nếu chỉ dùng Link
 
   const [code, setCode] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
-  useEffect(() => {}, [searchParams])
+  // State for resend functionality
+  const [isResending, setIsResending] = useState(false)
+  const [resendError, setResendError] = useState<string | null>(null)
+  const [resendSuccessMessage, setResendSuccessMessage] = useState<
+    string | null
+  >(null)
+  const [cooldown, setCooldown] = useState(0) // Cooldown timer in seconds
+
+  // useEffect(() => {}, [searchParams])
+
+  // Effect to handle the cooldown timer
+  useEffect(() => {
+    if (cooldown > 0) {
+      const timer = setTimeout(() => {
+        setCooldown(cooldown - 1)
+      }, 1000)
+      return () => clearTimeout(timer) // Cleanup the timer
+    }
+  }, [cooldown])
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
     setError(null)
     setSuccessMessage(null) // Reset success message on new submit attempt
+    setResendError(null) // Also clear resend errors on new submit
+    setResendSuccessMessage(null) // Also clear resend success on new submit
 
     if (!code) {
       setError(t('verifyEmail.error.missingFields')) // Nên dùng t('verifyEmail.error.missingFields')
@@ -46,6 +64,11 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = () => {
 
     try {
       const token = localStorage.getItem('token')
+      if (!token) {
+        setError(t('verifyEmail.error.noToken')) // Handle case where token is missing
+        setIsLoading(false)
+        return
+      }
       const response = await fetch(
         `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/verify`,
         {
@@ -76,11 +99,77 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = () => {
         // Lỗi từ backend (400, 404, 500)
         setError(data.message || t('verifyEmail.error.backendFailed'))
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Verification error:', err)
-      setError(t('verifyEmail.error.network'))
+      if (err.message === 'Failed to fetch') {
+        setError(t('verifyEmail.error.network'))
+      } else {
+        setError(t('verifyEmail.error.generic')) // Use a generic error message
+      }
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleResend = async () => {
+    setResendError(null) // Clear previous resend errors
+    setResendSuccessMessage(null) // Clear previous resend success messages
+    setError(null) // Also clear general errors
+    setSuccessMessage(null) // Also clear general success messages
+
+    // Prevent resend if already resending or in cooldown
+    if (isResending || cooldown > 0) {
+      return
+    }
+
+    setIsResending(true)
+
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        setResendError(t('verifyEmail.error.noToken')) // Handle case where token is missing
+        setIsResending(false)
+        return
+      }
+
+      const response = await fetch(
+        `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/re-send-verify`,
+        {
+          method: 'GET', // Corrected based on image provided
+          headers: {
+            // 'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          }
+          // Often no body is needed for resend if the token identifies the user
+          // body: JSON.stringify({})
+        }
+      )
+
+      const data = await response.json()
+
+      if (response.ok) {
+        // Success (e.g., 200 or 201)
+        setResendSuccessMessage(data.message || t('verifyEmail.resendSuccess'))
+        setCooldown(RESEND_COOLDOWN_SECONDS) // Start cooldown
+      } else {
+        // Error from backend
+        setResendError(data.message || t('verifyEmail.resendError'))
+        // Consider checking specific status codes if needed (e.g., 429 Too Many Requests)
+        if (response.status === 429) {
+          // Example for rate limiting
+          // Maybe get cooldown time from backend if provided
+        }
+      }
+    } catch (err: any) {
+      // Use 'any' or specific error type
+      console.error('Resend error:', err)
+      if (err.message === 'Failed to fetch') {
+        setResendError(t('verifyEmail.error.network'))
+      } else {
+        setResendError(t('verifyEmail.error.generic'))
+      }
+    } finally {
+      setIsResending(false)
     }
   }
 
@@ -107,6 +196,28 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = () => {
           {/* ... icon lỗi ... */}
           <div className='ml-3'>
             <p className='text-sm text-red-700'>{error}</p>
+          </div>
+        </div>
+      )}
+      {/* Thông báo thành công resend */}
+      {resendSuccessMessage && (
+        <div className='rounded-md bg-green-50 p-4'>
+          <div className='flex'>
+            {/* Icon success */}
+            <div className='ml-3'>
+              <p className='text-sm font-medium text-green-800'>
+                {resendSuccessMessage}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Thông báo lỗi resend */}
+      {resendError && (
+        <div className='rounded-md bg-red-50 p-4'>
+          {/* Icon lỗi */}
+          <div className='ml-3'>
+            <p className='text-sm text-red-700'>{resendError}</p>
           </div>
         </div>
       )}
@@ -155,15 +266,31 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = () => {
               {t('verifyEmail.noCode')} {/* Nên dùng t('verifyEmail.noCode') */}{' '}
             </span>
             {/* Có thể thêm link gửi lại code nếu cần */}
-            <Link
-              href='/'
-              className='hover:text-button/80 font-medium text-button'
-            >
-              {t('verifyEmail.resendLink')}
-            </Link>{' '}
-            {/* Thêm khoảng trắng nếu cần */}
-            <span className='text-gray-600'>{t('common.or')} </span>{' '}
-            {/* Nên dùng t('common.or') */} {/* Thêm khoảng trắng nếu cần */}
+            {/* Resend Button/Link - Conditional rendering based on cooldown and loading */}
+            {cooldown > 0 ? (
+              <span className='text-gray-500'>
+                {t('verifyEmail.resendCooldown', { seconds: cooldown })}
+              </span>
+            ) : (
+              // Use a button styled as a link for accessibility and correct semantic meaning (action vs navigation)
+              <button
+                type='button' // Important: type="button" to prevent form submission
+                onClick={handleResend}
+                disabled={isResending} // Disable button when resending
+                className='hover:text-button/80 font-medium text-button focus:underline focus:outline-none disabled:cursor-not-allowed disabled:opacity-50' // Add focus styles for accessibility
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer'
+                }} // Style to look like a link
+              >
+                {isResending
+                  ? t('verifyEmail.resending')
+                  : t('verifyEmail.resendLink')}
+              </button>
+            )}
+            <span className='text-gray-600'> {t('Common.or')} </span>{' '}
             <Link
               href='/auth/login'
               className='hover:text-button/80 font-medium text-button'

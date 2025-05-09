@@ -680,7 +680,9 @@
       "missingFields": "Please enter the verification code",
       "invalidCodeFormat": "Verification code must be 6 digits",
       "backendFailed": "Verification failed. Please check the code and try again.",
-      "network": "An error occurred during verification. Please try again later."
+      "network": "An error occurred during verification. Please try again later.",
+      "generic": "An unexpected error occurred. Please try again.",
+      "noToken": "Authentication token missing. Please log in again."
     },
     "success": {
       "message": "Verification successful! You can now log in."
@@ -691,6 +693,10 @@
     "submitButton": "Verify Account",
     "noCode": "Didn't receive the code yet?",
     "resendLink": "Resend code",
+    "resending": "Resending...",
+    "resendSuccess": "New code sent!",
+    "resendError": "Failed to resend code. Please try again.",
+    "resendCooldown": "Resend available in {seconds}s",
     "backToLogin": "Go back to Login",
     "returnToHomeButton": "Return to Home"
   },
