@@ -14,21 +14,19 @@ import BlacklistTab from './blacklist/BlacklistTab'
 import ProfileTab from './profile/ProfileTab'
 import NoteTab from './note/NoteTab'
 import MyConferencesTab from './myConferences/MyConferencesTab'
-import { Header } from '../utils/Header'
-// Không cần useMediaQuery nữa
-// import { useMediaQuery } from 'react-responsive'
+import { Header } from '../utils/Header' // Assuming Header component handles its own width/centering
 
 export default function Dashboard({ locale }: { locale: string }) {
   const t = useTranslations('')
   const searchParams = useSearchParams()
   const [activePage, setActivePage] = useState<string>('')
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false) // Giữ nguyên init là false
+  // Sidebar starts closed on small screens, open on large screens
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   // Logic cập nhật activePage dựa trên searchParams (giữ nguyên)
   useEffect(() => {
     const tab = searchParams.get('tab')
-    // Mặc định là Analysis nếu không có tab hợp lệ
-    let initialPage = 'Analysis'
+    let initialPage = 'Analysis' // Default
     if (tab === 'followed') initialPage = 'Followed'
     else if (tab === 'profile') initialPage = 'Profile'
     else if (tab === 'myconferences') initialPage = 'My Conferences'
@@ -38,22 +36,30 @@ export default function Dashboard({ locale }: { locale: string }) {
     else if (tab === 'setting') initialPage = 'Setting'
     else if (tab === 'moderation') initialPage = 'Moderation'
     else if (tab === 'requestadmintab') initialPage = 'RequestAdminTab'
-    // Nếu tab không khớp với bất kỳ trường hợp nào trên, nó vẫn giữ giá trị mặc định là 'Analysis'.
-    // Bạn có thể thêm một trường hợp else cuối cùng nếu muốn một tab mặc định khác khi không có tab nào được cung cấp hoặc không hợp lệ.
-    // Ví dụ: else { initialPage = 'Profile'; }
+    else if (tab === 'analysis') initialPage = 'Analysis' // Ensure 'analysis' param works
+
     setActivePage(initialPage)
 
-    // Optional: Trên mobile, tự động đóng sidebar khi chuyển tab
-    // Để check mobile ở client, bạn có thể dùng window.innerWidth trong useEffect sau mount.
-    // Lưu ý: Dùng window.innerWidth trong useEffect là OK, nhưng tránh dùng nó
-    // để quyết định *lần render đầu tiên* hoặc layout ban đầu vì nó không có ở server.
-    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
-      setIsSidebarOpen(false)
+    // Optional: On mobile, assume sidebar should be closed by default on navigation
+    // and needs a separate toggle (likely in the header).
+    // On desktop, maybe default to open? Or let state manage it.
+    // The current state manages it, initial is false. Let's keep it simple.
+    // If you want it open by default on desktop, you'd need a client-side check here.
+    // Example: if (typeof window !== 'undefined' && window.innerWidth > 768) { setIsSidebarOpen(true); }
+    // But this can cause hydration issues. Better to manage state or rely on user interaction.
+  }, [searchParams])
+
+  // Set initial sidebar state based on screen size after mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Open sidebar by default on desktop sizes (md breakpoint)
+      if (window.innerWidth >= 768) {
+        setIsSidebarOpen(true)
+      }
     }
-  }, [searchParams]) // Phụ thuộc vào searchParams
+  }, [])
 
   const renderPage = () => {
-    // Logic render page không đổi
     switch (activePage) {
       case 'Setting':
         return <SettingTab />
@@ -76,8 +82,7 @@ export default function Dashboard({ locale }: { locale: string }) {
       case 'RequestAdminTab':
         return <RequestAdminTab />
       default:
-        // Render tab mặc định hoặc Analysis nếu activePage không hợp lệ
-        return <Analysis /> // Hoặc <ProfileTab />
+        return <Analysis /> // Fallback
     }
   }
 
@@ -312,9 +317,8 @@ export default function Dashboard({ locale }: { locale: string }) {
     }
   ]
 
-  // Header height constant (adjust as needed based on your Header component's actual height)
-  // Assuming your Header is 72px tall (e.g., using px-18 utility)
-  const HEADER_HEIGHT_PX = 72
+  // Header height constant (adjust as needed)
+  const HEADER_HEIGHT_PX = 72 // Example height, adjust based on your Header
 
   // Toggle icons (keep these)
   const openIcon = (
@@ -360,57 +364,53 @@ export default function Dashboard({ locale }: { locale: string }) {
   // Render chính
   return (
     <>
-      {/* Header component */}
-      {/* Header nên là fixed hoặc sticky và có z-index cao để nó luôn ở trên cùng */}
+      {/* Header component - Assume it's sticky/fixed and has its own width/centering */}
+      {/* The Header should likely also be contained, aligning with the container used below */}
       <Header locale={locale} />
 
       {/* Container cho Sidebar và Main Content */}
-      {/* flex để sidebar và content nằm cạnh nhau trên desktop */}
-      {/* pt-[...] để nội dung không bị ẩn dưới header cố định */}
+      {/* Added container mx-auto to center this section */}
+      {/* Used flex to place sidebar and content side-by-side */}
       <div
-        className='relative flex min-h-screen'
-        style={{ paddingTop: `${HEADER_HEIGHT_PX}px` }}
+        className='container mx-0 flex min-h-screen px-0'
+        style={{ paddingTop: `${HEADER_HEIGHT_PX}px` }} // Add padding equal to header height
       >
-        {' '}
-        {/* Sử dụng style inline hoặc class Tailwind pt-[72px] */}
-        {/* Sidebar */}
+        {/* Sidebar - Now a flex item */}
         <aside
           className={`
-            fixed top-[${HEADER_HEIGHT_PX}px] left-0 h-[calc(100vh-${HEADER_HEIGHT_PX}px)] z-10 overflow-y-auto bg-background
-            transition-all duration-300 ease-in-out
-            ${isSidebarOpen ? 'md:w-52' : 'md:w-16'} /* Desktop width: 48 (open) or 16 (closed) */
-            /* Mobile width: 0 (hidden) */ /*
-            Mobile hide opacity */ w-0 opacity-0 md:opacity-100
-            ${!isSidebarOpen && 'md:overflow-hidden'} /* Optional: Hide on desktop when collapsed */ scrollbar
+            h-full flex-shrink-0 overflow-y-auto transition-all 
+            duration-300 ease-in-out scrollbar
+            ${isSidebarOpen ? 'w-52' : 'w-0 md:w-16'} 
+            ${!isSidebarOpen && 'md:overflow-hidden'} 
+            // Added background color class bg-background
           `}
-          // Nếu muốn ẩn hẳn trên mobile thay vì w-0/opacity-0:
-          // className={`
-          //   fixed top-[${HEADER_HEIGHT_PX}px] left-0 h-[calc(100vh-${HEADER_HEIGHT_PX}px)] bg-background overflow-y-auto z-10
-          //   transition-all duration-300 ease-in-out
-          //   ${isSidebarOpen ? 'md:w-48' : 'md:w-16'}
-          //   hidden md:block /* Hide completely on mobile, show as block on desktop */
-          // `}
         >
           <nav className='w-full'>
             <ul className='w-full'>
               {/* Toggle Button */}
-              {/* Ẩn button trên mobile */}
-              <li className='hidden w-full md:block'>
+              {/* Ẩn button trên mobile (w-0 state) */}
+              <li className='w-full'>
+                {' '}
+                {/* Keep as li for consistency */}
                 <button
                   onClick={toggleSidebar}
                   className={`
-                      flex w-full items-center px-4 py-2
+                      flex w-full items-center py-2
                       transition-colors duration-500 ease-in-out
                       hover:bg-button hover:opacity-60 focus:outline-none active:bg-blue-700
-                      ${isSidebarOpen ? 'justify-start' : 'justify-center'}
+                      ${isSidebarOpen ? 'justify-start px-4' : 'justify-center px-0 md:px-4'} /* Adjust padding */
                     `}
                 >
-                  {/* Icon và spacing */}
+                  {/* Icon and spacing */}
+                  {/* Icon is always visible on md+ when closed (w-16) */}
                   <span className={isSidebarOpen ? 'mr-4' : ''}>
                     {isSidebarOpen ? closeIcon : openIcon}
                   </span>
-                  {/* Chỉ hiển thị text khi sidebar mở */}
-                  {isSidebarOpen && <span>{t('Close')}</span>}
+                  {/* Only show text when sidebar open AND not on mobile (w-0) */}
+                  {isSidebarOpen && (
+                    <span className='whitespace-nowrap'>{t('Close')}</span>
+                  )}
+                  {/* For desktop closed (w-16), the button text is hidden by overflow-hidden */}
                 </button>
               </li>
 
@@ -425,7 +425,7 @@ export default function Dashboard({ locale }: { locale: string }) {
                         query: { tab: tabValue }
                       }}
                       className={`
-                          flex h-12 w-full items-center px-4 py-2
+                          flex h-12 w-full items-center py-2
                           transition-colors duration-500 ease-in-out
                           hover:bg-button hover:opacity-60 focus:outline-none
                           ${
@@ -433,15 +433,18 @@ export default function Dashboard({ locale }: { locale: string }) {
                               ? 'bg-button text-button-text hover:bg-secondary'
                               : ''
                           }
-                           ${isSidebarOpen ? 'justify-start' : 'justify-center'}
+                           ${isSidebarOpen ? 'justify-start px-4' : 'justify-center px-0 md:px-4'} /* Adjust padding */
                         `}
                     >
-                      {/* Icon và spacing */}
+                      {/* Icon and spacing */}
                       <span className={isSidebarOpen ? 'mr-4' : ''}>
                         {item.icon}
                       </span>
-                      {/* Chỉ hiển thị text khi sidebar mở */}
-                      {isSidebarOpen && <span>{item.label}</span>}
+                      {/* Only display text when sidebar is open */}
+                      {isSidebarOpen && (
+                        <span className='whitespace-nowrap'>{item.label}</span>
+                      )}
+                      {/* When closed on desktop (md:w-16), text is hidden by parent overflow */}
                     </Link>
                   </li>
                 )
@@ -449,18 +452,18 @@ export default function Dashboard({ locale }: { locale: string }) {
             </ul>
           </nav>
         </aside>
-        {/* Main Content Area */}
-        {/* flex-1 để chiếm hết không gian còn lại */}
-        {/* margin-left được điều chỉnh bởi trạng thái sidebar và media query */}
+
+        {/* Main Content Area - Takes remaining space */}
+        {/* Removed margin-left, flex handles spacing */}
+        {/* Added padding for content spacing */}
         <div
           className={`
-              /* Default
-              mobile margin */
-              ml-0 min-h-screen flex-1 transition-all duration-300 ease-in-out
-              ${isSidebarOpen ? 'md:ml-48' : 'md:ml-16'} /* Desktop margin: 48 (open) or 16 (closed) */
+              /* removed here, 
+              handled by parent
+              */ container flex min-h-screen flex-1 overflow-y-auto p-4 transition-all duration-300 ease-in-out
             `}
         >
-          {/* Render page dựa trên activePage */}
+          {/* Render page based on activePage */}
           {renderPage()}
         </div>
       </div>

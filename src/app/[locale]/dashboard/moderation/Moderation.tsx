@@ -96,7 +96,7 @@ const Moderation: React.FC = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gray-100 p-6 font-sans'>
+    <div className='min-h-screen w-full bg-gray-100 p-6 font-sans'>
       <h1 className='mb-8 text-center text-3xl font-bold text-gray-800'>
         Conference Submission Moderation
       </h1>
