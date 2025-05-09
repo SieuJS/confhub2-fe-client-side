@@ -148,7 +148,7 @@ const SettingTab: React.FC = () => {
 
   // --- Main Component Render ---
   return (
-    <div className='flex'>
+    <div className='flex w-full'>
       <main className='flex-1 p-8'>
         <header className='mb-4 flex items-center justify-between'>
           <h2 className='text-xl font-semibold md:text-2xl'>{t('Setting')}</h2>
