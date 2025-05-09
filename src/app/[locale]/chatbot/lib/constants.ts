@@ -2,7 +2,7 @@
 import {
     LanguageOption as LiveChatLanguageOption,
     PrebuiltVoice,
-    LanguageCode as LiveChatLanguageCode,
+    Language as LiveChatLanguageCode,
     OutputModality
 } from './live-chat.types';
 

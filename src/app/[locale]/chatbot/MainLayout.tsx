@@ -1,6 +1,3 @@
-
-// src/app/[locale]/chatbot/MainLayout.tsx
-
 'use client'
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
@@ -15,12 +12,13 @@ import {
   useSocketStore,
   useSettingsStore,
   useUiStore,
+  useMessageStore, // Added import
 } from './stores';
 import { useShallow } from 'zustand/react/shallow';
 
 // Import custom hooks
 import { useAppInitialization } from '@/src/hooks/chatbot/useAppInitialization';
-import { useUrlConversationSync } from '@/src/hooks/chatbot/useUrlConversationSync';
+import { useUrlConversationSync, urlSearchParamsToObject } from '@/src/hooks/chatbot/useUrlConversationSync';
 import { useConversationLifecycleManager } from '@/src/hooks/chatbot/useConversationLifecycleManager';
 
 interface MainLayoutComponentProps {
@@ -30,38 +28,27 @@ interface MainLayoutComponentProps {
 
 type MainContentView = 'chat' | 'history';
 
-const CHATBOT_HISTORY_PATH: AppPathname = '/chatbot/history';
-const CHATBOT_LIVECHAT_PATH: AppPathname = '/chatbot/livechat';
-const CHATBOT_REGULARCHAT_PATH: AppPathname = '/chatbot/regularchat';
-
-// Helper function (nếu chưa có sẵn hoặc import từ hooks)
-function urlSearchParamsToObject(params: URLSearchParams): Record<string, string> {
-  const obj: Record<string, string> = {};
-  if (params) {
-    for (const [key, value] of params.entries()) {
-      obj[key] = value;
-    }
-  }
-  return obj;
-}
-
+export const CHATBOT_HISTORY_PATH: AppPathname = '/chatbot/history';
+export const CHATBOT_LIVECHAT_PATH: AppPathname = '/chatbot/livechat';
+export const CHATBOT_REGULARCHAT_PATH: AppPathname = '/chatbot/regularchat';
 
 export default function MainLayoutComponent({
   children,
   isLiveChatContextActive
 }: MainLayoutComponentProps) {
   const t = useTranslations();
-  const router = useRouter(); // Keep router for handlers
+  const router = useRouter();
   const currentPathname = usePathname();
   const searchParamsHook = useSearchParams();
 
   // --- Store Hooks ---
   const {
     activeConversationId,
-    isLoadingHistory, // This is the global loading history from conversation store
+    isLoadingHistory,
     loadConversation,
     startNewConversation,
     deleteConversation,
+    setActiveConversationId: storeSetActiveConversationId, // Get the setter
   } = useConversationStore(
     useShallow(state => ({
       activeConversationId: state.activeConversationId,
@@ -69,6 +56,13 @@ export default function MainLayoutComponent({
       loadConversation: state.loadConversation,
       startNewConversation: state.startNewConversation,
       deleteConversation: state.deleteConversation,
+      setActiveConversationId: state.setActiveConversationId, // Add to shallow selector
+    }))
+  );
+
+  const { resetChatUIForNewConversation } = useMessageStore( // Get reset function
+    useShallow(state => ({
+      resetChatUIForNewConversation: state.resetChatUIForNewConversation,
     }))
   );
 
@@ -98,17 +92,18 @@ export default function MainLayoutComponent({
   );
   const [isProcessingDeletion, setIsProcessingDeletion] = useState(false);
   const [idBeingDeleted, setIdBeingDeleted] = useState<string | null>(null);
-  const prevActiveIdRef = useRef<string | null>(null); // For deletion logic
+  const prevActiveIdRef = useRef<string | null>(null);
+  const prevPathnameRef = useRef<string | null>(null); // <<<< To track pathname changes for blank slate logic
+  const prevSearchParamsStringRef = useRef<string>(''); // <<<< To track search param changes
 
-  // --- Custom Hooks for Logic Separation ---
   useAppInitialization();
 
-  // didAttemptLoadFromUrlRef is managed by useUrlConversationSync
   const { didAttemptLoadFromUrlRef } = useUrlConversationSync({
     currentView,
     isProcessingDeletion,
     idBeingDeleted,
   });
+
 
   useConversationLifecycleManager({
     currentView,
@@ -120,18 +115,14 @@ export default function MainLayoutComponent({
     onDeletionProcessed: () => {
       setIsProcessingDeletion(false);
       setIdBeingDeleted(null);
-      // No need to reset didAttemptLoadFromUrlRef here manually,
-      // useUrlConversationSync will handle its state.
     },
-    didAttemptLoadFromUrlRef: didAttemptLoadFromUrlRef, // Truyền ref vào
+    didAttemptLoadFromUrlRef: didAttemptLoadFromUrlRef,
     onNotFoundProcessed: () => {
       console.log("[MainLayout] onNotFoundProcessed called from LifecycleManager.");
-      // Nếu bạn muốn MainLayout reset cờ này:
       if (didAttemptLoadFromUrlRef.current) {
         didAttemptLoadFromUrlRef.current = false;
         console.log("[MainLayout] Reset didAttemptLoadFromUrlRef to false.");
       }
-      // Có thể cần thêm logic reset khác ở đây nếu cần
     },
   });
 
@@ -145,66 +136,99 @@ export default function MainLayoutComponent({
     if (currentView !== newView) {
       setCurrentView(newView);
     }
-    // Logic for clearing URL 'id' when in history view is handled by useUrlConversationSync
   }, [currentPathname, currentView]);
 
+  // Revised "blank slate" logic
+  useEffect(() => {
+    const currentUrlId = searchParamsHook.get('id');
+    const currentSearchParamsString = searchParamsHook.toString();
+
+    // This effect should run when the pathname or searchParams change.
+    // We want to trigger "blank slate" IF:
+    // 1. The current path IS /chatbot/regularchat.
+    // 2. The current URL has NO 'id' param.
+    // 3. AND this is a "fresh" navigation to this state, not just an internal state update.
+    //    A good heuristic for "fresh" navigation to this state is if:
+    //    a) The pathname *just became* /chatbot/regularchat OR
+    //    b) The pathname was already /chatbot/regularchat, but the search params *just became empty* (or 'id' was just removed).
+    // 4. AND there's an active conversation in the store that needs clearing.
+
+    const justNavigatedToRegularChatBase =
+      (prevPathnameRef.current !== CHATBOT_REGULARCHAT_PATH && currentPathname === CHATBOT_REGULARCHAT_PATH) ||
+      (currentPathname === CHATBOT_REGULARCHAT_PATH && prevSearchParamsStringRef.current !== '' && currentSearchParamsString === '');
+
+
+    if (
+      currentPathname === CHATBOT_REGULARCHAT_PATH &&
+      !currentUrlId && // No ID in the current URL
+      justNavigatedToRegularChatBase && // And we just arrived at this clean state
+      activeConversationId !== null // But a conversation IS active in the store
+    ) {
+      console.log('[MainLayout] Freshly navigated to /chatbot/regularchat (no URL ID) with an active conversation in store. Resetting to blank slate state.');
+      storeSetActiveConversationId(null);
+      resetChatUIForNewConversation(true);
+    }
+
+    // Update refs for the next run
+    prevPathnameRef.current = currentPathname;
+    prevSearchParamsStringRef.current = currentSearchParamsString;
+
+  }, [
+    currentPathname,
+    searchParamsHook, // This triggers re-run when URL query changes
+    activeConversationId,
+    storeSetActiveConversationId,
+    resetChatUIForNewConversation,
+  ]);
 
 
   // --- Event Handlers ---
   const handleSelectConversation = useCallback(
     (conversationId: string) => {
       if (!isConnected || isProcessingDeletion || isLoadingHistory) return;
-
-      // 1. Load the conversation (updates activeConversationId in store)
       loadConversation(conversationId);
-
-      // 2. Determine target path and update URL to reflect the selection
       const targetChatPath = chatMode === 'live' ? CHATBOT_LIVECHAT_PATH : CHATBOT_REGULARCHAT_PATH;
       const newParams = new URLSearchParams(searchParamsHook.toString());
-      newParams.set('id', conversationId);
-      const newQuery = urlSearchParamsToObject(newParams);
 
-      // If in history view, or on a different chat path, navigate fully
-      if (currentView === 'history' || currentPathname !== targetChatPath) {
-        router.push({ pathname: targetChatPath, query: newQuery });
+      if (targetChatPath === CHATBOT_LIVECHAT_PATH) {
+        newParams.delete('id');
+      } else {
+        newParams.set('id', conversationId);
       }
-      // If already on the correct chat path, but 'id' param is different, replace URL
-      else if (searchParamsHook.get('id') !== conversationId) {
-        router.replace({ pathname: currentPathname, query: newQuery });
+      const newQuery = urlSearchParamsToObject(newParams);
+      const newQueryString = newParams.toString();
+      const currentQueryString = searchParamsHook.toString();
+
+      if (currentPathname !== targetChatPath || currentQueryString !== newQueryString) {
+        if (currentView === 'history' || currentPathname !== targetChatPath) {
+          router.push({ pathname: targetChatPath, query: newQuery });
+        } else {
+          router.replace({ pathname: currentPathname, query: newQuery });
+        }
       }
-      // If already on correct path with correct id, no navigation needed.
     },
     [
-      loadConversation,
-      currentView,
-      router,
-      chatMode,
-      isConnected,
-      isProcessingDeletion,
-      isLoadingHistory,
-      currentPathname,
-      searchParamsHook, // Add searchParamsHook as a dependency
+      loadConversation, currentView, router, chatMode, isConnected,
+      isProcessingDeletion, isLoadingHistory, currentPathname, searchParamsHook,
     ]
   );
 
   const handleStartNewConversation = useCallback(() => {
     if (!isConnected || !isServerReadyForCommands || isProcessingDeletion) return;
-    // Dòng này đã được xóa: if (didAttemptLoadFromUrlRef.current) didAttemptLoadFromUrlRef.current = false;
-    startNewConversation();
+    startNewConversation(); // This will trigger store changes, leading to activeId becoming null then newId
     const targetChatPath = chatMode === 'live' ? CHATBOT_LIVECHAT_PATH : CHATBOT_REGULARCHAT_PATH;
-
-    // Logic cập nhật URL khi start new conversation
     const newParams = new URLSearchParams(searchParamsHook.toString());
-    const currentUrlId = newParams.get('id');
-    newParams.delete('id');
+    newParams.delete('id'); // Always remove 'id' when starting a new conversation
     const newQuery = urlSearchParamsToObject(newParams);
+    const currentUrlId = searchParamsHook.get('id');
 
+    // Navigate if path changes OR if there was an ID in the URL previously (even on same path)
     if (currentPathname !== targetChatPath || currentUrlId) {
       router.push({ pathname: targetChatPath, query: newQuery });
     }
   }, [
     startNewConversation, router, chatMode, isConnected, isServerReadyForCommands,
-    currentPathname, isProcessingDeletion, searchParamsHook // Đảm bảo searchParamsHook ở đây
+    currentPathname, isProcessingDeletion, searchParamsHook
   ]);
 
   const handleDeleteConversation = useCallback(
@@ -215,7 +239,6 @@ export default function MainLayoutComponent({
       setIdBeingDeleted(conversationIdToDelete);
       try {
         await deleteConversation(conversationIdToDelete);
-        // Lifecycle manager hook will handle redirection and state reset after store confirms
       } catch (error) {
         console.error(`[MainLayout] Error emitting delete request for ${conversationIdToDelete}:`, error);
         setIsProcessingDeletion(false);
