@@ -18,6 +18,8 @@ export interface ConversationStoreState {
     isSearching: boolean;
     isLoadingHistory: boolean;
     isHistoryLoaded: boolean; // For the active conversation
+    isProcessingExplicitNewChat: boolean; // <<<< THÊM STATE NÀY
+
 }
 
 // --- Types for Conversation Store Actions ---
@@ -28,6 +30,7 @@ export interface ConversationStoreActions {
     setIsSearching: (isSearching: boolean) => void;
     setIsLoadingHistory: (isLoading: boolean) => void;
     setIsHistoryLoaded: (isLoaded: boolean) => void;
+    setIsProcessingExplicitNewChat: (isProcessing: boolean) => void; // <<<< THÊM ACTION NÀY (nếu cần gọi từ bên ngoài, không thì set trực tiếp)
 
     // Complex Actions
     loadConversation: (conversationId: string, options?: { isFromUrl?: boolean }) => void;
@@ -55,6 +58,8 @@ const initialConversationStoreState: ConversationStoreState = {
     isSearching: false,
     isLoadingHistory: false,
     isHistoryLoaded: false,
+    isProcessingExplicitNewChat: false, // <<<< KHỞI TẠO
+
 };
 
 export const useConversationStore = create<ConversationStoreState & ConversationStoreActions>()(
@@ -94,6 +99,7 @@ export const useConversationStore = create<ConversationStoreState & Conversation
             setIsSearching: (isSearching) => set({ isSearching: isSearching }, false, 'setIsSearching'),
             setIsLoadingHistory: (isLoading) => set({ isLoadingHistory: isLoading }, false, 'setIsLoadingHistory'),
             setIsHistoryLoaded: (isLoaded) => set({ isHistoryLoaded: isLoaded }, false, 'setIsHistoryLoaded'),
+            setIsProcessingExplicitNewChat: (isProcessing) => set({ isProcessingExplicitNewChat: isProcessing }),
 
             // --- Complex Actions ---
             loadConversation: (conversationId, options) => {
@@ -150,16 +156,19 @@ export const useConversationStore = create<ConversationStoreState & Conversation
             startNewConversation: () => {
                 const { isConnected, isServerReadyForCommands } = useSocketStore.getState();
                 const { handleError } = useUiStore.getState();
-                const { resetChatUIForNewConversation, setLoadingState } = useMessageStore.getState();
+                const { resetChatUIForNewConversation, setLoadingState: setMessageLoadingState } = useMessageStore.getState(); // Đổi tên để tránh nhầm lẫn
 
                 if (!isConnected || !isServerReadyForCommands) {
                     handleError({ message: 'Cannot start new conversation: Not connected or server not ready.' });
                     return;
                 }
                 console.log('[ConversationStore] STARTING NEW CONVERSATION (explicit).');
-                resetChatUIForNewConversation(true); // Clear messages and active ID in messageStore
-                set({ activeConversationId: null, isHistoryLoaded: false }); // Clear active ID and history loaded flag here
-                setLoadingState({ isLoading: true, step: 'starting_new_chat', message: 'Preparing new chat...' });
+
+                set({ isProcessingExplicitNewChat: true }); // <<<< SET CỜ NÀY LÀ TRUE
+
+                resetChatUIForNewConversation(true);
+                set({ activeConversationId: null, isHistoryLoaded: false });
+                setMessageLoadingState({ isLoading: true, step: 'starting_new_chat', message: 'Preparing new chat...' });
                 useSocketStore.getState().emitStartNewConversation({});
             },
             deleteConversation: (conversationIdToDelete) => {
@@ -227,7 +236,7 @@ export const useConversationStore = create<ConversationStoreState & Conversation
                     if (!a.isPinned && b.isPinned) return 1;
                     return new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime();
                 });
-            
+
                 set(state => {
                     let newIsLoadingHistory = state.isLoadingHistory;
                     // Chỉ set isLoadingHistory = false bởi _onSocketConversationList nếu:
@@ -244,7 +253,7 @@ export const useConversationStore = create<ConversationStoreState & Conversation
                         // Giữ nguyên isLoadingHistory, để cho _onSocketInitialHistory xử lý việc set nó thành false.
                         console.log(`[ConversationStore _onSocketConversationList] Active conversation (${state.activeConversationId}) exists and its history is not yet loaded. Keeping isLoadingHistory (${state.isLoadingHistory}) as is.`);
                     }
-            
+
                     return {
                         conversationList: sortedList,
                         searchResults: sortedList, // Nên cập nhật searchResults cùng lúc
@@ -252,7 +261,7 @@ export const useConversationStore = create<ConversationStoreState & Conversation
                     };
                 }, false, '_onSocketConversationList');
             },
-            
+
             _onSocketInitialHistory: (payload) => {
                 // Khi initial history của một conversation cụ thể được load,
                 // ta có thể chắc chắn set isLoadingHistory = false và isHistoryLoaded = true.
@@ -265,7 +274,7 @@ export const useConversationStore = create<ConversationStoreState & Conversation
                 useMessageStore.getState().setLoadingState({ isLoading: false, step: 'history_loaded', message: '' });
             },
             _onSocketNewConversationStarted: (payload) => {
-                console.log(`[ConversationStore _onSocketNewConversationStarted] New Conversation ID: ${payload.conversationId}`);
+                console.log(`[ConversationStore _onSocketNewConversationStarted] New Conversation ID: ${payload.conversationId}. Explicit flow: ${get().isProcessingExplicitNewChat}`);
                 set(state => {
                     const newConv: ConversationMetadata = {
                         id: payload.conversationId,
@@ -282,16 +291,25 @@ export const useConversationStore = create<ConversationStoreState & Conversation
 
                     return {
                         activeConversationId: payload.conversationId,
-                        isHistoryLoaded: true, // New chat is considered "loaded" (empty)
+                        isHistoryLoaded: true,
                         isLoadingHistory: false,
                         conversationList: updatedList,
                         searchResults: updatedList,
+                        // isProcessingExplicitNewChat: false // Reset cờ ở đây nếu nó true
                     };
                 }, false, `_onSocketNewConversationStarted/${payload.conversationId}`);
-                // Message store would have been reset by startNewConversation action
-                useMessageStore.getState().setChatMessages(() => []); // Ensure messages are empty
-                useMessageStore.getState().setLoadingState({ isLoading: false, step: 'new_chat_ready', message: '' });
-                useUiStore.getState().setShowConfirmationDialog(false); // Close any open dialogs
+
+                if (get().isProcessingExplicitNewChat) {
+                    console.log('[ConversationStore _onSocketNewConversationStarted] Explicit new chat flow detected. Resetting message loading state.');
+                    useMessageStore.getState().setLoadingState({ isLoading: false, step: 'new_chat_ready', message: '' });
+                    set({ isProcessingExplicitNewChat: false }); // <<<< RESET CỜ SAU KHI XỬ LÝ
+                } else {
+                    console.log('[ConversationStore _onSocketNewConversationStarted] Implicit new chat flow. Message loading state will be handled by message events.');
+                    // Không làm gì với messageStore.loadingState ở đây
+                    // để cho sendMessage và các event liên quan tự quản lý.
+                }
+
+                useUiStore.getState().setShowConfirmationDialog(false);
             },
             _onSocketConversationDeleted: (payload) => {
                 const deletedId = payload.conversationId;
@@ -346,11 +364,11 @@ export const useConversationStore = create<ConversationStoreState & Conversation
                             ? { ...conv, isPinned: payload.isPinned, lastActivity: new Date().toISOString() } // <-- TẠO OBJECT MỚI
                             : conv
                     )
-                    .sort((a, b) => { // Sắp xếp lại
-                        if (a.isPinned && !b.isPinned) return -1;
-                        if (!a.isPinned && b.isPinned) return 1;
-                        return new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime();
-                    });
+                        .sort((a, b) => { // Sắp xếp lại
+                            if (a.isPinned && !b.isPinned) return -1;
+                            if (!a.isPinned && b.isPinned) return 1;
+                            return new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime();
+                        });
                 set(state => ({
                     conversationList: updater(state.conversationList),
                     searchResults: updater(state.searchResults) // Cập nhật cả searchResults nếu có
