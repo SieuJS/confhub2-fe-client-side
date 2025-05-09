@@ -17,8 +17,10 @@ export const pathnames = {
   '/chatbot/regularchat': '/chatbot/regularchat',
   '/chatbot/livechat': '/chatbot/livechat',
   '/chatbot/history': '/chatbot/history',
-
+  
+  '/visualization/landingvisualization': '/visualization/landingvisualization',
   '/visualization': '/visualization',
+  
   '/support': '/support',
   '/other': '/other',
   '/addconference': '/addconference',

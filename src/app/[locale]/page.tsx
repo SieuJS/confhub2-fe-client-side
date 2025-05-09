@@ -43,12 +43,12 @@ export default function HomePage({ locale }: { locale: string }) {
       {/* <SuperBanner /> */}
       <SuperBannerTree />
       <PopularConferences />
-      <SubjectAreasJournals
+      {/* <SubjectAreasJournals
         speed='90s' // You can still customize other props
         imageHeight='h-60'
         imageWidth='w-40'
         innerClasses='space-x-6 py-4'
-      />
+      /> */}
       <ConsumerInsights />
       <IntroduceVisualization />
       <FeatureComparisonTable />
