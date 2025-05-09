@@ -4,18 +4,19 @@ import ConversationList from './regularchat/ConversationList';
 import {
   useUiStore,
   useConversationStore,
+  useSettingsStore, // <<<< ADDED: To know the current chatMode
 } from './stores';
 import { useShallow } from 'zustand/react/shallow';
 // Import custom hook and child components
-import { useLeftPanelNavigation, NavItem } from '@/src/hooks/chatbot/useLeftPanelNavigation'; 
-import NavigationMenu from './NavigationMenu'; 
-import PanelToggleButton from './PanelToggleButton'; 
+import { useLeftPanelNavigation, NavItem } from '@/src/hooks/chatbot/useLeftPanelNavigation';
+import NavigationMenu from './NavigationMenu';
+import PanelToggleButton from './PanelToggleButton';
 
 interface LeftPanelProps {
   onSelectConversation: (conversationId: string) => void;
   onStartNewConversation: () => void;
   onDeleteConversation: (conversationId: string) => void;
-  currentView: 'chat' | 'history';
+  currentView: 'chat' | 'history'; // This indicates if we are on /history or a chat page
   isLiveServiceConnected?: boolean;
   deletingConversationId: string | null;
 }
@@ -24,7 +25,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
   onSelectConversation,
   onStartNewConversation,
   onDeleteConversation,
-  currentView,
+  currentView, // This prop from MainLayout tells us if the main content area is for history or chat
   isLiveServiceConnected,
   deletingConversationId,
 }) => {
@@ -55,11 +56,25 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
     }))
   );
 
+  // --- From SettingsStore (to determine if we are in 'live' chat mode) ---
+  const { chatMode } = useSettingsStore(
+    useShallow(state => ({
+      chatMode: state.chatMode,
+    }))
+  );
+
   // --- Custom Hook for Navigation Logic ---
   const { navItems } = useLeftPanelNavigation({
-    currentView,
+    currentView, // Pass currentView to the navigation hook
     isLiveServiceConnected,
   });
+
+  // Determine if the ConversationList should be shown
+  // It should be shown IF:
+  // 1. The left panel is open
+  // 2. The currentView (from MainLayout, indicating page like /history or /regularchat or /livechat) is 'chat' (i.e., not '/history')
+  // 3. AND the chatMode (from SettingsStore) is NOT 'live'.
+  const showConversationList = isLeftPanelOpen && currentView === 'chat' && chatMode !== 'live';
 
   return (
     <div
@@ -81,8 +96,8 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
 
         {isLeftPanelOpen && <div className='border-gray-20 mx-3 my-2 border-t '></div>}
 
-        {isLeftPanelOpen &&
-          currentView === 'chat' && (
+        {/* Modified condition here */}
+        {showConversationList && (
             <ConversationList
               conversationList={conversationList}
               activeConversationId={activeConversationId}
@@ -93,7 +108,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
               onClearConversation={clearConversation}
               onRenameConversation={renameConversation}
               onPinConversation={pinConversation}
-              currentView={currentView}
+              currentView={currentView} // This might not be strictly needed by ConversationList itself anymore if its visibility is controlled here
               deletingConversationId={deletingConversationId}
             />
           )}
