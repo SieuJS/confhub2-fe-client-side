@@ -6,15 +6,13 @@ import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import remarkBreaks from 'remark-breaks'
 import {
-  ChatMessageType,
   MessageType,
   ThoughtStep
-} from '@/src/app/[locale]/chatbot/lib/regular-types.ts'
+} from '@/src/app/[locale]/chatbot/lib/regular-chat.types'
 import { TriangleAlert, Copy, Pencil, Check } from 'lucide-react'
 import { toast } from 'react-toastify'
 import Map from '../../conferences/detail/Map'
-import ThoughtProcess from './ThoughtProcess' // <<<--- 1. IMPORT ThoughtProcess
-
+import ThoughtProcess from './ThoughtProcess'
 // Helper type (optional, makes it cleaner)
 type MarkdownComponentProps<T extends keyof ReactHTML> = PropsWithChildren<
   JSX.IntrinsicElements[T] & {
@@ -69,15 +67,14 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
   const bubbleClasses = `
         group relative
         max-w-[85%] md:max-w-[80%] p-3 rounded-lg shadow-sm flex flex-col text-sm
-        ${
-          isUser
-            ? 'bg-blue-500 text-white rounded-br-none'
-            : type === 'error'
-              ? 'bg-red-100 text-red-700 border border-red-200 rounded-bl-none dark:bg-red-900/20 dark:text-red-200 dark:border-red-500/30' // Added dark error
-              : type === 'warning'
-                ? 'bg-yellow-100 text-yellow-700 border border-yellow-200 rounded-bl-none dark:bg-yellow-900/20 dark:text-yellow-200 dark:border-yellow-500/30' // Added dark warning
-                : 'bg-gray-100 text-gray-800 rounded-bl-none border border-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600' // Added dark default
-        }
+        ${isUser
+      ? 'bg-blue-500 text-white rounded-br-none'
+      : type === 'error'
+        ? 'bg-red-100 text-red-700 border border-red-200 rounded-bl-none dark:bg-red-900/20 dark:text-red-200 dark:border-red-500/30' // Added dark error
+        : type === 'warning'
+          ? 'bg-yellow-100 text-yellow-700 border border-yellow-200 rounded-bl-none dark:bg-yellow-900/20 dark:text-yellow-200 dark:border-yellow-500/30' // Added dark warning
+          : 'bg-gray-100 text-gray-800 rounded-bl-none border border-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600' // Added dark default
+    }
         ${type === 'map' ? 'w-full md:w-[80%] lg:w-[70%]' : ''}
     `
 

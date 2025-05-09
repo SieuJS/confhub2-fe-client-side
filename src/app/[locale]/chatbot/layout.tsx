@@ -1,24 +1,38 @@
-// src/app/[locale]/chatbot/layout.tsx
 "use client";
 
-import { LiveAPIProvider } from '@/src/app/[locale]/chatbot/livechat/contexts/LiveAPIContext'; // Điều chỉnh path
-import { ChatSocketProvider } from './context/ChatSocketContext'; // Điều chỉnh path
+import { LiveAPIProvider } from '@/src/app/[locale]/chatbot/livechat/contexts/LiveAPIContext';
 import MainLayoutComponent from '@/src/app/[locale]/chatbot/MainLayout';
-import { ChatSettingsProvider } from '@/src/app/[locale]/chatbot/context/ChatSettingsContext'; // <-- IMPORT PROVIDER
-import { API_URI } from '@/src/app/[locale]/chatbot/lib/constants'; // Điều chỉnh path
-import { appConfig } from '@/src/middleware';
+import { LiveChatSettingsProvider } from '@/src/app/[locale]/chatbot/context/LiveChatSettingsContext';
+import { API_URI } from '@/src/app/[locale]/chatbot/lib/constants';
 import { usePathname } from '@/src/navigation';
+import { AppWideInitializers } from '@/src/app/[locale]/chatbot/AppWideInitializers';
+// --- IMPORT STORE MỚI ---
+import { useSettingsStore } from './stores/setttingsStore'; // Hoặc './stores' nếu có index.ts
+import { useEffect } from 'react';
 
 const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-const SOCKET_SERVER_URL = appConfig.NEXT_PUBLIC_BACKEND_URL;
-
 
 export default function ChatbotRootLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const unlocalizedPathname = usePathname(); // Ví dụ: /chatbot, /chatbot/regularchat
+    const unlocalizedPathname = usePathname();
+    // --- Lấy state và action từ SettingsStore ---
+    const setChatMode = useSettingsStore(state => state.setChatMode);
+    const currentStoreChatMode = useSettingsStore(state => state.chatMode);
+
+    const isLiveChatPage = unlocalizedPathname.includes('/chatbot/livechat');
+
+    // Đồng bộ chatMode trong store với trạng thái isLiveChatPage
+    useEffect(() => {
+        const newMode = isLiveChatPage ? 'live' : 'regular';
+        if (currentStoreChatMode !== newMode) {
+            // console.log(`[ChatbotRootLayout] Path: ${unlocalizedPathname}. Setting chatMode from ${currentStoreChatMode} to ${newMode}`);
+            setChatMode(newMode); // Action từ SettingsStore
+        }
+    }, [isLiveChatPage, currentStoreChatMode, setChatMode, unlocalizedPathname]);
+
 
     if (typeof API_KEY !== "string" || !API_KEY) {
         console.error("NEXT_PUBLIC_GEMINI_API_KEY is not set or invalid.");
@@ -29,23 +43,25 @@ export default function ChatbotRootLayout({
         );
     }
 
-    // Các provider này có thể cần cho cả trang landing nếu nút trên AIBanner
-    // cần chúng. Nếu không, chúng có thể được chuyển vào khối `else`.
     return (
-        <LiveAPIProvider url={API_URI} apiKey={API_KEY}>
-            <ChatSocketProvider socketUrl={SOCKET_SERVER_URL}>
-                {unlocalizedPathname === '/chatbot/landingchatbot' ? (
-                    // Đây là trang landing (/chatbot/landingchatbot), không cần MainLayoutComponent và ChatSettingsProvider
-                    <>{children}</>
-                ) : (
-                    // Đây là các trang giao diện chat (/chatbot/regularchat, /chatbot/livechat, ...)
-                    <ChatSettingsProvider>
-                        <MainLayoutComponent>
+        <>
+            <AppWideInitializers />
+
+            {isLiveChatPage ? (
+                <LiveAPIProvider url={API_URI} apiKey={API_KEY}>
+                    <LiveChatSettingsProvider>
+                        <MainLayoutComponent isLiveChatContextActive={true}>
                             {children}
                         </MainLayoutComponent>
-                    </ChatSettingsProvider>
-                )}
-            </ChatSocketProvider>
-        </LiveAPIProvider>
+                    </LiveChatSettingsProvider>
+                </LiveAPIProvider>
+            ) : unlocalizedPathname === '/chatbot/landingchatbot' ? (
+                <>{children}</>
+            ) : (
+                <MainLayoutComponent isLiveChatContextActive={false}>
+                    {children}
+                </MainLayoutComponent>
+            )}
+        </>
     );
 }

@@ -1,254 +1,105 @@
 // src/app/[locale]/chatbot/LeftPanel.tsx
-import React from 'react' // <--- Đảm bảo React được import
-import { ChatMode, ConversationMetadata } from './lib/regular-chat.types'
+import React from 'react';
+import ConversationList from './regularchat/ConversationList';
 import {
-  X,
-  HomeIcon,
-  History as HistoryIcon,
-  Bot,
-  Radio,
-  AlignJustify
-} from 'lucide-react'
-import ConversationList from './sidepanel/ConversationList'
-import { useTranslations } from 'next-intl'
-import { Link, usePathname } from '@/src/navigation'
-import type { ComponentProps } from 'react'
+  useUiStore,
+  useConversationStore,
+} from './stores';
+import { useShallow } from 'zustand/react/shallow';
+// Import custom hook and child components
+import { useLeftPanelNavigation, NavItem } from '@/src/hooks/chatbot/useLeftPanelNavigation'; 
+import NavigationMenu from './NavigationMenu'; 
+import PanelToggleButton from './PanelToggleButton'; 
 
 interface LeftPanelProps {
-  isOpen: boolean
-  onToggleOpen: () => void
-  currentChatMode: ChatMode // Là chatMode từ useChatSettings
-  onChatModeChange: (mode: ChatMode) => void
-  isLiveConnected: boolean
-  conversationList: ConversationMetadata[]
-  activeConversationId: string | null
-  onSelectConversation: (conversationId: string) => void
-  onStartNewConversation: () => void
-  isLoadingConversations: boolean // <--- PROP QUAN TRỌNG
-  onDeleteConversation: (conversationId: string) => void
-  onClearConversation: (conversationId: string) => void
-  onRenameConversation: (conversationId: string, newTitle: string) => void
-  onPinConversation: (conversationId: string, isPinned: boolean) => void
-  currentView: 'chat' | 'history' // Được xác định từ pathname trong MainLayoutComponent
+  onSelectConversation: (conversationId: string) => void;
+  onStartNewConversation: () => void;
+  onDeleteConversation: (conversationId: string) => void;
+  currentView: 'chat' | 'history';
+  isLiveServiceConnected?: boolean;
+  deletingConversationId: string | null;
 }
-
-type AppHref = ComponentProps<typeof Link>['href']
-interface NavItemBase {
-  id: string
-  label: string
-  icon: React.ElementType
-  isActive: boolean
-  disabled?: boolean
-}
-interface NavLinkItem extends NavItemBase {
-  type: 'link'
-  href: AppHref
-}
-interface NavButtonItem extends NavItemBase {
-  type: 'button'
-  action: () => void
-}
-type NavItem = NavLinkItem | NavButtonItem
 
 const LeftPanel: React.FC<LeftPanelProps> = ({
-  isOpen,
-  onToggleOpen,
-  currentChatMode, // Đây chính là chatMode từ context
-  onChatModeChange,
-  isLiveConnected,
-  conversationList,
-  activeConversationId,
   onSelectConversation,
   onStartNewConversation,
-  isLoadingConversations, // <--- PROP QUAN TRỌNG
   onDeleteConversation,
-  onClearConversation,
-  onRenameConversation,
-  onPinConversation,
-  currentView
+  currentView,
+  isLiveServiceConnected,
+  deletingConversationId,
 }) => {
-  
-  const t = useTranslations()
-  const currentPathname = usePathname() // Unlocalized pathname
-  const disableChatModeSelection = isLiveConnected
+  // --- From UiStore ---
+  const { isLeftPanelOpen, toggleLeftPanel } = useUiStore(
+    useShallow(state => ({
+      isLeftPanelOpen: state.isLeftPanelOpen,
+      toggleLeftPanel: state.toggleLeftPanel,
+    }))
+  );
 
-  const navItems: NavItem[] = [
-    {
-      id: 'home',
-      label: t('Home'),
-      icon: HomeIcon,
-      href: '/',
-      isActive: currentPathname === '/', // Active khi ở trang chủ
-      type: 'link'
-    },
-    {
-      id: 'regularChat',
-      label: t('Regular_Chat'),
-      icon: Bot,
-      href: { pathname: '/chatbot/regularchat' },
-      isActive:
-        currentView === 'chat' &&
-        currentChatMode === 'regular' &&
-        currentPathname === '/chatbot/regularchat',
-      disabled: disableChatModeSelection,
-      type: 'link'
-    },
-    {
-      id: 'liveStream',
-      label: t('Live_Stream'),
-      icon: Radio,
-      href: { pathname: '/chatbot/livechat' },
-      isActive:
-        currentView === 'chat' &&
-        currentChatMode === 'live' &&
-        currentPathname === '/chatbot/livechat',
-      disabled: disableChatModeSelection,
-      type: 'link'
-    },
-    {
-      id: 'chatHistory',
-      label: t('Chat_History'),
-      icon: HistoryIcon,
-      href: { pathname: '/chatbot/history' },
-      isActive: currentView === 'history',
-      type: 'link'
-    }
-  ]
+  // --- From ConversationStore (for ConversationList) ---
+  const {
+    conversationList,
+    activeConversationId,
+    isLoadingHistory,
+    clearConversation,
+    renameConversation,
+    pinConversation,
+  } = useConversationStore(
+    useShallow(state => ({
+      conversationList: state.conversationList,
+      activeConversationId: state.activeConversationId,
+      isLoadingHistory: state.isLoadingHistory,
+      clearConversation: state.clearConversation,
+      renameConversation: state.renameConversation,
+      pinConversation: state.pinConversation,
+    }))
+  );
 
-  const iconOnlyButtonBaseClasses = 'h-12 w-12 justify-center p-2'
-  const commonButtonInteractiveClasses =
-    'rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500'
-  const expandedButtonBaseClasses = 'px-3 py-2.5 text-sm font-medium'
+  // --- Custom Hook for Navigation Logic ---
+  const { navItems } = useLeftPanelNavigation({
+    currentView,
+    isLiveServiceConnected,
+  });
 
   return (
     <div
       className={`bg-white-pure h-full flex-shrink-0 shadow-xl transition-all duration-300 ease-in-out  ${
-        isOpen ? 'w-72' : 'w-16'
+        isLeftPanelOpen ? 'w-72' : 'w-16'
       }`}
-      aria-hidden={!isOpen || undefined}
+      aria-hidden={!isLeftPanelOpen || undefined}
     >
       <div className='flex h-full w-full flex-col overflow-hidden'>
         <div
-          className={`flex flex-shrink-0 flex-col ${isOpen ? 'p-3' : 'space-y-1 p-2'}`}
+          className={`flex flex-shrink-0 flex-col ${isLeftPanelOpen ? 'p-3' : 'space-y-1 p-2'}`}
         >
-          <div
-            className={`${isOpen ? 'mb-3 flex items-center justify-between' : 'flex justify-center'}`}
-          >
-            <button
-              onClick={onToggleOpen}
-              className={`flex items-center
-                ${isOpen ? `${expandedButtonBaseClasses} ${commonButtonInteractiveClasses}` : `${iconOnlyButtonBaseClasses} ${commonButtonInteractiveClasses}`}
-                ${isOpen ? 'w-auto' : 'w-full'}
-              `}
-              title={isOpen ? t('Close_panel') : t('Open_panel')}
-              aria-label={isOpen ? t('Close_panel') : t('Open_panel')}
-              aria-expanded={isOpen}
-            >
-              {isOpen ? (
-                <>
-                  <span className='flex-grow text-lg font-semibold'>
-                    {/* Menu */}
-                  </span>
-                  <X size={20} className='ml-auto h-5 w-5' aria-hidden='true' />
-                </>
-              ) : (
-                <AlignJustify
-                  size={24}
-                  className='h-6 w-6'
-                  aria-hidden='true'
-                />
-              )}
-            </button>
-          </div>
-
-          <nav className={`${isOpen ? 'space-y-1' : 'space-y-1'}`}>
-            {navItems.map(item => {
-              const IconComponent = item.icon
-              const isActiveClasses = item.isActive
-                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                : commonButtonInteractiveClasses
-
-              const disabledClasses = item.disabled
-                ? 'cursor-not-allowed opacity-50'
-                : ''
-
-              const buttonLayoutClasses = isOpen
-                ? expandedButtonBaseClasses
-                : iconOnlyButtonBaseClasses
-
-              if (item.type === 'link') {
-                return (
-                  <Link
-                    key={item.id}
-                    href={item.href}
-                    className={`group flex w-full items-center ${buttonLayoutClasses} ${isActiveClasses} ${disabledClasses}`}
-                    title={isOpen ? undefined : item.label}
-                    aria-current={item.isActive ? 'page' : undefined}
-                    aria-disabled={item.disabled}
-                    onClick={e => {
-                      if (item.disabled) e.preventDefault()
-                    }}
-                    tabIndex={item.disabled ? -1 : undefined}
-                  >
-                    <IconComponent
-                      size={isOpen ? 20 : 24}
-                      className={`${isOpen ? 'mr-3' : ''} flex-shrink-0 ${item.isActive ? 'text-blue-600 dark:text-blue-400' : ' group-hover:text-gray-600  dark:group-hover:text-gray-300'}`}
-                      strokeWidth={1.75}
-                    />
-                    {isOpen && <span>{item.label}</span>}
-                  </Link>
-                )
-              }
-              return (
-                <button
-                  key={item.id}
-                  type='button'
-                  onClick={item.action}
-                  disabled={item.disabled}
-                  className={`group flex w-full items-center ${buttonLayoutClasses} ${isActiveClasses} ${disabledClasses}`}
-                  title={isOpen ? undefined : item.label}
-                  aria-pressed={item.isActive}
-                  aria-label={!isOpen ? item.label : undefined}
-                >
-                  <IconComponent
-                    size={isOpen ? 20 : 24}
-                    className={`${isOpen ? 'mr-3' : ''} flex-shrink-0 ${item.isActive ? 'text-blue-600 dark:text-blue-400' : ' group-hover:text-gray-600  dark:group-hover:text-gray-300'}`}
-                    strokeWidth={1.75}
-                  />
-                  {isOpen && <span>{item.label}</span>}
-                </button>
-              )
-            })}
-          </nav>
+          <PanelToggleButton
+            isPanelOpen={isLeftPanelOpen}
+            onTogglePanel={toggleLeftPanel}
+          />
+          <NavigationMenu navItems={navItems} isLeftPanelOpen={isLeftPanelOpen} />
         </div>
 
-        {isOpen && <div className='border-gray-20 mx-3 my-2 border-t '></div>}
+        {isLeftPanelOpen && <div className='border-gray-20 mx-3 my-2 border-t '></div>}
 
-        {/*
-          Điều kiện hiển thị ConversationList:
-          1. LeftPanel đang mở (isOpen)
-          2. View hiện tại là 'chat' (currentView === 'chat')
-          Nếu cả hai điều kiện này đúng, ConversationList sẽ được render.
-          Prop `isLoading` của ConversationList sẽ nhận giá trị của `isLoadingConversations`.
-        */}
-        {isOpen &&
+        {isLeftPanelOpen &&
           currentView === 'chat' && (
             <ConversationList
               conversationList={conversationList}
               activeConversationId={activeConversationId}
               onSelectConversation={onSelectConversation}
               onStartNewConversation={onStartNewConversation}
-              isLoading={isLoadingConversations} // <--- SPINNER TRONG ConversationList SẼ DÙNG PROP NÀY
+              isLoading={isLoadingHistory}
               onDeleteConversation={onDeleteConversation}
-              onClearConversation={onClearConversation}
-              onRenameConversation={onRenameConversation}
-              onPinConversation={onPinConversation}
+              onClearConversation={clearConversation}
+              onRenameConversation={renameConversation}
+              onPinConversation={pinConversation}
               currentView={currentView}
+              deletingConversationId={deletingConversationId}
             />
           )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LeftPanel
+export default LeftPanel;

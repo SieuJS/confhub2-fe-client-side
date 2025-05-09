@@ -68,12 +68,15 @@ export interface ResultUpdate {
     action?: FrontendAction; // Now includes NavigationAction or OpenMapAction
 }
 
+
 export interface ErrorUpdate {
-    type: 'error';
+    type: 'error' | 'warning'; // Có thể là 'error' hoặc 'warning'
     message: string;
-    step?: string; // The step where the error might have occurred
-    thought?: string; // Optional: keep if used elsewhere, or remove
-    thoughts?: ThoughtStep[]; // Add the thought process history leading to the error
+    step?: string;          // Bước trong quy trình server gây ra lỗi
+    code?: string;          // Mã lỗi cụ thể từ server (ví dụ: 'AUTH_REQUIRED', 'CONVERSATION_NOT_FOUND')
+    details?: any;          // Thông tin chi tiết thêm về lỗi (ví dụ: { conversationId: 'xyz' })
+    thoughts?: ThoughtStep[]; // Lịch sử "suy nghĩ" dẫn đến lỗi
+    // `thought?: string;` có thể được loại bỏ nếu `thoughts?: ThoughtStep[]` đã bao hàm ý nghĩa của nó
 }
 
 
@@ -150,23 +153,24 @@ export interface InitialHistoryPayload {
 export interface ConfirmationResultPayload {
     confirmationId: string; // The ID of the original confirmation request
     status:
-        | 'confirmed'      // User confirmed, action likely succeeded (e.g., email sent)
-        | 'cancelled'      // User cancelled the action
-        | 'timeout'        // The confirmation request timed out before user interaction
-        | 'not_found'      // The confirmation ID was not found (already processed or invalid)
-        | 'failed'         // User confirmed, but the action failed (e.g., email sending error)
-        | 'unauthorized'   // The user trying to confirm/cancel was not the original requester
-        | 'error';         // Generic error processing the confirmation/cancellation
+    | 'confirmed'      // User confirmed, action likely succeeded (e.g., email sent)
+    | 'cancelled'      // User cancelled the action
+    | 'timeout'        // The confirmation request timed out before user interaction
+    | 'not_found'      // The confirmation ID was not found (already processed or invalid)
+    | 'failed'         // User confirmed, but the action failed (e.g., email sending error)
+    | 'unauthorized'   // The user trying to confirm/cancel was not the original requester
+    | 'error';         // Generic error processing the confirmation/cancellation
     message: string;       // A user-friendly message describing the outcome
     details?: any;         // Optional: Additional details (e.g., error specifics if status is 'failed' or 'error')
 }
 
 
 
-export type Language = 'en' | 'vi' | 'zh';
 export type ChatMode = 'live' | 'regular';
+export type LanguageCode = 'en' | 'vi' | 'zh';
+
 export interface LanguageOption {
-    code: Language;
+    code: LanguageCode;
     name: string;
     flagCode: string;
 }
@@ -212,7 +216,7 @@ export interface SearchConversationsClientData {
 export interface ConversationMetadata { // Hoặc ClientConversationMetadata
     id: string;
     title: string;       // Sẽ là customTitle nếu có, nếu không là auto-generated
-    lastActivity: Date;  // Hoặc string nếu bạn parse ở client
+    lastActivity: string | Date;  // Hoặc string nếu bạn parse ở client
     isPinned: boolean;
     // customTitle?: string; // Tùy chọn: Client có thể muốn biết đây là custom title hay không
     // snippet?: string; // Cho kết quả tìm kiếm

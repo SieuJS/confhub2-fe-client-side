@@ -1,94 +1,115 @@
+// src/app/[locale]/chatbot/ConversationToolbar.tsx
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { Pencil, Pin, PinOff, Trash2, Eraser } from 'lucide-react' // Giữ lại icons cần thiết
-import { ConversationMetadata } from '../lib/regular-chat.types'
-import { useSharedChatSocket } from '../context/ChatSocketContext'
-import { useTranslations } from 'next-intl'
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Pencil, Pin, PinOff, Trash2, Eraser } from 'lucide-react';
+// --- IMPORT STORE MỚI HOẶC HOOKS TỪ STOREHOOKS ---
+import {
+    useActiveConversationState, // Cho activeConversationId
+    useConversationListState,   // Cho conversationList
+    useConversationActions      // Cho các actions
+} from '@/src/app/[locale]/chatbot/stores/storeHooks'; // Điều chỉnh path tới storeHooks.ts
+import { useTranslations } from 'next-intl';
+// useShallow không cần thiết ở đây vì các hook trong storeHooks đã sử dụng nó
 
-interface ConversationToolbarProps {
-  activeConversationId: string | null
-  conversationList: ConversationMetadata[] // Cần để lấy metadata của conv hiện tại
-}
+const ConversationToolbar: React.FC = () => {
+  const t = useTranslations();
 
-const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
-  activeConversationId,
-  conversationList
-}) => {
-  const t = useTranslations()
+  // --- Lấy state và actions từ các store đã tách ---
+  const { activeConversationId } = useActiveConversationState();
+  const { conversationList } = useConversationListState();
   const {
     renameConversation,
     pinConversation,
     clearConversation,
     deleteConversation,
-    // Không cần loadConversation và startNewConversation ở đây trực tiếp
-  } = useSharedChatSocket()
+  } = useConversationActions();
 
-  const [currentTitle, setCurrentTitle] = useState('')
-  const [isPinned, setIsPinned] = useState(false)
-  const [isEditingTitle, setIsEditingTitle] = useState(false)
-  const [newTitleInput, setNewTitleInput] = useState('')
-  // Không cần state showMoreMenu nữa
+  // --- State cục bộ cho UI của toolbar ---
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [newTitleInput, setNewTitleInput] = useState('');
 
-  const activeConversation = activeConversationId
-    ? conversationList.find(conv => conv.id === activeConversationId)
-    : null
+  // --- Tính toán activeConversation metadata ---
+  const activeConversation = useMemo(() => {
+    if (!activeConversationId) return null;
+    return conversationList.find(conv => conv.id === activeConversationId);
+  }, [activeConversationId, conversationList]);
 
+  const prevActiveConversationIdRef = useRef(activeConversationId);
+
+  // --- Đồng bộ state cục bộ với activeConversation từ store ---
   useEffect(() => {
     if (activeConversation) {
-      setCurrentTitle(activeConversation.title)
-      setIsPinned(activeConversation.isPinned)
-      setNewTitleInput(activeConversation.title) // Khởi tạo input với title hiện tại
+      if (!isEditingTitle) {
+        setNewTitleInput(activeConversation.title);
+      }
     } else {
-      setCurrentTitle(t('New_Chat')) // Hoặc một tiêu đề mặc định khác
-      setIsPinned(false)
+      setNewTitleInput(t('New_Chat'));
     }
-    setIsEditingTitle(false) // Reset editing state khi conversation thay đổi
-    // Không cần reset showMoreMenu
-  }, [activeConversation, t])
 
-  const handleRename = () => {
-    if (!activeConversationId || newTitleInput.trim() === '') return
-    renameConversation(activeConversationId, newTitleInput.trim())
-    setIsEditingTitle(false)
-    // Title sẽ được cập nhật qua event `onConversationRenamed` và `conversationList` prop
-  }
+    if (activeConversationId !== prevActiveConversationIdRef.current) {
+      setIsEditingTitle(false); // Reset editing khi conversation thay đổi
+    }
+    prevActiveConversationIdRef.current = activeConversationId;
+  }, [activeConversation, activeConversationId, isEditingTitle, t]);
 
-  const handleTogglePin = () => {
-    if (!activeConversationId) return
-    pinConversation(activeConversationId, !isPinned)
-    // isPinned sẽ được cập nhật qua event `onConversationPinStatusChanged`
-  }
 
-  const handleClear = () => {
-    if (!activeConversationId || !activeConversation) return
+  const handleRename = useCallback(() => {
+    if (!activeConversationId || !activeConversation || newTitleInput.trim() === '' || newTitleInput.trim() === activeConversation.title) {
+      setIsEditingTitle(false);
+      if (activeConversation) setNewTitleInput(activeConversation.title);
+      return;
+    }
+    renameConversation(activeConversationId, newTitleInput.trim());
+    setIsEditingTitle(false);
+  }, [activeConversationId, newTitleInput, renameConversation, activeConversation]);
+
+  const handleTogglePin = useCallback(() => {
+    if (!activeConversationId || !activeConversation) return;
+    pinConversation(activeConversationId, !activeConversation.isPinned);
+  }, [activeConversationId, activeConversation, pinConversation]);
+
+  const handleClear = useCallback(() => {
+    if (!activeConversationId || !activeConversation) return;
     if (
       window.confirm(
         t('Confirm_Clear_Conversation', { title: activeConversation.title })
       )
     ) {
-      clearConversation(activeConversationId)
-      // Việc cập nhật UI sau khi clear thường được xử lý bởi socket event
+      clearConversation(activeConversationId);
     }
-    // Không cần đóng menu
-  }
+  }, [activeConversationId, activeConversation, clearConversation, t]);
 
-  const handleDelete = () => {
-    if (!activeConversationId || !activeConversation) return
+  const handleDelete = useCallback(() => {
+    if (!activeConversationId || !activeConversation) return;
     if (
       window.confirm(
         t('Confirm_Delete_Conversation', { title: activeConversation.title })
       )
     ) {
-      deleteConversation(activeConversationId)
-      // Sau khi xóa, activeConversationId sẽ bị clear, UI sẽ tự động về trạng thái intro
+      // deleteConversation action từ conversationStore sẽ emit event.
+      // MainLayout sẽ theo dõi activeConversationId. Nếu nó bị set về null
+      // (do _onSocketConversationDeleted xử lý), MainLayout sẽ điều hướng.
+      deleteConversation(activeConversationId);
     }
-    // Không cần đóng menu
+  }, [activeConversationId, activeConversation, deleteConversation, t]);
+
+
+  if (!activeConversationId || !activeConversation) {
+    return (
+      <div className='bg-white-pure flex h-14 flex-shrink-0 items-center justify-between border-b border-gray-200 px-4 py-2 shadow-sm dark:border-gray-700 '>
+        <div className='flex min-w-0 items-center'>
+          <h2 className='truncate text-base font-semibold '>
+            {/* Tiêu đề mặc định khi không có active conversation có thể để trống hoặc hiển thị "Chat" */}
+            {/* {t('New_Chat')} */}
+          </h2>
+        </div>
+      </div>
+    );
   }
 
-  if (!activeConversationId) {
-    return null // Không hiển thị toolbar nếu không có conversation nào active
-  }
+  const currentTitle = activeConversation.title;
+  const isPinned = activeConversation.isPinned;
 
   return (
     <div className='bg-white-pure flex h-14 flex-shrink-0 items-center justify-between border-b border-gray-200 px-4 py-2 shadow-sm dark:border-gray-700 '>
@@ -98,8 +119,14 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
             type='text'
             value={newTitleInput}
             onChange={e => setNewTitleInput(e.target.value)}
-            onBlur={handleRename} // Lưu khi mất focus
-            onKeyDown={e => e.key === 'Enter' && handleRename()}
+            onBlur={handleRename}
+            onKeyDown={e => {
+              if (e.key === 'Enter') handleRename();
+              if (e.key === 'Escape') {
+                setIsEditingTitle(false);
+                setNewTitleInput(currentTitle);
+              }
+            }}
             className='mr-2 rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
             autoFocus
           />
@@ -107,6 +134,10 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
           <h2
             className='truncate text-base font-semibold '
             title={currentTitle}
+            onDoubleClick={() => {
+                setNewTitleInput(currentTitle); // Đảm bảo input được khởi tạo đúng trước khi edit
+                setIsEditingTitle(true);
+            }}
           >
             {currentTitle}
           </h2>
@@ -114,30 +145,32 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
       </div>
 
       <div className='flex items-center space-x-2'>
-        {/* Rename Button */}
         <button
-          onClick={() => setIsEditingTitle(true)}
-          disabled={isEditingTitle}
+          onClick={() => {
+            if (isEditingTitle) {
+              handleRename();
+            } else {
+              setNewTitleInput(currentTitle);
+              setIsEditingTitle(true);
+            }
+          }}
           className='rounded-md p-1.5  hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500  dark:hover:bg-gray-700 dark:hover:text-gray-200'
-          title={t('Rename_Conversation')}
+          title={isEditingTitle ? t('Save_Title') : t('Rename_Conversation')}
         >
           <Pencil size={18} />
         </button>
 
-        {/* Pin/Unpin Button */}
         <button
           onClick={handleTogglePin}
-          className={`rounded-md p-1.5 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:bg-gray-700 ${
-            isPinned
-              ? 'text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
-              : '  dark:hover:text-gray-200'
-          }`}
+          className={`rounded-md p-1.5 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:bg-gray-700 ${isPinned
+            ? 'text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
+            : '  dark:hover:text-gray-200'
+            }`}
           title={isPinned ? t('Unpin_Conversation') : t('Pin_Conversation')}
         >
           {isPinned ? <PinOff size={18} /> : <Pin size={18} />}
         </button>
 
-        {/* Clear Button (Di chuyển ra ngoài menu) */}
         <button
           onClick={handleClear}
           className='rounded-md p-1.5  hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500  dark:hover:bg-gray-700 dark:hover:text-gray-200'
@@ -146,7 +179,6 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
           <Eraser size={18} />
         </button>
 
-        {/* Delete Button (Di chuyển ra ngoài menu) */}
         <button
           onClick={handleDelete}
           className='rounded-md p-1.5 text-red-600 hover:bg-red-50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 dark:text-red-400 dark:hover:bg-red-700 dark:hover:text-red-300'
@@ -154,10 +186,9 @@ const ConversationToolbar: React.FC<ConversationToolbarProps> = ({
         >
           <Trash2 size={18} />
         </button>
-
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ConversationToolbar
+export default ConversationToolbar;

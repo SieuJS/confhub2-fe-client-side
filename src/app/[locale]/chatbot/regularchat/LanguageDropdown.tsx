@@ -1,62 +1,66 @@
 // src/components/layout/sidepanel/LanguageDropdown.tsx
-import React, { useState, useRef, useEffect } from 'react'
-import Image from 'next/image'
+import React, { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import {
-  Language,
-  LanguageOption
-} from '@/src/app/[locale]/chatbot/lib/live-chat.types'
-import { ChevronDown } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+  LanguageOption, //
+} from '@/src/app/[locale]/chatbot/lib/live-chat.types'; 
+import { ChevronDown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface LanguageDropdownProps {
-  currentLanguage: Language
-  availableLanguages: LanguageOption[]
-  onLanguageChange: (lang: Language) => void
-  disabled: boolean
+  currentLanguage: LanguageOption; // <--- THAY ĐỔI: Giờ là LanguageOption
+  availableLanguages: LanguageOption[];
+  onLanguageChange: (lang: LanguageOption) => void; // <--- THAY ĐỔI: Giờ nhận LanguageOption
+  disabled: boolean;
 }
 
-const getFlagUrl = (flagCode: string) => `/country_flags/${flagCode}.svg`
+const getFlagUrl = (flagCode: string) => `/country_flags/${flagCode}.svg`;
 
 const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
-  currentLanguage,
+  currentLanguage, // currentLanguage giờ là object LanguageOption
   availableLanguages,
   onLanguageChange,
   disabled
 }) => {
-  const t = useTranslations()
+  const t = useTranslations();
 
-  const [isOpen, setIsOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const selectedLanguage = availableLanguages.find(
-    lang => lang.code === currentLanguage
-  )
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleSelect = (langCode: Language) => {
-    onLanguageChange(langCode)
-    setIsOpen(false)
-  }
+  // selectedLanguage giờ chính là currentLanguage (vì nó đã là object)
+  // const selectedLanguage = availableLanguages.find(
+  //   lang => lang.code === currentLanguage.code // So sánh code nếu currentLanguage là object
+  // );
+  // Hoặc đơn giản là:
+  const selectedLanguage = currentLanguage;
 
-  // Click outside handler
+
+  const handleSelect = (langOption: LanguageOption) => { // <--- THAY ĐỔI: Nhận LanguageOption
+    onLanguageChange(langOption); // <--- THAY ĐỔI: Truyền LanguageOption
+    setIsOpen(false);
+  };
+
+  // Click outside handler (giữ nguyên)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
-    }
+    };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('mousedown', handleClickOutside);
     } else {
-      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isOpen])
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   return (
     <div className='mb-6'>
@@ -77,7 +81,7 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
           aria-labelledby='language-select-label'
         >
           <span className='flex items-center'>
-            {selectedLanguage ? (
+            {selectedLanguage ? ( // selectedLanguage giờ là currentLanguage
               <>
                 <Image
                   src={getFlagUrl(selectedLanguage.flagCode)}
@@ -90,6 +94,7 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
                 <span className='block truncate '>{selectedLanguage.name}</span>
               </>
             ) : (
+              // Trường hợp này ít xảy ra nếu currentLanguage luôn có giá trị mặc định
               <span className='block truncate '>{t('Select_language')}</span>
             )}
           </span>
@@ -107,33 +112,33 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
             aria-labelledby='language-select-label'
             className='absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-900 sm:text-sm'
           >
-            {availableLanguages.map(lang => (
+            {availableLanguages.map(langOption => ( // Đổi tên biến thành langOption cho rõ
               <button
-                key={lang.code}
+                key={langOption.code}
                 type='button'
                 role='option'
-                aria-selected={currentLanguage === lang.code}
-                onClick={() => handleSelect(lang.code)}
-                disabled={disabled} // Keep disabled state consistent
+                aria-selected={currentLanguage.code === langOption.code} // So sánh code
+                onClick={() => handleSelect(langOption)} // <--- THAY ĐỔI: Truyền cả object langOption
+                disabled={disabled}
                 className={`relative w-full cursor-default select-none py-2 pl-3 pr-9 text-left hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700 ${
-                  currentLanguage === lang.code
+                  currentLanguage.code === langOption.code // So sánh code
                     ? 'bg-blue-50 font-semibold text-blue-700 dark:bg-gray-800'
                     : ''
                 }`}
               >
                 <div className='flex items-center'>
                   <Image
-                    src={getFlagUrl(lang.flagCode)}
-                    alt={`${lang.name} flag`}
+                    src={getFlagUrl(langOption.flagCode)}
+                    alt={`${langOption.name} flag`}
                     width={20}
                     height={15}
                     className='mr-2 h-auto w-[20px] flex-shrink-0 rounded-sm'
                     loading='lazy'
                   />
                   <span
-                    className={`block truncate ${currentLanguage === lang.code ? 'font-semibold' : 'font-normal'}`}
+                    className={`block truncate ${currentLanguage.code === langOption.code ? 'font-semibold' : 'font-normal'}`}
                   >
-                    {lang.name}
+                    {langOption.name}
                   </span>
                 </div>
               </button>
@@ -142,7 +147,7 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LanguageDropdown
+export default LanguageDropdown;
