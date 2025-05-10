@@ -1,31 +1,40 @@
 // components/conferences/EventCard.tsx
 import React, { useState, useCallback } from 'react'
 import Image from 'next/image'
-import { ConferenceInfo } from '../../../models/response/conference.list.response' // Type for event prop
-import { ConferenceResponse } from '@/src/models/response/conference.response' // Type potentially needed by hooks
-import { Link } from '@/src/navigation' // Assuming next-intl/link setup
+import { ConferenceInfo } from '../../../models/response/conference.list.response'
+import { ConferenceResponse } from '@/src/models/response/conference.response'
+import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
-import { useRouter } from '@/src/navigation' // Assuming next-intl/navigation setup
-import useAuthApi from '@/src/hooks/auth/useAuthApi' // Hook to check login status
+import { useRouter } from '@/src/navigation'
+import useAuthApi from '@/src/hooks/auth/useAuthApi'
 
-// Import the provided hooks for Follow and Calendar actions
-import useFollowConference from '@/src/hooks/conferenceDetails/useFollowConference' // Adjust path if needed
-import useAddToCalendar from '@/src/hooks/conferenceDetails/useAddToCalendar' // Adjust path if needed
+import useFollowConference from '@/src/hooks/conferenceDetails/useFollowConference'
+import useAddToCalendar from '@/src/hooks/conferenceDetails/useAddToCalendar'
 
 interface EventCardProps {
-  event: ConferenceInfo // The data for this specific event card
+  event: ConferenceInfo
   className?: string
   style?: React.CSSProperties
+  userBlacklist: string[] // Add userBlacklist prop
 }
 
-const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
-  const t = useTranslations('') // For internationalization
-  const router = useRouter() // For navigation (e.g., redirecting to login)
-  const { isLoggedIn } = useAuthApi() // Get user login status
+const EventCard: React.FC<EventCardProps> = ({
+  event,
+  className,
+  userBlacklist // Destructure the prop
+}) => {
+  const t = useTranslations('')
+  const router = useRouter()
+  const { isLoggedIn } = useAuthApi()
+
+  // Check if the current event ID is in the blacklist
+  const isBlacklisted = userBlacklist?.includes(event.id) ?? false // Safe check for userBlacklist
 
   // --- Prepare data for hooks ---
   // Hooks expect ConferenceResponse | null. We adapt the ConferenceInfo.
   // Casting is simpler if the structure is compatible enough (primarily needs 'id').
+  // Only pass conference data to hooks if it's not blacklisted? Or let hooks handle it?
+  // Let's pass it regardless, but actions will be disabled by isBlacklisted check later.
   const conferenceDataForHook = event as unknown as ConferenceResponse | null
 
   // --- Instantiate hooks for this card ---
@@ -54,10 +63,8 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
   const checkLoginAndRedirect = useCallback(
     (callback: () => void) => {
       if (!isLoggedIn) {
-        // Redirect to login page if not logged in
-        router.push(`/auth/login`) // Adjust path as needed
+        router.push(`/auth/login`)
       } else {
-        // Execute the callback action if logged in
         callback()
       }
     },
@@ -69,14 +76,13 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
     if (!date) return 'TBD'
     try {
       return date.toLocaleDateString('en-US', {
-        // Use a specific locale for consistency
         year: 'numeric',
         month: 'short',
         day: 'numeric'
       })
     } catch (e) {
       console.error('Error formatting date:', date, e)
-      return 'Invalid Date' // Handle potential errors
+      return 'Invalid Date'
     }
   }, [])
 
@@ -87,7 +93,6 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
       try {
         const startDate = new Date(fromDate)
         const endDate = new Date(toDate)
-        // Basic validation
         if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
           return 'Invalid Date Range'
         }
@@ -100,15 +105,14 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
         return 'Invalid Date Range'
       }
     },
-    [formatDate] // Dependency
+    [formatDate]
   )
 
   // Location string generation
   const locationString =
     [event.location?.cityStateProvince, event.location?.country]
-      .filter(Boolean) // Remove null/undefined parts
-      .join(', ') || // Join with comma and space
-    'Location Not Available'
+      .filter(Boolean)
+      .join(', ') || 'Location Not Available'
 
   // Dynamic styling for Rank badge
   const getRankColor = useCallback((rank?: string) => {
@@ -129,7 +133,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
 
   // Dynamic styling for Access Type badge
   const getAccessTypeColor = useCallback((accessType?: string) => {
-    accessType = accessType?.toUpperCase() // Normalize
+    accessType = accessType?.toUpperCase()
     switch (accessType) {
       case 'ONLINE':
         return 'bg-green-100 text-green-700 border border-green-300'
@@ -147,61 +151,85 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
   // Handles clicking the Favorite (Follow) button
   const handleFavoriteClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation() // Prevent card click when clicking button
-      checkLoginAndRedirect(triggerFollowAction) // Check login, then call hook's action
-      setShowFavoriteTooltip(false) // Hide tooltip immediately
+      e.stopPropagation()
+      // Only perform action if not blacklisted
+      if (!isBlacklisted) {
+        checkLoginAndRedirect(triggerFollowAction)
+      }
+      setShowFavoriteTooltip(false)
     },
-    [checkLoginAndRedirect, triggerFollowAction] // Dependencies
+    [checkLoginAndRedirect, triggerFollowAction, isBlacklisted]
   )
 
   // Handles clicking the Add to Calendar button
   const handleAddCalendarClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation() // Prevent card click
-      checkLoginAndRedirect(triggerCalendarAction) // Check login, then call hook's action
-      setShowAddCalendarTooltip(false) // Hide tooltip immediately
+      e.stopPropagation()
+      // Only perform action if not blacklisted
+      if (!isBlacklisted) {
+        checkLoginAndRedirect(triggerCalendarAction)
+      }
+      setShowAddCalendarTooltip(false)
     },
-    [checkLoginAndRedirect, triggerCalendarAction] // Dependencies
+    [checkLoginAndRedirect, triggerCalendarAction, isBlacklisted]
   )
 
   // Handles clicking the Go to Website button
   const handleGoToWebsite = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>, url: string) => {
-      e.preventDefault() // Prevent potential default link behavior
-      e.stopPropagation() // Prevent card click
-      if (url) {
-        window.open(url, '_blank', 'noopener noreferrer') // Open in new tab securely
-      } else {
+      e.preventDefault()
+      e.stopPropagation()
+      // Only perform action if not blacklisted
+      if (!isBlacklisted && url) {
+        window.open(url, '_blank', 'noopener noreferrer')
+      } else if (!url) {
         console.warn('No URL provided for Go to Website')
-        // Optionally show a message to the user
       }
-      setShowWebsiteTooltip(false) // Hide tooltip
+      setShowWebsiteTooltip(false)
     },
-    [] // No dependencies needed
+    [isBlacklisted]
   )
 
   // Combine loading states from both hooks
   const isLoading = followLoading || calendarLoading
 
+  // Add styles for blacklisted state
+  const blacklistedStyles = isBlacklisted
+    ? 'opacity-50 grayscale pointer-events-none cursor-default' // Make it opaque, grayscale, and non-interactive
+    : ''
+
   // --- Render ---
   return (
+    // Apply blacklisted styles to the main container
     <div
-      className={`bg-white-pure flex flex-col overflow-hidden rounded-lg shadow-lg transition duration-300 ease-in-out hover:shadow-xl  ${className}`}
+      className={`flex flex-col overflow-hidden rounded-lg bg-white-pure shadow-lg transition duration-300 ease-in-out ${isBlacklisted ? '' : 'hover:shadow-xl'} ${className} ${blacklistedStyles}`}
+      style={{ position: 'relative' }} // Added for absolute positioning of the badge
     >
+      {/* Blacklisted Badge */}
+      {isBlacklisted && (
+        // Position the badge absolutely
+        <div className='pointer-events-auto absolute left-2 top-2 z-10 rounded bg-red-600 px-2 py-1 text-xs font-semibold text-white'>
+          {' '}
+          {/* Use pointer-events-auto to make the badge itself potentially interactive if needed, though here it's just text */}
+          {t('Blacklisted')}{' '}
+          {/* Assuming you have a translation key for 'Blacklisted' */}
+        </div>
+      )}
+
       {/* Image Section with Badges */}
-      <div className='relative hover:opacity-90'>
+      {/* Note: The image itself and badges should still display */}
+      <div className='relative'>
         <Image
-          // Use a placeholder or actual image source
-          src={'/bg-2.jpg'} // Example: Use logoUrl if available, fallback to default
-          alt={event.title || 'Conference Image'} // Provide meaningful alt text
+          src={'/bg-2.jpg'}
+          alt={event.title || 'Conference Image'}
           width={400}
-          height={225} // Adjust aspect ratio as needed
-          style={{ objectFit: 'cover', width: '100%', height: '180px' }} // Ensure consistent height
-          className='w-full'
-          priority // Consider adding priority for above-the-fold images
+          height={225}
+          style={{ objectFit: 'cover', width: '100%', height: '180px' }}
+          className={`w-full ${isBlacklisted ? '' : 'hover:opacity-90'}`} // Don't apply hover opacity if blacklisted
+          priority
           onError={e => {
             e.currentTarget.src = '/bg-2.jpg'
-          }} // Fallback image on error
+          }}
         />
         {/* Rank Badge */}
         <div className='absolute right-2 top-0'>
@@ -214,11 +242,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
         {/* Access Type Badge */}
         {event.accessType && (
           <div className='absolute right-2 top-9'>
-            {' '}
-            {/* Adjusted positioning */}
             <span
               className={`rounded px-2 py-1 text-xs font-semibold ${getAccessTypeColor(event.accessType)}`}
-              title={`Access Type: ${event.accessType}`} // Tooltip for access type
+              title={`Access Type: ${event.accessType}`}
             >
               {event.accessType}
             </span>
@@ -228,20 +254,26 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
 
       {/* Content Section */}
       <div className='flex flex-grow flex-col px-4 py-4'>
-        {' '}
-        {/* Increased padding slightly */}
         {/* Title and Acronym */}
         <div className='mb-2'>
-          <Link
-            href={{ pathname: `/conferences/detail`, query: { id: event.id } }}
-            className='group' // Group for hover effects if needed
-          >
-            <h3 className='cursor-pointer text-left text-base font-bold  transition duration-300 group-hover:text-blue-600'>
-              {' '}
-              {/* Adjusted size, added line-clamp */}
+          {/* Conditionally render Link or just text based on blacklisted status */}
+          {isBlacklisted ? (
+            <h3 className='text-left text-base font-bold opacity-50'>
               {event.title} {event.acronym ? `(${event.acronym})` : ''}
             </h3>
-          </Link>
+          ) : (
+            <Link
+              href={{
+                pathname: `/conferences/detail`,
+                query: { id: event.id }
+              }}
+              className='group'
+            >
+              <h3 className='cursor-pointer text-left text-base font-bold  transition duration-300 group-hover:text-blue-600'>
+                {event.title} {event.acronym ? `(${event.acronym})` : ''}
+              </h3>
+            </Link>
+          )}
         </div>
         {/* Location */}
         <div className='mb-3 flex items-center text-xs  transition duration-300 '>
@@ -257,13 +289,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
             strokeLinejoin='round'
             className='lucide lucide-map-pin mr-1.5 flex-shrink-0 text-red-600'
           >
-            {' '}
-            {/* Adjusted size/margin/color */}
             <path d='M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0' />
             <circle cx='12' cy='10' r='3' />
           </svg>
-          <span className='line-clamp-1 text-left'>{locationString}</span>{' '}
-          {/* Added line-clamp */}
+          <span className='line-clamp-1 text-left'>{locationString}</span>
         </div>
         {/* Date */}
         <div className='mb-3 flex items-center text-xs  transition duration-300 '>
@@ -279,8 +308,6 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
             strokeLinejoin='round'
             className='lucide lucide-calendar-days mr-1.5 flex-shrink-0 text-red-600'
           >
-            {' '}
-            {/* Adjusted size/margin/color */}
             <path d='M8 2v4' />
             <path d='M16 2v4' />
             <rect width='18' height='18' x='3' y='4' rx='2' />
@@ -298,33 +325,40 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
         </div>
         {/* Topics */}
         <div className='mb-4'>
-          {' '}
-          {/* Increased margin */}
           <div className='flex flex-wrap gap-1.5'>
-            {' '}
-            {/* Adjusted gap */}
             {event.topics && event.topics.length > 0 ? (
               <>
-                {event.topics.slice(0, 3).map(topic => (
-                  <Link
-                    key={topic}
-                    href={{
-                      pathname: `/conferences`,
-                      query: { topics: topic }
-                    }}
-                  >
+                {event.topics.slice(0, 3).map(topic =>
+                  // Optionally make topic links non-interactive if blacklisted
+                  isBlacklisted ? (
                     <span
-                      className='bg-gray-10 hover:bg-gray-20 inline-block max-w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium  transition duration-200 ' /* Adjusted padding */
-                      title={topic} // Add tooltip for full topic name
+                      key={topic}
+                      className='inline-block max-w-full cursor-default overflow-hidden text-ellipsis whitespace-nowrap rounded-full bg-gray-10 px-2.5 py-1 text-xs font-medium opacity-50' // Styled as non-interactive
+                      title={topic}
                     >
                       {topic}
                     </span>
-                  </Link>
-                ))}
+                  ) : (
+                    <Link
+                      key={topic}
+                      href={{
+                        pathname: `/conferences`,
+                        query: { topics: topic }
+                      }}
+                    >
+                      <span
+                        className='inline-block max-w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap rounded-full bg-gray-10 px-2.5 py-1 text-xs font-medium transition  duration-200 hover:bg-gray-20 '
+                        title={topic}
+                      >
+                        {topic}
+                      </span>
+                    </Link>
+                  )
+                )}
                 {event.topics.length > 3 && (
                   <span
                     key='more-topics'
-                    className='bg-gray-10 inline-block max-w-full cursor-default overflow-hidden text-ellipsis whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium '
+                    className='inline-block max-w-full cursor-default overflow-hidden text-ellipsis whitespace-nowrap rounded-full bg-gray-10 px-2.5 py-1 text-xs font-medium '
                     title={`${event.topics.length - 3} more topics`}
                   >
                     +{event.topics.length - 3} {t('more')}
@@ -337,9 +371,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
           </div>
         </div>
         {/* Action Buttons */}
-        <div className='border-gray-10 mt-auto flex items-center justify-end border-t pt-2 '>
-          {' '}
-          {/* Added border top */}
+        <div className='mt-auto flex items-center justify-end border-t border-gray-10 pt-2 '>
           <div className='flex space-x-2'>
             {/* Go to Website Button */}
             <div className='relative'>
@@ -347,8 +379,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
                 onClick={e => handleGoToWebsite(e, event.link || '')}
                 onMouseEnter={() => setShowWebsiteTooltip(true)}
                 onMouseLeave={() => setShowWebsiteTooltip(false)}
-                className='bg-gray-10 hover:bg-gray-20 hover:text-gray-80 flex h-9 w-9 items-center justify-center rounded-full p-2  transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:opacity-50 '
-                disabled={!event.link} // Disable if no link
+                // Disable button if blacklisted or no link
+                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-10 p-2 transition hover:bg-gray-20  hover:text-gray-80 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${isBlacklisted || !event.link ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''}`}
+                disabled={isBlacklisted || !event.link}
                 title={t('Go_to_Website')}
               >
                 <svg
@@ -376,20 +409,19 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
                 onClick={handleAddCalendarClick}
                 onMouseEnter={() => setShowAddCalendarTooltip(true)}
                 onMouseLeave={() => setShowAddCalendarTooltip(false)}
-                className={`bg-gray-10 hover:bg-gray-20 flex h-9 w-9 items-center justify-center rounded-full p-2 transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50  ${
+                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-10 p-2 transition hover:bg-gray-20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${isBlacklisted || isLoading ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''}  ${
                   isAddToCalendar
                     ? 'text-blue-600 hover:text-blue-700'
                     : ' hover:text-gray-80'
                 }`}
-                style={{ minWidth: '36px', minHeight: '36px' }} // Ensure minimum size
-                disabled={isLoading} // Disable during loading
+                style={{ minWidth: '36px', minHeight: '36px' }}
+                disabled={isBlacklisted || isLoading} // Disable if blacklisted or loading
                 title={
                   isAddToCalendar
                     ? t('Remove_from_Calendar')
                     : t('Add_to_Calendar')
                 }
               >
-                {/* Conditionally render spinner or icon */}
                 {calendarLoading ? (
                   <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent'></div>
                 ) : (
@@ -405,8 +437,6 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
                     strokeLinejoin='round'
                     className='lucide lucide-calendar-plus'
                   >
-                    {' '}
-                    {/* Changed Icon slightly */}
                     <path d='M8 2v4' />
                     <path d='M16 2v4' />
                     <path d='M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8' />
@@ -424,21 +454,19 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
                 onClick={handleFavoriteClick}
                 onMouseEnter={() => setShowFavoriteTooltip(true)}
                 onMouseLeave={() => setShowFavoriteTooltip(false)}
-                className={`bg-gray-10 hover:bg-gray-20 flex h-9 w-9 items-center justify-center rounded-full p-2 transition focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50  ${
-                  // Changed focus ring color
+                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-10 p-2 transition hover:bg-gray-20 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1 ${isBlacklisted || isLoading ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''}  ${
                   isFollowing
                     ? 'text-yellow-500 hover:text-yellow-600'
                     : ' hover:text-gray-80'
                 }`}
-                style={{ minWidth: '36px', minHeight: '36px' }} // Ensure minimum size
-                disabled={isLoading} // Disable during loading
+                style={{ minWidth: '36px', minHeight: '36px' }}
+                disabled={isBlacklisted || isLoading} // Disable if blacklisted or loading
                 title={
                   isFollowing
                     ? t('Remove_from_Favorites')
                     : t('Add_to_Favorites')
                 }
               >
-                {/* Conditionally render spinner or icon */}
                 {followLoading ? (
                   <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent'></div>
                 ) : (
@@ -447,9 +475,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, className }) => {
                     width='20'
                     height='20'
                     viewBox='0 0 24 24'
-                    fill={
-                      isFollowing ? 'currentColor' : 'none'
-                    } /* Fill when favorited */
+                    fill={isFollowing ? 'currentColor' : 'none'}
                     stroke='currentColor'
                     strokeWidth='1.5'
                     strokeLinecap='round'

@@ -1000,5 +1000,6 @@
   "Something_went_wrong": "Something went wrong",
   "Journal_not_found": "Journal not found",
   "Moderation": "Moderation",
-  "Request_Admin_Tab": "Request Admin Tab"
+  "Request_Admin_Tab": "Request Admin Tab",
+  "Status": "Status"
 }
