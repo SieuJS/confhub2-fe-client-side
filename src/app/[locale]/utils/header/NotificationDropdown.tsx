@@ -104,10 +104,10 @@ const NotificationDropdown: FC<Props> = ({
           // onClick={closeAllMenus}
         >
           <div
-            className={`flex items-start border-b border-gray-200 p-4 hover:bg-gray-50 ${notification.seenAt ? '' : 'bg-blue-50'}`}
+            className={`flex items-start border-b border-gray-20 p-4 hover:bg-gray-5 ${notification.seenAt ? '' : 'bg-gray-10'}`}
           >
             <div className='mr-3 flex-shrink-0'>
-              <div className='relative flex h-10 w-10 items-center justify-center rounded-full bg-gray-200'>
+              <div className='relative flex h-10 w-10 items-center justify-center rounded-full bg-gray-20'>
                 <span className='font-medium '>
                   {notification.type
                     ? notification.type.charAt(0).toUpperCase()
@@ -134,12 +134,12 @@ const NotificationDropdown: FC<Props> = ({
                   ),
                   pre: ({ node, ...props }) => (
                     <pre
-                      className='overflow-x-auto rounded-md bg-gray-100 p-2'
+                      className='overflow-x-auto rounded-md bg-gray-10 p-2'
                       {...props}
                     />
                   ),
                   code: ({ node, ...props }) => (
-                    <code className='rounded bg-gray-100 px-1' {...props} />
+                    <code className='rounded bg-gray-10 px-1' {...props} />
                   ),
                   h1: ({ node, ...props }) => (
                     <h1 className='text-base font-bold' {...props} />
@@ -172,7 +172,7 @@ const NotificationDropdown: FC<Props> = ({
               >
                 {sanitizedMessage}
               </ReactMarkdown>
-              <span className='text-xs text-gray-500'>
+              <span className='text-xs '>
                 {timeAgo(notification.createdAt, language)}
               </span>
             </div>
@@ -196,7 +196,7 @@ const NotificationDropdown: FC<Props> = ({
   // JSX Render gốc, chỉ thay đổi việc sử dụng `sortedNotifications` để kiểm tra length
   return (
     <div
-      className={`absolute right-0 z-50 mr-8 mt-10 w-80 overflow-hidden rounded-lg bg-white shadow-xl transition-all duration-300 ease-in-out md:w-[400px] ${
+      className={`absolute right-0 z-50 mr-8 mt-10 w-80 overflow-hidden rounded-lg bg-white-pure shadow-xl transition-all duration-300 ease-in-out md:w-[400px] ${
         // Giữ nguyên style gốc
         isNotificationOpen
           ? 'visible translate-y-0 opacity-100'
@@ -207,7 +207,7 @@ const NotificationDropdown: FC<Props> = ({
       }}
       onClick={e => e.stopPropagation()}
     >
-      <div className='border-b border-gray-200 p-4'>
+      <div className='border-b border-gray-20 p-4'>
         <div className='flex items-center justify-between'>
           <h6 className='text-sm font-semibold md:text-lg'>
             {t('Notifications')}
@@ -223,12 +223,12 @@ const NotificationDropdown: FC<Props> = ({
 
       <div className='overflow-y-auto' style={{ maxHeight: '25rem' }}>
         {isLoadingNotifications ? (
-          <div className='p-4 text-center text-gray-500'>{t('Loading')}</div>
+          <div className='p-4 text-center text-gray-50'>{t('Loading')}</div>
         ) : sortedNotifications.length > 0 ? ( // --- BƯỚC 3: KIỂM TRA LENGTH CỦA MẢNG ĐÃ SẮP XẾP ---
           <>
             {newNotifications.length > 0 && (
               <>
-                <div className='border-b border-gray-200 px-4 py-2 text-sm font-semibold '>
+                <div className='border-b border-gray-20 px-4 py-2 text-sm font-semibold '>
                   {t('NEW')}
                 </div>
                 {newNotifications.map(renderNotificationItem)}
@@ -236,7 +236,7 @@ const NotificationDropdown: FC<Props> = ({
             )}
             {earlierNotifications.length > 0 && (
               <>
-                <div className='border-b border-gray-200 px-4 py-2 text-sm font-semibold '>
+                <div className='border-b border-gray-20 px-4 py-2 text-sm font-semibold '>
                   {t('EARLIER')}
                 </div>
                 {earlierNotifications.map(renderNotificationItem)}
@@ -244,13 +244,11 @@ const NotificationDropdown: FC<Props> = ({
             )}
           </>
         ) : (
-          <div className='p-4 text-center text-gray-500'>
-            {t('No_new_notifications')}
-          </div>
+          <div className='p-4 text-center '>{t('No_new_notifications')}</div>
         )}
       </div>
 
-      <div className='border-t border-gray-200 p-4 text-center'>
+      <div className='border-t border-gray-20 p-4 text-center'>
         <Link
           href={{ pathname: `/dashboard`, query: { tab: 'notifications' } }}
           lang={locale}

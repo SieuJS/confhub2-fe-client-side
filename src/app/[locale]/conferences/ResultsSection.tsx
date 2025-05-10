@@ -7,9 +7,13 @@ import { useTranslations } from 'next-intl'
 
 import Pagination from '../utils/Pagination'
 
-interface ResultsSectionProps {}
+// Thêm prop userBlacklist
+interface ResultsSectionProps {
+  userBlacklist: string[] // Assume this prop is passed from a parent component
+}
 
-const ResultsSection: React.FC<ResultsSectionProps> = () => {
+// Nhận userBlacklist từ props
+const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
   const t = useTranslations('')
 
   const {
@@ -42,7 +46,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
   }
 
   return (
-    <div className='bg-white-pure w-full rounded-lg p-4 shadow '>
+    <div className='w-full rounded-lg bg-white-pure p-4 shadow '>
       <div className='mb-4 flex flex-col items-center justify-between sm:flex-row'>
         <h2 className='mb-2 text-xl font-semibold sm:mb-0'>
           {t('Conference_Results')} ({totalItems})
@@ -56,7 +60,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
             </label>
             <select
               id='sort-by'
-              className='bg-gray-5 rounded border px-2 py-1 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 '
+              className='rounded border bg-gray-5 px-2 py-1 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 '
               value={sortBy}
               onChange={handleSortByChange}
               title='Select field to sort by'
@@ -73,7 +77,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
             </label>
             <select
               id='event-per-page'
-              className='bg-gray-5 rounded border px-2 py-1 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 '
+              className='rounded border bg-gray-5 px-2 py-1 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 '
               value={eventsPerPage}
               onChange={handleEventPerPageChange}
               title='Select number of event per page'
@@ -87,7 +91,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
 
             <button
               onClick={handleSortOrderChange}
-              className='bg-gray-20 hover:bg-gray-30 rounded px-1 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500  '
+              className='rounded bg-gray-20 px-1 py-1 text-sm hover:bg-gray-30 focus:outline-none focus:ring-2 focus:ring-blue-500  '
               title={sortOrder === 'asc' ? 'Sort Ascending' : 'Sort Descending'}
             >
               {sortOrder === 'asc' ? (
@@ -137,7 +141,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
             onClick={() =>
               setViewType(prev => (prev === 'card' ? 'table' : 'card'))
             }
-            className='bg-gray-20 hover:bg-gray-30 rounded px-1 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 '
+            className='rounded bg-gray-20 px-1 py-1 text-sm hover:bg-gray-30 focus:outline-none focus:ring-2 focus:ring-blue-500 '
             title={
               viewType === 'card'
                 ? 'Switch to Table View'
@@ -187,7 +191,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
           {/* --- ADDED: Download CSV Button --- */}
           <button
             // onClick={handleDownloadCSV}
-            className='bg-gray-20 hover:bg-gray-30 rounded px-1 py-1  text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 '
+            className='rounded bg-gray-20 px-1 py-1 text-sm  hover:bg-gray-30 focus:outline-none focus:ring-2 focus:ring-blue-500 '
             title='Download CSV'
           >
             <svg
@@ -216,11 +220,21 @@ const ResultsSection: React.FC<ResultsSectionProps> = () => {
           {viewType === 'card' ? (
             <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
               {sortedEvents.payload.map(event => (
-                <EventCard key={event.id} event={event} />
+                // Truyền danh sách blacklist xuống EventCard
+                <EventCard
+                  key={event.id}
+                  event={event}
+                  userBlacklist={userBlacklist}
+                />
               ))}
             </div>
           ) : (
-            <EventTable events={sortedEvents.payload} />
+            // Assuming EventTable also needs the blacklist info to style rows
+            // You would need to modify EventTable.tsx similarly
+            <EventTable
+              events={sortedEvents.payload}
+              userBlacklist={userBlacklist}
+            />
           )}
           <div className='mt-4'>
             <Pagination

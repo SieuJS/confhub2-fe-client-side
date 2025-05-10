@@ -8,6 +8,7 @@ import { Header } from '../utils/Header'
 import Footer from '../utils/Footer'
 import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
+import useUserBlacklist from '@/src/hooks/auth/useUserBlacklist' // This is just an example hook name
 
 export default function Conferences({
   params: { locale }
@@ -15,8 +16,9 @@ export default function Conferences({
   params: { locale: string }
 }) {
   const t = useTranslations('')
-  const router = useRouter()
+  const { blacklistedEventIds } = useUserBlacklist() // Example hook usage
 
+  const router = useRouter()
   const handleSearch = useCallback(
     async (searchParamsFromComponent: {
       keyword?: string
@@ -108,7 +110,7 @@ export default function Conferences({
         <div className='w-full bg-background py-10'></div>
         <SearchSection onSearch={handleSearch} onClear={handleClear} />
         <div className='container mx-auto mt-4 px-0 md:px-4'>
-          <ResultsSection />
+          <ResultsSection userBlacklist={blacklistedEventIds} />
         </div>
       </div>
       <Footer />
