@@ -98,6 +98,8 @@ export interface ChatMessageType {
     thoughts?: ThoughtStep[];
     location?: string; // <<< ADDED: Optional location for map messages
     timestamp?: string;
+      action?: FrontendAction; // <<<< THÊM DÒNG NÀY
+
 }
 
 
