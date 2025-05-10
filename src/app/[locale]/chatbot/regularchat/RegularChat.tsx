@@ -6,7 +6,7 @@ import ChatHistory from './ChatHistory';
 import ChatInput from './ChatInput';
 import LoadingIndicator from './LoadingIndicator';
 import ChatIntroductionDisplay from './ChatIntroduction';
-import EmailConfirmationDialog from './EmailConfirmationDialog';
+import EmailConfirmationDialog from '../EmailConfirmationDialog';
 import ConversationToolbar from './ConversationToolbar';
 import { useTimer } from '@/src/hooks/chatbot/useTimer';
 import { useTranslations } from 'next-intl';

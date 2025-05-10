@@ -1,7 +1,7 @@
 // src/app/[locale]/chatbot/RightSettingsPanel.tsx
 import React from 'react';
 import { X, Settings } from 'lucide-react';
-import LanguageDropdown from './regularchat/LanguageDropdown';
+import LanguageDropdown from './LanguageDropdown';
 import LiveChatSpecificSettings from './livechat/LiveChatSpecificSettings';
 import { useTranslations } from 'next-intl';
 // --- IMPORT STORE MỚI ---

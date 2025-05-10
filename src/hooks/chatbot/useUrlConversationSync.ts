@@ -57,6 +57,7 @@ export function useUrlConversationSync({
   const urlIdParam = searchParamsHook.get('id');
   const searchParamsString = searchParamsHook.toString();
 
+ 
   // Effect 1: Đồng bộ activeConversationId (từ store) ra URL (?id=...)
   useEffect(() => {
     if (isProcessingDeletion && idBeingDeleted === urlIdParam) {
@@ -67,7 +68,7 @@ export function useUrlConversationSync({
     const newParams = new URLSearchParams(searchParamsString);
     let shouldUpdateURL = false;
     const isLiveChatCurrentPath = currentPathname === CHATBOT_LIVECHAT_PATH;
-    const isRegularChatCurrentPath = currentPathname === CHATBOT_REGULARCHAT_PATH;
+    // const isRegularChatCurrentPath = currentPathname === CHATBOT_REGULARCHAT_PATH; // Not strictly needed for revised logic
 
     if (isLiveChatCurrentPath) {
       if (newParams.has('id')) {
@@ -76,26 +77,27 @@ export function useUrlConversationSync({
         shouldUpdateURL = true;
       }
     } else if (currentView === 'chat') {
-      if (activeConversationId) {
+      if (activeConversationId) { // Store has an active conversation
         if (urlIdParam !== activeConversationId) {
-          // console.log(`[useUrlConversationSync Effect1] Chat View (${currentPathname}): ActiveId (${activeConversationId}) differs from URL ID (${urlIdParam}). Setting URL ID.`);
+          // console.log(`[useUrlConversationSync Effect1] Chat View (${currentPathname}): ActiveId (${activeConversationId}) differs from URL ID (${urlIdParam || 'null'}). Setting URL ID to ${activeConversationId}.`);
           newParams.set('id', activeConversationId);
           shouldUpdateURL = true;
         }
-      } else { // activeConversationId is null
-        if (urlIdParam) { // Only remove if URL actually has an ID
-            // This covers cases like blank slate where activeId becomes null, or new chat.
-            // The prevActiveConversationIdForEffect1Ref helps distinguish initial load vs. activeId becoming null.
-            if ( (prevActiveConversationIdForEffect1Ref.current !== null &&
-                 prevActiveConversationIdForEffect1Ref.current !== undefined && // It was previously non-null
-                 activeConversationId === null) || // And now it's null
-                 (isRegularChatCurrentPath && activeConversationId === null) // Or specifically for regular chat blank slate
-            ) {
-                // console.log(`[useUrlConversationSync Effect1] Chat View (${currentPathname}): ActiveId is null. URL ID (${urlIdParam}) exists. Removing ID from URL.`);
-                newParams.delete('id');
-                shouldUpdateURL = true;
-            }
+      } else { // activeConversationId is null in store
+        if (urlIdParam) { // But URL has an ID
+          // Only clear URL ID if activeId *became* null (e.g. new chat, deletion finished, explicit set to null)
+          // NOT on initial load where activeId is null and urlIdParam exists, because Effect 2 should handle loading it.
+          if (prevActiveConversationIdForEffect1Ref.current !== null &&
+              prevActiveConversationIdForEffect1Ref.current !== undefined) {
+            // console.log(`[useUrlConversationSync Effect1] Chat View (${currentPathname}): ActiveId became null (was ${prevActiveConversationIdForEffect1Ref.current}). URL ID (${urlIdParam}) exists. Removing ID from URL.`);
+            newParams.delete('id');
+            shouldUpdateURL = true;
+          }
+          // else: activeId is null, prevActiveId was also null/undefined, but urlIdParam exists.
+          // This is the state during initial load of a specific chat URL.
+          // Effect 2 is responsible for loading from urlIdParam. Don't clear the URL ID here.
         }
+        // If activeConversationId is null AND urlIdParam is also null, nothing to do.
       }
     } else { // currentView is 'history'
       if (urlIdParam) {
@@ -120,6 +122,7 @@ export function useUrlConversationSync({
   }, [
     activeConversationId, currentView, currentPathname, router,
     urlIdParam, searchParamsString, isProcessingDeletion, idBeingDeleted,
+    // prevActiveConversationIdForEffect1Ref.current is implicitly part of this via activeConversationId
   ]);
 
 
@@ -131,7 +134,9 @@ export function useUrlConversationSync({
       return;
     }
 
-    if ((urlIdParam !== prevUrlIdParamForEffect2ResetRef.current || currentView !== 'chat') && didAttemptLoadFromUrlRef.current) {
+    // Reset didAttemptLoadFromUrlRef if urlIdParam changes, or if we switch away from chat view
+    // This allows re-attempts if the user navigates back to the same problematic URL ID after it failed once.
+    if ((urlIdParam !== prevUrlIdParamForEffect2ResetRef.current || (urlIdParam && currentView !== 'chat')) && didAttemptLoadFromUrlRef.current) {
       // console.log(`[useUrlConversationSync Effect2] urlIdParam or currentView changed. Resetting didAttemptLoadFromUrlRef. Old urlId: ${prevUrlIdParamForEffect2ResetRef.current}, New urlId: ${urlIdParam}, currentView: ${currentView}`);
       didAttemptLoadFromUrlRef.current = false;
     }
@@ -143,39 +148,42 @@ export function useUrlConversationSync({
     }
 
     const isLiveChatCurrentPath = currentPathname === CHATBOT_LIVECHAT_PATH;
-    const isRegularChatCurrentPath = currentPathname === CHATBOT_REGULARCHAT_PATH;
+    // const isRegularChatCurrentPath = currentPathname === CHATBOT_REGULARCHAT_PATH; // Not needed for the removed block
 
     if (isLiveChatCurrentPath) {
+      // If on live chat, any 'id' param is invalid. Reset attempt flag if it was set.
       if (urlIdParam && didAttemptLoadFromUrlRef.current) {
         // console.log(`[useUrlConversationSync Effect2] On live chat path with URL ID ${urlIdParam} and didAttemptLoad. Resetting didAttemptLoadFromUrlRef.`);
         didAttemptLoadFromUrlRef.current = false;
       }
-      return;
+      return; // No conversation loading from ID on live chat path
     }
 
-    if (isRegularChatCurrentPath && activeConversationId === null) {
-      // console.log(`[useUrlConversationSync Effect2] On regular chat path and activeConversationId is null. Assuming blank slate. Skipping load from URL ID: ${urlIdParam}.`);
-      if (urlIdParam && didAttemptLoadFromUrlRef.current) {
-        didAttemptLoadFromUrlRef.current = false;
-      }
-      return;
-    }
+    // ---- THIS BLOCK WAS THE PRIMARY ISSUE AND IS REMOVED ----
+    // if (isRegularChatCurrentPath && activeConversationId === null) {
+    //   console.log(`[useUrlConversationSync Effect2] On regular chat path and activeConversationId is null. Assuming blank slate. Skipping load from URL ID: ${urlIdParam}.`);
+    //   if (urlIdParam && didAttemptLoadFromUrlRef.current) {
+    //     didAttemptLoadFromUrlRef.current = false;
+    //   }
+    //   return;
+    // }
+    // ---- END REMOVED BLOCK ----
 
     if (
       currentView === 'chat' &&
-      urlIdParam &&
-      activeConversationId !== urlIdParam &&
-      !isLoadingHistory &&
-      isConnected &&
-      isServerReadyForCommands &&
-      !didAttemptLoadFromUrlRef.current
+      urlIdParam &&                              // There's an ID in the URL to load
+      activeConversationId !== urlIdParam &&     // And it's not already the active one
+      !isLoadingHistory &&                       // And we're not already loading history (could be for this one or another)
+      isConnected && isServerReadyForCommands && // And socket is ready
+      !didAttemptLoadFromUrlRef.current          // And we haven't already tried loading this specific urlIdParam in this "session" of it being in the URL
     ) {
       // console.log(`[useUrlConversationSync Effect2] Attempting to load conversation ${urlIdParam} from URL. Current activeId: ${activeConversationId || 'null'}.`);
-      didAttemptLoadFromUrlRef.current = true;
+      didAttemptLoadFromUrlRef.current = true; // Mark that we are now attempting to load this urlIdParam
       loadConversation(urlIdParam, { isFromUrl: true });
     } else if (currentView === 'chat' && urlIdParam && activeConversationId === urlIdParam && didAttemptLoadFromUrlRef.current) {
       // console.log(`[useUrlConversationSync Effect2] urlIdParam ${urlIdParam} matches activeId. didAttemptLoadFromUrlRef is true. No action needed, load was attempted/completed.`);
     } else if (currentView === 'chat' && urlIdParam && activeConversationId !== urlIdParam && !didAttemptLoadFromUrlRef.current) {
+      // Conditions to load are met, but some prerequisite like socket or isLoadingHistory is blocking. Log if needed.
       // if (isLoadingHistory) {
         // console.log(`[useUrlConversationSync Effect2] Conditions met to load ${urlIdParam} from URL, but isLoadingHistory is true. Waiting.`);
       // } else if (!isConnected || !isServerReadyForCommands) {
@@ -185,6 +193,8 @@ export function useUrlConversationSync({
   }, [
     urlIdParam, currentView, currentPathname, activeConversationId, loadConversation,
     isLoadingHistory, isConnected, isServerReadyForCommands, isProcessingDeletion, idBeingDeleted,
+    // didAttemptLoadFromUrlRef.current is not a dependency here, it's managed internally
+    // searchParamsString is implicitly covered by urlIdParam change
   ]);
 
   return { didAttemptLoadFromUrlRef };
