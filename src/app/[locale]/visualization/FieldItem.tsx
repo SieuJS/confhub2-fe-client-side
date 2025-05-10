@@ -1,3 +1,4 @@
+// src/app/[locale]/visualization/FieldItem.tsx
 import React from 'react'
 import { DraggableProvided, DraggableStateSnapshot } from '@hello-pangea/dnd'
 import { DataField } from '../../../models/visualization/visualization' // Adjust path as needed

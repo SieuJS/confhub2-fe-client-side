@@ -19,7 +19,7 @@ export async function fetchVisualizationData(): Promise<ConferenceDetailsListRes
         }
 
         const responseData: ConferenceDetailsListResponse = await response.json();
-        // console.log(responseData.payload.slice(0,2))
+        console.log(responseData.payload.slice(0,2))
         return responseData;
 
     } catch (error: any) {

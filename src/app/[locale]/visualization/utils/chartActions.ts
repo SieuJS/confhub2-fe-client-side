@@ -1,4 +1,4 @@
-// src/utils/chartActions.ts
+// src/app/[locale]/visualization/utils/chartActions.ts
 import { MutableRefObject } from 'react';
 import type { EChartsType } from '@/src/models/visualization/echarts';
 import { saveAs } from 'file-saver';

@@ -1,4 +1,4 @@
-// src/app/visualization/DropZone.tsx
+// src/app/[locale]/visualization/DropZone.tsx
 import React from 'react'
 import { DroppableProvided, DroppableStateSnapshot } from '@hello-pangea/dnd'
 import { DataField } from '../../../models/visualization/visualization' // Adjust path as needed
