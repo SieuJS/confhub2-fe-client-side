@@ -1,7 +1,6 @@
 // src/components/chatbot/EmailConfirmationDialog.tsx (or appropriate path)
 import React, { useState, useEffect, useRef } from 'react';
-// import { useTranslations } from 'next-intl'; // Removed
-import { ConfirmSendEmailAction } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Adjust path
+import { ConfirmSendEmailAction } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
 
 interface EmailConfirmationDialogProps {
   isOpen: boolean;
@@ -18,7 +17,6 @@ const EmailConfirmationDialog: React.FC<EmailConfirmationDialogProps> = ({
   onCancel,
   onClose,
 }) => {
-  // const t = useTranslations('Chatbot.EmailConfirmationDialog'); // Removed
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -33,8 +31,6 @@ const EmailConfirmationDialog: React.FC<EmailConfirmationDialogProps> = ({
           if (prevTime <= 1) {
             clearInterval(timerRef.current!);
             timerRef.current = null;
-            // Don't automatically call onCancel, backend timeout handles the logic
-            // Just close the dialog visually
             onClose();
             return 0;
           }
@@ -113,7 +109,7 @@ const EmailConfirmationDialog: React.FC<EmailConfirmationDialogProps> = ({
             Confirm
           </button>
           <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            {`Time left: ${timeLeft} seconds`} {/* Display timer directly */}
+            {`Time left: ${timeLeft} seconds`}
           </span>
           <button
             onClick={handleCancelClick}

@@ -3,7 +3,7 @@ import { useRouter, usePathname, AppPathname } from '@/src/navigation';
 import { useConversationStore, useSocketStore } from '@/src/app/[locale]/chatbot/stores';
 import { useShallow } from 'zustand/react/shallow';
 import { useSearchParams } from 'next/navigation';
-import { CHATBOT_LIVECHAT_PATH, CHATBOT_REGULARCHAT_PATH, CHATBOT_HISTORY_PATH } from '@/src/app/[locale]/chatbot/MainLayout';
+import { CHATBOT_LIVECHAT_PATH } from '@/src/app/[locale]/chatbot/MainLayout';
 
 interface UseUrlConversationSyncProps {
   currentView: 'chat' | 'history';

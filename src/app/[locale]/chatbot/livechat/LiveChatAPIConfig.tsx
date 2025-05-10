@@ -227,7 +227,7 @@
 
 
 
-// src/components/LiveChatAPIConfig.tsx (Sử dụng phương thức cũ , không dùng A2A)
+// src/app/[locale]/livechat/LiveChatAPIConfig.tsx (Sử dụng phương thức cũ , không dùng A2A)
 
 "use client";
 import { useEffect, memo } from "react";
@@ -242,10 +242,10 @@ import {
   websiteInfo,
   EN_followUnfollowItemDeclaration,
   EN_openGoogleMapDeclaration
-} from "../lib/functions"; // Adjust path
+} from "../lib/functions"; 
 import { OutputModality, PrebuiltVoice, Language, ToolCall } from '@/src/app/[locale]/chatbot/lib/live-chat.types';
-import { transformConferenceData } from '../utils/transformApiData'; // Adjust path
-import { appConfig } from "@/src/middleware"; // Adjust path
+import { transformConferenceData } from '../utils/transformApiData'; 
+import { appConfig } from "@/src/middleware"; 
 import { FunctionDeclaration, FunctionCall } from "@google/generative-ai";
 import { usePathname } from 'next/navigation';
 

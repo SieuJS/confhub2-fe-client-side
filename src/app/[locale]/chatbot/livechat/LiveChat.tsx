@@ -1,61 +1,58 @@
-// src/components/chatbot/LiveChatExperience.tsx
+// src/app/[locale]/chatbot/livechat/LiveChat.tsx
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { useLiveAPIContext } from './contexts/LiveAPIContext' // Giả sử path này đúng
+import { useLiveAPIContext } from './contexts/LiveAPIContext'
 import {
   isServerContentMessage,
   isModelTurn,
   isTurnComplete,
   isInterrupted
-} from './multimodal-live-types' // Giả sử path này đúng
-import { useLoggerStore } from './lib/store-logger' // Giả sử path này đúng
-import Logger from './logger/Logger' // Giả sử path này đúng
-import ChatInput from './main-layout/ChatInput' // Giả sử path này đúng
-import ConnectionButton from './main-layout/ConnectionButton' // Giả sử path này đúng
-import MicButton from './main-layout/MicButton' // Giả sử path này đúng
-import ChatIntroduction from './main-layout/ChatIntroduction' // Giả sử path này đúng
-import ConnectionStatus from './main-layout/ConnectionStatus' // Giả sử path này đúng
-import RestartStreamButton from './main-layout/RestartStreamButton' // Giả sử path này đúng
-import { LiveChatAPIConfig } from './LiveChatAPIConfig' // Giả sử path này đúng
+} from './multimodal-live-types'
+import { useLoggerStore } from './lib/store-logger'
+import Logger from './logger/Logger'
+import ChatInput from './main-layout/ChatInput'
+import ConnectionButton from './main-layout/ConnectionButton'
+import MicButton from './main-layout/MicButton'
+import ChatIntroduction from './main-layout/ChatIntroduction'
+import ConnectionStatus from './main-layout/ConnectionStatus'
+import RestartStreamButton from './main-layout/RestartStreamButton'
+import { LiveChatAPIConfig } from './LiveChatAPIConfig'
 
 // Hooks
-import useConnection from './hooks/useConnection' // Giả sử path này đúng
-import useTimer from './hooks/useTimer' // Giả sử path này đúng
-import useLoggerScroll from './hooks/useLoggerScroll' // Giả sử path này đúng
-import useLoggerEvents from './hooks/useLoggerEvents' // Giả sử path này đúng
-import useAudioRecorder from './hooks/useAudioRecorder' // Giả sử path này đúng
-import useModelAudioResponse from './hooks/useModelAudioResponse' // Giả sử path này đúng
-import useVolumeControl from './hooks/useVolumeControl' // Giả sử path này đúng
-import useInteractionHandlers from './hooks/useInteractionHandlers' // Giả sử path này đúng
+import useConnection from './hooks/useConnection'
+import useTimer from './hooks/useTimer'
+import useLoggerScroll from './hooks/useLoggerScroll'
+import useLoggerEvents from './hooks/useLoggerEvents'
+import useAudioRecorder from './hooks/useAudioRecorder'
+import useModelAudioResponse from './hooks/useModelAudioResponse'
+import useVolumeControl from './hooks/useVolumeControl'
+import useInteractionHandlers from './hooks/useInteractionHandlers'
 
 // Types and Constants
-import { getSystemInstructions } from '../lib/instructions' // Đảm bảo path đúng
-import { AudioRecorder } from './lib/audio-recorder' // Giả sử path này đúng
+import { getSystemInstructions } from '../lib/instructions'
+import { AudioRecorder } from './lib/audio-recorder'
 import { useTranslations } from 'next-intl'
 
 // --- THAY ĐỔI QUAN TRỌNG ---
-import { useLiveChatSettings } from '../context/LiveChatSettingsContext' // Context này cho modality, voice
-// --- IMPORT STORE MỚI ---
-import { useChatSettingsState } from '@/src/app/[locale]/chatbot/stores/storeHooks'; // Hoặc import trực tiếp từ settingsStore
+import { useLiveChatSettings } from './contexts/LiveChatSettingsContext' // Context này cho modality, voice
+import { useChatSettingsState } from '@/src/app/[locale]/chatbot/stores/storeHooks';
 
 export default function LiveChatExperience() {
-  // Lấy modality và voice từ LiveChatSettingsContext
   const {
     currentModality,
     currentVoice,
+    // --- LẤY SETTER TỪ LIVE CHAT SETTINGS CONTEXT ---
+    setLiveChatConnected,
   } = useLiveChatSettings()
 
-  // --- LẤY currentLanguage TỪ SettingsStore ---
   const { currentLanguage: currentLanguageOptionFromStore } = useChatSettingsState();
-  // Trích xuất language code ('en', 'vi', 'zh')
   const currentLanguageCode = currentLanguageOptionFromStore.code;
 
   const t = useTranslations()
 
-  // --- Connection & Timer Hooks ---
   const {
-    connected,
+    connected, // Đây là trạng thái kết nối chính từ useConnection
     isConnecting,
     streamStartTime,
     connectionStatusMessage,
@@ -63,7 +60,7 @@ export default function LiveChatExperience() {
     handleDisconnect,
     handleReconnect,
     error: connectionError
-  } = useConnection() // Hook này có thể cần xem xét nếu nó phụ thuộc vào ngôn ngữ hoặc các cài đặt toàn cục
+  } = useConnection()
 
   const { elapsedTime, showTimer, handleCloseTimer } = useTimer(
     isConnecting,
@@ -71,20 +68,17 @@ export default function LiveChatExperience() {
     streamStartTime
   )
 
-  // --- Context and Store Hooks ---
-  const { client, volume, on, off /*, setConfig */ } = useLiveAPIContext() // setConfig có thể không dùng nữa nếu config qua LiveChatAPIConfig
+  const { client, volume, on, off } = useLiveAPIContext()
   const { log, clearLogs, logs } = useLoggerStore()
 
-  // --- State ---
   const loggerRef = useRef<HTMLDivElement>(null)
   const [isSendingMessage, setIsSendingMessage] = useState(false)
   const lastSentLogIndexRef = useRef<number | null>(null)
   const [inVolume, setInVolume] = useState(0)
-  const [audioRecorder] = useState(() => new AudioRecorder()) // Khởi tạo AudioRecorder
+  const [audioRecorder] = useState(() => new AudioRecorder())
   const [muted, setMuted] = useState(false)
   const [hasInteracted, setHasInteracted] = useState(false)
 
-  // --- Interaction Handlers Hook ---
   const { handleSendMessage, handleStartVoice } = useInteractionHandlers({
     connected,
     connectWithPermissions,
@@ -101,7 +95,11 @@ export default function LiveChatExperience() {
     }
   })
 
-  // --- Effects ---
+  // --- EFFECT ĐỂ CẬP NHẬT TRẠNG THÁI KẾT NỐI TRONG CONTEXT ---
+  useEffect(() => {
+    setLiveChatConnected(connected); // Cập nhật context khi 'connected' thay đổi
+  }, [connected, setLiveChatConnected]);
+
   useEffect(() => {
     if (connected) {
       clearLogs()
@@ -138,27 +136,17 @@ export default function LiveChatExperience() {
           return
         }
       }
-      // Dòng này có thể quá chung chung, cần xem xét lại logic `isSendingMessage`
-      // else if (currentLog.type?.startsWith('receive.')) {
-      //   setIsSendingMessage(false)
-      //   lastSentLogIndexRef.current = null
-      //   return
-      // }
     }
-  }, [logs, isSendingMessage /*, setIsSendingMessage */]) // Bỏ setIsSendingMessage nếu không cần thiết
+  }, [logs, isSendingMessage])
 
-  // --- Other Hooks ---
   useLoggerScroll(loggerRef)
   useLoggerEvents(on, off, log)
-  useAudioRecorder(connected, muted, audioRecorder, client, log, setInVolume) // audioRecorder đã được khởi tạo
+  useAudioRecorder(connected, muted, audioRecorder, client, log, setInVolume)
   useModelAudioResponse(on, off, log)
   useVolumeControl(inVolume)
 
-  // --- Determine System Instructions ---
-  // Sử dụng currentLanguageCode ('en', 'vi', 'zh')
   const systemInstructions = getSystemInstructions(currentLanguageCode)
 
-  // --- Connection Status Display Logic ---
   let connectionStatusType: 'connected' | 'error' | 'info' | 'connecting' =
     'info'
   if (isConnecting) connectionStatusType = 'connecting'
@@ -175,12 +163,11 @@ export default function LiveChatExperience() {
 
   return (
     <div className='bg-white-pure relative flex h-full flex-col rounded-xl border-2 shadow-inner '>
-      {/* LiveChatAPIConfig sẽ được client API đọc để cấu hình stream */}
       <LiveChatAPIConfig
         outputModality={currentModality}
         selectedVoice={currentVoice}
-        language={currentLanguageCode} // <--- TRUYỀN LANGUAGE CODE TỪ SettingsStore
-        systemInstructions={systemInstructions} // systemInstructions dựa trên language code
+        language={currentLanguageCode}
+        systemInstructions={systemInstructions}
       />
 
       {shouldShowExternalStatus && (
@@ -204,7 +191,7 @@ export default function LiveChatExperience() {
 
       <div className='flex-grow overflow-y-auto p-4' ref={loggerRef}>
         {!connected && !hasInteracted ? (
-          <ChatIntroduction // Component này có thể cần currentLanguageCode nếu có logic hiển thị dựa trên ngôn ngữ
+          <ChatIntroduction
             onStartVoice={() => {
               handleStartVoice()
               setHasInteracted(true)
@@ -225,13 +212,13 @@ export default function LiveChatExperience() {
         <MicButton
           muted={muted}
           setMuted={setMuted}
-          volume={volume} // volume từ useLiveAPIContext
+          volume={volume}
           connected={connected}
         />
         <div className='flex-grow'>
           <ChatInput
             onSendMessage={handleSendMessage}
-            disabled={!connected || isSendingMessage} // Cập nhật logic disabled
+            disabled={!connected || isSendingMessage}
             isLoading={isSendingMessage}
           />
         </div>

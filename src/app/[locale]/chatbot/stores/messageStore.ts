@@ -1,4 +1,4 @@
-// src/stores/messageStore.ts (hoặc đường dẫn tương ứng của bạn)
+// src/stores/messageStore.ts
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import {

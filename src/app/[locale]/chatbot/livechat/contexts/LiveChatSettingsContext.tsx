@@ -1,17 +1,19 @@
-// src/components/chatbot/context/ChatSettingsContext.tsx
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { OutputModality, PrebuiltVoice } from '../lib/live-chat.types';
-import { AVAILABLE_VOICES_LIVE_CHAT, DEFAULT_MODALITY_LIVE_CHAT, DEFAULT_VOICE_LIVE_CHAT } from '../lib/constants';
+import { OutputModality, PrebuiltVoice } from '../../lib/live-chat.types';
+import { AVAILABLE_VOICES_LIVE_CHAT, DEFAULT_MODALITY_LIVE_CHAT, DEFAULT_VOICE_LIVE_CHAT } from '../../lib/constants';
 
-// --- Interface cho Context Value (chỉ chứa state của Live Chat) ---
+// --- Interface cho Context Value ---
 interface LiveChatSettingsContextType {
     currentModality: OutputModality;
     setCurrentModality: (modality: OutputModality) => void;
     currentVoice: PrebuiltVoice;
     setCurrentVoice: (voice: PrebuiltVoice) => void;
     availableVoices: PrebuiltVoice[];
+    // --- THÊM TRẠNG THÁI KẾT NỐI VÀ SETTER ---
+    isLiveChatConnected: boolean;
+    setLiveChatConnected: (isConnected: boolean) => void;
 }
 
 interface LiveChatSettingsProviderProps {
@@ -29,9 +31,11 @@ export const useLiveChatSettings = (): LiveChatSettingsContextType => {
 };
 
 export const LiveChatSettingsProvider: React.FC<LiveChatSettingsProviderProps> = ({ children }) => {
-    // State cho Modality và Voice (chỉ dành cho Live Chat)
     const [currentModality, setCurrentModality] = useState<OutputModality>(DEFAULT_MODALITY_LIVE_CHAT);
     const [currentVoice, setCurrentVoice] = useState<PrebuiltVoice>(DEFAULT_VOICE_LIVE_CHAT);
+    // --- STATE MỚI CHO KẾT NỐI LIVE CHAT ---
+    const [isLiveChatConnected, setLiveChatConnected] = useState<boolean>(false);
+
     return (
         <LiveChatSettingsContext.Provider
             value={{
@@ -40,6 +44,9 @@ export const LiveChatSettingsProvider: React.FC<LiveChatSettingsProviderProps> =
                 currentVoice,
                 setCurrentVoice,
                 availableVoices: AVAILABLE_VOICES_LIVE_CHAT,
+                // --- TRUYỀN STATE VÀ SETTER MỚI VÀO CONTEXT VALUE ---
+                isLiveChatConnected,
+                setLiveChatConnected,
             }}
         >
             {children}

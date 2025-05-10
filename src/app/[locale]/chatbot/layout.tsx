@@ -2,7 +2,7 @@
 
 import { LiveAPIProvider } from '@/src/app/[locale]/chatbot/livechat/contexts/LiveAPIContext';
 import MainLayoutComponent from '@/src/app/[locale]/chatbot/MainLayout';
-import { LiveChatSettingsProvider } from '@/src/app/[locale]/chatbot/context/LiveChatSettingsContext';
+import { LiveChatSettingsProvider } from '@/src/app/[locale]/chatbot/livechat/contexts/LiveChatSettingsContext';
 import { API_URI } from '@/src/app/[locale]/chatbot/lib/constants';
 import { usePathname } from '@/src/navigation';
 import { AppWideInitializers } from '@/src/app/[locale]/chatbot/AppWideInitializers';
