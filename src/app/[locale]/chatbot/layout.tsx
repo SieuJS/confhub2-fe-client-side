@@ -1,3 +1,4 @@
+// src/app/[locale]/chatbot/layout.tsx
 "use client";
 
 import { LiveAPIProvider } from '@/src/app/[locale]/chatbot/livechat/contexts/LiveAPIContext';
@@ -5,7 +6,7 @@ import MainLayoutComponent from '@/src/app/[locale]/chatbot/MainLayout';
 import { LiveChatSettingsProvider } from '@/src/app/[locale]/chatbot/livechat/contexts/LiveChatSettingsContext';
 import { API_URI } from '@/src/app/[locale]/chatbot/lib/constants';
 import { usePathname } from '@/src/navigation';
-import { AppWideInitializers } from '@/src/app/[locale]/chatbot/AppWideInitializers';
+// import { AppWideInitializers } from '@/src/app/[locale]/AppWideInitializers';
 // --- IMPORT STORE MỚI ---
 import { useSettingsStore } from './stores/setttingsStore'; // Hoặc './stores' nếu có index.ts
 import { useEffect } from 'react';
@@ -45,7 +46,7 @@ export default function ChatbotRootLayout({
 
     return (
         <>
-            <AppWideInitializers />
+            {/* <AppWideInitializers /> */}
 
             {isLiveChatPage ? (
                 <LiveAPIProvider url={API_URI} apiKey={API_KEY}>

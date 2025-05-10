@@ -1,7 +1,7 @@
 // src/hooks/useProcessedFeedbacks.ts
 import { useMemo } from 'react';
-import { Feedback, SortOption } from '../../../models/send/feedback.send';
-import { filterFeedbacks, sortFeedbacks } from '../../../app/[locale]/conferences/detail/feedback/utils/feedbackUtils';
+import { Feedback, SortOption } from '../../models/send/feedback.send';
+import { filterFeedbacks, sortFeedbacks } from '../../app/[locale]/conferences/detail/feedback/utils/feedbackUtils';
 
 /**
  * Hook to filter and sort feedbacks efficiently using useMemo.

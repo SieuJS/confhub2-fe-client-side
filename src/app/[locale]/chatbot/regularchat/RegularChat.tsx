@@ -22,8 +22,11 @@ import {
     useConversationListState
 } from '@/src/app/[locale]/chatbot/stores/storeHooks';
 // useShallow không cần thiết ở đây vì các hook trong storeHooks đã sử dụng nó
+interface RegularChatProps {
+    isSmallContext?: boolean; // <-- THÊM PROP MỚI
+}
 
-function RegularChat() {
+function RegularChat({ isSmallContext = false }: RegularChatProps) { // <-- Nhận prop
   const t = useTranslations();
 
   // --- Lấy state và actions từ các store đã tách ---
@@ -113,76 +116,91 @@ function RegularChat() {
     setShowConfirmationDialog(false, null); // Action từ uiStore
   }, [setShowConfirmationDialog]);
 
-
   return (
-    <div className='bg-white-pure border-gray-20 relative mx-auto flex h-full w-full flex-col rounded-xl border shadow-xl '>
-      <div className='bg-gray-5 border-gray-20 flex-shrink-0 border-b p-2'>
-        <div className='flex items-center justify-center space-x-1 text-center text-xs '>
+    // - `rounded-xl` có thể giữ nguyên hoặc giảm bớt bo góc trên mobile nếu muốn.
+    // - `shadow-xl` có thể giảm trên mobile nếu cần.
+    <div className='bg-white-pure relative mx-auto flex h-full w-full flex-col overflow-hidden rounded-lg border border-gray-200 shadow-lg dark:bg-gray-850 dark:border-gray-700'>
+      {/* --- Connection Status Bar --- */}
+      {/* - `p-2` có thể là `p-1.5` hoặc `p-1` trên mobile nếu không gian chật hẹp. */}
+      {/* - `text-xs` là tốt cho mobile. */}
+      <div className='flex-shrink-0 border-b border-gray-200 p-1.5 text-center dark:border-gray-700 dark:bg-gray-800'>
+        <div className='flex items-center justify-center space-x-1 text-xs text-gray-600 dark:text-gray-400'>
           <span
             className={`h-2 w-2 rounded-full ${isConnected ? 'animate-pulse bg-green-500' : 'bg-red-500'}`}
           ></span>
           <span>
             {isConnected ? t('Connected') : t('Disconnected')}{' '}
-            {socketId ? `(ID: ${socketId.substring(0, 5)}...)` : ''}
+            {/* Có thể ẩn socketId trên màn hình rất nhỏ nếu cần */}
+            <span className="hidden sm:inline">
+              {socketId ? `(ID: ${socketId.substring(0, 5)}...)` : ''}
+            </span>
           </span>
         </div>
       </div>
 
-      {activeConversationId && ( // Kiểm tra activeConversationId từ conversationStore
-        <ConversationToolbar /> // Component này cũng cần được cập nhật để dùng store mới
+      {/* --- Conversation Toolbar --- */}
+      {/* ConversationToolbar sẽ tự xử lý responsive bên trong nó */}
+      {activeConversationId && (
+        <ConversationToolbar />
       )}
 
+      {/* --- Chat History Area --- */}
+      {/* - `p-4 md:p-6` -> `p-3 sm:p-4 md:p-6` để padding nhỏ hơn trên mobile. */}
+      {/* - `space-y-4` có thể giảm thành `space-y-3` trên mobile. */}
       <div
         ref={chatHistoryRef}
-        className='bg-gray-5 flex-grow space-y-4 overflow-y-auto  p-4  md:p-6'
+        className='flex-grow space-y-3 overflow-y-auto  p-3 sm:p-4 md:p-6 dark:bg-gray-800'
       >
         {showIntroduction && (
           <ChatIntroductionDisplay
             onSuggestionClick={handleSuggestionClick}
-            language={currentLanguage.code} // MODIFIED HERE
+            language={currentLanguage.code}
           />
         )}
-        <ChatHistory messages={chatMessages} /> {/* chatMessages từ messageStore */}
-      </div>
+<ChatHistory
+            messages={chatMessages}
+            isInsideSmallContainer={isSmallContext} // <-- TRUYỀN PROP XUỐNG
+        />      </div>
 
-      {/*
-        Kết hợp cả messageLoadingState.isLoading (khi gửi/nhận) và isLoadingHistory (khi load cả cuộc trò chuyện).
-        Điều này đảm bảo LoadingIndicator hiển thị đúng trong cả hai trường hợp.
-      */}
+      {/* --- Loading Indicator Area --- */}
+      {/* - `px-4 py-2` -> `px-3 py-1.5 sm:px-4 sm:py-2` */}
       {(messageLoadingState.isLoading || isLoadingHistory) &&
         !showConfirmationDialog && (
-          <div className='bg-gray-5 flex-shrink-0 border-t border-gray-200 px-4 py-2   dark:border-gray-600 '>
+          <div className='flex-shrink-0 border-t border-gray-200  px-3 py-1.5 sm:px-4 sm:py-2 dark:border-gray-700 dark:bg-gray-800'>
             <LoadingIndicator
               step={isLoadingHistory ? 'loading_history' : messageLoadingState.step}
               message={
                 isLoadingHistory
                   ? t('Loading_Chat_History')
-                  : messageLoadingState.message // message từ messageLoadingState
+                  : messageLoadingState.message
               }
-              timeCounter={isLoadingHistory ? undefined : timeCounter} // Chỉ hiển thị timer khi không phải load history
+              timeCounter={isLoadingHistory ? undefined : timeCounter}
             />
           </div>
         )}
 
-      <div className='bg-gray-5 flex-shrink-0 border-t border-gray-200  p-3 pt-2  dark:border-gray-600  md:p-4'>
+      {/* --- Chat Input Area --- */}
+      {/* - `p-3 pt-2 md:p-4` -> `p-2 sm:p-3 md:p-4` */}
+      <div className='flex-shrink-0 border-t border-gray-200  p-2 sm:p-3 md:p-4 dark:border-gray-700 dark:bg-gray-800'>
         <ChatInput
           onSendMessage={sendChatMessage}
           disabled={
-            messageLoadingState.isLoading || // Disable khi đang gửi/nhận tin nhắn
+            messageLoadingState.isLoading ||
             !isConnected ||
             showConfirmationDialog ||
-            isLoadingHistory // Disable khi đang load cả cuộc trò chuyện
+            isLoadingHistory
           }
           onRegisterFillFunction={handleSetFillInput}
         />
       </div>
 
+      {/* EmailConfirmationDialog sẽ tự xử lý responsive bên trong nó */}
       <EmailConfirmationDialog
-        isOpen={showConfirmationDialog} // Từ uiStore
-        data={confirmationData} // Từ uiStore
-        onConfirm={handleConfirmSend} // Từ uiStore
-        onCancel={handleCancelSend} // Từ uiStore
-        onClose={handleDialogClose} // Hàm cục bộ gọi action từ uiStore
+        isOpen={showConfirmationDialog}
+        data={confirmationData}
+        onConfirm={handleConfirmSend}
+        onCancel={handleCancelSend}
+        onClose={handleDialogClose}
       />
     </div>
   );

@@ -8,7 +8,7 @@ import useAuthApi from '@/src/hooks/auth/useAuthApi' // Adjust path
 import { Feedback, SortOption } from '../../../../models/send/feedback.send'
 import GeneralPagination from '../../utils/GeneralPagination'
 // Import Hooks
-import { useProcessedFeedbacks } from '@/src/hooks/conferenceDetails/feedback/useProcessedFeedbacks' // Adjust path
+import { useProcessedFeedbacks } from '@/src/hooks/conferenceDetails/useProcessedFeedbacks' // Adjust path
 
 // Import Utils
 import {

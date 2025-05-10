@@ -5,4 +5,5 @@ import RegularChat from '@/src/app/[locale]/chatbot/regularchat/RegularChat'; //
 
 export default function RegularChatPage() {
     return <RegularChat />;
+
 }

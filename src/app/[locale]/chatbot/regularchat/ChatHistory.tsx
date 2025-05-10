@@ -1,26 +1,32 @@
 // src/app/[locale]/chatbot/chat/ChatHistory.tsx
 import React from 'react';
-import ChatMessageDisplay from './ChatMessageDisplay'; // Ensure correct import path
-import { ChatMessageType } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Adjust path if needed
+import ChatMessageDisplay from './ChatMessageDisplay';
+import { ChatMessageType } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
 
 interface ChatHistoryProps {
     messages: ChatMessageType[];
+    isInsideSmallContainer?: boolean; // <-- THÊM PROP MỚI
 }
 
-const ChatHistory: React.FC<ChatHistoryProps> = ({ messages }) => {
+const ChatHistory: React.FC<ChatHistoryProps> = ({
+    messages,
+    isInsideSmallContainer = false // <-- Giá trị mặc định
+}) => {
     return (
-        <div className="space-y-4"> {/* Adds space between message rows */}
+        <div className="flex flex-col">
             {messages.map((msg) => (
-                // Use message ID as key for better React performance/stability
-                <div key={msg.id} className={`flex ${msg.isUser ? 'justify-end' : 'justify-start text-left'}`}>
-                    {/* Pass all necessary props, including the optional location */}
+                <div
+                    key={msg.id}
+                    className={`flex w-full py-1 ${msg.isUser ? 'justify-end pl-6 sm:pl-10 md:pl-16' : 'justify-start pr-6 sm:pr-10 md:pr-16'}`}
+                >
                     <ChatMessageDisplay
-                        id={msg.id} // Pass id
+                        id={msg.id}
                         message={msg.message}
                         isUser={msg.isUser}
                         type={msg.type}
                         thoughts={msg.thoughts}
-                        location={msg.location} // <<< PASS location prop
+                        location={msg.location}
+                        isInsideSmallContainer={isInsideSmallContainer} // <-- TRUYỀN PROP XUỐNG
                     />
                 </div>
             ))}

@@ -1,18 +1,19 @@
-// src/app/[locale]/layout.tsx (hoặc đường dẫn tương tự)
+// src/app/[locale]/layout.tsx
 
-import React from 'react'
-import { ThemeProvider } from '@/src/app/[locale]/utils/ThemeProvider'
-import type { Metadata } from 'next'
+import React from 'react';
+import { ThemeProvider } from '@/src/app/[locale]/utils/ThemeProvider';
+import type { Metadata } from 'next';
 import {
   AbstractIntlMessages,
   NextIntlClientProvider,
-  useMessages
-} from 'next-intl'
-import localFont from 'next/font/local'
-import NextTopLoader from 'nextjs-toploader'
-import { ToastContainer } from 'react-toastify' // <--- Import ToastContainer
-import 'react-toastify/dist/ReactToastify.css' // <--- Import CSS cho react-toastify
-import './globals.css'
+  useMessages // useMessages chỉ hoạt động trong Server Components hoặc Client Components được gọi từ Server Components
+} from 'next-intl';
+import localFont from 'next/font/local';
+import NextTopLoader from 'nextjs-toploader';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './globals.css';
+import ChatbotGlobalInitializer from './chatbot/ChatbotGlobalInitializer'; // <-- IMPORT MỚI
 
 // ... (Phần định nghĩa fonts: spaceGrotesk, inter, rubik)
 const spaceGrotesk = localFont({
@@ -134,6 +135,8 @@ export default function RootLayout({
             locale={locale}
             messages={messages as AbstractIntlMessages}
           >
+            <ChatbotGlobalInitializer /> {/* <-- SỬ DỤNG Ở ĐÂY */}
+
             {/* --- NextTopLoader --- */}
             <NextTopLoader
               initialPosition={0.08}

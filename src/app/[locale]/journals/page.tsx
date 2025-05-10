@@ -8,6 +8,7 @@ import { Header } from '../utils/Header';
 import Footer from '../utils/Footer';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
+import FloatingChatbot from '@/src/app/[locale]/floatingchatbot/FloatingChatbot'; // <-- IMPORT MỚI
 
 
 export default function Journals({ params: { locale } }: { params: { locale: string } }) {
@@ -53,16 +54,16 @@ export default function Journals({ params: { locale } }: { params: { locale: str
 
         const paramsString = newParams.toString();
         router.push(`/${locale}/journals?${paramsString}`);
-        }, [locale, router]);
+    }, [locale, router]);
 
-        const handleClear = useCallback(() => {
-            const newParams = new URLSearchParams();
-            const paramsString = newParams.toString();
-            router.push(`/${locale}/journals?${paramsString}`);
-      }, [locale, router]);
+    const handleClear = useCallback(() => {
+        const newParams = new URLSearchParams();
+        const paramsString = newParams.toString();
+        router.push(`/${locale}/journals?${paramsString}`);
+    }, [locale, router]);
 
     return (
-        <>  
+        <>
             <Header locale={locale} />
             <div className="text-center text-2xl">
                 <div className="py-10 bg-background w-full"></div>
@@ -71,10 +72,12 @@ export default function Journals({ params: { locale } }: { params: { locale: str
                     onClear={handleClear}
                 />
                 <div className="container mx-auto mt-4 px-4 ">
-                    <ResultsJournalSection/>
+                    <ResultsJournalSection />
                 </div>
             </div>
             <Footer />
+            <FloatingChatbot /> {/* <-- THÊM CHATBOT NỔI Ở ĐÂY */}
+
         </>
     );
 }

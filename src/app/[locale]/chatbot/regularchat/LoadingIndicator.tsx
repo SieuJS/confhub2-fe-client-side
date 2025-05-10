@@ -163,19 +163,23 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
   return (
     <div
       id='loading-container'
-      className='mb-2 flex animate-pulse items-center space-x-2 text-gray-600 dark:text-gray-400'
+      // - `mb-2` có thể giữ nguyên hoặc giảm.
+      // - `space-x-2` -> `space-x-1.5 sm:space-x-2`
+      className='flex animate-pulse items-center space-x-1.5 text-xs text-gray-600 sm:space-x-2 dark:text-gray-400'
     >
       <button
         disabled
         type='button'
-        className='inline-flex items-center rounded-lg border border-gray-200 bg-gray-100 px-3 py-2 text-sm font-medium dark:border-gray-600 dark:bg-gray-700'
+        // - `px-3 py-2 text-sm` -> `px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm`
+        className='inline-flex items-center rounded-md border border-gray-200 bg-gray-100 px-2 py-1 text-xs font-medium sm:px-2.5 sm:py-1.5 sm:text-sm dark:border-gray-600 dark:bg-gray-700'
         title={`Current step: ${step.replace(/_/g, ' ')}`}
       >
-        {/* Spinner vẫn giữ */}
         <svg
           aria-hidden='true'
           role='status'
-          className='me-2 inline h-3.5 w-3.5 animate-spin text-gray-200 dark:text-gray-500'
+          // - `h-3.5 w-3.5` -> `h-3 w-3 sm:h-3.5 sm:w-3.5`
+          // - `me-2` -> `me-1.5 sm:me-2`
+          className='me-1.5 inline h-3 w-3 animate-spin text-gray-200 sm:me-2 sm:h-3.5 sm:w-3.5 dark:text-gray-500'
           viewBox='0 0 100 101'
           fill='none'
           xmlns='http://www.w3.org/2000/svg'
@@ -190,21 +194,20 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
           />
         </svg>
 
-        {/* Icon Giai đoạn */}
-        {PhaseIconComponent && (
+         {PhaseIconComponent && (
+          // - `h-4 w-4 me-2` -> `h-3.5 w-3.5 me-1.5 sm:h-4 sm:w-4 sm:me-2`
           <PhaseIconComponent
-            className='me-2 h-4 w-4 flex-shrink-0'
+            className='me-1.5 h-3.5 w-3.5 flex-shrink-0 sm:me-2 sm:h-4 sm:w-4'
             aria-hidden='true'
           />
         )}
 
         {/* Thông điệp Step */}
         {/* Chỉ hiển thị message nếu nó khác với các thông báo mặc định hoặc loading */}
-        {message &&
+         {message &&
           !['Loading history...', 'Starting new chat...', ''].includes(
             message
           ) && <span className='truncate'>{message}</span>}
-        {/* Hiển thị thông báo mặc định nếu không có message cụ thể cho các step loading */}
         {step === 'loading_history' && !message && (
           <span className='truncate'>{t('Loading_history')}</span>
         )}
@@ -214,19 +217,18 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
         {step === 'sending' && !message && (
           <span className='truncate'>{t('Sending')}</span>
         )}
-        {/* Có thể thêm các step khác nếu cần thông báo mặc định */}
       </button>
-      {/* Bộ đếm thời gian */}
       {timeCounter && (
+        // - `text-sm` -> `text-xs sm:text-sm`
         <span
           id='time-counter'
-          className='flex-shrink-0 font-mono text-sm text-gray-500'
+          className='flex-shrink-0 font-mono text-xs text-gray-500 sm:text-sm'
         >
           {timeCounter}
         </span>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default LoadingIndicator
+export default LoadingIndicator;

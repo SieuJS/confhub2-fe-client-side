@@ -18,7 +18,7 @@ export type ConferenceResponse = {
     source: string;
     fieldOfResearch: string;
   }[];
-  organizations: {
+  organizations: { // Đây là cấu trúc chúng ta muốn cho ConferenceOrganizationItem
     id: string;
     isAvailable: boolean;
     createdAt: string;
@@ -31,7 +31,7 @@ export type ConferenceResponse = {
     link: string;
     impLink: string;
     cfpLink: string;
-    summerize: string;
+    summerize: string; // Lưu ý: có vẻ "summarize" bị typo thành "summerize" ở đây và trong Organization type
     publisher: string;
     locations: {
       address: string;
@@ -47,9 +47,12 @@ export type ConferenceResponse = {
       name: string;
     }[];
   }[];
-  feedbacks: any[];
-  followBy: any[];
+  feedbacks: any[]; // Nên thay any bằng Feedback[] nếu có thể
+  followBy: any[];  // Nên thay any bằng FollowerInfo[] nếu có thể
 };
+
+// Kiểu mới cho một phần tử trong mảng organizations của ConferenceResponse
+export type ConferenceOrganizationItem = ConferenceResponse['organizations'][number];
 
 export type ConferenceIdentity = {
   id: string;
@@ -60,22 +63,27 @@ export type ConferenceIdentity = {
   updatedAt: string | null;
 };
 
+// Type Organization cũ có thể giữ lại nếu nó phục vụ mục đích khác,
+// hoặc bạn có thể loại bỏ nếu nó không còn cần thiết và chỉ gây nhầm lẫn.
+// Nếu giữ lại, hãy đảm bảo nó không được sử dụng sai ngữ cảnh.
 export type Organization = {
   id: string;
   year: number | null;
   accessType: string | null;
   isAvailable: boolean | null;
   conferenceId: string | null;
-  summerize: string | null;
+  summerize: string | null; // Typo "summarize"
   callForPaper: string | null;
   publisher: string | null;
   link: string | null;
   cfpLink: string | null;
   impLink: string | null;
   topics: string[] | null;
+  // Không có 'locations' hay 'conferenceDates' ở đây
   createdAt: string | null;
   updatedAt: string | null;
 };
+
 
 export type ImportantDate = {
   fromDate: string | null;
