@@ -15,6 +15,14 @@ export interface SocketStoreState {
 }
 
 // --- Types for Socket Store Actions ---
+export interface SendMessagePayload { // Tạo interface riêng cho payload này
+    userInput: string;
+    isStreaming: boolean;
+    language: string;
+    conversationId?: string | null; // THÊM DÒNG NÀY
+}
+
+// --- Types for Socket Store Actions ---
 export interface SocketStoreActions {
     setAuthToken: (token: string | null | undefined) => void;
     initializeAuth: () => void; // Loads token from localStorage
@@ -23,6 +31,7 @@ export interface SocketStoreActions {
     setIsServerReadyForCommands: (isReady: boolean) => void;
     setHasFatalConnectionError: (hasError: boolean) => void;
     disconnectSocket: () => void;
+
 
     // Socket Event Handlers (called by useChatSocketManager)
     _onSocketConnect: (socketId: string) => void;
@@ -41,7 +50,7 @@ export interface SocketStoreActions {
     emitClearConversation: (conversationId: string) => void;
     emitRenameConversation: (conversationId: string, newTitle: string) => void;
     emitPinConversation: (conversationId: string, isPinned: boolean) => void;
-    emitSendMessage: (payload: { userInput: string; isStreaming: boolean; language: string; /* conversationId?: string; */ }) => void;
+    emitSendMessage: (payload: SendMessagePayload) => void; // SỬA Ở ĐÂY
 }
 
 const initialSocketStoreState: SocketStoreState = {
@@ -188,13 +197,14 @@ export const useSocketStore = create<SocketStoreState & SocketStoreActions>()(
                         socketRef.current.emit('pin_conversation', { conversationId, isPinned });
                     }
                 },
-                emitSendMessage: (payload) => {
+                emitSendMessage: (payload) => { // Sửa signature ở đây
                     const { socketRef, isConnected, isServerReadyForCommands } = get();
                     if (!socketRef.current || !isConnected || !isServerReadyForCommands) {
                         useUiStore.getState().handleError({ message: "Cannot send message: Not connected or server not ready.", type: 'error' }, false, false);
                         return;
                     }
-                    console.log(`[SocketStore] Emitting 'send_message'. Lang: ${payload.language}, Stream: ${payload.isStreaming}. Socket ID: ${socketRef.current?.id}`);
+                    // Log cả conversationId để debug
+                    console.log(`[SocketStore] Emitting 'send_message'. ConvID: ${payload.conversationId}, Lang: ${payload.language}, Stream: ${payload.isStreaming}. Socket ID: ${socketRef.current?.id}`);
                     socketRef.current.emit('send_message', payload);
                 },
             }),

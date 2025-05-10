@@ -37,7 +37,13 @@ export interface ThoughtStep {
     message: string;    // The descriptive message for that step
     timestamp: string;  // ISO timestamp when the step occurred
     details?: any;      // Optional: Any extra data (like function args)
+    agentId?: AgentId; // <<< THÊM HOẶC ĐẢM BẢO CÓ TRƯỜNG NÀY
+
 }
+
+
+export type AgentId = 'HostAgent' | 'ConferenceAgent' | 'JournalAgent' | 'AdminContactAgent' | 'NavigationAgent' | 'WebsiteInfoAgent' | string; // Allow string for flexibility if needed
+
 
 export interface StatusUpdate {
     type: 'status';
@@ -45,7 +51,7 @@ export interface StatusUpdate {
     message: string;
     details?: any; // Optional details relevant to the step (e.g., function name/args)
     thoughts?: ThoughtStep[]; // Add the thought process history
-
+    agentId?: AgentId; // <<< THÊM DÒNG NÀY
 }
 
 // --- Define Action Types ---
@@ -99,6 +105,7 @@ export interface LoadingState {
     isLoading: boolean;
     step: string;
     message: string;
+    agentId?: string;
 }
 
 

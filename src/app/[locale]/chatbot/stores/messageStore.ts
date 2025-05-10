@@ -1,10 +1,19 @@
+// src/stores/messageStore.ts (hoặc đường dẫn tương ứng của bạn)
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import {
-    ChatMessageType, LoadingState, ThoughtStep, ErrorUpdate, ChatUpdate, ResultUpdate,
-    EmailConfirmationResult, ConfirmSendEmailAction, StatusUpdate
-} from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Adjust path
-import { StreamingTextAnimationControls } from '@/src/hooks/chatbot/useStreamingTextAnimation'; // Adjust path
+    ChatMessageType,
+    LoadingState,
+    ThoughtStep,
+    ErrorUpdate,
+    ChatUpdate,
+    ResultUpdate,
+    EmailConfirmationResult,
+    ConfirmSendEmailAction,
+    StatusUpdate,
+    AgentId
+} from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
+import { StreamingTextAnimationControls } from '@/src/hooks/chatbot/useStreamingTextAnimation';
 import { generateMessageId, constructNavigationUrl, openUrlInNewTab } from '@/src/app/[locale]/chatbot/utils/chatUtils';
 import { appConfig } from '@/src/middleware';
 import { useSettingsStore } from './setttingsStore';
@@ -14,32 +23,24 @@ import { useConversationStore } from './conversationStore';
 
 const BASE_WEB_URL = appConfig.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:8386";
 
-// --- Types for Message Store State ---
 export interface MessageStoreState {
     chatMessages: ChatMessageType[];
     loadingState: LoadingState;
     animationControls: StreamingTextAnimationControls | null;
     isAwaitingFinalResultRef: React.MutableRefObject<boolean>;
-    // Thêm state để lưu ID của tin nhắn bot đang chờ stream
-    pendingBotMessageId: string | null; // <<<< THÊM DÒNG NÀY
+    pendingBotMessageId: string | null;
 }
 
-
-// --- Types for Message Store Actions ---
 export interface MessageStoreActions {
     setChatMessages: (newMessagesOrUpdater: ChatMessageType[] | ((prev: ChatMessageType[]) => ChatMessageType[])) => void;
     addChatMessage: (message: ChatMessageType) => void;
     updateMessageById: (messageId: string, updates: Partial<ChatMessageType> | ((prev: ChatMessageType) => Partial<ChatMessageType>)) => void;
     setLoadingState: (loadingState: LoadingState) => void;
-    setAnimationControls: (controls: StreamingTextAnimationControls | null) => void; // Allow null
+    setAnimationControls: (controls: StreamingTextAnimationControls | null) => void;
     resetAwaitFlag: () => void;
-    setPendingBotMessageId: (id: string | null) => void; // <<<< THÊM DÒNG NÀY
-
-    // Complex Actions
+    setPendingBotMessageId: (id: string | null) => void;
     sendMessage: (userInput: string) => void;
-    resetChatUIForNewConversation: (clearActiveIdInOtherStores?: boolean) => void; // Renamed for clarity
-
-    // Socket Event Handlers (called by useChatSocketManager)
+    resetChatUIForNewConversation: (clearActiveIdInOtherStores?: boolean) => void;
     _onSocketStatusUpdate: (data: StatusUpdate) => void;
     _onSocketChatUpdate: (data: ChatUpdate) => void;
     _onSocketChatResult: (data: ResultUpdate) => void;
@@ -49,20 +50,18 @@ export interface MessageStoreActions {
 
 const initialMessageStoreState: MessageStoreState = {
     chatMessages: [],
-    loadingState: { isLoading: false, step: '', message: '' },
+    loadingState: { isLoading: false, step: 'idle', message: '', agentId: undefined },
     animationControls: null,
     isAwaitingFinalResultRef: { current: false },
-    pendingBotMessageId: null, // <<<< THÊM DÒNG NÀY
+    pendingBotMessageId: null,
 };
-
 
 export const useMessageStore = create<MessageStoreState & MessageStoreActions>()(
     devtools(
         (set, get) => ({
             ...initialMessageStoreState,
 
-            // --- Setters ---
-            setChatMessages: (newMessagesOrUpdater) => { // Action này thuộc messageStore
+            setChatMessages: (newMessagesOrUpdater) => {
                 if (typeof newMessagesOrUpdater === 'function') {
                     set(state => ({ chatMessages: newMessagesOrUpdater(state.chatMessages) }), false, 'setChatMessages (updater fn)');
                 } else {
@@ -80,91 +79,101 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
             setLoadingState: (loadingState) => set({ loadingState }, false, 'setLoadingState'),
             setAnimationControls: (controls) => set({ animationControls: controls }, false, 'setAnimationControls'),
             resetAwaitFlag: () => {
-                // console.log("[MessageStore] Resetting isAwaitingFinalResultRef from:", get().isAwaitingFinalResultRef.current);
                 get().isAwaitingFinalResultRef.current = false;
             },
-            setPendingBotMessageId: (id) => set({ pendingBotMessageId: id }, false, 'setPendingBotMessageId'), // <<<< THÊM DÒNG NÀY
+            setPendingBotMessageId: (id) => set({ pendingBotMessageId: id }, false, 'setPendingBotMessageId'),
 
-            // --- Complex Actions ---
             resetChatUIForNewConversation: (clearActiveIdInOtherStores = true) => {
                 set({
                     chatMessages: [],
-                    loadingState: { isLoading: false, step: 'idle', message: '' },
-                    pendingBotMessageId: null, // <<<< THÊM DÒNG NÀY ĐỂ RESET
+                    loadingState: { isLoading: false, step: 'idle', message: '', agentId: undefined },
+                    pendingBotMessageId: null,
                 }, false, 'resetChatUIForNewConversation/messages');
                 get().animationControls?.stopStreaming();
                 get().resetAwaitFlag();
-
                 if (clearActiveIdInOtherStores) {
-                    // setActiveConversationId(null) in conversationStore will handle its part.
+                    //
                 }
                 useUiStore.getState().setShowConfirmationDialog(false);
             },
+
             sendMessage: (userInput) => {
-                const { addChatMessage, setLoadingState, animationControls, resetAwaitFlag, setPendingBotMessageId } = get(); // <<<< Thêm setPendingBotMessageId
+                const { addChatMessage, setLoadingState, animationControls, resetAwaitFlag, setPendingBotMessageId } = get();
                 const { isStreamingEnabled, currentLanguage } = useSettingsStore.getState();
                 const { hasFatalConnectionError } = useSocketStore.getState();
                 const { handleError, hasFatalError: uiHasFatalError } = useUiStore.getState();
+                const { activeConversationId } = useConversationStore.getState();
 
                 const trimmedMessage = userInput.trim();
                 if (!trimmedMessage) return;
 
                 if (hasFatalConnectionError || uiHasFatalError) {
-                    handleError({ message: "Cannot send message: A critical error occurred.", type: 'error' }, false, false);
+                    handleError({ message: "Cannot send message: A critical error occurred.", type: 'error', step: 'send_message_fail_fatal' }, false, false);
                     return;
                 }
 
-                animationControls?.stopStreaming(); // Điều này sẽ reset animationControls.currentStreamingId về null
+                animationControls?.stopStreaming();
                 resetAwaitFlag();
-                setLoadingState({ isLoading: true, step: 'sending', message: 'Sending...' });
+                setLoadingState({ isLoading: true, step: 'sending', message: 'Sending...', agentId: undefined });
 
                 const newUserMessage: ChatMessageType = {
                     id: generateMessageId(), message: trimmedMessage, isUser: true, type: 'text', timestamp: new Date().toISOString(),
                 };
                 addChatMessage(newUserMessage);
 
-                // Tạo một ID cho tin nhắn bot placeholder và lưu nó
                 const botPlaceholderId = `bot-pending-${generateMessageId()}`;
-                setPendingBotMessageId(botPlaceholderId); // <<<< LƯU ID NÀY
-
-                // KHÔNG addChatMessage cho bot placeholder ở đây nữa.
-                // Việc này sẽ do _onSocketChatUpdate xử lý nếu cần.
+                setPendingBotMessageId(botPlaceholderId);
 
                 useSocketStore.getState().emitSendMessage({
                     userInput: trimmedMessage,
                     isStreaming: isStreamingEnabled,
                     language: currentLanguage.code,
+                    conversationId: activeConversationId,
                 });
             },
 
+            _onSocketStatusUpdate: (data: StatusUpdate) => {
+                const { agentId, step, message } = data;
+                let displayMessage = message;
 
-            // --- Socket Event Handlers ---
-            _onSocketStatusUpdate: (data) => set({ loadingState: { isLoading: true, step: data.step, message: data.message } }, false, `_onSocketStatusUpdate/${data.step}`),
+                if (agentId && agentId !== 'HostAgent') {
+                    displayMessage = `[${agentId}] ${message}`;
+                }
+
+                set(state => ({
+                    loadingState: {
+                        ...state.loadingState,
+                        isLoading: true,
+                        step: step,
+                        message: displayMessage,
+                        agentId: agentId
+                    }
+                }), false, `_onSocketStatusUpdate/${agentId || 'unknown_agent'}/${step}`);
+            },
 
             _onSocketChatUpdate: (update) => {
-                const { animationControls, isAwaitingFinalResultRef, addChatMessage, setLoadingState, pendingBotMessageId, chatMessages, setPendingBotMessageId } = get(); // <<<< Lấy pendingBotMessageId và chatMessages
-                if (!animationControls) { console.warn("ChatUpdate received but no animationControls"); return; }
+                const { animationControls, isAwaitingFinalResultRef, addChatMessage, setLoadingState, pendingBotMessageId, chatMessages, setPendingBotMessageId } = get(); // Sửa lại: không cần setPendingBotMessageId ở đây vì nó đã có ở scope ngoài
+                if (!animationControls) {
+                    console.warn("ChatUpdate received but no animationControls");
+                    return;
+                }
 
                 const currentStreamingIdByControls = animationControls.currentStreamingId;
+                const currentAgentId = get().loadingState.agentId;
 
-                // Logic mới: Ưu tiên pendingBotMessageId
                 if (pendingBotMessageId) {
-                    // Kiểm tra xem message với pendingBotMessageId đã tồn tại chưa
                     const existingBotMessage = chatMessages.find(msg => msg.id === pendingBotMessageId);
                     if (!existingBotMessage) {
-                        // Nếu chưa tồn tại, đây là chunk đầu tiên cho message này, thêm nó vào
                         addChatMessage({
-                            id: pendingBotMessageId,
-                            message: '', // Bắt đầu rỗng
-                            isUser: false,
-                            type: 'text',
-                            thoughts: [],
-                            timestamp: new Date().toISOString()
+                            id: pendingBotMessageId, message: '', isUser: false, type: 'text',
+                            thoughts: [], timestamp: new Date().toISOString()
                         });
-                        setLoadingState({ isLoading: true, step: 'streaming_response', message: 'Receiving...' });
+                        const streamingMessage = currentAgentId && currentAgentId !== 'HostAgent'
+                            ? `[${currentAgentId}] Receiving...`
+                            : 'Receiving...';
+                        setLoadingState({ isLoading: true, step: 'streaming_response', message: streamingMessage, agentId: currentAgentId });
                     }
 
-                    // Bắt đầu stream hoặc tiếp tục stream cho pendingBotMessageId
                     if (!currentStreamingIdByControls || currentStreamingIdByControls !== pendingBotMessageId) {
                         animationControls.startStreaming(pendingBotMessageId);
                     }
@@ -172,33 +181,42 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
                     animationControls.processChunk(update.textChunk);
 
                 } else {
-                    // Trường hợp không có pendingBotMessageId (ít khả năng xảy ra nếu sendMessage hoạt động đúng)
-                    // hoặc nếu currentStreamingIdByControls đã có và đang stream
-                    if (isAwaitingFinalResultRef.current || currentStreamingIdByControls) {
-                        if (!isAwaitingFinalResultRef.current && currentStreamingIdByControls) isAwaitingFinalResultRef.current = true;
-                        animationControls.processChunk(update.textChunk);
-                    } else {
-                        // Fallback (logic cũ, nhưng lý tưởng là không rơi vào đây)
-                        console.warn("[MessageStore _onSocketChatUpdate] Fallback: No pendingBotMessageId, creating new streaming ID.");
-                        isAwaitingFinalResultRef.current = true;
-                        const newStreamingId = `streaming-${generateMessageId()}`;
-                        addChatMessage({ id: newStreamingId, message: '', isUser: false, type: 'text', thoughts: [], timestamp: new Date().toISOString() });
-                        setLoadingState({ isLoading: true, step: 'streaming_response', message: 'Receiving...' });
-                        animationControls.startStreaming(newStreamingId);
-                        animationControls.processChunk(update.textChunk);
-                        setPendingBotMessageId(newStreamingId); // Cập nhật pending ID cho lần sau
-                    }
+                    console.warn("[MessageStore _onSocketChatUpdate] Fallback: No pendingBotMessageId or stream already active with different ID.");
+                    isAwaitingFinalResultRef.current = true;
+                    const newStreamingId = `streaming-${generateMessageId()}`;
+                    addChatMessage({ id: newStreamingId, message: '', isUser: false, type: 'text', thoughts: [], timestamp: new Date().toISOString() });
+
+                    const streamingMessage = currentAgentId && currentAgentId !== 'HostAgent'
+                        ? `[${currentAgentId}] Receiving...`
+                        : 'Receiving...';
+                    // Sử dụng hàm setPendingBotMessageId của store
+                    get().setPendingBotMessageId(newStreamingId);
+                    setLoadingState({ isLoading: true, step: 'streaming_response', message: streamingMessage, agentId: currentAgentId });
+
+                    animationControls.startStreaming(newStreamingId);
+                    animationControls.processChunk(update.textChunk);
                 }
             },
 
             _onSocketChatResult: (result) => {
-                const { animationControls, isAwaitingFinalResultRef, setLoadingState, updateMessageById, resetAwaitFlag, addChatMessage, pendingBotMessageId, setPendingBotMessageId } = get(); // <<<< Lấy pendingBotMessageId
+                const { animationControls, isAwaitingFinalResultRef, setLoadingState, updateMessageById, resetAwaitFlag, addChatMessage, pendingBotMessageId, setPendingBotMessageId: storeSetPendingBotMessageId } = get();
                 const { currentLocale } = useSettingsStore.getState();
                 const { setShowConfirmationDialog } = useUiStore.getState();
 
-                if (!animationControls) { console.warn("ChatResult received but no animationControls"); return; }
+                if (!animationControls) {
+                    console.warn("ChatResult received but no animationControls. Adding message directly.");
+                     addChatMessage({
+                        id: generateMessageId(), isUser: false, message: result.message || "Result received",
+                        thoughts: result.thoughts, type: result.action?.type === 'openMap' ? 'map' : 'text',
+                        location: result.action?.type === 'openMap' ? result.action.location : undefined,
+                        timestamp: new Date().toISOString()
+                    });
+                    setLoadingState({ isLoading: false, step: 'result_received_no_controls', message: '', agentId: undefined });
+                    resetAwaitFlag();
+                    storeSetPendingBotMessageId(null);
+                    return;
+                }
 
-                // Ưu tiên pendingBotMessageId nếu có, nếu không thì dùng currentStreamingId từ controls
                 const streamingIdToUse = pendingBotMessageId || animationControls.currentStreamingId;
 
                 if (!isAwaitingFinalResultRef.current && !streamingIdToUse) {
@@ -209,48 +227,42 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
                         location: result.action?.type === 'openMap' ? result.action.location : undefined,
                         timestamp: new Date().toISOString()
                     });
-                    resetAwaitFlag();
-                    setLoadingState({ isLoading: false, step: 'result_received', message: '' });
-                    setPendingBotMessageId(null); // <<<< RESET
-                    return;
+                } else if (streamingIdToUse) {
+                    animationControls.completeStream(); // This should trigger onContentUpdate for the last time
+
+                    updateMessageById(streamingIdToUse, (prevMsg) => {
+                        let finalUpdates: Partial<ChatMessageType> = {
+                            message: result.message || prevMsg.message, // prevMsg.message should be updated by onContentUpdate
+                            thoughts: result.thoughts || prevMsg.thoughts,
+                            timestamp: new Date().toISOString(),
+                        };
+                        const action = result.action;
+
+                        if (action?.type === 'openMap' && action.location) {
+                            finalUpdates.type = 'map';
+                            finalUpdates.location = action.location;
+                            finalUpdates.message = result.message || `Showing map for: ${action.location}`;
+                        } else if (action?.type === 'confirmEmailSend') {
+                            finalUpdates.type = 'text';
+                            finalUpdates.message = result.message || 'Please confirm the action.';
+                        } else if (action?.type === 'navigate' && !result.message) {
+                            finalUpdates.message = `Okay, navigating...`;
+                        }
+
+                        if (!finalUpdates.message && (!action || (action.type !== 'openMap' && action.type !== 'confirmEmailSend'))) {
+                            finalUpdates.message = "Task completed.";
+                        }
+                        return finalUpdates;
+                    });
+                } else {
+                     console.error("[MessageStore _onSocketChatResult] *** CRITICAL: NO STREAMING ID FOUND AFTER COMPLETION! Adding as new. ***");
+                    addChatMessage({ id: generateMessageId(), isUser: false, message: result.message || "Final result", thoughts: result.thoughts, type: 'text', timestamp: new Date().toISOString() });
                 }
 
                 resetAwaitFlag();
-                const finalStreamedMessage = animationControls.completeStream(); // completeStream sẽ gọi onContentUpdate lần cuối
-                setLoadingState({ isLoading: false, step: 'result_received', message: '' });
+                setLoadingState({ isLoading: false, step: 'result_received', message: '', agentId: undefined });
+                storeSetPendingBotMessageId(null);
 
-
-                if (!streamingIdToUse) {
-                    console.error("[MessageStore _onSocketChatResult] *** CRITICAL: NO STREAMING ID FOUND AFTER COMPLETION! ***");
-                    // Add as a new message if ID was lost
-                    addChatMessage({ id: generateMessageId(), isUser: false, message: result.message || finalStreamedMessage || "Final result", thoughts: result.thoughts, type: 'text', timestamp: new Date().toISOString() });
-                    setPendingBotMessageId(null); // <<<< RESET
-                    return;
-                }
-
-                // updateMessageById đã được gọi nhiều lần bởi onContentUpdate trong animationControls
-                // Bây giờ chỉ cần cập nhật các thông tin cuối cùng như thoughts, action, type
-                updateMessageById(streamingIdToUse, (prevMsg) => {
-                    let finalUpdates: Partial<ChatMessageType> = {
-                        message: result.message || prevMsg.message, // Ưu tiên message từ server nếu có
-                        thoughts: result.thoughts || prevMsg.thoughts,
-                        timestamp: new Date().toISOString(), // Cập nhật timestamp
-                    };
-                    const action = result.action;
-
-                    if (action?.type === 'openMap' && action.location) {
-                        finalUpdates.type = 'map'; finalUpdates.location = action.location;
-                        finalUpdates.message = result.message || `Showing map for: ${action.location}`;
-                    } else if (action?.type === 'confirmEmailSend') {
-                        finalUpdates.type = 'text'; // Or a custom type if you have specific UI for it
-                        finalUpdates.message = result.message || 'Please confirm the action.';
-                    } else if (action?.type === 'navigate' && !result.message) {
-                        finalUpdates.message = `Okay, navigating...`; // Default message for navigation
-                    }
-                    return finalUpdates;
-                });
-
-                // Xử lý action
                 const action = result.action;
                 if (action?.type === 'navigate' && action.url) {
                     const finalUrl = constructNavigationUrl(BASE_WEB_URL, currentLocale, action.url);
@@ -258,40 +270,41 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
                 } else if (action?.type === 'confirmEmailSend' && action.payload) {
                     setShowConfirmationDialog(true, action.payload as ConfirmSendEmailAction);
                 }
-
-                setPendingBotMessageId(null); // <<<< RESET pendingBotMessageId sau khi xử lý xong result
             },
-            _onSocketChatError: (errorData: ErrorUpdate) => {
-                // Lấy actions/state từ messageStore (store hiện tại)
-                const { animationControls, resetAwaitFlag, setChatMessages: currentStoreSetChatMessages } = get(); // Lấy setChatMessages từ get() của messageStore
 
-                // Lấy actions/state từ các store khác
+            _onSocketChatError: (errorData: ErrorUpdate) => {
+                const {
+                    animationControls,
+                    resetAwaitFlag,
+                    setChatMessages: currentStoreSetChatMessages,
+                    setLoadingState,
+                    setPendingBotMessageId // <<< Đã sửa ở đây
+                } = get();
                 const { activeConversationId, setActiveConversationId, setIsHistoryLoaded, setIsLoadingHistory } = useConversationStore.getState();
                 const { handleError } = useUiStore.getState();
 
-                console.log("[MessageStore _onSocketChatError] Event: Chat Error received from server:", errorData);
+                console.error("[MessageStore _onSocketChatError] Event: Chat Error received from server:", errorData);
                 resetAwaitFlag();
                 animationControls?.stopStreaming();
+                setPendingBotMessageId(null); // Bây giờ OK
 
                 const { step: errorStep, code: errorCode, details, message } = errorData;
                 const historyLoadErrorSteps = ['history_not_found_load', 'history_load_fail_server', 'auth_required_load', 'invalid_request_load'];
                 const isRelatedToActiveConv = (errorCode === 'CONVERSATION_NOT_FOUND' || errorCode === 'ACCESS_DENIED') && details?.conversationId === activeConversationId;
 
                 if (historyLoadErrorSteps.includes(errorStep || '') || isRelatedToActiveConv) {
-                    console.log(`[MessageStore _onSocketChatError] Error (${errorStep || errorCode}: "${message}") related to active/history. Resetting active conv state.`);
-                    setActiveConversationId(null, { skipUiReset: true }); // Gọi action của conversationStore
-
-                    // SỬA Ở ĐÂY: Gọi setChatMessages của messageStore
-                    currentStoreSetChatMessages(() => []); // Clear messages trong messageStore
-
-                    setIsHistoryLoaded(false); // Gọi action của conversationStore
-                    setIsLoadingHistory(false); // Gọi action của conversationStore
+                    setActiveConversationId(null, { skipUiReset: true });
+                    currentStoreSetChatMessages(() => []);
+                    setIsHistoryLoaded(false);
+                    setIsLoadingHistory(false);
                 }
                 const isFatal = errorCode === 'FATAL_SERVER_ERROR' || errorCode === 'AUTH_REQUIRED' || errorCode === 'ACCESS_DENIED';
-                handleError(errorData, true, isFatal); // Gọi action của uiStore
+                handleError(errorData, true, isFatal);
+                setLoadingState({ isLoading: false, step: errorData.step || 'error_received', message: errorData.message, agentId: undefined });
             },
+
             _onSocketEmailConfirmationResult: (result) => {
-                const { addChatMessage, setLoadingState } = get();
+                const { addChatMessage, setLoadingState, setPendingBotMessageId } = get(); // Thêm setPendingBotMessageId nếu có thể có stream bị ngắt
                 const { confirmationData, setShowConfirmationDialog } = useUiStore.getState();
 
                 if (result.confirmationId === confirmationData?.confirmationId) {
@@ -301,12 +314,13 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
                     id: generateMessageId(), message: result.message, isUser: false,
                     type: result.status === 'success' ? 'text' : 'warning', timestamp: new Date().toISOString()
                 });
-                setLoadingState({ isLoading: false, step: `email_${result.status}`, message: '' });
+                // Có thể reset pendingBotMessageId ở đây nếu một email confirmation result có thể ngắt một stream đang chạy
+                // setPendingBotMessageId(null);
+                setLoadingState({ isLoading: false, step: `email_${result.status}`, message: '', agentId: undefined });
             },
         }),
         {
             name: "MessageStore",
-            // No persist for messages and animation state
         }
     )
 );

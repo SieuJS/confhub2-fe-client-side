@@ -143,43 +143,33 @@ export default function MainLayoutComponent({
     const currentUrlId = searchParamsHook.get('id');
     const currentSearchParamsString = searchParamsHook.toString();
 
-    // This effect should run when the pathname or searchParams change.
-    // We want to trigger "blank slate" IF:
-    // 1. The current path IS /chatbot/regularchat.
-    // 2. The current URL has NO 'id' param.
-    // 3. AND this is a "fresh" navigation to this state, not just an internal state update.
-    //    A good heuristic for "fresh" navigation to this state is if:
-    //    a) The pathname *just became* /chatbot/regularchat OR
-    //    b) The pathname was already /chatbot/regularchat, but the search params *just became empty* (or 'id' was just removed).
-    // 4. AND there's an active conversation in the store that needs clearing.
-
     const justNavigatedToRegularChatBase =
-      (prevPathnameRef.current !== CHATBOT_REGULARCHAT_PATH && currentPathname === CHATBOT_REGULARCHAT_PATH) ||
-      (currentPathname === CHATBOT_REGULARCHAT_PATH && prevSearchParamsStringRef.current !== '' && currentSearchParamsString === '');
-
+        (prevPathnameRef.current !== CHATBOT_REGULARCHAT_PATH && currentPathname === CHATBOT_REGULARCHAT_PATH) ||
+        (currentPathname === CHATBOT_REGULARCHAT_PATH && prevPathnameRef.current === CHATBOT_REGULARCHAT_PATH && prevSearchParamsStringRef.current !== '' && currentSearchParamsString === '');
+        // Điều kiện thứ 2: prevPathnameRef.current === CHATBOT_REGULARCHAT_PATH để đảm bảo không phải từ trang khác tới
+        // mà là từ regularchat?id=... về regularchat
 
     if (
-      currentPathname === CHATBOT_REGULARCHAT_PATH &&
-      !currentUrlId && // No ID in the current URL
-      justNavigatedToRegularChatBase && // And we just arrived at this clean state
-      activeConversationId !== null // But a conversation IS active in the store
+        currentPathname === CHATBOT_REGULARCHAT_PATH &&
+        !currentUrlId &&
+        justNavigatedToRegularChatBase &&
+        activeConversationId !== null // Lấy từ store
     ) {
-      console.log('[MainLayout] Freshly navigated to /chatbot/regularchat (no URL ID) with an active conversation in store. Resetting to blank slate state.');
-      storeSetActiveConversationId(null);
-      resetChatUIForNewConversation(true);
+        console.log('[MainLayout] Blank Slate: Navigated to /chatbot/regularchat (no URL ID) with an active conversation in store. Resetting.');
+        storeSetActiveConversationId(null); // <- This will set activeConversationId in conversationStore to null
+        resetChatUIForNewConversation(true); // <- This will clear messages in messageStore
     }
 
-    // Update refs for the next run
     prevPathnameRef.current = currentPathname;
     prevSearchParamsStringRef.current = currentSearchParamsString;
 
-  }, [
+}, [
     currentPathname,
-    searchParamsHook, // This triggers re-run when URL query changes
-    activeConversationId,
+    searchParamsHook,
+    activeConversationId, // Thêm dependency này RẤT QUAN TRỌNG
     storeSetActiveConversationId,
     resetChatUIForNewConversation,
-  ]);
+]);
 
 
   // --- Event Handlers ---
