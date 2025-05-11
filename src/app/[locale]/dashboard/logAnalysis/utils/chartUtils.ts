@@ -71,6 +71,7 @@ export const getPieChartOption = (title: string, data: Array<{ name: string; val
 };
 
 // Helper function to create Bar chart options
+// Helper function to create Bar chart options
 export const getBarChartOption = (title: string, xAxisData: string[], seriesData: number[], seriesName: string, color?: string) => {
     return {
         title: {
@@ -106,7 +107,14 @@ export const getBarChartOption = (title: string, xAxisData: string[], seriesData
                     interval: 0,
                     rotate: 30, // Xoay label nếu cần
                     fontSize: 11, // Giảm kích thước font trục X
-                    color: '#555'
+                    color: '#555',
+                    formatter: function (value: string) {
+                        // Thêm dấu "..." nếu giá trị dài hơn 20 ký tự
+                        if (value.length > 30) {
+                            return value.substring(0, 27) + '...'; // Lấy 17 ký tự đầu + "..."
+                        }
+                        return value;
+                    }
                 },
                 axisLine: {
                     lineStyle: {

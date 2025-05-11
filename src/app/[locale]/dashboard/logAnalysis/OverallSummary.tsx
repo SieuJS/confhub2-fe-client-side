@@ -32,18 +32,18 @@ const OverallSummary: React.FC<OverallSummaryProps> = ({
   // --- CẬP NHẬT overallStatusData ---
   const overallStatusData = useMemo(() => {
     if (!data?.overall) return []
-    const failedOrCrashedTasks = data.overall.failedOrCrashedTasks || 0
-    const totalCompletedTasks = data.overall.completedTasks || 0
+    const failedOrCrashedTasks = data.overall.totalConferencesInput - data.overall.processedConferencesCount || 0
+    const processedConferencesCount = data.overall.processedConferencesCount || 0
     // --- THÊM processingTasks ---
     const processingTasks = data.overall.processingTasks || 0 // Lấy số lượng task đang xử lý
     const successfulExtractions = data.overall.successfulExtractions || 0
 
-    // Phân loại completed tasks dựa trên extraction success
+    // Phân loại processedConferencesCount dựa trên extraction success
     const completedWithExtractionOk = successfulExtractions
     // Các task completed nhưng extraction không thành công hoặc không có
     const completedWithoutExtractionOk = Math.max(
       0,
-      totalCompletedTasks - successfulExtractions
+      processedConferencesCount - successfulExtractions
     )
 
     return [
@@ -72,7 +72,9 @@ const OverallSummary: React.FC<OverallSummaryProps> = ({
     if (!data?.geminiApi) return []
     const determineRetries = data.geminiApi.retriesByType?.['determine'] || 0
     const extractRetries = data.geminiApi.retriesByType?.['extract'] || 0
-    const retries = determineRetries + extractRetries
+    const cfpRetries = data.geminiApi.retriesByType?.['cfp'] || 0
+
+    const retries = determineRetries + extractRetries + cfpRetries
     return [
       { name: 'Successful', value: data.geminiApi.successfulCalls || 0 },
       { name: 'Failed', value: data.geminiApi.failedCalls || 0 },
