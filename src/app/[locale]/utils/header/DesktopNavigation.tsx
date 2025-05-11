@@ -70,11 +70,10 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
       <Link
         lang={locale}
         href={`/chatbot/landingchatbot`}
-        className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-button md:mx-4 ${isActive(`/${locale}/chatbot`) ? 'text-button' : ''}`}
+        className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-button md:mx-4 ${isActive(`/${locale}/chatbot`) ? 'text-button' : ''} inline-flex items-center`}
       >
         {t('Chatbot')}
-        {/* Thêm thẻ span cho chữ NEW */}
-        <span className='mb-1 ml-1 inline-block rounded bg-button px-1.5 py-0.5 align-middle text-xs font-semibold text-button-text'>
+        <span className='ml-1 shrink-0 rounded bg-button px-1.5 py-0.5 text-xs font-semibold text-button-text'>
           {t('NEW')}
         </span>
         <span

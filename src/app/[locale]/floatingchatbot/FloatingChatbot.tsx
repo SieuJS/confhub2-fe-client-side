@@ -12,6 +12,7 @@ import {
 } from '@/src/app/[locale]/chatbot/stores'
 import { useTranslations } from 'next-intl'
 import { useAppInitialization } from '@/src/hooks/chatbot/useAppInitialization'
+import AnimatedIcon from '../utils/AnimatedIcon'
 
 const FloatingChatbot: React.FC = () => {
   const t = useTranslations('')
@@ -92,11 +93,12 @@ const FloatingChatbot: React.FC = () => {
       {!isChatOpen && (
         <button
           onClick={toggleChatbot}
-          className='fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition-transform duration-150 ease-in-out hover:scale-110 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'
+          className='fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full   transition-transform duration-150 ease-in-out hover:scale-110  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'
           aria-label={t('Open_Chat')}
           title={t('Open_Chat')}
         >
-          <MessageCircle size={28} />
+          {/* <MessageCircle size={28} /> */}
+          <AnimatedIcon className='h-24 w-24' loopOnHover={true} />
         </button>
       )}
 

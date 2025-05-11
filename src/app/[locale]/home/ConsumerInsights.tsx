@@ -1,6 +1,9 @@
+// src/app/[locale]/home/ConsumerInsights.tsx
+'use client' // Giữ nguyên dòng này
+
 import React, { useState, useEffect, useRef } from 'react'
 import { useTranslations } from 'next-intl'
-import Odometer from 'react-odometerjs' // Import Odometer
+import Odometer from 'react-odometerjs' // Giữ nguyên import
 import Button from '../utils/Button'
 import { Link } from '@/src/navigation'
 import {
@@ -11,11 +14,13 @@ import {
 } from 'react-icons/fa'
 
 // --- IMPORT ODOMETER CSS ---
+// Giữ nguyên import CSS
 import 'odometer/themes/odometer-theme-default.css'
 
 interface ConsumerInsightsProps {}
 
 const ConsumerInsights: React.FC<ConsumerInsightsProps> = ({}) => {
+  // ... (giữ nguyên code logic và render)
   const t = useTranslations('ConsumerInsights')
   const title = t('title')
   const subtitle = t('subtitle')
@@ -90,18 +95,19 @@ const ConsumerInsights: React.FC<ConsumerInsightsProps> = ({}) => {
               </div>
 
               {/* --- Animated Number Display using react-odometerjs --- */}
-              {/* V V V V V V V V THIS IS THE FIX V V V V V V V */}
-              <div // Changed from <p>
+              {/* The Odometer component itself will only render and execute on the client */}
+              <div
                 className='mb-2 text-4xl font-bold md:text-5xl'
                 style={{ color: stat.color }}
               >
+                {/* Odometer is safely rendered inside a Client Component */}
                 <Odometer
-                  value={isVisible ? stat.value : 0}
+                  value={isVisible ? stat.value : 0} // Value updates when visible
                   format='(,ddd)'
                   duration={1000}
                 />
               </div>
-              {/* ^ ^ ^ ^ ^ ^ ^ ^ THIS IS THE FIX ^ ^ ^ ^ ^ ^ ^ */}
+              {/* ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ */}
 
               {/* Label */}
               <p className='mt-1 text-sm font-medium uppercase tracking-wider '>

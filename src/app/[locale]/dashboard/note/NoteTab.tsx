@@ -423,7 +423,7 @@ const NoteTab: React.FC<NoteTabProps> = () => {
   }
 
   return (
-    <div className='flex h-full flex-col bg-background p-2 md:p-4'>
+    <div className='flex h-full w-full flex-col bg-background p-2 md:p-4'>
       {/* Dates Details Section */}
       <section className='mb-4 rounded-md bg-background px-4 pb-6 pt-4 shadow'>
         <h2 className='mb-4 text-lg font-semibold'>{t('Dates_details')}</h2>

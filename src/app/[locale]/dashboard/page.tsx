@@ -372,7 +372,7 @@ export default function Dashboard({ locale }: { locale: string }) {
       {/* Added container mx-auto to center this section */}
       {/* Used flex to place sidebar and content side-by-side */}
       <div
-        className='container mx-0 flex min-h-screen px-0'
+        className=' mx-0 flex min-h-screen px-0'
         style={{ paddingTop: `${HEADER_HEIGHT_PX}px` }} // Add padding equal to header height
       >
         {/* Sidebar - Now a flex item */}
@@ -458,9 +458,7 @@ export default function Dashboard({ locale }: { locale: string }) {
         {/* Added padding for content spacing */}
         <div
           className={`
-              /* removed here, 
-              handled by parent
-              */ container flex min-h-screen flex-1 overflow-y-auto p-4 transition-all duration-300 ease-in-out
+               mx-0 flex min-h-screen w-full flex-1 overflow-y-auto p-0 transition-all duration-300 ease-in-out
             `}
         >
           {/* Render page based on activePage */}

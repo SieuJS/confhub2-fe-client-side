@@ -1,19 +1,21 @@
 // src/app/[locale]/layout.tsx
 
-import React from 'react';
-import { ThemeProvider } from '@/src/app/[locale]/utils/ThemeProvider';
-import type { Metadata } from 'next';
+import React from 'react'
+import { ThemeProvider } from '@/src/app/[locale]/utils/ThemeProvider'
+import type { Metadata } from 'next'
+import type { Viewport } from 'next' // Import Viewport type nếu cần
+
 import {
   AbstractIntlMessages,
   NextIntlClientProvider,
   useMessages // useMessages chỉ hoạt động trong Server Components hoặc Client Components được gọi từ Server Components
-} from 'next-intl';
-import localFont from 'next/font/local';
-import NextTopLoader from 'nextjs-toploader';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import './globals.css';
-import ChatbotGlobalInitializer from './chatbot/ChatbotGlobalInitializer'; // <-- IMPORT MỚI
+} from 'next-intl'
+import localFont from 'next/font/local'
+import NextTopLoader from 'nextjs-toploader'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import './globals.css'
+import ChatbotGlobalInitializer from './chatbot/ChatbotGlobalInitializer' // <-- IMPORT MỚI
 
 // ... (Phần định nghĩa fonts: spaceGrotesk, inter, rubik)
 const spaceGrotesk = localFont({
@@ -72,8 +74,14 @@ export const metadata: Metadata = {
   keywords:
     'conferences, academic conferences, conference management, research conferences',
   authors: [{ name: 'ConFHub Team' }],
-  viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow'
+}
+export const viewport: Viewport = {
+  // Sử dụng type Viewport
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false
 }
 
 export default function RootLayout({
@@ -136,7 +144,6 @@ export default function RootLayout({
             messages={messages as AbstractIntlMessages}
           >
             <ChatbotGlobalInitializer /> {/* <-- SỬ DỤNG Ở ĐÂY */}
-
             {/* --- NextTopLoader --- */}
             <NextTopLoader
               initialPosition={0.08}
