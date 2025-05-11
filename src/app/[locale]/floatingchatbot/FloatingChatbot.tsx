@@ -12,7 +12,18 @@ import {
 } from '@/src/app/[locale]/chatbot/stores'
 import { useTranslations } from 'next-intl'
 import { useAppInitialization } from '@/src/hooks/chatbot/useAppInitialization'
-import AnimatedIcon from '../utils/AnimatedIcon'
+// import AnimatedIcon from '../utils/AnimatedIcon'
+import dynamic from 'next/dynamic'
+
+// Import AnimatedIcon một cách dynamic với ssr: false
+const DynamicAnimatedIcon = dynamic(() => import('../utils/AnimatedIcon'), {
+  ssr: false, // ĐÂY LÀ ĐIỂM QUAN TRỌNG NHẤT
+  // Tùy chọn: Hiển thị một placeholder trong khi component đang tải trên client
+  // Đảm bảo placeholder có kích thước tương tự để tránh layout shift
+  loading: () => (
+    <div className='flex h-24 w-24 items-center justify-center'></div>
+  ) // Hoặc spinner, icon tạm...
+})
 
 const FloatingChatbot: React.FC = () => {
   const t = useTranslations('')
@@ -98,7 +109,7 @@ const FloatingChatbot: React.FC = () => {
           title={t('Open_Chat')}
         >
           {/* <MessageCircle size={28} /> */}
-          <AnimatedIcon className='h-24 w-24' loopOnHover={true} />
+          <DynamicAnimatedIcon className='h-24 w-24' loopOnHover={true} />
         </button>
       )}
 

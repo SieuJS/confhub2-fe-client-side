@@ -1,4 +1,4 @@
-// components/Header/components/AuthButtons.tsx (Corrected LoadingIndicator usage)
+// src/app/[locale]/utils/header/AuthButtons.tsx
 
 import { FC } from 'react'
 import { Link } from '@/src/navigation'
