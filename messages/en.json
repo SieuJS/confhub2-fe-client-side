@@ -1001,5 +1001,14 @@
   "Journal_not_found": "Journal not found",
   "Moderation": "Moderation",
   "Request_Admin_Tab": "Request Admin Tab",
-  "Status": "Status"
+  "Status": "Status",
+  "Type_message_short": "Type message...",
+  "Open_Chatbot": "Open Chatbot",
+  "Close_Chat_Settings": "Close Chat Settings",
+  "Open_Chat_Settings": "Open Chat Settings",
+  "Chat_With_Us": "Chat With Us",
+  "Close_Chatbot": "Close Chatbot",
+  "Chat_Settings": "Chat Settings",
+  "Close_Chat": "Close Chat",
+  "Open_Chat": "Open Chat"
 }
