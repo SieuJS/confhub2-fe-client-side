@@ -1,4 +1,4 @@
-// components/Header/components/UserDropdown.tsx
+// src/app/[locale]/utils/header/UserDropdown.tsx
 import { FC, useState, useEffect, useRef } from 'react'
 import { Link } from '@/src/navigation' // assuming this is next-intl Link
 import { useTranslations } from 'next-intl'

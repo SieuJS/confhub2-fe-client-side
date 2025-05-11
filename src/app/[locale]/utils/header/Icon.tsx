@@ -2,11 +2,6 @@
 import { FC, useState, useEffect } from 'react' // Import useState, useEffect
 // import { useLocalStorage } from 'usehooks-ts'; // Có thể không cần thiết nếu chỉ dùng ở đây
 
-// >>> XÓA TOÀN BỘ ĐOẠN CODE TRUY CẬP localStorage Ở TOP LEVEL NÀY <<<
-// let user: { avatar?: string | null } | null = null;
-// try { ... } catch (error) { ... }
-// >>> HẾT ĐOẠN CODE CẦN XÓA <<<
-
 interface NotificationIconProps {
   notificationEffect: boolean
   unreadCount: number | string

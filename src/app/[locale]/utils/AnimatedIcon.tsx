@@ -1,4 +1,5 @@
 // src/components/AnimatedIcon.tsx
+'use client' // <--- THÊM DÒNG NÀY
 import React, { useRef, useState } from 'react' // Import useState
 import Lottie, { LottieRefCurrentProps } from 'lottie-react'
 

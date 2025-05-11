@@ -1,3 +1,5 @@
+// src/app/[locale]/utils/Header.tsx
+
 import { FC, useRef, useState, useEffect } from 'react'
 import { Link } from '@/src/navigation'
 import LogoIcon from '../../icons/logo'
