@@ -106,7 +106,7 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
     }, [conferenceDataArray, sortColumn, sortDirection]);
 
     // handleSort (cập nhật type SortableColumn đã đủ)
-     const handleSort = useCallback((column: SortableColumn) => {
+    const handleSort = useCallback((column: SortableColumn) => {
         if (sortColumn === column) {
             setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
         } else {
@@ -149,7 +149,7 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
 
     const handleSelectError = useCallback(() => {
         const newSelection: Record<string, boolean> = {};
-         // Lọc dựa trên errorCount đã tính
+        // Lọc dựa trên errorCount đã tính
         sortedData.forEach(conf => { if (conf.errorCount > 0) newSelection[conf.title] = true; });
         setSelectedConferences(newSelection);
     }, [sortedData]);
@@ -157,14 +157,14 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
     // --- THÊM HÀM CHỌN THEO WARNING ---
     const handleSelectWarning = useCallback(() => {
         const newSelection: Record<string, boolean> = {};
-         // Lọc dựa trên hasValidationWarnings đã tính
+        // Lọc dựa trên hasValidationWarnings đã tính
         sortedData.forEach(conf => { if (conf.hasValidationWarnings) newSelection[conf.title] = true; });
         setSelectedConferences(newSelection);
     }, [sortedData]);
 
     const handleSelectNoWarning = useCallback(() => {
         const newSelection: Record<string, boolean> = {};
-         // Lọc dựa trên hasValidationWarnings đã tính
+        // Lọc dựa trên hasValidationWarnings đã tính
         sortedData.forEach(conf => { if (!conf.hasValidationWarnings) newSelection[conf.title] = true; });
         setSelectedConferences(newSelection);
     }, [sortedData]);
@@ -198,7 +198,7 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
     }, [selectedConferences, mainSaveStatus]);
 
     // handleBulkSave (logic bên trong không cần thay đổi nhiều, vì isSaveEnabled đã lọc trước)
-     const handleBulkSave = async () => {
+    const handleBulkSave = async () => {
         if (!isSaveEnabled) return; // Guard đã bao gồm cả check warning
 
         setMainSaveStatus('saving');
@@ -221,12 +221,12 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
         const savePromises = itemsToSave.map(conf =>
             // Giả sử API chỉ cần title và dữ liệu preview (hoặc toàn bộ conf nếu cần)
             // Đảm bảo API của bạn nhận đúng dữ liệu bạn muốn lưu
-             saveConferenceToJson(conf.title, conf.finalResult || {}) // Ví dụ: chỉ lưu preview
-           // saveConferenceToJson(conf.title, conf) // Hoặc lưu toàn bộ conf
+            saveConferenceToJson(conf.title, conf.finalResult || {}) // Ví dụ: chỉ lưu preview
+            // saveConferenceToJson(conf.title, conf) // Hoặc lưu toàn bộ conf
         );
 
         const results = await Promise.allSettled(savePromises);
-        console.log(`Bulk save results:`, JSON.stringify( results));
+        console.log(`Bulk save results:`, JSON.stringify(results));
         // Process results (logic này vẫn đúng để cập nhật row status)
         const finalRowStatus: Record<string, RowSaveStatus> = { ...nextRowStatus };
         const finalRowErrors: Record<string, string> = { ...nextRowErrors };
@@ -242,15 +242,15 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
                 failedSaves++;
                 // Cố gắng lấy message lỗi một cách an toàn hơn
                 const errorMessage = typeof result.reason === 'object' && result.reason !== null && 'message' in result.reason
-                                     ? String(result.reason.message)
-                                     : String(result.reason);
+                    ? String(result.reason.message)
+                    : String(result.reason);
                 finalRowStatus[currentTitle] = 'error';
                 finalRowErrors[currentTitle] = errorMessage;
                 console.error(`Bulk Save Error (Rejected): ${currentTitle}`, errorMessage);
             } else if (result.status === 'fulfilled') {
-                 // API có thể trả về { success: boolean, title: string, message?: string }
-                 const response = result.value as { success: boolean, title?: string, message?: string }; // Type assertion
-                 const titleFromResponse = response.title ?? currentTitle; // Ưu tiên title từ response nếu có
+                // API có thể trả về { success: boolean, title: string, message?: string }
+                const response = result.value as { success: boolean, title?: string, message?: string }; // Type assertion
+                const titleFromResponse = response.title ?? currentTitle; // Ưu tiên title từ response nếu có
 
                 if (!response.success) {
                     overallSuccess = false;
@@ -290,10 +290,10 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
     }, [selectedTitles]);
 
 
-     // --- CẬP NHẬT Return state and handlers ---
-     // Đảm bảo hook trả về các hàm đã được định nghĩa trong phạm vi của nó
-     // với các kiểu đã export ở trên
-     return {
+    // --- CẬP NHẬT Return state and handlers ---
+    // Đảm bảo hook trả về các hàm đã được định nghĩa trong phạm vi của nó
+    // với các kiểu đã export ở trên
+    return {
         sortedData,
         conferenceDataArray,
         sortColumn,
@@ -316,5 +316,5 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
         rowSaveStatus,
         rowSaveErrors,
         handleCrawlAgain,
-     };
+    };
 };
