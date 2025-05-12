@@ -36,18 +36,19 @@ import { useTranslations } from 'next-intl'
 
 // --- THAY ĐỔI QUAN TRỌNG ---
 import { useLiveChatSettings } from './contexts/LiveChatSettingsContext' // Context này cho modality, voice
-import { useChatSettingsState } from '@/src/app/[locale]/chatbot/stores/storeHooks';
+import { useChatSettingsState } from '@/src/app/[locale]/chatbot/stores/storeHooks'
 
 export default function LiveChatExperience() {
   const {
     currentModality,
     currentVoice,
     // --- LẤY SETTER TỪ LIVE CHAT SETTINGS CONTEXT ---
-    setLiveChatConnected,
+    setLiveChatConnected
   } = useLiveChatSettings()
 
-  const { currentLanguage: currentLanguageOptionFromStore } = useChatSettingsState();
-  const currentLanguageCode = currentLanguageOptionFromStore.code;
+  const { currentLanguage: currentLanguageOptionFromStore } =
+    useChatSettingsState()
+  const currentLanguageCode = currentLanguageOptionFromStore.code
 
   const t = useTranslations()
 
@@ -97,8 +98,8 @@ export default function LiveChatExperience() {
 
   // --- EFFECT ĐỂ CẬP NHẬT TRẠNG THÁI KẾT NỐI TRONG CONTEXT ---
   useEffect(() => {
-    setLiveChatConnected(connected); // Cập nhật context khi 'connected' thay đổi
-  }, [connected, setLiveChatConnected]);
+    setLiveChatConnected(connected) // Cập nhật context khi 'connected' thay đổi
+  }, [connected, setLiveChatConnected])
 
   useEffect(() => {
     if (connected) {
@@ -162,7 +163,7 @@ export default function LiveChatExperience() {
   const shouldShowRestartButton = connectionStatusType === 'error'
 
   return (
-    <div className='bg-white-pure relative flex h-full flex-col rounded-xl border-2 shadow-inner '>
+    <div className='relative flex h-full flex-col rounded-xl border-2 bg-white-pure shadow-inner '>
       <LiveChatAPIConfig
         outputModality={currentModality}
         selectedVoice={currentVoice}
@@ -202,7 +203,7 @@ export default function LiveChatExperience() {
         )}
       </div>
 
-      <div className='border-gray-20 bg-gray-10 m-4 flex items-center gap-2 rounded-full border p-1.5  '>
+      <div className='m-4 flex items-center gap-2 rounded-full border border-gray-20 bg-gray-10 p-1  '>
         <ConnectionButton
           connected={connected}
           connect={connectWithPermissions}

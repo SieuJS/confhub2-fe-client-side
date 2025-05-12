@@ -141,13 +141,13 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
       <Button
         variant='secondary' // Sử dụng ghost hoặc một variant không có background mặc định để dễ tùy chỉnh hover
-        size='medium' // Sử dụng size 'icon' nếu Button component hỗ trợ để tối ưu padding/margin cho icon
+        size='small' // Sử dụng size 'icon' nếu Button component hỗ trợ để tối ưu padding/margin cho icon
         rounded={true} // Giữ bo tròn
         onClick={handleSendMessage}
         disabled={isEffectivelyDisabled}
         aria-label={isLoading ? t('Sending') : t('Send_message')}
         className={`
-         h-12                                
+         h-10 w-10                                
         `}
         // style={{ minWidth: '32px', minHeight: '32px' }}
       >
@@ -157,7 +157,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
         ) : (
           // --- Hoặc dùng thư viện react-spinners ---
           // <ClipLoader size={18} color={"#2563EB"} loading={true} /> // Điều chỉnh size/color phù hợp
-          <GrSend className='h-4 w-4 text-button' size={18} /> // Điều chỉnh kích thước icon nếu cần
+          <GrSend className='h-5 w-5 text-center text-button' size={20} /> // Điều chỉnh kích thước icon nếu cần
         )}
       </Button>
     </div>
