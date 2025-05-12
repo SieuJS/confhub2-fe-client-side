@@ -1,3 +1,5 @@
+// src/app/[locate]/conferences/detail/page.tsx
+
 'use client'
 
 import { useTranslations } from 'next-intl'
@@ -11,7 +13,7 @@ import { Header } from '../../utils/Header'
 import Footer from '../../utils/Footer'
 import { useRouter, usePathname } from 'next/navigation'
 import useAuthApi from '@/src/hooks/auth/useAuthApi'
-import FloatingChatbot from '@/src/app/[locale]/floatingchatbot/FloatingChatbot'; // <-- IMPORT MỚI
+import FloatingChatbot from '@/src/app/[locale]/floatingchatbot/FloatingChatbot' // <-- IMPORT MỚI
 
 // Import the custom hooks
 import useSequentialConferenceData from '@/src/hooks/conferenceDetails/useSequentialConferenceData'
@@ -24,12 +26,12 @@ import useUpdateConference from '../../../../hooks/conferenceDetails/useUpdateCo
 import useBlacklistConference from '../../../../hooks/conferenceDetails/useBlacklistConference'
 
 // Import new components
-import ConferenceHeader from './ConferenceHeader';
-import ConferenceTopics from './ConferenceTopics';
-import ConferenceActionButtons from './ConferenceActionButtons';
+import ConferenceHeader from './ConferenceHeader'
+import ConferenceTopics from './ConferenceTopics'
+import ConferenceActionButtons from './ConferenceActionButtons'
 
 // Import utility functions
-import { transformDates, calculateOverallRating } from './utils/conferenceUtils';
+import { transformDates, calculateOverallRating } from './utils/conferenceUtils'
 
 interface EventCardProps {
   locale: string
@@ -53,7 +55,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   // --- Extract accessType and rank from the last organization ---
   const lastOrganization =
     conferenceDataFromDB?.organizations?.[
-    conferenceDataFromDB.organizations.length - 1
+      conferenceDataFromDB.organizations.length - 1
     ]
   const firstRankData = conferenceDataFromDB?.ranks?.[0]
 
@@ -86,21 +88,27 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } =
     useTopicsDisplay(lastOrganization?.topics || [])
 
-  const { dateDisplay } = useFormatConferenceDates(transformedDatesData, language)
+  const { dateDisplay } = useFormatConferenceDates(
+    transformedDatesData,
+    language
+  )
   const { isLoggedIn } = useAuthApi()
 
   // Removed menu state and refs, they are now in ConferenceActionButtons
 
-  const checkLoginAndRedirect = useCallback((callback: () => void) => { // Keep useCallback
-    if (!isLoggedIn) {
-      const localePrefix = pathname.split('/')[1]
-      const pathWithLocale = `/${localePrefix}/auth/login`
-      router.push(pathWithLocale)
-    } else {
-      callback()
-    }
-  }, [isLoggedIn, pathname, router])
-
+  const checkLoginAndRedirect = useCallback(
+    (callback: () => void) => {
+      // Keep useCallback
+      if (!isLoggedIn) {
+        const localePrefix = pathname.split('/')[1]
+        const pathWithLocale = `/${localePrefix}/auth/login`
+        router.push(pathWithLocale)
+      } else {
+        callback()
+      }
+    },
+    [isLoggedIn, pathname, router]
+  )
 
   useEffect(() => {
     if (updateResult) {
@@ -123,9 +131,8 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
   const totalReviews = conferenceDataFromDB?.feedbacks?.length || 0
 
   return (
-    <div className='bg-gray-5 flex min-h-screen flex-col'>
+    <div className='flex min-h-screen flex-col bg-gray-5'>
       <Header locale={locale} />
-
       <div className='container mx-auto flex-grow px-0 py-8 pt-20 md:px-4'>
         {isUpdating && ( // Action Loading Overlay
           <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
@@ -136,8 +143,7 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         {/* Display errors (e.g., followError, calendarError, blacklistError) using toasts or a notification system */}
         {/* {followError && <p className="text-red-500 text-center">Follow Error: {followError}</p>} */}
 
-
-        <div className='bg-white-pure rounded-lg p-2 shadow-md md:p-4'>
+        <div className='rounded-lg bg-white-pure p-2 shadow-md md:p-4'>
           <div className='flex flex-col gap-4 md:flex-row'>
             {/* Left Column */}
             <div className='md:w-4/5'>
@@ -186,14 +192,12 @@ const Detail: React.FC<EventCardProps> = ({ locale }: EventCardProps) => {
         </div>
 
         {/* Feedback Section */}
-        <div className='bg-white-pure mt-8 rounded-lg p-4 shadow-md md:p-6'>
+        <div className='mt-8 rounded-lg bg-white-pure p-4 shadow-md md:p-6'>
           <ConferenceFeedback conferenceData={conferenceDataFromDB} />
         </div>
       </div>
-
       <Footer />
       <FloatingChatbot /> {/* <-- THÊM CHATBOT NỔI Ở ĐÂY */}
-
     </div>
   )
 }

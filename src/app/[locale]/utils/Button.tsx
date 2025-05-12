@@ -6,7 +6,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size?: 'small' | 'medium' | 'large' | 'mini'
   rounded?: boolean
   advanced?: boolean
-  advancedDivColor?: string;
+  advancedDivColor?: string
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -31,28 +31,34 @@ const Button: React.FC<ButtonProps> = ({
   const variantStyles = {
     primary: 'bg-button text-button-text ring-secondary ring-2',
     secondary: 'bg-button-secondary text-secondary ring-secondary ring-2',
-    danger: 'bg-danger text-danger ring-danger ring-2'
+    danger: 'bg-red-400 text-button-text ring-red-500 ring-2'
   }
 
-  const advancedStyles = advanced ? 'relative hover:shadow-lg transition-shadow duration-300 group' : ''; // group class still needed for button hover effect if you keep it
+  const advancedStyles = advanced
+    ? 'relative hover:shadow-lg transition-shadow duration-300 group'
+    : '' // group class still needed for button hover effect if you keep it
 
-  const buttonStyles = `${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className} ${advancedStyles}`;
+  const buttonStyles = `${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className} ${advancedStyles}`
 
   const renderButton = () => (
     <button className={buttonStyles} {...props}>
       {children}
     </button>
-  );
+  )
 
   if (advanced) {
     return (
-      <div className={`${advancedDivColor} rounded-full relative overflow-hidden`}> {/* Div wrapper with ripple effect and overflow-hidden */}
-        <span className="absolute inset-0 pointer-events-none before:absolute before:-inset-1 before:bg-button before:opacity-10 before:rounded-full before:scale-0 before:origin-center before:animate-pulse-ripple"></span>
+      <div
+        className={`${advancedDivColor} relative overflow-hidden rounded-full`}
+      >
+        {' '}
+        {/* Div wrapper with ripple effect and overflow-hidden */}
+        <span className='pointer-events-none absolute inset-0 before:absolute before:-inset-1 before:origin-center before:scale-0 before:animate-pulse-ripple before:rounded-full before:bg-button before:opacity-10'></span>
         {renderButton()}
       </div>
-    );
+    )
   } else {
-    return renderButton();
+    return renderButton()
   }
 }
 
