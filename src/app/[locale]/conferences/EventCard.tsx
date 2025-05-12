@@ -463,8 +463,8 @@ const EventCard: React.FC<EventCardProps> = ({
                 disabled={isBlacklisted || isLoading} // Disable if blacklisted or loading
                 title={
                   isFollowing
-                    ? t('Remove_from_Favorites')
-                    : t('Add_to_Favorites')
+                    ? t('Unfollow')
+                    : t('Follow')
                 }
               >
                 {followLoading ? (
