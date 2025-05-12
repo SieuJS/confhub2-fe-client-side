@@ -78,7 +78,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   return (
     // - `px-2 py-1` -> `px-1.5 py-0.5 sm:px-2 sm:py-1` cho container input
     <div
-      className='flex w-full items-end rounded-3xl bg-white px-1.5 py-0.5 shadow-sm transition-all duration-200 ease-in-out focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 dark:bg-gray-700 dark:focus-within:border-blue-400'
+      className='flex w-full items-end rounded-2xl bg-white px-1.5 py-1 shadow-sm transition-all duration-200 ease-in-out focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 dark:bg-gray-700 dark:focus-within:border-blue-400'
     >
       <TextareaAutosize
         ref={inputRef}
@@ -108,14 +108,14 @@ const ChatInput: React.FC<ChatInputProps> = ({
       {/* - Nút gửi có thể cần điều chỉnh size hoặc padding trên mobile */}
       <Button
         variant='primary'
-        size='small' // Có thể dùng 'icon' hoặc 'small'
+        size='mini' // Có thể dùng 'icon' hoặc 'small'
         rounded={true}
         onClick={handleSendMessage}
         disabled={disabled || !inputValue.trim()}
         aria-label={t('Send_message')} // Sử dụng key translation
-        className='ml-1.5 sm:ml-2 flex-shrink-0 p-2 sm:p-2.5' // Điều chỉnh padding cho nút
+        className='ml-1.5 sm:ml-2 flex-shrink-0' // Điều chỉnh padding cho nút
       >
-        <GrSend size={18} className="sm:w-5 sm:h-5 w-4 h-4" /> {/* Kích thước icon */}
+        <GrSend size={12} className="sm:w-5 sm:h-5 w-4 h-4" /> {/* Kích thước icon */}
       </Button>
     </div>
   );

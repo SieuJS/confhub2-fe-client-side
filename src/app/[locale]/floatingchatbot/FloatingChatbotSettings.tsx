@@ -3,11 +3,11 @@
 
 import React from 'react'
 import { X, Settings } from 'lucide-react'
-import LanguageDropdown from '../chatbot/LanguageDropdown' // Đảm bảo đường dẫn đúng
+import LanguageDropdown from '../chatbot/LanguageDropdown'
 import { useTranslations } from 'next-intl'
-import { useSettingsStore } from '@/src/app/[locale]/chatbot/stores' // Đường dẫn đến store
+import { useSettingsStore } from '@/src/app/[locale]/chatbot/stores'
 import { useShallow } from 'zustand/react/shallow'
-import { LanguageOption } from '@/src/app/[locale]/chatbot/stores' // Import LanguageOption
+import { LanguageOption } from '@/src/app/[locale]/chatbot/stores'
 
 interface FloatingChatbotSettingsProps {
   isOpen: boolean
@@ -18,36 +18,52 @@ const FloatingChatbotSettings: React.FC<FloatingChatbotSettingsProps> = ({
   isOpen,
   onClose
 }) => {
-  const t = useTranslations('') // Hoặc namespace phù hợp
+  const t = useTranslations('')
 
   const {
     currentLanguage,
     availableLanguages,
     isStreamingEnabled,
+    isConversationToolbarHiddenInFloatingChat,
+    isThoughtProcessHiddenInFloatingChat, // <-- Get new state
     setCurrentLanguage,
-    setIsStreamingEnabled
+    setIsStreamingEnabled,
+    setIsConversationToolbarHiddenInFloatingChat,
+    setIsThoughtProcessHiddenInFloatingChat // <-- Get new action
   } = useSettingsStore(
     useShallow(state => ({
       currentLanguage: state.currentLanguage,
       availableLanguages: state.availableLanguages,
       isStreamingEnabled: state.isStreamingEnabled,
+      isConversationToolbarHiddenInFloatingChat: state.isConversationToolbarHiddenInFloatingChat,
+      isThoughtProcessHiddenInFloatingChat: state.isThoughtProcessHiddenInFloatingChat, // <-- Access
       setCurrentLanguage: state.setCurrentLanguage,
-      setIsStreamingEnabled: state.setIsStreamingEnabled
+      setIsStreamingEnabled: state.setIsStreamingEnabled,
+      setIsConversationToolbarHiddenInFloatingChat: state.setIsConversationToolbarHiddenInFloatingChat,
+      setIsThoughtProcessHiddenInFloatingChat: state.setIsThoughtProcessHiddenInFloatingChat // <-- Access
     }))
   )
 
-  const handleStreamingToggle = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleStreamingToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsStreamingEnabled(event.target.checked)
   }
+
+  const handleToolbarToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsConversationToolbarHiddenInFloatingChat(event.target.checked)
+  }
+
+  const handleThoughtProcessToggle = ( // <-- New handler
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setIsThoughtProcessHiddenInFloatingChat(event.target.checked)
+  }
+
 
   if (!isOpen) {
     return null
   }
 
   return (
-    // Sử dụng absolute positioning để panel này nổi lên trên RegularChat bên trong FloatingChatbot
     <div
       className='absolute inset-0 z-10 flex h-full w-full flex-col overflow-hidden rounded-b-lg bg-white-pure shadow-inner transition-opacity duration-300 ease-in-out'
       aria-modal='true'
@@ -99,18 +115,67 @@ const FloatingChatbotSettings: React.FC<FloatingChatbotSettingsProps> = ({
             </label>
           </div>
 
+          {/* Hide Conversation Toolbar Setting */}
+          <div className='space-y-1'>
+            <label
+              htmlFor='toolbar-toggle-floating'
+              className='block text-sm font-medium '
+            >
+              {t('FloatingChat_Hide_Toolbar')}
+            </label>
+            <label
+              htmlFor='toolbar-toggle-floating'
+              className='inline-flex cursor-pointer items-center'
+            >
+              <input
+                type='checkbox'
+                id='toolbar-toggle-floating'
+                className='peer sr-only'
+                checked={isConversationToolbarHiddenInFloatingChat}
+                onChange={handleToolbarToggle}
+              />
+              <div className="peer relative h-6 w-10 rounded-full bg-gray-20 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-30 after:bg-white-pure after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white-pure peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"></div>
+            </label>
+            <p className='text-xs text-gray-500 dark:text-gray-400'>
+              {t('FloatingChat_Hide_Toolbar_Description')}
+            </p>
+          </div>
+
+          {/* Hide Thought Process Setting */}
+          <div className='space-y-1'>
+            <label
+              htmlFor='thought-process-toggle-floating'
+              className='block text-sm font-medium '
+            >
+              {t('FloatingChat_Hide_Thought_Process')} {/* Thêm key translation mới */}
+            </label>
+            <label
+              htmlFor='thought-process-toggle-floating'
+              className='inline-flex cursor-pointer items-center'
+            >
+              <input
+                type='checkbox'
+                id='thought-process-toggle-floating'
+                className='peer sr-only'
+                checked={isThoughtProcessHiddenInFloatingChat} // true = hidden
+                onChange={handleThoughtProcessToggle}
+              />
+              <div className="peer relative h-6 w-10 rounded-full bg-gray-20 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-30 after:bg-white-pure after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white-pure peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"></div>
+            </label>
+            <p className='text-xs text-gray-500 dark:text-gray-400'>
+              {t('FloatingChat_Hide_Thought_Process_Description')} {/* Thêm key translation mới */}
+            </p>
+          </div>
+
           {/* Language Dropdown Setting */}
           <div className='space-y-1'>
-            {/* <label className='block text-sm font-medium text-gray-700'>
-              {t('Language')}
-            </label> */}
             <LanguageDropdown
               currentLanguage={currentLanguage}
               availableLanguages={availableLanguages}
               onLanguageChange={(lang: LanguageOption) =>
                 setCurrentLanguage(lang)
-              } // Đảm bảo kiểu khớp
-              disabled={false} // Không có live chat context ở đây
+              }
+              disabled={false}
             />
           </div>
         </div>

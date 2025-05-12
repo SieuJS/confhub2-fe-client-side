@@ -1,3 +1,4 @@
+// src/app/[locale]/chatbot/sotres/settingStore.ts
 import { create } from 'zustand';
 import { persist, createJSONStorage, devtools } from 'zustand/middleware';
 import {
@@ -17,9 +18,11 @@ export interface LanguageOption {
 
 export interface SettingsStoreState {
     chatMode: ChatMode;
-    currentLocale: string; // App's current language from URL
+    currentLocale: string;
     isStreamingEnabled: boolean;
-    currentLanguage: LanguageOption; // Chatbot's language
+    isConversationToolbarHiddenInFloatingChat: boolean;
+    isThoughtProcessHiddenInFloatingChat: boolean; // <-- NEW STATE
+    currentLanguage: LanguageOption;
     availableLanguages: LanguageOption[];
 }
 
@@ -27,15 +30,17 @@ export interface SettingsStoreActions {
     setChatMode: (mode: ChatMode) => void;
     setCurrentLocale: (locale: string) => void;
     setIsStreamingEnabled: (enabled: boolean) => void;
+    setIsConversationToolbarHiddenInFloatingChat: (hidden: boolean) => void;
+    setIsThoughtProcessHiddenInFloatingChat: (hidden: boolean) => void; // <-- NEW ACTION
     setCurrentLanguage: (language: LanguageOption) => void;
-    // availableLanguages is usually static, but if it could change:
-    // setAvailableLanguages: (languages: LanguageOption[]) => void;
 }
 
 const initialSettingsStoreState: SettingsStoreState = {
     chatMode: 'regular',
-    currentLocale: 'en', // Default, will be overridden
+    currentLocale: 'en',
     isStreamingEnabled: IS_STREAMING_ENABLED_DEFAULT,
+    isConversationToolbarHiddenInFloatingChat: true,
+    isThoughtProcessHiddenInFloatingChat: true, // <-- Default to hidden for floating chat
     currentLanguage: DEFAULT_LANGUAGE_REGULAR_CHAT,
     availableLanguages: AVAILABLE_LANGUAGES_REGULAR_CHAT,
 };
@@ -49,14 +54,14 @@ export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions
                 setChatMode: (mode) => {
                     if (get().chatMode === mode) return;
                     set({ chatMode: mode }, false, `setChatMode/${mode}`);
-                    // Component (e.g., MainLayout or a settings component) will handle navigation
-                    // and potentially call startNewConversation from conversationStore if needed.
                 },
                 setCurrentLocale: (locale) => {
                     if (get().currentLocale === locale) return;
                     set({ currentLocale: locale }, false, 'setCurrentLocale');
                 },
                 setIsStreamingEnabled: (enabled) => set({ isStreamingEnabled: enabled }, false, 'setIsStreamingEnabled'),
+                setIsConversationToolbarHiddenInFloatingChat: (hidden) => set({ isConversationToolbarHiddenInFloatingChat: hidden }, false, 'setIsConversationToolbarHiddenInFloatingChat'),
+                setIsThoughtProcessHiddenInFloatingChat: (hidden) => set({ isThoughtProcessHiddenInFloatingChat: hidden }, false, 'setIsThoughtProcessHiddenInFloatingChat'), // <-- IMPLEMENT NEW ACTION
                 setCurrentLanguage: (language) => set({ currentLanguage: language }, false, 'setCurrentLanguage'),
             }),
             {
@@ -66,18 +71,17 @@ export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions
                     chatMode: state.chatMode,
                     currentLocale: state.currentLocale,
                     isStreamingEnabled: state.isStreamingEnabled,
+                    isConversationToolbarHiddenInFloatingChat: state.isConversationToolbarHiddenInFloatingChat,
+                    isThoughtProcessHiddenInFloatingChat: state.isThoughtProcessHiddenInFloatingChat, // <-- PERSIST NEW STATE
                     currentLanguage: state.currentLanguage,
-                    // availableLanguages is from constants, no need to persist
                 }),
                 onRehydrateStorage: () => (state) => {
                     if (state) {
-                        // Ensure availableLanguages is always up-to-date from constants
                         state.availableLanguages = AVAILABLE_LANGUAGES_REGULAR_CHAT;
-                        // Validate currentLanguage against availableLanguages
                         if (!AVAILABLE_LANGUAGES_REGULAR_CHAT.find(lang => lang.code === state.currentLanguage?.code)) {
                             state.currentLanguage = DEFAULT_LANGUAGE_REGULAR_CHAT;
                         }
-                        console.log('[SettingsStore] Rehydrated from storage. ChatMode:', state.chatMode, 'Lang:', state.currentLanguage?.name);
+                        // console.log('[SettingsStore] Rehydrated:', state);
                     }
                 }
             }

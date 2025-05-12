@@ -1,5 +1,5 @@
 // src/app/[locale]/chatbot/chat/ChatMessageDisplay.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { ReactHTML, PropsWithChildren } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -13,6 +13,8 @@ import { TriangleAlert, Copy, Pencil, Check } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Map from '../../conferences/detail/Map'; // Đảm bảo component Map responsive
 import ThoughtProcess from './ThoughtProcess'; // Đảm bảo component ThoughtProcess responsive
+import { useSettingsStore } from '../stores';
+import { useShallow } from 'zustand/react/shallow';
 
 type MarkdownComponentProps<T extends keyof ReactHTML> = PropsWithChildren<
   JSX.IntrinsicElements[T] & {
@@ -27,8 +29,7 @@ interface ChatMessageDisplayProps {
   type: MessageType;
   thoughts?: ThoughtStep[];
   location?: string;
-    isInsideSmallContainer?: boolean; // <-- THÊM PROP MỚI
-
+  isInsideSmallContainer?: boolean;
 }
 
 const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
@@ -38,12 +39,54 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
   type = 'text',
   thoughts,
   location,
-    isInsideSmallContainer = false // <-- Giá trị mặc định là false
-
+  isInsideSmallContainer = false
 }) => {
   const [isCopied, setIsCopied] = useState(false);
+  const { isThoughtProcessHiddenInFloatingChat } = useSettingsStore(
+    useShallow(state => ({
+      isThoughtProcessHiddenInFloatingChat: state.isThoughtProcessHiddenInFloatingChat,
+    }))
+  );
 
-  const handleCopyClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  // --- Logic mới cho độ rộng động của tin nhắn model ---
+  const bubbleRef = useRef<HTMLDivElement>(null);
+  const [modelMessageShouldBeFullWidth, setModelMessageShouldBeFullWidth] = useState(false);
+
+  useEffect(() => {
+    // Chỉ áp dụng logic này cho tin nhắn model trong small container
+    if (!isUser && isInsideSmallContainer && bubbleRef.current) {
+      const bubbleElement = bubbleRef.current;
+      // Container cha trực tiếp của bubble (trong ChatHistory.tsx, là div.flex.w-full.py-1...)
+      // Chúng ta cần chiều rộng của không gian mà bubble CÓ THỂ chiếm.
+      // Giả sử parentElement là nơi bubble được đặt vào.
+      const parentElement = bubbleElement.parentElement;
+
+      if (parentElement) {
+        // Tạm thời render với w-auto để đo
+        // (Cần đảm bảo class ban đầu cho phép đo này)
+        const initialBubbleWidth = bubbleElement.offsetWidth;
+        const parentWidth = parentElement.offsetWidth;
+
+        // Ngưỡng 70%
+        const thresholdWidth = parentWidth * 0.95;
+
+        if (initialBubbleWidth > thresholdWidth) {
+          setModelMessageShouldBeFullWidth(true);
+        } else {
+          setModelMessageShouldBeFullWidth(false); // Đảm bảo reset nếu tin nhắn thay đổi và ngắn lại
+        }
+      }
+    } else {
+      // Reset nếu không phải model message hoặc không trong small container
+      setModelMessageShouldBeFullWidth(false);
+    }
+    // Chạy lại khi message thay đổi (quan trọng nếu nội dung message cập nhật động)
+    // hoặc khi isInsideSmallContainer thay đổi (mặc dù ít khả năng)
+  }, [message, isUser, isInsideSmallContainer, id]); // Thêm id để re-check khi message mới cùng loại xuất hiện
+
+
+  // ... (handleCopyClick, handleEditClick giữ nguyên)
+   const handleCopyClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     if (isCopied) return;
     navigator.clipboard
@@ -64,18 +107,25 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
     console.log('Edit button clicked for message:', message);
   };
 
-   const getMaxWidthClasses = () => {
+  const getWidthAndMaxWidthClasses = () => {
     if (isInsideSmallContainer) {
-      // Khi bên trong container nhỏ (như FloatingChatbot)
-      return 'max-w-[100%]'; // Luôn giữ max-width lớn
+      if (!isUser) {
+        // Sử dụng state đã tính toán
+        return modelMessageShouldBeFullWidth
+          ? 'w-full max-w-full' // Nếu dài, chiếm 100%
+          : 'w-auto max-w-full'; // Nếu ngắn, co theo nội dung (max-w-full vẫn để không tràn)
+      }
+      // User message trong small container
+      return 'w-auto max-w-full sm:max-w-[90%] md:max-w-[80%]';
     }
-    // Khi ở trang chat bình thường, sử dụng responsive max-width
-    return 'max-w-[100%] sm:max-w-[100%] md:max-w-[80%] lg:max-w-[75%] xl:max-w-[70%]';
+
+    // Trang chat bình thường
+    return 'w-auto max-w-full sm:max-w-[90%] md:max-w-[80%] lg:max-w-[75%] xl:max-w-[70%]';
   };
 
   const bubbleClasses = `
     group relative
-    w-auto ${getMaxWidthClasses()} // <-- SỬ DỤNG HÀM ĐỂ LẤY CLASS MAX-WIDTH
+    ${getWidthAndMaxWidthClasses()} // Sử dụng class từ hàm
     p-2.5 sm:p-3 rounded-lg shadow-sm flex flex-col text-sm
     ${isUser
       ? 'bg-blue-500 text-white rounded-br-none dark:bg-blue-600'
@@ -85,28 +135,21 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
           ? 'bg-yellow-100 text-yellow-700 border border-yellow-200 rounded-bl-none dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-700/50'
           : 'bg-gray-100 text-gray-800 rounded-bl-none border border-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600'
     }
-    ${type === 'map' ? 'w-full' : ''}
+    // Xử lý map riêng biệt, không phụ thuộc vào modelMessageShouldBeFullWidth vì map thường nên full
+    ${type === 'map' ? (isInsideSmallContainer && !isUser ? 'w-full' : (isInsideSmallContainer && isUser ? 'w-auto max-w-[90%]' : 'sm:w-full md:w-[80%] lg:w-[70%]')) : ''}
   `;
 
-  // Class cho container bao quanh bubble, để căn chỉnh trái/phải
-  // và đảm bảo bubble không bị dính sát vào cạnh của ChatHistory
-  const messageRowClasses = `
-    flex w-full py-1 px-1 sm:px-2  // Thêm padding ngang cho cả hàng tin nhắn
-    ${isUser ? 'justify-end' : 'justify-start'}
-  `;
+  const shouldShowThoughtProcess =
+    !isUser &&
+    thoughts &&
+    thoughts.length > 0 &&
+    (!isInsideSmallContainer || (isInsideSmallContainer && !isThoughtProcessHiddenInFloatingChat));
 
   return (
-    // Bọc ChatMessageDisplay bằng một div để kiểm soát padding và alignment
-    // Div này sẽ nằm trong ChatHistory.tsx
-    // Chúng ta sẽ di chuyển logic căn chỉnh trái/phải ra ChatHistory.tsx
-    // Ở đây ChatMessageDisplay chỉ tập trung vào bubble.
-    // Tuy nhiên, để giữ code bạn đã cung cấp, tôi sẽ để lại messageRowClasses ở đây
-    // và bạn có thể quyết định cấu trúc lại sau.
-    // Nếu giữ ở đây, thì ChatHistory không cần `justify-end/start` nữa.
-    // <div className={messageRowClasses}> // Bỏ dòng này nếu căn chỉnh ở ChatHistory
-      <div className={bubbleClasses}> {/* Bubble tin nhắn */}
-        {/* ... (nội dung icon, map, markdown, nút actions, thoughts giữ nguyên như trước) ... */}
-         {type === 'error' && (
+      // Áp dụng ref vào bubble
+      <div ref={bubbleRef} className={bubbleClasses}>
+        {/* ... (Nội dung còn lại của component giữ nguyên) ... */}
+        {type === 'error' && (
             <TriangleAlert className='absolute -left-1.5 -top-1.5 mr-1.5 inline-block h-4 w-4 rounded-full bg-white p-0.5 text-red-600 shadow dark:bg-gray-800 dark:text-red-400' />
         )}
         {type === 'warning' && (
@@ -157,10 +200,10 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
                     <h3 className='my-1.5 text-base font-medium sm:my-2 sm:text-lg dark:text-gray-200' {...props} />
                 ),
                 ul: ({ node, ...props }) => (
-                    <ul className='my-1.5 list-inside list-disc pl-2 sm:my-2 sm:pl-4 dark:text-gray-300' {...props} />
+                    <ul className='my-1.5 list-inside list-disc pl-0.5 sm:my-2 sm:pl-1 dark:text-gray-300' {...props} />
                 ),
                 ol: ({ node, ...props }) => (
-                    <ol className='my-1.5 list-inside list-decimal pl-2 sm:my-2 sm:pl-4 dark:text-gray-300' {...props} />
+                    <ol className='my-1.5 list-inside list-decimal pl-0.5 sm:my-2 sm:pl-1 dark:text-gray-300' {...props} />
                 ),
                 li: ({ node, ...props }) => <li className='my-0.5 sm:my-1 dark:text-gray-300' {...props} />
                 }}
@@ -199,13 +242,12 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
             </div>
         )}
 
-        {!isUser && thoughts && thoughts.length > 0 && (
+        {shouldShowThoughtProcess && (
             <div className='mt-2 border-t border-black/10 pt-1.5 sm:mt-3 sm:pt-2 dark:border-white/20'>
             <ThoughtProcess thoughts={thoughts} />
             </div>
         )}
       </div>
-    // </div> // Bỏ dòng này nếu căn chỉnh ở ChatHistory
   );
 };
 
