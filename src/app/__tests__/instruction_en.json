@@ -1,0 +1,707 @@
+{
+  "title": "Website User Guide",
+  "sections": [
+    {
+      "title": "1. Login and Registration",
+      "cases": [
+        {
+          "title": "1.1 Successful Login",
+          "details": "*   **Description:** Guide on how to log in to the system.\n*   **Precondition:**\n    *   You have a valid account.\n    *   You are on the Login page (URL ending in `/auth/login`).\n*   **Steps:**\n    1.  Enter your valid Email in the 'Email' field.\n    2.  Enter your valid Password in the 'Password' field.\n    3.  Click the 'Sign In' button.\n*   **Expected Result:** The system will redirect you to the homepage. On the navigation bar (header), you will see your profile/avatar icon."
+        },
+        {
+          "title": "1.2 Failed Login (Incorrect Password)",
+          "details": "*   **Description:** Describes what happens when you enter an incorrect password.\n*   **Precondition:**\n    *   You have a valid account.\n    *   You are on the Login page (URL ending in `/auth/login`).\n*   **Steps:**\n    1.  Enter your valid Email in the 'Email' field.\n    2.  Enter an *incorrect* Password in the 'Password' field.\n    3.  Click the 'Sign In' button.\n*   **Expected Result:** The system will display an error message such as 'Wrong password' or 'Sai mật khẩu'. You will remain on the Login page."
+        },
+        {
+          "title": "1.3 Failed Login (Email not registered)",
+          "details": "*   **Description:** Describes what happens when you enter an Email that does not exist in the system.\n*   **Precondition:**\n    *   You are on the Login page (URL ending in `/auth/login`).\n*   **Steps:**\n    1.  Enter an Email address that is *not* registered in the 'Email' field.\n    2.  Enter any password in the 'Password' field.\n    3.  Click the 'Sign In' button.\n*   **Expected Result:** The system will display an error message 'No email match'. You will remain on the Login page."
+        },
+        {
+          "title": "1.4 Failed Login (Leave required fields empty)",
+          "details": "*   **Description:** Describes what happens when you try to log in without entering Email or Password.\n*   **Precondition:**\n    *   You are on the Login page (URL ending in `/auth/login`).\n*   **Steps:**\n    1.  Leave the 'Email' field empty.\n    2.  Leave the 'Password' field empty.\n    3.  Click the 'Sign In' button.\n*   **Expected Result:** The system will display a validation error message (e.g., 'Please fill out this field') directly below the empty fields. You will remain on the Login page."
+        },
+        {
+          "title": "1.5 Forgot Password",
+          "details": "*   **Description:** Guide on how to access the password recovery page.\n*   **Precondition:**\n    *   You are on the Login page (URL ending in `/auth/login`).\n*   **Steps:**\n    1.  Click the 'Forgot Password?' link.\n*   **Expected Result:** The system will redirect you to the 'Forgot Password' page."
+        },
+        {
+          "title": "1.6 Register a New Account",
+          "details": "*   **Description:** Guide on how to access the new account registration page.\n*   **Precondition:**\n    *   You are on the Login page (URL ending in `/auth/login`).\n*   **Steps:**\n    1.  Click the 'Sign Up Now' link.\n*   **Expected Result:** The system will redirect you to the 'Sign Up' page (URL ending in `/auth/register`)."
+        },
+        {
+          "title": "1.7 Sign In with Google",
+          "details": "*   **Description:** Guide on how to use the quick sign-in feature with a Google account.\n*   **Precondition:**\n    *   You are on the Login page (URL ending in `/auth/login`).\n*   **Steps:**\n    1.  Click the 'Continue with Google' button.\n*   **Expected Result:** The system will display a popup window or redirect you to Google's authentication page for you to choose the Google account to use for signing in."
+        }
+      ]
+    },
+    {
+      "title": "2. Account Registration",
+      "cases": [
+        {
+          "title": "2.1 Successful Account Registration",
+          "details": "*   **Description:** Guide on how to create a new account.\n*   **Precondition:**\n    *   You are on the Sign Up page (URL ending in `/auth/register`).\n    *   The Email address you want to register has not been used for another account.\n*   **Steps:**\n    1.  Enter a valid First Name in the 'First Name' field.\n    2.  Enter a valid Last Name in the 'Last Name' field.\n    3.  Enter or select a valid Date of Birth (18 years or older) in the 'Date of Birth' field.\n    4.  Enter a valid and unused Email in the 'Email' field.\n    5.  Enter a valid Password (at least 8 characters) in the 'Password' field.\n    6.  Re-enter the Password matching the 'Password' field in the 'Confirm Password' field.\n    7.  Click the 'Create account' button.\n*   **Expected Result:** The system will redirect you to a page for account verification (e.g., via email)."
+        },
+        {
+          "title": "2.2 Registration Failure (Leave required fields empty)",
+          "details": "*   **Description:** Describes what happens when you leave any required field (*) empty during registration.\n*   **Precondition:**\n    *   You are on the Sign Up page (URL ending in `/auth/register`).\n*   **Steps:**\n    1.  Leave one of the required fields * (e.g., the 'Email' field) empty.\n    2.  Fill in all other required fields with valid data.\n    3.  Click the 'Create account' button.\n*   **Expected Result:** The system will display a validation error message (e.g., 'Please fill out this field') directly below the empty field. The account will not be created. You will remain on the Sign Up page."
+        },
+        {
+          "title": "2.3 Registration Failure (Email already exists)",
+          "details": "*   **Description:** Describes what happens when you try to register with an Email already in use.\n*   **Precondition:**\n    *   You are on the Sign Up page (URL ending in `/auth/register`).\n    *   The Email address you want to register is already in use for another account.\n*   **Steps:**\n    1.  Fill in all required fields with valid data, except the 'Email' field.\n    2.  Enter an Email address that is already in use in the 'Email' field.\n    3.  Click the 'Create account' button.\n*   **Expected Result:** The system will display an error message 'User already exists'. The account will not be created. You will remain on the Sign Up page."
+        },
+        {
+          "title": "2.4 Registration Failure (Password and Confirm Password do not match)",
+          "details": "*   **Description:** Describes what happens when the password you enter and the confirmation password do not match.\n*   **Precondition:**\n    *   You are on the Sign Up page (URL ending in `/auth/register`).\n*   **Steps:**\n    1.  Fill in all required fields with valid data, except the 'Confirm Password' field.\n    2.  Enter a value in the 'Confirm Password' field that is *different* from the value in the 'Password' field.\n    3.  Click the 'Create account' button.\n*   **Expected Result:** The system will display a validation error message below the 'Confirm Password' field (e.g., 'The passwords you entered do not match. Please re-enter your password.'). The account will not be created. You will remain on the Sign Up page."
+        },
+        {
+          "title": "2.5 Registration Failure (Date of Birth under 18)",
+          "details": "*   **Description:** Describes what happens when the date of birth you enter indicates you are under 18 years old.\n*   **Precondition:**\n    *   You are on the Sign Up page (URL ending in `/auth/register`).\n*   **Steps:**\n    1.  Fill in all required fields with valid data, except the 'Date of Birth' field.\n    2.  Enter an invalid date of birth (under 18 years old) in the 'Date of Birth' field.\n    3.  Click the 'Create account' button.\n*   **Expected Result:** The system will display an error message (e.g., 'You must be at least 18 years old...'). The account will not be created. You will remain on the Sign Up page."
+        },
+        {
+          "title": "2.6 Registration Failure (Password less than 8 characters)",
+          "details": "*   **Description:** Describes what happens when the password you enter is shorter than 8 characters.\n*   **Precondition:**\n    *   You are on the Sign Up page (URL ending in `/auth/register`).\n*   **Steps:**\n    1.  Fill in all required fields with valid data, except the 'Password' field.\n    2.  Enter a password shorter than 8 characters in the 'Password' field.\n    3.  Click the 'Create account' button.\n*   **Expected Result:** The system will display an error message (e.g., 'Your password must be at least 8 characters long...'). The account will not be created. You will remain on the Sign Up page."
+        },
+        {
+          "title": "2.7 Go back to Login page from Registration page",
+          "details": "*   **Description:** Guide on how to return to the Login page.\n*   **Precondition:**\n    *   You are on the Sign Up page (URL ending in `/auth/register`).\n*   **Steps:**\n    1.  Click the 'Sign In' link.\n*   **Expected Result:** The system will redirect you to the 'Login' page (URL ending in `/auth/login`)."
+        }
+      ]
+    },
+    {
+      "title": "3. Navigation Bar (Header)",
+      "cases": [
+        {
+          "title": "3.1 Access Main Pages",
+          "details": "*   **Description:** Links on the navigation bar allow quick access to the main areas of the website.\n*   **Precondition:**\n    *   You are on any page where the navigation bar (header) is displayed.\n*   **Steps:**\n    1.  Click the corresponding link on the navigation bar.\n*   **Expected Result:**\n    *   Click 'Journals': Redirects to the journal search and information page.\n    *   Click 'Conference': Redirects to the conference search and information page.\n    *   Click 'Publish': Redirects to the add new conference page.\n    *   Click 'Chatbot': Redirects to the Chatbot introduction page.\n    *   Click 'Visualize': Redirects to the statistical chart creation page.\n    *   Click 'Support': Redirects to the support page (Contact Us & FAQ).\n    *   Click 'Login' (when not logged in): Redirects to the Login page."
+        },
+        {
+          "title": "3.2 Change Language",
+          "details": "*   **Description:** How to change the display language of the website.\n*   **Precondition:**\n    *   You are on any page where the navigation bar (header) is displayed.\n    *   The system supports multiple languages.\n*   **Steps:**\n    1.  Click the icon or text displaying the current language on the navigation bar (e.g., 'English').\n    2.  Select a different language from the dropdown list (e.g., select 'Vietnamese').\n*   **Expected Result:** The interface of the current page (content, labels, buttons, etc.) will be updated to the language you selected."
+        },
+        {
+          "title": "3.3 User Menu (when logged in)",
+          "details": "*   **Description:** Access the menu containing links to the Dashboard and settings.\n*   **Precondition:**\n    *   You are logged in.\n    *   The user icon (avatar) is displayed on the navigation bar.\n*   **Steps:**\n    1.  Click the user icon (avatar) on the navigation bar.\n*   **Expected Result:** A dropdown menu will appear, displaying your name (e.g., 'Hello DONG QUAN') and navigation links to sections within the Dashboard such as Profile, My Conferences, Followed, Note, Notifications, Blacklisted, Setting, and Logout."
+        },
+        {
+          "title": "3.4 Log Out",
+          "details": "*   **Description:** How to log out of your account.\n*   **Precondition:**\n    *   You are logged in.\n    *   The user menu (avatar) is open.\n*   **Steps:**\n    1.  In the user dropdown menu, click the 'Logout' link.\n*   **Expected Result:** You will be logged out of your account. The system will redirect you to the homepage (and the 'Login' button will reappear on the header). Your session will end."
+        },
+        {
+          "title": "3.5 Change Theme",
+          "details": "*   **Description:** How to switch between Light Mode and Dark Mode interfaces.\n*   **Precondition:**\n    *   You are on any page where the navigation bar (header) is displayed.\n*   **Steps:**\n    1.  Click the 'Theme' icon or 'Theme' dropdown on the navigation bar.\n    2.  Select the 'Light' option to switch to the light interface.\n    3.  Select the 'Dark' option to switch to the dark interface.\n*   **Expected Result:** The interface of the current page (background color, text color, UI component colors) will switch to the corresponding color scheme based on the mode you selected."
+        }
+      ]
+    },
+    {
+      "title": "4. Search Conferences",
+      "cases": [
+        {
+          "title": "4.1 Access Conference Search Page",
+          "details": "*   **Description:** How to get to the main search page to explore conferences.\n*   **Precondition:**\n    *   You are on any page where the navigation bar (header) is displayed.\n*   **Steps:**\n    1.  Click the 'Conference' link on the navigation bar.\n*   **Expected Result:** The system will redirect you to the Conferences Search page (URL ending in `/conferences`), displaying the initial list of all conferences."
+        },
+        {
+          "title": "4.2 Basic Search",
+          "details": "*   **Description:** How to search for conferences by keyword, title, or acronym.\n*   **Precondition:**\n    *   You are on the Conferences Search page (URL ending in `/conferences`).\n*   **Steps:**\n    1.  **To search by keyword (default):** Enter the keyword in the main search box (labeled 'Keyword').\n    2.  **To search by Title:** Click the 'Keyword' box, select 'Title' from the dropdown menu, then enter the title in the main search box.\n    3.  **To search by Acronym:** Click the 'Keyword' box, select 'Acronym' from the dropdown menu, then enter the acronym in the main search box.\n    4.  Click the 'Search' button.\n*   **Expected Result:** The page will display a list of conferences containing the keyword, title, or acronym you entered. The number of results ('Conference Results (XXX)') will be updated."
+        },
+        {
+          "title": "4.3 Search by Type",
+          "details": "*   **Description:** How to filter search results by conference type (Offline, Hybrid).\n*   **Precondition:**\n    *   You are on the Conferences Search page (URL ending in `/conferences`).\n*   **Steps:**\n    1.  Click the 'Type' dropdown.\n    2.  Select a type from the list (e.g., 'Hybrid').\n    3.  (Optional) Enter additional search criteria.\n    4.  Click the 'Search' button.\n*   **Expected Result:** The page displays a list of conferences matching the selected Type. A filter tag 'Type: [Type]' will appear above the results list. The number of results will be updated."
+        },
+        {
+          "title": "4.4 Search by Date Range",
+          "details": "*   **Description:** How to filter search results by the date range of the conference.\n*   **Precondition:**\n    *   You are on the Conferences Search page (URL ending in `/conferences`).\n*   **Steps:**\n    1.  Enter the start date (e.g., '04/01/2025') in the 'Start: mm/dd/yyyy' field in the date filter section.\n    2.  Enter the end date (e.g., '04/30/2025') in the 'End: mm/dd/yyyy' field in the date filter section.\n    3.  (Optional) Enter additional search criteria.\n    4.  Click the 'Search' button.\n*   **Expected Result:** The page displays a list of conferences taking place within the date range you entered. The URL will be updated with date parameters (e.g., `Date=YYYY-MM-DD&Date=YYYY-MM-DD`). The number of results will be updated."
+        },
+        {
+          "title": "4.5 Search by Location",
+          "details": "*   **Description:** How to filter search results by location (country).\n*   **Precondition:**\n    *   You are on the Conferences Search page (URL ending in `/conferences`).\n*   **Steps:**\n    1.  Enter the location/country (e.g., 'Armenia') in the 'Location' field.\n    2.  (Optional) Enter additional search criteria.\n    3.  Click the 'Search' button.\n*   **Expected Result:** The page displays a list of conferences in the location you entered. The URL will be updated with the country parameter (e.g., `Country=Armenia`). The number of results will be updated."
+        },
+        {
+          "title": "4.6 Show/Hide Advanced Search Options",
+          "details": "*   **Description:** How to view or hide additional search filters.\n*   **Precondition:**\n    *   You are on the Conferences Search page (URL ending in `/conferences`).\n*   **Steps:**\n    1.  To show: Click the 'Show advanced search options' link.\n    2.  To hide: Click the 'Hide advanced search options' link.\n*   **Expected Result:**\n    *   When showing: Additional filter fields such as 'Submission Date', 'Publisher', 'Rank', 'Source', 'Avg. Score', 'Topics', 'Field of Research' will appear below the basic search fields. The link will change to 'Hide advanced search options'.\n    *   When hiding: The additional filter fields will disappear. The link will change back to 'Show advanced search options'."
+        },
+        {
+          "title": "4.7 Advanced Search (Rank, Publisher, Source, Score, Topics, Field of Research, Submission Date)",
+          "details": "*   **Description:** Guide on using advanced filters to refine search results.\n*   **Precondition:**\n    *   You are on the Conferences Search page (URL ending in `/conferences`).\n    *   Advanced search options are displayed.\n*   **Steps:**\n    1.  Enter or select values for one or more advanced filter fields you want to use (e.g., 'Rank: A*', 'Publisher: ACM', 'Submission Date: 01/01/2025 - 03/31/2025', 'Field of Research: Human Computer Interaction', etc.).\n    2.  (Optional) Enter additional basic search criteria.\n    3.  Click the 'Search' button.\n*   **Expected Result:** The page displays a list of conferences that satisfy ALL the criteria you entered/selected. Corresponding filter tags will appear above the list. The number of results will be updated.\n*   **Note:** If invalid data is entered in advanced fields (e.g., Avg. Score '6', incorrect date format), the system may display validation errors or return 'No results found'."
+        },
+        {
+          "title": "4.8 Search with Non-existent Keyword",
+          "details": "*   **Description:** Describes what happens when you search using a keyword not present in the data.\n*   **Precondition:**\n    *   You are on the Conferences Search page (URL ending in `/conferences`).\n*   **Steps:**\n    1.  Enter a non-existent keyword in the main search box.\n    2.  Click the 'Search' button.\n*   **Expected Result:** The system will display the message 'No results found'. The results list will be empty."
+        },
+        {
+          "title": "4.9 Search with Empty Fields",
+          "details": "*   **Description:** Describes what happens when you click the search button without entering any criteria.\n*   **Precondition:**\n    *   You are on the Conferences Search page (URL ending in `/conferences`).\n    *   All search fields (basic and advanced) are empty.\n*   **Steps:**\n    1.  Click the 'Search' button.\n*   **Expected Result:** The page will display the full list of all conferences available in the system again."
+        },
+        {
+          "title": "4.10 Clear Filters ('Clear' Button)",
+          "details": "*   **Description:** How to clear all entered search criteria and view the full list again.\n*   **Precondition:**\n    *   You are on the Conferences Search page (URL ending in `/conferences`).\n    *   You have entered data in at least one search field.\n*   **Steps:**\n    1.  Click the 'Clear' button.\n*   **Expected Result:** All search fields (basic and advanced) will be cleared. Filter tags above the list will disappear. The page will display the full list of all conferences again."
+        },
+        {
+          "title": "4.11 Remove a Specific Filter",
+          "details": "*   **Description:** How to remove a specific applied filter (e.g., remove only the Topics filter while keeping the Date filter).\n*   **Precondition:**\n    *   You are on the Conferences Search page (URL ending in `/conferences`).\n    *   At least one filter has been applied and the corresponding filter tag is displayed above the results list (e.g., 'Topics: [Topic Name] x' tag).\n*   **Steps:**\n    1.  Click the 'x' icon on the filter tag you want to remove (e.g., the 'Topics: Human-in-the-loop AI x' tag).\n    2.  Click the 'Search' button again.\n*   **Expected Result:** The selected filter tag will disappear. The results list will be updated to apply only the remaining filters (or display all if no filters are left). The number of results will be updated."
+        },
+        {
+          "title": "4.12 Sort Search Results",
+          "details": "*   **Description:** How to change the display order of conferences in the results list.\n*   **Precondition:**\n    *   You are on the Conferences Search page (URL ending in `/conferences`).\n    *   There is a results list displayed.\n*   **Steps:**\n    1.  Click the 'Sort By' dropdown.\n    2.  Select the desired sorting criterion from the list (e.g., 'Date').\n*   **Expected Result:** The list of conferences will be re-sorted according to the criterion you selected (e.g., by date ascending or descending)."
+        },
+        {
+          "title": "4.13 Change Number of Results per Page",
+          "details": "*   **Description:** How to adjust the number of conferences displayed on a single results page.\n*   **Precondition:**\n    *   You are on the Conferences Search page (URL ending in `/conferences`).\n    *   The total number of results found is greater than the default number displayed on the first page.\n*   **Steps:**\n    1.  Click the 'Events per page' dropdown (or similar).\n    2.  Select a value different from the current one (e.g., 10, 20, 50, 100).\n*   **Expected Result:** The number of conferences displayed on the page will be updated according to the value you selected. Pagination controls may change to accommodate the new total number of pages."
+        },
+        {
+          "title": "4.14 Use Pagination",
+          "details": "*   **Description:** How to move between search results pages.\n*   **Precondition:**\n    *   You are on the Conferences Search page (URL ending in `/conferences`).\n    *   The total number of results found is greater than the number of conferences displayed on one page.\n*   **Steps:**\n    1.  Click the arrow icons or page numbers in the pagination section (usually at the bottom of the results list).\n*   **Expected Result:** The page will display the list of conferences for the next page or the page you selected. The URL may be updated with a page parameter (e.g., `?page=2`)."
+        },
+        {
+          "title": "4.15 View Conference Details",
+          "details": "*   **Description:** How to navigate to the page displaying detailed information about a specific conference.\n*   **Precondition:**\n    *   You are on the Conferences Search page (URL ending in `/conferences`).\n    *   At least one conference is displayed in the list.\n*   **Steps:**\n    1.  Click the conference name (title) on the information card of any conference in the results list.\n*   **Expected Result:** The system will redirect you to the detail page of the conference you clicked."
+        }
+      ]
+    },
+    {
+      "title": "5. Conference Detail Page",
+      "cases": [
+        {
+          "title": "5.1 View Detailed Conference Information",
+          "details": "*   **Description:** Guide on how to view full information about a conference.\n*   **Precondition:**\n    *   You are on the detail page of a specific conference (URL ending in `/conferences/detail?id=...`).\n*   **Steps:**\n    1.  Access the conference detail page.\n    2.  Observe the information sections displayed.\n*   **Expected Result:** The page will display key information such as Title, Dates, Location, Ratings, Publisher, Followers, Topics, Rank, Status (Offline/Online/Hybrid), and sub-information tabs (Overview, Important Dates, Call for papers,...)."
+        },
+        {
+          "title": "5.2 Switch Between Information Tabs",
+          "details": "*   **Description:** How to view different sections of conference information (Important Dates, Call for papers,...).\n*   **Precondition:**\n    *   You are on the detail page of a conference with multiple information tabs.\n*   **Steps:**\n    1.  Click the title of the tab you want to view (e.g., 'Important Dates', 'Call for papers').\n    2.  Observe the content displayed below the tabs.\n*   **Expected Result:** The content displayed in the main area of the page will change to show the information corresponding to the tab you selected."
+        },
+        {
+          "title": "5.3 Click on Topic Tag",
+          "details": "*   **Description:** How to search for other conferences with the same Topic.\n*   **Precondition:**\n    *   You are on the detail page of a conference displaying Topic tags.\n*   **Steps:**\n    1.  Click on any Topic tag (e.g., 'Computer-Supported Cooperative Work').\n*   **Expected Result:** The system will redirect you to the Conferences search page. The 'Topics' search field in the advanced search section will be pre-filled with the Topic you clicked. The results list will display conferences related to that Topic."
+        },
+        {
+          "title": "5.4 Follow Conference",
+          "details": "*   **Description:** How to bookmark a conference to receive relevant updates.\n*   **Precondition:**\n    *   You are logged in.\n    *   You are on the detail page of a conference.\n    *   The current conference is not yet 'Followed' by you.\n*   **Steps:**\n    1.  Find and click the 'Follow' button in the right sidebar area.\n*   **Expected Result:** The 'Follow' button will change state/color (e.g., to 'Followed' or 'Following'). The number of 'Followers' may increase by 1. The system may display a confirmation message. This conference will appear in your \"Followed\" list in the Dashboard."
+        },
+        {
+          "title": "5.5 Unfollow Conference",
+          "details": "*   **Description:** How to stop following a conference.\n*   **Precondition:**\n    *   You are logged in.\n    *   You are on the detail page of a conference.\n    *   The current conference is currently 'Followed' by you.\n*   **Steps:**\n    1.  Find and click the 'Follow' button (which is in the 'Followed'/'Following' state) in the right sidebar area.\n*   **Expected Result:** The 'Follow' button will change state/color back to its original appearance (e.g., to 'Follow'). The number of 'Followers' may decrease by 1. The system may display a confirmation message. This conference will disappear from your \"Followed\" list in the Dashboard."
+        },
+        {
+          "title": "5.6 Add to Personal Calendar",
+          "details": "*   **Description:** How to add a conference to your personal calendar within the system.\n*   **Precondition:**\n    *   You are logged in.\n    *   You are on the detail page of a conference.\n*   **Steps:**\n    1.  Find and click the 'Calendar' button in the right sidebar area.\n*   **Expected Result:** The system will add this conference's information to your personal calendar (it may appear in the 'Note' section of the Dashboard). The system displays a confirmation message (e.g., 'You have added the conference... to your calendar')."
+        },
+        {
+          "title": "5.7 Blacklist Conference",
+          "details": "*   **Description:** How to add a conference to your blacklist so it does not appear in your default search results.\n*   **Precondition:**\n    *   You are logged in.\n    *   You are on the detail page of a conference.\n    *   The current conference is not yet 'Blacklist'. The button is labeled 'Blacklist'.\n*   **Steps:**\n    1.  Find and click the 'Blacklist' button in the right sidebar area.\n*   **Expected Result:** The 'Blacklist' button will change to 'Blacklisted'. The system may display a confirmation message. This conference will not appear in your default search results and will appear in your \"Blacklisted\" list in the Dashboard."
+        },
+        {
+          "title": "5.8 Remove from Blacklist Conference",
+          "details": "*   **Description:** How to remove a conference from your blacklist.\n*   **Precondition:**\n    *   You are logged in.\n    *   You are on the detail page of a conference.\n    *   The current conference is currently 'Blacklist'. The button is labeled 'Blacklisted'.\n*   **Steps:**\n    1.  Find and click the 'Blacklisted' button in the right sidebar area.\n*   **Expected Result:** The 'Blacklisted' button will change back to 'Blacklist'. The system may display a confirmation message. This conference will reappear in your default search results and will disappear from your \"Blacklisted\" list in the Dashboard."
+        },
+        {
+          "title": "5.9 Access Official Website",
+          "details": "*   **Description:** How to open the official website of the conference.\n*   **Precondition:**\n    *   You are on the detail page of a conference.\n    *   This conference has official website URL information.\n*   **Steps:**\n    1.  Find and click the 'Website' button in the right sidebar area.\n*   **Expected Result:** The system will open a new tab in your browser and navigate to the official website URL of that conference."
+        },
+        {
+          "title": "5.10 Share Conference",
+          "details": "*   **Description:** How to share information about the conference.\n*   **Precondition:**\n    *   You are on the detail page of a conference.\n*   **Steps:**\n    1.  Find and click the 'Share' button in the right sidebar area.\n*   **Expected Result:** The system will display a popup window with sharing options (e.g., Copy link, Share via social media, Email,...)."
+        },
+        {
+          "title": "5.11 Update Information",
+          "details": "*   **Description:** How to request the latest information for the conference to be updated from its official page.\n*   **Precondition:**\n    *   You are logged in.\n    *   You are on the detail page of a conference.\n*   **Steps:**\n    1.  Find and click the 'Update' button in the right sidebar area.\n*   **Expected Result:** The detailed information for the conference on the page will be refreshed based on the latest data collected from the official page (if available)."
+        }
+      ]
+    },
+    {
+      "title": "6. Conference Feedback",
+      "cases": [
+        {
+          "title": "6.1 View Feedback Section",
+          "details": "*   **Description:** How to view reviews about the conference.\n*   **Precondition:**\n    *   You are on the detail page of a conference.\n    *   The Feedback section is displayed (it might be a tab or a separate section).\n*   **Steps:**\n    1.  Scroll down or click the Feedback tab to view this section.\n    2.  Observe the content displayed.\n*   **Expected Result:** The Feedback section will display the Average rating, total number of reviews ('Based on X reviews'), a rating distribution chart by stars (1-5 stars), and a list of reviews posted by other users. If there are no reviews yet, you will see 0.0 rating, 0 reviews, and the message 'No feedback yet'. The feedback submission form will still be displayed."
+        },
+        {
+          "title": "6.2 Submit New Feedback",
+          "details": "*   **Description:** How to submit your rating and comment about the conference.\n*   **Precondition:**\n    *   You are logged in.\n    *   You are in the Feedback section of the conference.\n    *   You have not submitted feedback for this conference yet.\n*   **Steps:**\n    1.  Select the number of stars you want to rate in the 'Rate the Conference' section (e.g., click the 5th star to give a 5-star rating).\n    2.  Enter your comment in the 'Write your feedback...' field.\n    3.  Click the 'Post Feedback' button.\n*   **Expected Result:** Your feedback will be submitted successfully. The new rating will appear in the review list. The Average rating and rating distribution chart will be updated to include your rating. The system may display a success message."
+        },
+        {
+          "title": "6.3 Filter Reviews by Rating",
+          "details": "*   **Description:** How to display only reviews with a specific number of stars.\n*   **Precondition:**\n    *   You are in the Feedback section of the conference.\n    *   There are multiple reviews with different ratings.\n*   **Steps:**\n    1.  Click the 'All Feedback' dropdown.\n    2.  Select a filter option by number of stars (e.g., '5 Stars').\n*   **Expected Result:** The review list will be updated to display only reviews with the number of stars corresponding to your selection."
+        },
+        {
+          "title": "6.4 Sort Reviews",
+          "details": "*   **Description:** How to change the display order of reviews.\n*   **Precondition:**\n    *   You are in the Feedback section of the conference.\n    *   There are multiple reviews with different times or ratings.\n*   **Steps:**\n    1.  Click the 'Recently Added' dropdown (or the current sorting criterion).\n    2.  Select the desired sorting criterion:\n        *   'Recently Added': Sort by newest submission time.\n        *   'Highest Rated': Sort by rating from high to low.\n*   **Expected Result:** The review list will be re-sorted according to the criterion you selected ('Highest Rated' or 'Recently Added')."
+        }
+      ]
+    },
+    {
+      "title": "7. Notification System",
+      "cases": [
+        {
+          "title": "7.1 Open Quick Notification Panel (Header Icon)",
+          "details": "*   **Description:** How to quickly view the latest notifications from the bell icon on the header.\n*   **Precondition:**\n    *   You are logged in.\n    *   The notification icon (bell shape) is displayed on the navigation bar.\n*   **Steps:**\n    1.  Click the notification icon (bell shape) on the navigation bar.\n*   **Expected Result:** A notification panel or popup will appear just below the bell icon, displaying a list of your recent notifications."
+        },
+        {
+          "title": "7.2 View Notification Content and Status (Popup)",
+          "details": "*   **Description:** Guide on how to identify new notifications and view summarized content in the popup panel.\n*   **Precondition:**\n    *   You are logged in.\n    *   There are new and old notifications in your system.\n    *   The notification popup panel is open.\n*   **Steps:**\n    1.  Observe the list of notifications in the popup panel.\n*   **Expected Result:** Notifications will be displayed with relevant content (e.g., notifications when you Follow, Unfollow, Blacklist, Remove Blacklist a conference, or new feedback...). Unread notifications will be marked (e.g., with 'NEW' text or a different background color) and the bell icon will display the count of unread notifications."
+        },
+        {
+          "title": "7.3 Mark All Notifications as Read (Popup)",
+          "details": "*   **Description:** How to mark all existing notifications in the popup panel as read.\n*   **Precondition:**\n    *   You are logged in.\n    *   There is at least one unread notification in the notification popup panel.\n    *   The notification popup panel is open.\n*   **Steps:**\n    1.  Click the 'Mark All As Read' link.\n*   **Expected Result:** All notifications in the list will be marked as read. Their status will change, and the count of unread notifications on the bell icon will reset to 0."
+        },
+        {
+          "title": "7.4 Redirect from Notification (Popup)",
+          "details": "*   **Description:** How to go directly to the related page from a notification (e.g., conference detail page).\n*   **Precondition:**\n    *   You are logged in.\n    *   At least one notification is displayed in the popup panel.\n    *   The notification popup panel is open.\n*   **Steps:**\n    1.  Click the content of a specific notification (e.g., the line 'You have followed the conference...').\n*   **Expected Result:** The system will redirect you to the detail page of the conference or item mentioned in that notification."
+        },
+        {
+          "title": "7.5 View All Notifications (Popup)",
+          "details": "*   **Description:** How to access the full page displaying all your notifications.\n*   **Precondition:**\n    *   You are logged in.\n    *   The notification popup panel is open.\n*   **Steps:**\n    1.  Click the 'View all' link at the bottom of the notification popup panel.\n*   **Expected Result:** The system will redirect you to a dedicated page within the Dashboard, displaying a full list of all your notifications (URL ending in `/dashboard?tab=notifications`)."
+        },
+        {
+          "title": "7.6 View All Notifications on Full Page",
+          "details": "*   **Description:** Guide on using the full notification management page in the Dashboard.\n*   **Precondition:**\n    *   You are logged in and on the Notifications page in the Dashboard (URL ending in `/dashboard?tab=notifications`).\n    *   There are different types of notifications.\n*   **Steps:**\n    1.  Access the Notifications page in the Dashboard.\n    2.  Ensure the 'All' tab is selected (or click the 'All' tab).\n    3.  Observe the displayed list of notifications.\n*   **Expected Result:** The page will display a full list of all your notifications in a table or detailed list format. Each notification displays the type, content, time, and has a checkbox next to it. There are bulk action buttons above the list."
+        },
+        {
+          "title": "7.7 Filter Notifications by Status (Unread, Read, Important) on Full Page",
+          "details": "*   **Description:** How to view only unread, read, or important notifications.\n*   **Precondition:**\n    *   You are logged in and on the Notifications page in the Dashboard.\n    *   There are notifications in different statuses.\n*   **Steps:**\n    1.  Click the desired filter tab:\n        *   'Unread': Only displays unread notifications.\n        *   'Read': Only displays read notifications.\n        *   'Important': Only displays notifications marked as important.\n*   **Expected Result:** The notification list will be filtered to display only notifications with the status corresponding to the tab you selected."
+        },
+        {
+          "title": "7.8 Search Notifications on Full Page",
+          "details": "*   **Description:** How to filter the notification list based on keywords in their content.\n*   **Precondition:**\n    *   You are logged in and on the Notifications page in the Dashboard.\n    *   There are notifications containing the keywords you want to search for.\n*   **Steps:**\n    1.  Enter a keyword (e.g., 'followed') in the 'Search notifications...' field.\n    2.  Observe the notification list as you type.\n*   **Expected Result:** The notification list will be filtered and display only the items containing the keyword you entered."
+        },
+        {
+          "title": "7.9 Select Notifications",
+          "details": "*   **Description:** How to select notifications to perform bulk actions.\n*   **Precondition:**\n    *   You are logged in and on the Notifications page in the Dashboard.\n    *   At least one notification is displayed in the list.\n*   **Steps:**\n    1.  To select all notifications on the page: Click the 'Select All' checkbox (usually at the top of the list). Click again to deselect all.\n    2.  To select one or more specific notifications: Click the checkbox next to each notification you want to select. Click again to deselect.\n*   **Expected Result:** The checkboxes you clicked will change to a selected state. When at least one notification is selected, bulk action buttons ('Mark As Read', 'Mark As Unimportant', 'Delete Selected') will appear or become active."
+        },
+        {
+          "title": "7.10 Perform Bulk Actions on Selected Notifications",
+          "details": "*   **Description:** How to mark as read, mark as important/unimportant, or delete multiple notifications at once.\n*   **Precondition:**\n    *   You are logged in and on the Notifications page in the Dashboard.\n    *   At least one notification has been selected by checking its checkbox.\n    *   Bulk action buttons are displayed.\n*   **Steps:**\n    1.  Select one or more notifications.\n    2.  Click the desired action button:\n        *   'Mark As Read': Marks the selected notifications as read.\n        *   'Mark As Important' / 'Mark As Unimportant': Marks the selected notifications as important or unimportant.\n        *   'Delete Selected': Deletes the selected notifications. If deleting, the system may ask for further confirmation.\n*   **Expected Result:**\n    *   'Mark As Read': Selected notifications are marked as read (e.g., background color changes).\n    *   'Mark As Important' / 'Mark As Unimportant': Selected notifications are marked as important/unimportant (e.g., star icon appears/disappears).\n    *   'Delete Selected': Selected notifications are removed from the list. The displayed list is updated."
+        }
+      ]
+    },
+    {
+      "title": "8. Dashboard",
+      "cases": [
+        {
+          "title": "8.1 Navigate within Dashboard (Sidebar)",
+          "details": "*   **Description:** Links in the left sidebar allow you to access different sections within the Dashboard.\n*   **Precondition:**\n    *   You are logged in.\n    *   The Dashboard sidebar is displayed.\n*   **Steps:**\n    1.  Click the corresponding link on the sidebar.\n*   **Expected Result:** The content in the main area of the Dashboard page will change to display the section corresponding to the link you clicked (e.g., Profile, My Conferences, Followed, Note, Notifications, Blacklisted, Setting, Analysis). The URL may change the `tab` parameter (e.g., `/dashboard?tab=profile`)."
+        },
+        {
+          "title": "8.2 Close/Expand Sidebar",
+          "details": "*   **Description:** How to hide or show the sidebar to free up space for the main content.\n*   **Precondition:**\n    *   You are logged in.\n*   **Steps:**\n    1.  To close: If the sidebar is displayed, click the 'Close' icon (usually an 'X' shape) in the top left corner of the sidebar.\n    2.  To open: If the sidebar is hidden, find and click the icon to reopen the sidebar (e.g., a three-line menu icon).\n*   **Expected Result:**\n    *   When closed: The sidebar is hidden, and the main content area expands.\n    *   When open: The sidebar reappears, and the main content area may shrink."
+        }
+      ]
+    },
+    {
+      "title": "9. Dashboard: Personal Profile",
+      "cases": [
+        {
+          "title": "9.1 View Profile Information",
+          "details": "*   **Description:** How to view the basic information of your account.\n*   **Precondition:**\n    *   You are logged in and on the Profile page in the Dashboard (URL ending in `/dashboard?tab=profile`).\n*   **Steps:**\n    1.  Access the Profile page.\n    2.  Observe the information displayed.\n*   **Expected Result:** The Profile page will display your First Name, Last Name, Email, and Date of Birth. The 'Edit Profile' and 'Change Password' buttons will also be displayed."
+        },
+        {
+          "title": "9.2 Edit Profile Information",
+          "details": "*   **Description:** How to go to the page that allows you to change personal information (except password).\n*   **Precondition:**\n    *   You are logged in and on the Profile page in the Dashboard.\n*   **Steps:**\n    1.  Click the 'Edit Profile' button.\n*   **Expected Result:** The system will redirect you to a page or form allowing you to edit information such as Name and Date of Birth."
+        },
+        {
+          "title": "9.3 Change Password",
+          "details": "*   **Description:** How to go to the page that allows you to change your account password.\n*   **Precondition:**\n    *   You are logged in and on the Profile page in the Dashboard.\n*   **Steps:**\n    1.  Click the 'Change Password' button.\n*   **Expected Result:** The system will redirect you to a page or form to enter your current password and a new password to change your password."
+        }
+      ]
+    },
+    {
+      "title": "10. Dashboard: My Conferences",
+      "cases": [
+        {
+          "title": "10.1 View Conference List by Status",
+          "details": "*   **Description:** How to view the conferences you have added to the system, categorized by processing status.\n*   **Precondition:**\n    *   You are logged in and on the My Conferences page in the Dashboard (URL ending in `/dashboard?tab=myconferences`).\n    *   You have added one or more conferences previously.\n*   **Steps:**\n    1.  To view conferences pending approval: Ensure the 'Pending' tab is selected (or click the 'Pending' tab).\n    2.  To view conferences that have been approved and are publicly displayed: Click the 'Approved' tab.\n    3.  To view conferences that have been rejected: Click the 'Rejected' tab.\n    4.  Observe the list of conferences displayed under the tab.\n*   **Expected Result:** The page content will change to display the list of conferences with the status corresponding to the tab you selected. If there are no conferences in that status, the system will display an appropriate message (e.g., 'You do not have any conferences in this category yet.')."
+        },
+        {
+          "title": "10.2 Add New Conference",
+          "details": "*   **Description:** How to go to the page to start the process of adding a new conference to the system.\n*   **Precondition:**\n    *   You are logged in and on the My Conferences page in the Dashboard.\n    *   You have the permission to add conferences (usually for specific roles).\n*   **Steps:**\n    1.  Click the 'Add Conference' button.\n*   **Expected Result:** The system will redirect you to the page or form to fill in the information for adding a new conference (URL ending in `/addConference`)."
+        },
+        {
+          "title": "10.3 Refresh List (Refetch Data)",
+          "details": "*   **Description:** How to reload the list of conferences in the current tab to see the latest updates.\n*   **Precondition:**\n    *   You are logged in and on the My Conferences page in the Dashboard.\n*   **Steps:**\n    1.  Click the 'Refetch Data' button.\n*   **Expected Result:** The system will reload the data for the conference list in the current tab. You may see a loading icon briefly."
+        }
+      ]
+    },
+    {
+      "title": "11. Dashboard: Followed Conferences",
+      "cases": [
+        {
+          "title": "11.1 View List of Followed Conferences",
+          "details": "*   **Description:** How to view the list of conferences you have marked as followed.\n*   **Precondition:**\n    *   You are logged in and on the Followed page in the Dashboard (URL ending in `/dashboard?tab=followed`).\n*   **Steps:**\n    1.  Access the Followed Conferences page.\n    2.  Observe the list of conferences displayed.\n*   **Expected Result:** The page will display the list of conferences you have Followed. Each item shows basic conference information and the time you started Following it. There is a 'Detail' button to view details of each conference. If no conferences are Followed, the system will display an appropriate message."
+        },
+        {
+          "title": "11.2 Go to Detail Page from Followed List",
+          "details": "*   **Description:** How to view detailed information of a conference from the followed list.\n*   **Precondition:**\n    *   You are logged in and on the Followed page in the Dashboard.\n    *   The Followed list is not empty.\n*   **Steps:**\n    1.  Click the 'Detail' button next to a conference in the Followed list.\n*   **Expected Result:** The system will redirect you to the detail page of that conference."
+        },
+        {
+          "title": "11.3 Refresh List on Followed Page",
+          "details": "*   **Description:** How to reload the list of conferences you have followed.\n*   **Precondition:**\n    *   You are logged in and on the Followed page in the Dashboard.\n*   **Steps:**\n    1.  Click the Refresh icon (usually a circular arrow shape) in the top right corner of the list.\n*   **Expected Result:** The system will reload the data for the Followed Conferences list."
+        }
+      ]
+    },
+    {
+      "title": "12. Dashboard: Blacklisted Conferences",
+      "cases": [
+        {
+          "title": "12.1 View List of Blacklisted Conferences",
+          "details": "*   **Description:** How to view the list of conferences you have added to the blacklist.\n*   **Precondition:**\n    *   You are logged in and on the Blacklisted page in the Dashboard (URL ending in `/dashboard?tab=blacklisted`).\n*   **Steps:**\n    1.  Access the Blacklisted Conferences page.\n    2.  Observe the list of conferences displayed.\n*   **Expected Result:** The page will display the list of conferences you have Blacklist. Each item shows basic conference information and the time you added it to the Blacklist. There is a 'Detail' button to view details of each conference. If no conferences are in the Blacklist, the system will display an appropriate message."
+        },
+        {
+          "title": "12.2 Go to Detail Page from Blacklisted List",
+          "details": "*   **Description:** How to view detailed information of a conference from the blacklisted list.\n*   **Precondition:**\n    *   You are logged in and on the Blacklisted page in the Dashboard.\n    *   The Blacklisted list is not empty.\n*   **Steps:**\n    1.  Click the 'Detail' button next to a conference in the Blacklisted list.\n*   **Expected Result:** The system will redirect you to the detail page of that conference."
+        },
+        {
+          "title": "12.3 Refresh List on Blacklisted Page",
+          "details": "*   **Description:** How to reload the list of conferences you have blacklisted.\n*   **Precondition:**\n    *   You are logged in and on the Blacklisted page in the Dashboard.\n*   **Steps:**\n    1.  Click the Refresh icon (usually a circular arrow shape) in the top right corner of the list.\n*   **Expected Result:** The system will reload the data for the Blacklisted Conferences list."
+        }
+      ]
+    },
+    {
+      "title": "13. Dashboard: Notes/Events",
+      "cases": [
+        {
+          "title": "13.1 View List of Upcoming Notes",
+          "details": "*   **Description:** How to view upcoming notes or events saved in your account.\n*   **Precondition:**\n    *   You are logged in and on the Note page in the Dashboard (URL ending in `/dashboard?tab=note`).\n*   **Steps:**\n    1.  Access the Note page.\n    2.  Observe the list of notes displayed in the left area.\n*   **Expected Result:** The page will display a list of Upcoming Notes with titles, related information (e.g., conference name, event type like submission date, notification), and a 'More Details' button. If there are no upcoming notes, the system will display an appropriate message."
+        },
+        {
+          "title": "13.2 Filter Notes by Type",
+          "details": "*   **Description:** How to filter the note list to view only items of a specific type (e.g., only view Submission events).\n*   **Precondition:**\n    *   You are logged in and on the Note page in the Dashboard.\n    *   There are notes of different types.\n*   **Steps:**\n    1.  Click the filter button corresponding to the event/note type you want to view (e.g., click the 'Submission' or 'Your notes' button).\n    2.  Observe the note list.\n*   **Expected Result:** The note list will be filtered to display only items of the type you selected. The color of the selected filter button will change."
+        },
+        {
+          "title": "13.3 Use Calendar to View Notes by Month",
+          "details": "*   **Description:** How to view events/notes on the calendar interface and switch between months.\n*   **Precondition:**\n    *   You are logged in and on the Note page in the Dashboard.\n*   **Steps:**\n    1.  Observe the calendar displayed in the right area.\n    2.  Click the arrow buttons ('Previous'/'Next') to switch between months or years.\n*   **Expected Result:** The calendar will display the days of the current month or the month/year you selected. Days with notes/events may be marked (e.g., with a small dot). The note list on the left may also update according to the month currently viewed on the calendar (depending on the interface design)."
+        },
+        {
+          "title": "13.4 Go to Note Details from List",
+          "details": "*   **Description:** How to view more detailed information about a specific note or event.\n*   **Precondition:**\n    *   You are logged in and on the Note page in the Dashboard.\n    *   The Upcoming Notes list is not empty.\n*   **Steps:**\n    1.  Click the 'More Details' button on any note in the list on the left.\n*   **Expected Result:** The system will display the detail page of the conference or event related to that note."
+        },
+        {
+          "title": "13.5 Search Notes",
+          "details": "*   **Description:** How to filter the note list based on keywords in the title or content of the notes.\n*   **Precondition:**\n    *   You are logged in and on the Note page in the Dashboard.\n    *   There are notes containing the keywords you want to search for.\n*   **Steps:**\n    1.  Enter a keyword (e.g., 'Conference') in the 'Search events...' field and press Enter or wait for the results to filter.\n    2.  Observe the note list as you type.\n*   **Expected Result:** The note list will be filtered and display only the items containing the keyword you entered."
+        }
+      ]
+    },
+    {
+      "title": "14. Dashboard: Settings",
+      "cases": [
+        {
+          "title": "14.1 View Setting Options",
+          "details": "*   **Description:** Guide on viewing the settings you can customize for your account.\n*   **Precondition:**\n    *   You are logged in and on the Setting page in the Dashboard (URL ending in `/dashboard?tab=setting`).\n*   **Steps:**\n    1.  Access the Setting page.\n    2.  Observe the options displayed.\n*   **Expected Result:** The page will display setting groups 'Receive Notifications', 'Auto add Events to Schedule', 'Change and Update', 'Your Upcoming Event', 'Customize Notification Delivery' with corresponding toggle switches. At the bottom is the 'Delete Account' button."
+        },
+        {
+          "title": "14.2 Change Toggle Setting Status",
+          "details": "*   **Description:** How to enable or disable setting options (e.g., receive notifications, automatically add events to schedule).\n*   **Precondition:**\n    *   You are logged in and on the Setting page in the Dashboard.\n*   **Steps:**\n    1.  Click the toggle switch icon next to the setting option you want to change (e.g., toggle 'Receive Notifications').\n    2.  Observe the state of the toggle switch (changes to On or Off).\n    3.  (Optional) Try reloading the page or logging out and back in to check if the setting is saved.\n*   **Expected Result:** The state of the toggle switch will change (On/Off) after you click it. The new setting will be saved and remain unchanged when you revisit the page."
+        },
+        {
+          "title": "14.3 Delete Account",
+          "details": "*   **Description:** How to initiate the process of deleting your account.\n*   **Precondition:**\n    *   You are logged in and on the Setting page in the Dashboard.\n*   **Steps:**\n    1.  Scroll to the bottom of the Setting page.\n    2.  Click the 'Delete Account' button.\n*   **Expected Result:** The system will display a confirmation window (popup) or redirect you to a separate page to confirm account deletion. A warning message about permanent data loss will usually be displayed."
+        }
+      ]
+    },
+    {
+      "title": "15. Add New Conference (Publish)",
+      "cases": [
+        {
+          "title": "15.1 Access Add New Conference Page",
+          "details": "*   **Description:** How to go to the form to contribute new conference information to the system.\n*   **Precondition:**\n    *   You are logged in (usually requires appropriate permissions to publish).\n    *   You are on any page where the navigation bar (header) is displayed.\n*   **Steps:**\n    1.  Click the 'Publish' link on the navigation bar.\n*   **Expected Result:** The system will redirect you to the 'Add New Conference' page (URL ending in `/addConference`), displaying the first step of the conference addition form."
+        },
+        {
+          "title": "15.2 Successful Conference Addition Process (Multiple Steps)",
+          "details": "*   **Description:** Guide on completing the process of adding a new conference with full and valid information.\n*   **Precondition:**\n    *   You are on the Add New Conference page (URL ending in `/addConference`).\n    *   You have complete information about the conference you want to add.\n*   **Steps:**\n    1.  **Step 1 (Add Conference):**\n        *   Fill in all required fields completely and accurately: 'Conference name', 'Acronym', 'Link', 'Type', 'Location (Address, Continent, Country, State/Province)'. Note: The 'Country' and 'State/Province' lists will automatically filter based on the 'Continent' and 'Country' you select.\n        *   In the Important Dates section, click 'Add Date', fill in 'Name', select 'Type', enter 'Start' date and 'End' date for each important date (e.g., Conference Date, Submission Date,...). Click 'Add Date' button to add another item, the trash icon to delete.\n        *   In the Topics section, enter each related topic into the 'Add a topic' field and click 'Add'. A topic tag will appear below. Click 'x' on the tag to delete.\n        *   Fill in optional fields if available: 'Image URL', 'Description'.\n        *   Click the 'Next' button.\n    2.  **Step 2 (Review Information):**\n        *   Review all the information you entered in Step 1 to ensure accuracy.\n        *   If corrections are needed, click the 'Back' button to return to Step 1.\n        *   If the information is correct, click the 'Next' button.\n    3.  **Step 3 (Terms and Conditions):**\n        *   Read the terms and conditions carefully.\n        *   To agree, check the 'I agree to the terms and conditions' checkbox.\n        *   If you need to go back to the Review page, click the 'Back' button.\n        *   To finalize, click the 'Add Conference' button.\n*   **Expected Result:** The system will display a successful conference addition message. The new conference you added will appear in the 'Pending' list in the My Conferences section of the Dashboard, awaiting review by an administrator. You may be redirected to the conference list page or the My Conferences page."
+        },
+        {
+          "title": "15.3 Conference Addition Failure (Validation Error)",
+          "details": "*   **Description:** Describes what happens when you try to add a conference but the entered information is missing or invalid.\n*   **Precondition:**\n    *   You are on the Add New Conference page (URL ending in `/addConference`).\n*   **Steps:**\n    1.  Enter some information, but leave a required field empty (e.g., 'Conference name').\n    2.  Or enter data in an incorrect format (e.g., 'Link' is not a URL).\n    3.  Or add an important date with a Start date after the End date.\n    4.  Click the 'Next' button (in Step 1) or 'Add Conference' button (in Step 3 if terms were not agreed to).\n*   **Expected Result:** The system will display a validation error message (e.g., 'Please fill out this field', 'Invalid URL format', date-related error) below the incorrect/missing input field. You will remain on the current page (Step 1 or Step 3), and the conference will not be added."
+        }
+      ]
+    },
+    {
+      "title": "16. Search Journals",
+      "cases": [
+        {
+          "title": "16.1 Access Journals Search Page",
+          "details": "*   **Description:** How to go to the search page to explore scientific journals.\n*   **Precondition:**\n    *   You are on any page where the navigation bar (header) is displayed.\n*   **Steps:**\n    1.  Click the 'Journals' link on the navigation bar.\n*   **Expected Result:** The system will redirect you to the Journals Search page (URL ending in `/journals`), displaying the initial list of all journals."
+        },
+        {
+          "title": "16.2 Search Journals by Keyword/Title",
+          "details": "*   **Description:** How to search for journals based on keyword or title.\n*   **Precondition:**\n    *   You are on the Journals Search page (URL ending in `/journals`).\n*   **Steps:**\n    1.  Enter a keyword or title (e.g., 'admin') in the main search box 'Enter Keyword Title/Journal Name'.\n    2.  Click the 'Search' button.\n*   **Expected Result:** The page will display a list of journals containing the keyword/title you entered. The number of results ('Results (XXX)') will be updated."
+        },
+        {
+          "title": "16.3 Advanced Journal Search",
+          "details": "*   **Description:** Guide on using additional filters to refine journal search results.\n*   **Precondition:**\n    *   You are on the Journals Search page (URL ending in `/journals`).\n    *   Advanced search options are displayed (see section 16.4).\n*   **Steps:**\n    1.  Enter or select values for one or more advanced filter fields you want to use (e.g., 'ISSN', 'Quartile', 'Subject Areas', 'Open Access Types', 'Publisher', 'Language', 'Impact Factor >= 10', 'H-index >= 50', 'CiteScore >= 5', 'SJR >= 1', 'Overall Rank <= 1000').\n    2.  (Optional) Enter additional keywords in the main search box.\n    3.  Click the 'Search' button.\n*   **Expected Result:** The page displays a list of journals that satisfy ALL the criteria you entered/selected. The number of results will be updated."
+        },
+        {
+          "title": "16.4 Show/Hide Advanced Journal Search Options",
+          "details": "*   **Description:** How to view or hide additional journal search filters.\n*   **Precondition:**\n    *   You are on the Journals Search page (URL ending in `/journals`).\n*   **Steps:**\n    1.  To show: Click the 'Show advanced search options' link.\n    2.  To hide: Click the 'Hide advanced search options' link.\n*   **Expected Result:**\n    *   When showing: Additional filter fields such as 'Subject Areas', 'Quartile', 'ISSN', 'Open Access Types', 'Publisher', 'Language', 'Metrics' will appear. The link will change to 'Hide advanced search options'.\n    *   When hiding: The additional filter fields will disappear. The link will change back to 'Show advanced search options'."
+        },
+        {
+          "title": "16.5 Search with Non-existent Keyword (Journals)",
+          "details": "*   **Description:** Describes what happens when you search for journals using a keyword not present in the data.\n*   **Precondition:**\n    *   You are on the Journals Search page (URL ending in `/journals`).\n*   **Steps:**\n    1.  Enter a non-existent keyword (e.g., 'nonexistentjournal123') in the main search box.\n    2.  Click the 'Search' button.\n*   **Expected Result:** The system will display the message 'No results found'. The results list will be empty."
+        },
+        {
+          "title": "16.6 Search with Empty Fields (Journals)",
+          "details": "*   **Description:** Describes what happens when you click the journal search button without entering any criteria.\n*   **Precondition:**\n    *   You are on the Journals Search page (URL ending in `/journals`).\n    *   All search fields (basic and advanced) are empty.\n*   **Steps:**\n    1.  Click the 'Search' button.\n*   **Expected Result:** The page will display the full list of all journals available in the system again."
+        },
+        {
+          "title": "16.7 Clear Filters ('Clear' Button - Journals)",
+          "details": "*   **Description:** How to clear all entered journal search criteria.\n*   **Precondition:**\n    *   You are on the Journals Search page (URL ending in `/journals`).\n    *   You have entered data in at least one search field.\n*   **Steps:**\n    1.  Enter a keyword (e.g., 'test').\n    2.  Click the 'Search' button.\n    3.  Click the 'Clear' button.\n*   **Expected Result:** All search fields (basic and advanced) will be cleared. The page will display the full list of all journals again."
+        },
+        {
+          "title": "16.8 Sort Journal Search Results",
+          "details": "*   **Description:** How to change the display order of journals in the results list.\n*   **Precondition:**\n    *   You are on the Journals Search page (URL ending in `/journals`).\n    *   There is a results list displayed.\n    *   Sorting options ('Title', 'Publisher', 'Impact Factor', 'H-index', 'SJR') exist in the 'Sort By' dropdown.\n*   **Steps:**\n    1.  Click the 'Sort By' dropdown.\n    2.  Select the desired sorting criterion from the list (e.g., 'Title', 'Impact Factor', 'H-index', 'SJR', 'Publisher').\n*   **Expected Result:** The list of journals will be re-sorted according to the criterion you selected (e.g., by name, Impact Factor from high to low, etc.)."
+        },
+        {
+          "title": "16.9 Use Pagination (Journals)",
+          "details": "*   **Description:** How to move between journal search results pages.\n*   **Precondition:**\n    *   You are on the Journals Search page (URL ending in `/journals`).\n    *   The total number of results found is greater than the number of journals displayed on a page.\n*   **Steps:**\n    1.  Click the 'Next page' arrow icon in the pagination section (usually at the bottom of the list).\n*   **Expected Result:** The page will display the list of journals for the next page. The URL may be updated with a page parameter."
+        },
+        {
+          "title": "16.10 View Journal Details",
+          "details": "*   **Description:** How to navigate to the page displaying detailed information about a specific journal.\n*   **Precondition:**\n    *   You are on the Journals Search page (URL ending in `/journals`).\n    *   At least one journal is displayed in the list.\n*   **Steps:**\n    1.  Click the 'Details' button on the information card of any journal in the results list.\n*   **Expected Result:** The system will redirect you to the detail page of the journal you clicked."
+        }
+      ]
+    },
+    {
+      "title": "17. Journal Detail Page",
+      "cases": [
+        {
+          "title": "17.1 View Detailed Journal Information",
+          "details": "*   **Description:** Guide on how to view full information about a journal.\n*   **Precondition:**\n    *   You are on the detail page of a specific journal (URL ending in `/journals/detail?id=...`).\n*   **Steps:**\n    1.  Access the journal detail page.\n    2.  Observe the information sections displayed.\n*   **Expected Result:** The page will display key information such as Title, ISSN, Overall Rank, Impact Factor, H-index, SJR, Best Quartile, Coverage History, Publisher, Country, Areas, and sub-information tabs (Overview, Impact Factor,...)."
+        },
+        {
+          "title": "17.2 Switch Between Journal Information Tabs",
+          "details": "*   **Description:** How to view different sections of journal information (Impact Factor, SJR,...).\n*   **Precondition:**\n    *   You are on the detail page of a journal with multiple information tabs.\n*   **Steps:**\n    1.  Click the title of the tab you want to view (e.g., 'Impact Factor', 'SJR').\n    2.  Observe the content displayed below the tabs.\n*   **Expected Result:** The content displayed in the main area of the page will change to show the information corresponding to the tab you selected."
+        },
+        {
+          "title": "17.3 Follow Journal",
+          "details": "*   **Description:** How to bookmark a journal to receive relevant updates (if this feature is fully supported).\n*   **Precondition:**\n    *   You are logged in.\n    *   You are on the detail page of a journal.\n    *   The current journal is not yet 'Followed' by you.\n*   **Steps:**\n    1.  Find and click the 'Follow' button.\n*   **Expected Result:** The 'Follow' button will change state/color (e.g., to 'Following'). The system may display a confirmation message."
+        },
+        {
+          "title": "17.4 Unfollow Journal",
+          "details": "*   **Description:** How to stop following a journal.\n*   **Precondition:**\n    *   You are logged in.\n    *   You are on the detail page of a journal.\n    *   The current journal is currently 'Followed' by you.\n*   **Steps:**\n    1.  Find and click the 'Follow' button (which is in the 'Following' state).\n*   **Expected Result:** The 'Follow' button will change state/color back to its original appearance (e.g., to 'Follow'). The system may display a confirmation message."
+        },
+        {
+          "title": "17.5 Access Official Journal Website",
+          "details": "*   **Description:** How to open the official website of the journal.\n*   **Precondition:**\n    *   You are on the detail page of a journal.\n    *   This journal has official website URL information.\n*   **Steps:**\n    1.  Find and click the 'Journal Website' button.\n*   **Expected Result:** The system will open a new tab in your browser and navigate to the official website URL of that journal."
+        }
+      ]
+    },
+    {
+      "title": "18. Support",
+      "cases": [
+        {
+          "title": "18.1 Access Support Page",
+          "details": "*   **Description:** How to go to the page containing contact information and frequently asked questions.\n*   **Precondition:**\n    *   You are on any page where the navigation bar (header) is displayed.\n*   **Steps:**\n    1.  Click the 'Support' link on the navigation bar.\n*   **Expected Result:** The system will redirect you to the Support page (URL ending in `/support`)."
+        },
+        {
+          "title": "18.2 Submit Contact Us Form",
+          "details": "*   **Description:** Guide on how to send a request or feedback to the support team.\n*   **Precondition:**\n    *   You are on the Support page (URL ending in `/support`).\n    *   You are viewing the Contact Us section (usually at the top of the page).\n*   **Steps:**\n    1.  Enter the Subject in the 'Subject' field.\n    2.  Select the request type from the 'Request type' dropdown (e.g., 'Contact', 'Report').\n    3.  Enter your message in the 'Your message' field.\n    4.  Check the 'I agree to the Terms & Conditions and Privacy Policy' checkbox.\n    5.  Click the 'Send message' button.\n*   **Expected Result:** If the information is valid and the terms checkbox is checked, the system will display a success message (e.g., 'Your message has been sent successfully'). If required fields are missing or terms are not agreed to, the system will display validation error messages and the form will not be submitted."
+        },
+        {
+          "title": "18.3 View Terms and Privacy Policy",
+          "details": "*   **Description:** How to view the detailed content of the Terms and Conditions and Privacy Policy.\n*   **Precondition:**\n    *   You are on the Support page (URL ending in `/support`).\n    *   You are viewing the Contact Us section.\n*   **Steps:**\n    1.  Click the 'Terms & Conditions' link.\n    2.  Click the 'Privacy Policy' link.\n*   **Expected Result:** The system will open a new page or window (modal) displaying the full content of the respective Terms and Conditions or Privacy Policy."
+        },
+        {
+          "title": "18.4 Search in Frequently Asked Questions (FAQ)",
+          "details": "*   **Description:** How to find answers to common questions in the FAQ section.\n*   **Precondition:**\n    *   You are on the Support page (URL ending in `/support`).\n    *   The FAQ section is displayed.\n*   **Steps:**\n    1.  Enter a keyword (e.g., 'account') in the 'How can we help you?' search field and press Enter or wait for the results to filter.\n    2.  Observe the list of FAQ questions.\n*   **Expected Result:** The list of FAQ questions will be filtered to display only those containing the keyword you entered. If no results are found, the system will display a 'No results found' message."
+        },
+        {
+          "title": "18.5 Filter FAQ by Category",
+          "details": "*   **Description:** How to view only FAQ questions belonging to a specific category.\n*   **Precondition:**\n    *   You are on the Support page (URL ending in `/support`).\n    *   The FAQ section displays a category sidebar.\n*   **Steps:**\n    1.  Click a category name in the left sidebar (e.g., 'Account').\n*   **Expected Result:** The list of FAQ questions will be filtered and display only those belonging to the category you selected."
+        },
+        {
+          "title": "18.6 Expand/Collapse FAQ Content",
+          "details": "*   **Description:** How to view the detailed content of an FAQ question.\n*   **Precondition:**\n    *   You are on the Support page (URL ending in `/support`).\n    *   The FAQ section displays a list of questions.\n*   **Steps:**\n    1.  Click the title of an FAQ question (e.g., 'What is this website?').\n    2.  To close the expanded content, click the title again.\n*   **Expected Result:**\n    *   On the first click: The detailed content section below the question title will appear (display). The icon next to the title may change (e.g., from a down arrow to an up arrow).\n    *   On clicking again: The detailed content section will hide. The icon next to the title may change back."
+        }
+      ]
+    },
+    {
+      "title": "19. Chatbot (Homepage Popup)",
+      "cases": [
+        {
+          "title": "19.1 Open Chatbot Window",
+          "details": "*   **Description:** How to start interacting with the Chatbot from the homepage.\n*   **Precondition:**\n    *   You are on the homepage or a page where the Chatbot icon is displayed.\n    *   The Chatbot icon (usually a circular shape in the bottom right corner) is displayed.\n*   **Steps:**\n    1.  Click the circular Chatbot icon in the bottom right corner of the screen.\n*   **Expected Result:** A 'Chat With Us' popup window will appear in the bottom right corner of the screen. The window displays an initial greeting and suggested questions. The small text below the title shows the connection status (e.g., 'Connected')."
+        },
+        {
+          "title": "19.2 Close Chatbot Window",
+          "details": "*   **Description:** How to hide the Chatbot window.\n*   **Precondition:**\n    *   The 'Chat With Us' popup window is open.\n*   **Steps:**\n    1.  In the 'Chat With Us' window, click the 'X' icon in the top right corner of the window title.\n*   **Expected Result:** The 'Chat With Us' popup window will disappear from the screen. The circular Chatbot icon will reappear."
+        },
+        {
+          "title": "19.3 Type and Send Text Message (Popup)",
+          "details": "*   **Description:** How to chat with the Chatbot by typing text.\n*   **Precondition:**\n    *   The 'Chat With Us' popup window is open.\n*   **Steps:**\n    1.  Click the input field at the bottom of the chat window.\n    2.  Enter your question or message (e.g., 'Find conferences about AI').\n    3.  Click the 'Send' icon (usually a paper plane or arrow shape) to the right of the input field.\n*   **Expected Result:** The message you entered appears in the chat history. 'Processing...' status may appear (depending on the bot's connection status), then the Chatbot will process and display a response."
+        },
+        {
+          "title": "19.4 Use Suggested Questions (Popup)",
+          "details": "*   **Description:** How to quickly send common questions that are readily available.\n*   **Precondition:**\n    *   The 'Chat With Us' popup window is open and displays buttons with suggested questions.\n*   **Steps:**\n    1.  Click one of the buttons containing a suggested question (e.g., 'Find Big Data conferences this year.').\n*   **Expected Result:** The text of the suggested question will be populated into the input field at the bottom, ready for you to send by clicking the send icon."
+        },
+        {
+          "title": "19.5 Open/Close Chatbot Settings Panel (Popup)",
+          "details": "*   **Description:** How to access the settings options for the Chatbot popup.\n*   **Precondition:**\n    *   The 'Chat With Us' popup window is open.\n*   **Steps:**\n    1.  To open: Click the 'Settings' icon (gear shape) on the Chatbot window title.\n    2.  To close: In the 'Chat Settings' panel, click the 'X' icon in the top right corner.\n*   **Expected Result:**\n    *   When open: The 'Chat Settings' panel will appear, overlaying the chat history section, displaying options like Stream Response, Hide Toolbar, Hide Thought Process, Language.\n    *   When closed: The settings panel will disappear, and the main chat history interface will be displayed again."
+        },
+        {
+          "title": "19.6 Change Language in Settings (Popup)",
+          "details": "*   **Description:** How to change the display language of the Chatbot popup interface.\n*   **Precondition:**\n    *   The Chatbot 'Chat Settings' panel is open.\n    *   Other language options are available in the 'Language' dropdown.\n*   **Steps:**\n    1.  In the settings panel, click the language selection dropdown (currently displaying the current language).\n    2.  Select a different language from the list (e.g., 'English').\n*   **Expected Result:** The display language in the Chatbot interface (greeting, suggested questions, setting labels) will change to the language you selected. The 'Language' dropdown will display the new language."
+        },
+        {
+          "title": "19.7 View Connection Status (Popup)",
+          "details": "*   **Description:** How to check the connection status of the Chatbot popup.\n*   **Precondition:**\n    *   The 'Chat With Us' popup window is open.\n*   **Steps:**\n    1.  Observe the small text below the 'Chat With Us' title.\n*   **Expected Result:** The small text will display the current connection status (e.g., 'Connected', 'Connecting...', 'Connection lost!')."
+        }
+      ]
+    },
+    {
+      "title": "20. Chatbot (Live Chat Page)",
+      "cases": [
+        {
+          "title": "20.1 Access Live Chat Page",
+          "details": "*   **Description:** How to access the full-screen Chatbot interface with advanced options.\n*   **Precondition:**\n    *   You are on the Chatbot introduction page (URL ending in `/chatbot`).\n*   **Steps:**\n    1.  Click the 'Live Chat' button.\n*   **Expected Result:** The system will redirect you to the Chatbot Live Chat page (URL ending in `/chatbot/livechat`)."
+        },
+        {
+          "title": "20.2 Select Regular Chat Mode",
+          "details": "*   **Description:** How to use the Chatbot in standard text input mode.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page (URL ending in `/chatbot/livechat`).\n*   **Steps:**\n    1.  In the 'Chat Mode & History' section, click the 'Regular Chat' button.\n*   **Expected Result:** The 'Regular Chat' button will be marked as selected. The main chat area interface displays a readiness state for text input ('Live Chat with Our Chatbot' or similar). You will see a standard text input field."
+        },
+        {
+          "title": "20.3 Start a New Conversation (New Chat)",
+          "details": "*   **Description:** How to clear the current chat history and start a new session.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page (URL ending in `/chatbot/livechat`).\n*   **Steps:**\n    1.  In the 'Chat History' section, click the 'New Chat' button.\n*   **Expected Result:** The content in the main chat area will be cleared. A new chat history item (representing the current session) will appear in the 'Chat History' area."
+        },
+        {
+          "title": "20.4 Send Message to Chatbot (Live Chat - Text)",
+          "details": "*   **Description:** How to send a question or request via text when in Regular Chat mode.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page.\n    *   'Regular Chat' mode is selected.\n*   **Steps:**\n    1.  Type your message in the 'Enter message' field at the bottom.\n    2.  Click the send message icon (arrow).\n*   **Expected Result:** Your message appears in the chat area. The Chatbot processes and displays a response in text format (default)."
+        },
+        {
+          "title": "20.5 Receive and Display Text Response (Live Chat)",
+          "details": "*   **Description:** Describes how the Chatbot replies with text for queries.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page.\n    *   'Regular Chat' mode is selected.\n    *   Output Format is set to 'Text' (or is the default).\n*   **Steps:**\n    1.  Send a text query (e.g., 'List some AI conferences in Asia.').\n*   **Expected Result:** The Chatbot displays a text response in the chat area, including information or a list of conferences related to your query."
+        },
+        {
+          "title": "20.6 Click an Initial Suggested Question (Live Chat)",
+          "details": "*   **Description:** How to use the suggested questions when starting a chat session.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page.\n    *   'Regular Chat' mode is selected.\n    *   The interface displays suggested questions ('Hello!', 'List for me...', 'Find conferences...').\n*   **Steps:**\n    1.  Click a suggested question (e.g., 'I want to know about blockchain conferences in Europe.').\n*   **Expected Result:** The text of the clicked suggested question will be populated into your input field, ready to be sent by clicking the send icon. After sending, the Chatbot will process and display a response for that question."
+        },
+        {
+          "title": "20.7 Click a Link in Chatbot Response (Live Chat)",
+          "details": "*   **Description:** How to access links provided in the Chatbot's response (e.g., link to a conference website).\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page.\n    *   You have received a response from the Chatbot containing a link.\n*   **Steps:**\n    1.  Click any link in the Chatbot's response (e.g., the website link of a conference).\n*   **Expected Result:** The system will open a new tab in your browser, navigating to the URL address of the clicked link."
+        },
+        {
+          "title": "20.8 View Chat History (Live Chat)",
+          "details": "*   **Description:** How to view a list of previous Chatbot conversations.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page (URL ending in `/chatbot/livechat`).\n    *   You have completed at least one conversation previously.\n*   **Steps:**\n    1.  Observe the 'Chat History' area on the left.\n*   **Expected Result:** Previous conversations will be listed in the 'Chat History' list, displaying a title (which might be the first question) and the relative time since the session ended."
+        },
+        {
+          "title": "20.9 Load Conversation from History (Live Chat)",
+          "details": "*   **Description:** How to review the detailed content of an old conversation.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page.\n    *   There is at least one item in 'Chat History'.\n*   **Steps:**\n    1.  Click an item in the 'Chat History' list.\n*   **Expected Result:** The content of the conversation you selected from the history will be loaded and displayed in the main chat area."
+        },
+        {
+          "title": "20.10 Change Chatbot Language (Live Chat - Settings)",
+          "details": "*   **Description:** How to change the language that the Chatbot will use for communication and responses.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page.\n    *   The system supports multiple languages for the Chatbot.\n*   **Steps:**\n    1.  In the 'Settings' section, click the 'Language' dropdown.\n    2.  Select a language different from the current language (e.g., from 'Tiếng Việt' to 'English').\n    3.  (Optional) Send a new message to test.\n*   **Expected Result:** The Chatbot interface (e.g., greeting, input field labels, suggestions) will update to the language you selected. The Chatbot's response to new messages will also be displayed in that language."
+        },
+        {
+          "title": "20.11 Select Output Format as Text (Live Chat - Settings)",
+          "details": "*   **Description:** How to configure the Chatbot to respond only with text.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page.\n    *   You are in 'Live Chat' mode.\n*   **Steps:**\n    1.  In the 'Settings' section, find 'Output Format'.\n    2.  Click the 'Text' button.\n*   **Expected Result:** The 'Text' button will be marked as selected. Subsequent Chatbot responses will be displayed as text."
+        },
+        {
+          "title": "20.12 Select Output Format as Audio (Live Chat - Settings)",
+          "details": "*   **Description:** How to configure the Chatbot to respond with audio (Text-to-Speech).\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page.\n    *   You are in 'Live Chat' mode.\n*   **Steps:**\n    1.  In the 'Settings' section, find 'Output Format'.\n    2.  Click the 'Audio' button.\n*   **Expected Result:** The 'Audio' button will be marked as selected. The Chatbot's subsequent response may display with an audio player or just play the audio."
+        },
+        {
+          "title": "20.13 Select Live Stream Mode",
+          "details": "*   **Description:** How to use the Chatbot in voice recognition and audio response mode.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page (URL ending in `/chatbot/livechat`).\n    *   'Regular Chat' mode is selected.\n*   **Steps:**\n    1.  In the 'Chat Mode & History' section, click the 'Live Stream' button.\n*   **Expected Result:** The 'Live Stream' button will be marked as selected. The main chat area interface displays a readiness state for voice input ('Live Chat with Our Chatbot'). Microphone and speaker icons will appear in the input field. The 'Connected' status line will be displayed (if connection is successful)."
+        },
+        {
+          "title": "20.14 Voice Input (Live Stream - Start Recording)",
+          "details": "*   **Description:** How to start recording your voice to send to the Chatbot.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page.\n    *   'Live Stream' mode is selected.\n    *   The browser has granted microphone access to this website.\n*   **Steps:**\n    1.  Click the play (or microphone) icon in the input field (usually a small icon on the right).\n*   **Expected Result:** The icon will change state (e.g., to a pause or sound wave icon). The system starts recording your voice. You may see a visual display of sound waves indicating audio is being captured."
+        },
+        {
+          "title": "20.15 Voice Input (Live Stream - Stop Recording)",
+          "details": "*   **Description:** How to end the voice recording process.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page.\n    *   Currently in voice recording process (Live Stream).\n*   **Steps:**\n    1.  Click the recording icon again (which is currently showing the recording state).\n*   **Expected Result:** The recording icon will stop (e.g., change to a crossed-out microphone icon or the original icon). The system will process the audio recording and send it to the Chatbot."
+        },
+        {
+          "title": "20.16 Receive and Display Audio Response (Live Stream)",
+          "details": "*   **Description:** Describes how the Chatbot replies with audio when in Live Stream mode with Audio Output.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page.\n    *   'Live Stream' mode is selected.\n    *   Output Format is set to 'Audio'.\n*   **Steps:**\n    1.  Send a query (via voice or text).\n*   **Expected Result:** The Chatbot processes and displays an audio response in the chat area. An audio player will appear with play, pause, and progress bar controls. The Chatbot may start speaking the response immediately."
+        },
+        {
+          "title": "20.17 Play Back Audio Response (Live Stream)",
+          "details": "*   **Description:** How to listen to the audio content in the Chatbot's response again.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page.\n    *   You have received an audio response from the Chatbot.\n*   **Steps:**\n    1.  Click the 'Play' button on the Chatbot's response audio player.\n*   **Expected Result:** The system will play back the audio content of the response. The 'Play' button will change to 'Pause'. The progress bar will update with playback time."
+        },
+        {
+          "title": "20.18 Pause/Resume Audio Playback (Live Stream)",
+          "details": "*   **Description:** How to pause and resume listening to the audio response.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page.\n    *   An audio response is currently playing.\n*   **Steps:**\n    1.  Click the 'Pause' button on the audio player to pause.\n    2.  Click the 'Play' button (currently displayed) on the audio player to resume.\n*   **Expected Result:** The audio will pause, and the 'Pause' button will change to 'Play'. When clicking again, the audio will resume playing from the paused position."
+        },
+        {
+          "title": "20.19 Change Chatbot Voice (Live Stream - Settings)",
+          "details": "*   **Description:** How to select a different voice for the Chatbot's audio responses.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page.\n    *   'Live Stream' mode is selected.\n    *   Output Format is set to 'Audio'.\n*   **Steps:**\n    1.  In the 'Settings' section, click the 'Voice' dropdown.\n    2.  Select a voice different from the current one (e.g., select 'Charon' if currently 'Puck').\n    3.  (Optional) Send a new query to hear the new voice.\n*   **Expected Result:** The 'Voice' dropdown displays the selected voice. The Chatbot's next audio response will be spoken in the new voice."
+        },
+        {
+          "title": "20.20 Switch Language in Live Stream + Audio Output Mode",
+          "details": "*   **Description:** Test the Chatbot responding with audio in the selected language.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page (URL: /chatbot/livechat).\n    *   'Live Stream' mode is selected.\n    *   Output Format is set to 'Audio'.\n    *   The system supports a language other than English (e.g., Vietnamese).\n*   **Steps:**\n    1.  In the 'Settings' section, click the 'Language' dropdown and select a language (e.g., 'Tiếng Việt').\n    2.  Send a query (via voice or text depending on configuration).\n*   **Expected Result:** The Chatbot will reply with audio using the selected language ('Tiếng Việt')."
+        },
+        {
+          "title": "20.21 View 'Connected' Status (Live Stream)",
+          "details": "*   **Description:** How to check if the Chatbot has successfully connected in Live Stream mode.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page (URL: /chatbot/livechat).\n    *   'Live Stream' mode is selected.\n*   **Steps:**\n    1.  Observe the small text below the 'Live Chat with Our Chatbot' title.\n*   **Expected Result:** The status line displays 'Connected' in green, along with connection time information (e.g., 'Connected for 00:19 / 10:00')."
+        },
+        {
+          "title": "20.22 Handling Connection Loss (Live Stream)",
+          "details": "*   **Description:** Describes the system's reaction when the connection to the Chatbot is suddenly interrupted.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page.\n    *   'Live Stream' mode is selected and displaying 'Connected' status.\n    *   The network connection is lost or the bot server encounters an issue.\n*   **Steps:**\n    1.  (Simulate) Cause network connection loss (e.g., turn off wifi/ethernet).\n    2.  Observe the connection status area and the chat area.\n*   **Expected Result:** The connection status will change to an error state (e.g., 'Connection lost!'). An error message may appear in the chat area (e.g., 'Connection lost unexpectedly'). Communication-related function buttons (input, send message) may be disabled."
+        },
+        {
+          "title": "20.23 Chatbot Functionality (Search, Details, Map, Redirect)",
+          "details": "*   **Description:** The Chatbot can handle requests to search for conferences by location, provide conference details, open address maps, and redirect to conference detail pages. These functions work in Regular Chat mode.\n*   **Precondition:**\n    *   Chatbot is in REGULAR CHAT mode.\n    *   Relevant conference data exists in the system.\n*   **Steps:**\n    1.  Enter the following questions or requests into the chat frame and send:\n        *   `list some conference in Vietnam` (Search by location)\n        *   `can you give details of MEDES` (Provide conference details)\n        *   `Can you open a map showing the address of conference SERA` (Open address map)\n        *   `Can you direct me to the SERA conference details page?` (Redirect to details page)\n*   **Expected Result:** The Chatbot will respond accordingly: a list of conferences by location, detailed conference information (with links), an address map, or open a confirmation window to redirect to the official page of the requested conference."
+        },
+        {
+          "title": "20.24 Chatbot Functionality (Guidance, Follow/Unfollow)",
+          "details": "*   **Description:** The Chatbot can provide guidance on using features and help users perform Follow/Unfollow actions for conferences. These functions work in Regular Chat mode.\n*   **Precondition:**\n    *   Chatbot is in REGULAR CHAT mode.\n    *   You are logged in to use Follow/Unfollow.\n    *   The conference requested to be Followed/Unfollowed exists in the system.\n*   **Steps:**\n    1.  Enter the following questions or requests into the chat frame and send:\n        *   `can you help me how to use follow conference feature` (Guidance on using Follow feature)\n        *   `can you help me follow HNTD conference` (Follow conference)\n        *   `can you help me unfollow HNTD conference` (Unfollow conference)\n*   **Expected Result:** The Chatbot will respond by: providing detailed guidance, confirming the conference has been successfully followed, or confirming the conference has been successfully unfollowed."
+        },
+        {
+          "title": "20.25 Handling Out-of-Scope Questions (Live Chat)",
+          "details": "*   **Description:** Describes the Chatbot's reaction when receiving irrelevant or unintelligible questions.\n*   **Precondition:**\n    *   Chatbot is active (Regular Chat or Live Stream).\n*   **Steps:**\n    1.  Enter an irrelevant or unclear question (e.g., 'What is the weather tomorrow?', 'Tell me a joke', or a random string of characters).\n    2.  Send the message.\n*   **Expected Result:** The Chatbot responds that it does not understand the question or that the question is outside its scope, and may suggest topics it can help you with (e.g., searching for conferences, providing conference details...)."
+        },
+        {
+          "title": "20.26 View Thought Process (Show Thought Process)",
+          "details": "*   **Description:** How to view the thinking steps or data the Chatbot used to generate its response.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page.\n    *   You have received a response from the Chatbot accompanied by a 'Show Thought Process' link.\n*   **Steps:**\n    1.  Click the 'Show Thought Process' link below the Chatbot's response.\n*   **Expected Result:** An additional content area (e.g., dropdown, popup, or expandable text) will appear below the Chatbot's response, displaying the bot's thinking steps (e.g., intent recognition, information extraction, data search...)."
+        },
+        {
+          "title": "20.27 Copy Response",
+          "details": "*   **Description:** How to copy the content of the Chatbot's response to the clipboard.\n*   **Precondition:**\n    *   You are on the Chatbot Live Chat page.\n    *   You have received a text response from the Chatbot.\n*   **Steps:**\n    1.  Find and click the 'Copy' icon or button associated with the Chatbot's response.\n    2.  (Optional) Paste the content into another editor to verify.\n*   **Expected Result:** The content of the Chatbot's response will be copied to the system clipboard. The system may display a confirmation message (e.g., 'Copied to clipboard!')."
+        }
+      ]
+    },
+    {
+      "title": "21. Visualize Data",
+      "cases": [
+        {
+          "title": "21.1 Access Visualization Page",
+          "details": "*   **Description:** How to go to the page that allows you to create statistical charts from conference data.\n*   **Precondition:**\n    *   You are logged in.\n    *   You are on any page where the navigation bar (header) is displayed.\n*   **Steps:**\n    1.  Click the 'Visualize' link on the navigation bar.\n*   **Expected Result:** The system will redirect you to the Visualization page (URL ending in `/en/visualization`), displaying the data selection area (FIELDS), chart configuration area (CONFIGURATION), and an initially empty chart display area."
+        },
+        {
+          "title": "21.2 Display Bar Chart",
+          "details": "*   **Description:** Guide on creating a simple bar chart.\n*   **Precondition:**\n    *   You are logged in and on the Visualization page.\n    *   Global Conferences data has been loaded (displayed in the FIELDS section).\n    *   'Continent' (Dimension) and 'Record Count' (Measure) fields are available.\n*   **Steps:**\n    1.  In the 'Configuration' section, click the 'Chart Type' dropdown and select 'Bar Chart'.\n    2.  From the 'FIELDS' section on the left, drag the 'Continent' field and drop it onto the 'X-Axis (Category/Dimension)' position in the 'Configuration' section.\n    3.  From the 'FIELDS' section on the left, drag the 'Record Count' field and drop it onto the 'Y-Axis (Value/Measure)' position in the 'Configuration' section.\n*   **Expected Result:** The central area will display a bar chart. The X-axis displays the names of continents. The Y-axis displays 'Record Count'. The bars will represent the number of conferences by continent with corresponding heights."
+        },
+        {
+          "title": "21.3 Display Line Chart",
+          "details": "*   **Description:** Guide on creating a line chart representing data across one dimension (e.g., by Continent), categorized by a second dimension (e.g., by Country).\n*   **Precondition:**\n    *   You are logged in and on the Visualization page.\n    *   Data has been loaded.\n    *   'Continent', 'Record Count', and 'Country' fields are available.\n*   **Steps:**\n    1.  In the 'Configuration' section, click the 'Chart Type' dropdown and select 'Line Chart'.\n    2.  From the 'FIELDS' section, drag the 'Continent' field and drop it onto the 'X-Axis (Category/Dimension)' position.\n    3.  From the 'FIELDS' section, drag the 'Record Count' field and drop it onto the 'Y-Axis (Value/Measure)' position.\n    4.  From the 'FIELDS' section, drag the 'Country' field and drop it onto the 'Color Group (Dimension)' position.\n*   **Expected Result:** The central area displays a line chart. The X-axis displays continents. The Y-axis displays 'Record Count'. Multiple lines of different colors are plotted on the chart, each representing the 'Record Count' of a country ('Country') across the continents. A Legend displays the list of countries corresponding to the line colors."
+        },
+        {
+          "title": "21.4 Display Pie Chart",
+          "details": "*   **Description:** Guide on creating a pie chart representing the proportional contribution of different parts to the whole (e.g., proportion of conferences by Country).\n*   **Precondition:**\n    *   You are logged in and on the Visualization page.\n    *   Data has been loaded.\n    *   'Record Count' (Measure) and 'Country' (Dimension) fields are available.\n*   **Steps:**\n    1.  In the 'Configuration' section, click the 'Chart Type' dropdown and select 'Pie Chart'.\n    2.  From the 'FIELDS' section, drag the 'Record Count' field and drop it onto the 'Value (Slice Size/Measure)' position.\n    3.  From the 'FIELDS' section, drag the 'Country' field and drop it onto the 'Slices Color (Dimension)' position.\n*   **Expected Result:** The central area will display a pie chart (or donut chart). The slices of the chart will represent the proportion of 'Record Count' by country ('Country'). Each country has a distinct color. A Legend displays the list of countries and their corresponding colors."
+        },
+        {
+          "title": "21.5 Change Chart Title",
+          "details": "*   **Description:** How to name the chart you create.\n*   **Precondition:**\n    *   You are logged in and on the Visualization page.\n    *   Any chart has been displayed.\n*   **Steps:**\n    1.  In the 'Configuration' section, find the 'Chart Options' section.\n    2.  Click the input field next to the 'Chart Title' label.\n    3.  Enter the new title you want (e.g., 'Conference Statistics Chart').\n*   **Expected Result:** The title displayed above the chart in the central area will change to the title you entered."
+        },
+        {
+          "title": "21.6 Show/Hide Legend",
+          "details": "*   **Description:** How to hide or show the list of items represented by colors on the chart (Legend).\n*   **Precondition:**\n    *   You are logged in and on the Visualization page.\n    *   A chart with a legend (e.g., Pie Chart or Line Chart with 'Color Group') has been displayed.\n*   **Steps:**\n    1.  In the 'Configuration' section, find the 'Chart Options' section.\n    2.  Click the toggle switch icon next to the 'Show Legend' label.\n*   **Expected Result:** The chart's Legend will disappear from the screen when you turn it off and reappear when you turn it on."
+        },
+        {
+          "title": "21.7 Show/Hide Toolbox",
+          "details": "*   **Description:** How to hide or show the toolbox on the chart (usually contains options like download, view data,...).\n*   **Precondition:**\n    *   You are logged in and on the Visualization page.\n    *   A chart with a toolbox has been displayed.\n*   **Steps:**\n    1.  In the 'Configuration' section, find the 'Chart Options' section.\n    2.  Click the toggle switch icon next to the 'Show Toolbox' label.\n*   **Expected Result:** The chart's Toolbox will disappear from the screen when you turn it off and reappear when you turn it on."
+        }
+      ]
+    },
+    {
+      "title": "22. Features by User Role",
+      "cases": [
+        {
+          "title": "22.1 Features for both Guest and Logged-in Users",
+          "details": "The following features can be accessed and used by anyone visiting the website, regardless of whether they are logged in:\n\n*   **Account Access (Sign Up / Sign In):** Create a new account or log in using personal information or Google.\n*   **Search Conferences:** Search for conferences based on criteria such as Location, Dates, Rank, Source, Organization Type, and other advanced filters.\n*   **View Conference Location Map:** View the conference location on an interactive map on the conference detail page (if location information is available).\n*   **Search Scientific Journals:** Search for relevant scientific journals using the search tool, including advanced filters.\n*   **AI Assistant (Chatbot):** Get instant answers about conferences and journals, receive assistance in navigating the platform, and quickly go to relevant sections. Can interact via text or voice through the Live Chat page or a popup window on the homepage."
+        },
+        {
+          "title": "22.2 Features only for Logged-in Users",
+          "details": "To access and use the following features, you **are required to be logged in** to your account:\n\n*   **Follow Conferences:** Save conferences you are interested in ('Follow') to receive notifications about important dates, changes...\n*   **Rate & Comment on Conferences:** Share your experience by rating the conference (1-5 stars) and leaving comments on the conference detail page.\n*   **Personal Calendar & Notes:** View saved events and notes on your personal calendar in the Dashboard. You can also add custom notes for specific dates to organize your work.\n*   **Contribute New Conferences:** Submit information about new conferences for review and inclusion in the website's listing through the publish process.\n*   **Receive Notifications:** Get important notifications directly within the application (via the bell icon and the Notifications page in the Dashboard) and optionally receive email alerts.\n*   **Customize Experience (Settings):** Manage personal settings such as email notification preferences, and choose to automatically add followed conferences to your personal calendar.\n*   **Manage Profile:** Access and edit your personal information such as updating display name, changing password, or address information.\n*   **Visualize Conference Data:** Explore information and trends about conferences by creating and customizing interactive charts on the Visualize page."
+        }
+      ]
+    }
+  ]
+}

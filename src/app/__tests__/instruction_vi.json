@@ -1,0 +1,707 @@
+{
+  "title": "Hướng dẫn sử dụng Website",
+  "sections": [
+    {
+      "title": "1. Đăng nhập và Đăng ký",
+      "cases": [
+        {
+          "title": "1.1 Đăng nhập thành công",
+          "details": "*   **Mô tả:** Hướng dẫn cách đăng nhập vào hệ thống.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã có một tài khoản hợp lệ.\n    *   Bạn đang ở trang Đăng nhập (URL kết thúc bằng `/auth/login`).\n*   **Các bước thực hiện:**\n    1.  Nhập Email hợp lệ của bạn vào ô 'Email'.\n    2.  Nhập Mật khẩu hợp lệ của bạn vào ô 'Password'.\n    3.  Nhấp vào nút 'Sign In'.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến trang chủ (Homepage). Trên thanh điều hướng (header), bạn sẽ thấy biểu tượng profile/avatar của mình."
+        },
+        {
+          "title": "1.2 Đăng nhập thất bại (Mật khẩu không hợp lệ)",
+          "details": "*   **Mô tả:** Mô tả khi bạn nhập sai mật khẩu.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã có một tài khoản hợp lệ.\n    *   Bạn đang ở trang Đăng nhập (URL kết thúc bằng `/auth/login`).\n*   **Các bước thực hiện:**\n    1.  Nhập Email hợp lệ của bạn vào ô 'Email'.\n    2.  Nhập Mật khẩu *không* hợp lệ vào ô 'Password'.\n    3.  Nhấp vào nút 'Sign In'.\n*   **Kết quả mong đợi:** Hệ thống sẽ hiển thị thông báo lỗi như 'Wrong password' hoặc 'Sai mật khẩu'. Bạn sẽ vẫn ở lại trang Đăng nhập."
+        },
+        {
+          "title": "1.3 Đăng nhập thất bại (Email chưa đăng ký)",
+          "details": "*   **Mô tả:** Mô tả khi bạn nhập Email chưa tồn tại trong hệ thống.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Đăng nhập (URL kết thúc bằng `/auth/login`).\n*   **Các bước thực hiện:**\n    1.  Nhập một địa chỉ Email *chưa* đăng ký vào ô 'Email'.\n    2.  Nhập bất kỳ mật khẩu nào vào ô 'Password'.\n    3.  Nhấp vào nút 'Sign In'.\n*   **Kết quả mong đợi:** Hệ thống sẽ hiển thị thông báo lỗi 'No email match'. Bạn sẽ vẫn ở lại trang Đăng nhập."
+        },
+        {
+          "title": "1.4 Đăng nhập thất bại (Để trống trường bắt buộc)",
+          "details": "*   **Mô tả:** Mô tả khi bạn cố gắng đăng nhập mà không nhập Email hoặc Mật khẩu.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Đăng nhập (URL kết thúc bằng `/auth/login`).\n*   **Các bước thực hiện:**\n    1.  Để trống ô 'Email'.\n    2.  Để trống ô 'Password'.\n    3.  Nhấp vào nút 'Sign In'.\n*   **Kết quả mong đợi:** Hệ thống sẽ hiển thị thông báo lỗi validation (ví dụ: 'Please fill out this field') ngay dưới các ô bị bỏ trống. Bạn sẽ vẫn ở lại trang Đăng nhập."
+        },
+        {
+          "title": "1.5 Quên mật khẩu",
+          "details": "*   **Mô tả:** Hướng dẫn cách truy cập trang khôi phục mật khẩu.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Đăng nhập (URL kết thúc bằng `/auth/login`).\n*   **Các bước thực hiện:**\n    1.  Nhấp vào liên kết 'Forgot Password?'.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến trang 'Quên mật khẩu'."
+        },
+        {
+          "title": "1.6 Đăng ký tài khoản mới",
+          "details": "*   **Mô tả:** Hướng dẫn cách truy cập trang đăng ký tài khoản mới.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Đăng nhập (URL kết thúc bằng `/auth/login`).\n*   **Các bước thực hiện:**\n    1.  Nhấp vào liên kết 'Sign Up Now'.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến trang 'Đăng ký' (URL kết thúc bằng `/auth/register`)."
+        },
+        {
+          "title": "1.7 Đăng nhập bằng Google",
+          "details": "*   **Mô tả:** Hướng dẫn cách sử dụng tính năng đăng nhập nhanh bằng tài khoản Google.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Đăng nhập (URL kết thúc bằng `/auth/login`).\n*   **Các bước thực hiện:**\n    1.  Nhấp vào nút 'Continue with Google'.\n*   **Kết quả mong đợi:** Hệ thống sẽ hiển thị một cửa sổ popup hoặc chuyển hướng bạn đến trang xác thực của Google để bạn chọn tài khoản Google muốn sử dụng để đăng nhập."
+        }
+      ]
+    },
+    {
+      "title": "2. Đăng ký tài khoản",
+      "cases": [
+        {
+          "title": "2.1 Đăng ký tài khoản thành công",
+          "details": "*   **Mô tả:** Hướng dẫn cách tạo tài khoản mới.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Đăng ký (URL kết thúc bằng `/auth/register`).\n    *   Địa chỉ Email bạn muốn đăng ký chưa được sử dụng cho tài khoản khác.\n*   **Các bước thực hiện:**\n    1.  Nhập Tên (First Name) hợp lệ vào ô 'First Name'.\n    2.  Nhập Họ (Last Name) hợp lệ vào ô 'Last Name'.\n    3.  Nhập hoặc chọn Ngày sinh (Date of Birth) hợp lệ (đủ 18 tuổi trở lên) vào ô 'Date of Birth'.\n    4.  Nhập Email hợp lệ và chưa tồn tại vào ô 'Email'.\n    5.  Nhập Mật khẩu hợp lệ (ít nhất 8 ký tự) vào ô 'Password'.\n    6.  Nhập lại Mật khẩu giống với ô 'Password' vào ô 'Confirm Password'.\n    7.  Nhấp vào nút 'Create account'.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến một trang để xác thực tài khoản (ví dụ: qua email)."
+        },
+        {
+          "title": "2.2 Đăng ký thất bại (Để trống trường bắt buộc)",
+          "details": "*   **Mô tả:** Mô tả khi bạn bỏ trống bất kỳ trường có dấu sao (*) nào khi đăng ký.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Đăng ký (URL kết thúc bằng `/auth/register`).\n*   **Các bước thực hiện:**\n    1.  Để trống một trong các ô có dấu sao * (ví dụ: ô 'Email').\n    2.  Điền đầy đủ các ô bắt buộc còn lại với dữ liệu hợp lệ.\n    3  Nhấp vào nút 'Create account'.\n*   **Kết quả mong đợi:** Hệ thống sẽ hiển thị thông báo lỗi validation (ví dụ: 'Please fill out this field') ngay dưới ô bị bỏ trống. Tài khoản sẽ không được tạo. Bạn sẽ vẫn ở lại trang Đăng ký."
+        },
+        {
+          "title": "2.3 Đăng ký thất bại (Email đã tồn tại)",
+          "details": "*   **Mô tả:** Mô tả khi bạn cố gắng đăng ký bằng Email đã có người sử dụng.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Đăng ký (URL kết thúc bằng `/auth/register`).\n    *   Địa chỉ Email bạn muốn đăng ký đã được sử dụng cho tài khoản khác.\n*   **Các bước thực hiện:**\n    1.  Điền đầy đủ các ô bắt buộc với dữ liệu hợp lệ, ngoại trừ ô 'Email'.\n    2.  Nhập một địa chỉ Email đã được sử dụng vào ô 'Email'.\n    3.  Nhấp vào nút 'Create account'.\n*   **Kết quả mong đợi:** Hệ thống sẽ hiển thị thông báo lỗi 'User already exists'. Tài khoản sẽ không được tạo. Bạn sẽ vẫn ở lại trang Đăng ký."
+        },
+        {
+          "title": "2.4 Đăng ký thất bại (Mật khẩu và Xác nhận Mật khẩu không khớp)",
+          "details": "*   **Mô tả:** Mô tả khi Mật khẩu bạn nhập và Mật khẩu xác nhận không giống nhau.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Đăng ký (URL kết thúc bằng `/auth/register`).\n*   **Các bước thực hiện:**\n    1.  Điền đầy đủ các ô bắt buộc với dữ liệu hợp lệ, ngoại trừ ô 'Confirm Password'.\n    2.  Nhập giá trị trong ô 'Confirm Password' *khác* với giá trị trong ô 'Password'.\n    3.  Nhấp vào nút 'Create account'.\n*   **Kết quả mong đợi:** Hệ thống sẽ hiển thị thông báo lỗi validation dưới ô 'Confirm Password' (ví dụ: 'The passwords you entered do not match. Please re-enter your password.'). Tài khoản sẽ không được tạo. Bạn sẽ vẫn ở lại trang Đăng ký."
+        },
+        {
+          "title": "2.5 Đăng ký thất bại (Ngày sinh chưa đủ 18 tuổi)",
+          "details": "*   **Mô tả:** Mô tả khi ngày sinh bạn nhập cho thấy bạn chưa đủ 18 tuổi.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Đăng ký (URL kết thúc bằng `/auth/register`).\n*   **Các bước thực hiện:**\n    1.  Điền đầy đủ các ô bắt buộc với dữ liệu hợp lệ, ngoại trừ ô 'Date of Birth'.\n    2.  Nhập một ngày sinh không hợp lệ (chưa đủ 18 tuổi) vào ô 'Date of Birth'.\n    3.  Nhấp vào nút 'Create account'.\n*   **Kết quả mong đợi:** Hệ thống sẽ hiển thị thông báo lỗi (ví dụ: 'You must be at least 18 years old...'). Tài khoản sẽ không được tạo. Bạn sẽ vẫn ở lại trang Đăng ký."
+        },
+        {
+          "title": "2.6 Đăng ký thất bại (Mật khẩu không đủ 8 ký tự)",
+          "details": "*   **Mô tả:** Mô tả khi mật khẩu bạn nhập ngắn hơn 8 ký tự.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Đăng ký (URL kết thúc bằng `/auth/register`).\n*   **Các bước thực hiện:**\n    1.  Điền đầy đủ các ô bắt buộc với dữ liệu hợp lệ, ngoại trừ ô 'Password'.\n    2.  Nhập mật khẩu ngắn hơn 8 ký tự vào ô 'Password'.\n    3.  Nhấp vào nút 'Create account'.\n*   **Kết quả mong đợi:** Hệ thống sẽ hiển thị thông báo lỗi (ví dụ: 'Your password must be at least 8 characters long...'). Tài khoản sẽ không được tạo. Bạn sẽ vẫn ở lại trang Đăng ký."
+        },
+        {
+          "title": "2.7 Quay lại trang Đăng nhập từ trang Đăng ký",
+          "details": "*   **Mô tả:** Hướng dẫn cách trở về trang Đăng nhập.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Đăng ký (URL kết thúc bằng `/auth/register`).\n*   **Các bước thực hiện:**\n    1.  Nhấp vào liên kết 'Sign In'.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến trang 'Đăng nhập' (URL kết thúc bằng `/auth/login`)."
+        }
+      ]
+    },
+    {
+      "title": "3. Thanh điều hướng (Header)",
+      "cases": [
+        {
+          "title": "3.1 Truy cập các trang chính",
+          "details": "*   **Mô tả:** Các liên kết trên thanh điều hướng giúp bạn truy cập nhanh các khu vực chính của website.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở bất kỳ trang nào có hiển thị thanh điều hướng (header).\n*   **Các bước thực hiện:**\n    1.  Nhấp vào liên kết tương ứng trên thanh điều hướng.\n*   **Kết quả mong đợi:**\n    *   Nhấp 'Journals': Chuyển hướng đến trang tìm kiếm và xem thông tin tạp chí.\n    *   Nhấp 'Conference': Chuyển hướng đến trang tìm kiếm và xem thông tin hội nghị.\n    *   Nhấp 'Publish': Chuyển hướng đến trang thêm mới hội nghị.\n    *   Nhấp 'Chatbot': Chuyển hướng đến trang giới thiệu Chatbot.\n    *   Nhấp 'Visualize': Chuyển hướng đến trang tạo biểu đồ thống kê.\n    *   Nhấp 'Support': Chuyển hướng đến trang hỗ trợ (Contact Us & FAQ).\n    *   Nhấp 'Login' (khi chưa đăng nhập): Chuyển hướng đến trang Đăng nhập."
+        },
+        {
+          "title": "3.2 Thay đổi ngôn ngữ",
+          "details": "*   **Mô tả:** Cách thay đổi ngôn ngữ hiển thị của website.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở bất kỳ trang nào có hiển thị thanh điều hướng (header).\n    *   Hệ thống hỗ trợ nhiều ngôn ngữ.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào biểu tượng hoặc văn bản hiển thị ngôn ngữ hiện tại trên thanh điều hướng (ví dụ: 'English').\n    2.  Chọn một ngôn ngữ khác từ danh sách thả xuống (ví dụ: chọn 'Vietnamese').\n*   **Kết quả mong đợi:** Giao diện của trang hiện tại (nội dung, nhãn, nút,...) sẽ được cập nhật sang ngôn ngữ bạn đã chọn."
+        },
+        {
+          "title": "3.3 Menu người dùng (khi đã đăng nhập)",
+          "details": "*   **Mô tả:** Truy cập menu chứa các liên kết đến Dashboard và cài đặt.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Biểu tượng người dùng (avatar) hiển thị trên thanh điều hướng.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào biểu tượng người dùng (avatar) trên thanh điều hướng.\n*   **Kết quả mong đợi:** Một menu thả xuống sẽ xuất hiện, hiển thị tên của bạn (ví dụ: 'Hello DONG QUAN') và các liên kết điều hướng đến các mục trong Dashboard như Profile, My Conferences, Followed, Note, Notifications, Blacklisted, Setting, và Logout."
+        },
+        {
+          "title": "3.4 Đăng xuất",
+          "details": "*   **Mô tả:** Cách thoát khỏi tài khoản của bạn.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Menu người dùng (avatar) đang mở.\n*   **Các bước thực hiện:**\n    1.  Trong menu thả xuống của người dùng, nhấp vào liên kết 'Logout'.\n*   **Kết quả mong đợi:** Bạn sẽ được đăng xuất khỏi tài khoản. Hệ thống sẽ chuyển hướng bạn đến trang chủ (và nút 'Login' sẽ hiển thị lại trên header). Phiên làm việc của bạn sẽ kết thúc."
+        },
+        {
+          "title": "3.5 Thay đổi Chủ đề (Theme)",
+          "details": "*   **Mô tả:** Cách chuyển đổi giữa chế độ giao diện Sáng (Light Mode) và Tối (Dark Mode).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở bất kỳ trang nào có hiển thị thanh điều hướng (header).\n*   **Các bước thực hiện:**\n    1.  Nhấp vào biểu tượng 'Theme' hoặc dropdown 'Theme' trên thanh điều hướng.\n    2.  Chọn tùy chọn 'Light' để chuyển sang giao diện sáng.\n    3.  Chọn tùy chọn 'Dark' để chuyển sang giao diện tối.\n*   **Kết quả mong đợi:** Giao diện của trang hiện tại (màu nền, màu chữ, màu các thành phần UI) sẽ chuyển sang tông màu tương ứng với chế độ bạn chọn."
+        }
+      ]
+    },
+    {
+      "title": "4. Tìm kiếm Hội nghị (Conferences)",
+      "cases": [
+        {
+          "title": "4.1 Truy cập trang Tìm kiếm Hội nghị",
+          "details": "*   **Mô tả:** Cách đến trang tìm kiếm chính để khám phá các hội nghị.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở bất kỳ trang nào có hiển thị thanh điều hướng (header).\n*   **Các bước thực hiện:**\n    1.  Nhấp vào liên kết 'Conference' trên thanh điều hướng.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến trang Conferences Search (URL kết thúc bằng `/conferences`), hiển thị danh sách tất cả hội nghị ban đầu."
+        },
+        {
+          "title": "4.2 Tìm kiếm cơ bản",
+          "details": "*   **Mô tả:** Cách tìm kiếm hội nghị theo từ khóa, tiêu đề hoặc tên viết tắt.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Conferences Search (URL kết thúc bằng `/conferences`).\n*   **Các bước thực hiện:**\n    1.  **Để tìm kiếm theo từ khóa (mặc định):** Nhập từ khóa vào ô tìm kiếm chính (có nhãn 'Keyword').\n    2.  **Để tìm kiếm theo Tiêu đề:** Nhấp vào ô 'Keyword', chọn 'Title' trong menu thả xuống, sau đó nhập tiêu đề vào ô tìm kiếm chính.\n    3.  **Để tìm kiếm theo Tên viết tắt (Acronym):** Nhấp vào ô 'Keyword', chọn 'Acronym' trong menu thả xuống, sau đó nhập tên viết tắt vào ô tìm kiếm chính.\n    4.  Nhấp vào nút 'Search'.\n*   **Kết quả mong đợi:** Trang sẽ hiển thị danh sách các hội nghị chứa từ khóa, tiêu đề hoặc tên viết tắt bạn đã nhập. Số lượng kết quả ('Conference Results (XXX)') sẽ được cập nhật."
+        },
+        {
+          "title": "4.3 Tìm kiếm theo Loại (Type)",
+          "details": "*   **Mô tả:** Cách lọc kết quả tìm kiếm theo loại hình hội nghị (Offline, Hybrid).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Conferences Search (URL kết thúc bằng `/conferences`).\n*   **Các bước thực hiện:**\n    1.  Nhấp vào dropdown 'Type'.\n    2.  Chọn một loại từ danh sách (ví dụ: 'Hybrid').\n    3.  (Tùy chọn) Nhập thêm các tiêu chí tìm kiếm khác.\n    4.  Nhấp vào nút 'Search'.\n*   **Kết quả mong đợi:** Trang hiển thị danh sách các hội nghị có Loại tương ứng. Một thẻ bộ lọc 'Type: [Loại]' sẽ xuất hiện phía trên danh sách kết quả. Số lượng kết quả cập nhật."
+        },
+        {
+          "title": "4.4 Tìm kiếm theo Khoảng ngày (Date Range)",
+          "details": "*   **Mô tả:** Cách lọc kết quả tìm kiếm theo khoảng ngày diễn ra của hội nghị.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Conferences Search (URL kết thúc bằng `/conferences`).\n*   **Các bước thực hiện:**\n    1.  Nhập ngày bắt đầu (ví dụ: '04/01/2025') vào ô 'Start: mm/dd/yyyy' trong phần lọc ngày.\n    2.  Nhập ngày kết thúc (ví dụ: '04/30/2025') vào ô 'End: mm/dd/yyyy' trong phần lọc ngày.\n    3.  (Tùy chọn) Nhập thêm các tiêu chí tìm kiếm khác.\n    4.  Nhấp vào nút 'Search'.\n*   **Kết quả mong đợi:** Trang hiển thị danh sách các hội nghị diễn ra trong khoảng ngày bạn đã nhập. URL sẽ cập nhật với các tham số ngày (ví dụ: `Date=YYYY-MM-DD&Date=YYYY-MM-DD`). Số lượng kết quả cập nhật."
+        },
+        {
+          "title": "4.5 Tìm kiếm theo Địa điểm (Location)",
+          "details": "*   **Mô tả:** Cách lọc kết quả tìm kiếm theo địa điểm (quốc gia).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Conferences Search (URL kết thúc bằng `/conferences`).\n*   **Các bước thực hiện:**\n    1.  Nhập địa điểm/quốc gia (ví dụ: 'Armenia') vào ô 'Location'.\n    2.  (Tùy chọn) Nhập thêm các tiêu chí tìm kiếm khác.\n    3.  Nhấp vào nút 'Search'.\n*   **Kết quả mong đợi:** Trang hiển thị danh sách các hội nghị ở địa điểm bạn đã nhập. URL sẽ cập nhật với tham số quốc gia (ví dụ: `Country=Armenia`). Số lượng kết quả cập nhật."
+        },
+        {
+          "title": "4.6 Hiển thị/Ẩn tùy chọn tìm kiếm nâng cao",
+          "details": "*   **Mô tả:** Cách xem hoặc ẩn các bộ lọc tìm kiếm bổ sung.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Conferences Search (URL kết thúc bằng `/conferences`).\n*   **Các bước thực hiện:**\n    1.  Để hiển thị: Nhấp vào liên kết 'Show advanced search options'.\n    2.  Để ẩn: Nhấp vào liên kết 'Hide advanced search options'.\n*   **Kết quả mong đợi:**\n    *   Khi hiển thị: Các ô lọc bổ sung như 'Submission Date', 'Publisher', 'Rank', 'Source', 'Avg. Score', 'Topics', 'Field of Research' sẽ xuất hiện bên dưới các ô tìm kiếm cơ bản. Liên kết sẽ đổi thành 'Hide advanced search options'.\n    *   Khi ẩn: Các ô lọc bổ sung sẽ biến mất. Liên kết sẽ đổi thành 'Show advanced search options'."
+        },
+        {
+          "title": "4.7 Tìm kiếm nâng cao (Rank, Publisher, Source, Score, Topics, Field of Research, Submission Date)",
+          "details": "*   **Mô tả:** Hướng dẫn sử dụng các bộ lọc nâng cao để tinh chỉnh kết quả tìm kiếm.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Conferences Search (URL kết thúc bằng `/conferences`).\n    *   Các tùy chọn tìm kiếm nâng cao đang được hiển thị.\n*   **Các bước thực hiện:**\n    1.  Nhập hoặc chọn giá trị cho một hoặc nhiều ô lọc nâng cao bạn muốn sử dụng (ví dụ: 'Rank: A*', 'Publisher: ACM', 'Submission Date: 01/01/2025 - 03/31/2025', 'Field of Research: Human Computer Interaction', v.v.).\n    2.  (Tùy chọn) Nhập thêm các tiêu chí tìm kiếm cơ bản.\n    3.  Nhấp vào nút 'Search'.\n*   **Kết quả mong đợi:** Trang hiển thị danh sách các hội nghị thỏa mãn TẤT CẢ các tiêu chí bạn đã nhập/chọn. Các thẻ bộ lọc tương ứng sẽ xuất hiện phía trên danh sách. Số lượng kết quả cập nhật.\n*   **Lưu ý:** Nếu nhập dữ liệu không hợp lệ vào các ô nâng cao (ví dụ: Avg. Score '6', định dạng ngày sai), hệ thống có thể hiển thị lỗi validation hoặc trả về 'No results found'."
+        },
+        {
+          "title": "4.8 Tìm kiếm với từ khóa không tồn tại",
+          "details": "*   **Mô tả:** Mô tả khi bạn tìm kiếm bằng một từ khóa không có trong dữ liệu.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Conferences Search (URL kết thúc bằng `/conferences`).\n*   **Các bước thực hiện:**\n    1.  Nhập một từ khóa không tồn tại vào ô tìm kiếm chính.\n    2.  Nhấp vào nút 'Search'.\n*   **Kết quả mong đợi:** Hệ thống sẽ hiển thị thông báo 'No results found'. Danh sách kết quả trống."
+        },
+        {
+          "title": "4.9 Tìm kiếm với trường trống",
+          "details": "*   **Mô tả:** Mô tả khi bạn nhấp nút tìm kiếm mà không nhập bất kỳ tiêu chí nào.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Conferences Search (URL kết thúc bằng `/conferences`).\n    *   Tất cả các ô tìm kiếm (cơ bản và nâng cao) đều trống.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào nút 'Search'.\n*   **Kết quả mong đợi:** Trang sẽ hiển thị lại danh sách đầy đủ tất cả các hội nghị có trong hệ thống."
+        },
+        {
+          "title": "4.10 Xóa bộ lọc (Nút Clear)",
+          "details": "*   **Mô tả:** Cách xóa tất cả các tiêu chí tìm kiếm đã nhập và xem lại danh sách đầy đủ.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Conferences Search (URL kết thúc bằng `/conferences`).\n    *   Bạn đã nhập dữ liệu vào ít nhất một ô tìm kiếm.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào nút 'Clear'.\n*   **Kết quả mong đợi:** Tất cả các ô tìm kiếm (cơ bản và nâng cao) sẽ được làm trống. Các thẻ bộ lọc phía trên danh sách sẽ biến mất. Trang sẽ hiển thị lại danh sách đầy đủ tất cả các hội nghị."
+        },
+        {
+          "title": "4.11 Xóa một bộ lọc cụ thể",
+          "details": "*   **Mô tả:** Cách gỡ bỏ một bộ lọc cụ thể đã áp dụng (ví dụ: chỉ xóa bộ lọc Topics mà vẫn giữ lại bộ lọc Date).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Conferences Search (URL kết thúc bằng `/conferences`).\n    *   Đã áp dụng ít nhất một bộ lọc và thẻ bộ lọc tương ứng hiển thị phía trên danh sách kết quả (ví dụ: thẻ 'Topics: [Tên Topic] x').\n*   **Các bước thực hiện:**\n    1.  Nhấp vào biểu tượng 'x' trên thẻ bộ lọc bạn muốn gỡ bỏ (ví dụ: thẻ 'Topics: Human-in-the-loop AI x').\n    2.  Nhấp lại vào nút 'Search'.\n*   **Kết quả mong đợi:** Thẻ bộ lọc đã chọn sẽ biến mất. Danh sách kết quả sẽ được cập nhật để chỉ áp dụng các bộ lọc còn lại (hoặc hiển thị tất cả nếu không còn bộ lọc nào). Số lượng kết quả cập nhật."
+        },
+        {
+          "title": "4.12 Sắp xếp kết quả tìm kiếm",
+          "details": "*   **Mô tả:** Cách thay đổi thứ tự hiển thị của các hội nghị trong danh sách kết quả.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Conferences Search (URL kết thúc bằng `/conferences`).\n    *   Có danh sách kết quả được hiển thị.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào dropdown 'Sort By'.\n    2.  Chọn tiêu chí sắp xếp mong muốn từ danh sách (ví dụ: 'Date').\n*   **Kết quả mong đợi:** Danh sách các hội nghị sẽ được sắp xếp lại theo tiêu chí bạn đã chọn (ví dụ: theo ngày tăng dần hoặc giảm dần)."
+        },
+        {
+          "title": "4.13 Thay đổi số lượng kết quả hiển thị trên mỗi trang",
+          "details": "*   **Mô tả:** Cách điều chỉnh số lượng hội nghị hiển thị trên một trang kết quả.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Conferences Search (URL kết thúc bằng `/conferences`).\n    *   Tổng số kết quả tìm thấy nhiều hơn số lượng hiển thị mặc định trên trang đầu tiên.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào dropdown 'Events per page' (hoặc tương tự).\n    2.  Chọn một giá trị khác giá trị hiện tại (ví dụ: 10, 20, 50, 100).\n*   **Kết quả mong đợi:** Số lượng hội nghị hiển thị trên trang sẽ được cập nhật theo giá trị bạn đã chọn. Các điều khiển phân trang (pagination) có thể thay đổi để phù hợp với tổng số trang mới."
+        },
+        {
+          "title": "4.14 Sử dụng phân trang",
+          "details": "*   **Mô tả:** Cách di chuyển giữa các trang kết quả tìm kiếm.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Conferences Search (URL kết thúc bằng `/conferences`).\n    *   Tổng số kết quả tìm thấy lớn hơn số lượng hội nghị hiển thị trên một trang.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào các biểu tượng mũi tên hoặc số trang trong phần phân trang (thường nằm ở dưới cùng danh sách kết quả).\n*   **Kết quả mong đợi:** Trang sẽ hiển thị danh sách các hội nghị của trang tiếp theo hoặc trang bạn đã chọn. URL có thể cập nhật thêm tham số trang (ví dụ: `?page=2`)."
+        },
+        {
+          "title": "4.15 Xem chi tiết Hội nghị",
+          "details": "*   **Mô tả:** Cách chuyển đến trang hiển thị thông tin chi tiết của một hội nghị cụ thể.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Conferences Search (URL kết thúc bằng `/conferences`).\n    *   Có ít nhất một hội nghị hiển thị trong danh sách.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào tên hội nghị (tiêu đề) trên thẻ thông tin (card) của bất kỳ hội nghị nào trong danh sách kết quả.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến trang chi tiết của hội nghị bạn đã nhấp."
+        }
+      ]
+    },
+    {
+      "title": "5. Trang chi tiết Hội nghị",
+      "cases": [
+        {
+          "title": "5.1 Xem thông tin chi tiết Conference",
+          "details": "*   **Mô tả:** Hướng dẫn cách xem thông tin đầy đủ về một hội nghị.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang chi tiết của một hội nghị cụ thể (URL kết thúc bằng `/conferences/detail?id=...`).\n*   **Các bước thực hiện:**\n    1.  Truy cập trang chi tiết hội nghị.\n    2.  Quan sát các phần thông tin hiển thị.\n*   **Kết quả mong đợi:** Trang sẽ hiển thị các thông tin chính như Tiêu đề, Ngày, Địa điểm, Ratings, Publisher, Followers, Topics, Rank, Trạng thái (Offline/Online/Hybrid), và các tab thông tin phụ (Overview, Important Dates, Call for papers,...)."
+        },
+        {
+          "title": "5.2 Chuyển đổi giữa các tab thông tin",
+          "details": "*   **Mô tả:** Cách xem các phần thông tin khác nhau của hội nghị (Important Dates, Call for papers,...).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang chi tiết của một hội nghị có nhiều tab thông tin.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào tiêu đề của tab bạn muốn xem (ví dụ: 'Important Dates', 'Call for papers').\n    2.  Quan sát nội dung hiển thị bên dưới các tab.\n*   **Kết quả mong đợi:** Nội dung hiển thị trong khu vực chính của trang sẽ thay đổi để hiển thị thông tin tương ứng với tab bạn đã chọn."
+        },
+        {
+          "title": "5.3 Nhấp vào thẻ Topic",
+          "details": "*   **Mô tả:** Cách tìm kiếm các hội nghị khác có cùng chủ đề (Topic).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang chi tiết của một hội nghị có hiển thị các thẻ Topic.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào một thẻ Topic bất kỳ (ví dụ: 'Computer-Supported Cooperative Work').\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến trang tìm kiếm Conferences. Ô tìm kiếm 'Topics' trong phần tìm kiếm nâng cao sẽ được điền sẵn với Topic bạn đã nhấp. Danh sách kết quả sẽ hiển thị các hội nghị liên quan đến Topic đó."
+        },
+        {
+          "title": "5.4 Theo dõi (Follow) Hội nghị",
+          "details": "*   **Mô tả:** Cách đánh dấu một hội nghị để theo dõi các cập nhật liên quan.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Bạn đang ở trang chi tiết của một hội nghị.\n    *   Hội nghị hiện tại chưa được bạn 'Follow'.\n*   **Các bước thực hiện:**\n    1.  Tìm và nhấp vào nút 'Follow' ở khu vực sidebar bên phải.\n*   **Kết quả mong đợi:** Nút 'Follow' sẽ thay đổi trạng thái/màu sắc (ví dụ: thành 'Followed' hoặc 'Following'). Số lượng 'Followers' có thể tăng lên 1. Hệ thống có thể hiển thị thông báo xác nhận. Hội nghị này sẽ xuất hiện trong danh sách \"Followed\" trong Dashboard của bạn."
+        },
+        {
+          "title": "5.5 Bỏ theo dõi (Unfollow) Hội nghị",
+          "details": "*   **Mô tả:** Cách ngừng theo dõi một hội nghị.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Bạn đang ở trang chi tiết của một hội nghị.\n    *   Hội nghị hiện tại đang được bạn 'Follow'.\n*   **Các bước thực hiện:**\n    1.  Tìm và nhấp vào nút 'Follow' (đang ở trạng thái 'Followed'/'Following') ở khu vực sidebar bên phải.\n*   **Kết quả mong đợi:** Nút 'Follow' sẽ thay đổi trạng thái/màu sắc trở lại ban đầu (ví dụ: thành 'Follow'). Số lượng 'Followers' có thể giảm xuống 1. Hệ thống có thể hiển thị thông báo xác nhận. Hội nghị này sẽ biến mất khỏi danh sách \"Followed\" trong Dashboard của bạn."
+        },
+        {
+          "title": "5.6 Thêm vào Lịch cá nhân (Calendar)",
+          "details": "*   **Mô tả:** Cách thêm một hội nghị vào lịch cá nhân của bạn trên hệ thống.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Bạn đang ở trang chi tiết của một hội nghị.\n*   **Các bước thực hiện:**\n    1.  Tìm và nhấp vào nút 'Calendar' ở khu vực sidebar bên phải.\n*   **Kết quả mong đợi:** Hệ thống sẽ thêm thông tin hội nghị này vào lịch cá nhân của bạn (có thể hiển thị trong mục 'Note' của Dashboard). Hệ thống hiển thị thông báo xác nhận (ví dụ: 'You have added the conference... to your calendar')."
+        },
+        {
+          "title": "5.7 Chặn (Blacklist) Hội nghị",
+          "details": "*   **Mô tả:** Cách đưa một hội nghị vào danh sách chặn để nó không hiển thị trong các kết quả tìm kiếm mặc định của bạn.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Bạn đang ở trang chi tiết của một hội nghị.\n    *   Hội nghị hiện tại chưa bị 'Blacklist'. Nút hiển thị là 'Blacklist'.\n*   **Các bước thực hiện:**\n    1.  Tìm và nhấp vào nút 'Blacklist' ở khu vực sidebar bên phải.\n*   **Kết quả mong đợi:** Nút 'Blacklist' sẽ thay đổi thành 'Blacklisted'. Hệ thống có thể hiển thị thông báo xác nhận. Hội nghị này sẽ không xuất hiện trong kết quả tìm kiếm mặc định của bạn và sẽ xuất hiện trong danh sách \"Blacklisted\" trong Dashboard."
+        },
+        {
+          "title": "5.8 Bỏ chặn (Remove from Blacklist) Hội nghị",
+          "details": "*   **Mô tả:** Cách gỡ một hội nghị khỏi danh sách chặn.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Bạn đang ở trang chi tiết của một hội nghị.\n    *   Hội nghị hiện tại đang bị 'Blacklist'. Nút hiển thị là 'Blacklisted'.\n*   **Các bước thực hiện:**\n    1.  Tìm và nhấp vào nút 'Blacklisted' ở khu vực sidebar bên phải.\n*   **Kết quả mong đợi:** Nút 'Blacklisted' sẽ thay đổi thành 'Blacklist'. Hệ thống có thể hiển thị thông báo xác nhận. Hội nghị này sẽ xuất hiện lại trong kết quả tìm kiếm mặc định của bạn và sẽ biến mất khỏi danh sách \"Blacklisted\" trong Dashboard."
+        },
+        {
+          "title": "5.9 Truy cập Website chính thức",
+          "details": "*   **Mô tả:** Cách mở trang web chính thức của hội nghị.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang chi tiết của một hội nghị.\n    *   Hội nghị này có thông tin URL trang web chính thức.\n*   **Các bước thực hiện:**\n    1.  Tìm và nhấp vào nút 'Website' ở khu vực sidebar bên phải.\n*   **Kết quả mong đợi:** Hệ thống sẽ mở một tab mới trên trình duyệt của bạn và điều hướng đến URL trang web chính thức của hội nghị đó."
+        },
+        {
+          "title": "5.10 Chia sẻ (Share) Hội nghị",
+          "details": "*   **Mô tả:** Cách chia sẻ thông tin về hội nghị.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang chi tiết của một hội nghị.\n*   **Các bước thực hiện:**\n    1.  Tìm và nhấp vào nút 'Share' ở khu vực sidebar bên phải.\n*   **Kết quả mong đợi:** Hệ thống sẽ hiển thị một cửa sổ popup với các tùy chọn chia sẻ (ví dụ: Sao chép liên kết, Chia sẻ qua mạng xã hội, Email,...)."
+        },
+        {
+          "title": "5.11 Cập nhật thông tin (Update)",
+          "details": "*   **Mô tả:** Cách yêu cầu cập nhật thông tin mới nhất cho hội nghị từ trang chính thức của nó.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Bạn đang ở trang chi tiết của một hội nghị.\n*   **Các bước thực hiện:**\n    1.  Tìm và nhấp vào nút 'Update' ở khu vực sidebar bên phải.\n*   **Kết quả mong đợi:** Các thông tin chi tiết của hội nghị trên trang sẽ được làm mới dựa trên dữ liệu mới nhất thu thập từ trang chính thức (nếu có)."
+        }
+      ]
+    },
+    {
+      "title": "6. Đánh giá (Feedback) về Hội nghị",
+      "cases": [
+        {
+          "title": "6.1 Xem phần Feedback",
+          "details": "*   **Mô tả:** Cách xem các đánh giá (review) về hội nghị.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang chi tiết của một hội nghị.\n    *   Phần Feedback được hiển thị (có thể là một tab hoặc phần riêng).\n*   **Các bước thực hiện:**\n    1.  Cuộn xuống hoặc nhấp vào tab Feedback để xem phần này.\n    2.  Quan sát nội dung hiển thị.\n*   **Kết quả mong đợi:** Phần Feedback sẽ hiển thị điểm đánh giá trung bình (Average rating), tổng số lượng reviews ('Based on X reviews'), biểu đồ phân bổ rating theo số sao (1-5 sao) và danh sách các review đã được đăng bởi người dùng khác. Nếu chưa có review nào, bạn sẽ thấy 0.0 rating, 0 reviews và thông báo 'No feedback yet'. Form gửi feedback vẫn hiển thị."
+        },
+        {
+          "title": "6.2 Gửi Feedback mới",
+          "details": "*   **Mô tả:** Cách gửi đánh giá và bình luận của bạn về hội nghị.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Bạn đang ở phần Feedback của hội nghị.\n    *   Bạn chưa gửi feedback cho hội nghị này.\n*   **Các bước thực hiện:**\n    1.  Chọn số sao bạn muốn đánh giá trong phần 'Rate the Conference' (ví dụ: nhấp vào ngôi sao thứ 5 để đánh giá 5 sao).\n    2.  Nhập nội dung bình luận của bạn vào ô 'Write your feedback...'.\n    3.  Nhấp vào nút 'Post Feedback'.\n*   **Kết quả mong đợi:** Feedback của bạn sẽ được gửi thành công. Đánh giá mới sẽ xuất hiện trong danh sách review. Điểm Average rating và biểu đồ phân bổ rating sẽ được cập nhật để bao gồm đánh giá của bạn. Hệ thống có thể hiển thị thông báo gửi thành công."
+        },
+        {
+          "title": "6.3 Lọc Review theo Rating",
+          "details": "*   **Mô tả:** Cách chỉ hiển thị các review có số sao nhất định.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở phần Feedback của hội nghị.\n    *   Có nhiều review với rating khác nhau.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào dropdown 'All Feedback'.\n    2.  Chọn một tùy chọn lọc theo số sao (ví dụ: '5 Stars').\n*   **Kết quả mong đợi:** Danh sách review sẽ được cập nhật để chỉ hiển thị các review có số sao tương ứng với lựa chọn của bạn."
+        },
+        {
+          "title": "6.4 Sắp xếp Review",
+          "details": "*   **Mô tả:** Cách thay đổi thứ tự hiển thị các review.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở phần Feedback của hội nghị.\n    *   Có nhiều review với thời gian hoặc rating khác nhau.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào dropdown 'Recently Added' (hoặc tiêu chí sắp xếp hiện tại).\n    2.  Chọn tiêu chí sắp xếp mong muốn:\n        *   'Recently Added': Sắp xếp theo thời gian gửi gần nhất.\n        *   'Highest Rated': Sắp xếp theo điểm đánh giá từ cao đến thấp.\n*   **Kết quả mong đợi:** Danh sách review sẽ được sắp xếp lại theo tiêu chí bạn đã chọn ('Highest Rated' hoặc 'Recently Added')."
+        }
+      ]
+    },
+    {
+      "title": "7. Hệ thống Thông báo (Notifications)",
+      "cases": [
+        {
+          "title": "7.1 Mở bảng thông báo nhanh (Header Icon)",
+          "details": "*   **Mô tả:** Cách xem nhanh các thông báo mới nhất từ biểu tượng chuông trên header.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Biểu tượng thông báo (hình quả chuông) hiển thị trên thanh điều hướng.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào biểu tượng thông báo (hình quả chuông) trên thanh điều hướng.\n*   **Kết quả mong đợi:** Một bảng hoặc popup thông báo sẽ xuất hiện ngay dưới biểu tượng chuông, hiển thị danh sách các thông báo gần đây của bạn."
+        },
+        {
+          "title": "7.2 Xem nội dung và trạng thái thông báo (Popup)",
+          "details": "*   **Mô tả:** Hướng dẫn cách nhận biết thông báo mới và xem nội dung tóm tắt trong bảng popup.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Có các thông báo mới và cũ trong hệ thống của bạn.\n    *   Bảng thông báo popup đang mở.\n*   **Các bước thực hiện:**\n    1.  Quan sát danh sách thông báo trong bảng popup.\n*   **Kết quả mong đợi:** Các thông báo sẽ được hiển thị với nội dung phù hợp (ví dụ: thông báo khi bạn Follow, Unfollow, Blacklist, Remove Blacklist một conference, hoặc có feedback mới...). Các thông báo chưa đọc sẽ được đánh dấu (ví dụ: chữ 'NEW' hoặc màu nền khác) và biểu tượng chuông sẽ hiển thị số lượng thông báo chưa đọc."
+        },
+        {
+          "title": "7.3 Đánh dấu tất cả thông báo là đã đọc (Popup)",
+          "details": "*   **Mô tả:** Cách đánh dấu tất cả các thông báo hiện có trong bảng popup là đã đọc.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Có ít nhất một thông báo chưa đọc trong bảng thông báo popup.\n    *   Bảng thông báo popup đang mở.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào liên kết 'Mark All As Read' (Đánh dấu tất cả đã đọc).\n*   **Kết quả mong đợi:** Tất cả các thông báo trong danh sách sẽ được đánh dấu là đã đọc. Trạng thái của chúng sẽ thay đổi và số lượng thông báo chưa đọc trên biểu tượng chuông sẽ trở về 0."
+        },
+        {
+          "title": "7.4 Chuyển hướng từ thông báo (Popup)",
+          "details": "*   **Mô tả:** Cách đi đến trang liên quan trực tiếp từ một thông báo (ví dụ: trang chi tiết hội nghị).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Có ít nhất một thông báo hiển thị trong bảng popup.\n    *   Bảng thông báo popup đang mở.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào nội dung của một thông báo cụ thể (ví dụ: dòng 'You have followed the conference...').\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến trang chi tiết của hội nghị hoặc mục được nhắc đến trong thông báo đó."
+        },
+        {
+          "title": "7.5 Xem tất cả thông báo (Popup)",
+          "details": "*   **Mô tả:** Cách truy cập trang đầy đủ hiển thị tất cả thông báo của bạn.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Bảng thông báo popup đang mở.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào liên kết 'View all' ở cuối bảng thông báo popup.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến một trang riêng trong Dashboard, hiển thị danh sách đầy đủ tất cả các thông báo của bạn (URL kết thúc bằng `/dashboard?tab=notifications`)."
+        },
+        {
+          "title": "7.6 Xem tất cả thông báo trên trang đầy đủ",
+          "details": "*   **Mô tả:** Hướng dẫn sử dụng trang quản lý thông báo đầy đủ trong Dashboard.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Notifications trong Dashboard (URL kết thúc bằng `/dashboard?tab=notifications`).\n    *   Có nhiều loại thông báo khác nhau.\n*   **Các bước thực hiện:**\n    1.  Truy cập trang Notifications trong Dashboard.\n    2.  Đảm bảo tab 'All' đang được chọn (hoặc nhấp vào tab 'All').\n    3.  Quan sát danh sách thông báo hiển thị.\n*   **Kết quả mong đợi:** Trang sẽ hiển thị danh sách đầy đủ tất cả các thông báo của bạn theo dạng bảng hoặc danh sách chi tiết. Mỗi thông báo hiển thị loại, nội dung, thời gian và có một checkbox bên cạnh. Có các nút hành động hàng loạt phía trên danh sách."
+        },
+        {
+          "title": "7.7 Lọc thông báo theo trạng thái (Unread, Read, Important) trên trang đầy đủ",
+          "details": "*   **Mô tả:** Cách chỉ xem các thông báo chưa đọc, đã đọc, hoặc quan trọng.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Notifications trong Dashboard.\n    *   Có các thông báo ở các trạng thái khác nhau.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào tab lọc mong muốn:\n        *   'Unread': Chỉ hiển thị thông báo chưa đọc.\n        *   'Read': Chỉ hiển thị thông báo đã đọc.\n        *   'Important': Chỉ hiển thị thông báo được đánh dấu quan trọng.\n*   **Kết quả mong đợi:** Danh sách thông báo sẽ được lọc chỉ hiển thị các thông báo có trạng thái tương ứng với tab bạn đã chọn."
+        },
+        {
+          "title": "7.8 Tìm kiếm thông báo trên trang đầy đủ",
+          "details": "*   **Mô tả:** Cách lọc danh sách thông báo dựa trên từ khóa có trong nội dung của chúng.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Notifications trong Dashboard.\n    *   Có các thông báo chứa từ khóa bạn muốn tìm.\n*   **Các bước thực hiện:**\n    1.  Nhập một từ khóa (ví dụ: 'followed') vào ô 'Search notifications...'.\n    2.  Quan sát danh sách thông báo khi bạn gõ.\n*   **Kết quả mong đợi:** Danh sách thông báo sẽ được lọc và hiển thị chỉ các mục chứa từ khóa bạn đã nhập."
+        },
+        {
+          "title": "7.9 Chọn thông báo",
+          "details": "*   **Mô tả:** Cách chọn các thông báo để thực hiện hành động hàng loạt.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Notifications trong Dashboard.\n    *   Có ít nhất một thông báo hiển thị trong danh sách.\n*   **Các bước thực hiện:**\n    1.  Để chọn tất cả thông báo trên trang: Nhấp vào checkbox 'Select All' (thường ở trên cùng danh sách). Nhấp lại để bỏ chọn tất cả.\n    2.  Để chọn một hoặc nhiều thông báo cụ thể: Nhấp vào checkbox bên cạnh từng thông báo bạn muốn chọn. Nhấp lại để bỏ chọn.\n*   **Kết quả mong đợi:** Các checkbox được nhấp sẽ chuyển sang trạng thái đã chọn. Khi có ít nhất một thông báo được chọn, các nút hành động hàng loạt ('Mark As Read', 'Mark As Unimportant', 'Delete Selected') sẽ hiển thị hoặc kích hoạt."
+        },
+        {
+          "title": "7.10 Thực hiện hành động hàng loạt với thông báo đã chọn",
+          "details": "*   **Mô tả:** Cách đánh dấu đã đọc, đánh dấu quan trọng/không quan trọng, hoặc xóa nhiều thông báo cùng lúc.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Notifications trong Dashboard.\n    *   Đã chọn ít nhất một thông báo bằng cách tick vào checkbox.\n    *   Các nút hành động hàng loạt hiển thị.\n*   **Các bước thực hiện:**\n    1.  Chọn một hoặc nhiều thông báo.\n    2.  Nhấp vào nút hành động mong muốn:\n        *   'Mark As Read': Đánh dấu các thông báo đã chọn là đã đọc.\n        *   'Mark As Important' / 'Mark As Unimportant': Đánh dấu các thông báo đã chọn là quan trọng hoặc không quan trọng.\n        *   'Delete Selected': Xóa các thông báo đã chọn. Nếu chọn xóa, hệ thống có thể yêu cầu xác nhận thêm.\n*   **Kết quả mong đợi:**\n    *   'Mark As Read': Các thông báo đã chọn được đánh dấu đã đọc (ví dụ: màu nền thay đổi).\n    *   'Mark As Important' / 'Mark As Unimportant': Các thông báo đã chọn được đánh dấu quan trọng/không quan trọng (ví dụ: xuất hiện/biến mất biểu tượng ngôi sao).\n    *   'Delete Selected': Các thông báo đã chọn bị xóa khỏi danh sách. Danh sách hiển thị được cập nhật."
+        }
+      ]
+    },
+    {
+      "title": "8. Dashboard (Bảng điều khiển cá nhân)",
+      "cases": [
+        {
+          "title": "8.1 Điều hướng trong Dashboard (Sidebar)",
+          "details": "*   **Mô tả:** Các liên kết ở sidebar bên trái giúp bạn truy cập các mục khác nhau trong Dashboard.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Sidebar của Dashboard đang hiển thị.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào liên kết tương ứng trên sidebar.\n*   **Kết quả mong đợi:** Nội dung khu vực chính của trang Dashboard sẽ thay đổi để hiển thị phần tương ứng với liên kết bạn đã nhấp (ví dụ: Profile, My Conferences, Followed, Note, Notifications, Blacklisted, Setting, Analysis). URL có thể thay đổi tham số `tab` (ví dụ: `/dashboard?tab=profile`)."
+        },
+        {
+          "title": "8.2 Đóng/Mở rộng Sidebar",
+          "details": "*   **Mô tả:** Cách ẩn hoặc hiển thị lại sidebar để có thêm không gian hiển thị nội dung chính.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n*   **Các bước thực hiện:**\n    1.  Để đóng: Nếu sidebar đang hiển thị, nhấp vào biểu tượng 'Close' (thường là hình chữ X) ở góc trên bên trái của sidebar.\n    2.  Để mở: Nếu sidebar đang ẩn, tìm và nhấp vào biểu tượng để mở lại sidebar (ví dụ: hình menu ba gạch).\n*   **Kết quả mong đợi:**\n    *   Khi đóng: Sidebar bị ẩn đi, nội dung chính của trang sẽ mở rộng ra.\n    *   Khi mở: Sidebar xuất hiện trở lại, nội dung chính có thể thu hẹp lại."
+        }
+      ]
+    },
+    {
+      "title": "9. Dashboard: Hồ sơ cá nhân (Profile)",
+      "cases": [
+        {
+          "title": "9.1 Xem thông tin Profile",
+          "details": "*   **Mô tả:** Cách xem các thông tin cơ bản của tài khoản của bạn.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Profile trong Dashboard (URL kết thúc bằng `/dashboard?tab=profile`).\n*   **Các bước thực hiện:**\n    1.  Truy cập trang Profile.\n    2.  Quan sát các thông tin hiển thị.\n*   **Kết quả mong đợi:** Trang Profile sẽ hiển thị Tên (First Name, Last Name), Email, và Ngày sinh (Date of Birth) của bạn. Các nút 'Edit Profile' và 'Change Password' cũng sẽ được hiển thị."
+        },
+        {
+          "title": "9.2 Chỉnh sửa thông tin Profile",
+          "details": "*   **Mô tả:** Cách đi đến trang cho phép bạn thay đổi thông tin cá nhân (trừ mật khẩu).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Profile trong Dashboard.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào nút 'Edit Profile'.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến một trang hoặc form cho phép bạn chỉnh sửa các thông tin như Tên và Ngày sinh."
+        },
+        {
+          "title": "9.3 Thay đổi mật khẩu",
+          "details": "*   **Mô tả:** Cách đi đến trang cho phép bạn đổi mật khẩu tài khoản.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Profile trong Dashboard.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào nút 'Change Password'.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến một trang hoặc form để nhập mật khẩu hiện tại và mật khẩu mới để thay đổi mật khẩu."
+        }
+      ]
+    },
+    {
+      "title": "10. Dashboard: Hội nghị của tôi (My Conferences)",
+      "cases": [
+        {
+          "title": "10.1 Xem danh sách Conference theo trạng thái",
+          "details": "*   **Mô tả:** Cách xem các hội nghị bạn đã thêm vào hệ thống, được phân loại theo trạng thái xử lý.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang My Conferences trong Dashboard (URL kết thúc bằng `/dashboard?tab=myconferences`).\n    *   Bạn đã thêm một hoặc nhiều hội nghị trước đó.\n*   **Các bước thực hiện:**\n    1.  Để xem các hội nghị đang chờ duyệt: Đảm bảo tab 'Pending' đang được chọn (hoặc nhấp vào tab 'Pending').\n    2.  Để xem các hội nghị đã được duyệt và hiển thị công khai: Nhấp vào tab 'Approved'.\n    3.  Để xem các hội nghị đã bị từ chối: Nhấp vào tab 'Rejected'.\n    4.  Quan sát danh sách các conference hiển thị dưới tab.\n*   **Kết quả mong đợi:** Nội dung trang sẽ thay đổi để hiển thị danh sách các hội nghị có trạng thái tương ứng với tab bạn đã chọn. Nếu không có hội nghị nào ở trạng thái đó, hệ thống sẽ hiển thị thông báo phù hợp (ví dụ: 'You do not have any conferences in this category yet.')."
+        },
+        {
+          "title": "10.2 Thêm Conference mới",
+          "details": "*   **Mô tả:** Cách đi đến trang để bắt đầu quy trình thêm một hội nghị mới vào hệ thống.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang My Conferences trong Dashboard.\n    *   Bạn có quyền thêm hội nghị (thường dành cho vai trò nhất định).\n*   **Các bước thực hiện:**\n    1.  Nhấp vào nút 'Add Conference'.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến trang hoặc form để điền thông tin thêm hội nghị mới (URL kết thúc bằng `/addConference`)."
+        },
+        {
+          "title": "10.3 Làm mới danh sách (Refetch Data)",
+          "details": "*   **Mô tả:** Cách tải lại danh sách hội nghị trong tab hiện tại để xem các cập nhật mới nhất.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang My Conferences trong Dashboard.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào nút 'Refetch Data'.\n*   **Kết quả mong đợi:** Hệ thống sẽ tải lại dữ liệu cho danh sách hội nghị trong tab hiện tại. Bạn có thể thấy biểu tượng loading trong giây lát."
+        }
+      ]
+    },
+    {
+      "title": "11. Dashboard: Hội nghị đã theo dõi (Followed)",
+      "cases": [
+        {
+          "title": "11.1 Xem danh sách Followed Conferences",
+          "details": "*   **Mô tả:** Cách xem danh sách các hội nghị mà bạn đã đánh dấu theo dõi.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Followed trong Dashboard (URL kết thúc bằng `/dashboard?tab=followed`).\n*   **Các bước thực hiện:**\n    1.  Truy cập trang Followed Conferences.\n    2.  Quan sát danh sách các conference hiển thị.\n*   **Kết quả mong đợi:** Trang sẽ hiển thị danh sách các hội nghị bạn đã Follow. Mỗi mục hiển thị thông tin cơ bản của conference và thời gian bạn bắt đầu Follow. Có nút 'Detail' để xem chi tiết mỗi hội nghị. Nếu không có hội nghị nào được Follow, hệ thống sẽ hiển thị thông báo phù hợp."
+        },
+        {
+          "title": "11.2 Chuyển đến trang chi tiết từ danh sách Followed",
+          "details": "*   **Mô tả:** Cách xem thông tin chi tiết của một hội nghị từ danh sách đã theo dõi.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Followed trong Dashboard.\n    *   Danh sách Followed không trống.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào nút 'Detail' bên cạnh một hội nghị trong danh sách Followed.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến trang chi tiết của hội nghị đó."
+        },
+        {
+          "title": "11.3 Làm mới danh sách (Refresh) trên trang Followed",
+          "details": "*   **Mô tả:** Cách tải lại danh sách các hội nghị bạn đã theo dõi.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Followed trong Dashboard.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào biểu tượng Refresh (thường là hình vòng tròn mũi tên) ở góc trên bên phải danh sách.\n*   **Kết quả mong đợi:** Hệ thống sẽ tải lại dữ liệu cho danh sách Followed Conferences."
+        }
+      ]
+    },
+    {
+      "title": "12. Dashboard: Hội nghị đã chặn (Blacklisted)",
+      "cases": [
+        {
+          "title": "12.1 Xem danh sách Blacklisted Conferences",
+          "details": "*   **Mô tả:** Cách xem danh sách các hội nghị mà bạn đã đưa vào danh sách chặn.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Blacklisted trong Dashboard (URL kết thúc bằng `/dashboard?tab=blacklisted`).\n*   **Các bước thực hiện:**\n    1.  Truy cập trang Blacklisted Conferences.\n    2.  Quan sát danh sách các conference hiển thị.\n*   **Kết quả mong đợi:** Trang sẽ hiển thị danh sách các hội nghị bạn đã Blacklist. Mỗi mục hiển thị thông tin cơ bản của conference và thời gian bạn đưa vào Blacklist. Có nút 'Detail' để xem chi tiết mỗi hội nghị. Nếu không có hội nghị nào trong Blacklist, hệ thống sẽ hiển thị thông báo phù hợp."
+        },
+        {
+          "title": "12.2 Chuyển đến trang chi tiết từ danh sách Blacklisted",
+          "details": "*   **Mô tả:** Cách xem thông tin chi tiết của một hội nghị từ danh sách đã chặn.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Blacklisted trong Dashboard.\n    *   Danh sách Blacklisted không trống.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào nút 'Detail' bên cạnh một hội nghị trong danh sách Blacklisted.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến trang chi tiết của hội nghị đó."
+        },
+        {
+          "title": "12.3 Làm mới danh sách (Refresh) trên trang Blacklisted",
+          "details": "*   **Mô tả:** Cách tải lại danh sách các hội nghị bạn đã chặn.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Blacklisted trong Dashboard.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào biểu tượng Refresh (thường là hình vòng tròn mũi tên) ở góc trên bên phải danh sách.\n*   **Kết quả mong đợi:** Hệ thống sẽ tải lại dữ liệu cho danh sách Blacklisted Conferences."
+        }
+      ]
+    },
+    {
+      "title": "13. Dashboard: Ghi chú/Sự kiện (Note)",
+      "cases": [
+        {
+          "title": "13.1 Xem danh sách Upcoming Notes",
+          "details": "*   **Mô tả:** Cách xem các ghi chú hoặc sự kiện sắp tới được lưu trong tài khoản của bạn.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Note trong Dashboard (URL kết thúc bằng `/dashboard?tab=note`).\n*   **Các bước thực hiện:**\n    1.  Truy cập trang Note.\n    2.  Quan sát danh sách các ghi chú hiển thị ở khu vực bên trái.\n*   **Kết quả mong đợi:** Trang sẽ hiển thị danh sách các Upcoming Notes với tiêu đề, thông tin liên quan (ví dụ: tên hội nghị, loại sự kiện như submission date, notification) và nút 'More Details'. Nếu không có ghi chú nào sắp tới, hệ thống sẽ hiển thị thông báo phù hợp."
+        },
+        {
+          "title": "13.2 Lọc Notes theo loại",
+          "details": "*   **Mô tả:** Cách lọc danh sách ghi chú để chỉ xem các mục thuộc loại cụ thể (ví dụ: chỉ xem các sự kiện Submission).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Note trong Dashboard.\n    *   Có các ghi chú thuộc nhiều loại khác nhau.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào nút lọc tương ứng với loại sự kiện/ghi chú bạn muốn xem (ví dụ: nhấp vào nút 'Submission' hoặc 'Your notes').\n    2.  Quan sát danh sách ghi chú.\n*   **Kết quả mong đợi:** Danh sách ghi chú sẽ được lọc chỉ hiển thị các mục thuộc loại bạn đã chọn. Màu sắc của nút lọc được chọn sẽ thay đổi."
+        },
+        {
+          "title": "13.3 Sử dụng lịch để xem Notes theo tháng",
+          "details": "*   **Mô tả:** Cách xem các sự kiện/ghi chú trên giao diện lịch và chuyển đổi giữa các tháng.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Note trong Dashboard.\n*   **Các bước thực hiện:**\n    1.  Quan sát lịch hiển thị ở khu vực bên phải.\n    2.  Nhấp vào các nút mũi tên ('Previous'/'Next') để chuyển đổi giữa các tháng hoặc năm.\n*   **Kết quả mong đợi:** Lịch sẽ hiển thị các ngày trong tháng hiện tại hoặc tháng/năm bạn đã chọn. Các ngày có ghi chú/sự kiện có thể được đánh dấu (ví dụ: có chấm nhỏ). Danh sách ghi chú bên trái cũng có thể cập nhật theo tháng đang xem trên lịch (tùy thuộc vào thiết kế giao diện)."
+        },
+        {
+          "title": "13.4 Chuyển đến chi tiết Note từ danh sách",
+          "details": "*   **Mô tả:** Cách xem thông tin chi tiết hơn về một ghi chú hoặc sự kiện cụ thể.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Note trong Dashboard.\n    *   Danh sách Upcoming Notes không trống.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào nút 'More Details' trên một ghi chú bất kỳ trong danh sách bên trái.\n*   **Kết quả mong đợi:** Hệ thống sẽ hiển thị trang chi tiết của hội nghị hoặc sự kiện liên quan đến ghi chú đó."
+        },
+        {
+          "title": "13.5 Tìm kiếm Notes",
+          "details": "*   **Mô tả:** Cách lọc danh sách ghi chú dựa trên từ khóa có trong tiêu đề hoặc nội dung ghi chú.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Note trong Dashboard.\n    *   Có các ghi chú chứa từ khóa bạn muốn tìm.\n*   **Các bước thực hiện:**\n    1.  Nhập một từ khóa (ví dụ: 'Conference') vào ô 'Search events...' và nhấn Enter hoặc chờ kết quả lọc.\n    2.  Quan sát danh sách ghi chú khi bạn gõ.\n*   **Kết quả mong đợi:** Danh sách ghi chú sẽ được lọc và hiển thị chỉ các mục chứa từ khóa bạn đã nhập."
+        }
+      ]
+    },
+    {
+      "title": "14. Dashboard: Cài đặt (Settings)",
+      "cases": [
+        {
+          "title": "14.1 Xem các tùy chọn Setting",
+          "details": "*   **Mô tả:** Hướng dẫn xem các cài đặt mà bạn có thể tùy chỉnh cho tài khoản của mình.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Setting trong Dashboard (URL kết thúc bằng `/dashboard?tab=setting`).\n*   **Các bước thực hiện:**\n    1.  Truy cập trang Setting.\n    2.  Quan sát các tùy chọn hiển thị.\n*   **Kết quả mong đợi:** Trang sẽ hiển thị các nhóm cài đặt 'Receive Notifications', 'Auto add Events to Schedule', 'Change and Update', 'Your Upcoming Event', 'Customize Notification Delivery' với các toggle switch tương ứng. Dưới cùng là nút 'Delete Account'."
+        },
+        {
+          "title": "14.2 Thay đổi trạng thái Toggle Setting",
+          "details": "*   **Mô tả:** Cách bật hoặc tắt các tùy chọn cài đặt (ví dụ: nhận thông báo, tự động thêm sự kiện vào lịch).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Setting trong Dashboard.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào biểu tượng toggle switch bên cạnh tùy chọn cài đặt bạn muốn thay đổi (ví dụ: toggle 'Receive Notifications').\n    2.  Quan sát trạng thái của toggle switch (chuyển sang On hoặc Off).\n    3.  (Tùy chọn) Thử tải lại trang hoặc thoát rồi vào lại trang Setting để kiểm tra cài đặt đã được lưu chưa.\n*   **Kết quả mong đợi:** Trạng thái của toggle switch sẽ thay đổi (On/Off) sau khi bạn nhấp. Cài đặt mới sẽ được lưu lại và vẫn giữ nguyên khi bạn truy cập lại trang."
+        },
+        {
+          "title": "14.3 Xóa tài khoản",
+          "details": "*   **Mô tả:** Cách bắt đầu quy trình xóa tài khoản của bạn.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Setting trong Dashboard.\n*   **Các bước thực hiện:**\n    1.  Cuộn xuống cuối trang Setting.\n    2.  Nhấp vào nút 'Delete Account'.\n*   **Kết quả mong đợi:** Hệ thống sẽ hiển thị một cửa sổ xác nhận (popup) hoặc chuyển hướng bạn đến một trang riêng để xác nhận việc xóa tài khoản. Thông báo cảnh báo về việc mất dữ liệu vĩnh viễn thường sẽ hiển thị."
+        }
+      ]
+    },
+    {
+      "title": "15. Thêm Hội nghị mới (Publish)",
+      "cases": [
+        {
+          "title": "15.1 Truy cập trang Thêm Hội nghị mới",
+          "details": "*   **Mô tả:** Cách đi đến form để đóng góp thông tin hội nghị mới cho hệ thống.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập (thường cần có quyền phù hợp để đăng).\n    *   Bạn đang ở bất kỳ trang nào có hiển thị thanh điều hướng (header).\n*   **Các bước thực hiện:**\n    1.  Nhấp vào liên kết 'Publish' trên thanh điều hướng.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến trang 'Add New Conference' (URL kết thúc bằng `/addConference`), hiển thị bước đầu tiên của form thêm conference."
+        },
+        {
+          "title": "15.2 Quy trình Thêm Conference thành công (Nhiều bước)",
+          "details": "*   **Mô tả:** Hướng dẫn hoàn thành quy trình thêm một hội nghị mới với thông tin đầy đủ và hợp lệ.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Add New Conference (URL kết thúc bằng `/addConference`).\n    *   Bạn có đầy đủ thông tin về hội nghị muốn thêm.\n*   **Các bước thực hiện:**\n    1.  **Bước 1 (Add Conference):**\n        *   Điền đầy đủ và chính xác các ô bắt buộc: 'Conference name', 'Acronym', 'Link', 'Type', 'Location (Address, Continent, Country, State/Province)'. Lưu ý: Danh sách 'Country' và 'State/Province' sẽ tự động lọc theo 'Continent' và 'Country' bạn chọn.\n        *   Trong phần Important Dates, nhấp 'Add Date', điền 'Name', chọn 'Type', nhập 'Start' date và 'End' date cho từng ngày quan trọng (ví dụ: Ngày hội nghị, Ngày nộp bài,...). Nhấp nút 'Add Date' để thêm mục khác, biểu tượng thùng rác để xóa.\n        *   Trong phần Topics, nhập từng chủ đề liên quan vào ô 'Add a topic' và nhấp 'Add'. Thẻ topic sẽ xuất hiện bên dưới. Nhấp 'x' trên thẻ để xóa.\n        *   Điền các ô tùy chọn nếu có: 'Image URL', 'Description'.\n        *   Nhấp nút 'Next'.\n    2.  **Bước 2 (Review Information):**\n        *   Kiểm tra lại tất cả thông tin bạn đã nhập ở Bước 1 xem có chính xác không.\n        *   Nếu cần chỉnh sửa, nhấp nút 'Back' để quay về Bước 1.\n        *   Nếu thông tin chính xác, nhấp nút 'Next'.\n    3.  **Bước 3 (Terms and Conditions):**\n        *   Đọc kỹ các điều khoản và điều kiện.\n        *   Để đồng ý, tích chọn checkbox 'I agree to the terms and conditions'.\n        *   Nếu cần quay lại trang Review, nhấp nút 'Back'.\n        *   Để hoàn tất, nhấp nút 'Add Conference'.\n*   **Kết quả mong đợi:** Hệ thống sẽ hiển thị thông báo thêm conference thành công. Hội nghị mới bạn thêm sẽ xuất hiện trong danh sách 'Pending' ở mục My Conferences trong Dashboard, chờ được duyệt bởi quản trị viên. Bạn có thể được chuyển hướng đến trang danh sách conference hoặc trang My Conferences."
+        },
+        {
+          "title": "15.3 Thêm Conference thất bại (Lỗi Validation)",
+          "details": "*   **Mô tả:** Mô tả khi bạn cố gắng thêm hội nghị nhưng thông tin nhập bị thiếu hoặc không hợp lệ.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Add New Conference (URL kết thúc bằng `/addConference`).\n*   **Các bước thực hiện:**\n    1.  Điền một số thông tin, nhưng để trống một ô bắt buộc (ví dụ: 'Conference name').\n    2.  Hoặc nhập dữ liệu không đúng định dạng (ví dụ: 'Link' không phải URL).\n    3.  Hoặc thêm một ngày quan trọng với ngày Start sau ngày End.\n    4.  Nhấp nút 'Next' (ở Bước 1) hoặc 'Add Conference' (ở Bước 3 nếu chưa đồng ý điều khoản).\n*   **Kết quả mong đợi:** Hệ thống sẽ hiển thị thông báo lỗi validation (ví dụ: 'Please fill out this field', 'Invalid URL format', lỗi liên quan đến ngày) dưới ô nhập liệu bị sai/thiếu. Bạn sẽ vẫn ở lại trang hiện tại (Bước 1 hoặc Bước 3) và hội nghị sẽ không được thêm."
+        }
+      ]
+    },
+    {
+      "title": "16. Tìm kiếm Tạp chí (Journals)",
+      "cases": [
+        {
+          "title": "16.1 Truy cập trang Tìm kiếm Tạp chí",
+          "details": "*   **Mô tả:** Cách đi đến trang tìm kiếm để khám phá các tạp chí khoa học.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở bất kỳ trang nào có hiển thị thanh điều hướng (header).\n*   **Các bước thực hiện:**\n    1.  Nhấp vào liên kết 'Journals' trên thanh điều hướng.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến trang Journals Search (URL kết thúc bằng `/journals`), hiển thị danh sách tất cả tạp chí ban đầu."
+        },
+        {
+          "title": "16.2 Tìm kiếm tạp chí theo từ khóa/tiêu đề",
+          "details": "*   **Mô tả:** Cách tìm kiếm tạp chí dựa trên từ khóa hoặc tiêu đề.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Journals Search (URL kết thúc bằng `/journals`).\n*   **Các bước thực hiện:**\n    1.  Nhập một từ khóa hoặc tiêu đề (ví dụ: 'admin') vào ô tìm kiếm chính 'Enter Keyword Title/Journal Name'.\n    2.  Nhấp vào nút 'Search'.\n*   **Kết quả mong đợi:** Trang sẽ hiển thị danh sách các tạp chí có chứa từ khóa/tiêu đề bạn đã nhập. Số lượng kết quả ('Results (XXX)') sẽ được cập nhật."
+        },
+        {
+          "title": "16.3 Tìm kiếm tạp chí nâng cao",
+          "details": "*   **Mô tả:** Hướng dẫn sử dụng các bộ lọc bổ sung để tinh chỉnh kết quả tìm kiếm tạp chí.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Journals Search (URL kết thúc bằng `/journals`).\n    *   Các tùy chọn tìm kiếm nâng cao đang được hiển thị (xem mục 16.4).\n*   **Các bước thực hiện:**\n    1.  Nhập hoặc chọn giá trị cho một hoặc nhiều ô lọc nâng cao bạn muốn sử dụng (ví dụ: 'ISSN', 'Quartile', 'Subject Areas', 'Open Access Types', 'Publisher', 'Language', 'Impact Factor >= 10', 'H-index >= 50', 'CiteScore >= 5', 'SJR >= 1', 'Overall Rank <= 1000').\n    2.  (Tùy chọn) Nhập thêm từ khóa vào ô tìm kiếm chính.\n    3.  Nhấp vào nút 'Search'.\n*   **Kết quả mong đợi:** Trang hiển thị danh sách các tạp chí thỏa mãn TẤT CẢ các tiêu chí bạn đã nhập/chọn. Số lượng kết quả cập nhật."
+        },
+        {
+          "title": "16.4 Hiển thị/Ẩn tùy chọn tìm kiếm tạp chí nâng cao",
+          "details": "*   **Mô tả:** Cách xem hoặc ẩn các bộ lọc tìm kiếm tạp chí bổ sung.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Journals Search (URL kết thúc bằng `/journals`).\n*   **Các bước thực hiện:**\n    1.  Để hiển thị: Nhấp vào liên kết 'Show advanced search options'.\n    2.  Để ẩn: Nhấp vào liên kết 'Hide advanced search options'.\n*   **Kết quả mong đợi:**\n    *   Khi hiển thị: Các ô lọc bổ sung như 'Subject Areas', 'Quartile', 'ISSN', 'Open Access Types', 'Publisher', 'Language', 'Metrics' sẽ xuất hiện. Liên kết sẽ đổi thành 'Hide advanced search options'.\n    *   Khi ẩn: Các ô lọc bổ sung sẽ biến mất. Liên kết sẽ đổi thành 'Show advanced search options'."
+        },
+        {
+          "title": "16.5 Tìm kiếm với từ khóa không tồn tại (Journals)",
+          "details": "*   **Mô tả:** Mô tả khi bạn tìm kiếm tạp chí bằng một từ khóa không có trong dữ liệu.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Journals Search (URL kết thúc bằng `/journals`).\n*   **Các bước thực hiện:**\n    1.  Nhập một từ khóa không tồn tại (ví dụ: 'nonexistentjournal123') vào ô tìm kiếm chính.\n    2.  Nhấp vào nút 'Search'.\n*   **Kết quả mong đợi:** Hệ thống sẽ hiển thị thông báo 'No results found'. Danh sách kết quả trống."
+        },
+        {
+          "title": "16.6 Tìm kiếm với trường trống (Journals)",
+          "details": "*   **Mô tả:** Mô tả khi bạn nhấp nút tìm kiếm tạp chí mà không nhập bất kỳ tiêu chí nào.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Journals Search (URL kết thúc bằng `/journals`).\n    *   Tất cả các ô tìm kiếm (cơ bản và nâng cao) đều trống.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào nút 'Search'.\n*   **Kết quả mong đợi:** Trang sẽ hiển thị lại danh sách đầy đủ tất cả các tạp chí có trong hệ thống."
+        },
+        {
+          "title": "16.7 Xóa bộ lọc (Nút Clear - Journals)",
+          "details": "*   **Mô tả:** Cách xóa tất cả các tiêu chí tìm kiếm tạp chí đã nhập.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Journals Search (URL kết thúc bằng `/journals`).\n    *   Bạn đã nhập dữ liệu vào ít nhất một ô tìm kiếm.\n*   **Các bước thực hiện:**\n    1.  Nhập từ khóa (ví dụ: 'test').\n    2.  Nhấp vào nút 'Search'.\n    3.  Nhấp vào nút 'Clear'.\n*   **Kết quả mong đợi:** Tất cả các ô tìm kiếm (cơ bản và nâng cao) sẽ được làm trống. Trang sẽ hiển thị lại danh sách đầy đủ tất cả các tạp chí."
+        },
+        {
+          "title": "16.8 Sắp xếp kết quả tìm kiếm tạp chí",
+          "details": "*   **Mô tả:** Cách thay đổi thứ tự hiển thị của các tạp chí trong danh sách kết quả.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Journals Search (URL kết thúc bằng `/journals`).\n    *   Có danh sách kết quả được hiển thị.\n    *   Các tùy chọn sắp xếp ('Title', 'Publisher', 'Impact Factor', 'H-index', 'SJR') tồn tại trong dropdown 'Sort By'.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào dropdown 'Sort By'.\n    2.  Chọn tiêu chí sắp xếp mong muốn từ danh sách (ví dụ: 'Title', 'Impact Factor', 'H-index', 'SJR', 'Publisher').\n*   **Kết quả mong đợi:** Danh sách các tạp chí sẽ được sắp xếp lại theo tiêu chí bạn đã chọn (ví dụ: theo tên, chỉ số Impact Factor từ cao đến thấp, v.v.)."
+        },
+        {
+          "title": "16.9 Sử dụng phân trang (Journals)",
+          "details": "*   **Mô tả:** Cách di chuyển giữa các trang kết quả tìm kiếm tạp chí.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Journals Search (URL kết thúc bằng `/journals`).\n    *   Tổng số kết quả tìm thấy lớn hơn số lượng tạp chí hiển thị trên một trang.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào biểu tượng mũi tên 'Next page' trong phần phân trang (thường ở cuối danh sách).\n*   **Kết quả mong đợi:** Trang sẽ hiển thị danh sách các tạp chí của trang tiếp theo. URL có thể cập nhật thêm tham số trang."
+        },
+        {
+          "title": "16.10 Xem chi tiết Journal",
+          "details": "*   **Mô tả:** Cách chuyển đến trang hiển thị thông tin chi tiết của một tạp chí cụ thể.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Journals Search (URL kết thúc bằng `/journals`).\n    *   Có ít nhất một tạp chí hiển thị trong danh sách.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào nút 'Details' trên thẻ thông tin (card) của bất kỳ tạp chí nào trong danh sách kết quả.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến trang chi tiết của tạp chí bạn đã nhấp."
+        }
+      ]
+    },
+    {
+      "title": "17. Trang chi tiết Tạp chí (Journal Detail)",
+      "cases": [
+        {
+          "title": "17.1 Xem thông tin chi tiết Journal",
+          "details": "*   **Mô tả:** Hướng dẫn cách xem thông tin đầy đủ về một tạp chí.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang chi tiết của một tạp chí cụ thể (URL kết thúc bằng `/journals/detail?id=...`).\n*   **Các bước thực hiện:**\n    1.  Truy cập trang chi tiết journal.\n    2.  Quan sát các phần thông tin hiển thị.\n*   **Kết quả mong đợi:** Trang sẽ hiển thị các thông tin chính như Tiêu đề, ISSN, Overall Rank, Impact Factor, H-index, SJR, Best Quartile, Coverage History, Publisher, Country, Areas, và các tab thông tin phụ (Overview, Impact Factor,...)."
+        },
+        {
+          "title": "17.2 Chuyển đổi giữa các tab thông tin Journal",
+          "details": "*   **Mô tả:** Cách xem các phần thông tin khác nhau của tạp chí (Impact Factor, SJR,...).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang chi tiết của một tạp chí có nhiều tab thông tin.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào tiêu đề của tab bạn muốn xem (ví dụ: 'Impact Factor', 'SJR').\n    2.  Quan sát nội dung hiển thị bên dưới các tab.\n*   **Kết quả mong đợi:** Nội dung hiển thị trong khu vực chính của trang sẽ thay đổi để hiển thị thông tin tương ứng với tab bạn đã chọn."
+        },
+        {
+          "title": "17.3 Theo dõi (Follow) Journal",
+          "details": "*   **Mô tả:** Cách đánh dấu một tạp chí để theo dõi các cập nhật liên quan (nếu tính năng này được hỗ trợ đầy đủ).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Bạn đang ở trang chi tiết của một tạp chí.\n    *   Tạp chí hiện tại chưa được bạn 'Follow'.\n*   **Các bước thực hiện:**\n    1.  Tìm và nhấp vào nút 'Follow'.\n*   **Kết quả mong đợi:** Nút 'Follow' sẽ thay đổi trạng thái/màu sắc (ví dụ: thành 'Following'). Hệ thống có thể hiển thị thông báo xác nhận."
+        },
+        {
+          "title": "17.4 Bỏ theo dõi (Unfollow) Journal",
+          "details": "*   **Mô tả:** Cách ngừng theo dõi một tạp chí.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Bạn đang ở trang chi tiết của một tạp chí.\n    *   Tạp chí hiện tại đang được bạn 'Follow'.\n*   **Các bước thực hiện:**\n    1.  Tìm và nhấp vào nút 'Follow' (đang ở trạng thái 'Following').\n*   **Kết quả mong đợi:** Nút 'Follow' sẽ thay đổi trạng thái/màu sắc trở lại ban đầu (ví dụ: thành 'Follow'). Hệ thống có thể hiển thị thông báo xác nhận."
+        },
+        {
+          "title": "17.5 Truy cập Website chính thức của Journal",
+          "details": "*   **Mô tả:** Cách mở trang web chính thức của tạp chí.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang chi tiết của một tạp chí.\n    *   Tạp chí này có thông tin URL trang web chính thức.\n*   **Các bước thực hiện:**\n    1.  Tìm và nhấp vào nút 'Journal Website'.\n*   **Kết quả mong đợi:** Hệ thống sẽ mở một tab mới trên trình duyệt của bạn và điều hướng đến URL trang web chính thức của tạp chí đó."
+        }
+      ]
+    },
+    {
+      "title": "18. Hỗ trợ (Support)",
+      "cases": [
+        {
+          "title": "18.1 Truy cập trang Hỗ trợ",
+          "details": "*   **Mô tả:** Cách đi đến trang chứa thông tin liên hệ và câu hỏi thường gặp.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở bất kỳ trang nào có hiển thị thanh điều hướng (header).\n*   **Các bước thực hiện:**\n    1.  Nhấp vào liên kết 'Support' trên thanh điều hướng.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến trang Support (URL kết thúc bằng `/support`)."
+        },
+        {
+          "title": "18.2 Gửi form Liên hệ (Contact Us)",
+          "details": "*   **Mô tả:** Hướng dẫn cách gửi yêu cầu hoặc phản hồi đến đội ngũ hỗ trợ.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Support (URL kết thúc bằng `/support`).\n    *   Bạn đang xem phần Contact Us (thường ở đầu trang).\n*   **Các bước thực hiện:**\n    1.  Nhập Chủ đề (Subject) vào ô 'Subject'.\n    2.  Chọn loại yêu cầu từ dropdown 'Request type' (ví dụ: 'Contact', 'Report').\n    3.  Nhập nội dung tin nhắn vào ô 'Your message'.\n    4.  Tích chọn checkbox 'I agree to the Terms & Conditions and Privacy Policy'.\n    5.  Nhấp vào nút 'Send message'.\n*   **Kết quả mong đợi:** Nếu thông tin hợp lệ và đã tích chọn điều khoản, hệ thống sẽ hiển thị thông báo gửi thành công (ví dụ: 'Your message has been sent successfully'). Nếu thiếu trường bắt buộc hoặc chưa đồng ý điều khoản, hệ thống sẽ hiển thị thông báo lỗi validation và form sẽ không được gửi."
+        },
+        {
+          "title": "18.3 Xem Điều khoản và Chính sách Bảo mật",
+          "details": "*   **Mô tả:** Cách xem nội dung chi tiết về Điều khoản và Điều kiện sử dụng cũng như Chính sách bảo mật.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Support (URL kết thúc bằng `/support`).\n    *   Bạn đang xem phần Contact Us.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào liên kết 'Terms & Conditions'.\n    2.  Nhấp vào liên kết 'Privacy Policy'.\n*   **Kết quả mong đợi:** Hệ thống sẽ mở một trang hoặc cửa sổ (modal) mới hiển thị nội dung đầy đủ về Điều khoản và Điều kiện hoặc Chính sách bảo mật tương ứng."
+        },
+        {
+          "title": "18.4 Tìm kiếm trong Câu hỏi thường gặp (FAQ)",
+          "details": "*   **Mô tả:** Cách tìm kiếm câu trả lời cho các câu hỏi phổ biến trong phần FAQ.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Support (URL kết thúc bằng `/support`).\n    *   Phần FAQ đang hiển thị.\n*   **Các bước thực hiện:**\n    1.  Nhập một từ khóa (ví dụ: 'account') vào ô tìm kiếm 'How can we help you?' và nhấn Enter hoặc chờ kết quả lọc.\n    2.  Quan sát danh sách câu hỏi FAQ.\n*   **Kết quả mong đợi:** Danh sách các câu hỏi FAQ sẽ được lọc để chỉ hiển thị những câu chứa từ khóa bạn đã nhập. Nếu không tìm thấy kết quả nào, hệ thống sẽ hiển thị thông báo không có kết quả."
+        },
+        {
+          "title": "18.5 Lọc FAQ theo danh mục",
+          "details": "*   **Mô tả:** Cách chỉ xem các câu hỏi FAQ thuộc một danh mục cụ thể.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Support (URL kết thúc bằng `/support`).\n    *   Phần FAQ hiển thị sidebar danh mục.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào tên một danh mục ở sidebar bên trái (ví dụ: 'Account').\n*   **Kết quả mong đợi:** Danh sách các câu hỏi FAQ sẽ được lọc và hiển thị chỉ những câu thuộc danh mục bạn đã chọn."
+        },
+        {
+          "title": "18.6 Mở/Đóng nội dung FAQ",
+          "details": "*   **Mô tả:** Cách xem nội dung chi tiết của một câu hỏi FAQ.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Support (URL kết thúc bằng `/support`).\n    *   Phần FAQ hiển thị danh sách câu hỏi.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào tiêu đề của một câu hỏi FAQ (ví dụ: 'What is this website?').\n    2.  Để đóng nội dung đã mở, nhấp lại vào tiêu đề đó.\n*   **Kết quả mong đợi:**\n    *   Khi nhấp lần đầu: Phần nội dung chi tiết dưới tiêu đề câu hỏi sẽ xuất hiện (hiển thị). Biểu tượng bên cạnh tiêu đề có thể thay đổi (ví dụ: từ mũi tên xuống thành mũi tên lên).\n    *   Khi nhấp lại: Phần nội dung chi tiết sẽ ẩn đi. Biểu tượng bên cạnh tiêu đề có thể thay đổi ngược lại."
+        }
+      ]
+    },
+    {
+      "title": "19. Chatbot (Popup trên Trang chủ)",
+      "cases": [
+        {
+          "title": "19.1 Mở cửa sổ Chatbot",
+          "details": "*   **Mô tả:** Cách bắt đầu tương tác với Chatbot từ trang chủ.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang chủ (Homepage) hoặc trang có hiển thị biểu tượng Chatbot.\n    *   Biểu tượng Chatbot (thường là hình tròn ở góc dưới bên phải) hiển thị.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào biểu tượng hình tròn của Chatbot ở góc dưới bên phải màn hình.\n*   **Kết quả mong đợi:** Một cửa sổ pop-up 'Chat With Us' sẽ xuất hiện ở góc dưới bên phải màn hình. Cửa sổ hiển thị lời chào ban đầu và các câu hỏi gợi ý. Dòng chữ nhỏ phía dưới tiêu đề hiển thị trạng thái kết nối (ví dụ: 'Connected')."
+        },
+        {
+          "title": "19.2 Đóng cửa sổ Chatbot",
+          "details": "*   **Mô tả:** Cách ẩn cửa sổ Chatbot.\n*   **Điều kiện tiên quyết:**\n    *   Cửa sổ pop-up 'Chat With Us' đang mở.\n*   **Các bước thực hiện:**\n    1.  Trong cửa sổ 'Chat With Us', nhấp vào biểu tượng 'X' ở góc trên bên phải của tiêu đề cửa sổ.\n*   **Kết quả mong đợi:** Cửa sổ pop-up 'Chat With Us' sẽ biến mất khỏi màn hình. Biểu tượng hình tròn Chatbot sẽ hiển thị lại."
+        },
+        {
+          "title": "19.3 Nhập và gửi tin nhắn văn bản (Popup)",
+          "details": "*   **Mô tả:** Cách trò chuyện với Chatbot bằng cách gõ văn bản.\n*   **Điều kiện tiên quyết:**\n    *   Cửa sổ pop-up 'Chat With Us' đang mở.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào ô nhập liệu ở dưới cùng cửa sổ chat.\n    2.  Nhập câu hỏi hoặc tin nhắn của bạn (ví dụ: 'Tìm hội nghị về AI').\n    3.  Nhấp vào biểu tượng 'Gửi' (thường là hình máy bay giấy hoặc mũi tên) ở bên phải ô nhập liệu.\n*   **Kết quả mong đợi:** Tin nhắn bạn đã nhập xuất hiện trong lịch sử trò chuyện. Trạng thái 'Processing...' có thể xuất hiện (tùy thuộc vào trạng thái kết nối của bot), sau đó Chatbot sẽ xử lý và hiển thị phản hồi."
+        },
+        {
+          "title": "19.4 Sử dụng các câu hỏi gợi ý (Popup)",
+          "details": "*   **Mô tả:** Cách nhanh chóng gửi các câu hỏi phổ biến có sẵn.\n*   **Điều kiện tiên quyết:**\n    *   Cửa sổ pop-up 'Chat With Us' đang mở và hiển thị các nút chứa câu hỏi gợi ý.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào một trong các nút chứa câu hỏi gợi ý (ví dụ: 'Tìm các hội nghị về Big Data trong năm nay.').\n*   **Kết quả mong đợi:** Văn bản của câu hỏi gợi ý sẽ được điền vào ô nhập liệu ở dưới cùng, sẵn sàng để bạn gửi đi bằng cách nhấp biểu tượng gửi."
+        },
+        {
+          "title": "19.5 Mở/Đóng bảng cài đặt Chatbot (Popup)",
+          "details": "*   **Mô tả:** Cách truy cập các tùy chọn cài đặt cho Chatbot popup.\n*   **Điều kiện tiên quyết:**\n    *   Cửa sổ pop-up 'Chat With Us' đang mở.\n*   **Các bước thực hiện:**\n    1.  Để mở: Nhấp vào biểu tượng 'Cài đặt' (hình bánh răng cưa) trên tiêu đề cửa sổ Chatbot.\n    2.  Để đóng: Trong bảng cài đặt 'Chat Settings', nhấp vào biểu tượng 'X' ở góc trên bên phải.\n*   **Kết quả mong đợi:**\n    *   Khi mở: Bảng cài đặt 'Chat Settings' sẽ xuất hiện, che phủ phần lịch sử trò chuyện, hiển thị các tùy chọn như Stream Response, Hide Toolbar, Hide Thought Process, Language.\n    *   Khi đóng: Bảng cài đặt sẽ biến mất, giao diện lịch sử trò chuyện chính hiển thị trở lại."
+        },
+        {
+          "title": "19.6 Thay đổi ngôn ngữ trong cài đặt (Popup)",
+          "details": "*   **Mô tả:** Cách thay đổi ngôn ngữ hiển thị của giao diện Chatbot popup.\n*   **Điều kiện tiên quyết:**\n    *   Bảng cài đặt 'Chat Settings' của Chatbot đang mở.\n    *   Tùy chọn ngôn ngữ khác có sẵn trong dropdown 'Language'.\n*   **Các bước thực hiện:**\n    1.  Trong bảng cài đặt, nhấp vào dropdown chọn ngôn ngữ (hiện đang hiển thị ngôn ngữ hiện tại).\n    2.  Chọn một ngôn ngữ khác từ danh sách (ví dụ: 'English').\n*   **Kết quả mong đợi:** Ngôn ngữ hiển thị trong giao diện Chatbot (lời chào, câu hỏi gợi ý, nhãn cài đặt) sẽ thay đổi sang ngôn ngữ bạn đã chọn. Dropdown 'Language' sẽ hiển thị ngôn ngữ mới."
+        },
+        {
+          "title": "19.7 Xem trạng thái kết nối (Popup)",
+          "details": "*   **Mô tả:** Cách kiểm tra trạng thái kết nối của Chatbot popup.\n*   **Điều kiện tiên quyết:**\n    *   Cửa sổ pop-up 'Chat With Us' đang mở.\n*   **Các bước thực hiện:**\n    1.  Quan sát dòng chữ nhỏ phía dưới tiêu đề 'Chat With Us'.\n*   **Kết quả mong đợi:** Dòng chữ nhỏ sẽ hiển thị trạng thái kết nối hiện tại (ví dụ: 'Connected', 'Connecting...', 'Connection lost!')."
+        }
+      ]
+    },
+    {
+      "title": "20. Chatbot (Trang Live Chat)",
+      "cases": [
+        {
+          "title": "20.1 Truy cập trang Live Chat",
+          "details": "*   **Mô tả:** Cách truy cập giao diện Chatbot toàn màn hình với các tùy chọn nâng cao.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang giới thiệu Chatbot (URL kết thúc bằng `/chatbot`).\n*   **Các bước thực hiện:**\n    1.  Nhấp vào nút 'Live Chat'.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến trang Live Chat của Chatbot (URL kết thúc bằng `/chatbot/livechat`)."
+        },
+        {
+          "title": "20.2 Chọn chế độ Regular Chat",
+          "details": "*   **Mô tả:** Cách sử dụng Chatbot ở chế độ nhập liệu văn bản thông thường.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat (URL kết thúc bằng `/chatbot/livechat`).\n*   **Các bước thực hiện:**\n    1.  Trong mục 'Chat Mode & History', nhấp vào nút 'Regular Chat'.\n*   **Kết quả mong đợi:** Nút 'Regular Chat' sẽ được đánh dấu là đang chọn. Giao diện khu vực chat chính hiển thị trạng thái sẵn sàng nhập tin nhắn văn bản. Bạn sẽ thấy ô nhập liệu văn bản thông thường."
+        },
+        {
+          "title": "20.3 Bắt đầu cuộc hội thoại mới (New Chat)",
+          "details": "*   **Mô tả:** Cách xóa lịch sử trò chuyện hiện tại và bắt đầu một phiên mới.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat (URL kết thúc bằng `/chatbot/livechat`).\n*   **Các bước thực hiện:**\n    1.  Trong phần 'Chat History', nhấp vào nút 'New Chat'.\n*   **Kết quả mong đợi:** Nội dung khu vực chat chính sẽ bị xóa trống. Một thẻ lịch sử chat mới (biểu thị phiên hiện tại) sẽ xuất hiện trong khu vực 'Chat History'."
+        },
+        {
+          "title": "20.4 Gửi tin nhắn đến Chatbot (Live Chat - Văn bản)",
+          "details": "*   **Mô tả:** Cách gửi câu hỏi hoặc yêu cầu bằng văn bản khi ở chế độ Regular Chat.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat.\n    *   Đang ở chế độ 'Regular Chat'.\n*   **Các bước thực hiện:**\n    1.  Nhập tin nhắn vào ô 'Nhập tin nhắn' ở dưới cùng.\n    2.  Nhấp vào biểu tượng gửi tin nhắn (mũi tên).\n*   **Kết quả mong đợi:** Tin nhắn của bạn xuất hiện trong khu vực chat. Chatbot xử lý và hiển thị phản hồi dưới dạng văn bản (mặc định)."
+        },
+        {
+          "title": "20.5 Nhận và hiển thị phản hồi dạng Văn bản (Live Chat)",
+          "details": "*   **Mô tả:** Mô tả cách Chatbot trả lời bằng văn bản cho các truy vấn.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat.\n    *   Đang ở chế độ 'Regular Chat'.\n    *   Output Format đang chọn 'Text' (hoặc là mặc định).\n*   **Các bước thực hiện:**\n    1.  Gửi một truy vấn bằng văn bản (ví dụ: 'List some AI conferences in Asia.').\n*   **Kết quả mong đợi:** Chatbot hiển thị phản hồi dạng văn bản trong khu vực chat, bao gồm thông tin hoặc danh sách hội nghị liên quan đến truy vấn của bạn."
+        },
+        {
+          "title": "20.6 Nhấp vào một gợi ý câu hỏi ban đầu (Live Chat)",
+          "details": "*   **Mô tả:** Cách sử dụng các câu hỏi gợi ý khi bắt đầu phiên chat.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat.\n    *   Đang ở chế độ 'Regular Chat'.\n    *   Giao diện hiển thị các câu hỏi gợi ý ('Xin chào!', 'Liệt kê cho tôi...', 'Tìm các hội nghị...').\n*   **Các bước thực hiện:**\n    1.  Nhấp vào một câu hỏi gợi ý (ví dụ: 'Tôi muốn biết về các hội nghị blockchain tại châu Âu.').\n*   **Kết quả mong đợi:** Câu hỏi gợi ý đã nhấp sẽ được điền vào ô nhập liệu của bạn, sẵn sàng để gửi đi bằng cách nhấp biểu tượng gửi. Sau khi gửi, Chatbot sẽ xử lý và hiển thị phản hồi cho câu hỏi đó."
+        },
+        {
+          "title": "20.7 Nhấp vào liên kết trong phản hồi của Chatbot (Live Chat)",
+          "details": "*   **Mô tả:** Cách truy cập các liên kết được cung cấp trong phản hồi của Chatbot (ví dụ: liên kết đến trang web hội nghị).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat.\n    *   Đã nhận được phản hồi từ Chatbot có chứa liên kết.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào một liên kết bất kỳ trong phản hồi của Chatbot (ví dụ: liên kết trang web của một conference).\n*   **Kết quả mong đợi:** Hệ thống sẽ mở một tab mới trên trình duyệt của bạn, điều hướng đến địa chỉ URL của liên kết đã nhấp."
+        },
+        {
+          "title": "20.8 Xem lịch sử Chat (Live Chat)",
+          "details": "*   **Mô tả:** Cách xem danh sách các cuộc hội thoại Chatbot trước đó.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat (URL kết thúc bằng `/chatbot/livechat`).\n    *   Đã thực hiện ít nhất một cuộc hội thoại trước đó.\n*   **Các bước thực hiện:**\n    1.  Quan sát khu vực 'Chat History' ở bên trái.\n*   **Kết quả mong đợi:** Các cuộc hội thoại trước đó sẽ được liệt kê trong danh sách 'Chat History', hiển thị tiêu đề (có thể là câu hỏi đầu tiên) và thời gian tương đối từ lúc kết thúc phiên chat."
+        },
+        {
+          "title": "20.9 Tải lại cuộc hội thoại từ lịch sử (Live Chat)",
+          "details": "*   **Mô tả:** Cách xem lại nội dung chi tiết của một cuộc hội thoại cũ.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat.\n    *   Có ít nhất một mục trong 'Chat History'.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào một mục trong danh sách 'Chat History'.\n*   **Kết quả mong đợi:** Nội dung của cuộc hội thoại bạn đã chọn từ lịch sử sẽ được tải và hiển thị trong khu vực chat chính."
+        },
+        {
+          "title": "20.10 Thay đổi ngôn ngữ Chatbot (Live Chat - Settings)",
+          "details": "*   **Mô tả:** Cách thay đổi ngôn ngữ mà Chatbot sẽ giao tiếp và phản hồi.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat.\n    *   Hệ thống hỗ trợ nhiều ngôn ngữ cho Chatbot.\n*   **Các bước thực hiện:**\n    1.  Trong phần 'Settings', nhấp vào dropdown 'Language'.\n    2.  Chọn một ngôn ngữ khác ngôn ngữ hiện tại (ví dụ: từ 'Tiếng Việt' sang 'English').\n    3.  (Tùy chọn) Gửi một tin nhắn mới để kiểm tra.\n*   **Kết quả mong đợi:** Giao diện Chatbot (ví dụ: câu chào, nhãn trường nhập liệu, gợi ý) sẽ cập nhật sang ngôn ngữ bạn đã chọn. Phản hồi của Chatbot cho tin nhắn mới cũng sẽ được hiển thị bằng ngôn ngữ đó."
+        },
+        {
+          "title": "20.11 Chọn định dạng Output là Text (Live Chat - Settings)",
+          "details": "*   **Mô tả:** Cách thiết lập để Chatbot chỉ phản hồi bằng văn bản.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat.\n    *   Đang ở chế độ 'Live Chat'.\n*   **Các bước thực hiện:**\n    1.  Trong phần 'Settings', tìm đến 'Output Format'.\n    2.  Nhấp vào nút 'Text'.\n*   **Kết quả mong đợi:** Nút 'Text' sẽ được đánh dấu là đang chọn. Các phản hồi tiếp theo của Chatbot sẽ hiển thị dưới dạng văn bản."
+        },
+        {
+          "title": "20.12 Chọn định dạng Output là Audio (Live Chat - Settings)",
+          "details": "*   **Mô tả:** Cách thiết lập để Chatbot phản hồi bằng âm thanh (Text-to-Speech).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat.\n    *   Đang ở chế độ 'Live Chat'.\n*   **Các bước thực hiện:**\n    1.  Trong phần 'Settings', tìm đến 'Output Format'.\n    2.  Nhấp vào nút 'Audio'.\n*   **Kết quả mong đợi:** Nút 'Audio' sẽ được đánh dấu là đang chọn. Phản hồi tiếp theo của Chatbot có thể hiển thị kèm theo trình phát âm thanh hoặc chỉ phát âm thanh."
+        },
+        {
+          "title": "20.13 Chọn chế độ Live Stream",
+          "details": "*   **Mô tả:** Cách sử dụng Chatbot ở chế độ nhận diện giọng nói và phản hồi âm thanh.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat (URL kết thúc bằng `/chatbot/livechat`).\n    *   Chế độ 'Regular Chat' đang được chọn.\n*   **Các bước thực hiện:**\n    1.  Trong mục 'Chat Mode & History', nhấp vào nút 'Live Stream'.\n*   **Kết quả mong đợi:** Nút 'Live Stream' sẽ được đánh dấu là đang chọn. Giao diện khu vực chat chính hiển thị trạng thái sẵn sàng nhận giọng nói ('Live Chat with Our Chatbot'). Biểu tượng microphone và loa sẽ xuất hiện ở ô nhập liệu. Dòng trạng thái 'Connected' sẽ hiển thị (nếu kết nối thành công)."
+        },
+        {
+          "title": "20.14 Nhập liệu bằng giọng nói (Live Stream - Bắt đầu ghi âm)",
+          "details": "*   **Mô tả:** Cách bắt đầu ghi âm giọng nói để gửi đến Chatbot.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat.\n    *   Chế độ 'Live Stream' đang được chọn.\n    *   Trình duyệt đã cấp quyền truy cập microphone cho website này.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào biểu tượng play (hoặc microphone) ở ô nhập liệu (thường là biểu tượng nhỏ bên phải).\n*   **Kết quả mong đợi:** Biểu tượng sẽ thay đổi trạng thái (ví dụ: sang biểu tượng tạm dừng hoặc sóng âm). Hệ thống bắt đầu ghi âm giọng nói của bạn. Bạn có thể thấy hiển thị sóng giao động thể hiện âm thanh đang được thu."
+        },
+        {
+          "title": "20.15 Nhập liệu bằng giọng nói (Live Stream - Dừng ghi âm)",
+          "details": "*   **Mô tả:** Cách kết thúc quá trình ghi âm giọng nói.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat.\n    *   Đang trong quá trình ghi âm giọng nói (Live Stream).\n*   **Các bước thực hiện:**\n    1.  Nhấp lại vào biểu tượng ghi âm (đang hiển thị trạng thái ghi âm).\n*   **Kết quả mong đợi:** Biểu tượng ghi âm sẽ dừng lại (ví dụ: chuyển sang biểu tượng microphone bị gạch chéo hoặc biểu tượng ban đầu). Hệ thống sẽ xử lý bản ghi âm và gửi nó đến Chatbot."
+        },
+        {
+          "title": "20.16 Nhận và hiển thị phản hồi dạng Audio (Live Stream)",
+          "details": "*   **Mô tả:** Mô tả cách Chatbot trả lời bằng âm thanh khi ở chế độ Live Stream với Output Audio.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat.\n    *   Chế độ 'Live Stream' đang được chọn.\n    *   Output Format đang chọn 'Audio'.\n*   **Các bước thực hiện:**\n    1.  Gửi một truy vấn (bằng giọng nói hoặc văn bản).\n*   **Kết quả mong đợi:** Chatbot xử lý và hiển thị phản hồi dạng âm thanh trong khu vực chat. Một trình phát audio sẽ xuất hiện với nút play, pause, và thanh tiến trình thời lượng. Chatbot có thể bắt đầu đọc phản hồi ngay lập tức."
+        },
+        {
+          "title": "20.17 Phát lại phản hồi dạng Audio (Live Stream)",
+          "details": "*   **Mô tả:** Cách nghe lại nội dung âm thanh trong phản hồi của Chatbot.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat.\n    *   Đã nhận được phản hồi dạng Audio từ Chatbot.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào nút 'Play' trên trình phát audio của phản hồi Chatbot.\n*   **Kết quả mong đợi:** Hệ thống sẽ phát lại nội dung âm thanh của phản hồi. Nút 'Play' sẽ chuyển thành 'Pause'. Thanh tiến trình sẽ cập nhật theo thời gian phát."
+        },
+        {
+          "title": "20.18 Tạm dừng/Tiếp tục phát lại Audio (Live Stream)",
+          "details": "*   **Mô tả:** Cách tạm dừng và tiếp tục nghe phản hồi âm thanh.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat.\n    *   Một phản hồi dạng Audio đang được phát.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào nút 'Pause' trên trình phát audio để tạm dừng.\n    2.  Nhấp lại vào nút 'Play' (hiện tại) trên trình phát audio để tiếp tục.\n*   **Kết quả mong đợi:** Âm thanh sẽ tạm dừng và nút 'Pause' chuyển thành 'Play'. Khi nhấp lại, âm thanh sẽ tiếp tục phát từ vị trí đã tạm dừng."
+        },
+        {
+          "title": "20.19 Thay đổi giọng đọc Chatbot (Live Stream - Settings)",
+          "details": "*   **Mô tả:** Cách chọn giọng đọc khác cho phản hồi dạng âm thanh của Chatbot.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat.\n    *   Chế độ 'Live Stream' đang được chọn.\n    *   Output Format đang chọn 'Audio'.\n*   **Các bước thực hiện:**\n    1.  Trong phần 'Settings', nhấp vào dropdown 'Voice'.\n    2.  Chọn một giọng đọc khác giọng hiện tại (ví dụ: chọn 'Charon' nếu đang là 'Puck').\n    3.  (Tùy chọn) Gửi một truy vấn mới để nghe giọng đọc mới.\n*   **Kết quả mong đợi:** Dropdown 'Voice' hiển thị giọng đã chọn. Phản hồi dạng Audio tiếp theo của Chatbot sẽ được đọc bằng giọng mới."
+        },
+        {
+          "title": "20.20 Chuyển ngôn ngữ ở chế độ Live Stream + Audio Output",
+          "details": "*   **Mô tả:** Kiểm tra Chatbot trả lời bằng âm thanh theo ngôn ngữ đã chọn.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat (URL: /chatbot/livechat).\n    *   Chế độ 'Live Stream' đang được chọn.\n    *   Output Format đang chọn 'Audio'.\n    *   Hệ thống hỗ trợ ngôn ngữ khác tiếng Anh (ví dụ: Tiếng Việt).\n*   **Các bước thực hiện:**\n    1.  Trong phần 'Settings', nhấp vào dropdown 'Language' và chọn một ngôn ngữ (ví dụ: 'Tiếng Việt').\n    2.  Gửi một truy vấn (bằng giọng nói hoặc văn bản tùy quy định).\n*   **Kết quả mong đợi:** Chatbot sẽ trả lời bằng âm thanh sử dụng ngôn ngữ đã chọn ('Tiếng Việt')."
+        },
+        {
+          "title": "20.21 Xem trạng thái kết nối 'Connected' (Live Stream)",
+          "details": "*   **Mô tả:** Cách kiểm tra Chatbot đã kết nối thành công ở chế độ Live Stream.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat (URL: /chatbot/livechat).\n    *   Chế độ 'Live Stream' đang được chọn.\n*   **Các bước thực hiện:**\n    1.  Quan sát dòng chữ nhỏ phía dưới tiêu đề 'Live Chat with Our Chatbot'.\n*   **Kết quả mong đợi:** Dòng trạng thái hiển thị 'Connected' với màu xanh lá cây, kèm theo thông tin thời gian kết nối (ví dụ: 'Connected for 00:19 / 10:00')."
+        },
+        {
+          "title": "20.22 Xử lý khi mất kết nối (Live Stream)",
+          "details": "*   **Mô tả:** Mô tả phản ứng của hệ thống khi kết nối với Chatbot bị ngắt đột ngột.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat.\n    *   Chế độ 'Live Stream' đang được chọn và hiển thị trạng thái 'Connected'.\n    *   Kết nối mạng bị ngắt hoặc server bot gặp sự cố.\n*   **Các bước thực hiện:**\n    1.  (Mô phỏng) Gây mất kết nối mạng (ví dụ: tắt wifi/ethernet).\n    2.  Quan sát khu vực trạng thái kết nối và khu vực chat.\n*   **Kết quả mong đợi:** Trạng thái kết nối sẽ thay đổi sang trạng thái lỗi (ví dụ: 'Connection lost!'). Một thông báo lỗi có thể xuất hiện trong khu vực chat (ví dụ: 'Connection lost unexpectedly'). Các nút chức năng liên quan đến giao tiếp (nhập liệu, gửi tin nhắn) có thể bị vô hiệu hóa."
+        },
+        {
+          "title": "20.23 Chức năng Chatbot (Tìm kiếm, Chi tiết, Bản đồ, Chuyển hướng)",
+          "details": "*   **Mô tả:** Chatbot có thể xử lý các yêu cầu tìm kiếm hội nghị theo địa điểm, cung cấp chi tiết hội nghị, mở bản đồ địa chỉ, và chuyển hướng đến trang chi tiết hội nghị. Các chức năng này hoạt động ở chế độ Regular Chat.\n*   **Điều kiện tiên quyết:**\n    *   Chatbot đang ở chế độ REGULAR CHAT.\n    *   Có dữ liệu hội nghị phù hợp trong hệ thống.\n*   **Các bước thực hiện:**\n    1.  Nhập các câu hỏi hoặc yêu cầu sau vào khung chat và gửi:\n        *   `list some conference in Vietnam` (Tìm kiếm theo địa điểm)\n        *   `can you give details of MEDES` (Cung cấp chi tiết hội nghị)\n        *   `Can you open a map showing the address of conference SERA` (Mở bản đồ địa chỉ)\n        *   `Can you direct me to the SERA conference details page?` (Chuyển hướng đến trang chi tiết)\n*   **Kết quả mong đợi:** Chatbot sẽ phản hồi tương ứng: danh sách hội nghị theo địa điểm, thông tin chi tiết hội nghị (kèm link), bản đồ địa chỉ hội nghị, hoặc mở cửa sổ xác nhận chuyển hướng đến trang chính thức của hội nghị được hỏi."
+        },
+        {
+          "title": "20.24 Chức năng Chatbot (Hướng dẫn, Follow/Unfollow)",
+          "details": "*   **Mô tả:** Chatbot có thể cung cấp hướng dẫn sử dụng các tính năng và giúp người dùng thực hiện hành động Follow/Unfollow hội nghị. Các chức năng này hoạt động ở chế độ Regular Chat.\n*   **Điều kiện tiên quyết:**\n    *   Chatbot đang ở chế độ REGULAR CHAT.\n    *   Bạn đã đăng nhập để sử dụng Follow/Unfollow.\n    *   Hội nghị được yêu cầu Follow/Unfollow tồn tại trong hệ thống.\n*   **Các bước thực hiện:**\n    1.  Nhập các câu hỏi hoặc yêu cầu sau vào khung chat và gửi:\n        *   `can you help me how to use follow conference feature` (Hướng dẫn sử dụng tính năng Theo dõi)\n        *   `can you help me follow HNTD conference` (Theo dõi hội nghị)\n        *   `can you help me unfollow HNTD conference` (Hủy theo dõi hội nghị)\n*   **Kết quả mong đợi:** Chatbot sẽ phản hồi: cung cấp hướng dẫn chi tiết, thông báo đã theo dõi hội nghị thành công, hoặc thông báo đã hủy theo dõi hội nghị thành công."
+        },
+        {
+          "title": "20.25 Xử lý câu hỏi ngoài phạm vi (Live Chat)",
+          "details": "*   **Mô tả:** Mô tả phản ứng của Chatbot khi nhận câu hỏi không liên quan hoặc không hiểu.\n*   **Điều kiện tiên quyết:**\n    *   Chatbot đang hoạt động (Regular Chat hoặc Live Stream).\n*   **Các bước thực hiện:**\n    1.  Nhập một câu hỏi không liên quan đến hội nghị hoặc khó hiểu (ví dụ: 'What is the weather tomorrow?', 'Tell me a joke', hoặc một chuỗi ký tự ngẫu nhiên).\n    2.  Gửi tin nhắn.\n*   **Kết quả mong đợi:** Chatbot phản hồi rằng nó không hiểu câu hỏi hoặc câu hỏi nằm ngoài phạm vi hỗ trợ, và có thể đề xuất các chủ đề mà nó có thể giúp bạn (ví dụ: tìm kiếm hội nghị, cung cấp chi tiết hội nghị...)."
+        },
+        {
+          "title": "20.26 Xem chi tiết quá trình xử lý (Show Thought Process)",
+          "details": "*   **Mô tả:** Cách xem các bước suy nghĩ hoặc dữ liệu mà Chatbot đã sử dụng để đưa ra phản hồi.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat.\n    *   Đã nhận được phản hồi từ Chatbot có kèm theo liên kết 'Show Thought Process'.\n*   **Các bước thực hiện:**\n    1.  Nhấp vào liên kết 'Show Thought Process' dưới phản hồi của Chatbot.\n*   **Kết quả mong đợi:** Một khu vực nội dung bổ sung (ví dụ: dropdown, popup, hoặc phần text mở rộng) sẽ xuất hiện dưới phản hồi của Chatbot, hiển thị các bước suy nghĩ của bot (ví dụ: nhận diện ý định, trích xuất thông tin, tìm kiếm dữ liệu...)."
+        },
+        {
+          "title": "20.27 Sao chép phản hồi (Copy Response)",
+          "details": "*   **Mô tả:** Cách sao chép nội dung phản hồi của Chatbot vào bộ nhớ tạm (clipboard).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đang ở trang Chatbot Live Chat.\n    *   Đã nhận được phản hồi dạng văn bản từ Chatbot.\n*   **Các bước thực hiện:**\n    1.  Tìm và nhấp vào biểu tượng hoặc nút 'Copy' liên quan đến phản hồi của Chatbot.\n    2.  (Tùy chọn) Dán nội dung vào một trình soạn thảo khác để kiểm tra.\n*   **Kết quả mong đợi:** Nội dung phản hồi của Chatbot sẽ được sao chép vào clipboard của hệ thống. Hệ thống có thể hiển thị thông báo xác nhận (ví dụ: 'Copied to clipboard!')."
+        }
+      ]
+    },
+    {
+      "title": "21. Trực quan hóa dữ liệu (Visualize)",
+      "cases": [
+        {
+          "title": "21.1 Truy cập trang Trực quan hóa",
+          "details": "*   **Mô tả:** Cách đi đến trang cho phép bạn tạo các biểu đồ thống kê từ dữ liệu hội nghị.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập.\n    *   Bạn đang ở bất kỳ trang nào có hiển thị thanh điều hướng (header).\n*   **Các bước thực hiện:**\n    1.  Nhấp vào liên kết 'Visualize' trên thanh điều hướng.\n*   **Kết quả mong đợi:** Hệ thống sẽ chuyển hướng bạn đến trang Visualization (URL kết thúc bằng `/en/visualization`), hiển thị khu vực chọn dữ liệu (FIELDS), cấu hình biểu đồ (CONFIGURATION) và khu vực hiển thị biểu đồ trống ban đầu."
+        },
+        {
+          "title": "21.2 Hiển thị Biểu đồ Cột (Bar Chart)",
+          "details": "*   **Mô tả:** Hướng dẫn tạo biểu đồ cột đơn giản.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Visualization.\n    *   Dữ liệu về Global Conferences đã được tải (hiển thị trong mục FIELDS).\n    *   Các trường 'Continent' (Dimension) và 'Record Count' (Measure) khả dụng.\n*   **Các bước thực hiện:**\n    1.  Trong mục 'Configuration', nhấp vào dropdown 'Chart Type' và chọn 'Bar Chart'.\n    2.  Từ mục 'FIELDS' bên trái, kéo trường 'Continent' và thả vào vị trí 'X-Axis (Category/Dimension)' trong mục 'Configuration'.\n    3.  Từ mục 'FIELDS' bên trái, kéo trường 'Record Count' và thả vào vị trí 'Y-Axis (Value/Measure)' trong mục 'Configuration'.\n*   **Kết quả mong đợi:** Khu vực trung tâm sẽ hiển thị biểu đồ cột. Trục X hiển thị tên các châu lục (Continent). Trục Y hiển thị 'Record Count'. Các cột sẽ biểu thị số lượng hội nghị theo từng châu lục với chiều cao tương ứng."
+        },
+        {
+          "title": "21.3 Hiển thị Biểu đồ Đường (Line Chart)",
+          "details": "*   **Mô tả:** Hướng dẫn tạo biểu đồ đường biểu diễn dữ liệu qua một chiều (ví dụ: theo Châu lục), được phân loại theo chiều thứ hai (ví dụ: theo Quốc gia).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Visualization.\n    *   Dữ liệu đã được tải.\n    *   Các trường 'Continent', 'Record Count', và 'Country' khả dụng.\n*   **Các bước thực hiện:**\n    1.  Trong mục 'Configuration', nhấp vào dropdown 'Chart Type' và chọn 'Line Chart'.\n    2.  Từ mục 'FIELDS', kéo trường 'Continent' và thả vào vị trí 'X-Axis (Category/Dimension)'.\n    3.  Từ mục 'FIELDS', kéo trường 'Record Count' và thả vào vị trí 'Y-Axis (Value/Measure)'.\n    4.  Từ mục 'FIELDS', kéo trường 'Country' và thả vào vị trí 'Color Group (Dimension)'.\n*   **Kết quả mong đợi:** Khu vực trung tâm hiển thị biểu đồ đường. Trục X hiển thị các châu lục. Trục Y hiển thị 'Record Count'. Nhiều đường khác màu được vẽ trên biểu đồ, mỗi đường biểu thị 'Record Count' của một quốc gia ('Country') theo các châu lục. Một chú thích (Legend) hiển thị danh sách các quốc gia tương ứng với màu đường."
+        },
+        {
+          "title": "21.4 Hiển thị Biểu đồ Tròn (Pie Chart)",
+          "details": "*   **Mô tả:** Hướng dẫn tạo biểu đồ tròn biểu diễn tỷ lệ đóng góp của các phần khác nhau vào tổng thể (ví dụ: tỷ lệ hội nghị theo Quốc gia).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Visualization.\n    *   Dữ liệu đã được tải.\n    *   Các trường 'Record Count' (Measure) và 'Country' (Dimension) khả dụng.\n*   **Các bước thực hiện:**\n    1.  Trong mục 'Configuration', nhấp vào dropdown 'Chart Type' và chọn 'Pie Chart'.\n    2.  Từ mục 'FIELDS', kéo trường 'Record Count' và thả vào vị trí 'Value (Slice Size/Measure)'.\n    3.  Từ mục 'FIELDS', kéo trường 'Country' và thả vào vị trí 'Slices Color (Dimension)'.\n*   **Kết quả mong đợi:** Khu vực trung tâm sẽ hiển thị biểu đồ tròn (hoặc dạng donut). Các lát cắt của biểu đồ sẽ biểu thị tỷ lệ của 'Record Count' theo từng quốc gia ('Country'). Mỗi quốc gia có một màu riêng. Một chú thích (Legend) hiển thị danh sách các quốc gia và màu tương ứng."
+        },
+        {
+          "title": "21.5 Thay đổi Tiêu đề biểu đồ",
+          "details": "*   **Mô tả:** Cách đặt tên cho biểu đồ bạn tạo.\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Visualization.\n    *   Một biểu đồ bất kỳ đã được hiển thị.\n*   **Các bước thực hiện:**\n    1.  Trong mục 'Configuration', tìm đến phần 'Chart Options'.\n    2.  Nhấp vào ô nhập liệu bên cạnh nhãn 'Chart Title'.\n    3.  Nhập tiêu đề mới bạn muốn (ví dụ: 'Bieu Do Thong Ke Hoi Nghi').\n*   **Kết quả mong đợi:** Tiêu đề hiển thị phía trên biểu đồ ở khu vực trung tâm sẽ thay đổi thành tiêu đề bạn đã nhập."
+        },
+        {
+          "title": "21.6 Bật/Tắt hiển thị Chú thích (Legend)",
+          "details": "*   **Mô tả:** Cách ẩn hoặc hiển thị danh sách các mục được biểu diễn bằng màu sắc trên biểu đồ (Legend).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Visualization.\n    *   Một biểu đồ có hiển thị chú thích (ví dụ: Pie Chart hoặc Line Chart có 'Color Group') đã được hiển thị.\n*   **Các bước thực hiện:**\n    1.  Trong mục 'Configuration', tìm đến phần 'Chart Options'.\n    2.  Nhấp vào biểu tượng toggle switch bên cạnh nhãn 'Show Legend'.\n*   **Kết quả mong đợi:** Chú thích (Legend) của biểu đồ sẽ biến mất khỏi màn hình khi bạn tắt và xuất hiện trở lại khi bạn bật."
+        },
+        {
+          "title": "21.7 Bật/Tắt hiển thị Hộp công cụ (Toolbox)",
+          "details": "*   **Mô tả:** Cách ẩn hoặc hiển thị hộp công cụ trên biểu đồ (thường chứa các tùy chọn như tải xuống, xem dữ liệu,...).\n*   **Điều kiện tiên quyết:**\n    *   Bạn đã đăng nhập và đang ở trang Visualization.\n    *   Một biểu đồ có hiển thị hộp công cụ đã được hiển thị.\n*   **Các bước thực hiện:**\n    1.  Trong mục 'Configuration', tìm đến phần 'Chart Options'.\n    2.  Nhấp vào biểu tượng toggle switch bên cạnh nhãn 'Show Toolbox'.\n*   **Kết quả mong đợi:** Hộp công cụ (Toolbox) của biểu đồ sẽ biến mất khỏi màn hình khi bạn tắt và xuất hiện trở lại khi bạn bật."
+        }
+      ]
+    },
+    {
+      "title": "22. Tính năng theo vai trò người dùng",
+      "cases": [
+        {
+          "title": "22.1 Tính năng dành cho cả Người dùng khách và Người dùng đã đăng nhập",
+          "details": "Các tính năng sau có thể được truy cập và sử dụng bởi bất kỳ ai truy cập website, bất kể họ đã đăng nhập hay chưa:\n\n*   **Truy cập tài khoản (Đăng ký / Đăng nhập):** Tạo tài khoản mới hoặc đăng nhập bằng thông tin cá nhân hoặc Google.\n*   **Tìm kiếm Hội nghị:** Tìm kiếm các hội nghị dựa trên tiêu chí như Địa điểm, Ngày, Xếp hạng (Rank), Nguồn (Source), Loại tổ chức và các bộ lọc nâng cao khác.\n*   **Xem Bản đồ địa điểm Hội nghị:** Xem địa điểm diễn ra hội nghị trên bản đồ tương tác trong trang chi tiết hội nghị (nếu có thông tin địa điểm).\n*   **Tìm kiếm Tạp chí Khoa học:** Tìm kiếm các tạp chí khoa học liên quan bằng công cụ tìm kiếm, bao gồm các bộ lọc nâng cao.\n*   **Trợ lý AI (Chatbot):** Nhận câu trả lời tức thời về hội nghị và tạp chí, được trợ giúp điều hướng nền tảng, chuyển nhanh đến các mục liên quan. Có thể tương tác bằng văn bản hoặc giọng nói thông qua trang Live Chat hoặc cửa sổ pop-up trên trang chủ."
+        },
+        {
+          "title": "22.2 Tính năng chỉ dành cho Người dùng đã đăng nhập",
+          "details": "Để truy cập và sử dụng các tính năng sau, bạn **yêu cầu phải đăng nhập** vào tài khoản của mình:\n\n*   **Theo dõi Hội nghị:** Lưu lại các hội nghị bạn quan tâm ('Follow') để nhận thông báo cập nhật về các ngày quan trọng, thay đổi...\n*   **Đánh giá & Bình luận Hội nghị:** Chia sẻ trải nghiệm của bạn bằng cách đánh giá hội nghị (từ 1-5 sao) và để lại bình luận trên trang chi tiết hội nghị.\n*   **Lịch cá nhân & Ghi chú:** Xem các sự kiện và ghi chú đã lưu trên lịch cá nhân trong Dashboard. Bạn cũng có thể thêm ghi chú tùy chỉnh cho các ngày cụ thể để tự tổ chức công việc.\n*   **Đóng góp Hội nghị mới:** Gửi thông tin về các hội nghị mới để được xem xét và đưa vào danh sách của website thông qua quy trình publish.\n*   **Cập nhật Thông báo:** Nhận các thông báo quan trọng trực tiếp trong ứng dụng (qua biểu tượng chuông và trang Notifications trong Dashboard) và tùy chọn nhận cảnh báo qua email.\n*   **Tùy chỉnh Trải nghiệm (Cài đặt):** Quản lý các cài đặt cá nhân như tùy chọn nhận thông báo email, chọn tự động thêm hội nghị đã theo dõi vào lịch cá nhân.\n*   **Quản lý Hồ sơ:** Truy cập và chỉnh sửa thông tin cá nhân của bạn như cập nhật tên hiển thị, thay đổi mật khẩu hoặc thông tin địa chỉ.\n*   **Trực quan hóa dữ liệu Hội nghị:** Khám phá thông tin và xu hướng về hội nghị thông qua việc tạo và tùy chỉnh các biểu đồ tương tác trên trang Visualize."
+        }
+      ]
+    }
+  ]
+}

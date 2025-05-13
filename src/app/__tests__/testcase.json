@@ -5523,5 +5523,427 @@
     ],
     "tester": "",
     "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Viz_001",
+    "testCaseName": "Hiển thị biểu đồ cột (Bar Chart) với cấu hình cơ bản",
+    "description": "Kiểm tra hệ thống có thể hiển thị đúng biểu đồ cột khi người dùng chọn loại biểu đồ 'Bar Chart' và cấu hình các trường dữ liệu (ví dụ: Continent và Record Count).",
+    "preconditions": [
+      "Người dùng đang ở trang Visualization (URL: /en/visualization).",
+      "Dữ liệu về Global Conferences đã được tải và hiển thị trong mục FIELDS.",
+      "Các trường 'Continent' (Dimension) và 'Record Count' (Measure) khả dụng."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong mục 'Configuration', nhấp vào dropdown 'Chart Type' và chọn 'Bar Chart'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Từ mục 'FIELDS' bên trái, kéo trường 'Continent' thả vào vị trí 'X-Axis (Category/Dimension)' trong 'Configuration'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Từ mục 'FIELDS' bên trái, kéo trường 'Record Count' thả vào vị trí 'Y-Axis (Value/Measure)' trong 'Configuration'."
+      }
+    ],
+    "expectedResult": "Khu vực trung tâm hiển thị biểu đồ cột. Trục X hiển thị các châu lục (Continent). Trục Y hiển thị 'Record Count'. Các cột biểu thị số lượng bản ghi theo từng châu lục với chiều cao tương ứng (như trong ảnh chụp Bar Chart).",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_VB_001_HienThiBieuDo",
+      "YC_VB_002_CauHinhBieuDo"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Viz_002",
+    "testCaseName": "Hiển thị biểu đồ đường (Line Chart) với cấu hình nhiều dòng",
+    "description": "Kiểm tra hệ thống có thể hiển thị đúng biểu đồ đường khi người dùng chọn loại biểu đồ 'Line Chart' và cấu hình các trường dữ liệu, bao gồm cả trường cho 'Color Group' (ví dụ: Continent, Record Count, và Country).",
+    "preconditions": [
+      "Người dùng đang ở trang Visualization.",
+      "Dữ liệu đã được tải.",
+      "Các trường 'Continent', 'Record Count', và 'Country' khả dụng."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong mục 'Configuration', nhấp vào dropdown 'Chart Type' và chọn 'Line Chart'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Từ mục 'FIELDS', kéo trường 'Continent' thả vào vị trí 'X-Axis (Category/Dimension)'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Từ mục 'FIELDS', kéo trường 'Record Count' thả vào vị trí 'Y-Axis (Value/Measure)'."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Từ mục 'FIELDS', kéo trường 'Country' thả vào vị trí 'Color Group (Dimension)'."
+      }
+    ],
+    "expectedResult": "Khu vực trung tâm hiển thị biểu đồ đường. Trục X hiển thị các châu lục. Trục Y hiển thị 'Record Count'. Nhiều đường khác màu được vẽ trên biểu đồ, mỗi đường biểu thị 'Record Count' của một quốc gia ('Country') theo các châu lục (như trong ảnh chụp Line Chart). Legend hiển thị danh sách các quốc gia tương ứng với màu đường.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_VB_001_HienThiBieuDo",
+      "YC_VB_002_CauHinhBieuDo"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Viz_003",
+    "testCaseName": "Hiển thị biểu đồ tròn (Pie Chart) với cấu hình",
+    "description": "Kiểm tra hệ thống có thể hiển thị đúng biểu đồ tròn khi người dùng chọn loại biểu đồ 'Pie Chart' và cấu hình các trường dữ liệu (ví dụ: Record Count và Country).",
+    "preconditions": [
+      "Người dùng đang ở trang Visualization.",
+      "Dữ liệu đã được tải.",
+      "Các trường 'Record Count' (Measure) và 'Country' (Dimension) khả dụng."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong mục 'Configuration', nhấp vào dropdown 'Chart Type' và chọn 'Pie Chart'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Từ mục 'FIELDS', kéo trường 'Record Count' thả vào vị trí 'Value (Slice Size/Measure)'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Từ mục 'FIELDS', kéo trường 'Country' thả vào vị trí 'Slices Color (Dimension)'."
+      }
+    ],
+    "expectedResult": "Khu vực trung tâm hiển thị biểu đồ tròn (hoặc dạng donut). Các lát cắt của biểu đồ biểu thị tỷ lệ của 'Record Count' theo từng quốc gia ('Country'). Mỗi quốc gia có một màu riêng. Legend hiển thị danh sách các quốc gia và màu tương ứng (như trong ảnh chụp Pie Chart), có thể có phân trang.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_VB_001_HienThiBieuDo",
+      "YC_VB_002_CauHinhBieuDo"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Viz_004",
+    "testCaseName": "Thay đổi tiêu đề biểu đồ",
+    "description": "Kiểm tra người dùng có thể thay đổi tiêu đề của biểu đồ thông qua trường nhập liệu trong mục Chart Options.",
+    "preconditions": [
+      "Người dùng đang ở trang Visualization.",
+      "Một biểu đồ bất kỳ đã được hiển thị trong khu vực trung tâm."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong mục 'Configuration', tìm đến phần 'Chart Options'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào trường nhập liệu bên cạnh nhãn 'Chart Title'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhập một tiêu đề mới (ví dụ: 'Bieu Do Thong Ke Hoi Nghi') vào trường 'Chart Title'."
+      }
+    ],
+    "expectedResult": "Tiêu đề hiển thị phía trên biểu đồ ở khu vực trung tâm thay đổi thành tiêu đề mới đã nhập.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Low",
+    "relatedRequirements": [
+      "YC_VB_004_TuyChinhBieuDo"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Viz_005",
+    "testCaseName": "Bật/Tắt hiển thị chú thích (Legend)",
+    "description": "Kiểm tra người dùng có thể ẩn hoặc hiển thị lại chú thích (Legend) của biểu đồ bằng cách sử dụng toggle switch trong Chart Options.",
+    "preconditions": [
+      "Người dùng đang ở trang Visualization.",
+      "Một biểu đồ có hiển thị chú thích (ví dụ: Pie Chart hoặc Line Chart có 'Color Group') đã được hiển thị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong mục 'Configuration', tìm đến phần 'Chart Options'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào icon toggle switch bên cạnh nhãn 'Show Legend' để tắt chú thích."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Quan sát khu vực biểu đồ."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp lại vào icon toggle switch bên cạnh nhãn 'Show Legend' để bật chú thích."
+      },
+      {
+        "stepNumber": 5,
+        "action": "Quan sát khu vực biểu đồ."
+      }
+    ],
+    "expectedResult": "Sau bước 3, chú thích (Legend) của biểu đồ biến mất khỏi màn hình. Sau bước 5, chú thích (Legend) của biểu đồ xuất hiện trở lại.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Low",
+    "relatedRequirements": [
+      "YC_VB_004_TuyChinhBieuDo"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Viz_006",
+    "testCaseName": "Bật/Tắt hiển thị hộp công cụ (Toolbox)",
+    "description": "Kiểm tra người dùng có thể ẩn hoặc hiển thị lại hộp công cụ (Toolbox) của biểu đồ bằng cách sử dụng toggle switch trong Chart Options.",
+    "preconditions": [
+      "Người dùng đang ở trang Visualization.",
+      "Một biểu đồ có hiển thị hộp công cụ đã được hiển thị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong mục 'Configuration', tìm đến phần 'Chart Options'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào icon toggle switch bên cạnh nhãn 'Show Toolbox' để tắt chú thích."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Quan sát khu vực biểu đồ."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp lại vào icon toggle switch bên cạnh nhãn 'Show Toolbox' để bật chú thích."
+      },
+      {
+        "stepNumber": 5,
+        "action": "Quan sát khu vực biểu đồ."
+      }
+    ],
+    "expectedResult": "Sau bước 3, hộp công cụ (Toolbox) của biểu đồ biến mất khỏi màn hình. Sau bước 5, hộp công cụ (Toolbox) của biểu đồ xuất hiện trở lại.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Low",
+    "relatedRequirements": [
+      "YC_VB_004_TuyChinhBieuDo"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Chat_023",
+    "testCaseName": "Mở bong bóng Chatbot",
+    "description": "Kiểm tra người dùng có thể mở cửa sổ Chatbot bằng cách nhấp vào biểu tượng hình tròn gốc dưới bên phải của màn hình.",
+    "preconditions": [
+      "Người dùng đang ở trang chủ (Homepage)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "nhấp vào biểu tượng hình tròn gốc dưới bên phải của màn hình."
+      }
+    ],
+    "expectedResult": "Cửa sổ pop-up 'Chat With Us' xuất hiện ở góc dưới bên phải màn hình. Cửa sổ hiển thị lời chào và các câu hỏi gợi ý ban đầu.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_Chat_023_MoChatbot"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Chat_024",
+    "testCaseName": "Đóng cửa sổ Chatbot",
+    "description": "Kiểm tra người dùng có thể đóng cửa sổ Chatbot bằng cách nhấp vào nút 'X' trên tiêu đề cửa sổ.",
+    "preconditions": [
+      "Người dùng đang ở trang chủ.",
+      "Cửa sổ pop-up 'Chat With Us' đang mở."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong cửa sổ 'Chat With Us', nhấp vào biểu tượng 'X' ở góc trên bên phải."
+      }
+    ],
+    "expectedResult": "Cửa sổ pop-up 'Chat With Us' biến mất khỏi màn hình.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_Chat_024_DongChatbot"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Chat_025",
+    "testCaseName": "Nhập và gửi tin nhắn văn bản",
+    "description": "Kiểm tra người dùng có thể nhập văn bản vào ô nhập liệu và gửi tin nhắn đi.",
+    "preconditions": [
+      "Người dùng đang ở trang chủ.",
+      "Cửa sổ pop-up 'Chat With Us' đang mở."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong cửa sổ 'Chat With Us', nhấp vào ô nhập liệu ở dưới cùng."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhập một câu hỏi hoặc tin nhắn bất kỳ (ví dụ: 'Tìm hội nghị về AI')."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào biểu tượng 'Gửi' (hình máy bay giấy) ở bên phải ô nhập liệu."
+      }
+    ],
+    "expectedResult": "Tin nhắn đã nhập xuất hiện trong lịch sử trò chuyện. Trạng thái 'Processing...' có thể xuất hiện (tùy thuộc vào trạng thái kết nối của bot).",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_Chat_025_GuiTinNhan"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Chat_026",
+    "testCaseName": "Sử dụng các câu hỏi gợi ý",
+    "description": "Kiểm tra người dùng có thể sử dụng các câu hỏi gợi ý có sẵn trong cửa sổ Chatbot.",
+    "preconditions": [
+      "Người dùng đang ở trang chủ.",
+      "Cửa sổ pop-up 'Chat With Us' đang mở và hiển thị các câu hỏi gợi ý."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong cửa sổ 'Chat With Us', nhấp vào một trong các nút chứa câu hỏi gợi ý (ví dụ: 'Tìm các hội nghị về Big Data trong năm nay.')."
+      }
+    ],
+    "expectedResult": "Văn bản của câu hỏi gợi ý được điền vào ô nhập liệu ở dưới cùng, sẵn sàng để người dùng gửi đi.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_Chat_026_CauHoiGoiY"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Chat_027",
+    "testCaseName": "Mở bảng cài đặt Chatbot",
+    "description": "Kiểm tra người dùng có thể mở bảng cài đặt của Chatbot.",
+    "preconditions": [
+      "Người dùng đang ở trang chủ.",
+      "Cửa sổ pop-up 'Chat With Us' đang mở."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong cửa sổ 'Chat With Us', nhấp vào biểu tượng 'Cài đặt' (hình bánh răng cưa)."
+      }
+    ],
+    "expectedResult": "Bảng cài đặt 'Chat Settings' xuất hiện, che phủ phần lịch sử trò chuyện của cửa sổ Chatbot và hiển thị các tùy chọn cài đặt như Stream Response, Hide Toolbar, Hide Thought Process, Language.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Low",
+    "relatedRequirements": [
+      "YC_Chat_027_MoCaiDat"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Chat_028",
+    "testCaseName": "Đóng bảng cài đặt Chatbot",
+    "description": "Kiểm tra người dùng có thể đóng bảng cài đặt của Chatbot và trở về giao diện trò chuyện.",
+    "preconditions": [
+      "Người dùng đang ở trang chủ.",
+      "Bảng cài đặt 'Chat Settings' của Chatbot đang mở."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong bảng cài đặt 'Chat Settings', nhấp vào biểu tượng 'X' ở góc trên bên phải."
+      }
+    ],
+    "expectedResult": "Bảng cài đặt 'Chat Settings' biến mất, giao diện lịch sử trò chuyện chính của Chatbot hiển thị trở lại.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Low",
+    "relatedRequirements": [
+      "YC_Chat_028_MoCaiDat"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Chat_029",
+    "testCaseName": "Thay đổi ngôn ngữ trong cài đặt",
+    "description": "Kiểm tra người dùng có thể thay đổi ngôn ngữ hiển thị của Chatbot thông qua bảng cài đặt.",
+    "preconditions": [
+      "Người dùng đang ở trang chủ.",
+      "Bảng cài đặt 'Chat Settings' của Chatbot đang mở.",
+      "Tùy chọn ngôn ngữ khác 'Tiếng Việt' có sẵn trong dropdown 'Language'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong bảng cài đặt 'Chat Settings', nhấp vào dropdown chọn ngôn ngữ (hiện đang là 'Tiếng Việt')."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn một ngôn ngữ khác từ danh sách (ví dụ: 'English')."
+      }
+    ],
+    "expectedResult": "Ngôn ngữ hiển thị trong giao diện Chatbot (lời chào, câu hỏi gợi ý, nhãn cài đặt) thay đổi sang ngôn ngữ đã chọn. Dropdown 'Language' hiển thị ngôn ngữ mới được chọn.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_Chat_029_ThayDoiNgonNgu"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Chat_030",
+    "testCaseName": "Xem trạng thái kết nối của Chatbot",
+    "description": "Kiểm tra Chatbot hiển thị đúng trạng thái kết nối của nó.",
+    "preconditions": [
+      "Người dùng đang ở trang chủ.",
+      "Cửa sổ pop-up 'Chat With Us' đang mở."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Quan sát dòng chữ nhỏ phía dưới tiêu đề 'Chat With Us'."
+      }
+    ],
+    "expectedResult": "Dòng chữ nhỏ hiển thị trạng thái kết nối hiện tại",
+    "actualResult": "",
+    "status": "",
+    "priority": "Low",
+    "relatedRequirements": [
+      "YC_Chat_030_HienThiTrangThai"
+    ],
+    "tester": "",
+    "executionDate": ""
   }
 ]
