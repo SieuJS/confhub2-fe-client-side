@@ -26,17 +26,16 @@ export default function Dashboard({ locale }: { locale: string }) {
   // Logic cập nhật activePage dựa trên searchParams (giữ nguyên)
   useEffect(() => {
     const tab = searchParams.get('tab')
-    let initialPage = 'Analysis' // Default
+    let initialPage = 'Profile' // Default
     if (tab === 'followed') initialPage = 'Followed'
-    else if (tab === 'profile') initialPage = 'Profile'
     else if (tab === 'myconferences') initialPage = 'My Conferences'
     else if (tab === 'note') initialPage = 'Note'
     else if (tab === 'notifications') initialPage = 'Notifications'
     else if (tab === 'blacklisted') initialPage = 'Blacklisted'
     else if (tab === 'setting') initialPage = 'Setting'
-    else if (tab === 'moderation') initialPage = 'Moderation'
-    else if (tab === 'requestadmintab') initialPage = 'RequestAdminTab'
-    else if (tab === 'analysis') initialPage = 'Analysis' // Ensure 'analysis' param works
+    // else if (tab === 'moderation') initialPage = 'Moderation'
+    // else if (tab === 'requestadmintab') initialPage = 'RequestAdminTab'
+    // else if (tab === 'analysis') initialPage = 'Analysis' // Ensure 'analysis' param works
 
     setActivePage(initialPage)
 
@@ -73,84 +72,84 @@ export default function Dashboard({ locale }: { locale: string }) {
         return <NoteTab />
       case 'My Conferences':
         return <MyConferencesTab />
-      case 'Profile':
-        return <ProfileTab />
-      case 'Analysis':
-        return <Analysis />
-      case 'Moderation':
-        return <Moderation />
-      case 'RequestAdminTab':
-        return <RequestAdminTab />
+      // case 'Profile':
+      //   return <ProfileTab />
+      // case 'Analysis':
+      //   return <Analysis />
+      // case 'Moderation':
+      //   return <Moderation />
+      // case 'RequestAdminTab':
+      //   return <RequestAdminTab />
       default:
-        return <Analysis /> // Fallback
+        return <ProfileTab /> // Fallback
     }
   }
 
   // Menu items remains the same
   const menuItems = [
-    {
-      page: 'Analysis',
-      label: t('Analysis'),
-      icon: (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          width='24'
-          height='24'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='#525252'
-          strokeWidth='1.5'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          className='lucide lucide-airplay-icon lucide-airplay'
-        >
-          <path d='M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1' />
-          <path d='m12 15 5 6H7Z' />
-        </svg>
-      )
-    },
-    {
-      page: 'Moderation',
-      label: t('Moderation'),
-      icon: (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          width='24'
-          height='24'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='#525252'
-          strokeWidth='1.5'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          className='lucide lucide-airplay-icon lucide-airplay'
-        >
-          <path d='M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1' />
-          <path d='m12 15 5 6H7Z' />
-        </svg>
-      )
-    },
-    {
-      page: 'RequestAdminTab',
-      label: t('Request_Admin_Tab'),
-      icon: (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          width='24'
-          height='24'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='#525252'
-          strokeWidth='1.5'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          className='lucide lucide-airplay-icon lucide-airplay'
-        >
-          <path d='M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1' />
-          <path d='m12 15 5 6H7Z' />
-        </svg>
-      )
-    },
+    // {
+    //   page: 'Analysis',
+    //   label: t('Analysis'),
+    //   icon: (
+    //     <svg
+    //       xmlns='http://www.w3.org/2000/svg'
+    //       width='24'
+    //       height='24'
+    //       viewBox='0 0 24 24'
+    //       fill='none'
+    //       stroke='#525252'
+    //       strokeWidth='1.5'
+    //       strokeLinecap='round'
+    //       strokeLinejoin='round'
+    //       className='lucide lucide-airplay-icon lucide-airplay'
+    //     >
+    //       <path d='M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1' />
+    //       <path d='m12 15 5 6H7Z' />
+    //     </svg>
+    //   )
+    // },
+    // {
+    //   page: 'Moderation',
+    //   label: t('Moderation'),
+    //   icon: (
+    //     <svg
+    //       xmlns='http://www.w3.org/2000/svg'
+    //       width='24'
+    //       height='24'
+    //       viewBox='0 0 24 24'
+    //       fill='none'
+    //       stroke='#525252'
+    //       strokeWidth='1.5'
+    //       strokeLinecap='round'
+    //       strokeLinejoin='round'
+    //       className='lucide lucide-airplay-icon lucide-airplay'
+    //     >
+    //       <path d='M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1' />
+    //       <path d='m12 15 5 6H7Z' />
+    //     </svg>
+    //   )
+    // },
+    // {
+    //   page: 'RequestAdminTab',
+    //   label: t('Request_Admin_Tab'),
+    //   icon: (
+    //     <svg
+    //       xmlns='http://www.w3.org/2000/svg'
+    //       width='24'
+    //       height='24'
+    //       viewBox='0 0 24 24'
+    //       fill='none'
+    //       stroke='#525252'
+    //       strokeWidth='1.5'
+    //       strokeLinecap='round'
+    //       strokeLinejoin='round'
+    //       className='lucide lucide-airplay-icon lucide-airplay'
+    //     >
+    //       <path d='M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1' />
+    //       <path d='m12 15 5 6H7Z' />
+    //     </svg>
+    //   )
+    // },
     {
       page: 'Profile',
       label: t('Profile'),

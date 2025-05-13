@@ -176,7 +176,7 @@ export interface ConfirmationResultPayload {
 
 
 export type ChatMode = 'live' | 'regular';
-export type LanguageCode = 'en' | 'vi' | 'zh';
+export type LanguageCode = 'en' | 'vi' | 'zh' | 'de' | 'fr'| 'es'| 'ru' | 'ja'| 'ko'| 'ar'| 'fa';
 
 export interface LanguageOption {
     code: LanguageCode;

@@ -8,7 +8,7 @@ import {
 } from '@/src/app/[locale]/chatbot/lib/constants'; // Adjust path
 
 // --- Types for Settings Store ---
-export type LanguageCode = 'en' | 'vi' | 'zh';
+export type LanguageCode = 'en' | 'vi' | 'zh' | 'de' | 'fr'| 'es'| 'ru' | 'ja'| 'ko'| 'ar'| 'fa';
 export type ChatMode = 'live' | 'regular';
 export interface LanguageOption {
     code: LanguageCode;
@@ -37,7 +37,7 @@ export interface SettingsStoreActions {
 
 const initialSettingsStoreState: SettingsStoreState = {
     chatMode: 'regular',
-    currentLocale: 'en',
+    currentLocale: 'vi',
     isStreamingEnabled: IS_STREAMING_ENABLED_DEFAULT,
     isConversationToolbarHiddenInFloatingChat: true,
     isThoughtProcessHiddenInFloatingChat: true, // <-- Default to hidden for floating chat

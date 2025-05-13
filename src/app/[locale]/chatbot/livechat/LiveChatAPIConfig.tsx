@@ -233,19 +233,19 @@
 import { useEffect, memo } from "react";
 import { useLiveAPIContext } from '@/src/app/[locale]/chatbot/livechat/contexts/LiveAPIContext';
 import {
-  EN_getConferencesDeclaration,
-  EN_getJournalsDeclaration,
-  EN_getWebsiteInfoDeclaration, EN_navigationDeclaration,
+  englishGetConferencesDeclaration,
+  englishGetJournalsDeclaration,
+  englishGetWebsiteInfoDeclaration, englishNavigationDeclaration, englishManageFollowDeclaration, englishManageCalendarDeclaration, englishSendEmailToAdminDeclaration,
   // drawChartDeclaration, // Keep commented if not used
-  VN_getConferencesDeclaration, VN_getJournalsDeclaration, VN_getWebsiteInfoDeclaration, VN_drawChartDeclaration,
-  CN_getConferencesDeclaration, CN_getJournalsDeclaration, CN_getWebsiteInfoDeclaration, CN_drawChartDeclaration,
+  // VN_getConferencesDeclaration, VN_getJournalsDeclaration, VN_getWebsiteInfoDeclaration, VN_drawChartDeclaration,
+  // CN_getConferencesDeclaration, CN_getJournalsDeclaration, CN_getWebsiteInfoDeclaration, CN_drawChartDeclaration,
   websiteInfo,
-  EN_followUnfollowItemDeclaration,
-  EN_openGoogleMapDeclaration
-} from "../lib/functions"; 
+  // EN_manageFollowDeclaration,
+  // EN_openGoogleMapDeclaration
+} from "../lib/functions";
 import { OutputModality, PrebuiltVoice, Language, ToolCall } from '@/src/app/[locale]/chatbot/lib/live-chat.types';
-import { transformConferenceData } from '../utils/transformApiData'; 
-import { appConfig } from "@/src/middleware"; 
+import { transformConferenceData } from '../utils/transformApiData';
+import { appConfig } from "@/src/middleware";
 import { FunctionDeclaration, FunctionCall } from "@google/generative-ai";
 import { usePathname } from 'next/navigation';
 
@@ -285,36 +285,45 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
     // Determine active language (use currentLocale if available and reliable, otherwise fall back to prop)
     const activeLang = language;
 
-    if (activeLang === 'vi') {
-      console.log("Using Vietnamese function declarations.");
-      activeFunctionDeclarations = [
-        VN_getConferencesDeclaration,
-        VN_getJournalsDeclaration,
-        VN_getWebsiteInfoDeclaration,
-        // navigationDeclaration, // Add navigation
-        // VN_drawChartDeclaration,
-      ];
-    } else if (activeLang === 'zh') {
-      console.log("Using Chinese function declarations.");
-      activeFunctionDeclarations = [
-        CN_getConferencesDeclaration,
-        CN_getJournalsDeclaration,
-        CN_getWebsiteInfoDeclaration,
-        // navigationDeclaration, // Add navigation
-        // CN_drawChartDeclaration,
-      ];
-    } else { // Default to English
-      console.log("Using English function declarations (default).");
-      activeFunctionDeclarations = [
-        EN_getConferencesDeclaration,
-        EN_getJournalsDeclaration,
-        EN_getWebsiteInfoDeclaration,
-        EN_navigationDeclaration, // Add navigation
-        // drawChartDeclaration,
-        EN_followUnfollowItemDeclaration,
-        EN_openGoogleMapDeclaration
-      ];
-    }
+    // if (activeLang === 'vi') {
+    //   console.log("Using Vietnamese function declarations.");
+    activeFunctionDeclarations = [
+      englishGetConferencesDeclaration,
+      englishGetJournalsDeclaration,
+      englishGetWebsiteInfoDeclaration,
+      englishNavigationDeclaration, // Add navigation
+      englishManageFollowDeclaration,
+      englishManageCalendarDeclaration,
+      englishNavigationDeclaration,
+      englishSendEmailToAdminDeclaration
+    ];
+    // } else if (activeLang === 'zh') {
+    //   console.log("Using Chinese function declarations.");
+    //   activeFunctionDeclarations = [
+    //     englishGetConferencesDeclaration,
+    //     englishGetJournalsDeclaration,
+    //     englishGetWebsiteInfoDeclaration,
+    //     englishNavigationDeclaration, // Add navigation
+    //     // drawChartDeclaration,
+    //     englishManageFollowDeclaration,
+    //     englishManageCalendarDeclaration,
+    //     englishNavigationDeclaration, 
+    //     englishSendEmailToAdminDeclaration
+    //   ];
+    // } else { // Default to English
+    //   console.log("Using English function declarations (default).");
+    //   activeFunctionDeclarations = [
+    //     englishGetConferencesDeclaration,
+    //     englishGetJournalsDeclaration,
+    //     englishGetWebsiteInfoDeclaration,
+    //     englishNavigationDeclaration, // Add navigation
+    //     // drawChartDeclaration,
+    //     englishManageFollowDeclaration,
+    //     englishManageCalendarDeclaration,
+    //     englishNavigationDeclaration, 
+    //     englishSendEmailToAdminDeclaration
+    //   ];
+    // }
     // --- End Selection ---
 
     const finalConfig = {
@@ -341,9 +350,10 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
     const onToolCall = async (toolCall: ToolCall) => {
       console.log(`Got toolcall`, toolCall);
       const NEXT_PUBLIC_DATABASE_URL = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1` || "http://confhub.engineer/api/v1";
+      console.log(NEXT_PUBLIC_DATABASE_URL);
       const BASE_WEB_URL = "http://localhost:8386"; // Your web app's base URL
       const responses = [];
-      
+
       // Helper function to safely extract URL argument
       const getUrlArg = (fc: FunctionCall): string | undefined => {
         return fc.args && typeof fc.args === 'object' && typeof (fc.args as any).url === 'string'
@@ -412,7 +422,7 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
               // Or perhaps calls a general info endpoint? Clarify its purpose.
               // For now, let's assume it doesn't need an API call here, maybe handled differently
               console.warn(`${fc.name} called, but no specific backend API defined in this handler.`);
-              responses.push({ response: { content: websiteInfo}, id: fc.id });
+              responses.push({ response: { content: websiteInfo }, id: fc.id });
               requiresApiCall = false; // Prevent API call attempt below
               break; // Skip to next function call
 

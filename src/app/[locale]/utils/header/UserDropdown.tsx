@@ -165,14 +165,14 @@ const UserDropdown: FC<Props> = ({
           <div className='flex flex-col py-1'>
             {/* Các Link menu - Sử dụng hàm handleLinkClick */}
             {/* Chỉ cần truyền sự kiện e */}
-            <Link
+            {/* <Link
               href={{ pathname: `/dashboard`, query: { tab: 'analysis' } }}
               locale={locale}
               className='block px-2 py-2 text-sm  hover:bg-gray-100  dark:hover:bg-gray-700'
               onClick={handleLinkClick} // Chỉ truyền hàm xử lý click
             >
               {t('Analysis')}
-            </Link>
+            </Link> */}
             <Link
               href={{ pathname: `/dashboard`, query: { tab: 'profile' } }}
               locale={locale}

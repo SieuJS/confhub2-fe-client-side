@@ -31,7 +31,7 @@ export type LiveConfig = {
 
 export type PrebuiltVoice = "Puck" | "Charon" | "Kore" | "Fenrir" | "Aoede" | "Orus" | "Zephyr";
 export type OutputModality = "text" | "audio" | "image";
-export type Language = 'en' | 'vi' | 'zh';
+export type Language = 'en' | 'vi' | 'zh' | 'de' | 'fr'| 'es'| 'ru' | 'ja'| 'ko'| 'ar'| 'fa';
 export type ChatMode = 'live' | 'regular';
 export interface LanguageOption {
     code: Language;

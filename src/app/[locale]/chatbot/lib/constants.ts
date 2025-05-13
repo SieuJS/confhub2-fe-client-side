@@ -13,9 +13,17 @@ export const AVAILABLE_VOICES_LIVE_CHAT: PrebuiltVoice[] = ["Puck", "Charon", "K
 
 // BỎ thuộc tính 'value' nếu không cần thiết
 export const AVAILABLE_LANGUAGES_LIVE_CHAT: LiveChatLanguageOption[] = [
-    { code: 'en', name: 'English', flagCode: 'gb' },
-    { code: 'vi', name: 'Tiếng Việt', flagCode: 'vn' },
-    { code: 'zh', name: '中文', flagCode: 'cn' },
+    { name: 'Tiếng Việt', code: 'vi', flagCode: 'vn' },
+    { name: 'English', code: 'en', flagCode: 'gb' },
+    { name: '中文', code: 'zh', flagCode: 'cn' },
+    { name: 'Deutsch', code: 'de', flagCode: 'de' },
+    { name: 'Français', code: 'fr', flagCode: 'fr' },
+    { name: 'Español', code: 'es', flagCode: 'es' },
+    { name: 'Русский', code: 'ru', flagCode: 'ru' },
+    { name: '日本語', code: 'ja', flagCode: 'jp' },
+    { name: '한국어', code: 'ko', flagCode: 'kr' },
+    { name: 'العربية', code: 'ar', flagCode: 'sa' },
+    { name: 'فارسی', code: 'fa', flagCode: 'ir' }
 ];
 
 export const DEFAULT_LANGUAGE_LIVE_CHAT: LiveChatLanguageCode = 'vi';
@@ -24,9 +32,17 @@ export const DEFAULT_MODALITY_LIVE_CHAT: OutputModality = 'audio';
 
 // --- Constants cho Regular Chat (VÀ CÓ THỂ DÙNG CHUNG) ---
 export const AVAILABLE_LANGUAGES_REGULAR_CHAT: RegularChatLanguageOption[] = [
-    { code: 'en', name: 'English', flagCode: 'gb' },
-    { code: 'vi', name: 'Tiếng Việt', flagCode: 'vn' },
-    { code: 'zh', name: '中文', flagCode: 'cn' },
+    { name: 'Tiếng Việt', code: 'vi', flagCode: 'vn' },
+    { name: 'English', code: 'en', flagCode: 'gb' },
+    { name: '中文', code: 'zh', flagCode: 'cn' },
+    { name: 'Deutsch', code: 'de', flagCode: 'de' },
+    { name: 'Français', code: 'fr', flagCode: 'fr' },
+    { name: 'Español', code: 'es', flagCode: 'es' },
+    { name: 'Русский', code: 'ru', flagCode: 'ru' },
+    { name: '日本語', code: 'ja', flagCode: 'jp' },
+    { name: '한국어', code: 'ko', flagCode: 'kr' },
+    { name: 'العربية', code: 'ar', flagCode: 'sa' },
+    { name: 'فارسی', code: 'fa', flagCode: 'ir' }
 ];
 
 export const DEFAULT_LANGUAGE_REGULAR_CHAT: RegularChatLanguageOption = AVAILABLE_LANGUAGES_REGULAR_CHAT[0];
