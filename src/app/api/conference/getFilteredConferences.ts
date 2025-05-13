@@ -1,3 +1,4 @@
+// src/app/api/conference/getFilteredConferences.ts
 import { appConfig } from '@/src/middleware';
 import { ConferenceListResponse } from '@/src/models/response/conference.list.response';
 

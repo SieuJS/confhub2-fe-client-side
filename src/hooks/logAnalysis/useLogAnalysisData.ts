@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { fetchLogAnalysisData } from '../../app/api/logAnalysis/logAnalysisApi'; // Điều chỉnh đường dẫn nếu cần
+import { fetchLogAnalysisData } from '../../app/api/logAnalysis/logAnalysis'; // Điều chỉnh đường dẫn nếu cần
 import { LogAnalysisResult } from '../../models/logAnalysis/logAnalysis'; // Điều chỉnh đường dẫn nếu cần
 import useAuthApi, { getToken } from '../auth/useAuthApi'; // Import hook useAuthApi và hàm getToken
 

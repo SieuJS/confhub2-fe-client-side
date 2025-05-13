@@ -1,4 +1,4 @@
-// frontend/getListConferences.ts
+// sr/app/api/conference/getListConferences.ts
 "use_client";
 import { appConfig } from '@/src/middleware';
 import { ConferenceListResponse } from '../../../models/response/conference.list.response';

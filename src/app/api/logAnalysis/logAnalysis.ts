@@ -1,4 +1,4 @@
-// src/services/logAnalysisApi.ts
+// src/app/api/logAnalysis/logAnalysis.ts
 import { LogAnalysisResult } from '../../../models/logAnalysis/logAnalysis';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;

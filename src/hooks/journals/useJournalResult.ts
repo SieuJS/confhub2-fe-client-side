@@ -34,7 +34,7 @@ const useJournalResults = ({ initialData }: UseJournalResultsProps = {}) => {
                 setError(null);
                 try {
                     console.log("Fetching base journal data from API...");
-                    const response = await fetch('/api/journal'); // Gọi API endpoint
+                    const response = await fetch('/api/journals'); // Gọi API endpoint
                     if (!response.ok) {
                         throw new Error(`API call failed with status: ${response.status}`);
                     }

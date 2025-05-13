@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'; // Thêm useRef
-import { fetchVisualizationData } from '@/src/app/api/visualization/visualizationApi';
+import { fetchVisualizationData } from '@/src/app/api/visualization/visualization';
 import { ConferenceDetailsListResponse } from '@/src/models/response/conference.response';
 
 interface UseVisualizationDataReturn {

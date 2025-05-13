@@ -29,13 +29,34 @@ async function readJsonlFile(filePath: string): Promise<JournalResponse[]> {
 
 export async function GET() {
     try {
-        const dataDir = path.join(process.cwd(), 'src', 'models', 'journalData');
-        const allFiles = await fs.promises.readdir(dataDir);
+        const cwd = process.cwd();
+        console.log(`Current working directory: ${cwd}`); // Log CWD
+        const dataDir = path.join(cwd, 'src', 'models', 'journalData');
+        console.log(`Calculated data directory: ${dataDir}`); // Log dataDir
+
+        let allFiles: string[] = [];
+        try {
+            allFiles = await fs.promises.readdir(dataDir);
+            console.log(`Files found in ${dataDir}:`, allFiles); // Log found files
+        } catch (readDirError: any) {
+            console.error(`Error reading directory ${dataDir}:`, readDirError.message);
+            if (readDirError.code === 'ENOENT') {
+                console.error(`Directory not found! Path: ${dataDir}`); // Specific log for directory not found
+            }
+            throw readDirError; // Rethrow to catch in main catch block
+        }
+
+
         const jsonlFiles = allFiles.filter(file => file.endsWith('.jsonl'));
+        console.log(`Filtered .jsonl files:`, jsonlFiles); // Log filtered files
 
         if (jsonlFiles.length === 0) {
             console.warn("No .jsonl files found in", dataDir);
-            return NextResponse.json([]); // Trả về mảng rỗng nếu không có file
+            // Vẫn trả về 200 OK với mảng rỗng, vì API hoạt động nhưng không có data.
+            // Lỗi 404 ở client có thể do front-end xử lý khi nhận mảng rỗng.
+            // Nếu bạn muốn 404 khi không có file, thay dòng dưới bằng:
+            // return NextResponse.json({ message: 'No data files found' }, { status: 404 });
+            return NextResponse.json([]);
         }
 
         let allJournals: JournalResponse[] = [];
@@ -51,8 +72,9 @@ export async function GET() {
         console.log(`Successfully loaded a total of ${allJournals.length} journals from ${jsonlFiles.length} files.`);
         return NextResponse.json(allJournals);
 
-    } catch (error) {
-        console.error('Failed to load journals:', error);
-        return NextResponse.json({ message: 'Internal Server Error: Failed to load journals' }, { status: 500 });
+    } catch (error: any) {
+        console.error('Failed to load journals:', error.message, error); // Log đầy đủ lỗi
+        // Trả về lỗi 500 nếu có lỗi xảy ra trong quá trình xử lý (đọc thư mục, file, parse)
+        return NextResponse.json({ message: 'Internal Server Error: Failed to load journals', error: error.message }, { status: 500 });
     }
 }

@@ -1,4 +1,4 @@
-// src/app/api/conference/visualizationApi.ts
+// src/app/api/visualization/visualization.ts
 
 import { appConfig } from "@/src/middleware";
 import { ConferenceDetailsListResponse } from "@/src/models/response/conference.response";
