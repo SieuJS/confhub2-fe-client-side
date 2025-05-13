@@ -154,7 +154,7 @@ export default function MainLayout({
       {!isOutputSettingsOpen && (
         <button
           onClick={() => setIsOutputSettingsOpen(true)}
-          className='bg-white-pure hover:bg-gray-5 fixed left-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full shadow-lg hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 '
+          className='fixed left-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white-pure shadow-lg hover:bg-gray-5 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 '
           title='Open settings'
           aria-label='Open settings'
           aria-expanded={isOutputSettingsOpen} // Technically false here, but reflects the state it controls
@@ -206,7 +206,7 @@ export default function MainLayout({
           )}
         </div>
         {/* Chat Input Area (same as before) */}
-        <div className='flex items-center gap-2 rounded-full border border-gray-300 bg-gray-100 p-1.5'>
+        <div className='flex items-center gap-2 rounded-3xl border border-gray-300 bg-gray-100 p-1'>
           <ConnectionButton
             connected={connected}
             connect={connectWithPermissions}

@@ -1,4 +1,4 @@
-// hooks/useFollowConference.ts
+// /src/hooks/useFollowConference.ts
 import { useState, useEffect } from 'react';
 import { ConferenceResponse } from '../../models/response/conference.response';
 import { Follow, UserResponse } from '../../models/response/user.response';

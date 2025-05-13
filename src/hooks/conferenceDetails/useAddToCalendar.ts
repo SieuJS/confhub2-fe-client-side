@@ -1,4 +1,4 @@
-// hooks/useAddToCalendar.ts
+// /src/hooks/useAddToCalendar.ts
 import { useState, useEffect } from 'react';
 import { ConferenceResponse } from '../../models/response/conference.response';
 import { Calendar } from '../../models/response/user.response';

@@ -1010,5 +1010,12 @@
   "Close_Chatbot": "Close Chatbot",
   "Chat_Settings": "Chat Settings",
   "Close_Chat": "Close Chat",
-  "Open_Chat": "Open Chat"
+  "Open_Chat": "Open Chat",
+  "Blacklist_Requires_Unfollow_Calendar": "You must unfollow this conference and remove it from your calendar before blacklisting.",
+  "Remove_Blacklist_First_Tooltip": "Remove from blacklist first to perform this action.",
+  "FloatingChat_Hide_Toolbar": "Hide Toolbar",
+  "FloatingChat_Hide_Thought_Process": "Hide Thought Process",
+  "FloatingChat_Hide_Toolbar_Description": "Hide the toolbar for a cleaner chat interface.",
+  "FloatingChat_Hide_Thought_Process_Description": "Hide the thought process for a more streamlined chat experience.",
+  "Toggle user menu": "Toggle user menu"
 }
