@@ -15,6 +15,7 @@ type LoginFormProps = {
 const LoginForm: React.FC<LoginFormProps> = (/* props: LoginFormProps */) => {
   const t = useTranslations('')
   const nextIntlRouter = useNextIntlRouter(); // For navigation that preserves locale
+  const [showPassword, setShowPassword] = useState(false)
 
   const {
     email,
@@ -126,18 +127,34 @@ const LoginForm: React.FC<LoginFormProps> = (/* props: LoginFormProps */) => {
                   </div>
                 </div>
                 <div className='mt-1'>
-                  <input
-                    id='password'
-                    name='password'
-                    type='password'
-                    autoComplete='current-password'
-                    required
-                    value={password}
-                    onChange={handlePasswordChange}
-                    className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm'
-                    placeholder='••••••••'
-                    disabled={isLoading}
-                  />
+                  <div className='relative'>
+                    <input
+                      id='password'
+                      name='password'
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete='current-password'
+                      required
+                      value={password}
+                      onChange={handlePasswordChange}
+                      className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm'
+                      placeholder='••••••••'
+                      disabled={isLoading}
+                    />
+                    {password && 
+                      <button
+                      type='button'
+                      onClick={() => setShowPassword(!showPassword)}
+                      className='absolute right-2 top-1/2 -translate-y-1/2 text-xl'
+                      >
+                        <span className="relative inline-block w-6 text-xl leading-none">
+                          👁️
+                          {showPassword && (
+                            <span className="absolute left-0 top-1/2 h-[2px] w-[28px] -translate-y-1/2 -rotate-45 bg-black"></span>
+                          )}
+                        </span>
+                      </button>
+                    }
+                  </div>
                 </div>
               </div>
 

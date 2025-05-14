@@ -77,8 +77,8 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
       setError(null);
   
       try {
-        const response = await fetch(`${API_ENDPOINT}${isAddToCalendar ? '/calendar/remove-event' :'/calendar/add-event'}`, {
-          method: 'PUT',
+        const response = await fetch(`${API_ENDPOINT}${isAddToCalendar ? '/calendar/remove' :'/calendar/add'}`, {
+          method: 'POST',
           headers: {
           'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
