@@ -58,6 +58,13 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
       setError(t('Error_Password_Too_Short'));
       return;
     }
+    const allowRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]*$/;
+
+    if (!allowRegex.test(password)) {
+      setError(t('Error_Invalid_Password_Format'));
+      return;
+    }
+
     if (!isOldEnough(dob)) {
       setError(t('Error_Age_Requirement'));
       return;
@@ -183,7 +190,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
                 <label htmlFor='confirmPassword' className='block text-sm font-medium '>{t('Confirm_Password')} <span className='text-red-500'>*</span></label>
                 <div className='mt-1'>
                   <div className='relative'>
-                    <input id='confirmPassword' name='confirmPassword' type={showConfirmPassword ? 'text' : 'password'} required value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm' placeholder='••••••••' disabled={isLoading}/>
+                    <input id='confirmPassword' name='confirmPassword' type={showConfirmPassword ? 'text' : 'password'} required value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm' placeholder='••••••••' disabled={isLoading} />
                     {confirmPassword && 
                       <button
                         type='button'

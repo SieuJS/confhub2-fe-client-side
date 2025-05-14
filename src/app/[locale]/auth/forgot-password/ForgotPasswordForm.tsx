@@ -50,6 +50,13 @@ const ForgotPasswordForm = () => {
     setError('')
     setSuccess('')
 
+    const allowRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]*$/;
+
+    if (!allowRegex.test(newPassword)) {
+      setError(t('Error_Invalid_Password_Format'));
+      setIsLoading(false)
+      return;
+    }
     try {
       await axios.post(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/reset-password`, {
         email,

@@ -22,6 +22,7 @@ export const useChangePassword = (userId: string, onClose: () => void) => {
     setError(null);
   };
 
+  
   const handleConfirmNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setConfirmNewPassword(e.target.value);
     setError(null);
@@ -34,6 +35,14 @@ export const useChangePassword = (userId: string, onClose: () => void) => {
 
     if (newPassword !== confirmNewPassword) {
       setError('New passwords do not match.');
+      setIsLoading(false);
+      return;
+    }
+
+    const allowRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]*$/;
+
+    if (!allowRegex.test(newPassword)) {
+      setError('New passwords is invalid format.');
       setIsLoading(false);
       return;
     }
