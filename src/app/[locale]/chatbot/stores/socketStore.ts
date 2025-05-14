@@ -10,7 +10,8 @@ export interface SocketStoreState {
     authToken: string | null; // Sửa: Khởi tạo là null, sẽ được set từ AuthContext
     isConnected: boolean;
     socketId: string | null;
-    socketRef: React.MutableRefObject<Socket | null>; // Not persisted
+    socket: Socket | null; // <<<< THAY ĐỔI: socketRef -> socket
+
     isServerReadyForCommands: boolean;
     hasFatalConnectionError: boolean;
 }
@@ -39,7 +40,7 @@ export interface SocketStoreActions {
 
 
     // Actions that emit socket events (can be called from other stores or components)
-    emitGetInitialConversations: () => void;
+    emitGetConversationList: () => void;
     emitLoadConversation: (conversationId: string) => void;
     emitStartNewConversation: (payload?: Record<string, any>) => void;
     emitUserConfirmEmail: (confirmationId: string) => void;
@@ -55,7 +56,7 @@ const initialSocketStoreState: SocketStoreState = {
     authToken: null, // <<<< THAY ĐỔI: Khởi tạo là null
     isConnected: false,
     socketId: null,
-    socketRef: { current: null },
+    socket: null, // <<<< THAY ĐỔI
     isServerReadyForCommands: false,
     hasFatalConnectionError: false,
 };
@@ -74,22 +75,27 @@ export const useSocketStore = create<SocketStoreState & SocketStoreActions>()(
                 set({ authToken: token, hasFatalConnectionError: false });
             },
             // initializeAuth: () => { /* <<<< LOẠI BỎ initializeAuth >>>> */ },
-            setSocketInstance: (socket) => {
-                const currentStoreSocketRef = get().socketRef;
-                currentStoreSocketRef.current = socket;
-                console.log('[SocketStore] setSocketInstance called. New socket.current set.', socket ? socket.id : null);
+            setSocketInstance: (newSocketInstance) => { // đổi tên param cho rõ
+                // Ngắt kết nối socket cũ nếu có và khác với socket mới
+                const currentSocket = get().socket;
+                if (currentSocket && currentSocket !== newSocketInstance && currentSocket.connected) {
+                    console.log('[SocketStore] Disconnecting old socket instance before setting new one.');
+                    currentSocket.disconnect();
+                }
+                set({ socket: newSocketInstance }); // <<<< THAY ĐỔI
+                console.log('[SocketStore] setSocketInstance called. New socket set.', newSocketInstance ? newSocketInstance.id : null);
+            },
+            disconnectSocket: () => {
+                const currentSocket = get().socket; // <<<< THAY ĐỔI
+                if (currentSocket) {
+                    console.log('[SocketStore] disconnectSocket called. Disconnecting...');
+                    currentSocket.disconnect();
+                }
             },
             setIsConnected: (status, socketId = null) => set({ isConnected: status, socketId: status ? socketId : null }, false, 'setIsConnected'),
             setIsServerReadyForCommands: (isReady) => set({ isServerReadyForCommands: isReady }, false, 'setIsServerReadyForCommands'),
             setHasFatalConnectionError: (hasError) => set({ hasFatalConnectionError: hasError }, false, 'setHasFatalConnectionError'),
-            disconnectSocket: () => {
-                const socket = get().socketRef.current;
-                if (socket) {
-                    console.log('[SocketStore] disconnectSocket called. Disconnecting...');
-                    socket.disconnect();
-                }
-                // Không reset authToken ở đây. Việc này sẽ do AuthContext và useChatSocketManager quyết định.
-            },
+
 
             _onSocketConnect: (socketIdParam) => {
                 console.log(`[SocketStore _onSocketConnect] Connected with ID ${socketIdParam}`);
@@ -128,81 +134,87 @@ export const useSocketStore = create<SocketStoreState & SocketStoreActions>()(
             _onSocketConnectionReady: (payload) => {
                 console.log(`[SocketStore _onSocketConnectionReady] Server ready. UserID: ${payload.userId}`);
                 set({ isServerReadyForCommands: true }, false, '_onSocketConnectionReady');
-                get().emitGetInitialConversations();
+                // get().emitGetInitialConversations(); // Dòng cũ
+                get().emitGetConversationList(); // <<<< SỬA TÊN HÀM GỌI (nếu bạn tạo hàm mới) HOẶC TRỰC TIẾP TÊN EVENT
             },
 
-            // --- Emitters (giữ nguyên) ---
-            emitGetInitialConversations: () => {
-                const { socketRef, isConnected } = get();
-                if (socketRef.current && isConnected) {
-                    console.log('[SocketStore] Emitting get_initial_conversations');
-                    socketRef.current.emit('get_initial_conversations');
+
+            // Sửa tên hàm emit hoặc tạo hàm mới
+            emitGetConversationList: () => { // <<<< TẠO HÀM MỚI HOẶC ĐỔI TÊN emitGetInitialConversations
+                const { socket, isConnected } = get();
+                if (socket && isConnected) {
+                    console.log('[SocketStore] Emitting get_conversation_list'); // <<<< SỬA TÊN EVENT
+                    socket.emit('get_conversation_list'); // <<<< SỬA TÊN EVENT
                 } else {
-                    console.warn('[SocketStore] Cannot emit get_initial_conversations: Socket not ready.');
+                    console.warn('[SocketStore] Cannot emit get_conversation_list: Socket not ready.');
                 }
             },
             emitLoadConversation: (conversationId) => {
-                const { socketRef, isConnected } = get();
-                if (socketRef.current && isConnected && conversationId) {
+                const { socket, isConnected } = get();
+                if (socket && isConnected && conversationId) {
                     console.log(`[SocketStore] Emitting load_conversation for ID: ${conversationId}`);
-                    socketRef.current.emit('load_conversation', { conversationId });
+                    socket.emit('load_conversation', { conversationId });
                 } else {
                     console.warn('[SocketStore] Cannot emit load_conversation: Socket not ready or no ID.');
                 }
             },
             emitStartNewConversation: (payload = {}) => {
-                const { socketRef, isConnected } = get();
-                if (socketRef.current && isConnected) {
-                    console.log('[SocketStore] Emitting start_new_conversation');
-                    socketRef.current.emit('start_new_conversation', payload);
+                const { socket, isConnected } = get();
+                if (socket && isConnected) {
+                    socket.emit('start_new_conversation', payload);
                 } else {
                     console.warn('[SocketStore] Cannot emit start_new_conversation: Socket not ready.');
                 }
             },
             emitUserConfirmEmail: (confirmationId) => {
-                const { socketRef, isConnected } = get();
-                if (socketRef.current && isConnected) {
-                    socketRef.current.emit('user_confirm_email', { confirmationId });
+                const { socket, isConnected } = get();
+                if (socket && isConnected) {
+                    socket.emit('user_confirm_email', { confirmationId });
                 }
             },
             emitUserCancelEmail: (confirmationId) => {
-                const { socketRef, isConnected } = get();
-                if (socketRef.current && isConnected) {
-                    socketRef.current.emit('user_cancel_email', { confirmationId });
+                const { socket, isConnected } = get();
+                if (socket && isConnected) {
+                    socket.emit('user_cancel_email', { confirmationId });
                 }
             },
             emitDeleteConversation: (conversationId) => {
-                const { socketRef, isConnected } = get();
-                if (socketRef.current && isConnected && conversationId) {
-                    socketRef.current.emit('delete_conversation', { conversationId });
+                const { socket, isConnected } = get();
+
+                if (socket && isConnected && conversationId) {
+                    socket.emit('delete_conversation', { conversationId });
                 }
             },
             emitClearConversation: (conversationId) => {
-                const { socketRef, isConnected } = get();
-                if (socketRef.current && isConnected && conversationId) {
-                    socketRef.current.emit('clear_conversation', { conversationId });
+                const { socket, isConnected } = get();
+
+                if (socket && isConnected && conversationId) {
+                    socket.emit('clear_conversation', { conversationId });
                 }
             },
             emitRenameConversation: (conversationId, newTitle) => {
-                const { socketRef, isConnected } = get();
-                if (socketRef.current && isConnected && conversationId) {
-                    socketRef.current.emit('rename_conversation', { conversationId, newTitle });
+                const { socket, isConnected } = get();
+
+                if (socket && isConnected && conversationId) {
+                    socket.emit('rename_conversation', { conversationId, newTitle });
                 }
             },
             emitPinConversation: (conversationId, isPinned) => {
-                const { socketRef, isConnected } = get();
-                if (socketRef.current && isConnected && conversationId) {
-                    socketRef.current.emit('pin_conversation', { conversationId, isPinned });
+                const { socket, isConnected } = get();
+
+                if (socket && isConnected && conversationId) {
+                    socket.emit('pin_conversation', { conversationId, isPinned });
                 }
             },
-             emitSendMessage: (payload) => {
-                const { socketRef, isConnected, isServerReadyForCommands } = get();
-                if (!socketRef.current || !isConnected || !isServerReadyForCommands) {
+            emitSendMessage: (payload) => {
+                const { socket, isConnected, isServerReadyForCommands } = get();
+                if (!socket || !isConnected || !isServerReadyForCommands) {
+
                     useUiStore.getState().handleError({ message: "Cannot send message: Not connected or server not ready.", type: 'error' }, false, false);
                     return;
                 }
-                console.log(`[SocketStore] Emitting 'send_message'. ConvID: ${payload.conversationId}, Lang: ${payload.language}, Stream: ${payload.isStreaming}. Socket ID: ${socketRef.current?.id}`);
-                socketRef.current.emit('send_message', payload);
+                console.log(`[SocketStore] Emitting 'send_message'. ... Socket ID: ${socket?.id}`);
+                socket.emit('send_message', payload);
             },
         }),
         // devtools config

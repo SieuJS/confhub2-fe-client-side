@@ -88,21 +88,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const _handleAuthSuccess = useCallback((authData: AuthResponse, customRedirectPath?: string) => {
     _persistAuthDataToLocalStorage(authData);
-    setUserState(authData.user);
+    setUserState(authData.user); // Sử dụng setUserState
     setIsLoggedIn(true);
     setError(null);
 
-    // Ưu tiên customRedirectPath, sau đó là returnUrl từ localStorage, cuối cùng là '/'
-    const redirectTarget = customRedirectPath || localStorage.getItem(LOCAL_STORAGE_KEYS.RETURN_URL) || '/';
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.RETURN_URL); // Xóa sau khi dùng
-    console.log("[AuthProvider] Auth success. Redirecting to:", redirectTarget);
-    router.push(redirectTarget);
-  }, [router]);
+    const returnUrl = customRedirectPath || localStorage.getItem(LOCAL_STORAGE_KEYS.RETURN_URL) || '/';
+    localStorage.removeItem(LOCAL_STORAGE_KEYS.RETURN_URL);
+    console.log("[AuthProvider] Auth success. Redirecting to:", returnUrl);
+    router.push(returnUrl);
+  }, [router]); // Không cần updateAuthUser ở đây vì _handleAuthSuccess đã xử lý cả user và token
 
   const _performLogout = useCallback(async (options?: { preventRedirect?: boolean; callApi?: boolean }) => {
     console.log("[AuthProvider] Performing logout. Options:", options);
-    _clearAuthDataFromLocalStorage(); // Sẽ xóa cả returnUrl nếu có
-    setUserState(null);
+    _clearAuthDataFromLocalStorage();
+    setUserState(null); // Sử dụng setUserState
     setIsLoggedIn(false);
     setError(null);
 
@@ -113,18 +112,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.warn("[AuthProvider] Failed to call server logout API.", e);
       }
     }
-
     if (!options?.preventRedirect) {
-      // <<<< LOGIC REDIRECT KHI LOGOUT >>>>
-      // Thông thường, khi logout, ta sẽ về trang chủ hoặc trang login.
-      // Việc redirect về returnUrl (có thể là trang cần auth) là không phổ biến.
-      // Tuy nhiên, nếu bạn MUỐN logout cũng về returnUrl (NẾU CÓ):
-      // const redirectTarget = localStorage.getItem(LOCAL_STORAGE_KEYS.RETURN_URL) || '/';
-      // localStorage.removeItem(LOCAL_STORAGE_KEYS.RETURN_URL); // Xóa nếu dùng cho logout
-      // router.push(redirectTarget);
-
-      // HÀNH VI MẶC ĐỊNH HIỆN TẠI (VỀ TRANG CHỦ):
-      console.log("[AuthProvider] Logout: Redirecting to /");
       router.push('/');
     }
   }, [router]);
@@ -186,37 +174,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
   }, [_performLogout]); // user không nên là dependency ở đây để tránh vòng lặp
 
-  // Hàm logout gọi _performLogout
-  const logout = async (options?: { callApi?: boolean }): Promise<void> => {
-    setIsLoading(true);
-    await _performLogout({ callApi: options?.callApi ?? true }); // Sẽ redirect theo logic trong _performLogout
-    setIsLoading(false);
-  };
-
-  // Hàm googleSignIn và các hàm khác có thể lưu returnUrl
-  const googleSignIn = async (): Promise<void> => {
-    setIsLoading(true);
-    const currentPath = window.location.pathname + window.location.search;
-    // Chỉ lưu returnUrl nếu người dùng chưa đăng nhập
-    if (!isLoggedIn) {
-      localStorage.setItem(LOCAL_STORAGE_KEYS.RETURN_URL, currentPath);
-      console.log("[AuthProvider] googleSignIn: Stored returnUrl:", currentPath);
-    }
-    // Chuyển hướng đến API route xử lý Google OAuth phía backend/Next.js
-    window.history.pushState(null, '', '/api/v1/auth/google');
-  };
-
-  // Hàm signIn cũng nên lưu returnUrl nếu cần, nhưng thường thì trang login đã tự xử lý
-  // việc này bằng cách không cho truy cập nếu đã login, hoặc returnUrl được set
-  // bởi một middleware bảo vệ route.
-  // Nếu không, có thể thêm vào hàm signIn:
   const signIn = async (credentials: Record<string, string>): Promise<void> => {
     setIsLoading(true);
     setError(null);
-    // const currentPath = window.location.pathname + window.location.search;
-    // if (!isLoggedIn && currentPath !== '/auth/login') { // Giả sử trang login là /auth/login
-    //     localStorage.setItem(LOCAL_STORAGE_KEYS.RETURN_URL, currentPath);
-    // }
     try {
       const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/login`, {
         method: 'POST',
@@ -225,7 +185,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
       const data = await response.json();
       if (response.ok && data.user && data.token) {
-        _handleAuthSuccess(data as AuthResponse); // _handleAuthSuccess sẽ đọc returnUrl
+        _handleAuthSuccess(data as AuthResponse);
       } else {
         setError(data.message || 'Incorrect email or password.');
       }
@@ -234,6 +194,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const googleSignIn = async (): Promise<void> => {
+    setIsLoading(true);
+    const currentPath = window.location.pathname + window.location.search;
+    localStorage.setItem(LOCAL_STORAGE_KEYS.RETURN_URL, currentPath);
+    window.location.href = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/google`;
   };
 
   const processTokenFromOAuth = useCallback(async (token: string, customRedirectPath?: string): Promise<void> => {
@@ -259,8 +226,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [_handleAuthSuccess, _performLogout]);
 
+  const logout = async (options?: { callApi?: boolean }): Promise<void> => {
+    setIsLoading(true);
+    await _performLogout({ callApi: options?.callApi ?? true });
+    setIsLoading(false);
+  };
 
-  const getToken = (): string | null => _getStoredToken();
+  const getToken = useCallback((): string | null => _getStoredToken(), []); // Bọc trong useCallback
 
   const contextValue = {
     user, // State user
