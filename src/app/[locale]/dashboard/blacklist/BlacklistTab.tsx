@@ -1,12 +1,7 @@
 // BlacklistTab.tsx
 import React, { useState, useEffect, useCallback } from 'react'
 import ConferenceItem from '../../conferences/ConferenceItem'
-import { getListConferenceFromJSON } from '../../../../app/api/conference/getListConferences'
 import { ConferenceInfo } from '../../../../models/response/conference.list.response'
-import {
-  UserResponse,
-  Blacklist
-} from '../../../../models/response/user.response'
 import { timeAgo, formatDateFull } from '../timeFormat'
 import Tooltip from '../../utils/Tooltip'
 import { useTranslations } from 'next-intl'

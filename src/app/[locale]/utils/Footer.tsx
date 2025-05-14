@@ -58,7 +58,7 @@ const Footer = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link href='/chatbot' className='hover:text-text-secondary'>
+                    <Link href='/chatbot/landingchatbot' className='hover:text-text-secondary'>
                       {t('Chatbot')}
                     </Link>
                   </li>

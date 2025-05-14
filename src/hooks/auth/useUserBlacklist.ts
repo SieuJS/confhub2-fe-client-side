@@ -1,44 +1,49 @@
 // src/hooks/auth/useUserBlacklist.ts
 import { useState, useEffect, useCallback } from 'react';
 import { appConfig } from '@/src/middleware';
+import { useAuth } from '@/src/contexts/AuthContext'; // <<<< THAY ĐỔI QUAN TRỌNG
 
 interface UseUserBlacklistResult {
-  blacklistedEventIds: string[]; // Array of event IDs that are blacklisted
-  loading: boolean;              // Whether the blacklist data is currently loading
-  error: string | null;          // Any error that occurred during fetching
-  isLoggedIn: boolean;           // Whether the user is currently logged in based on localStorage
-  refetch: () => void;           // Function to manually refetch the blacklist
+  blacklistedEventIds: string[];
+  loading: boolean;
+  error: string | null;
+  refetch: () => void; // Giữ lại refetch thủ công nếu cần
 }
 
 const API_GET_BLACKLIST_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/blacklist-conference`;
 
 const useUserBlacklist = (): UseUserBlacklistResult => {
   const [blacklistedEventIds, setBlacklistedEventIds] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false); // Bắt đầu là false, chỉ true khi fetch
   const [error, setError] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  // Using a state variable or refetch dependency to trigger manual refetches
-  const [refetchTrigger, setRefetchTrigger] = useState(0);
 
+  // <<<< THAY ĐỔI QUAN TRỌNG: Lấy thông tin từ AuthContext >>>>
+  const { isLoggedIn, getToken, isInitializing: isAuthInitializing } = useAuth();
 
   const fetchData = useCallback(async () => {
+    // Không fetch nếu AuthProvider chưa khởi tạo xong hoặc người dùng chưa đăng nhập
+    if (isAuthInitializing || !isLoggedIn) {
+      setBlacklistedEventIds([]); // Xóa blacklist nếu không đăng nhập hoặc đang khởi tạo
+      setLoading(false); // Đảm bảo loading là false
+      setError(null); // Xóa lỗi cũ nếu có
+      return;
+    }
+
+    const token = getToken(); // Lấy token từ AuthContext
+
+    if (!token) {
+      console.warn('[useUserBlacklist] User is logged in, but no token found. Cannot fetch blacklist.');
+      setBlacklistedEventIds([]);
+      setLoading(false);
+      setError('Authentication token not available.'); // Thông báo lỗi rõ ràng hơn
+      return;
+    }
+
+    console.log('[useUserBlacklist] Fetching blacklist data...');
     setLoading(true);
-    setError(null); // Clear previous errors
+    setError(null);
 
     try {
-      const userData = localStorage.getItem('user');
-      const token = localStorage.getItem('token');
-
-      // Check if user data and token exist
-      if (!userData || !token) {
-        setIsLoggedIn(false);
-        setBlacklistedEventIds([]); // Clear blacklist if not logged in
-        setLoading(false);
-        return;
-      }
-
-      setIsLoggedIn(true); // User data found, assume logged in
-
       const response = await fetch(API_GET_BLACKLIST_ENDPOINT, {
         method: 'GET',
         headers: {
@@ -52,38 +57,49 @@ const useUserBlacklist = (): UseUserBlacklistResult => {
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
-      const data: Array<{ conferenceId: string, [key: string]: any }> = await response.json(); // API response is an array of objects including conferenceId
+      // Giả sử API trả về: { success: true, data: [{ conferenceId: "id1" }, { conferenceId: "id2" }] }
+      // Hoặc chỉ là mảng: [{ conferenceId: "id1" }, { conferenceId: "id2" }]
+      const responseData: any = await response.json();
 
-      // Extract only the conference IDs
-      const ids = data.map(item => item.conferenceId).filter(id => id != null); // Filter out any potential null/undefined IDs
+      let ids: string[] = [];
+      if (responseData && Array.isArray(responseData.data)) { // Nếu có trường 'data' là mảng
+        ids = responseData.data.map((item: any) => item.conferenceId).filter((id: any) => typeof id === 'string');
+      } else if (Array.isArray(responseData)) { // Nếu response là một mảng trực tiếp
+         ids = responseData.map((item: any) => item.conferenceId).filter((id: any) => typeof id === 'string');
+      } else {
+        console.warn('[useUserBlacklist] Unexpected data format for blacklist:', responseData);
+      }
 
       setBlacklistedEventIds(ids);
 
     } catch (err: any) {
-      console.error('Failed to fetch blacklist data:', err);
+      console.error('[useUserBlacklist] Failed to fetch blacklist data:', err);
       setError(err.message || 'Failed to fetch blacklist data');
-      setBlacklistedEventIds([]); // Clear list on error
+      setBlacklistedEventIds([]);
     } finally {
       setLoading(false);
     }
-  }, [refetchTrigger]); // Add refetchTrigger as a dependency
+    // Dependencies cho fetchData:
+    // isAuthInitializing, isLoggedIn, getToken là các giá trị/hàm từ useAuth,
+    // chúng nên ổn định hoặc thay đổi khi trạng thái auth thực sự thay đổi.
+  }, [isAuthInitializing, isLoggedIn, getToken]);
 
-  // Fetch data when the component mounts or refetchTrigger changes
+  // Fetch data khi component mount và khi trạng thái đăng nhập hoặc token thay đổi
   useEffect(() => {
+    fetchData();
+  }, [fetchData]); // fetchData đã bao gồm các dependencies cần thiết từ useAuth
+
+  // Hàm refetch thủ công vẫn giữ nguyên cách hoạt động là gọi lại fetchData
+  const refetch = useCallback(() => {
     fetchData();
   }, [fetchData]);
 
-  // Function to trigger a manual refetch
-  const refetch = useCallback(() => {
-    setRefetchTrigger(prev => prev + 1);
-  }, []);
-
+  // Không cần trả về isLoggedIn nữa vì component sử dụng hook này có thể lấy từ useAuth()
   return {
     blacklistedEventIds,
     loading,
     error,
-    isLoggedIn,
-    refetch // Return the refetch function
+    refetch,
   };
 };
 

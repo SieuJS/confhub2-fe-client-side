@@ -115,7 +115,7 @@ export default function Conferences({
         </div>
       </div>
       <Footer />
-            <FloatingChatbot /> {/* <-- THÊM CHATBOT NỔI Ở ĐÂY */}
+      <FloatingChatbot /> {/* <-- THÊM CHATBOT NỔI Ở ĐÂY */}
 
     </>
   )

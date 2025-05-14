@@ -16,6 +16,7 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import './globals.css'
 import ChatbotGlobalInitializer from './chatbot/ChatbotGlobalInitializer' // <-- IMPORT MỚI
+import { AuthProvider } from '@/src/contexts/AuthContext'; // Điều chỉnh path nếu cần
 
 // ... (Phần định nghĩa fonts: spaceGrotesk, inter, rubik)
 const spaceGrotesk = localFont({
@@ -107,59 +108,62 @@ export default function RootLayout({
         />
       </head>
       <body>
-        {/* --- ThemeProvider bao bọc mọi thứ để ToastContainer có thể nhận theme --- */}
-        <ThemeProvider
-          enableSystem
-          attribute='class'
-          defaultTheme='light'
-          themes={[
-            'light',
-            'dark',
-            'instagram',
-            'facebook',
-            'discord',
-            'netflix',
-            'twilight',
-            'reddit'
-          ]}
-        >
-          {/* --- ToastContainer đặt ở đây --- */}
-          {/* Có thể thêm props để tùy chỉnh, ví dụ: position, autoClose, theme */}
-          <ToastContainer
-            position='top-right' // Vị trí hiển thị (phổ biến)
-            autoClose={3000} // Tự động đóng sau 3 giây
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={locale === 'ar' || locale === 'fa'} // Hỗ trợ RTL nếu cần
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme='colored' // Sử dụng theme màu ('light', 'dark', 'colored') - 'colored' sẽ có màu theo type (success, error,...)
-          />
-
-          {/* --- NextIntlClientProvider --- */}
-          <NextIntlClientProvider
-            locale={locale}
-            messages={messages as AbstractIntlMessages}
+        <AuthProvider> {/* Bọc toàn bộ ứng dụng hoặc phần cần xác thực */}
+          {/* --- ThemeProvider bao bọc mọi thứ để ToastContainer có thể nhận theme --- */}
+          <ThemeProvider
+            enableSystem
+            attribute='class'
+            defaultTheme='light'
+            themes={[
+              'light',
+              'dark',
+              'instagram',
+              'facebook',
+              'discord',
+              'netflix',
+              'twilight',
+              'reddit'
+            ]}
           >
-            <ChatbotGlobalInitializer /> {/* <-- SỬ DỤNG Ở ĐÂY */}
-            {/* --- NextTopLoader --- */}
-            <NextTopLoader
-              initialPosition={0.08}
-              crawlSpeed={200}
-              height={3}
-              crawl={true}
-              easing='ease'
-              speed={200}
-              shadow='0 0 10px #2299DD,0 0 5px #2299DD'
-              color='var(--primary)'
-              showSpinner={false}
+            {/* --- ToastContainer đặt ở đây --- */}
+            {/* Có thể thêm props để tùy chỉnh, ví dụ: position, autoClose, theme */}
+            <ToastContainer
+              position='top-right' // Vị trí hiển thị (phổ biến)
+              autoClose={3000} // Tự động đóng sau 3 giây
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={locale === 'ar' || locale === 'fa'} // Hỗ trợ RTL nếu cần
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme='colored' // Sử dụng theme màu ('light', 'dark', 'colored') - 'colored' sẽ có màu theo type (success, error,...)
             />
-            {/* --- Nội dung chính của trang --- */}
-            <main className='mx-auto max-w-screen-2xl'>{children}</main>
-          </NextIntlClientProvider>
-        </ThemeProvider>
+
+            {/* --- NextIntlClientProvider --- */}
+            <NextIntlClientProvider
+              locale={locale}
+              messages={messages as AbstractIntlMessages}
+            >
+              <ChatbotGlobalInitializer /> {/* <-- SỬ DỤNG Ở ĐÂY */}
+              {/* --- NextTopLoader --- */}
+              <NextTopLoader
+                initialPosition={0.08}
+                crawlSpeed={200}
+                height={3}
+                crawl={true}
+                easing='ease'
+                speed={200}
+                shadow='0 0 10px #2299DD,0 0 5px #2299DD'
+                color='var(--primary)'
+                showSpinner={false}
+              />
+              {/* --- Nội dung chính của trang --- */}
+              <main className='mx-auto max-w-screen-2xl'>{children}</main>
+            </NextIntlClientProvider>
+          </ThemeProvider>
+        </AuthProvider>
+
       </body>
     </html>
   )

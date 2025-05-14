@@ -1,167 +1,139 @@
 // src/components/ProfileTab.tsx
-import React, { useState, useEffect } from 'react' // <--- useEffect already here
-import Image from 'next/image'
-import Button from '../../utils/Button'
-import { useTranslations } from 'next-intl'
-import { useUserData } from '@/src/hooks/dashboard/profile/useUserData'
-import { useEditProfile } from '@/src/hooks/dashboard/profile/useEditProfile'
-import { useImageSelection } from '@/src/hooks/dashboard/profile/useImageSelection'
-import { Link } from '@/src/navigation'
-import ChangePasswordForm from './ChangePasswordForm'
+'use client'; // Đảm bảo là client component
+
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+import Button from '../../utils/Button'; // Kiểm tra lại đường dẫn
+import { useTranslations } from 'next-intl';
+// import { useUserData } from '@/src/hooks/dashboard/profile/useUserData'; // Không cần hook này nữa nếu user lấy từ Context
+import { useEditProfile } from '@/src/hooks/dashboard/profile/useEditProfile';
+import { useImageSelection } from '@/src/hooks/dashboard/profile/useImageSelection';
+import { Link } from '@/src/navigation';
+import ChangePasswordForm from './ChangePasswordForm';
+import { useAuth } from '@/src/contexts/AuthContext'; // <<<< THAY ĐỔI QUAN TRỌNG
 
 const ProfileTab: React.FC = () => {
-  const t = useTranslations('')
+  const t = useTranslations('');
 
-  // Use the hook to get loading, error, and data states
-  const { userData, loading, error } = useUserData()
+  // <<<< THAY ĐỔI QUAN TRỌNG: Lấy user, isInitializing, error từ AuthContext
+  const { user: authUser, isInitializing: isAuthInitializing, error: authError, isLoggedIn } = useAuth();
 
+  // userData cho useEditProfile sẽ là authUser từ context
+  // initialUserData được truyền vào useEditProfile sẽ là authUser
+  // Điều này đảm bảo useEditProfile luôn làm việc với dữ liệu user mới nhất từ context.
   const {
     isEditing,
-    editedData,
+    editedData, // editedData này sẽ được khởi tạo từ authUser trong useEditProfile
     setEditedData,
     handleEditClick,
     handleSaveClick,
     handleCancelClick,
     handleInputChange,
     handleInterestedTopicsChange
-  } = useEditProfile(userData) // Pass userData to the hook
+  } = useEditProfile(authUser); // Truyền authUser làm initialUserData
 
   const {
     showModal: showAvatarModal,
     setShowModal: setShowAvatarModal,
     options: avatarOptions,
     handleImageSelect: handleAvatarSelect
-  } = useImageSelection('avatar', setEditedData)
+  } = useImageSelection('avatar', setEditedData);
 
   const {
     showModal: showBackgroundModal,
     setShowModal: setShowBackgroundModal,
     options: backgroundOptions,
     handleImageSelect: handleBackgroundSelect
-  } = useImageSelection('background', setEditedData)
+  } = useImageSelection('background', setEditedData);
 
   const predefinedTopics = [
-    'Blockchain',
-    'Chemical Biology',
-    'AI',
-    'Furniture',
-    'Home Improvement'
-  ]
+    'Blockchain', 'Chemical Biology', 'AI', 'Furniture', 'Home Improvement'
+    // Thêm các topic khác nếu cần
+  ];
 
-  const [showChangePasswordForm, setShowChangePasswordForm] = useState(false)
-
-  // --- START: Sửa lỗi Hydration cho Date of Birth (Giữ nguyên, cái này đúng) ---
-  const [formattedDob, setFormattedDob] = useState<string | null>(null) // State để lưu ngày sinh đã định dạng
+  const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
+  const [formattedDob, setFormattedDob] = useState<string | null>(null);
 
   useEffect(() => {
-    // Chỉ chạy ở client sau khi component đã mount
-    if (userData?.dob) {
+    // userData ở đây nên là authUser từ context
+    if (authUser?.dob) {
       try {
-        // Định dạng ngày tháng ở client
-        const date = new Date(userData.dob)
-        // Kiểm tra xem date có hợp lệ không trước khi định dạng
+        const date = new Date(authUser.dob);
         if (!isNaN(date.getTime())) {
-          // Sử dụng một định dạng chuẩn hoặc locale-aware để tránh lỗi hydration nếu có
-          // Ví dụ: 'YYYY-MM-DD' hoặc toLocaleDateString()
-          // toLocaleDateString() là an toàn vì nó chạy sau hydrate
-          setFormattedDob(date.toLocaleDateString())
+          setFormattedDob(date.toLocaleDateString(t('language_code') || undefined, { year: 'numeric', month: 'long', day: 'numeric' }));
         } else {
-          console.error('Invalid date format received for dob:', userData.dob)
-          setFormattedDob(t('Invalid_Date')) // Hoặc hiển thị thông báo lỗi
+          setFormattedDob(t('Invalid_Date'));
         }
       } catch (e) {
-        console.error('Error formatting date:', e)
-        setFormattedDob(t('Invalid_Date')) // Xử lý lỗi nếu có
+        setFormattedDob(t('Invalid_Date'));
       }
     } else {
-      setFormattedDob(null) // Reset nếu không có dob
+      setFormattedDob(null);
     }
-  }, [userData?.dob, t]) // Thêm dependency t nếu bạn dùng trong chuỗi lỗi
-  // --- END: Sửa lỗi Hydration ---
+  }, [authUser?.dob, t]);
 
-  // --- START: REMOVE THE PROBLEMATIC LOCALSTORAGE CHECK ---
-  // Remove this entire block:
-  /*
-  if (!localStorage.getItem('token')) {
-    if (loading) {
-      return <div className='container mx-auto p-4'>{t('Loading')}</div> // Show loading initially
-    }
-    return (
-      <div className='container mx-auto p-4'>
-        {t('Please_log_in_to_view_profile')}
-      </div>
-    )
-  }
-  */
-  // --- END: REMOVE ---
 
-  // --- Now, rely solely on the state from the useUserData hook ---
-
-  // Handle loading state from the hook
-  if (loading) {
+  // Xử lý trạng thái tải từ AuthProvider
+  if (isAuthInitializing) {
     return (
       <div className='flex h-screen items-center justify-center'>
-        <div className='h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900'></div>
+        {/* Spinner hoặc skeleton UI */}
+        <div className='h-20 w-20 animate-spin rounded-full border-b-2 border-t-2 border-gray-900'></div>
       </div>
-    )
+    );
   }
 
-  // Handle error state from the hook (This should now cover the "no token" case if the hook is implemented correctly)
-  if (error) {
-    // The hook should set error if no token is found or fetching fails.
-    // Display the error message provided by the hook.
-    return <div className='py-4 text-center text-red-500'>{error}</div>
+  // Xử lý lỗi từ AuthProvider (ví dụ: không thể fetch user ban đầu)
+  if (authError && !isLoggedIn) { // Chỉ hiển thị lỗi này nếu user thực sự chưa login
+    return <div className='py-6 text-center text-red-500'>{authError}</div>;
   }
 
-  // Handle the case where loading is false, no error, but no user data is returned (e.g., token invalid, or API issue)
-  // This might be redundant if the hook always sets an error for these cases, but good as a fallback.
-  if (!userData) {
-    // If the error message from the hook isn't specific enough for "not logged in",
-    // you could potentially add a check here if you can determine *why* userData is null
-    // (e.g., if the hook returns a specific type of error).
-    // For now, assume the hook sets an appropriate error message like "Please log in"
-    // if the token is missing or invalid. If not, you might need to adjust the hook
-    // or add a client-side check *after* loading is false and before rendering userData.
-    // However, relying *only* on the hook's states is the cleaner approach.
+  // Xử lý trường hợp chưa đăng nhập (sau khi AuthProvider đã khởi tạo)
+  if (!isLoggedIn) {
     return (
-      <div className='py-4 text-center'>
-        {t('No_user_data_found_or_not_logged_in')}
+      <div className='py-6 text-center'>
+        <p className="mb-4">{t('Please_log_in_to_view_profile')}</p>
+        <Link href="/auth/login">
+            <Button variant="primary">{t('Sign_In')}</Button>
+        </Link>
       </div>
-    )
+    );
   }
 
-  // If we reach here, loading is false, no error, and userData exists.
-  // Proceed with rendering the profile UI.
+  // Nếu đã đăng nhập nhưng không có thông tin user (ít khi xảy ra nếu logic AuthProvider đúng)
+  if (!authUser) {
+    return <div className='py-6 text-center'>{t('User_data_not_available')}</div>;
+  }
 
-  const displayAvatarUrl =
-    editedData.avatar || userData.avatar || '/avatar1.jpg'
-  const displayBackgroundUrl =
-    editedData.background || userData.background || '/bg-2.jpg'
+  // Nếu đến đây, isAuthInitializing là false, isLoggedIn là true, và authUser tồn tại.
+  // Dữ liệu để hiển thị (và chỉnh sửa) nên dựa trên authUser và editedData.
+  const displayUser = isEditing ? editedData : authUser;
+
+  const displayAvatarUrl = displayUser.avatar || authUser.avatar || '/defaults/avatar1.jpg'; // Fallback sâu hơn
+  const displayBackgroundUrl = displayUser.background || authUser.background || '/defaults/bg-2.jpg';
+
 
   const handleChangePasswordClick = () => {
-    setShowChangePasswordForm(true)
-  }
+    setShowChangePasswordForm(true);
+  };
 
   return (
-    <div className='w-full overflow-hidden rounded-lg bg-background shadow-md md:px-12 md:py-8'>
-      {/* Rest of your rendering logic remains the same */}
-
+    <div className='w-full overflow-hidden rounded-lg bg-background shadow-xl md:px-10 md:py-6'> {/* Tăng shadow và padding */}
       {/* Cover Photo */}
-      <div className='relative h-60 overflow-hidden rounded-lg md:h-80'>
-        {/* ... Image and Change Background Button ... */}
+      <div className='relative h-52 overflow-hidden rounded-t-lg md:h-72'> {/* Giảm chiều cao một chút */}
         <Image
           src={displayBackgroundUrl}
           alt='Cover Photo'
           fill
           style={{ objectFit: 'cover' }}
-          sizes='100vw' // Use a more specific size if possible, but 100vw is a common fallback
-          priority
+          sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw' // Tối ưu sizes
+          priority={!isEditing} // Priority nếu đang ở display mode
         />
         {isEditing && (
           <button
             type='button'
             onClick={() => setShowBackgroundModal(true)}
-            className='absolute bottom-2 right-2 rounded bg-background px-4 py-2 text-sm font-medium opacity-80 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
+            className='absolute bottom-3 right-3 rounded-md bg-black bg-opacity-50 px-3 py-1.5 text-xs font-medium text-white hover:bg-opacity-70 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800'
           >
             {t('Change_Background')}
           </button>
@@ -169,302 +141,228 @@ const ProfileTab: React.FC = () => {
       </div>
 
       {/* Profile Info Section */}
-      <div className='relative flex flex-col items-center gap-5 py-5 md:flex-row md:items-center md:px-6'>
-        <div className='relative -mt-40 h-40 w-40 overflow-hidden rounded-full border-4 border-button-text bg-background'>
-          <img
+      <div className='relative -mt-16 flex flex-col items-center px-4 pb-6 md:-mt-20 md:flex-row md:items-end md:space-x-5'>
+        <div className='relative h-32 w-32 overflow-hidden rounded-full border-4 border-white shadow-lg md:h-40 md:w-40 dark:border-gray-800'>
+          {/* Sử dụng Image component cho avatar nếu có thể, hoặc img nếu URL là external hoàn toàn */}
+          <Image
             src={displayAvatarUrl}
-            alt={`Avatar of ${userData.firstName} ${userData.lastName}`}
-            className='h-full w-full object-cover'
+            alt={`Avatar of ${authUser.firstName} ${authUser.lastName}`}
+            fill
+            style={{ objectFit: 'cover' }}
+            sizes="160px" // Kích thước của avatar
+            priority={!isEditing}
           />
           {isEditing && (
             <button
               type='button'
               onClick={() => setShowAvatarModal(true)}
-              className='absolute bottom-2 left-2 rounded bg-background bg-opacity-70 px-4 py-2 text-sm font-medium hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
+              className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 text-transparent transition-all duration-300 hover:bg-opacity-50 hover:text-white'
             >
-              {t('Change_Avatar')}
+              <span className="text-xs font-medium">{t('Change')}</span>
             </button>
           )}
         </div>
 
-        {/* Name and Title */}
-        <div className='flex-grow'>
-          <h1 className='text-center text-xl font-bold md:text-left md:text-3xl'>
-            {userData.firstName} {userData.lastName}
+        <div className='mt-3 flex-grow text-center md:mt-0 md:text-left'>
+          <h1 className='text-2xl font-bold text-gray-900 md:text-3xl dark:text-white'>
+            {authUser.firstName} {authUser.lastName}
           </h1>
-          {userData.aboutme && (
-            <p className='text-center text-sm md:text-left'>
-              <span className='text-base font-semibold'>{t('About_me')}:</span>{' '}
-              {userData.aboutme.split(' ').map((word, index) => (
-                // Using index in key is okay here as the list is static
-                <React.Fragment key={index}>{word} </React.Fragment>
-              ))}
+          {authUser.aboutme && ( // Hiển thị aboutme từ authUser (dữ liệu đã lưu)
+            <p className='mt-1 text-sm text-gray-600 dark:text-gray-300'>
+              {/* <span className='font-semibold'>{t('About_me')}:</span>{' '} */}
+              {authUser.aboutme}
             </p>
           )}
         </div>
+        {!isEditing && (
+             <div className="mt-4 flex flex-col space-y-2 md:mt-0 md:flex-row md:space-x-3 md:space-y-0">
+                <Button
+                    variant='primary'
+                    onClick={handleEditClick}
+                    className='w-full md:w-auto'
+                >
+                    {t('Edit_Profile')}
+                </Button>
+                <Button
+                    variant='danger' // Thay đổi variant cho phù hợp
+                    onClick={handleChangePasswordClick}
+                    className='w-full md:w-auto'
+                >
+                    {t('Change_Password')}
+                </Button>
+            </div>
+        )}
       </div>
 
       {/* Avatar Modal */}
       {showAvatarModal && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
-          {/* ... Modal content ... */}
-          <div className='w-full max-w-md rounded-lg bg-background p-6 shadow-lg'>
-            <h2 className='mb-4 text-lg font-semibold'>
-              {t('Select_an_Avatar')}
-            </h2>
-            <div className='grid grid-cols-4 gap-4'>
+        <div className='fixed inset-0 z-50 flex animate-fadeIn items-center justify-center bg-black bg-opacity-60 p-4'>
+          <div className='w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800'>
+            <div className="flex items-center justify-between">
+                <h2 className='text-xl font-semibold text-gray-800 dark:text-white'>
+                {t('Select_an_Avatar')}
+                </h2>
+                <button onClick={() => setShowAvatarModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div className='mt-6 grid grid-cols-3 gap-3 sm:grid-cols-4'> {/* Tăng số cột */}
               {avatarOptions.map((avatarUrl: string) => (
                 <button
                   key={avatarUrl}
-                  onClick={() => handleAvatarSelect(avatarUrl)}
-                  className='aspect-square overflow-hidden rounded-full hover:ring-2 hover:ring-button hover:ring-offset-2'
+                  onClick={() => { handleAvatarSelect(avatarUrl); setShowAvatarModal(false); }}
+                  className='aspect-square overflow-hidden rounded-full transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
                 >
                   <Image
                     src={avatarUrl}
                     alt='Avatar Option'
-                    width={100}
+                    width={100} // Giữ nguyên kích thước để đảm bảo chất lượng ảnh preview
                     height={100}
                     className='h-full w-full object-cover'
-                    // priority // Only use priority for the main LCP image if necessary
                   />
                 </button>
               ))}
             </div>
-            <button
-              type='button'
-              onClick={() => setShowAvatarModal(false)}
-              className='mt-4 w-full rounded-md bg-background-secondary px-4 py-2 text-sm font-medium opacity-80 hover:bg-background-secondary hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
-            >
-              {t('Cancel')}
-            </button>
+            {/* Nút Cancel không cần thiết nếu click vào ảnh là chọn và đóng modal */}
+            {/* <button type='button' onClick={() => setShowAvatarModal(false)} className='mt-6 w-full rounded-md bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'> {t('Cancel')} </button> */}
           </div>
         </div>
       )}
 
       {/* Background Modal */}
       {showBackgroundModal && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
-          {/* ... Modal content ... */}
-          <div className='w-full max-w-lg rounded-lg bg-background p-6 shadow-lg'>
-            <h2 className='mb-4 text-lg font-semibold'>
-              {t('Select_a_Background')}
-            </h2>
-            <div className='grid grid-cols-2 gap-4'>
-              {backgroundOptions.map((backgroundUrl: string) => (
-                <button
-                  key={backgroundUrl}
-                  onClick={() => handleBackgroundSelect(backgroundUrl)}
-                  className='aspect-video overflow-hidden rounded hover:ring-2 hover:ring-button hover:ring-offset-2'
-                >
-                  <Image
-                    src={backgroundUrl}
-                    alt='Background Option'
-                    width={300} // Add dimensions for better layout and performance
-                    height={200} // Keep aspect ratio if possible
-                    className='h-full w-full object-cover'
-                    // priority // Only use priority for the main LCP image if necessary
-                  />
-                </button>
-              ))}
+         <div className='fixed inset-0 z-50 flex animate-fadeIn items-center justify-center bg-black bg-opacity-60 p-4'>
+            <div className='w-full max-w-xl rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800'> {/* Tăng max-w */}
+                <div className="flex items-center justify-between">
+                    <h2 className='text-xl font-semibold text-gray-800 dark:text-white'> {t('Select_a_Background')} </h2>
+                    <button onClick={() => setShowBackgroundModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div className='mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3'> {/* Tăng số cột */}
+                {backgroundOptions.map((backgroundUrl: string) => (
+                    <button
+                    key={backgroundUrl}
+                    onClick={() => { handleBackgroundSelect(backgroundUrl); setShowBackgroundModal(false); }}
+                    className='aspect-[16/10] overflow-hidden rounded-md shadow-sm transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2' // Sửa aspect ratio
+                    >
+                    <Image
+                        src={backgroundUrl}
+                        alt='Background Option'
+                        fill // Dùng fill và aspect ratio cho button cha
+                        style={{ objectFit: 'cover' }}
+                        sizes="(max-width: 640px) 50vw, 33vw" // Tối ưu sizes
+                    />
+                    </button>
+                ))}
+                </div>
+                {/* <button type='button' onClick={() => setShowBackgroundModal(false)} className='mt-6 w-full rounded-md bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'> {t('Cancel')} </button> */}
             </div>
-            <button
-              type='button'
-              onClick={() => setShowBackgroundModal(false)}
-              className='mt-4 w-full rounded-md bg-background-secondary px-4 py-2 text-sm font-medium opacity-80 hover:bg-background-secondary hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
-            >
-              {t('Cancel')}
-            </button>
-          </div>
         </div>
       )}
 
       {/* Edit/Display Section */}
-      <div className='border-t border-background p-6'>
+      <div className='mt-6 border-t border-gray-200 px-2 py-6 md:px-0 dark:border-gray-700'>
         {isEditing ? (
-          // Edit Form
-          <div className='space-y-6 py-2'>
-            {/* ... Edit form fields ... */}
-            <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+          <div className='space-y-6'>
+            <div className='grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2'>
               <div>
-                <label
-                  htmlFor='firstName'
-                  className='block text-sm font-medium'
-                >
-                  {t('First_Name')}
-                </label>
-                <input
-                  type='text'
-                  id='firstName'
-                  name='firstName'
-                  value={editedData.firstName || ''}
-                  onChange={handleInputChange}
-                  className='focus:ring-none mt-1 block w-full rounded-md border-button bg-opacity-70 p-2 shadow-md focus:border-2 focus:outline-none focus:ring-button'
-                />
+                <label htmlFor='firstName' className='block text-sm font-medium text-gray-700 dark:text-gray-300'> {t('First_Name')} </label>
+                <input type='text' id='firstName' name='firstName' value={editedData.firstName || ''} onChange={handleInputChange} className='mt-1 block w-full rounded-md border-gray-300 p-2.5 shadow-sm focus:border-button focus:ring-button dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-button dark:focus:ring-button sm:text-sm' />
               </div>
               <div>
-                <label htmlFor='lastName' className='block text-sm font-medium'>
-                  {t('Last_Name')}
-                </label>
-                <input
-                  type='text'
-                  id='lastName'
-                  name='lastName'
-                  value={editedData.lastName || ''}
-                  onChange={handleInputChange}
-                  className='focus:ring-none mt-1 block w-full rounded-md border-button bg-opacity-70 p-2 shadow-md focus:border-2 focus:outline-none focus:ring-button'
-                />
+                <label htmlFor='lastName' className='block text-sm font-medium text-gray-700 dark:text-gray-300'> {t('Last_Name')} </label>
+                <input type='text' id='lastName' name='lastName' value={editedData.lastName || ''} onChange={handleInputChange} className='mt-1 block w-full rounded-md border-gray-300 p-2.5 shadow-sm focus:border-button focus:ring-button dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-button dark:focus:ring-button sm:text-sm' />
+              </div>
+              <div> {/* Date of Birth chiếm full width trên mobile, 1/2 trên desktop */}
+                <label htmlFor='dob' className='block text-sm font-medium text-gray-700 dark:text-gray-300'> {t('Date_of_Birth')} </label>
+                <input type='date' id='dob' name='dob' value={editedData.dob?.split('T')[0] || ''} onChange={handleInputChange} className='mt-1 block w-full rounded-md border-gray-300 p-2.5 shadow-sm focus:border-button focus:ring-button dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-button dark:focus:ring-button sm:text-sm' />
               </div>
             </div>
 
-            <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-              <div>
-                <label htmlFor='dob' className='block text-sm font-medium'>
-                  {t('Date_of_Birth')}
-                </label>
-                <input
-                  type='date'
-                  id='dob'
-                  name='dob'
-                  value={editedData.dob?.split('T')[0] || ''} // Assuming dob is an ISO string
-                  onChange={handleInputChange}
-                  className='focus:ring-none mt-1 block w-full rounded-md border-button bg-opacity-70 p-2 shadow-md focus:border-2 focus:outline-none focus:ring-button'
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor='about' className='block text-sm font-medium'>
-                {t('About_me')}
-              </label>
-              <textarea
-                id='about'
-                name='aboutme'
-                value={editedData.aboutme || ''}
-                onChange={handleInputChange}
-                maxLength={100}
-                className='focus:ring-none mt-1 block h-32 w-full rounded-md border-button bg-opacity-70 p-2 shadow-md focus:border-2 focus:outline-none focus:ring-button'
-              />
-              <p className='text-sm '>
-                {editedData.aboutme ? editedData.aboutme.length : 0}/100{' '}
-                {t('characters')}
+            <div className="col-span-full"> {/* About me chiếm full width */}
+              <label htmlFor='about' className='block text-sm font-medium text-gray-700 dark:text-gray-300'> {t('About_me')} </label>
+              <textarea id='about' name='aboutme' value={editedData.aboutme || ''} onChange={handleInputChange} maxLength={250} rows={4} className='mt-1 block w-full rounded-md border-gray-300 p-2.5 shadow-sm focus:border-button focus:ring-button dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-button dark:focus:ring-button sm:text-sm' />
+              <p className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
+                {editedData.aboutme ? editedData.aboutme.length : 0}/250 {t('characters')}
               </p>
             </div>
 
-            <div className='mt-4'>
-              <label className='block text-sm font-medium '>
-                {t('I_am_also_interested_in_these_topics')}
-              </label>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'> {t('I_am_also_interested_in_these_topics')} </label>
               <div className='mt-2 flex flex-wrap gap-2'>
                 {predefinedTopics.map(topic => {
-                  const isSelected = (
-                    editedData.interestedTopics || []
-                  ).includes(topic)
+                  const isSelected = (editedData.interestedTopics || []).includes(topic);
                   return (
-                    <span
-                      key={topic} // Use topic as key
+                    <button // Dùng button để dễ dàng xử lý click
+                      type="button"
+                      key={topic}
                       onClick={() => handleInterestedTopicsChange(topic)}
-                      className={`cursor-pointer rounded-full px-4 py-2 text-sm transition duration-200  ${
+                      className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 ${
                         isSelected
-                          ? 'bg-button text-button-text'
-                          : 'bg-background  hover:bg-background-secondary'
+                          ? 'bg-button text-button-text focus:ring-button'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300 focus:ring-gray-400 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
                       }`}
                     >
                       {topic}
-                    </span>
-                  )
+                    </button>
+                  );
                 })}
               </div>
             </div>
 
-            <div className='mt-8 flex justify-end space-x-4'>
-              <button
-                type='button'
-                onClick={handleCancelClick}
-                className='rounded-md bg-background px-6 py-2  hover:bg-background-secondary focus:outline-none focus:ring-2 focus:ring-gray-400'
-              >
-                {t('Cancel')}
-              </button>
-              <button
-                type='button'
-                onClick={handleSaveClick}
-                className='rounded-md bg-button px-6 py-2 text-button-text hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-button'
-              >
-                {t('Save')}
-              </button>
+            <div className='mt-8 flex justify-end space-x-3'>
+              <Button variant='danger' onClick={handleCancelClick} className="px-5 py-2"> {t('Cancel')} </Button>
+              <Button variant='primary' onClick={handleSaveClick} className="px-5 py-2"> {t('Save_Changes')} </Button>
             </div>
           </div>
         ) : (
           // Display Information
-          <>
-            <div className='flex justify-center space-x-4 md:justify-end'>
-              <Button
-                variant='primary'
-                onClick={handleEditClick}
-                className='rounded-md px-4 py-2 focus:outline-none focus:ring-2'
-              >
-                {t('Edit_Profile')}
-              </Button>
-              <Button
-                variant='primary'
-                onClick={handleChangePasswordClick}
-                className='rounded-md px-4 py-2 focus:outline-none focus:ring-2'
-              >
-                {t('Change_Password')}
-              </Button>
-            </div>
-
-            <div className='mt-4 space-y-2'>
-              <p>
-                <span className='font-semibold'>Email:</span>{' '}
-                <a className='text-button hover:underline'>{userData.email}</a>
-              </p>
-
-              {/* --- Sử dụng state đã định dạng --- */}
-              {formattedDob && (
-                <p>
-                  <span className='font-semibold'>{t('Date_of_Birth')}:</span>{' '}
-                  {formattedDob}
-                </p>
-              )}
-              {/* --- End sử dụng state đã định dạng --- */}
-
-              {userData.interestedTopics &&
-                userData.interestedTopics.length > 0 && (
-                  <div className='pt-2'>
-                    <span className='mb-2 block font-semibold'>
-                      {t('Interested_Topics')}:
-                    </span>
-                    <div className='flex flex-wrap gap-2'>
-                      {userData.interestedTopics.map(topic => (
-                        <Link
-                          key={topic} // Use topic as key
-                          href={{
-                            pathname: `/conferences`,
-                            query: { topics: topic }
-                          }}
-                          className='hover:text-text-secondary'
-                        >
-                          <span className='rounded-full bg-button px-4 py-2 text-sm text-button-text'>
-                            {topic}
-                          </span>
-                        </Link>
-                      ))}
+          <div className='space-y-4'>
+             {/* Nút Edit Profile và Change Password đã được chuyển lên trên */}
+            <div className="grid grid-cols-1 gap-x-4 gap-y-3 md:grid-cols-2">
+                <div>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('Email_Address')}</dt>
+                    <dd className="mt-1 text-sm text-gray-900 dark:text-white">{authUser.email}</dd>
+                </div>
+                {formattedDob && (
+                    <div>
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('Date_of_Birth')}</dt>
+                        <dd className="mt-1 text-sm text-gray-900 dark:text-white">{formattedDob}</dd>
                     </div>
-                  </div>
                 )}
             </div>
-          </>
+
+            {authUser.interestedTopics && authUser.interestedTopics.length > 0 && (
+              <div>
+                <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>{t('Interested_Topics')}</dt>
+                <dd className='mt-2 flex flex-wrap gap-2'>
+                  {authUser.interestedTopics.map(topic => (
+                    <Link
+                      key={topic}
+                      href={{ pathname: `/conferences`, query: { topics: topic } }}
+                    >
+                      <span className='cursor-pointer rounded-full bg-button bg-opacity-10 px-3 py-1.5 text-xs font-medium text-button transition-colors hover:bg-opacity-20 dark:bg-opacity-20 dark:hover:bg-opacity-30'>
+                        {topic}
+                      </span>
+                    </Link>
+                  ))}
+                </dd>
+              </div>
+            )}
+             {/* About me đã hiển thị ở phần header của profile */}
+          </div>
         )}
       </div>
 
-      {showChangePasswordForm && (
+      {showChangePasswordForm && authUser && ( // Đảm bảo authUser tồn tại
         <ChangePasswordForm
-          userId={userData.id} // userData is guaranteed to exist here
+          userId={authUser.id}
           onClose={() => setShowChangePasswordForm(false)}
         />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ProfileTab
+export default ProfileTab;

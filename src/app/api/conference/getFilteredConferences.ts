@@ -50,23 +50,5 @@ export const fetchConferences = async (params: FetchConferencesParams): Promise<
 
   const data: ConferenceListResponse = await response.json(); // Rõ ràng kiểu dữ liệu trả về.
 
-  // 2. Send the received data to your backend (3000)
-  
-  // // 2. Send the received data to your backend (3000)
-  // const saveResponse = await fetch(API_SAVE_CONFERENCE_ENDPOINT, {
-  //   method: 'POST', // Use POST for sending data
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  //   body: JSON.stringify(data), // Send the ENTIRE responseData
-  // });
-
-  // if (!saveResponse.ok) {
-  //   // Handle errors from the save operation
-  //   throw new Error(`Save operation failed! status: ${saveResponse.status}`);
-  // }
-  // const saveResult = await saveResponse.json(); //get save success message
-  // console.log(saveResult.message); // log save success message
-
   return data;
 };

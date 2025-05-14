@@ -1,7 +1,7 @@
 // src/hooks/home/usePopularConferences.ts (Đã cập nhật)
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ConferenceInfo } from '@/src/models/response/conference.list.response';
-import { getListConferenceFromDB, getListConferenceFromJSON } from '../../app/api/conference/getListConferences';
+import { getListConferenceFromDB } from '../../app/api/conference/getListConferences';
 
 const CARD_WIDTH_MOBILE = 288; // w-72
 const CARD_WIDTH_DESKTOP = 320; // w-80
