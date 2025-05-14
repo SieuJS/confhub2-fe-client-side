@@ -88,7 +88,7 @@ You are HCMUS, a friendly and helpful chatbot specializing in conferences, journ
     *   Location context -> 'openGoogleMap'.
     *   Conference/Journal context + "follow this", "add to my follow list", "unfollow" -> 'manageFollow'.
     *   Conference context + "add this", "add to my calendar list", "remove" -> 'manageCalendar'.
-    *   **User request to "contact admin", "report bug", "send feedback" -> Guide towards 'sendEmailToAdmin' process.**
+    *   User request to "contact admin", "report bug", "send feedback" -> Guide towards 'sendEmailToAdmin' process.
 `;
 
 // Vietnamese

@@ -7,8 +7,9 @@ import {
   isServerContentMessage,
   isModelTurn,
   isTurnComplete,
-  isInterrupted
-} from './multimodal-live-types'
+  isInterrupted,
+  isServerAudioMessage // <--- IMPORT THIS
+} from './multimodal-live-types' // <--- Ensure this path is correct
 import { useLoggerStore } from './lib/store-logger'
 import Logger from './logger/Logger'
 import ChatInput from './main-layout/ChatInput'
@@ -35,14 +36,13 @@ import { AudioRecorder } from './lib/audio-recorder'
 import { useTranslations } from 'next-intl'
 
 // --- THAY ĐỔI QUAN TRỌNG ---
-import { useLiveChatSettings } from './contexts/LiveChatSettingsContext' // Context này cho modality, voice
+import { useLiveChatSettings } from './contexts/LiveChatSettingsContext'
 import { useChatSettingsState } from '@/src/app/[locale]/chatbot/stores/storeHooks'
 
 export default function LiveChatExperience() {
   const {
     currentModality,
     currentVoice,
-    // --- LẤY SETTER TỪ LIVE CHAT SETTINGS CONTEXT ---
     setLiveChatConnected
   } = useLiveChatSettings()
 
@@ -53,7 +53,7 @@ export default function LiveChatExperience() {
   const t = useTranslations()
 
   const {
-    connected, // Đây là trạng thái kết nối chính từ useConnection
+    connected,
     isConnecting,
     streamStartTime,
     connectionStatusMessage,
@@ -87,18 +87,19 @@ export default function LiveChatExperience() {
     client,
     log,
     startLoading: (sentLogIndex: number) => {
+      console.log(`[LiveChat] startLoading called. Index: ${sentLogIndex}`);
       setIsSendingMessage(true)
       lastSentLogIndexRef.current = sentLogIndex
     },
-    stopLoading: () => {
+    stopLoading: () => { // This is for direct send errors
+      console.log(`[LiveChat] stopLoading (direct error) called.`);
       setIsSendingMessage(false)
       lastSentLogIndexRef.current = null
     }
   })
 
-  // --- EFFECT ĐỂ CẬP NHẬT TRẠNG THÁI KẾT NỐI TRONG CONTEXT ---
   useEffect(() => {
-    setLiveChatConnected(connected) // Cập nhật context khi 'connected' thay đổi
+    setLiveChatConnected(connected)
   }, [connected, setLiveChatConnected])
 
   useEffect(() => {
@@ -115,35 +116,59 @@ export default function LiveChatExperience() {
     }
   }, [connected, isConnecting, streamStartTime])
 
+  // EFFECT TO STOP LOADING BASED ON SERVER RESPONSE
   useEffect(() => {
     if (!isSendingMessage || lastSentLogIndexRef.current === null) {
+      // console.log("[useEffect-StopLoading] Not sending or no lastSentLogIndex. Bailing.");
       return
     }
+
+    // console.log(`[useEffect-StopLoading] Checking logs. isSending: ${isSendingMessage}, lastSentIndex: ${lastSentLogIndexRef.current}, logs.length: ${logs.length}`);
+
     const startIndexToCheck = lastSentLogIndexRef.current + 1
     for (let i = startIndexToCheck; i < logs.length; i++) {
       const currentLog = logs[i]
+      // console.log(`[useEffect-StopLoading] Checking log at index ${i}, type: ${currentLog?.type}`);
+
       if (!currentLog?.message) {
+        // console.log(`[useEffect-StopLoading] Log at index ${i} has no message. Skipping.`);
         continue
       }
+
+      let shouldStopLoading = false;
+
       if (isServerContentMessage(currentLog.message)) {
         const { serverContent } = currentLog.message
+        // console.log(`[useEffect-StopLoading] Log at index ${i} is ServerContentMessage. Content:`, serverContent);
         if (
           isModelTurn(serverContent) ||
           isTurnComplete(serverContent) ||
           isInterrupted(serverContent)
         ) {
-          setIsSendingMessage(false)
-          lastSentLogIndexRef.current = null
-          return
+          console.log(`[useEffect-StopLoading] ServerContent (text/turn/interrupted) received. Log type: ${currentLog.type}. Stopping loading.`);
+          shouldStopLoading = true;
         }
+      } else if (isServerAudioMessage(currentLog.message)) { // <--- ADD THIS CHECK
+        // console.log(`[useEffect-StopLoading] Log at index ${i} is ServerAudioMessage. Log type: ${currentLog.type}. Content:`, currentLog.message);
+        console.log(`[useEffect-StopLoading] ServerAudio received. Log type: ${currentLog.type}. Stopping loading.`);
+        shouldStopLoading = true;
+      }
+      // You could add more checks here for other message types if needed, e.g., ToolCallMessage, etc.
+      // depending on whether those should also stop the input loading.
+
+      if (shouldStopLoading) {
+        setIsSendingMessage(false)
+        lastSentLogIndexRef.current = null
+        // console.log("[useEffect-StopLoading] Loading stopped.");
+        return // Exit the loop and effect once loading is stopped
       }
     }
-  }, [logs, isSendingMessage])
+  }, [logs, isSendingMessage]) // Dependencies: logs and isSendingMessage
 
   useLoggerScroll(loggerRef)
-  useLoggerEvents(on, off, log)
+  useLoggerEvents(on, off, log) // This logs various incoming messages, including ServerContent and potentially ServerAudio via other means
   useAudioRecorder(connected, muted, audioRecorder, client, log, setInVolume)
-  useModelAudioResponse(on, off, log)
+  useModelAudioResponse(on, off, log) // This hook specifically listens for and logs 'server.audio' (ServerAudioMessage)
   useVolumeControl(inVolume)
 
   const systemInstructions = getSystemInstructions(currentLanguageCode)

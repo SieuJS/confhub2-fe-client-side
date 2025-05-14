@@ -82,11 +82,11 @@ const ModelTurnLog: React.FC<ModelTurnLogProps> = ({
         </ReactMarkdown>
       )}
       {/* Render other parts (code, etc.) */}
-      {/* {parts
+      {parts
         .filter((part) => !part.text || part.text === "\n") // filter only part is not text
         .map((part, j) => (
           <RenderPart part={part} key={`model-turn-part-${j}`} />
-        ))} */}
+        ))}
     </div>
   )
 }
