@@ -113,16 +113,34 @@ export const useSocketStore = create<SocketStoreState & SocketStoreActions>()(
                 }), false, '_onSocketDisconnect');
                 useMessageStore.getState().setLoadingState({ isLoading: false, step: 'disconnected', message: `Disconnected: ${reason}` });
             },
-            _onSocketConnectError: (error) => {
+            _onSocketConnectError: (error) => { // error ở đây thường là Error của JS, có thể có `data` nếu server gửi
                 console.error("[SocketStore _onSocketConnectError]", error);
-                const isAuthRelated = error.message.toLowerCase().includes('auth') || error.message.toLowerCase().includes('token');
+
+                let errorCode = 'CONNECTION_FAILED'; // Mã lỗi mặc định
+                let errorMessage = error.message;
+                const isAuthRelatedByName = error.message.toLowerCase().includes('auth') || error.message.toLowerCase().includes('token');
+
+                // Kiểm tra xem error.data có tồn tại và có code không (thường do server bắn về khi handshake)
+                // Ví dụ, server middleware của socket.io có thể gọi next(new Error("Auth failed", { data: { code: "AUTH_HANDSHAKE_FAILED" } }))
+                if (error && (error as any).data && (error as any).data.code) {
+                    errorCode = (error as any).data.code;
+                    if ((error as any).data.message) {
+                        errorMessage = (error as any).data.message;
+                    }
+                } else if (isAuthRelatedByName) {
+                    errorCode = 'AUTH_CONNECTION_ERROR'; // Mã cụ thể hơn nếu phát hiện từ tên
+                }
+
                 set({ isConnected: false, socketId: null, isServerReadyForCommands: false, hasFatalConnectionError: true }, false, '_onSocketConnectError/setFatal');
-                useUiStore.getState().handleError(error, true, isAuthRelated);
+                // Truyền error object đầy đủ, hoặc một object mới với code và message đã được xử lý
+                useUiStore.getState().handleError({ message: errorMessage, code: errorCode, type: 'error' }, true, true);
             },
-            _onSocketAuthError: (error) => {
+
+            _onSocketAuthError: (error) => { // error ở đây là { message: string } từ server
                 console.error("[SocketStore _onSocketAuthError]", error);
                 set({ isConnected: false, socketId: null, isServerReadyForCommands: false, hasFatalConnectionError: true }, false, '_onSocketAuthError/setFatal');
-                useUiStore.getState().handleError({ ...error, type: 'error', code: 'AUTH_REQUIRED' }, true, true);
+                // Giữ nguyên việc truyền code AUTH_REQUIRED
+                useUiStore.getState().handleError({ message: error.message, type: 'error', code: 'AUTH_REQUIRED' }, true, true);
             },
             _onSocketConnectionReady: (payload) => {
                 console.log(`[SocketStore _onSocketConnectionReady] Server ready. UserID: ${payload.userId}`);

@@ -1,22 +1,23 @@
 // src/app/[locale]/chatbot/regularchat/ConversationList.tsx
-import React from 'react'; 
+import React from 'react';
 import { ConversationMetadata } from '../lib/regular-chat.types';
 import { PlusCircle, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import ConversationItem from './ConversationItem'; 
+import ConversationItem from './ConversationItem';
 
 interface ConversationListProps {
   conversationList: ConversationMetadata[];
   activeConversationId: string | null;
   onSelectConversation: (conversationId: string) => void;
   onStartNewConversation: () => void;
-  isLoading: boolean; // Loading toàn bộ danh sách
+  isLoading: boolean;
   onDeleteConversation: (conversationId: string) => void;
   onClearConversation: (conversationId: string) => void;
   onRenameConversation: (conversationId: string, newTitle: string) => void;
   onPinConversation: (conversationId: string, isPinned: boolean) => void;
-  currentView: 'chat' | 'history'; // Vẫn cần để xác định isLogicallyActive
-  deletingConversationId: string | null; // ID của conversation đang trong quá trình xóa chung
+  currentView: 'chat' | 'history';
+  deletingConversationId: string | null;
+  disabled?: boolean; // <<<< THÊM PROP DISABLED >>>>
 }
 
 const ConversationList: React.FC<ConversationListProps> = ({
@@ -31,23 +32,23 @@ const ConversationList: React.FC<ConversationListProps> = ({
   onPinConversation,
   currentView,
   deletingConversationId,
+  disabled = false, // <<<< GIÁ TRỊ MẶC ĐỊNH >>>>
 }) => {
   const t = useTranslations();
 
-  // Logic confirm trước khi xóa/clear có thể chuyển vào ConversationItem
-  // Hoặc giữ ở đây nếu bạn muốn tất cả confirmation dialog có cùng style/behavior từ đây
   const handleDeleteWithConfirm = (id: string, title: string) => {
+    if (disabled) return; // Không làm gì nếu bị disabled
     if (window.confirm(t('Confirm_Delete_Conversation', { title: title || 'Untitled' }))) {
       onDeleteConversation(id);
     }
   };
 
   const handleClearWithConfirm = (id: string, title: string) => {
-     if (window.confirm(t('Confirm_Clear_Conversation', { title: title || 'Untitled' }))) {
+    if (disabled) return; // Không làm gì nếu bị disabled
+    if (window.confirm(t('Confirm_Clear_Conversation', { title: title || 'Untitled' }))) {
       onClearConversation(id);
     }
   };
-
 
   return (
     <div className='flex flex-grow flex-col overflow-hidden px-3 pb-3 pt-0'>
@@ -57,7 +58,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
         </span>
         <button
           onClick={onStartNewConversation}
-          disabled={isLoading || !!deletingConversationId}
+          disabled={disabled || isLoading || !!deletingConversationId} // <<<< SỬ DỤNG PROP DISABLED >>>>
           className='flex items-center space-x-1 rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50 dark:text-blue-400 dark:hover:bg-blue-900/50'
           title={t('Start_New_Chat')}
         >
@@ -79,18 +80,19 @@ const ConversationList: React.FC<ConversationListProps> = ({
           </div>
         )}
 
-        {conversationList.map(conv => (
+         {conversationList.map(conv => (
           <ConversationItem
             key={conv.id}
             conv={conv}
-            isActive={conv.id === activeConversationId && currentView === 'chat'}
+            isActive={conv.id === activeConversationId && currentView === 'chat' && !disabled} // Không active nếu disabled
             isBeingDeleted={deletingConversationId === conv.id}
             isLoadingList={isLoading}
-            onSelect={onSelectConversation}
-            onDelete={handleDeleteWithConfirm} // Truyền hàm có confirm
-            onClear={handleClearWithConfirm}   // Truyền hàm có confirm
-            onRename={onRenameConversation}
-            onTogglePin={onPinConversation}
+            onSelect={disabled ? () => {} : onSelectConversation} // Vô hiệu hóa onSelect
+            onDelete={handleDeleteWithConfirm} // handleDeleteWithConfirm đã kiểm tra disabled
+            onClear={handleClearWithConfirm}   // handleClearWithConfirm đã kiểm tra disabled
+            onRename={disabled ? async () => {} : onRenameConversation} // Vô hiệu hóa onRename
+            onTogglePin={disabled ? async () => {} : onPinConversation} // Vô hiệu hóa onTogglePin
+            disabled={disabled} // <<<< TRUYỀN PROP DISABLED XUỐNG ConversationItem >>>>
           />
         ))}
       </div>

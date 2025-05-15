@@ -1,3 +1,4 @@
+
 // src/contexts/AuthContext.tsx
 'use client';
 
@@ -5,6 +6,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, Rea
 import { useRouter } from 'next/navigation';
 import { AuthResponse, UserResponse } from '@/src/models/response/user.response';
 import { appConfig } from '@/src/middleware';
+import { useMessageStore } from '../app/[locale]/chatbot/stores';
 
 // --- Helper: LocalStorage Management ---
 const LOCAL_STORAGE_KEYS = {
@@ -104,6 +106,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUserState(null); // Sử dụng setUserState
     setIsLoggedIn(false);
     setError(null);
+
+    // Thêm dòng này để reset MessageStore khi logout
+    useMessageStore.getState().resetChatUIForNewConversation(false); // false để không clear active ID nếu không cần thiết ở đây
+
 
     if (options?.callApi) {
       try {
@@ -258,3 +264,4 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
+

@@ -6,10 +6,9 @@ import MainLayoutComponent from '@/src/app/[locale]/chatbot/MainLayout';
 import { LiveChatSettingsProvider } from '@/src/app/[locale]/chatbot/livechat/contexts/LiveChatSettingsContext';
 import { API_URI } from '@/src/app/[locale]/chatbot/lib/constants';
 import { usePathname } from '@/src/navigation';
-// import { AppWideInitializers } from '@/src/app/[locale]/AppWideInitializers';
-// --- IMPORT STORE MỚI ---
-import { useSettingsStore } from './stores/setttingsStore'; // Hoặc './stores' nếu có index.ts
+import { useSettingsStore } from './stores/setttingsStore';
 import { useEffect } from 'react';
+import ChatbotErrorDisplay from './ChatbotErrorDisplay';
 
 const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
@@ -19,18 +18,16 @@ export default function ChatbotRootLayout({
     children: React.ReactNode;
 }) {
     const unlocalizedPathname = usePathname();
-    // --- Lấy state và action từ SettingsStore ---
     const setChatMode = useSettingsStore(state => state.setChatMode);
     const currentStoreChatMode = useSettingsStore(state => state.chatMode);
 
     const isLiveChatPage = unlocalizedPathname.includes('/chatbot/livechat');
+    const isLandingChatbotPage = unlocalizedPathname === '/chatbot/landingchatbot'; // Thêm biến này cho rõ ràng
 
-    // Đồng bộ chatMode trong store với trạng thái isLiveChatPage
     useEffect(() => {
         const newMode = isLiveChatPage ? 'live' : 'regular';
         if (currentStoreChatMode !== newMode) {
-            // console.log(`[ChatbotRootLayout] Path: ${unlocalizedPathname}. Setting chatMode from ${currentStoreChatMode} to ${newMode}`);
-            setChatMode(newMode); // Action từ SettingsStore
+            setChatMode(newMode);
         }
     }, [isLiveChatPage, currentStoreChatMode, setChatMode, unlocalizedPathname]);
 
@@ -44,9 +41,14 @@ export default function ChatbotRootLayout({
         );
     }
 
+    // Chỉ hiển thị ChatbotErrorDisplay nếu không phải là trang landing
+    // Và chỉ khi các trang chatbot khác đang hoạt động (ví dụ, không phải lỗi config API_KEY)
+    const shouldShowChatbotErrorDisplay = !isLandingChatbotPage;
+
     return (
         <>
-            {/* <AppWideInitializers /> */}
+            {/* Chỉ render ChatbotErrorDisplay nếu cần */}
+            {shouldShowChatbotErrorDisplay && <ChatbotErrorDisplay />}
 
             {isLiveChatPage ? (
                 <LiveAPIProvider url={API_URI} apiKey={API_KEY}>
@@ -56,9 +58,13 @@ export default function ChatbotRootLayout({
                         </MainLayoutComponent>
                     </LiveChatSettingsProvider>
                 </LiveAPIProvider>
-            ) : unlocalizedPathname === '/chatbot/landingchatbot' ? (
+            ) : isLandingChatbotPage ? ( // Sử dụng biến đã tạo
+                // Trang landing, không có ChatbotErrorDisplay bao bọc trực tiếp ở đây nữa
+                // (nó sẽ được bao bọc bởi điều kiện shouldShowChatbotErrorDisplay ở trên nếu logic thay đổi)
+                // Với logic hiện tại, nó sẽ không có ChatbotErrorDisplay
                 <>{children}</>
             ) : (
+                // Các trang chatbot regular khác
                 <MainLayoutComponent isLiveChatContextActive={false}>
                     {children}
                 </MainLayoutComponent>

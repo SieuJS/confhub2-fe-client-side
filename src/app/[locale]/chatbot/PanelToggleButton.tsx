@@ -6,14 +6,20 @@ import { useTranslations } from 'next-intl';
 interface PanelToggleButtonProps {
   isPanelOpen: boolean;
   onTogglePanel: () => void;
+  disabled?: boolean; // <<<< THÊM PROP DISABLED >>>>
 }
 
-const PanelToggleButton: React.FC<PanelToggleButtonProps> = ({ isPanelOpen, onTogglePanel }) => {
+const PanelToggleButton: React.FC<PanelToggleButtonProps> = ({
+  isPanelOpen,
+  onTogglePanel,
+  disabled = false, // <<<< GIÁ TRỊ MẶC ĐỊNH >>>>
+}) => {
   const t = useTranslations();
   const commonButtonInteractiveClasses =
     'rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500';
   const iconOnlyButtonBaseClasses = 'h-12 w-12 justify-center p-2';
   const expandedButtonBaseClasses = 'px-3 py-2.5 text-sm font-medium';
+  const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed' : '';
 
   return (
     <div
@@ -21,9 +27,11 @@ const PanelToggleButton: React.FC<PanelToggleButtonProps> = ({ isPanelOpen, onTo
     >
       <button
         onClick={onTogglePanel}
+        disabled={disabled} // <<<< SỬ DỤNG PROP DISABLED >>>>
         className={`flex items-center
           ${isPanelOpen ? `${expandedButtonBaseClasses} ${commonButtonInteractiveClasses}` : `${iconOnlyButtonBaseClasses} ${commonButtonInteractiveClasses}`}
           ${isPanelOpen ? 'w-auto' : 'w-full'}
+          ${disabledClasses} // <<<< ÁP DỤNG CLASS KHI DISABLED >>>>
         `}
         title={isPanelOpen ? t('Close_panel') : t('Open_panel')}
         aria-label={isPanelOpen ? t('Close_panel') : t('Open_panel')}

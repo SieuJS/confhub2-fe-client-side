@@ -7,23 +7,27 @@ import { useSocketStore } from './socketStore';
 import { ChatMessageType } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
 
 // --- Types for UI Store State ---
+// --- Types for UI Store State ---
 export interface UiStoreState {
-    hasFatalError: boolean; // General fatal errors, not specific to connection
+    hasFatalError: boolean;
+    fatalErrorCode: string | null; // NEW: Để lưu mã lỗi cụ thể khi hasFatalError là true
     showConfirmationDialog: boolean;
     confirmationData: ConfirmSendEmailAction | null;
     isLeftPanelOpen: boolean;
     isRightPanelOpen: boolean;
-    // currentView: 'chat' | 'history'; // Consider if this is still needed or if URL path is enough
+    // currentView: 'chat' | 'history';
 }
 
 // --- Types for UI Store Actions ---
 export interface UiStoreActions {
-    setHasFatalError: (hasError: boolean) => void;
+    setHasFatalError: (hasError: boolean, errorCode?: string | null) => void; // MODIFIED
     setShowConfirmationDialog: (show: boolean, data?: ConfirmSendEmailAction | null) => void;
     toggleLeftPanel: () => void;
     setLeftPanelOpen: (isOpen: boolean) => void; // Added for explicit control
     setRightPanelOpen: (isOpen: boolean) => void;
     // setCurrentView: (view: 'chat' | 'history') => void;
+    clearFatalError: () => void; // NEW: Để xóa lỗi nghiêm trọng
+
 
     // Complex Actions
     handleError: (
@@ -37,6 +41,7 @@ export interface UiStoreActions {
 
 const initialUiStoreState: UiStoreState = {
     hasFatalError: false,
+    fatalErrorCode: null, // NEW
     showConfirmationDialog: false,
     confirmationData: null,
     isLeftPanelOpen: true,
@@ -51,7 +56,14 @@ export const useUiStore = create<UiStoreState & UiStoreActions>()(
                 ...initialUiStoreState,
 
                 // --- Setters ---
-                setHasFatalError: (hasError) => set({ hasFatalError: hasError }, false, 'setHasFatalError'),
+                setHasFatalError: (hasError, errorCode = null) => {
+                    set({
+                        hasFatalError: hasError,
+                        // Chỉ set errorCode nếu hasError là true, ngược lại thì null
+                        fatalErrorCode: hasError ? (errorCode || get().fatalErrorCode || 'UNKNOWN_FATAL_ERROR') : null
+                    }, false, 'setHasFatalError');
+                },
+                clearFatalError: () => set({ hasFatalError: false, fatalErrorCode: null }, false, 'clearFatalError'),
                 setShowConfirmationDialog: (show, data = null) => set({ showConfirmationDialog: show, confirmationData: data }, false, 'setShowConfirmationDialog'),
                 toggleLeftPanel: () => set(state => ({ isLeftPanelOpen: !state.isLeftPanelOpen }), false, 'toggleLeftPanel'),
                 setLeftPanelOpen: (isOpen) => set({ isLeftPanelOpen: isOpen }, false, 'setLeftPanelOpen'),
@@ -73,10 +85,13 @@ export const useUiStore = create<UiStoreState & UiStoreActions>()(
 
                     if (errorInput instanceof Error) {
                         finalError.message = errorInput.message;
+                        // Cố gắng lấy code nếu có, ví dụ từ custom error
+                        if ('code' in errorInput && typeof (errorInput as any).code === 'string') {
+                            finalError.code = (errorInput as any).code;
+                        }
                     } else if (typeof errorInput === 'object' && errorInput !== null) {
-                        // Check for ErrorUpdate structure or custom error object
                         if ('type' in errorInput && (errorInput.type === 'error' || errorInput.type === 'warning')) {
-                             const errUpdate = errorInput as ErrorUpdate;
+                            const errUpdate = errorInput as ErrorUpdate;
                             finalError.message = errUpdate.message;
                             finalError.thoughts = errUpdate.thoughts;
                             finalError.step = errUpdate.step;
@@ -94,6 +109,7 @@ export const useUiStore = create<UiStoreState & UiStoreActions>()(
                         }
                     }
 
+
                     if (stopLoadingInMessageStore) {
                         setLoadingState({ isLoading: false, step: 'error', message: finalError.errorType === 'error' ? 'Error' : 'Warning' });
                     }
@@ -102,19 +118,25 @@ export const useUiStore = create<UiStoreState & UiStoreActions>()(
                         id: generateMessageId(),
                         message: finalError.message,
                         isUser: false,
-                        type: finalError.errorType, // 'error' or 'warning'
+                        type: finalError.errorType,
                         thoughts: finalError.thoughts,
                         timestamp: new Date().toISOString(),
                     };
                     addChatMessage(botMessage);
 
-                    if (isFatal || finalError.code === 'FATAL_SERVER_ERROR' || finalError.code === 'AUTH_REQUIRED' || finalError.code === 'ACCESS_DENIED') {
-                        console.warn(`[UiStore] Fatal error detected (${finalError.message}, code: ${finalError.code}). Setting fatal error flag.`);
-                        set({ hasFatalError: true }, false, 'handleError/setFatal');
-                        if (finalError.code === 'AUTH_REQUIRED' || finalError.code === 'ACCESS_DENIED') {
-                             useSocketStore.getState().setHasFatalConnectionError(true); // Also set connection specific fatal error
-                             useSocketStore.getState().setIsConnected(false, null);
-                             useSocketStore.getState().setIsServerReadyForCommands(false);
+                    const isAuthError = finalError.code === 'AUTH_REQUIRED' || finalError.code === 'ACCESS_DENIED' || finalError.code === 'TOKEN_EXPIRED'; // Thêm TOKEN_EXPIRED nếu có
+                    const isGenericFatal = finalError.code === 'FATAL_SERVER_ERROR';
+
+                    if (isFatal || isAuthError || isGenericFatal) {
+                        const errorCodeToSet = finalError.code || 'UNKNOWN_FATAL_ERROR';
+                        console.warn(`[UiStore] Fatal error detected (${finalError.message}, code: ${errorCodeToSet}). Setting fatal error flag.`);
+                        // Sử dụng action setHasFatalError đã được cập nhật
+                        get().setHasFatalError(true, errorCodeToSet);
+
+                        if (isAuthError) {
+                            useSocketStore.getState().setHasFatalConnectionError(true);
+                            useSocketStore.getState().setIsConnected(false, null);
+                            useSocketStore.getState().setIsServerReadyForCommands(false);
                         }
                     }
                 },
@@ -132,8 +154,8 @@ export const useUiStore = create<UiStoreState & UiStoreActions>()(
                     }
                 },
                 handleCancelSend: (confirmationId) => {
-                     const { isConnected } = useSocketStore.getState();
-                     const { setShowConfirmationDialog } = get();
+                    const { isConnected } = useSocketStore.getState();
+                    const { setShowConfirmationDialog } = get();
                     if (isConnected) {
                         useSocketStore.getState().emitUserCancelEmail(confirmationId);
                     } else {
@@ -150,7 +172,7 @@ export const useUiStore = create<UiStoreState & UiStoreActions>()(
                     isRightPanelOpen: state.isRightPanelOpen,
                     // hasFatalError, showConfirmationDialog, confirmationData are transient
                 }),
-                 onRehydrateStorage: () => (state) => {
+                onRehydrateStorage: () => (state) => {
                     if (state) {
                         console.log('[UiStore] Rehydrated from storage.');
                     }

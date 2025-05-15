@@ -107,7 +107,9 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
                 const trimmedMessage = userInput.trim();
                 if (!trimmedMessage) return;
 
-                if (hasFatalConnectionError || uiHasFatalError) {
+                 if (hasFatalConnectionError || uiHasFatalError) {
+                    // Hiện tại: handleError chỉ thêm một tin nhắn vào chat và set loading state.
+                    // Nó KHÔNG set hasFatalError trong UiStore từ đây, vì isFatal = false
                     handleError({ message: "Cannot send message: A critical error occurred.", type: 'error', step: 'send_message_fail_fatal' } as any, false, false);
                     return;
                 }
@@ -198,103 +200,154 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
                 }
             },
 
-            _onSocketChatResult: (result) => {
+            _onSocketChatResult: (result) => { // result should be typed, e.g., { message?: string; thoughts?: any[]; action?: FrontendAction }
                 const {
                     animationControls,
-                    isAwaitingFinalResultRef,
+                    // isAwaitingFinalResultRef, // Assuming this is handled correctly elsewhere or not directly needed here
                     setLoadingState,
                     updateMessageById,
                     addChatMessage,
                     pendingBotMessageId,
                     setPendingBotMessageId: storeSetPendingBotMessageId,
                     chatMessages,
-                    resetAwaitFlag, // <<<< ĐẢM BẢO resetAwaitFlag được destructure ở đây
-                } = get();
-                const { currentLocale, isStreamingEnabled } = useSettingsStore.getState(); // Lấy isStreamingEnabled
+                    resetAwaitFlag,
+                } = get(); // Ensure get() returns all these methods/properties correctly typed
+
+                const { currentLocale, isStreamingEnabled } = useSettingsStore.getState();
                 const { setShowConfirmationDialog } = useUiStore.getState();
 
-                animationControls?.completeStream();
+                animationControls?.completeStream(); // Assuming animationControls is correctly typed and handled
 
                 const targetMessageId = pendingBotMessageId;
+
+                const createMessagePayload = (existingMessageContent?: string): Partial<ChatMessageType> => {
+                    let messageContent = result.message || existingMessageContent || "Task completed.";
+                    let messageType: ChatMessageType['type'] = 'text';
+                    let locationData: string | undefined = undefined;
+                    const actionData: FrontendAction | undefined = result.action; // Type FrontendAction correctly
+
+                    if (actionData?.type === 'openMap' && actionData.location) {
+                        messageType = 'map';
+                        locationData = actionData.location;
+                        // Use result.message if provided, otherwise generate a default for map
+                        messageContent = result.message || `Showing map for: ${actionData.location}`;
+                    } else if (actionData?.type === 'itemFollowStatusUpdated') {
+                        messageType = 'follow_update';
+                        // messageContent will be the textual response from the backend, e.g., "Successfully followed..."
+                        // If result.message is empty for this action, we might want a default, or rely on the FollowUpdateDisplay component
+                        // For now, if result.message is empty, it will fall back to "Task completed" via the initial assignment.
+                        // Or, ensure backend always sends a message for this.
+                        if (!result.message) {
+                            messageContent = actionData.payload.followed ? "Item followed." : "Item unfollowed.";
+                        }
+                    } else if (actionData?.type === 'confirmEmailSend') {
+                        messageType = 'text'; // Or a specific type like 'confirmation_request' if you want custom rendering
+                        messageContent = result.message || 'Please confirm the action.';
+                    } else if (actionData?.type === 'navigate' && !result.message) {
+                        // If only a navigate action without a message, provide a default
+                        messageContent = `Okay, navigating...`;
+                    }
+
+                    // Default message content if none is set by conditions or result.message
+                    // This check might be redundant if the initial `messageContent` assignment covers it.
+                    if (!result.message && messageContent === "Task completed.") { // Check if it's still the generic default
+                        if (actionData?.type === 'openMap' && actionData.location) {
+                            messageContent = `Showing map for: ${actionData.location}`;
+                        } else if (actionData?.type === 'itemFollowStatusUpdated') {
+                            messageContent = actionData.payload.followed ? "Item followed." : "Item unfollowed.";
+                        } else if (actionData?.type === 'confirmEmailSend') {
+                            messageContent = 'Please confirm the action.';
+                        } else if (actionData?.type === 'navigate') {
+                            messageContent = `Okay, navigating...`;
+                        }
+                        // If still "Task completed." and no specific action message, it stays.
+                    }
+
+
+                    return {
+                        message: messageContent,
+                        thoughts: result.thoughts,
+                        type: messageType,
+                        location: locationData,
+                        action: actionData, // action (with payload) is included here
+                        timestamp: new Date().toISOString(),
+                    };
+                };
 
                 if (targetMessageId) {
                     const messageExists = chatMessages.some(msg => msg.id === targetMessageId);
 
-                    const createMessagePayload = (existingMessageContent?: string): Partial<ChatMessageType> => {
-                        let messageContent = result.message || existingMessageContent || "Task completed.";
-                        let messageType: ChatMessageType['type'] = 'text';
-                        let locationData: string | undefined = undefined;
-                        let actionData: FrontendAction | undefined = result.action; // Gán action từ result
-
-                        if (actionData?.type === 'openMap' && actionData.location) {
-                            messageType = 'map';
-                            locationData = actionData.location;
-                            messageContent = result.message || `Showing map for: ${actionData.location}`;
-                        } else if (actionData?.type === 'confirmEmailSend') {
-                            messageType = 'text';
-                            messageContent = result.message || 'Please confirm the action.';
-                        } else if (actionData?.type === 'navigate' && !result.message) {
-                            messageContent = `Okay, navigating...`;
-                        }
-
-                        if (!result.message && (!actionData || (actionData.type !== 'openMap' && actionData.type !== 'confirmEmailSend' && actionData.type !== 'navigate'))) {
-                            messageContent = "Task completed.";
-                        }
-
-                        return {
-                            message: messageContent,
-                            thoughts: result.thoughts,
-                            type: messageType,
-                            location: locationData,
-                            action: actionData, // action được thêm vào đây
-                            timestamp: new Date().toISOString(),
-                        };
-                    };
-
                     if (messageExists) {
-                        console.log(`[MessageStore _onSocketChatResult] Updating existing message ID: ${targetMessageId} (stream path)`);
+                        // This case is usually for streaming updates where the message shell already exists.
+                        // If the final result (non-streamed) also uses targetMessageId, this path is fine.
+                        console.log(`[MessageStore _onSocketChatResult] Updating existing message ID: ${targetMessageId}`);
                         updateMessageById(targetMessageId, (prevMsg) => ({
                             ...prevMsg,
-                            ...createMessagePayload(prevMsg.message)
+                            ...createMessagePayload(prevMsg.message) // Pass existing content for potential merging
                         }));
-                    } else if (!isStreamingEnabled) { // <<<< SỬA Ở ĐÂY: không gọi isStreamingEnabled()
-                        console.log(`[MessageStore _onSocketChatResult] Adding new message for ID: ${targetMessageId} (non-stream path)`);
+                    } else if (!isStreamingEnabled) {
+                        // Non-streaming mode, and the message with targetMessageId wasn't pre-created.
+                        // This means targetMessageId was set, and we are now adding the full message.
+                        console.log(`[MessageStore _onSocketChatResult] Adding new message for (non-stream, but ID was pending): ${targetMessageId}`);
                         addChatMessage({
                             id: targetMessageId,
                             isUser: false,
-                            ...createMessagePayload() // Không cần cast vì ChatMessageType đã có action
-                        } as ChatMessageType); // Vẫn nên cast để an toàn nếu createMessagePayload không trả về đủ các trường required
+                            // Ensure all required fields of ChatMessageType are provided
+                            // The 'as ChatMessageType' cast is a fallback. Ideally, createMessagePayload + id + isUser is enough.
+                            ...(createMessagePayload() as Omit<ChatMessageType, 'id' | 'isUser'>)
+                        } as ChatMessageType);
                     } else {
+                        // Streaming mode, but the targetMessageId (which should have been created on stream start) wasn't found.
+                        // This is an unexpected state, so log a warning and add as a new message.
                         console.warn(`[MessageStore _onSocketChatResult] Stream mode, but message ${targetMessageId} not found. Adding as new generated ID.`);
                         addChatMessage({
                             id: generateMessageId(),
                             isUser: false,
-                            ...createMessagePayload()
+                            ...(createMessagePayload() as Omit<ChatMessageType, 'id' | 'isUser'>)
                         } as ChatMessageType);
                     }
                 } else {
+                    // No pendingBotMessageId. This means the result is entirely new, not an update to a pending message.
+                    // This can happen if the bot sends a message proactively or if the pending ID logic failed.
                     console.warn("[MessageStore _onSocketChatResult] No pendingBotMessageId. Adding result as a new message with generated ID.");
+
+                    // We need to determine the type based on the action here as well,
+                    // because createMessagePayload might not be called or its result might be overridden.
+                    let finalType: ChatMessageType['type'] = 'text';
+                    let finalLocation: string | undefined = undefined;
+                    const action = result.action;
+
+                    if (action?.type === 'openMap' && action.location) {
+                        finalType = 'map';
+                        finalLocation = action.location;
+                    } else if (action?.type === 'itemFollowStatusUpdated') {
+                        finalType = 'follow_update';
+                    } // Add other action types if they influence the message 'type' directly
+
                     addChatMessage({
                         id: generateMessageId(),
                         isUser: false,
-                        message: result.message || "Result received",
+                        message: result.message || "Result received", // Provide a default if message is null
                         thoughts: result.thoughts,
-                        type: result.action?.type === 'openMap' ? 'map' : 'text',
-                        location: result.action?.type === 'openMap' ? result.action.location : undefined,
+                        type: finalType,
+                        location: finalLocation,
                         action: result.action,
                         timestamp: new Date().toISOString()
                     });
                 }
 
-                resetAwaitFlag(); // <<<< Gọi resetAwaitFlag() ở đây
+                resetAwaitFlag();
                 setLoadingState({ isLoading: false, step: 'result_received', message: '', agentId: undefined });
-                storeSetPendingBotMessageId(null);
+                storeSetPendingBotMessageId(null); // Clear the pending ID as the result has been processed
 
+                // Handle side-effects of actions
                 const action = result.action;
                 if (action?.type === 'navigate' && action.url) {
-                    const finalUrl = constructNavigationUrl(BASE_WEB_URL, currentLocale, action.url);
+                    // Ensure BASE_WEB_URL and currentLocale are available and correctly typed
+                    const finalUrl = constructNavigationUrl(BASE_WEB_URL, currentLocale, action.url); // Assuming currentLocale.code for locale string
                     openUrlInNewTab(finalUrl);
                 } else if (action?.type === 'confirmEmailSend' && action.payload) {
+                    // Ensure action.payload can be safely cast to ConfirmSendEmailAction
                     setShowConfirmationDialog(true, action.payload as ConfirmSendEmailAction);
                 }
             },

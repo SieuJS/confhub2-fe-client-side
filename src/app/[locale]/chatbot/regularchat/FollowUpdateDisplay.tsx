@@ -1,0 +1,128 @@
+// src/app/[locale]/chatbot/chat/FollowUpdateDisplay.tsx
+import React from 'react';
+// Ensure ItemFollowStatusUpdatePayload, FollowItem etc. are correctly imported.
+// If they come from `shared/types` directly, update the import path.
+import { ItemFollowStatusUpdatePayload, FollowItem, FollowItemDate, FollowItemLocation } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
+import { CheckCircle2, MinusCircle, CalendarDays, MapPin, FileText, Newspaper, ExternalLink } from 'lucide-react';
+import { Link } from '@/src/navigation'
+import { useTranslations } from 'next-intl'; // For internationalization
+// Assuming you have a Button component. If not, you'll style an <a> tag.
+// import Button from '@/src/components/ui/Button'; // Example path to your Button component
+
+interface FollowUpdateDisplayProps {
+  payload: ItemFollowStatusUpdatePayload;
+}
+
+const formatDate = (isoDateString: string): string => {
+  if (!isoDateString) return '';
+  try {
+    return new Date(isoDateString).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  } catch (e) {
+    return isoDateString; // Fallback
+  }
+};
+
+const formatFollowItemDateRange = (dates?: FollowItemDate): string | null => {
+  if (!dates || !dates.fromDate) return null;
+  const from = formatDate(dates.fromDate);
+  if (!dates.toDate || dates.fromDate === dates.toDate) return from;
+  const to = formatDate(dates.toDate);
+  return `${from} - ${to}`;
+};
+
+const formatFollowItemLocation = (location?: FollowItemLocation): string | null => {
+  if (!location) return null;
+  const parts: string[] = [];
+  if (location.cityStateProvince) parts.push(location.cityStateProvince);
+  if (location.country) parts.push(location.country);
+  return parts.length > 0 ? parts.join(', ') : null;
+};
+
+const FollowUpdateDisplay: React.FC<FollowUpdateDisplayProps> = ({ payload }) => {
+  const { item, itemType, followed } = payload;
+  const t = useTranslations('Chatbot'); // Or your relevant namespace
+
+  const dateString = formatFollowItemDateRange(item.dates);
+  const locationString = formatFollowItemLocation(item.location);
+
+  const ItemIcon = itemType === 'conference' ? FileText : Newspaper;
+
+  // Determine the detail page path based on itemType
+  const detailPathname = itemType === 'conference' ? '/conferences/detail' : '/journals/detail'; // Adjust for journal path
+
+  return (
+    <div className="mt-1 rounded-md border border-gray-200 p-3 dark:border-gray-600 dark:bg-gray-700/50">
+      <div className="flex items-center mb-2">
+        {followed ? (
+          <CheckCircle2 className="mr-2 h-5 w-5 flex-shrink-0 text-green-500 dark:text-green-400" />
+        ) : (
+          <MinusCircle className="mr-2 h-5 w-5 flex-shrink-0 text-red-500 dark:text-red-400" />
+        )}
+        <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+          {itemType === 'conference' ? t('Conference') : t('Journal')}{' '}
+          {followed ? t('Followed_status') : t('Unfollowed_status')}
+        </p>
+      </div>
+
+      <div className="space-y-1.5 text-xs text-gray-700 dark:text-gray-300">
+        <div className="flex items-start">
+          <ItemIcon className="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-gray-500 dark:text-gray-400" />
+          <span className="font-medium text-gray-800 dark:text-gray-100">{item.title} ({item.acronym})</span>
+        </div>
+        {dateString && (
+          <div className="flex items-start">
+            <CalendarDays className="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-gray-500 dark:text-gray-400" />
+            <span>{dateString}</span>
+          </div>
+        )}
+        {locationString && (
+          <div className="flex items-start">
+            <MapPin className="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-gray-500 dark:text-gray-400" />
+            <span>{locationString}</span>
+          </div>
+        )}
+        {item.status && (
+           <div className="flex items-start">
+            {/* Using a simple info icon as a placeholder. You can use a specific Lucide icon if preferred. */}
+            <span className="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-gray-500 dark:text-gray-400">ℹ️</span>
+            <span>{t('Status')}: {item.status}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Details Button Section */}
+      <div className="mt-3 pt-2 border-t border-gray-200 dark:border-gray-600/50 flex justify-end">
+        <Link
+          href={{
+            pathname: detailPathname,
+            query: { id: item.id } // item.id should be the ID for the detail page
+          }}
+          passHref // Important for custom components like a styled Button
+          legacyBehavior // Recommended if your Button isn't directly an <a> tag
+        >
+          {/* 
+            If your Button component internally renders an <a> tag, you might not need legacyBehavior.
+            If your Button component is a <button> or <div> that you style, legacyBehavior + an inner <a> is needed,
+            or your Button must accept an `href` and render an `<a>`.
+            Simplest is to wrap a styled <a>.
+          */}
+          <a
+            className="inline-flex items-center justify-center rounded-md bg-blue-500 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-offset-gray-800"
+            // If using your custom Button component that doesn't render <a>:
+            // Replace <a> with <Button variant='primary' size={'small'} rounded> ... </Button>
+            // Ensure your Button component can be used within a Link correctly.
+          >
+            {t('View_Details')}
+            <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
+          </a>
+        </Link>
+      </div>
+    </div>
+  );
+};
+
+export default FollowUpdateDisplay;

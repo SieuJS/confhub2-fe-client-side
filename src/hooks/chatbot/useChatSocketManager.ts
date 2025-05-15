@@ -1,3 +1,4 @@
+
 // src/hooks/chatbot/useChatSocketManager.ts
 import { useEffect, useRef } from 'react';
 import io, { Socket } from 'socket.io-client';
@@ -40,10 +41,8 @@ if (typeof window !== 'undefined' && BACKEND_URL_CONFIG) {
 
 
 export function useChatSocketManager() {
-    // <<<< THAY ĐỔI QUAN TRỌNG: Lấy token từ AuthContext >>>>
     const { getToken, isLoggedIn, isInitializing: isAuthInitializing } = useAuth();
-    const currentAuthToken = getToken(); // Lấy token trực tiếp từ hàm của AuthContext
-
+    const currentAuthToken = getToken();
     const { setSocketInstance, setCurrentAuthTokenForSocket } = useSocketStore(
         useShallow(state => ({
             setSocketInstance: state.setSocketInstance,
@@ -83,7 +82,7 @@ export function useChatSocketManager() {
 
     const previousAuthTokenRef = useRef(currentAuthToken);
     const isMountedRef = useRef(true);
-    const socketInstanceRef = useRef<Socket | null>(null);
+    const socketInstanceRef = useRef<Socket | null>(null); // Ref để giữ instance socket hiện tại
 
     useEffect(() => {
         if (isMountedRef.current) {
@@ -91,12 +90,9 @@ export function useChatSocketManager() {
         }
     }, [animationControls, messageStoreActions.setAnimationControls]);
 
+
     useEffect(() => {
         isMountedRef.current = true;
-
-        // <<<< THAY ĐỔI QUAN TRỌNG: Cập nhật currentAuthTokenForSocket trong store >>>>
-        // Điều này giúp các phần khác của store (nếu có) biết về token hiện tại,
-        // mặc dù socket.io sử dụng token trực tiếp từ `auth` option.
         setCurrentAuthTokenForSocket(currentAuthToken);
 
         console.log(`[SocketManager Connect Effect] Running. AuthToken from AuthContext: ${currentAuthToken ? 'exists' : 'null'}, isLoggedIn: ${isLoggedIn}, isAuthInitializing: ${isAuthInitializing}, Base URL: ${socketIoBaseUrl}`);
@@ -104,58 +100,52 @@ export function useChatSocketManager() {
         // 1. Chờ AuthContext khởi tạo xong
         if (isAuthInitializing) {
             console.log("[SocketManager Connect Effect] AuthContext is initializing. Skipping connection attempt.");
-            // Nếu có socket cũ, có thể cân nhắc ngắt kết nối nếu logic yêu cầu
             if (socketInstanceRef.current && socketInstanceRef.current.connected) {
                 console.log("[SocketManager Connect Effect] Disconnecting existing socket while AuthContext initializes.");
                 socketInstanceRef.current.disconnect();
-                // setSocketInstance(null) sẽ được gọi trong onDisconnect
+                // Instance ref sẽ được set là null nếu ngắt kết nối ở đây để logic sau đó có thể tạo mới
+                socketInstanceRef.current = null;
             }
             return;
         }
 
-        // 2. Handle missing base URL (invalid config)
+        // 2. Handle missing base URL
         if (!socketIoBaseUrl) {
             console.warn("[SocketManager Connect Effect] Socket Base URL is not valid. Skipping connection.");
             if (socketInstanceRef.current) {
-                socketInstanceRef.current.disconnect(); // Không cần removeAllListeners ở đây, disconnect là đủ
+                socketInstanceRef.current.disconnect();
+                socketInstanceRef.current = null;
             }
             previousAuthTokenRef.current = currentAuthToken;
             return;
         }
 
-        // 3. Logic kết nối/ngắt kết nối dựa trên currentAuthToken và trạng thái socket hiện tại
-        const needsNewConnection = (
-            currentAuthToken && // Chỉ kết nối nếu có token
-            (!socketInstanceRef.current || !socketInstanceRef.current.connected || previousAuthTokenRef.current !== currentAuthToken)
-        );
+        // 3. Quyết định có cần ngắt kết nối socket cũ hoặc tạo socket mới
+        const isSocketCurrentlyConnected = socketInstanceRef.current ? socketInstanceRef.current.connected : false;
+        const tokenHasChanged = previousAuthTokenRef.current !== currentAuthToken;
 
-        const needsDisconnection = (
-            !currentAuthToken && // Nếu không có token (logged out)
-            socketInstanceRef.current && socketInstanceRef.current.connected
-        );
-
-
-        // --- Ngắt kết nối nếu cần ---
-        if (needsDisconnection || (needsNewConnection && socketInstanceRef.current)) {
-            console.log(`[SocketManager Connect Effect] Disconnecting previous socket. Needs Disconnect: ${needsDisconnection}, Needs New: ${needsNewConnection}`);
-            socketInstanceRef.current?.disconnect(); // disconnect sẽ trigger _onSocketDisconnect
-            // Các listeners sẽ được gỡ tự động khi socket disconnect và được garbage collected,
-            // hoặc khi tạo socket mới, chúng ta sẽ không attach vào instance cũ nữa.
-            // Việc gỡ listeners thủ công (`removeAllListeners`) cần cẩn thận hơn nếu dùng cùng instance socket cho nhiều lần connect.
-            // Ở đây, chúng ta tạo instance mới mỗi khi token thay đổi đáng kể.
+        // Ngắt kết nối socket hiện tại NẾU:
+        // - Nó tồn tại (socketInstanceRef.current không null) VÀ
+        //   ( (Token đã thay đổi) HOẶC (không có token VÀ socket vẫn đang kết nối) )
+        if (socketInstanceRef.current && (tokenHasChanged || (!currentAuthToken && isSocketCurrentlyConnected))) {
+            console.log(`[SocketManager Connect Effect] Disconnecting previous socket. Instance ID: ${socketInstanceRef.current.id}. Token changed: ${tokenHasChanged}, No token & connected: ${!currentAuthToken && isSocketCurrentlyConnected}`);
+            socketInstanceRef.current.disconnect();
+            socketInstanceRef.current = null; // Xóa ref sau khi disconnect để logic tạo mới có thể chạy
         }
 
-
-        // --- Tạo kết nối mới nếu cần ---
-        if (needsNewConnection && currentAuthToken) { // Double check currentAuthToken
-            console.log(`[SocketManager Connect Effect] Creating new socket instance. Token: ${currentAuthToken ? 'VALID' : 'NULL'}`);
+        // Tạo kết nối MỚI NẾU:
+        // - Chưa có socket instance nào (socketInstanceRef.current là null)
+        //   (Điều này xảy ra ở lần chạy đầu tiên, hoặc sau khi socket cũ đã bị ngắt ở trên)
+        if (!socketInstanceRef.current) {
+            console.log(`[SocketManager Connect Effect] Attempting to create socket instance. Token for auth: ${currentAuthToken ? 'VALID' : 'NULL'}`);
 
             const newSocket = io(socketIoBaseUrl, {
+                // ... (options của socket giữ nguyên)
                 reconnectionAttempts: 5,
                 reconnectionDelay: 1000,
                 reconnectionDelayMax: 5000,
                 timeout: 20000,
-                auth: { token: currentAuthToken }, // <<<< SỬ DỤNG currentAuthToken TỪ AuthContext >>>>
+                auth: { token: currentAuthToken },
                 transports: ['websocket'],
                 ...(socketIoPathOption && socketIoPathOption !== '/socket.io/' && { path: socketIoPathOption }),
             });
@@ -168,12 +158,11 @@ export function useChatSocketManager() {
             // --- Register Event Handlers (Logic giữ nguyên) ---
             const createMountedAwareHandler = <Args extends any[]>(handler: (...args: Args) => void) => {
                 return (...args: Args) => {
-                    if (isMountedRef.current && socketInstanceRef.current === newSocket) {
+                    if (isMountedRef.current && socketInstanceRef.current === newSocket) { // Kiểm tra instance hiện tại
                         handler(...args);
                     }
                 };
             };
-
             newSocket.on('connect', createMountedAwareHandler(() => {
                 if (newSocket.id) socketStoreActions._onSocketConnect(newSocket.id);
             }));
@@ -207,7 +196,7 @@ export function useChatSocketManager() {
             newSocket.io.on('reconnect_attempt', createMountedAwareHandler((attempt) => console.log(`[SocketManager] Reconnect attempt ${attempt}`)));
             newSocket.io.on('reconnect_error', createMountedAwareHandler((error) => {
                 console.error(`[SocketManager] Reconnect error (Manager): ${error.message}`, error);
-                socketStoreActions._onSocketConnectError(error); // Có thể dùng lại handler lỗi kết nối
+                socketStoreActions._onSocketConnectError(error);
             }));
             newSocket.io.on('reconnect_failed', createMountedAwareHandler(() => {
                 console.error("[SocketManager] Reconnect failed (Manager).");
@@ -216,34 +205,30 @@ export function useChatSocketManager() {
             newSocket.io.on('reconnect', createMountedAwareHandler((attemptNumber) => {
                 console.log(`[SocketManager] Reconnected successfully after ${attemptNumber} attempts.`);
             }));
-
-        } else if (!currentAuthToken && socketInstanceRef.current) {
-            // Trường hợp token trở thành null và socket vẫn còn, đảm bảo nó đã bị ngắt ở bước trên.
-            console.log("[SocketManager Connect Effect] Token is null, ensuring no active socket connection.");
         }
 
         previousAuthTokenRef.current = currentAuthToken;
 
-        // Cleanup function
+        // Cleanup function for component unmount
         return () => {
-            isMountedRef.current = false;
-            console.log(`[SocketManager Connect Effect Cleanup] Running cleanup. Current Socket ID: ${socketInstanceRef.current?.id}`);
-            // Không ngắt kết nối socket ở đây một cách vô điều kiện.
-            // Việc ngắt kết nối nên được quản lý bởi logic thay đổi token hoặc unmount toàn bộ AppWideInitializers.
-            // Nếu ngắt ở đây mỗi khi `currentAuthToken` thay đổi, sẽ gây ngắt kết nối không cần thiết.
-            // `socketInstanceRef.current?.disconnect()` sẽ được gọi bởi logic ở trên nếu token thay đổi VÀ cần tạo socket mới, hoặc token thành null.
+            isMountedRef.current = false; // Đánh dấu component đã unmount
+            console.log(`[SocketManager Connect Effect Cleanup] Running cleanup for component unmount. Current Socket ID: ${socketInstanceRef.current?.id}`);
+            if (socketInstanceRef.current) {
+                console.log("[SocketManager Connect Effect Cleanup] Disconnecting socket on component unmount.");
+                socketInstanceRef.current.off(); // Gỡ bỏ tất cả listeners trên instance này
+                socketInstanceRef.current.disconnect();
+                socketInstanceRef.current = null;
+            }
         };
     }, [
-        currentAuthToken, // Phụ thuộc vào token từ AuthContext
-        isLoggedIn,       // Phản ứng với trạng thái đăng nhập
-        isAuthInitializing, // Chờ AuthContext khởi tạo
-        socketIoBaseUrl,
-        socketIoPathOption,
+        currentAuthToken,
+        isLoggedIn,
+        isAuthInitializing,
         setSocketInstance,
-        setCurrentAuthTokenForSocket, // Thêm vào dependency
+        setCurrentAuthTokenForSocket,
         socketStoreActions,
-        conversationStoreActions, // Giữ nguyên
-        messageStoreActions,    // Giữ nguyên
+        conversationStoreActions,
+        messageStoreActions,
     ]);
 
     return null;
