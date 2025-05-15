@@ -149,7 +149,7 @@ const DetailContent: React.FC<DetailContentProps> = ({ locale, conferenceId }) =
   const totalReviews = conferenceDataFromDB?.feedbacks?.length || 0;
 
   return (
-    <div className='flex min-h-screen flex-col bg-gray-50'>
+    <div className='flex min-h-screen flex-col'>
       <Header locale={locale} />
       <main className='container mx-auto flex-grow px-0 py-8 pt-20 md:px-4'>
         {isUpdating && (
