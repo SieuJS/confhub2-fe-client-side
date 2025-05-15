@@ -9,7 +9,6 @@ import Footer from '../utils/Footer';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 import FloatingChatbot from '@/src/app/[locale]/floatingchatbot/FloatingChatbot'; // <-- IMPORT MỚI
-import ChatbotErrorDisplay from '../chatbot/ChatbotErrorDisplay';
 
 
 export default function Journals({ params: { locale } }: { params: { locale: string } }) {
@@ -77,7 +76,7 @@ export default function Journals({ params: { locale } }: { params: { locale: str
                 </div>
             </div>
             <Footer />
-            <ChatbotErrorDisplay/>
+        
             <FloatingChatbot /> {/* <-- THÊM CHATBOT NỔI Ở ĐÂY */}
 
         </>

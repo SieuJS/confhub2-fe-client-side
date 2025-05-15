@@ -31,7 +31,6 @@ import ConferenceActionButtons from './ConferenceActionButtons'
 
 // Import utility functions
 import { transformDates, calculateOverallRating } from './utils/conferenceUtils'
-import ChatbotErrorDisplay from '../../chatbot/ChatbotErrorDisplay'
 
 interface DetailContentProps {
   locale: string
@@ -216,7 +215,6 @@ const DetailContent: React.FC<DetailContentProps> = ({ locale, conferenceId }) =
         </div>
       </main>
       <Footer />
-      <ChatbotErrorDisplay />
       <FloatingChatbot />
     </div>
   )

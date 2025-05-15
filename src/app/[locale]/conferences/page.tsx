@@ -10,7 +10,6 @@ import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
 import FloatingChatbot from '@/src/app/[locale]/floatingchatbot/FloatingChatbot'; // <-- IMPORT MỚI
 import useUserBlacklist from '@/src/hooks/auth/useUserBlacklist' // This is just an example hook name
-import ChatbotErrorDisplay from '../chatbot/ChatbotErrorDisplay'
 
 export default function Conferences({
   params: { locale }
@@ -116,7 +115,7 @@ export default function Conferences({
         </div>
       </div>
       <Footer />
-      <ChatbotErrorDisplay/>
+    
       <FloatingChatbot /> {/* <-- THÊM CHATBOT NỔI Ở ĐÂY */}
 
     </>

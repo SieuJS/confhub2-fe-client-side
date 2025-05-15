@@ -10,7 +10,6 @@ import Support from './support'
 import SupportForm from './supportForm'
 import ContactMethods from './ContactMethods'
 import FloatingChatbot from '@/src/app/[locale]/floatingchatbot/FloatingChatbot'; // <-- IMPORT MỚI
-import ChatbotErrorDisplay from '../chatbot/ChatbotErrorDisplay'
 
 const FAQ = ({ locale }: { locale: string }) => {
   const t = useTranslations('FAQ')
@@ -23,7 +22,7 @@ const FAQ = ({ locale }: { locale: string }) => {
       <SupportForm />
       <ContactMethods />
       <Footer />
-      <ChatbotErrorDisplay/>
+    
       <FloatingChatbot /> {/* <-- THÊM CHATBOT NỔI Ở ĐÂY */}
 
     </>
