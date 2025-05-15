@@ -168,10 +168,10 @@ export const useSocketStore = create<SocketStoreState & SocketStoreActions>()(
                     console.warn('[SocketStore] Cannot emit load_conversation: Socket not ready or no ID.');
                 }
             },
-            emitStartNewConversation: (payload = {}) => {
+            emitStartNewConversation: (payload = {}) => { // payload will now be { language: 'en' } or { language: 'vi' }
                 const { socketRef, isConnected } = get();
                 if (socketRef.current && isConnected) {
-                    console.log('[SocketStore] Emitting start_new_conversation');
+                    console.log('[SocketStore] Emitting start_new_conversation with payload:', payload); // Log to verify
                     socketRef.current.emit('start_new_conversation', payload);
                 } else {
                     console.warn('[SocketStore] Cannot emit start_new_conversation: Socket not ready.');

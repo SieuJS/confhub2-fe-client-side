@@ -11,9 +11,9 @@ import { useSearchParams } from 'next/navigation';
 import {
   useConversationStore,
   useSocketStore,
-  useSettingsStore,
+  useSettingsStore, // Ensure this is imported
   useUiStore,
-  useMessageStore, // Added import
+  useMessageStore,
 } from './stores';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -47,9 +47,9 @@ export default function MainLayoutComponent({
     activeConversationId,
     isLoadingHistory,
     loadConversation,
-    startNewConversation,
+    startNewConversation, // This is the action from conversationStore
     deleteConversation,
-    setActiveConversationId: storeSetActiveConversationId, // Get the setter
+    setActiveConversationId: storeSetActiveConversationId,
   } = useConversationStore(
     useShallow(state => ({
       activeConversationId: state.activeConversationId,
@@ -57,11 +57,11 @@ export default function MainLayoutComponent({
       loadConversation: state.loadConversation,
       startNewConversation: state.startNewConversation,
       deleteConversation: state.deleteConversation,
-      setActiveConversationId: state.setActiveConversationId, // Add to shallow selector
+      setActiveConversationId: state.setActiveConversationId,
     }))
   );
 
-  const { resetChatUIForNewConversation } = useMessageStore( // Get reset function
+  const { resetChatUIForNewConversation } = useMessageStore(
     useShallow(state => ({
       resetChatUIForNewConversation: state.resetChatUIForNewConversation,
     }))
@@ -74,9 +74,10 @@ export default function MainLayoutComponent({
     }))
   );
 
-  const { chatMode } = useSettingsStore(
+  const { chatMode, currentLanguage } = useSettingsStore( // <<< ADD currentLanguage HERE
     useShallow(state => ({
       chatMode: state.chatMode,
+      currentLanguage: state.currentLanguage, // <<< Get currentLanguage from settings store
     }))
   );
 
@@ -94,8 +95,8 @@ export default function MainLayoutComponent({
   const [isProcessingDeletion, setIsProcessingDeletion] = useState(false);
   const [idBeingDeleted, setIdBeingDeleted] = useState<string | null>(null);
   const prevActiveIdRef = useRef<string | null>(null);
-  const prevPathnameRef = useRef<string | null>(null); // <<<< To track pathname changes for blank slate logic
-  const prevSearchParamsStringRef = useRef<string>(''); // <<<< To track search param changes
+  const prevPathnameRef = useRef<string | null>(null);
+  const prevSearchParamsStringRef = useRef<string>('');
 
   useAppInitialization();
 
@@ -139,7 +140,6 @@ export default function MainLayoutComponent({
     }
   }, [currentPathname, currentView]);
 
-  // Revised "blank slate" logic
   useEffect(() => {
     const currentUrlId = searchParamsHook.get('id');
     const currentSearchParamsString = searchParamsHook.toString();
@@ -147,30 +147,28 @@ export default function MainLayoutComponent({
     const justNavigatedToRegularChatBase =
         (prevPathnameRef.current !== CHATBOT_REGULARCHAT_PATH && currentPathname === CHATBOT_REGULARCHAT_PATH) ||
         (currentPathname === CHATBOT_REGULARCHAT_PATH && prevPathnameRef.current === CHATBOT_REGULARCHAT_PATH && prevSearchParamsStringRef.current !== '' && currentSearchParamsString === '');
-        // Điều kiện thứ 2: prevPathnameRef.current === CHATBOT_REGULARCHAT_PATH để đảm bảo không phải từ trang khác tới
-        // mà là từ regularchat?id=... về regularchat
 
     if (
         currentPathname === CHATBOT_REGULARCHAT_PATH &&
         !currentUrlId &&
         justNavigatedToRegularChatBase &&
-        activeConversationId !== null // Lấy từ store
+        activeConversationId !== null
     ) {
         console.log('[MainLayout] Blank Slate: Navigated to /chatbot/regularchat (no URL ID) with an active conversation in store. Resetting.');
-        storeSetActiveConversationId(null); // <- This will set activeConversationId in conversationStore to null
-        resetChatUIForNewConversation(true); // <- This will clear messages in messageStore
+        storeSetActiveConversationId(null);
+        resetChatUIForNewConversation(true);
     }
 
     prevPathnameRef.current = currentPathname;
     prevSearchParamsStringRef.current = currentSearchParamsString;
 
-}, [
+  }, [
     currentPathname,
     searchParamsHook,
-    activeConversationId, // Thêm dependency này RẤT QUAN TRỌNG
+    activeConversationId,
     storeSetActiveConversationId,
     resetChatUIForNewConversation,
-]);
+  ]);
 
 
   // --- Event Handlers ---
@@ -206,20 +204,31 @@ export default function MainLayoutComponent({
 
   const handleStartNewConversation = useCallback(() => {
     if (!isConnected || !isServerReadyForCommands || isProcessingDeletion) return;
-    startNewConversation(); // This will trigger store changes, leading to activeId becoming null then newId
+
+    // Use the language code from the settings store
+    const langCode = currentLanguage?.code || 'en'; // Fallback to 'en' if undefined
+    console.log(`[MainLayout] Starting new conversation with language: ${langCode}`);
+    startNewConversation(langCode); // <<< PASS language code HERE
+
     const targetChatPath = chatMode === 'live' ? CHATBOT_LIVECHAT_PATH : CHATBOT_REGULARCHAT_PATH;
     const newParams = new URLSearchParams(searchParamsHook.toString());
-    newParams.delete('id'); // Always remove 'id' when starting a new conversation
+    newParams.delete('id');
     const newQuery = urlSearchParamsToObject(newParams);
     const currentUrlId = searchParamsHook.get('id');
 
-    // Navigate if path changes OR if there was an ID in the URL previously (even on same path)
     if (currentPathname !== targetChatPath || currentUrlId) {
       router.push({ pathname: targetChatPath, query: newQuery });
     }
   }, [
-    startNewConversation, router, chatMode, isConnected, isServerReadyForCommands,
-    currentPathname, isProcessingDeletion, searchParamsHook
+    startNewConversation, // This is the action from conversationStore
+    router,
+    chatMode,
+    isConnected,
+    isServerReadyForCommands,
+    currentPathname,
+    isProcessingDeletion,
+    searchParamsHook,
+    currentLanguage, // <<< ADD currentLanguage as a dependency
   ]);
 
   const handleDeleteConversation = useCallback(
@@ -227,7 +236,7 @@ export default function MainLayoutComponent({
       if (!isConnected || isProcessingDeletion) return;
       console.log(`[MainLayout handleDeleteConversation] Initiating deletion for ${conversationIdToDelete}.`);
       setIsProcessingDeletion(true);
-      setIdBeingDeleted(conversationIdToDelete);
+setIdBeingDeleted(conversationIdToDelete);
       try {
         await deleteConversation(conversationIdToDelete);
       } catch (error) {
@@ -243,7 +252,7 @@ export default function MainLayoutComponent({
     <div className='bg-gray-10 flex h-screen overflow-hidden' >
       <LeftPanel
         onSelectConversation={handleSelectConversation}
-        onStartNewConversation={handleStartNewConversation}
+        onStartNewConversation={handleStartNewConversation} // This now calls the modified handler
         onDeleteConversation={handleDeleteConversation}
         currentView={currentView}
         deletingConversationId={isProcessingDeletion ? idBeingDeleted : null}

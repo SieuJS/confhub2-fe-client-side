@@ -1,14 +1,20 @@
-
-//src/app/[locale]/chatbot/stores/conversationStore.ts
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import {
     ConversationMetadata, InitialHistoryPayload, ConversationDeletedPayload,
     ConversationClearedPayload, ConversationRenamedPayload, ConversationPinStatusChangedPayload
-} from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Adjust path
+} from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
 import { useMessageStore } from './messageStore';
 import { useSocketStore } from './socketStore';
 import { useUiStore } from './uiStore';
+
+// Define default titles for fallback on frontend if needed (though backend should provide it)
+const FE_DEFAULT_TITLES: { [key: string]: string } = {
+    en: "New Chat",
+    vi: "Cuộc trò chuyện mới",
+};
+const FE_FALLBACK_DEFAULT_TITLE = "New Chat";
+
 
 // --- Types for Conversation Store State ---
 export interface ConversationStoreState {
@@ -17,10 +23,8 @@ export interface ConversationStoreState {
     searchResults: ConversationMetadata[];
     isSearching: boolean;
     isLoadingHistory: boolean;
-    isHistoryLoaded: boolean; // For the active conversation
-    isProcessingExplicitNewChat: boolean; // <<<< THÊM STATE NÀY
-    
-
+    isHistoryLoaded: boolean;
+    isProcessingExplicitNewChat: boolean;
 }
 
 // --- Types for Conversation Store Actions ---
@@ -31,22 +35,22 @@ export interface ConversationStoreActions {
     setIsSearching: (isSearching: boolean) => void;
     setIsLoadingHistory: (isLoading: boolean) => void;
     setIsHistoryLoaded: (isLoaded: boolean) => void;
-    setIsProcessingExplicitNewChat: (isProcessing: boolean) => void; // <<<< THÊM ACTION NÀY (nếu cần gọi từ bên ngoài, không thì set trực tiếp)
-    resetConversationState: () => void; // <<<< THÊM ACTION MỚI
+    setIsProcessingExplicitNewChat: (isProcessing: boolean) => void;
 
     // Complex Actions
     loadConversation: (conversationId: string, options?: { isFromUrl?: boolean }) => void;
-    startNewConversation: () => void;
-    deleteConversation: (conversationId: string) => Promise<void>; // For UI to await emit
+    startNewConversation: (language: string) => void; // << MODIFIED: Add language parameter
+    deleteConversation: (conversationId: string) => Promise<void>;
     clearConversation: (conversationId: string) => void;
     renameConversation: (conversationId: string, newTitle: string) => void;
     pinConversation: (conversationId: string, isPinned: boolean) => void;
     searchConversations: (searchTerm: string) => void;
 
-    // Socket Event Handlers (called by useChatSocketManager)
+    // Socket Event Handlers
     _onSocketConversationList: (list: ConversationMetadata[]) => void;
     _onSocketInitialHistory: (payload: InitialHistoryPayload) => void;
-    _onSocketNewConversationStarted: (payload: { conversationId: string; title?: string; lastActivity?: string; isPinned?: boolean; }) => void;
+    // << MODIFIED: Add language to payload type if you want strict typing from backend
+    _onSocketNewConversationStarted: (payload: { conversationId: string; title: string; lastActivity?: string; isPinned?: boolean; language?: string }) => void;
     _onSocketConversationDeleted: (payload: ConversationDeletedPayload) => void;
     _onSocketConversationCleared: (payload: ConversationClearedPayload) => void;
     _onSocketConversationRenamed: (payload: ConversationRenamedPayload) => void;
@@ -60,9 +64,9 @@ const initialConversationStoreState: ConversationStoreState = {
     isSearching: false,
     isLoadingHistory: false,
     isHistoryLoaded: false,
-    isProcessingExplicitNewChat: false, // <<<< KHỞI TẠO
-
+    isProcessingExplicitNewChat: false,
 };
+
 
 export const useConversationStore = create<ConversationStoreState & ConversationStoreActions>()(
     devtools(
@@ -103,14 +107,6 @@ export const useConversationStore = create<ConversationStoreState & Conversation
             setIsHistoryLoaded: (isLoaded) => set({ isHistoryLoaded: isLoaded }, false, 'setIsHistoryLoaded'),
             setIsProcessingExplicitNewChat: (isProcessing) => set({ isProcessingExplicitNewChat: isProcessing }),
 
-            resetConversationState: () => {
-                console.log("[ConversationStore] Resetting conversation state to initial.");
-                set(initialConversationStoreState, false, 'resetConversationState');
-                // Không cần gọi resetChatUIForNewConversation từ đây nữa,
-                // AuthContext sẽ gọi nó trực tiếp từ MessageStore nếu cần.
-            },
-
-            
             // --- Complex Actions ---
             loadConversation: (conversationId, options) => {
                 const { activeConversationId: currentActiveId, isHistoryLoaded: currentHistoryLoaded, setIsLoadingHistory, setIsHistoryLoaded, setActiveConversationId, isLoadingHistory } = get();
@@ -163,23 +159,25 @@ export const useConversationStore = create<ConversationStoreState & Conversation
                 setLoadingState({ isLoading: true, step: 'loading_history', message: 'Loading history...' });
                 useSocketStore.getState().emitLoadConversation(conversationId);
             },
-            startNewConversation: () => {
+            startNewConversation: (language: string) => { // << MODIFIED: Accept language
                 const { isConnected, isServerReadyForCommands } = useSocketStore.getState();
                 const { handleError } = useUiStore.getState();
-                const { resetChatUIForNewConversation, setLoadingState: setMessageLoadingState } = useMessageStore.getState(); // Đổi tên để tránh nhầm lẫn
+                const { resetChatUIForNewConversation, setLoadingState: setMessageLoadingState } = useMessageStore.getState();
 
                 if (!isConnected || !isServerReadyForCommands) {
                     handleError({ message: 'Cannot start new conversation: Not connected or server not ready.' });
                     return;
                 }
-                console.log('[ConversationStore] STARTING NEW CONVERSATION (explicit).');
+                console.log(`[ConversationStore] STARTING NEW CONVERSATION (explicit) with language: ${language}.`);
 
-                set({ isProcessingExplicitNewChat: true }); // <<<< SET CỜ NÀY LÀ TRUE
+                set({ isProcessingExplicitNewChat: true });
 
                 resetChatUIForNewConversation(true);
                 set({ activeConversationId: null, isHistoryLoaded: false });
                 setMessageLoadingState({ isLoading: true, step: 'starting_new_chat', message: 'Preparing new chat...' });
-                useSocketStore.getState().emitStartNewConversation({});
+
+                // << MODIFIED: Pass language in the payload
+                useSocketStore.getState().emitStartNewConversation({ language });
             },
             deleteConversation: (conversationIdToDelete) => {
                 return new Promise<void>((resolve, reject) => {
@@ -283,12 +281,14 @@ export const useConversationStore = create<ConversationStoreState & Conversation
                 useMessageStore.getState().setChatMessages(Array.isArray(payload.messages) ? payload.messages : []);
                 useMessageStore.getState().setLoadingState({ isLoading: false, step: 'history_loaded', message: '' });
             },
-            _onSocketNewConversationStarted: (payload) => {
-                console.log(`[ConversationStore _onSocketNewConversationStarted] New Conversation ID: ${payload.conversationId}. Explicit flow: ${get().isProcessingExplicitNewChat}`);
+              _onSocketNewConversationStarted: (payload) => { // << MODIFIED: Payload includes title
+                console.log(`[ConversationStore _onSocketNewConversationStarted] New Conversation ID: ${payload.conversationId}. Title: "${payload.title}". Explicit flow: ${get().isProcessingExplicitNewChat}`);
                 set(state => {
+                    const langCode = payload.language?.slice(0,2) || 'en';
                     const newConv: ConversationMetadata = {
                         id: payload.conversationId,
-                        title: payload.title || "New Chat",
+                        // Backend should provide the language-specific title
+                        title: payload.title || (FE_DEFAULT_TITLES[langCode] || FE_FALLBACK_DEFAULT_TITLE),
                         lastActivity: payload.lastActivity || new Date().toISOString(),
                         isPinned: payload.isPinned || false,
                     };
@@ -301,22 +301,20 @@ export const useConversationStore = create<ConversationStoreState & Conversation
 
                     return {
                         activeConversationId: payload.conversationId,
-                        isHistoryLoaded: true,
+                        isHistoryLoaded: true, // New conversation has no history to load yet
                         isLoadingHistory: false,
                         conversationList: updatedList,
                         searchResults: updatedList,
-                        // isProcessingExplicitNewChat: false // Reset cờ ở đây nếu nó true
+                        // isProcessingExplicitNewChat: false, // Reset below
                     };
                 }, false, `_onSocketNewConversationStarted/${payload.conversationId}`);
 
                 if (get().isProcessingExplicitNewChat) {
                     console.log('[ConversationStore _onSocketNewConversationStarted] Explicit new chat flow detected. Resetting message loading state.');
                     useMessageStore.getState().setLoadingState({ isLoading: false, step: 'new_chat_ready', message: '' });
-                    set({ isProcessingExplicitNewChat: false }); // <<<< RESET CỜ SAU KHI XỬ LÝ
+                    set({ isProcessingExplicitNewChat: false });
                 } else {
                     console.log('[ConversationStore _onSocketNewConversationStarted] Implicit new chat flow. Message loading state will be handled by message events.');
-                    // Không làm gì với messageStore.loadingState ở đây
-                    // để cho sendMessage và các event liên quan tự quản lý.
                 }
 
                 useUiStore.getState().setShowConfirmationDialog(false);
