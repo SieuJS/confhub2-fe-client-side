@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import {
     useSocketStore,
     useConversationStore,
-    useMessageStore,
+    useMessageStore, // <--- Đảm bảo import MessageStoreState và MessageStoreActions từ đây nếu cần type đầy đủ
     useSettingsStore,
     useUiStore,
 } from '@/src/app/[locale]/chatbot/stores';
@@ -28,12 +28,11 @@ import {
     LanguageCode,
     ChatMode,
     LanguageOption,
-    StatusUpdate, // Thêm StatusUpdate nếu nó được sử dụng trong LoadingState hoặc các type khác
-    FrontendAction, // Thêm FrontendAction nếu nó là một phần của ChatMessageType
+    StatusUpdate,
+    FrontendAction,
+    EditingMessageState, // <<< THÊM TYPE MỚI CHO EDITING MESSAGE
 } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
-import { StreamingTextAnimationControls } from '@/src/hooks/chatbot/useStreamingTextAnimation'; // Đường dẫn có thể cần điều chỉnh
-// Nếu Socket từ 'socket.io-client' được dùng làm kiểu, import nó:
-// import { Socket } from 'socket.io-client';
+import { StreamingTextAnimationControls } from '@/src/hooks/chatbot/useStreamingTextAnimation';
 
 
 // === SocketStore Hooks ===
@@ -127,14 +126,16 @@ export const useConversationActions = () => {
 };
 
 
-// === MessageStore Hooks === (Giữ nguyên, không bị ảnh hưởng trực tiếp)
+
+// === MessageStore Hooks ===
 
 export const useChatMessageState = () => {
     return useMessageStore(
         useShallow(state => ({
             chatMessages: state.chatMessages,
             loadingState: state.loadingState,
-            pendingBotMessageId: state.pendingBotMessageId, // Thêm state này
+            pendingBotMessageId: state.pendingBotMessageId,
+            // editingMessage: state.editingMessage, // <<< CÓ THỂ BỎ
         }))
     );
 };
@@ -146,13 +147,16 @@ export const useMessageActions = () => {
             addChatMessage: state.addChatMessage,
             updateMessageById: state.updateMessageById,
             setLoadingState: state.setLoadingState,
-            setPendingBotMessageId: state.setPendingBotMessageId, // Thêm action này
+            setPendingBotMessageId: state.setPendingBotMessageId,
             sendMessage: state.sendMessage,
             resetChatUIForNewConversation: state.resetChatUIForNewConversation,
-            clearAuthErrorMessages: state.clearAuthErrorMessages, // Thêm action này
+            clearAuthErrorMessages: state.clearAuthErrorMessages,
+            // setEditingMessage: state.setEditingMessage, // <<< BỎ
+            submitEditedMessage: state.submitEditedMessage, // Signature đã được cập nhật trong store
         }))
     );
 };
+
 
 export const useUpdateChatMessageCallbackForAnimation = () => {
     const storeUpdateMessageById = useMessageStore(state => state.updateMessageById);

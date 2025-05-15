@@ -4,6 +4,7 @@ import { devtools } from 'zustand/middleware'; // Loại bỏ persist và create
 import { Socket } from 'socket.io-client';
 import { useMessageStore } from './messageStore';
 import { useUiStore } from './uiStore';
+import { EditUserMessagePayload } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // <<< NEW
 
 // --- Types for Socket Store State ---
 export interface SocketStoreState {
@@ -22,6 +23,7 @@ export interface SendMessagePayload {
     isStreaming: boolean;
     language: string;
     conversationId?: string | null;
+    frontendMessageId?: string;
 }
 
 export interface SocketStoreActions {
@@ -52,6 +54,7 @@ export interface SocketStoreActions {
     emitRenameConversation: (conversationId: string, newTitle: string) => void;
     emitPinConversation: (conversationId: string, isPinned: boolean) => void;
     emitSendMessage: (payload: SendMessagePayload) => void;
+    emitEditUserMessage: (payload: EditUserMessagePayload) => void; // <<< NEW
 }
 
 const initialSocketStoreState: SocketStoreState = {
@@ -221,6 +224,15 @@ export const useSocketStore = create<SocketStoreState & SocketStoreActions>()(
                 }
                 console.log(`[SocketStore] Emitting 'send_message'. ConvID: ${payload.conversationId}, Lang: ${payload.language}, Stream: ${payload.isStreaming}. Socket ID: ${socketRef.current?.id}`);
                 socketRef.current.emit('send_message', payload);
+            },
+            emitEditUserMessage: (payload) => {
+                const { socketRef, isConnected, isServerReadyForCommands } = get();
+                if (!socketRef.current || !isConnected || !isServerReadyForCommands) {
+                    useUiStore.getState().handleError({ message: "Cannot edit message: Not connected or server not ready.", type: 'error' }, false, false);
+                    return;
+                }
+                console.log(`[SocketStore] Emitting 'edit_user_message'. ConvID: ${payload.conversationId}, MsgID: ${payload.messageIdToEdit}`);
+                socketRef.current.emit('edit_user_message', payload);
             },
         }),
         { name: "SocketStore" } // devtools name

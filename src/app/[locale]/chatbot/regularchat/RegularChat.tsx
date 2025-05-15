@@ -3,7 +3,7 @@
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import ChatHistory from './ChatHistory';
-import ChatInput from './ChatInput';
+import ChatInput from './ChatInput'; // Đây là ChatInput đã được cập nhật ở bước trước (chỉ gửi tin nhắn mới)
 import LoadingIndicator from './LoadingIndicator';
 import ChatIntroductionDisplay from './ChatIntroduction';
 import EmailConfirmationDialog from '../EmailConfirmationDialog';
@@ -11,14 +11,14 @@ import ConversationToolbar from './ConversationToolbar';
 import { useTimer } from '@/src/hooks/chatbot/useTimer';
 import { useTranslations } from 'next-intl';
 import {
-  useChatSettingsState, // This already imports from useSettingsStore via storeHooks
-  useChatMessageState,
-  useMessageActions,
+  useChatSettingsState,
+  useChatMessageState, // Vẫn cần để lấy chatMessages, loadingState
+  useMessageActions,   // Vẫn cần để lấy sendMessage (cho tin nhắn mới) và submitEditedMessage (cho tin nhắn đã sửa)
   useSocketConnectionStatus,
   useUIState,
   useUIActions,
   useActiveConversationState,
-  useConversationListState
+  useConversationListState,
 } from '@/src/app/[locale]/chatbot/stores/storeHooks';
 // Trực tiếp import useSettingsStore để lấy state mới
 import { useSettingsStore } from '@/src/app/[locale]/chatbot/stores';
@@ -31,15 +31,15 @@ interface RegularChatProps {
 function RegularChat({ isSmallContext = false }: RegularChatProps) {
   const t = useTranslations();
 
-  const { currentLanguage, isStreamingEnabled } = useChatSettingsState(); // Lấy từ storeHook
-  // Lấy state isConversationToolbarHiddenInFloatingChat trực tiếp từ useSettingsStore
+  const { currentLanguage } = useChatSettingsState(); // isStreamingEnabled không còn dùng trực tiếp ở đây cho logic edit
   const isConversationToolbarHiddenInFloatingChat = useSettingsStore(
     state => state.isConversationToolbarHiddenInFloatingChat
   );
 
-
+  // editingMessage từ store không còn được RegularChat sử dụng trực tiếp để điều khiển UI edit
   const { chatMessages, loadingState: messageLoadingState } = useChatMessageState();
-  const { sendMessage } = useMessageActions();
+  // sendMessage giờ là để gửi tin nhắn mới, submitEditedMessage để gửi tin nhắn đã sửa
+  const { sendMessage, submitEditedMessage } = useMessageActions();
 
   const { isConnected, socketId } = useSocketConnectionStatus();
 
@@ -55,6 +55,9 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
     ((text: string) => void) | null
   >(null);
   const chatHistoryRef = useRef<HTMLDivElement>(null);
+
+  // chatInputRef không còn cần thiết cho logic edit nữa
+  // const chatInputRef = useRef<{ setText: (text: string) => void, focus: () => void } | null>(null);
 
   useEffect(() => {
     if (chatHistoryRef.current && !showConfirmationDialog) {
@@ -75,7 +78,8 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
     }
   }, [messageLoadingState.isLoading, showConfirmationDialog, stopTimer, timeCounter]);
 
-  const sendChatMessage = useCallback(
+  // Đổi tên hàm này để rõ ràng là gửi tin nhắn MỚI từ ChatInput
+  const handleSendNewMessage = useCallback(
     async (userMessage: string) => {
       const trimmedMessage = userMessage.trim();
       if (!trimmedMessage) return;
@@ -85,7 +89,7 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
       }
       if (!hasChatStarted) setHasChatStarted(true);
       startTimer();
-      sendMessage(trimmedMessage);
+      sendMessage(trimmedMessage); // Gọi action sendMessage từ store
     },
     [
       isConnected,
@@ -95,12 +99,29 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
     ]
   );
 
+  // Hàm mới để xử lý việc xác nhận chỉnh sửa từ ChatMessageDisplay
+  const handleConfirmEdit = useCallback(
+    (messageId: string, newText: string) => {
+      // submitEditedMessage action trong messageStore đã được cập nhật
+      // để nhận messageId và newText
+      if (!isConnected) {
+        console.warn('Attempted to submit edited message while disconnected.');
+        // Có thể hiển thị toast/warning cho người dùng
+        return;
+      }
+      console.log(`[RegularChat] Confirming edit for message ${messageId}. New text: "${newText}"`);
+      submitEditedMessage(messageId, newText); // Gọi action submitEditedMessage từ store
+    },
+    [submitEditedMessage, isConnected] // Thêm isConnected vào dependency
+  );
+
   const handleSetFillInput = useCallback((fillFunc: (text: string) => void) => {
     setFillInputFunction(() => fillFunc);
   }, []);
 
   const handleSuggestionClick = useCallback(
     (suggestion: string) => {
+      // Khi bấm suggestion, nó sẽ luôn điền vào ChatInput chính để gửi tin nhắn mới
       if (fillInputFunction) {
         fillInputFunction(suggestion);
       }
@@ -115,11 +136,13 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
     setShowConfirmationDialog(false, null);
   }, [setShowConfirmationDialog]);
 
-  // Điều kiện hiển thị toolbar
   const shouldShowToolbar = activeConversationId && (
-    !isSmallContext || // Luôn hiển thị nếu không phải là small context (ví dụ: chat toàn trang)
-    (isSmallContext && !isConversationToolbarHiddenInFloatingChat) // Nếu là small context, chỉ hiển thị nếu setting cho phép (không bị ẩn)
+    !isSmallContext ||
+    (isSmallContext && !isConversationToolbarHiddenInFloatingChat)
   );
+
+  // Bỏ các hàm handleSendMessageOrUpdate, handleStartEdit, handleCancelEdit
+  // vì logic edit giờ nằm trong ChatMessageDisplay và được xử lý qua handleConfirmEdit.
 
   return (
     <div className='bg-white-pure relative mx-auto flex h-full w-full flex-col overflow-hidden border border-gray-200 shadow-lg dark:bg-gray-850 dark:border-gray-700'>
@@ -137,8 +160,7 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
         </div>
       </div>
 
-      {/* --- Conversation Toolbar --- */}
-      {shouldShowToolbar && ( // <-- SỬ DỤNG ĐIỀU KIỆN MỚI
+      {shouldShowToolbar && (
         <ConversationToolbar />
       )}
 
@@ -155,6 +177,7 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
         <ChatHistory
           messages={chatMessages}
           isInsideSmallContainer={isSmallContext}
+          onConfirmEdit={handleConfirmEdit} // <<< Chỉ truyền callback này
         />
       </div>
 
@@ -173,16 +196,21 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
           </div>
         )}
 
-      <div className='flex-shrink-0 border-t border-gray-200 p-1 sm:p-2 md:p-3 dark:border-gray-700 dark:bg-gray-800'>
+       <div className='flex-shrink-0 border-t border-gray-200 p-1 sm:p-2 md:p-3 dark:border-gray-700 dark:bg-gray-800'>
         <ChatInput
-          onSendMessage={sendChatMessage}
+          onSendMessage={handleSendNewMessage} // <<< Luôn gọi hàm gửi tin nhắn MỚI
           disabled={
-            messageLoadingState.isLoading ||
+            messageLoadingState.isLoading || // Vẫn disable ChatInput khi đang loading
             !isConnected ||
             showConfirmationDialog ||
             isLoadingHistory
+            // Cân nhắc: Có nên disable ChatInput khi một message nào đó đang được edit in-place không?
+            // Hiện tại, ChatMessageDisplay tự quản lý việc edit, nên ChatInput có thể vẫn hoạt động song song.
+            // Nếu muốn disable, bạn cần một state global (ví dụ trong messageStore) để biết có message nào đang được edit không.
+            // Ví dụ: || !!messageStore.isAnyMessageBeingEdited
           }
           onRegisterFillFunction={handleSetFillInput}
+          // Không cần truyền isEditing và initialEditText nữa
         />
       </div>
 

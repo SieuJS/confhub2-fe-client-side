@@ -6,12 +6,24 @@ import { ChatMessageType } from '@/src/app/[locale]/chatbot/lib/regular-chat.typ
 interface ChatHistoryProps {
     messages: ChatMessageType[];
     isInsideSmallContainer?: boolean;
+    onConfirmEdit: (messageId: string, newText: string) => void; // <<< CHỈ CẦN PROP NÀY
 }
 
 const ChatHistory: React.FC<ChatHistoryProps> = ({
     messages,
-    isInsideSmallContainer = false
+    isInsideSmallContainer = false,
+    onConfirmEdit,
 }) => {
+     // Find the ID of the latest user message
+    let latestUserMessageId: string | null = null;
+    for (let i = messages.length - 1; i >= 0; i--) {
+        if (messages[i].isUser) {
+            latestUserMessageId = messages[i].id;
+            break;
+        }
+    }
+
+
     return (
         <div className="flex flex-col">
             {messages.map((msg) => {
@@ -20,7 +32,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({
                     ? (msg.isUser ? 'pl-1 sm:pl-2' : 'pr-1 sm:pr-2')
                     : (msg.isUser ? 'pl-6 sm:pl-10 md:pl-16' : 'pr-6 sm:pr-10 md:pr-16');
 
-                return (
+                 return (
                     <div
                         key={msg.id}
                         className={`flex w-full py-1 ${alignmentClasses} ${messageRowPaddingClasses}`}
@@ -34,6 +46,8 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({
                             location={msg.location}
                             action={msg.action}
                             isInsideSmallContainer={isInsideSmallContainer}
+                            isLatestUserMessage={msg.isUser && msg.id === latestUserMessageId}
+                            onConfirmEdit={onConfirmEdit} // <<< TRUYỀN PROP XUỐNG
                         />
                     </div>
                 );

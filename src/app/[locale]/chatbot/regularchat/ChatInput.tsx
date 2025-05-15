@@ -1,98 +1,131 @@
 // src/app/[locale]/chatbot/chat/ChatInput.tsx
-import React, { useState, useRef, useEffect, useCallback } from 'react'
-import TextareaAutosize from 'react-textarea-autosize'
-import Button from '../../utils/Button' // If using a custom component
-import { GrSend } from 'react-icons/gr'
-import { useTranslations } from 'next-intl'
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import TextareaAutosize from 'react-textarea-autosize';
+import Button from '../../utils/Button'; // Assuming this is your custom Button component
+import { GrSend } from 'react-icons/gr';
+import { BsCheckLg } from 'react-icons/bs'; // Using Bootstrap Check icon as an example
+// Hoặc nếu bạn muốn dùng lucide-react cho nhất quán:
+// import { SendHorizonal, Check } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface ChatInputProps {
-  onSendMessage: (message: string) => void
-  // Changed prop name to match parent
-  onRegisterFillFunction: (fillFunc: (text: string) => void) => void
-  disabled?: boolean
+  onSendMessage: (message: string) => void; // This will handle both send and update
+  onRegisterFillFunction: (fillFunc: (text: string) => void) => void;
+  disabled?: boolean;
+  isEditing?: boolean;      // <<< NEW PROP
+  initialEditText?: string; // <<< NEW PROP
+  // onCancelEdit?: () => void; // Optional: if ChatInput had its own cancel button
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({
   onSendMessage,
-  onRegisterFillFunction, // Use the new prop name
-  disabled = false
+  onRegisterFillFunction,
+  disabled = false,
+  isEditing = false,      // <<< DESTRUCTURE
+  initialEditText = '', // <<< DESTRUCTURE
 }) => {
-  const t = useTranslations()
+  const t = useTranslations();
 
-  const [inputValue, setInputValue] = useState<string>('')
-  const inputRef = useRef<HTMLTextAreaElement>(null)
+  const [inputValue, setInputValue] = useState<string>('');
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Register the fill function with the parent using the correct prop
   useEffect(() => {
     const fillFunc = (text: string) => {
       if (!disabled) {
-        setInputValue(text)
-        // Trigger resize after setting value programmatically
-        setTimeout(
-          () =>
-            inputRef.current?.dispatchEvent(
-              new Event('input', { bubbles: true })
-            ),
+        setInputValue(text);
+        setTimeout(() =>
+            inputRef.current?.dispatchEvent(new Event('input', { bubbles: true })),
           0
-        )
-        inputRef.current?.focus()
+        );
+        inputRef.current?.focus();
+      }
+    };
+    if (onRegisterFillFunction) { // Make sure onRegisterFillFunction is provided
+        onRegisterFillFunction(fillFunc);
+    }
+  }, [onRegisterFillFunction, disabled]);
+
+  // Effect to populate input when edit mode starts or initial text changes
+  useEffect(() => {
+    if (isEditing) {
+      setInputValue(initialEditText);
+      // Focus and potentially select text for easier editing
+      inputRef.current?.focus();
+      // inputRef.current?.select(); // Uncomment if you want text to be selected
+    } else {
+      // If not editing and inputValue is from a previous edit session that was cancelled
+      // by sending a new message, inputValue might still hold the old edit text.
+      // We clear it here ONLY IF it wasn't an explicit cancellation that kept the text.
+      // For simplicity, if `isEditing` becomes false, and the parent didn't intend to keep
+      // the `initialEditText` (e.g., by setting it to the current input), we clear.
+      // However, `RegularChat` controls `initialEditText`. If `isEditing` is false,
+      // `initialEditText` will likely be `''`.
+      // This effect mainly handles setting the text when `isEditing` becomes true.
+      // When `isEditing` becomes false, `RegularChat` will pass `initialEditText=""`
+      // (unless user sends a new message while editing, then this component resets inputValue via handleSendMessage).
+      if (!isEditing && inputValue !== '' && inputValue === initialEditText) {
+         // This condition is a bit tricky. If `RegularChat` resets `initialEditText` to `''`
+         // when `isEditing` becomes `false`, then `inputValue` should also become `''`.
+         // The current logic in `handleSendMessage` clears `inputValue` only if `!isEditing`.
+         // This should be sufficient.
       }
     }
-    onRegisterFillFunction(fillFunc) // Register the function
-  }, [onRegisterFillFunction, disabled]) // Dependency array updated
+  }, [isEditing, initialEditText]);
+
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       if (!disabled) {
-        setInputValue(e.target.value)
-        // TextareaAutosize handles resizing automatically on input event
+        setInputValue(e.target.value);
       }
     },
     [disabled]
-  )
+  );
 
-  const handleSendMessage = useCallback(() => {
-    const trimmedMessage = inputValue.trim()
+  const handleSendMessageInternal = useCallback(() => {
+    const trimmedMessage = inputValue.trim();
     if (!disabled && trimmedMessage) {
-      onSendMessage(trimmedMessage)
-      setInputValue('')
-      // Reset height explicitly after sending might be needed with TextareaAutosize
-      if (inputRef.current) {
-        inputRef.current.style.height = 'auto'
+      onSendMessage(trimmedMessage); // Parent (RegularChat) handles clearing editing state
+                                     // or resetting input based on `isEditing` prop change.
+      if (!isEditing) {
+        // Only clear input if sending a NEW message.
+        // If editing, the parent will change `isEditing` prop, which will
+        // trigger the useEffect above to potentially reset the input via `initialEditText`.
+        setInputValue('');
+        if (inputRef.current) {
+          inputRef.current.style.height = 'auto'; // Reset height for new messages
+        }
       }
     }
-  }, [inputValue, onSendMessage, disabled])
+  }, [inputValue, onSendMessage, disabled, isEditing]); // <<< ADD isEditing dependency
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (disabled) return
+      if (disabled) return;
       if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault()
-        handleSendMessage()
+        e.preventDefault();
+        handleSendMessageInternal();
       }
-      // Shift+Enter for newline is default textarea behavior
     },
-    [handleSendMessage, disabled]
-  )
+    [handleSendMessageInternal, disabled] // <<< Use internal handler
+  );
+
+  const placeholderText = disabled
+    ? t('Disconnected')
+    : isEditing
+      ? t('Edit_your_message') // <<< Key for editing placeholder
+      : t('Type_message_short');
+
+  const buttonAriaLabel = isEditing ? t('Update_message') : t('Send_message'); // <<< Key for update button
 
   return (
-    // - `px-2 py-1` -> `px-1.5 py-0.5 sm:px-2 sm:py-1` cho container input
     <div className='flex w-full items-end rounded-2xl bg-white px-1 py-0.5 shadow-sm transition-all duration-200 ease-in-out focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 dark:bg-gray-700 dark:focus-within:border-blue-400'>
       <TextareaAutosize
         ref={inputRef}
         value={inputValue}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
-        placeholder={
-          disabled
-            ? t('Disconnect')
-            : // Giảm độ dài placeholder trên mobile nếu cần
-              t('Type_message_short') // Tạo một key translation mới cho placeholder ngắn hơn
-          // hoặc sử dụng class để ẩn/hiện phần dài hơn:
-          // t('Type_message') + <span class="hidden sm:inline"> Shift+Enter for new line</span>
-        }
-        // - `p-2` -> `p-1.5 sm:p-2`
-        // - `text-sm` có thể giữ nguyên hoặc `text-xs sm:text-sm`
+        placeholder={placeholderText}
         className={`
            max-h-28 flex-grow resize-none overflow-y-auto rounded-2xl
           bg-transparent px-1.5 py-1 text-sm text-gray-800
@@ -102,21 +135,23 @@ const ChatInput: React.FC<ChatInputProps> = ({
         rows={1}
         disabled={disabled}
       />
-
-      {/* - Nút gửi có thể cần điều chỉnh size hoặc padding trên mobile */}
       <Button
-        variant='primary'
-        size='mini' // Có thể dùng 'icon' hoặc 'small'
+        variant={isEditing ? 'primary' : 'secondary'} // <<< Change variant for visual cue
+        size='mini'
         rounded={true}
-        onClick={handleSendMessage}
+        onClick={handleSendMessageInternal} // <<< Use internal handler
         disabled={disabled || !inputValue.trim()}
-        aria-label={t('Send_message')} // Sử dụng key translation
-        className='mb-0.5 ml-1.5 flex-shrink-0 ' // Điều chỉnh padding cho nút
+        aria-label={buttonAriaLabel}
+        className='mb-0.5 ml-1.5 flex-shrink-0 '
       >
-        <GrSend size={12} className='h-4 w-4' /> {/* Kích thước icon */}
+        {isEditing ? (
+          <BsCheckLg size={12} className='h-4 w-4' /> // <<< Check icon for update
+        ) : (
+          <GrSend size={12} className='h-4 w-4' /> // Send icon
+        )}
       </Button>
     </div>
-  )
-}
+  );
+};
 
-export default ChatInput
+export default ChatInput;

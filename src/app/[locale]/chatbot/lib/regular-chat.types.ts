@@ -103,6 +103,10 @@ export interface ChatMessageType {
 
 }
 
+export interface EditingMessageState {
+    id: string;           // ID của tin nhắn đang được chỉnh sửa
+    originalText: string; // Nội dung gốc của tin nhắn trước khi chỉnh sửa
+}
 
 export interface LoadingState {
     isLoading: boolean;
@@ -110,12 +114,6 @@ export interface LoadingState {
     message: string;
     agentId?: string;
 }
-
-
-
-
-
-
 
 
 /**
@@ -260,6 +258,8 @@ export interface EmailConfirmationResult {
 // Update ResultUpdate if action is part of it
 export interface ResultUpdate {
     type: 'result';
+    id?: string; // <<< ADD THIS OPTIONAL FIELD (it's the final backend ID of the bot message)
+
     message: string; // Can be null if only action is present
     thoughts?: ThoughtStep[];
     action?: FrontendAction; // Ensure this includes the new type
@@ -348,7 +348,30 @@ export interface ConversationMetadata { // Hoặc ClientConversationMetadata
     // snippet?: string; // Cho kết quả tìm kiếm
 }
 
-// --- Payload cho sự kiện kết quả tìm kiếm từ backend ---
-// Backend trả về một mảng ConversationMetadata
-// export type ConversationSearchResultsPayload = ConversationMetadata[];
-// Không cần type riêng, vì nó là mảng ConversationMetadata
+export interface EditUserMessagePayload {
+    conversationId: string;
+    messageIdToEdit: string;
+    newText: string;
+    language: string; // Good to include for context if backend needs it
+}
+
+export interface ConversationUpdatedAfterEditPayload {
+    editedUserMessage: ChatMessageType; // The user message with its original ID but updated content
+    newBotMessage: ChatMessageType;     // The new bot response
+    conversationId: string;             // To ensure update is for the active conversation
+}
+
+// Add to your backend shared types as well (e.g., src/chatbot/shared/types.ts)
+// Assuming ChatMessage type on backend is similar or can be mapped from Frontend's ChatMessageType
+export interface BackendEditUserMessagePayload {
+    conversationId: string;
+    messageIdToEdit: string;
+    newText: string;
+    language: string;
+}
+
+export interface BackendConversationUpdatedAfterEditPayload {
+    editedUserMessage: HistoryItem; // Or your backend's message type
+    newBotMessage: HistoryItem;     // Or your backend's message type
+    conversationId: string;
+}

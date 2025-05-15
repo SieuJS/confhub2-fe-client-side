@@ -1,8 +1,9 @@
+// src/app/[locale]/chatbot/stores/conversationStore.ts
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import {
     ConversationMetadata, InitialHistoryPayload, ConversationDeletedPayload,
-    ConversationClearedPayload, ConversationRenamedPayload, ConversationPinStatusChangedPayload
+    ConversationClearedPayload, ConversationRenamedPayload, ConversationPinStatusChangedPayload, 
 } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
 import { useMessageStore } from './messageStore';
 import { useSocketStore } from './socketStore';
@@ -45,11 +46,11 @@ export interface ConversationStoreActions {
     renameConversation: (conversationId: string, newTitle: string) => void;
     pinConversation: (conversationId: string, isPinned: boolean) => void;
     searchConversations: (searchTerm: string) => void;
+    resetConversationState: () => void; // <<<< THÊM ACTION MỚI
 
     // Socket Event Handlers
     _onSocketConversationList: (list: ConversationMetadata[]) => void;
     _onSocketInitialHistory: (payload: InitialHistoryPayload) => void;
-    // << MODIFIED: Add language to payload type if you want strict typing from backend
     _onSocketNewConversationStarted: (payload: { conversationId: string; title: string; lastActivity?: string; isPinned?: boolean; language?: string }) => void;
     _onSocketConversationDeleted: (payload: ConversationDeletedPayload) => void;
     _onSocketConversationCleared: (payload: ConversationClearedPayload) => void;
@@ -107,6 +108,13 @@ export const useConversationStore = create<ConversationStoreState & Conversation
             setIsHistoryLoaded: (isLoaded) => set({ isHistoryLoaded: isLoaded }, false, 'setIsHistoryLoaded'),
             setIsProcessingExplicitNewChat: (isProcessing) => set({ isProcessingExplicitNewChat: isProcessing }),
 
+            resetConversationState: () => {
+                console.log("[ConversationStore] Resetting conversation state to initial.");
+                set(initialConversationStoreState, false, 'resetConversationState');
+                // Không cần gọi resetChatUIForNewConversation từ đây nữa,
+                // AuthContext sẽ gọi nó trực tiếp từ MessageStore nếu cần.
+            },
+            
             // --- Complex Actions ---
             loadConversation: (conversationId, options) => {
                 const { activeConversationId: currentActiveId, isHistoryLoaded: currentHistoryLoaded, setIsLoadingHistory, setIsHistoryLoaded, setActiveConversationId, isLoadingHistory } = get();

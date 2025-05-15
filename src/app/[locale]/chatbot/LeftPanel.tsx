@@ -225,7 +225,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
             {isAuthInitializing ? (
               <div className={`flex items-center ${isLeftPanelOpen ? 'w-full' : ''}`}>
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-700 dark:border-gray-300"></div>
-                {isLeftPanelOpen && <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">{t('Initializing...')}</span>}
+                {isLeftPanelOpen && <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">{t('Initializing')}</span>}
               </div>
             ) : isLoggedIn && user ? (
               // Khi đã đăng nhập
