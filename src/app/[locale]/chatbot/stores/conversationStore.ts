@@ -19,6 +19,7 @@ export interface ConversationStoreState {
     isLoadingHistory: boolean;
     isHistoryLoaded: boolean; // For the active conversation
     isProcessingExplicitNewChat: boolean; // <<<< THÊM STATE NÀY
+    
 
 }
 
@@ -31,6 +32,7 @@ export interface ConversationStoreActions {
     setIsLoadingHistory: (isLoading: boolean) => void;
     setIsHistoryLoaded: (isLoaded: boolean) => void;
     setIsProcessingExplicitNewChat: (isProcessing: boolean) => void; // <<<< THÊM ACTION NÀY (nếu cần gọi từ bên ngoài, không thì set trực tiếp)
+    resetConversationState: () => void; // <<<< THÊM ACTION MỚI
 
     // Complex Actions
     loadConversation: (conversationId: string, options?: { isFromUrl?: boolean }) => void;
@@ -101,6 +103,14 @@ export const useConversationStore = create<ConversationStoreState & Conversation
             setIsHistoryLoaded: (isLoaded) => set({ isHistoryLoaded: isLoaded }, false, 'setIsHistoryLoaded'),
             setIsProcessingExplicitNewChat: (isProcessing) => set({ isProcessingExplicitNewChat: isProcessing }),
 
+            resetConversationState: () => {
+                console.log("[ConversationStore] Resetting conversation state to initial.");
+                set(initialConversationStoreState, false, 'resetConversationState');
+                // Không cần gọi resetChatUIForNewConversation từ đây nữa,
+                // AuthContext sẽ gọi nó trực tiếp từ MessageStore nếu cần.
+            },
+
+            
             // --- Complex Actions ---
             loadConversation: (conversationId, options) => {
                 const { activeConversationId: currentActiveId, isHistoryLoaded: currentHistoryLoaded, setIsLoadingHistory, setIsHistoryLoaded, setActiveConversationId, isLoadingHistory } = get();

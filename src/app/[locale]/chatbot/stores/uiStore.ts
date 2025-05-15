@@ -121,6 +121,8 @@ export const useUiStore = create<UiStoreState & UiStoreActions>()(
                         type: finalError.errorType,
                         thoughts: finalError.thoughts,
                         timestamp: new Date().toISOString(),
+                        errorCode: finalError.code, // <<<< THÊM errorCode VÀO ĐÂY
+
                     };
                     addChatMessage(botMessage);
 

@@ -85,7 +85,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
         onKeyDown={handleKeyDown}
         placeholder={
           disabled
-            ? t('Processing')
+            ? t('Disconnect')
             : // Giảm độ dài placeholder trên mobile nếu cần
               t('Type_message_short') // Tạo một key translation mới cho placeholder ngắn hơn
           // hoặc sử dụng class để ẩn/hiện phần dài hơn:

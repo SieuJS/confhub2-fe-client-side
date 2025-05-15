@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
-export async function GET(request: Request) { // Changed to GET for simplicity, can be POST
+export async function POST(request: Request) { // Changed to POST for simplicity, can be POST
   console.log("[Server API - /api/auth/logout] Attempting to clear cookies...");
 
   // If you set HttpOnly cookies from the backend for authentication, clear them here.

@@ -11,7 +11,6 @@ import IntroduceVisualization from './home/IntroduceVisualization'
 import FeatureComparisonTable from './home/FeatureComparisonTable'
 import SuperBannerTree from './home/SuperBannerTree'
 // <<< Bỏ import FloatingChatbot thông thường ở đây >>>
-
 // --- Dynamic Import ConsumerInsights (đã làm ở bước trước) ---
 const DynamicConsumerInsights = dynamic(
   () => import('./home/ConsumerInsights'),

@@ -31,6 +31,7 @@ import ConferenceActionButtons from './ConferenceActionButtons'
 
 // Import utility functions
 import { transformDates, calculateOverallRating } from './utils/conferenceUtils'
+import ChatbotErrorDisplay from '../../chatbot/ChatbotErrorDisplay'
 
 interface DetailContentProps {
   locale: string
@@ -53,7 +54,7 @@ const DetailContent: React.FC<DetailContentProps> = ({ locale, conferenceId }) =
 
   const lastOrganization =
     conferenceDataFromDB?.organizations?.[
-      conferenceDataFromDB.organizations.length - 1
+    conferenceDataFromDB.organizations.length - 1
     ]
   const firstRankData = conferenceDataFromDB?.ranks?.[0]
   const transformedDatesData = transformDates(lastOrganization?.conferenceDates)
@@ -133,9 +134,9 @@ const DetailContent: React.FC<DetailContentProps> = ({ locale, conferenceId }) =
   }
   if (dbError) { // Các lỗi khác từ API
     return (
-        <div className="flex h-screen items-center justify-center">
-            <div>Error loading conference data: {dbError}</div>
-        </div>
+      <div className="flex h-screen items-center justify-center">
+        <div>Error loading conference data: {dbError}</div>
+      </div>
     );
   }
   if (!conferenceDataFromDB) { // Trường hợp không có data sau khi loading xong và không có lỗi cụ thể
@@ -200,7 +201,7 @@ const DetailContent: React.FC<DetailContentProps> = ({ locale, conferenceId }) =
                 handleBlacklistClick={handleBlacklistClick}
                 blacklistLoading={blacklistLoading}
                 checkLoginAndRedirect={checkLoginAndRedirect}
-                // Cân nhắc truyền user.roles vào đây nếu cần kiểm tra quyền hạn cụ thể
+              // Cân nhắc truyền user.roles vào đây nếu cần kiểm tra quyền hạn cụ thể
               />
             </div>
           </div>
@@ -215,6 +216,7 @@ const DetailContent: React.FC<DetailContentProps> = ({ locale, conferenceId }) =
         </div>
       </main>
       <Footer />
+      <ChatbotErrorDisplay />
       <FloatingChatbot />
     </div>
   )

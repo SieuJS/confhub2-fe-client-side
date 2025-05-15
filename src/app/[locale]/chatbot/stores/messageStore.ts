@@ -41,6 +41,8 @@ export interface MessageStoreActions {
     setPendingBotMessageId: (id: string | null) => void;
     sendMessage: (userInput: string) => void;
     resetChatUIForNewConversation: (clearActiveIdInOtherStores?: boolean) => void;
+    clearAuthErrorMessages: () => void; // <<<< THÊM ACTION MỚI
+
     _onSocketStatusUpdate: (data: StatusUpdate) => void;
     _onSocketChatUpdate: (data: ChatUpdate) => void;
     _onSocketChatResult: (data: ResultUpdate) => void;
@@ -97,6 +99,16 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
                 useUiStore.getState().setShowConfirmationDialog(false);
             },
 
+            clearAuthErrorMessages: () => {
+                console.log("[MessageStore] Clearing authentication error messages from chat.");
+                set(state => ({
+                    chatMessages: state.chatMessages.filter(msg =>
+                        !(msg.type === 'error' && msg.errorCode === 'AUTH_REQUIRED')
+                    )
+                }), false, 'clearAuthErrorMessages');
+            },
+
+
             sendMessage: (userInput) => {
                 const { addChatMessage, setLoadingState, animationControls, resetAwaitFlag, setPendingBotMessageId } = get();
                 const { isStreamingEnabled, currentLanguage } = useSettingsStore.getState();
@@ -107,7 +119,7 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
                 const trimmedMessage = userInput.trim();
                 if (!trimmedMessage) return;
 
-                 if (hasFatalConnectionError || uiHasFatalError) {
+                if (hasFatalConnectionError || uiHasFatalError) {
                     // Hiện tại: handleError chỉ thêm một tin nhắn vào chat và set loading state.
                     // Nó KHÔNG set hasFatalError trong UiStore từ đây, vì isFatal = false
                     handleError({ message: "Cannot send message: A critical error occurred.", type: 'error', step: 'send_message_fail_fatal' } as any, false, false);

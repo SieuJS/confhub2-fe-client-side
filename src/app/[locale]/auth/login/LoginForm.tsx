@@ -4,12 +4,14 @@ import React, { useEffect, useState } from 'react'
 import { Link, useRouter as useNextIntlRouter } from '@/src/navigation' // Assuming this is next-intl's Link/useRouter
 import useLoginForm from '../../../../hooks/auth/useLoginForm'
 import { useTranslations } from 'next-intl'
+import { Eye, EyeOff } from 'lucide-react' // Import Eye and EyeOff
+
 // Removed axios and appConfig as Google Login is now handled by useAuthApi
 // Removed useRouter from 'next/navigation' as useNextIntlRouter is used
 
 type LoginFormProps = {
   // redirectUri is no longer needed here as Google flow is handled by useAuthApi
-  // redirectUri: string 
+  // redirectUri: string
 }
 
 const LoginForm: React.FC<LoginFormProps> = (/* props: LoginFormProps */) => {
@@ -140,18 +142,15 @@ const LoginForm: React.FC<LoginFormProps> = (/* props: LoginFormProps */) => {
                       placeholder='••••••••'
                       disabled={isLoading}
                     />
-                    {password && 
+                    {/* Thay thế biểu tượng mắt thủ công bằng icon từ lucide-react */}
+                    {password && // Hiển thị nút toggle chỉ khi có mật khẩu
                       <button
-                      type='button'
-                      onClick={() => setShowPassword(!showPassword)}
-                      className='absolute right-2 top-1/2 -translate-y-1/2 text-xl'
+                        type='button'
+                        onClick={() => setShowPassword(!showPassword)}
+                        className='absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-0' // Thêm một số style cho nút
+                        aria-label={showPassword ? t('Hide password') : t('Show password')} // Thêm aria-label cho accessibility
                       >
-                        <span className="relative inline-block w-6 text-xl leading-none">
-                          👁️
-                          {showPassword && (
-                            <span className="absolute left-0 top-1/2 h-[2px] w-[28px] -translate-y-1/2 -rotate-45 bg-black"></span>
-                          )}
-                        </span>
+                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />} {/* Sử dụng icon lucide-react */}
                       </button>
                     }
                   </div>

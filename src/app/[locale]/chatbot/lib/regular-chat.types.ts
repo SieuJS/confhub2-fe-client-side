@@ -99,6 +99,7 @@ export interface ChatMessageType {
     location?: string; // <<< ADDED: Optional location for map messages
     timestamp?: string;
     action?: FrontendAction; // <<<< THÊM DÒNG NÀY
+    errorCode?: string; // <<<< THÊM THUỘC TÍNH NÀY
 
 }
 

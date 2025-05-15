@@ -122,7 +122,7 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
   );
 
   return (
-    <div className='bg-white-pure relative mx-auto flex h-full w-full flex-col overflow-hidden rounded-lg border border-gray-200 shadow-lg dark:bg-gray-850 dark:border-gray-700'>
+    <div className='bg-white-pure relative mx-auto flex h-full w-full flex-col overflow-hidden border border-gray-200 shadow-lg dark:bg-gray-850 dark:border-gray-700'>
       <div className='flex-shrink-0 border-b border-gray-200 p-1.5 text-center dark:border-gray-700 dark:bg-gray-800'>
         <div className='flex items-center justify-center space-x-1 text-xs text-gray-600 dark:text-gray-400'>
           <span

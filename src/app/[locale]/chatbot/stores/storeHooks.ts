@@ -6,11 +6,10 @@ import {
     useMessageStore,
     useSettingsStore,
     useUiStore,
-} from '@/src/app/[locale]/chatbot/stores'; // Assumes you have an index.ts in stores directory
+} from '@/src/app/[locale]/chatbot/stores';
 import { useShallow } from 'zustand/react/shallow';
 
-// Import all necessary types that might be used by components consuming these hooks
-// Adjust paths as per your project structure
+// Import all necessary types
 import {
     ChatMessageType,
     LoadingState,
@@ -26,22 +25,29 @@ import {
     ConversationRenamedPayload,
     ConversationPinStatusChangedPayload,
     EmailConfirmationResult,
-    LanguageCode, // From settingsStore types
-    ChatMode,     // From settingsStore types
-    LanguageOption // From settingsStore types
-} from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Main types file
-import { StreamingTextAnimationControls } from '../../../../hooks/chatbot/useStreamingTextAnimation'; // Hook for animation controls
+    LanguageCode,
+    ChatMode,
+    LanguageOption,
+    StatusUpdate, // Thêm StatusUpdate nếu nó được sử dụng trong LoadingState hoặc các type khác
+    FrontendAction, // Thêm FrontendAction nếu nó là một phần của ChatMessageType
+} from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
+import { StreamingTextAnimationControls } from '@/src/hooks/chatbot/useStreamingTextAnimation'; // Đường dẫn có thể cần điều chỉnh
+// Nếu Socket từ 'socket.io-client' được dùng làm kiểu, import nó:
+// import { Socket } from 'socket.io-client';
+
 
 // === SocketStore Hooks ===
 
 /**
- * Hook to get socket connection status, authentication token, and related info.
+ * Hook to get socket connection status and related info.
+ * Auth token is now managed by AuthContext and passed to useChatSocketManager.
  * @returns {object} Socket connection state.
  */
 export const useSocketConnectionStatus = () => {
     return useSocketStore(
         useShallow(state => ({
-            authToken: state.authToken,
+            // authToken: state.authToken, // LOẠI BỎ - AuthToken giờ do AuthContext quản lý
+            currentAuthTokenForSocket: state.currentAuthTokenForSocket, // Thêm state này nếu component cần biết token hiện tại đang dùng cho socket
             isConnected: state.isConnected,
             socketId: state.socketId,
             isServerReadyForCommands: state.isServerReadyForCommands,
@@ -51,75 +57,63 @@ export const useSocketConnectionStatus = () => {
 };
 
 /**
- * Hook to get actions for managing socket connection and authentication.
- * These are actions that components might typically trigger.
+ * Hook to get actions for managing socket connection.
  * @returns {object} Socket connection actions.
  */
-export const useSocketConnectionActions = () => {
+export const useSocketActions = () => { // Đổi tên từ useSocketConnectionActions để ngắn gọn hơn
     return useSocketStore(
         useShallow(state => ({
-            initializeAuth: state.initializeAuth,
-            setAuthToken: state.setAuthToken, // Useful for login/logout flows
-            disconnectSocket: state.disconnectSocket, // To manually disconnect
-            // Emitter actions can also be exposed here if components need to call them directly,
-            // though often they are called from other store actions.
-            // Example: emitGetInitialConversations: state.emitGetInitialConversations
+            // initializeAuth: state.initializeAuth, // LOẠI BỎ - AuthContext quản lý init
+            // setAuthToken: state.setAuthToken, // LOẠI BỎ - Token được set bởi useChatSocketManager thông qua setCurrentAuthTokenForSocket
+            setCurrentAuthTokenForSocket: state.setCurrentAuthTokenForSocket, // Giữ lại nếu có trường hợp đặc biệt cần set từ ngoài, nhưng thường là không
+            disconnectSocket: state.disconnectSocket,
+            // Các emitters có thể được thêm vào đây nếu component cần gọi trực tiếp
+            // Ví dụ: emitGetInitialConversations: state.emitGetInitialConversations
         }))
     );
 };
 
 /**
  * Hook to get the raw socket instance ref. Use with extreme caution.
- * Primarily intended for `useChatSocketManager` or very advanced scenarios
- * where direct socket manipulation is unavoidable.
+ * Primarily intended for `useChatSocketManager`.
  * @returns {React.MutableRefObject<Socket | null>} The socket ref.
  */
 export const useSocketRef = () => {
-    return useSocketStore(state => state.socketRef);
+    return useSocketStore(state => state.socketRef); // Giữ nguyên
 };
 
 
-// === ConversationStore Hooks ===
+// === ConversationStore Hooks === (Giữ nguyên, không bị ảnh hưởng trực tiếp bởi thay đổi SocketStore)
 
-/**
- * Hook to get the list of conversations, search results, and related loading/searching states.
- * @returns {object} Conversation list state.
- */
 export const useConversationListState = () => {
     return useConversationStore(
         useShallow(state => ({
             conversationList: state.conversationList,
             searchResults: state.searchResults,
             isSearching: state.isSearching,
-            isLoadingHistory: state.isLoadingHistory, // Global loading state for any history operation
+            isLoadingHistory: state.isLoadingHistory,
         }))
     );
 };
 
-/**
- * Hook to get the active conversation ID and whether its history/messages are loaded.
- * @returns {object} Active conversation state.
- */
 export const useActiveConversationState = () => {
     return useConversationStore(
         useShallow(state => ({
             activeConversationId: state.activeConversationId,
-            isHistoryLoaded: state.isHistoryLoaded, // Specifically for the activeConversationId
+            isHistoryLoaded: state.isHistoryLoaded,
+            isProcessingExplicitNewChat: state.isProcessingExplicitNewChat, // Thêm state này
         }))
     );
 };
 
-/**
- * Hook to get actions for managing conversations (loading, starting, deleting, etc.).
- * @returns {object} Conversation management actions.
- */
 export const useConversationActions = () => {
     return useConversationStore(
         useShallow(state => ({
-            setConversationList: state.setConversationList, // If direct manipulation is needed
+            setConversationList: state.setConversationList,
             setActiveConversationId: state.setActiveConversationId,
-            setIsLoadingHistory: state.setIsLoadingHistory, // If direct manipulation is needed
-            setIsHistoryLoaded: state.setIsHistoryLoaded,   // If direct manipulation is needed
+            setIsLoadingHistory: state.setIsLoadingHistory,
+            setIsHistoryLoaded: state.setIsHistoryLoaded,
+            setIsProcessingExplicitNewChat: state.setIsProcessingExplicitNewChat, // Thêm action này
             loadConversation: state.loadConversation,
             startNewConversation: state.startNewConversation,
             deleteConversation: state.deleteConversation,
@@ -127,61 +121,46 @@ export const useConversationActions = () => {
             renameConversation: state.renameConversation,
             pinConversation: state.pinConversation,
             searchConversations: state.searchConversations,
+            resetConversationState: state.resetConversationState, // Thêm action này
         }))
     );
 };
 
 
-// === MessageStore Hooks ===
+// === MessageStore Hooks === (Giữ nguyên, không bị ảnh hưởng trực tiếp)
 
-/**
- * Hook to get chat messages and the loading state related to sending/receiving messages.
- * @returns {object} Chat messages and loading state.
- */
 export const useChatMessageState = () => {
     return useMessageStore(
         useShallow(state => ({
             chatMessages: state.chatMessages,
-            loadingState: state.loadingState, // Loading state for message operations
+            loadingState: state.loadingState,
+            pendingBotMessageId: state.pendingBotMessageId, // Thêm state này
         }))
     );
 };
 
-/**
- * Hook to get actions for sending messages, managing individual messages, and resetting chat UI.
- * @returns {object} Message management actions.
- */
 export const useMessageActions = () => {
     return useMessageStore(
         useShallow(state => ({
-            setChatMessages: state.setChatMessages, // For direct manipulation or complex updates
+            setChatMessages: state.setChatMessages,
             addChatMessage: state.addChatMessage,
             updateMessageById: state.updateMessageById,
-            setLoadingState: state.setLoadingState, // For direct manipulation
+            setLoadingState: state.setLoadingState,
+            setPendingBotMessageId: state.setPendingBotMessageId, // Thêm action này
             sendMessage: state.sendMessage,
             resetChatUIForNewConversation: state.resetChatUIForNewConversation,
+            clearAuthErrorMessages: state.clearAuthErrorMessages, // Thêm action này
         }))
     );
 };
 
-/**
- * Hook specifically for providing the `updateMessageById` callback to `useStreamingTextAnimation`.
- * This ensures the callback is stable if `updateMessageById` itself is stable.
- * @returns {function} Callback to update a message's content.
- */
 export const useUpdateChatMessageCallbackForAnimation = () => {
     const storeUpdateMessageById = useMessageStore(state => state.updateMessageById);
     return useCallback((messageId: string, newContent: string) => {
-        // Only update the message content, keep other properties
         storeUpdateMessageById(messageId, (prevMsg) => ({ ...prevMsg, message: newContent, timestamp: new Date().toISOString() }));
     }, [storeUpdateMessageById]);
 };
 
-/**
- * Hook to get and set animation controls, and manage the awaiting flag for streaming.
- * Primarily intended for `useChatSocketManager` and `useStreamingTextAnimation`.
- * @returns {object} Animation controls and related state/actions.
- */
 export const useAnimationControls = () => {
     return useMessageStore(
         useShallow(state => ({
@@ -194,28 +173,20 @@ export const useAnimationControls = () => {
 };
 
 
-// === SettingsStore Hooks ===
+// === SettingsStore Hooks === (Giữ nguyên)
 
-/**
- * Hook to get all chat-related settings (mode, locale, streaming, language).
- * @returns {object} All chat settings.
- */
 export const useChatSettingsState = () => {
     return useSettingsStore(
         useShallow(state => ({
             chatMode: state.chatMode,
-            currentLocale: state.currentLocale, // App's UI locale
+            currentLocale: state.currentLocale,
             isStreamingEnabled: state.isStreamingEnabled,
-            currentLanguage: state.currentLanguage, // Chatbot's language
+            currentLanguage: state.currentLanguage,
             availableLanguages: state.availableLanguages,
         }))
     );
 };
 
-/**
- * Hook to get actions for modifying chat-related settings.
- * @returns {object} Chat settings actions.
- */
 export const useChatSettingsActions = () => {
     return useSettingsStore(
         useShallow(state => ({
@@ -223,21 +194,19 @@ export const useChatSettingsActions = () => {
             setCurrentLocale: state.setCurrentLocale,
             setIsStreamingEnabled: state.setIsStreamingEnabled,
             setCurrentLanguage: state.setCurrentLanguage,
+            // resetSettingsToDefaults: state.resetSettingsToDefaults, // Thêm nếu có action này
         }))
     );
 };
 
 
-// === UiStore Hooks ===
+// === UiStore Hooks === (Giữ nguyên)
 
-/**
- * Hook to get general UI states: fatal errors, dialog visibility, panel states.
- * @returns {object} General UI state.
- */
 export const useUIState = () => {
     return useUiStore(
         useShallow(state => ({
-            hasFatalError: state.hasFatalError, // General, non-connection fatal errors
+            hasFatalError: state.hasFatalError,
+            fatalErrorCode: state.fatalErrorCode, // Thêm state này
             showConfirmationDialog: state.showConfirmationDialog,
             confirmationData: state.confirmationData,
             isLeftPanelOpen: state.isLeftPanelOpen,
@@ -246,33 +215,25 @@ export const useUIState = () => {
     );
 };
 
-/**
- * Hook to get actions for controlling UI elements, handling general errors, and confirmations.
- * @returns {object} UI control actions.
- */
 export const useUIActions = () => {
     return useUiStore(
         useShallow(state => ({
             setHasFatalError: state.setHasFatalError,
+            clearFatalError: state.clearFatalError, // Thêm action này
             setShowConfirmationDialog: state.setShowConfirmationDialog,
             toggleLeftPanel: state.toggleLeftPanel,
             setLeftPanelOpen: state.setLeftPanelOpen,
             setRightPanelOpen: state.setRightPanelOpen,
-            handleError: state.handleError, // General error handler
-            handleConfirmSend: state.handleConfirmSend, // For email confirmation dialog
-            handleCancelSend: state.handleCancelSend,   // For email confirmation dialog
+            handleError: state.handleError,
+            handleConfirmSend: state.handleConfirmSend,
+            handleCancelSend: state.handleCancelSend,
         }))
     );
 };
 
 
-// === Combined "Facade" Hooks (for specific component use cases) ===
+// === Combined "Facade" Hooks ===
 
-/**
- * Facade hook for components managing the overall conversation lifecycle
- * (e.g., a layout component or a primary chat view controller).
- * @returns {object} Combined state and actions for conversation management.
- */
 export const useConversationManagement = () => {
     const listState = useConversationListState();
     const activeConvState = useActiveConversationState();
@@ -280,16 +241,25 @@ export const useConversationManagement = () => {
     return { ...listState, ...activeConvState, ...actions };
 };
 
-/**
- * Facade hook tailored for a chat input component.
- * Gathers necessary state and actions for sending messages and reflecting current settings.
- * @returns {object} State and actions for a chat input.
- */
 export const useChatInputCore = () => {
     const { sendMessage } = useMessageActions();
     const { isStreamingEnabled, currentLanguage } = useChatSettingsState();
     const { isConnected, isServerReadyForCommands } = useSocketConnectionStatus();
-    const { loadingState } = useChatMessageState(); // To disable input while loading/streaming
+    const { loadingState } = useChatMessageState();
+    const { hasFatalError, fatalErrorCode } = useUIState(); // Lấy thêm lỗi từ UIStore
+
+    // Helper để xác định lỗi có liên quan đến xác thực hoặc kết nối không
+    const getIsAuthRelatedOrConnectionError = useCallback((code: string | null): boolean => {
+        if (!code) return false;
+        const criticalErrorCodes = [
+            'AUTH_REQUIRED', 'ACCESS_DENIED', 'TOKEN_EXPIRED',
+            'AUTH_CONNECTION_ERROR', 'AUTH_HANDSHAKE_FAILED',
+            'CONNECTION_FAILED', 'FATAL_SERVER_ERROR'
+        ];
+        return criticalErrorCodes.includes(code);
+    }, []);
+
+    const isInputDisabled = hasFatalError && getIsAuthRelatedOrConnectionError(fatalErrorCode);
 
     return {
         sendMessage,
@@ -297,78 +267,64 @@ export const useChatInputCore = () => {
         currentLanguage,
         isConnected,
         isServerReadyForCommands,
-        isLoading: loadingState.isLoading, // Simplified loading state for input
+        isLoading: loadingState.isLoading,
+        isInputDisabled, // Prop mới để vô hiệu hóa input
     };
 };
 
-/**
- * Facade hook for components displaying the main chat message area.
- * Provides messages, loading states, and active conversation context.
- * @returns {object} State for the chat message display area.
- */
 export const useChatAreaCore = () => {
     const { chatMessages, loadingState } = useChatMessageState();
     const { activeConversationId, isHistoryLoaded } = useActiveConversationState();
-    const { isLoadingHistory } = useConversationListState(); // For the initial load of history
-    const { animationControls } = useAnimationControls(); // For potential direct interaction if needed
+    const { isLoadingHistory } = useConversationListState();
+    const { animationControls } = useAnimationControls();
 
     return {
         chatMessages,
-        loadingState, // Message-specific loading (sending, streaming)
+        loadingState,
         activeConversationId,
-        isHistoryLoaded, // Is the *current* active conversation's history fully loaded?
-        isLoadingHistory, // Is *any* history loading operation in progress?
+        isHistoryLoaded,
+        isLoadingHistory,
         animationControls,
     };
 };
 
-
-/**
- * Facade hook providing necessary state and actions for the LeftPanel component,
- * which typically lists conversations and allows starting new ones.
- * @returns {object} State and actions for the LeftPanel.
- */
 export const useLeftPanelCore = () => {
     const {
         conversationList,
         searchResults,
         isSearching,
-        // isLoadingHistory, // Nếu LeftPanel cần biết trạng thái loading chung của history
-    } = useConversationListState(); // Lấy state liên quan đến danh sách
-
-    const { activeConversationId } = useActiveConversationState(); // Lấy activeConversationId từ đây
-
+    } = useConversationListState();
+    const { activeConversationId, isLoadingHistory } = useConversationStore( // Lấy isLoadingHistory trực tiếp từ store gốc nếu cần
+        useShallow(state => ({
+            activeConversationId: state.activeConversationId,
+            isLoadingHistory: state.isLoadingHistory,
+        }))
+    );
     const {
         startNewConversation,
         searchConversations,
-        loadConversation, // Dùng khi người dùng chọn một cuộc trò chuyện từ danh sách
-        deleteConversation, // Dùng khi người dùng xóa một cuộc trò chuyện từ danh sách
+        loadConversation,
+        deleteConversation,
     } = useConversationActions();
-
     const { isLeftPanelOpen } = useUIState();
-    const { setLeftPanelOpen } = useUIActions(); // Để đóng/mở panel, ví dụ trên mobile
+    const { toggleLeftPanel } = useUIActions(); // Đổi sang toggleLeftPanel nếu chỉ là toggle
 
     return {
         conversationList,
         searchResults,
         isSearching,
-        activeConversationId, // Bây giờ đã có giá trị đúng
+        activeConversationId,
+        isLoadingHistory, // Thêm lại isLoadingHistory
         startNewConversation,
         searchConversations,
         loadConversation,
         deleteConversation,
         isLeftPanelOpen,
-        setLeftPanelOpen,
-        // isLoadingHistory, // Có thể thêm lại nếu LeftPanel cần hiển thị spinner khi lịch sử đang tải
+        toggleLeftPanel, // Sử dụng toggleLeftPanel
     };
 };
 
 
-/**
- * Facade hook providing necessary state and actions for the RightSettingsPanel component,
- * where users configure chat settings.
- * @returns {object} State and actions for the RightSettingsPanel.
- */
 export const useRightSettingsPanelCore = () => {
     const settingsState = useChatSettingsState();
     const settingsActions = useChatSettingsActions();
@@ -384,59 +340,46 @@ export const useRightSettingsPanelCore = () => {
 };
 
 /**
- * Hook for a component that needs to initialize authentication and potentially
- * display global connection errors.
- * @returns {object} Authentication and connection status/actions.
+ * Hook for a component that needs to initialize application state,
+ * primarily setting the locale. Authentication is handled by AuthContext.
+ * @returns {object} Actions for app initialization.
  */
-export const useAppInitializerCore = () => {
-    const { initializeAuth } = useSocketConnectionActions();
-    const { authToken, isConnected, hasFatalConnectionError } = useSocketConnectionStatus();
-    const { hasFatalError } = useUIState(); // General fatal errors
-    const { setCurrentLocale } = useChatSettingsActions(); // For setting initial locale
+export const useAppInitializerCore = () => { // Đổi tên và mục đích
+    // initializeAuth đã bị loại bỏ khỏi đây
+    const { setCurrentLocale } = useChatSettingsActions();
+    // Các trạng thái kết nối có thể được lấy từ useSocketConnectionStatus nếu cần
+    // const { isConnected, hasFatalConnectionError } = useSocketConnectionStatus();
+    // const { hasFatalError } = useUIState();
 
     return {
-        initializeAuth,
-        authToken,
-        isConnected,
-        hasFatalConnectionError,
-        hasFatalError,
         setCurrentLocale,
+        // isConnected, // Có thể trả về nếu component init cần biết
+        // hasFatalConnectionError,
+        // hasFatalError
     };
 };
 
 
-// --- Re-exporting common types for convenience ---
-// This allows components to import types directly from storeHooks.ts if they wish.
+// --- Re-exporting common types ---
 export type {
-    // Socket Store Related
-    // (Socket type itself is usually not needed by typical UI components)
-
-    // Conversation Store Related
     ConversationMetadata,
     InitialHistoryPayload,
     ConversationDeletedPayload,
     ConversationClearedPayload,
     ConversationRenamedPayload,
     ConversationPinStatusChangedPayload,
-
-    // Message Store Related
     ChatMessageType,
-    LoadingState, // Generic loading state used in MessageStore
+    LoadingState,
     ThoughtStep,
     ChatUpdate,
     ResultUpdate,
     EmailConfirmationResult,
     StreamingTextAnimationControls,
-
-    // Settings Store Related
     LanguageCode,
     ChatMode,
     LanguageOption,
-
-    // UI Store Related
     ConfirmSendEmailAction,
-    // ErrorUpdate is complex, components usually interact via handleError's simpler forms
-
-    // General Error/Update types that might be passed around
     ErrorUpdate,
+    StatusUpdate, // Đảm bảo type này được export nếu nó dùng ở đâu đó
+    FrontendAction, // Đảm bảo type này được export
 };
