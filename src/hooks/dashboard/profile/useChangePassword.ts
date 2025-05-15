@@ -2,20 +2,18 @@
 import { appConfig } from '@/src/middleware';
 import { useState, useCallback } from 'react';
 
-const API_VERIFY_PASSWORD_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/user/verify-password`;
-const API_CHANGE_PASSWORD_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/user/change-password`;
+const API_CHANGE_PASSWORD_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/change-password`;
 
 export const useChangePassword = (userId: string, onClose: () => void) => {
-  const [currentPassword, setCurrentPassword] = useState('');
+  const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [step, setStep] = useState<'confirm' | 'change'>('confirm');
 
-  const handleCurrentPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrentPassword(e.target.value);
+  const handleOldPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setOldPassword(e.target.value);
     setError(null);
   };
 
@@ -24,37 +22,11 @@ export const useChangePassword = (userId: string, onClose: () => void) => {
     setError(null);
   };
 
+  
   const handleConfirmNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setConfirmNewPassword(e.target.value);
     setError(null);
   };
-
-  const handleConfirmCurrentPassword = useCallback(async () => {
-    setError(null);
-    setMessage(null);
-    setIsLoading(true);
-    try {
-      const response = await fetch(API_VERIFY_PASSWORD_ENDPOINT, { // Gọi API verify
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id: userId, currentPassword }), // Gửi id và currentPassword
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setStep('change'); // Chuyển sang bước đổi mật khẩu
-      } else {
-        setError(data.message || 'Invalid current password');
-      }
-    } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [userId, currentPassword]);
 
   const handleChangePassword = useCallback(async () => {
     setError(null);
@@ -67,20 +39,29 @@ export const useChangePassword = (userId: string, onClose: () => void) => {
       return;
     }
 
+    const allowRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]*$/;
+
+    if (!allowRegex.test(newPassword)) {
+      setError('New passwords is invalid format.');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch(API_CHANGE_PASSWORD_ENDPOINT, { // Gọi API change-password
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
         },
-        body: JSON.stringify({ id: userId, newPassword, confirmNewPassword }), // Gửi id, newPassword, confirmNewPassword
+        body: JSON.stringify({ oldPassword, newPassword }), // Gửi id, newPassword, confirmNewPassword
       });
 
       const data = await response.json();
 
       if (response.ok) {
         setMessage(data.message);
-        setCurrentPassword('');
+        setOldPassword('');
         setNewPassword('');
         setConfirmNewPassword('');
         setTimeout(() => {
@@ -97,17 +78,15 @@ export const useChangePassword = (userId: string, onClose: () => void) => {
   }, [userId, newPassword, confirmNewPassword, onClose]);
 
   return {
-    currentPassword,
+    oldPassword,
     newPassword,
     confirmNewPassword,
     error,
     message,
     isLoading,
-    step,
-    handleCurrentPasswordChange,
+    handleOldPasswordChange,
     handleNewPasswordChange,
     handleConfirmNewPasswordChange,
-    handleConfirmCurrentPassword,
     handleChangePassword,
   };
 };

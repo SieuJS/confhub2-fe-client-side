@@ -22,6 +22,8 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [dob, setDob] = useState('')
   const [error, setError] = useState('') // Local form error
   const [isLoading, setIsLoading] = useState(false) // Local loading state for submission
@@ -56,6 +58,13 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
       setError(t('Error_Password_Too_Short'));
       return;
     }
+    const allowRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]*$/;
+
+    if (!allowRegex.test(password)) {
+      setError(t('Error_Invalid_Password_Format'));
+      return;
+    }
+
     if (!isOldEnough(dob)) {
       setError(t('Error_Age_Requirement'));
       return;
@@ -158,13 +167,45 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
               <div>
                 <label htmlFor='password' className='block text-sm font-medium '>{t('Password')} <span className='text-red-500'>*</span></label>
                 <div className='mt-1'>
-                  <input id='password' name='password' type='password' required value={password} onChange={e => setPassword(e.target.value)} className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm' placeholder='••••••••' disabled={isLoading}/>
+                  <div className='relative'>
+                    <input id='password' name='password' type={showPassword ? 'text' : 'password'} required value={password} onChange={e => setPassword(e.target.value)} className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm' placeholder='••••••••' disabled={isLoading}/>
+                    {password && 
+                      <button
+                        type='button'
+                        onClick={() => setShowPassword(!showPassword)}
+                        className='absolute right-2 top-1/2 -translate-y-1/2 text-xl'
+                      >
+                        <span className="relative inline-block w-6 text-xl leading-none">
+                          👁️
+                          {showPassword && (
+                            <span className="absolute left-0 top-1/2 h-[2px] w-[28px] -translate-y-1/2 -rotate-45 bg-black"></span>
+                          )}
+                        </span>
+                      </button>
+                    }
+                  </div>
                 </div>
               </div>
               <div>
                 <label htmlFor='confirmPassword' className='block text-sm font-medium '>{t('Confirm_Password')} <span className='text-red-500'>*</span></label>
                 <div className='mt-1'>
-                  <input id='confirmPassword' name='confirmPassword' type='password' required value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm' placeholder='••••••••' disabled={isLoading}/>
+                  <div className='relative'>
+                    <input id='confirmPassword' name='confirmPassword' type={showConfirmPassword ? 'text' : 'password'} required value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm' placeholder='••••••••' disabled={isLoading} />
+                    {confirmPassword && 
+                      <button
+                        type='button'
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className='absolute right-2 top-1/2 -translate-y-1/2 text-xl'
+                      >
+                        <span className="relative inline-block w-6 text-xl leading-none">
+                          👁️
+                          {showConfirmPassword && (
+                            <span className="absolute left-0 top-1/2 h-[2px] w-[28px] -translate-y-1/2 -rotate-45 bg-black"></span>
+                          )}
+                        </span>
+                    </button>
+                  }
+                  </div>
                 </div>
               </div>
 

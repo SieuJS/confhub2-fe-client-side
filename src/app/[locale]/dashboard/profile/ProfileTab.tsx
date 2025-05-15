@@ -55,12 +55,13 @@ const ProfileTab: React.FC = () => {
   const [formattedDob, setFormattedDob] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log(authUser?.dob)
     // userData ở đây nên là authUser từ context
     if (authUser?.dob) {
       try {
         const date = new Date(authUser.dob);
         if (!isNaN(date.getTime())) {
-          setFormattedDob(date.toLocaleDateString(t('language_code') || undefined, { year: 'numeric', month: 'long', day: 'numeric' }));
+          setFormattedDob(date.toLocaleDateString(t('language') || undefined, { year: 'numeric', month: 'long', day: 'numeric' }));
         } else {
           setFormattedDob(t('Invalid_Date'));
         }
@@ -322,7 +323,7 @@ const ProfileTab: React.FC = () => {
              {/* Nút Edit Profile và Change Password đã được chuyển lên trên */}
             <div className="grid grid-cols-1 gap-x-4 gap-y-3 md:grid-cols-2">
                 <div>
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('Email_Address')}</dt>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('Email')}</dt>
                     <dd className="mt-1 text-sm text-gray-900 dark:text-white">{authUser.email}</dd>
                 </div>
                 {formattedDob && (
