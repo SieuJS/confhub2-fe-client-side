@@ -74,6 +74,7 @@ export function useChatSocketManager() {
         _onSocketChatResult: state._onSocketChatResult,
         _onSocketChatError: state._onSocketChatError,
         _onSocketEmailConfirmationResult: state._onSocketEmailConfirmationResult,
+        _onSocketConversationUpdatedAfterEdit: state._onSocketConversationUpdatedAfterEdit, // <<< ADD THIS LINE
         setAnimationControls: state.setAnimationControls,
     })));
 
@@ -190,6 +191,7 @@ export function useChatSocketManager() {
             newSocket.on('chat_result', createMountedAwareHandler(messageStoreActions._onSocketChatResult));
             newSocket.on('chat_error', createMountedAwareHandler(messageStoreActions._onSocketChatError));
             newSocket.on('email_confirmation_result', createMountedAwareHandler(messageStoreActions._onSocketEmailConfirmationResult));
+            newSocket.on('conversation_updated_after_edit', createMountedAwareHandler(messageStoreActions._onSocketConversationUpdatedAfterEdit));
 
 
             // Listener cho các sự kiện của Manager (quản lý reconnect)

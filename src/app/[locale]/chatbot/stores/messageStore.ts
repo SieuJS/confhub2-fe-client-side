@@ -200,64 +200,90 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
             _onSocketConversationUpdatedAfterEdit: (payload) => {
                 const { editedUserMessage, newBotMessage, conversationId } = payload;
                 const { activeConversationId } = useConversationStore.getState();
-                const { setLoadingState } = get();
+                const { setLoadingState } = get(); // animationControls, resetAwaitFlag, setPendingBotMessageId are not directly needed here for final update
 
                 if (activeConversationId !== conversationId) {
-                    console.warn('[MessageStore] Received conversation_updated_after_edit for a non-active conversation.');
+                    console.warn('[MessageStore] Received conversation_updated_after_edit for a non-active conversation. Ignoring.');
                     return;
                 }
 
+                // It's good practice to stop any ongoing streaming and clear pending states
+                // as this event signifies a definitive update.
+                get().animationControls?.stopStreaming();
+                get().resetAwaitFlag();
+                get().setPendingBotMessageId(null);
+
+                console.log(`[MessageStore _onSocketConversationUpdatedAfterEdit] Processing update for conv: ${conversationId}`);
+                console.log(`[MessageStore _onSocketConversationUpdatedAfterEdit] Edited User Message (payload): ID=${editedUserMessage.id}, Text="${editedUserMessage.message}"`);
+                if (newBotMessage) {
+                    console.log(`[MessageStore _onSocketConversationUpdatedAfterEdit] New Bot Message (payload): ID=${newBotMessage.id}, Text="${newBotMessage.message}"`);
+                } else {
+                    console.log(`[MessageStore _onSocketConversationUpdatedAfterEdit] No new bot message in payload.`);
+                }
+
+
                 set(state => {
-                    let currentMessages = [...state.chatMessages];
+                    const currentMessages = [...state.chatMessages];
+                    console.log(`[MessageStore _onSocketConversationUpdatedAfterEdit] State before update - messages:`, JSON.parse(JSON.stringify(currentMessages.map(m => ({ id: m.id, text: m.message, isUser: m.isUser })))));
+
+
                     const userMessageIndex = currentMessages.findIndex(msg => msg.id === editedUserMessage.id);
 
                     if (userMessageIndex === -1) {
-                        console.warn(`[MessageStore] _onSocketConversationUpdatedAfterEdit: Original user message ${editedUserMessage.id} not found for update.`);
+                        console.warn(`[MessageStore _onSocketConversationUpdatedAfterEdit] Original user message ${editedUserMessage.id} not found in current state. This is unexpected. Current IDs:`, currentMessages.map(m => m.id));
+                        // If the user message isn't found, it's hard to proceed correctly.
+                        // Option 1: Just add new messages (might lead to duplicates or wrong order)
+                        // Option 2: Replace all messages if this is a full state sync (less likely for this event)
+                        // Option 3: Log and do nothing, or try to append if absolutely necessary.
+                        // For now, let's log and not modify if the anchor (user message) is missing.
                         return { chatMessages: currentMessages };
                     }
 
+                    console.log(`[MessageStore _onSocketConversationUpdatedAfterEdit] Found user message at index ${userMessageIndex}. Updating its content.`);
+                    // 1. Update the user's message content directly.
+                    // The ID should already match. Ensure all properties from payload are applied.
                     currentMessages[userMessageIndex] = {
-                        ...currentMessages[userMessageIndex],
-                        ...editedUserMessage,
+                        ...currentMessages[userMessageIndex], // Preserve existing properties like timestamp if not in payload
+                        ...editedUserMessage, // Overlay with payload data (message, potentially new timestamp, etc.)
                     };
 
-                    let filteredMessages = currentMessages.filter((msg, index) => {
-                        if (index < userMessageIndex) return true;
-                        if (msg.id === editedUserMessage.id) return true;
-                        if (newBotMessage && msg.id === newBotMessage.id) return true; // newBotMessage might be null if edit resulted in no new bot msg
-                        return false;
-                    });
+                    // 2. Determine the messages to keep: only those up to and including the edited user message.
+                    //    All subsequent messages are candidates for removal (they are the old bot response).
+                    let updatedMessages = currentMessages.slice(0, userMessageIndex + 1);
+                    console.log(`[MessageStore _onSocketConversationUpdatedAfterEdit] Messages after slicing (kept user msg and before):`, JSON.parse(JSON.stringify(updatedMessages.map(m => ({ id: m.id, text: m.message, isUser: m.isUser })))));
 
-                    if (newBotMessage) { // Only proceed if there's a new bot message in the payload
-                        const isNewBotMessageAlreadyCorrectlyPlaced = filteredMessages.some(msg => msg.id === newBotMessage.id);
 
-                        if (!isNewBotMessageAlreadyCorrectlyPlaced) {
-                            const userMsgIdxInFiltered = filteredMessages.findIndex(m => m.id === editedUserMessage.id);
-                            if (userMsgIdxInFiltered > -1) {
-                                filteredMessages.splice(userMsgIdxInFiltered + 1, 0, newBotMessage);
-                                console.log(`[MessageStore] _onSocketConversationUpdatedAfterEdit: Added/Inserted new bot message ${newBotMessage.id}`);
-                            } else {
-                                // Should not happen if userMessageIndex was valid
-                                filteredMessages.push(newBotMessage);
-                                console.warn(`[MessageStore] _onSocketConversationUpdatedAfterEdit: User message ${editedUserMessage.id} not found in filtered list, appending new bot message ${newBotMessage.id}`);
-                            }
+                    // 3. Add the new bot message from the payload, if it exists.
+                    //    The `newBotMessage` from the payload should have its final backend ID.
+                    if (newBotMessage && newBotMessage.id) {
+                        // Check if a message with this newBotMessage.id ALREADY exists in `updatedMessages`
+                        // (This shouldn't happen if slicing was correct, as `updatedMessages` only contains user message and prior)
+                        // However, if `_onSocketChatResult` perfectly promoted the ID, and somehow the slice was wrong, this is a safeguard.
+                        const existingNewBotMessageIndex = updatedMessages.findIndex(msg => msg.id === newBotMessage.id);
+
+                        if (existingNewBotMessageIndex !== -1) {
+                            // This case is unlikely if the slice at step 2 is correct (removes old bot messages).
+                            // If it occurs, it means the newBotMessage (with its final ID) was somehow part of the messages *before or including* the user's edited message.
+                            // This would be a logic error elsewhere. For now, update it.
+                            console.warn(`[MessageStore _onSocketConversationUpdatedAfterEdit] New bot message ${newBotMessage.id} found unexpectedly in pre-sliced list. Updating it.`);
+                            updatedMessages[existingNewBotMessageIndex] = { ...updatedMessages[existingNewBotMessageIndex], ...newBotMessage };
                         } else {
-                            const newBotMsgIdx = filteredMessages.findIndex(m => m.id === newBotMessage.id);
-                            if (newBotMsgIdx > -1) {
-                                filteredMessages[newBotMsgIdx] = { ...filteredMessages[newBotMsgIdx], ...newBotMessage };
-                                console.log(`[MessageStore] _onSocketConversationUpdatedAfterEdit: Ensured content of existing new bot message ${newBotMessage.id} is up-to-date.`);
-                            }
+                            // This is the expected path: add the new bot message after the user's edited message.
+                            console.log(`[MessageStore _onSocketConversationUpdatedAfterEdit] Adding new bot message ${newBotMessage.id} to the list.`);
+                            updatedMessages.push(newBotMessage);
                         }
+                    } else if (newBotMessage && !newBotMessage.id) {
+                        console.warn(`[MessageStore _onSocketConversationUpdatedAfterEdit] New bot message received in payload but without an ID. Cannot reliably add it.`);
                     }
-                    return { chatMessages: filteredMessages };
-                }, false, '_onSocketConversationUpdatedAfterEdit/updateMessages');
 
-                setLoadingState({ isLoading: false, step: 'message_updated', message: '', agentId: undefined });
+
+                    console.log(`[MessageStore _onSocketConversationUpdatedAfterEdit] Final messages for state update:`, JSON.parse(JSON.stringify(updatedMessages.map(m => ({ id: m.id, text: m.message, isUser: m.isUser })))));
+
+                    return { chatMessages: updatedMessages };
+                }, false, '_onSocketConversationUpdatedAfterEdit/updateAndReplaceMessages');
+
+                setLoadingState({ isLoading: false, step: 'message_updated_and_bot_response_applied', message: '', agentId: undefined });
             },
-
-
-
-
 
             _onSocketStatusUpdate: (data: StatusUpdate) => {
                 const { agentId, step, message } = data;
