@@ -6,12 +6,6 @@ import { useTranslations } from 'next-intl';
 import { useUiStore, useSettingsStore } from './stores';
 import { useShallow } from 'zustand/react/shallow';
 import { useLiveChatSettings } from './livechat/contexts/LiveChatSettingsContext';
-
-// --- IMPORT CÁC KIỂU CẦN THIẾT TỪ STORE ---
-// Giả sử 'setttingsStore.ts' (hoặc tên file store của bạn) export các kiểu này,
-// và './stores/index.ts' (nếu có) cũng re-export chúng.
-// Nếu không, bạn có thể cần import trực tiếp từ file store, ví dụ:
-// import { LanguageOption } from './stores/setttingsStore';
 import { LanguageOption } from './stores';
 
 

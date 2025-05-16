@@ -39,12 +39,11 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
     }))
   );
 
-  // Gọi hook MỘT LẦN ở top level
   const {
     isGenericChatFunctionalityDisabled,
     isCurrentFatalErrorAuthRelated,
     uiHasFatalError,
-    isAuthInitializing // Lấy isAuthInitializing từ đây
+    isAuthInitializing
   } = useLeftPanelAuthControls();
 
 
@@ -70,8 +69,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
   const { navItems } = useLeftPanelNavigation({ currentView, isLiveServiceConnected });
   const showConversationList = isLeftPanelOpen && currentView === 'chat' && chatMode !== 'live';
 
-  // Sử dụng giá trị isAuthInitializing đã lấy từ hook ở trên
-  if (!isClient && isAuthInitializing) { // <--- SỬA Ở ĐÂY
+  if (!isClient && isAuthInitializing) { 
     return (
       <div
         className={`h-full flex-shrink-0 bg-white-pure shadow-xl transition-all duration-300 ease-in-out ${isLeftPanelOpen ? 'w-72' : 'w-16'} flex items-center justify-center`}
@@ -118,19 +116,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
             disabled={isGenericChatFunctionalityDisabled}
           />
         )}
-
-        {/*
-          Không cần kiểm tra isClient ở đây nữa nếu AuthFooter tự xử lý việc render
-          hoặc nếu logic loading spinner ở trên đã đủ.
-          Nếu AuthFooter CẦN `isClient` để hoạt động đúng, bạn có thể truyền nó vào.
-          Tuy nhiên, thông thường, component con nên tự quản lý trạng thái client-side của nó nếu cần.
-        */}
         {isClient && <AuthFooter isLeftPanelOpen={isLeftPanelOpen} />}
-        {/* Hoặc đơn giản là: <AuthFooter isLeftPanelOpen={isLeftPanelOpen} />
-            nếu AuthFooter không cần isClient hoặc đã có logic isClient riêng.
-            Dựa vào code AuthFooter bạn cung cấp, nó không trực tiếp dùng isClient prop.
-            Nó chỉ dùng isAuthInitializing, mà isAuthInitializing đã được xử lý ở spinner phía trên.
-        */}
       </div>
     </div>
   );

@@ -35,10 +35,13 @@ export function useChatInteractions({ onChatStart, startTimer }: UseChatInteract
         // Cân nhắc hiển thị toast
         return;
       }
-      console.log(`[useChatInteractions] Confirming edit for message ${messageId}. New text: "${newText}"`);
+      console.log(`[useChatInteractions handleConfirmEdit] Submitting edit. MessageID: "${messageId}", NewText: "${newText}"`);
+      
+      startTimer?.(); // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< THÊM DÒNG NÀY
+      
       submitEditedMessage(messageId, newText); // Gửi tin nhắn đã chỉnh sửa
     },
-    [submitEditedMessage, isConnected]
+    [submitEditedMessage, isConnected, startTimer] // <<<< THÊM startTimer VÀO DEPENDENCY ARRAY
   );
 
   const handleSetFillInput = useCallback((fillFunc: (text: string) => void) => {

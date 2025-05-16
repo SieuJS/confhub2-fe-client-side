@@ -286,10 +286,16 @@ export const useConversationStore = create<ConversationStoreState & Conversation
                     activeConversationId: payload.conversationId,
                     isHistoryLoaded: true,
                 }, false, `_onSocketInitialHistory/${payload.conversationId}`);
+
                 useMessageStore.getState().setChatMessages(Array.isArray(payload.messages) ? payload.messages : []);
+
                 const messagesFromBackend = Array.isArray(payload.messages) ? payload.messages : [];
-                console.log('[ConversationStore _onSocketInitialHistory] Raw messages from backend:', JSON.parse(JSON.stringify(messagesFromBackend))); // LOG SÂU
+                console.log('[ConversationStore _onSocketInitialHistory] Payload messages from backend:', JSON.parse(JSON.stringify(messagesFromBackend.map(m => ({ id: m.id, text: m.message?.substring(0, 20), isUser: m.isUser })))));
                 useMessageStore.getState().setChatMessages(messagesFromBackend); // <--- Quan trọng
+                // Log state của messageStore sau khi cập nhật
+                const currentChatMessages = useMessageStore.getState().chatMessages;
+                console.log('[ConversationStore _onSocketInitialHistory] messageStore.chatMessages AFTER update:', JSON.parse(JSON.stringify(currentChatMessages.map(m => ({ id: m.id, text: m.message?.substring(0, 20), isUser: m.isUser })))));
+
                 useMessageStore.getState().setLoadingState({ isLoading: false, step: 'history_loaded', message: '' });
             },
             _onSocketNewConversationStarted: (payload) => { // << MODIFIED: Payload includes title

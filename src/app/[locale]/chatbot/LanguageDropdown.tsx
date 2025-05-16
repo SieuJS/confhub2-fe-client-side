@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import {
   LanguageOption, //
-} from '@/src/app/[locale]/chatbot/lib/live-chat.types'; 
+} from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; 
 import { ChevronDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 

@@ -4,15 +4,11 @@
 import React, { useEffect, useRef } from 'react';
 import LeftPanel from './LeftPanel';
 import RightSettingsPanel from './RightPanel';
-import { useTranslations } from 'next-intl'; // Keep for any remaining direct t() calls
-import { usePathname, useRouter, AppPathname } from '@/src/navigation';
+import { useTranslations } from 'next-intl';
+import { AppPathname } from '@/src/navigation';
 import { useSearchParams } from 'next/navigation';
 import {
   useConversationStore,
-  // useSocketStore, // No longer directly used here if actions handle it
-  // useSettingsStore, // No longer directly used here
-  // useUiStore, // Handled by SettingsToggleButton
-  // useMessageStore, // Handled by useChatViewManager
 } from './stores';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -20,19 +16,18 @@ import { useShallow } from 'zustand/react/shallow';
 import { useAppInitialization } from '@/src/hooks/chatbot/useAppInitialization';
 import { useUrlConversationSync } from '@/src/hooks/chatbot/useUrlConversationSync';
 import { useConversationLifecycleManager } from '@/src/hooks/chatbot/useConversationLifecycleManager';
-import { useChatViewManager } from '@/src/hooks/chatbot/useChatViewManager'; // NEW
-import { useConversationActions } from '@/src/hooks/chatbot/useConversationActions'; // NEW
+import { useChatViewManager } from '@/src/hooks/chatbot/useChatViewManager';
+import { useConversationActions } from '@/src/hooks/chatbot/useConversationActions';
 
 // Import child components
-import DeletionOverlay from './regularchat/DeletionOverlay'; // NEW
-import SettingsToggleButton from './regularchat/SettingToggleButton'; // NEW
+import DeletionOverlay from './regularchat/DeletionOverlay';
+import SettingsToggleButton from './regularchat/SettingToggleButton';
 
 interface MainLayoutComponentProps {
   children: React.ReactNode;
   isLiveChatContextActive?: boolean;
 }
 
-// Paths can be moved to a constants file or kept here if specific to this layout context
 export const CHATBOT_HISTORY_PATH: AppPathname = '/chatbot/history';
 export const CHATBOT_LIVECHAT_PATH: AppPathname = '/chatbot/livechat';
 export const CHATBOT_REGULARCHAT_PATH: AppPathname = '/chatbot/regularchat';
@@ -42,11 +37,11 @@ export default function MainLayoutComponent({
   children,
   isLiveChatContextActive
 }: MainLayoutComponentProps) {
-  const t = useTranslations(); // For any remaining direct usages
-  const searchParamsHook = useSearchParams(); // For useUrlConversationSync & LifecycleManager
+  const t = useTranslations();
+  const searchParamsHook = useSearchParams();
 
-  // --- Store Hooks (only what's directly needed by MainLayout or its direct effects) ---
-  const { activeConversationId } = useConversationStore( // Make sure this is present
+  // --- Store Hooks  ---
+  const { activeConversationId } = useConversationStore(
     useShallow(state => ({
       activeConversationId: state.activeConversationId,
     }))
@@ -61,21 +56,21 @@ export default function MainLayoutComponent({
     handleDeleteConversation,
     isProcessingDeletion,
     idBeingDeleted,
-    resetDeletionState, // Important for lifecycle manager
+    resetDeletionState,
   } = useConversationActions({ currentView });
 
 
   const { didAttemptLoadFromUrlRef } = useUrlConversationSync({
     currentView,
-    isProcessingDeletion, // Pass these down
-    idBeingDeleted,       // Pass these down
+    isProcessingDeletion,
+    idBeingDeleted,
   });
 
 
   // --- Refs needed by hooks ---
-  const prevActiveIdRef = useRef<string | null>(null); // << ENSURE THIS IS UNCOMMENTED/PRESENT
+  const prevActiveIdRef = useRef<string | null>(null);
 
-  useEffect(() => { // << ENSURE THIS IS UNCOMMENTED/PRESENT
+  useEffect(() => {
     prevActiveIdRef.current = activeConversationId;
   }, [activeConversationId]);
 
@@ -83,7 +78,7 @@ export default function MainLayoutComponent({
     currentView,
     isProcessingDeletion,
     idBeingDeleted,
-    prevActiveIdRef, // << Pass the ref here
+    prevActiveIdRef,
     urlIdParam: searchParamsHook.get('id'),
     searchParamsString: searchParamsHook.toString(),
     onDeletionProcessed: () => {

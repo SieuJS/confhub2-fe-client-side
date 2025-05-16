@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import {
     useSocketStore,
     useConversationStore,
-    useMessageStore, // <--- Đảm bảo import MessageStoreState và MessageStoreActions từ đây nếu cần type đầy đủ
+    useMessageStore,
     useSettingsStore,
     useUiStore,
 } from '@/src/app/[locale]/chatbot/stores';
