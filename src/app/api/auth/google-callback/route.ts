@@ -25,6 +25,8 @@ export async function GET(request: Request) {
         <body>
           <script>
             localStorage.setItem('token', '${token}');
+            localStorage.setItem('locale', 'en');
+            localStorage.setItem('loginStatus', 'true');
             window.location.href = '/en/dashboard';
           </script>
         </body>
