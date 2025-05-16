@@ -1,3 +1,4 @@
+// src/app/[locale]/chatbot/livechat/multimodal-live-types.ts
 import type {
   Content,
   FunctionCall,

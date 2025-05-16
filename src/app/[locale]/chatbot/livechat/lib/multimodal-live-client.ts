@@ -1,3 +1,4 @@
+// src/app/[locale]/chatbot/livechat/lib/multimodal-live-client.ts
 import { Content, GenerativeContentBlob, Part } from "@google/generative-ai";
 import { EventEmitter } from "eventemitter3";
 import { difference } from "lodash";

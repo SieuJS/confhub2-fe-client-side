@@ -1,3 +1,4 @@
+// src/app/[locale]/chatbot/livechat/lib/utils.ts
 export type GetAudioContextOptions = AudioContextOptions & {
   id?: string;
 };

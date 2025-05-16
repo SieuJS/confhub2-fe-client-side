@@ -163,11 +163,11 @@ async function handleManageCalendar(fc: LiveFunctionCall, config: HandlerConfig)
     const itemId = itemDetails.id;
     const itemName = itemDetails.name;
 
-    const apiAction = action === 'add' ? 'add-event' : 'remove-event';
+    const apiAction = action === 'add' ? 'add' : 'remove';
     const actionUrl = `${config.databaseUrl}/calendar/${apiAction}`;
     const payload = { conferenceId: itemId };
 
-    await makeFrontendApiCall(actionUrl, 'PUT', token, payload);
+    await makeFrontendApiCall(actionUrl, 'POST', token, payload);
     modelMessage = `Successfully ${action === 'add' ? 'added' : 'removed'} conference "${itemName}" ${action === 'add' ? 'to' : 'from'} your calendar.`;
   }
   return { response: { content: modelMessage }, id: fc.id }; // Now fc.id is valid

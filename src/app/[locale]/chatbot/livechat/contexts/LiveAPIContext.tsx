@@ -1,3 +1,4 @@
+// src/app/[locale]/chatbot/livechat/contexts/LiveAPIContext.tsx
 import { createContext, FC, ReactNode, useContext } from "react";
 import { useLiveAPI, UseLiveAPIResults } from "../hooks/useLiveApi";
 

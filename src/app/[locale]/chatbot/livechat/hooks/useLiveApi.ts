@@ -1,4 +1,4 @@
-// useLiveApi.ts (Corrected for Accumulation)
+// src/app/[locale]/chatbot/livechat/hooks/useLiveApi.ts 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   MultimodalLiveAPIClientConnection,
