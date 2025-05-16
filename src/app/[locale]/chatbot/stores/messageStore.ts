@@ -389,8 +389,6 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
             },
 
             _onSocketChatResult: (result: ResultUpdate) => {
-                console.log('[MessageStore _onSocketChatResult] Received chat_result. Thoughts in payload:', JSON.stringify(result.thoughts));
-
                 const {
                     animationControls,
                     setLoadingState,

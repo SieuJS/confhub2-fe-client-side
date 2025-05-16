@@ -14,6 +14,11 @@ import {
   FiFilePlus // <<< Icon cho việc bắt đầu chat mới
 } from 'react-icons/fi' // Hoặc thư viện icon bạn đang dùng
 import { MdOutlineAltRoute } from 'react-icons/md'
+// Import icons from other libraries if needed
+import { FaBrain } from 'react-icons/fa'; // Example: Using react-icons/fa for FaBrain
+import { GiPapers } from 'react-icons/gi'; // Example: Using react-icons/gi for GiPapers
+import { GoGear } from 'react-icons/go'; // Example: Using react-icons/go for GoGear
+
 import { useTranslations } from 'next-intl'
 
 /**
@@ -59,6 +64,7 @@ const getLoadingPhaseIcon = (step: string): React.ElementType => {
   if (normalizedStep === 'routing_task') {
     return MdOutlineAltRoute
   }
+
   // --- Giai đoạn Xử lý Input ---
   if (normalizedStep === 'processing_input' || normalizedStep === 'sending') {
     // Thêm 'sending'
@@ -117,6 +123,30 @@ const getLoadingPhaseIcon = (step: string): React.ElementType => {
     return FiEdit
   }
 
+  // === CÁC STEP MỚI ĐƯỢC BỔ SUNG ===
+
+  // sub_agent_thinking: Icon liên quan đến suy nghĩ của sub-agent
+  if (normalizedStep === 'sub_agent_thinking') {
+    return FaBrain; // Sử dụng FaBrain từ react-icons/fa
+  }
+
+  // function_result_prepared: Icon liên quan đến kết quả đã chuẩn bị
+  if (normalizedStep === 'function_result_prepared') {
+    return GiPapers; // Sử dụng GiPapers từ react-icons/gi (có thể thay bằng icon khác tùy ý)
+  }
+
+  // sub_agent_processing_complete: Icon liên quan đến xử lý hoàn tất bởi sub-agent
+  if (normalizedStep === 'sub_agent_processing_complete') {
+    return GoGear; // Sử dụng GoGear từ react-icons/go (có thể thay bằng icon khác tùy ý)
+  }
+
+  // function_result_processed: Icon liên quan đến kết quả đã được xử lý
+  if (normalizedStep === 'function_result_processed') {
+    return FiDatabase; // Có thể dùng lại FiDatabase hoặc chọn icon khác liên quan đến dữ liệu/kết quả
+  }
+
+  // ===============================
+
   // --- Mặc định / Fallback ---
   console.warn(`LoadingIndicator: Unknown step "${step}", using default icon.`)
   return FiCpu // Thinking làm mặc định
@@ -141,24 +171,31 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
   const completedSteps = [
     'history_loaded',
     'new_chat_ready',
-    'result_received',
+    'result_received', // Thêm result_received nếu đây là trạng thái cuối
     'connected', // Thường không hiển thị loading khi chỉ connected
     'disconnected', // Không hiển thị loading khi disconnected
     'email_success', // Có thể ẩn sau một thời gian ngắn hoặc nếu không có message
     'email_failed', // Tương tự email_success
-    'email_cancelled' // Tương tự
+    'email_cancelled', // Tương tự
+    'sub_agent_processing_complete', // Có thể ẩn nếu không có message cuối cùng
     // Thêm các step khác nếu cần
   ]
 
   // Ẩn indicator nếu step nằm trong danh sách hoàn thành
-  if (completedSteps.includes(step)) {
-    // Có thể thêm điều kiện chỉ ẩn nếu !message nếu bạn *muốn* giữ lại indicator
-    // khi có thông báo kết quả (ví dụ: email_success với message "Email sent!")
-    // if (!message) {
-    return null // Ẩn hoàn toàn
-    // }
+  // Thêm logic để hiển thị lại nếu có message đặc biệt liên quan đến kết quả cuối
+  const completedStepsWithOptionalMessage = [
+    'email_success',
+    'email_failed',
+    'email_cancelled',
+    'sub_agent_processing_complete' // Ví dụ: Có thể có message "Sub-agent finished processing."
+  ];
+
+
+  if (completedSteps.includes(step) && (!completedStepsWithOptionalMessage.includes(step) || !message)) {
+    return null; // Ẩn hoàn toàn nếu là step hoàn thành VÀ không nằm trong danh sách có message tùy chọn, HOẶC không có message
   }
   // --------------------------
+
 
   return (
     <div
@@ -205,9 +242,16 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
         {/* Thông điệp Step */}
         {/* Chỉ hiển thị message nếu nó khác với các thông báo mặc định hoặc loading */}
          {message &&
-          !['Loading history...', 'Starting new chat...', ''].includes(
-            message
-          ) && <span className='truncate'>{message}</span>}
+          ![
+            'Loading history...',
+            'Starting new chat...',
+            '',
+            // Thêm các message mặc định khác bạn không muốn hiển thị cùng step
+            'Thinking...', // Ví dụ: nếu bạn có message mặc định cho thinking
+            'Processing function result...' // Ví dụ
+          ].includes(message) && <span className='truncate'>{message}</span>}
+
+        {/* Hiển thị message mặc định nếu không có message tùy chỉnh */}
         {step === 'loading_history' && !message && (
           <span className='truncate'>{t('Loading_history')}</span>
         )}
@@ -217,6 +261,21 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
         {step === 'sending' && !message && (
           <span className='truncate'>{t('Sending')}</span>
         )}
+        {step === 'sub_agent_thinking' && !message && (
+            <span className='truncate'>{t('Sub_agent_thinking')}</span> // Thêm bản dịch cho step mới
+        )}
+        {step === 'function_result_prepared' && !message && (
+             <span className='truncate'>{t('Function_result_prepared')}</span> // Thêm bản dịch cho step mới
+        )}
+         {step === 'sub_agent_processing_complete' && !message && (
+             <span className='truncate'>{t('Sub_agent_processing_complete')}</span> // Thêm bản dịch cho step mới
+        )}
+         {step === 'function_result_processed' && !message && (
+             <span className='truncate'>{t('Function_result_processed')}</span> // Thêm bản dịch cho step mới
+        )}
+        {/* Thêm các case khác cho step và message mặc định nếu cần */}
+
+
       </button>
       {timeCounter && (
         // - `text-sm` -> `text-xs sm:text-sm`
