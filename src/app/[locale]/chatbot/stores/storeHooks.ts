@@ -32,7 +32,7 @@ import {
     FrontendAction,
     EditingMessageState, // <<< THÊM TYPE MỚI CHO EDITING MESSAGE
 } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
-import { StreamingTextAnimationControls } from '@/src/hooks/chatbot/useStreamingTextAnimation';
+import { StreamingTextAnimationControls } from '@/src/hooks/regularchat/useStreamingTextAnimation';
 
 
 // === SocketStore Hooks ===

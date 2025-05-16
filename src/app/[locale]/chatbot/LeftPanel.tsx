@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 import ConversationList from './regularchat/ConversationList';
 import { useUiStore, useConversationStore, useSettingsStore } from './stores';
 import { useShallow } from 'zustand/react/shallow';
-import { useLeftPanelNavigation } from '@/src/hooks/chatbot/useLeftPanelNavigation';
+import { useLeftPanelNavigation } from '@/src/hooks/regularchat/useLeftPanelNavigation';
 import NavigationMenu from './NavigationMenu';
 import PanelToggleButton from './PanelToggleButton';
 import AuthFooter from './regularchat/AuthFooter';
-import { useLeftPanelAuthControls } from '@/src/hooks/chatbot/useLeftPanelAuthControls';
+import { useLeftPanelAuthControls } from '@/src/hooks/regularchat/useLeftPanelAuthControls';
 
 interface LeftPanelProps {
   onSelectConversation: (conversationId: string) => void;

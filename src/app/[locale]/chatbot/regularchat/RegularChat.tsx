@@ -7,8 +7,8 @@ import LoadingIndicator from './LoadingIndicator';
 import EmailConfirmationDialog from '../EmailConfirmationDialog';
 import ConversationToolbar from './ConversationToolbar';
 import ChatArea from './ChatArea'; // Component con mới
-import { useTimer } from '@/src/hooks/chatbot/useTimer';
-import { useChatInteractions } from '@/src/hooks/chatbot/useChatInteractions'; // Hook mới
+import { useTimer } from '@/src/hooks/regularchat/useTimer';
+import { useChatInteractions } from '@/src/hooks/regularchat/useChatInteractions'; // Hook mới
 import { useTranslations } from 'next-intl';
 import {
   useChatSettingsState,

@@ -2,7 +2,7 @@
 import React from 'react';
 import { LogIn, LogOut } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useLeftPanelAuthControls } from '@/src/hooks/chatbot/useLeftPanelAuthControls'; // Adjust path
+import { useLeftPanelAuthControls } from '@/src/hooks/regularchat/useLeftPanelAuthControls'; // Adjust path
 import { UserIcon } from '../../utils/header/Icon'; // Adjust path
 
 interface AuthFooterProps {

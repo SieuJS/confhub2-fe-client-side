@@ -38,11 +38,11 @@ interface MessageRendererProps {
 
 const MessageRenderer = ({ message, type }: MessageRendererProps) => { // Use the interface
   // --- LOGS FROM PREVIOUS STEP ---
-  console.log(`[MessageRenderer] Received message with type: ${type}`, JSON.stringify(message, null, 2));
+  // console.log(`[MessageRenderer] Received message with type: ${type}`, JSON.stringify(message, null, 2));
   if (type) { // Only log these if type is present
-    console.log("[MessageRenderer] Is it ToolResponse (via type)?", type === "client.toolResponse");
+    // console.log("[MessageRenderer] Is it ToolResponse (via type)?", type === "client.toolResponse");
   }
-  console.log("[MessageRenderer] Is it ToolResponse (via isToolResponseMessage)?", isToolResponseMessage(message));
+  // console.log("[MessageRenderer] Is it ToolResponse (via isToolResponseMessage)?", isToolResponseMessage(message));
   // --- END LOGS ---
 
   if (isClientAudioMessage(message)) {
@@ -66,14 +66,14 @@ const MessageRenderer = ({ message, type }: MessageRendererProps) => { // Use th
   // Updated logic to prioritize type, then structure
   if (type === "client.toolResponse") { // Check specific type first
     if (isToolResponseMessage(message)) { // Also ensure structure matches
-      console.log("[MessageRenderer] Rendering ToolResponseLog for (type client.toolResponse):", JSON.stringify(message, null, 2));
+      // console.log("[MessageRenderer] Rendering ToolResponseLog for (type client.toolResponse):", JSON.stringify(message, null, 2));
       return <ToolResponseLog message={message as ToolResponseMessage} />;
     } else {
-      console.warn("[MessageRenderer] Message type is 'client.toolResponse' but structure doesn't match isToolResponseMessage. Message:", message);
+      // console.warn("[MessageRenderer] Message type is 'client.toolResponse' but structure doesn't match isToolResponseMessage. Message:", message);
       // Fallback or render an error/default view
     }
   } else if (isToolResponseMessage(message)) { // Fallback to structure check if type isn't 'client.toolResponse'
-     console.log("[MessageRenderer] Rendering ToolResponseLog for (isToolResponseMessage, type was not client.toolResponse):", JSON.stringify(message, null, 2));
+    //  console.log("[MessageRenderer] Rendering ToolResponseLog for (isToolResponseMessage, type was not client.toolResponse):", JSON.stringify(message, null, 2));
     return <ToolResponseLog message={message} />;
   }
 

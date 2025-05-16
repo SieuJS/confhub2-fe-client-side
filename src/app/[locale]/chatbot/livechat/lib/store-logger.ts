@@ -1,4 +1,4 @@
-
+// src/app/[locale]/chatbot/livechat/lib/store-logger.ts
 import { create } from "zustand";
 import { StreamingLog } from "../multimodal-live-types";
 

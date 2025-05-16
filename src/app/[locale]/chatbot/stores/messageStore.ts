@@ -16,7 +16,7 @@ import {
     ConversationUpdatedAfterEditPayload, // <<< NEW
     ItemFollowStatusUpdatePayload
 } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
-import { StreamingTextAnimationControls } from '@/src/hooks/chatbot/useStreamingTextAnimation';
+import { StreamingTextAnimationControls } from '@/src/hooks/regularchat/useStreamingTextAnimation';
 import { generateMessageId, constructNavigationUrl, openUrlInNewTab } from '@/src/app/[locale]/chatbot/utils/chatUtils';
 import { appConfig } from '@/src/middleware';
 import { useSettingsStore } from './setttingsStore';

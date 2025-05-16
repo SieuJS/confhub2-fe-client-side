@@ -1,7 +1,7 @@
 // MicButton.tsx
 import cn from 'classnames'
 import React from 'react'
-import AudioPulse from '../audio-pulse/AudioPulse'
+import AudioPulse from '../AudioPulse'
 
 type MicButtonProps = {
   muted: boolean

@@ -11,12 +11,12 @@ export * from './lib/store-logger';
 export * from './lib/audio-recorder'; // Export the class
 
 // --- Main Layout Components ---
-export { default as ChatInput } from './main-layout/ChatInput';
-export { default as ConnectionButton } from './main-layout/ConnectionButton';
-export { default as MicButton } from './main-layout/MicButton';
-export { default as ChatIntroduction } from './main-layout/ChatIntroduction';
-export { default as ConnectionStatus } from './main-layout/ConnectionStatus';
-export { default as RestartStreamButton } from './main-layout/RestartStreamButton';
+export { default as ChatInput } from './layout/ChatInput';
+export { default as ConnectionButton } from './layout/ConnectionButton';
+export { default as MicButton } from './layout/MicButton';
+export { default as ChatIntroduction } from './layout/ChatIntroduction';
+export { default as ConnectionStatus } from './layout/ConnectionStatus';
+export { default as RestartStreamButton } from './layout/RestartStreamButton';
 export { default as Logger } from './logger/Logger';        // Export Logger component
 
 // --- Hooks ---

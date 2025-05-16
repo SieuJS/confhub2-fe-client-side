@@ -12,7 +12,7 @@ import {
   useUiStore // Import useUiStore
 } from '@/src/app/[locale]/chatbot/stores'
 import { useTranslations } from 'next-intl'
-import { useAppInitialization } from '@/src/hooks/chatbot/useAppInitialization'
+import { useAppInitialization } from '@/src/hooks/regularchat/useAppInitialization'
 import dynamic from 'next/dynamic'
 import ChatbotErrorDisplay from '../chatbot/ChatbotErrorDisplay' // Import ChatbotErrorDisplay
 

@@ -1,7 +1,7 @@
 // src/app/[locale]/chatbot/NavigationMenu.tsx
 import React from 'react';
 import { Link } from '@/src/navigation'; // Chỉ cần Link ở đây nếu AppPathname không dùng
-import type { NavItem, NavLinkItem, NavButtonItem } from '@/src/hooks/chatbot/useLeftPanelNavigation';
+import type { NavItem, NavLinkItem, NavButtonItem } from '@/src/hooks/regularchat/useLeftPanelNavigation';
 
 interface NavigationMenuProps {
   navItems: NavItem[];

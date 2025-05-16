@@ -11,9 +11,9 @@ import { useSettingsStore } from '../stores';
 import { useShallow } from 'zustand/react/shallow';
 
 // Import Hooks
-import { useMessageEditing } from '@/src/hooks/chatbot/useMessageEditing'; // Adjust path
-import { useMessageCopy } from '@/src/hooks/chatbot/useMessageCopy';     // Adjust path
-import { useMessageBubbleLogic } from '@/src/hooks/chatbot/useMessageBubbleLogic'; // Adjust path
+import { useMessageEditing } from '@/src/hooks/regularchat/useMessageEditing'; // Adjust path
+import { useMessageCopy } from '@/src/hooks/regularchat/useMessageCopy';     // Adjust path
+import { useMessageBubbleLogic } from '@/src/hooks/regularchat/useMessageBubbleLogic'; // Adjust path
 
 // Impor.
 import EditMessageForm from './EditMessageForm';         // Adjust path

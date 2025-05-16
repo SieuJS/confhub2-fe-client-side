@@ -9,7 +9,7 @@ import {
   useSettingsStore,
 } from '@/src/app/[locale]/chatbot/stores'; // Adjust path
 import { useShallow } from 'zustand/react/shallow';
-import { urlSearchParamsToObject } from '@/src/hooks/chatbot/useUrlConversationSync'; // Assuming this is still relevant
+import { urlSearchParamsToObject } from '@/src/hooks/regularchat/useUrlConversationSync'; // Assuming this is still relevant
 
 export const CHATBOT_LIVECHAT_PATH: AppPathname = '/chatbot/livechat';
 export const CHATBOT_REGULARCHAT_PATH: AppPathname = '/chatbot/regularchat';

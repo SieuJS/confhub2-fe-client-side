@@ -13,11 +13,11 @@ import {
 import { useShallow } from 'zustand/react/shallow';
 
 // Import custom hooks
-import { useAppInitialization } from '@/src/hooks/chatbot/useAppInitialization';
-import { useUrlConversationSync } from '@/src/hooks/chatbot/useUrlConversationSync';
-import { useConversationLifecycleManager } from '@/src/hooks/chatbot/useConversationLifecycleManager';
-import { useChatViewManager } from '@/src/hooks/chatbot/useChatViewManager';
-import { useConversationActions } from '@/src/hooks/chatbot/useConversationActions';
+import { useAppInitialization } from '@/src/hooks/regularchat/useAppInitialization';
+import { useUrlConversationSync } from '@/src/hooks/regularchat/useUrlConversationSync';
+import { useConversationLifecycleManager } from '@/src/hooks/regularchat/useConversationLifecycleManager';
+import { useChatViewManager } from '@/src/hooks/regularchat/useChatViewManager';
+import { useConversationActions } from '@/src/hooks/regularchat/useConversationActions';
 
 // Import child components
 import DeletionOverlay from './regularchat/DeletionOverlay';
