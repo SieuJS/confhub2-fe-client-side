@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import {
     ConversationMetadata, InitialHistoryPayload, ConversationDeletedPayload,
-    ConversationClearedPayload, ConversationRenamedPayload, ConversationPinStatusChangedPayload, 
+    ConversationClearedPayload, ConversationRenamedPayload, ConversationPinStatusChangedPayload,
 } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
 import { useMessageStore } from './messageStore';
 import { useSocketStore } from './socketStore';
@@ -114,7 +114,7 @@ export const useConversationStore = create<ConversationStoreState & Conversation
                 // Không cần gọi resetChatUIForNewConversation từ đây nữa,
                 // AuthContext sẽ gọi nó trực tiếp từ MessageStore nếu cần.
             },
-            
+
             // --- Complex Actions ---
             loadConversation: (conversationId, options) => {
                 const { activeConversationId: currentActiveId, isHistoryLoaded: currentHistoryLoaded, setIsLoadingHistory, setIsHistoryLoaded, setActiveConversationId, isLoadingHistory } = get();
@@ -287,12 +287,15 @@ export const useConversationStore = create<ConversationStoreState & Conversation
                     isHistoryLoaded: true,
                 }, false, `_onSocketInitialHistory/${payload.conversationId}`);
                 useMessageStore.getState().setChatMessages(Array.isArray(payload.messages) ? payload.messages : []);
+                const messagesFromBackend = Array.isArray(payload.messages) ? payload.messages : [];
+                console.log('[ConversationStore _onSocketInitialHistory] Raw messages from backend:', JSON.parse(JSON.stringify(messagesFromBackend))); // LOG SÂU
+                useMessageStore.getState().setChatMessages(messagesFromBackend); // <--- Quan trọng
                 useMessageStore.getState().setLoadingState({ isLoading: false, step: 'history_loaded', message: '' });
             },
-              _onSocketNewConversationStarted: (payload) => { // << MODIFIED: Payload includes title
+            _onSocketNewConversationStarted: (payload) => { // << MODIFIED: Payload includes title
                 console.log(`[ConversationStore _onSocketNewConversationStarted] New Conversation ID: ${payload.conversationId}. Title: "${payload.title}". Explicit flow: ${get().isProcessingExplicitNewChat}`);
                 set(state => {
-                    const langCode = payload.language?.slice(0,2) || 'en';
+                    const langCode = payload.language?.slice(0, 2) || 'en';
                     const newConv: ConversationMetadata = {
                         id: payload.conversationId,
                         // Backend should provide the language-specific title

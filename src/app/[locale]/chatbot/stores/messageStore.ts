@@ -37,7 +37,7 @@ export interface MessageStoreState {
     animationControls: StreamingTextAnimationControls | null;
     isAwaitingFinalResultRef: React.MutableRefObject<boolean>;
     pendingBotMessageId: string | null;
-    // editingMessage: EditingMessageState | null; // <<< NEW: State for which message is being edited
+    editingMessageId: string | null; // ID của tin nhắn đang được chỉnh sửa, null nếu không có
 }
 
 
@@ -53,6 +53,7 @@ export interface MessageStoreActions {
     resetChatUIForNewConversation: (clearActiveIdInOtherStores?: boolean) => void;
     setEditingMessage: (editingState: EditingMessageState | null) => void; // <<< NEW
     submitEditedMessage: (messageIdToEdit: string, newText: string) => void; // <<< THAY ĐỔI SIGNATURE
+    setEditingMessageId: (messageId: string | null) => void;
 
     clearAuthErrorMessages: () => void; // <<<< THÊM ACTION MỚI
 
@@ -71,7 +72,7 @@ const initialMessageStoreState: MessageStoreState = {
     animationControls: null,
     isAwaitingFinalResultRef: { current: false },
     pendingBotMessageId: null,
-    // editingMessage: null, // <<< NEW
+    editingMessageId: null,
 
 };
 
@@ -102,7 +103,7 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
             },
             setPendingBotMessageId: (id) => set({ pendingBotMessageId: id }, false, 'setPendingBotMessageId'),
 
-            // setEditingMessage: (editingState) => set({ editingMessage: editingState }, false, 'setEditingMessage'),
+            setEditingMessageId: (messageId) => set({ editingMessageId: messageId }, false, `setEditingMessageId/${messageId}`),
 
 
             resetChatUIForNewConversation: (clearActiveIdInOtherStores = true) => {
@@ -110,6 +111,8 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
                     chatMessages: [],
                     loadingState: { isLoading: false, step: 'idle', message: '', agentId: undefined },
                     pendingBotMessageId: null,
+                    editingMessageId: null, // <<< RESET Ở ĐÂY
+
                 }, false, 'resetChatUIForNewConversation/messages');
                 get().animationControls?.stopStreaming();
                 get().resetAwaitFlag();

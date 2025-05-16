@@ -172,7 +172,7 @@ const ThoughtProcess: React.FC<ThoughtProcessProps> = ({ thoughts }) => {
         </ul>
       )}
       {/* Scrollbar styles */}
-      {/* <style jsx>{`
+      <style jsx>{`
                 .pretty-scrollbar::-webkit-scrollbar { width: 6px; }
                 .pretty-scrollbar::-webkit-scrollbar-track { background: transparent; }
                 .pretty-scrollbar::-webkit-scrollbar-thumb {
@@ -182,7 +182,7 @@ const ThoughtProcess: React.FC<ThoughtProcessProps> = ({ thoughts }) => {
                 .dark .pretty-scrollbar::-webkit-scrollbar-thumb {
                     background-color: rgba(107, 114, 128, 0.5);
                 }
-            `}</style> */}
+            `}</style>
     </div>
   );
 };

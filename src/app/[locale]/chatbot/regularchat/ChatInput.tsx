@@ -110,11 +110,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
     [handleSendMessageInternal, disabled] // <<< Use internal handler
   );
 
-  const placeholderText = disabled
-    ? t('Disconnected')
-    : isEditing
-      ? t('Edit_your_message') // <<< Key for editing placeholder
-      : t('Type_message_short');
+  const placeholderText = t('Type_message_short');
 
   const buttonAriaLabel = isEditing ? t('Update_message') : t('Send_message'); // <<< Key for update button
 
