@@ -152,15 +152,15 @@ const ProfileTab: React.FC = () => {
           sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw' // Tối ưu sizes
           priority={!isEditing} // Priority nếu đang ở display mode
         />
-        {isEditing && (
+        {/* {isEditing && (
           <button
             type='button'
             onClick={() => setShowBackgroundModal(true)}
-            className='absolute bottom-3 right-3 rounded-md bg-black bg-opacity-50 px-3 py-1.5 text-xs font-medium text-white hover:bg-opacity-70 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800'
+            className='absolute right-3 top-3 rounded-md bg-black bg-opacity-50 px-3 py-1.5 text-xs font-medium text-white hover:bg-opacity-70 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800'
           >
             {t('Change_Background')}
           </button>
-        )}
+        )} */}
       </div>
       {/* Profile Info Section */}
       <div className='relative -mt-16 flex flex-col items-center px-4 pb-6 md:-mt-20 md:flex-row md:items-end md:space-x-5'>
@@ -189,10 +189,9 @@ const ProfileTab: React.FC = () => {
           <h1 className='text-2xl font-bold text-gray-900 dark:text-white md:text-3xl'>
             {authUser.firstName} {authUser.lastName}
           </h1>
-          {authUser.aboutme && ( // Hiển thị aboutme từ authUser (dữ liệu đã lưu)
+          {authUser.aboutMe && (
             <p className='mt-1 text-sm text-gray-600 dark:text-gray-300'>
-              {/* <span className='font-semibold'>{t('About_me')}:</span>{' '} */}
-              {authUser.aboutme}
+              {authUser.aboutMe}
             </p>
           )}
         </div>
@@ -206,7 +205,7 @@ const ProfileTab: React.FC = () => {
               {t('Edit_Profile')}
             </Button>
             <Button
-              variant='danger' // Thay đổi variant cho phù hợp
+              variant='danger'
               onClick={handleChangePasswordClick}
               className='w-full md:w-auto'
             >
@@ -399,15 +398,15 @@ const ProfileTab: React.FC = () => {
               </label>
               <textarea
                 id='about'
-                name='aboutme'
-                value={editedData.aboutme || ''}
+                name='aboutMe'
+                value={editedData.aboutMe || ''}
                 onChange={handleInputChange}
                 maxLength={250}
                 rows={4}
                 className='mt-1 block w-full rounded-md border-gray-300 p-2.5 shadow-sm focus:border-button focus:ring-button dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-button dark:focus:ring-button sm:text-sm'
               />
               <p className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
-                {editedData.aboutme ? editedData.aboutme.length : 0}/250{' '}
+                {editedData.aboutMe ? editedData.aboutMe.length : 0}/250{' '}
                 {t('characters')}
               </p>
             </div>

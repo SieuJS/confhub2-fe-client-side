@@ -776,10 +776,6 @@
         "name": "View Conference Location Map",
         "description": "See the conference venue on an interactive map within the details page."
       },
-      "journal_search": {
-        "name": "Search Scientific Journals",
-        "description": "Find relevant scientific journals using the search tool."
-      },
       "chatbot": {
         "name": "AI Assistant (Chatbot)",
         "description": [
@@ -1032,5 +1028,7 @@
   "All_My_Conferences": "All My Conferences",
   "Loading_your_conferences": "Loading your conferences...",
   "By_Users": "By Users",
-  "Save_Changes": "Save Changes"
+  "Save_Changes": "Save Changes",
+  "Location_Not_Available": "Location Not Available",
+  "Change": "Change"
 }
