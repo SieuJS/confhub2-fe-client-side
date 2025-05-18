@@ -8,7 +8,7 @@ export type UserResponse = {
   password?: string;
   role: string;
   avatar: string;
-  aboutme?: string;
+  aboutMe?: string;
   interestedTopics?: string[];
   background?: string;
   followedConferences?: Follow[];

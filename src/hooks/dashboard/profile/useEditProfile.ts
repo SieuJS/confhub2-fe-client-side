@@ -117,7 +117,7 @@ export const useEditProfile = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    if (name === 'aboutme' && value.length > 100) {
+    if (name === 'aboutMe' && value.length > 100) {
       return; // Giới hạn độ dài
     }
 

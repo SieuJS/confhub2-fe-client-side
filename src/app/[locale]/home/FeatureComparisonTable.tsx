@@ -53,13 +53,7 @@ const featureDataConfig: FeatureCategory[] = [
           'FeatureComparisonTable.features.location_map.description',
         requiresLogin: false
       },
-      {
-        id: 'journal_search',
-        nameKey: 'FeatureComparisonTable.features.journal_search.name',
-        descriptionKey:
-          'FeatureComparisonTable.features.journal_search.description',
-        requiresLogin: false
-      },
+
       {
         id: 'chatbot',
         nameKey: 'FeatureComparisonTable.features.chatbot.name',
@@ -69,7 +63,7 @@ const featureDataConfig: FeatureCategory[] = [
           'FeatureComparisonTable.features.chatbot.description.2',
           'FeatureComparisonTable.features.chatbot.description.3'
         ],
-        requiresLogin: false,
+        requiresLogin: true,
         isNew: true
       }
     ]
