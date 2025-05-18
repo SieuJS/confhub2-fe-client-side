@@ -15,8 +15,8 @@ interface SearchSectionProps {
     location?: string | null
     type?: 'Online' | 'Offline' | 'Hybrid' | null
     // submissionDate?: Date | null
-    submissionStartDate?: Date | null // NEW
-    submissionEndDate?: Date | null // NEW
+    subFromDate?: Date | null // NEW
+    subToDate?: Date | null // NEW
     publisher?: string | null
     rank?: string | null
     source?: string | null
@@ -77,8 +77,8 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
     selectedFieldsOfResearch,
     handlePublisherChange,
     selectedPublisher,
-    submissionStartDate,
-    submissionEndDate,
+    subFromDate,
+    subToDate,
     handleSubmissionDateRangeChange,
     handleClear // Get handleClear from the hook
   } = useSearchForm({ onSearch, onClear }) // Pass onClear to the hook
@@ -86,7 +86,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
   return (
     <div className='container mx-auto px-4 text-base'>
       {/* Use flex-wrap and justify-center for responsiveness */}
-      <div className='border-black-pure flex flex-wrap items-center  justify-between rounded-3xl border px-2 py-2 shadow-md'>
+      <div className='flex flex-wrap items-center justify-between  rounded-3xl border border-black-pure px-2 py-2 shadow-md'>
         <div
           className='flex w-40 flex-grow basis-full items-center  md:max-w-[500px] md:basis-auto'
           ref={searchTypeDropdownRef}
@@ -141,7 +141,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
               </svg>
             </button>
             {isSearchTypeDropdownOpen && (
-              <div className='bg-white-pure absolute left-0 z-10 mt-2 w-32 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none '>
+              <div className='absolute left-0 z-10 mt-2 w-32 rounded-md bg-white-pure shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none '>
                 <div
                   className='py-1'
                   role='menu'
@@ -150,19 +150,19 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
                 >
                   <button
                     onClick={() => handleSearchTypeChange('keyword')}
-                    className="role='menuitem' hover:bg-gray-10 hover:text-gray-90 block w-full px-4 py-2  text-left text-sm"
+                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
                   >
                     {t('Keyword')}
                   </button>
                   <button
                     onClick={() => handleSearchTypeChange('title')}
-                    className="role='menuitem' hover:bg-gray-10 hover:text-gray-90 block w-full px-4 py-2  text-left text-sm"
+                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
                   >
                     {t('Title')}
                   </button>
                   <button
                     onClick={() => handleSearchTypeChange('acronym')}
-                    className="role='menuitem' hover:bg-gray-10 hover:text-gray-90 block w-full px-4 py-2  text-left text-sm"
+                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
                   >
                     {t('Acronym')}
                   </button>
@@ -173,7 +173,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
         </div>
 
         {/* Use hidden and block with media queries for dividers */}
-        <div className='border-gray-30 mx-2 hidden h-6 border-l md:block'></div>
+        <div className='mx-2 hidden h-6 border-l border-gray-30 md:block'></div>
 
         <div className='flex items-center space-x-2 px-2'>
           <label htmlFor='fromDate' className='text-sm'>
@@ -234,7 +234,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
           </button>
 
           {isLocationDropdownOpen && (
-            <div className='bg-white-pure absolute left-0 z-10 mt-2 w-48 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none '>
+            <div className='absolute left-0 z-10 mt-2 w-48 rounded-md bg-white-pure shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none '>
               <div
                 className='max-h-48 overflow-y-scroll py-1'
                 role='menu'
@@ -244,14 +244,14 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
                 <input
                   type='text'
                   placeholder={t('Search_location')}
-                  className='bg-white-pure block w-full px-4 py-2 text-sm placeholder:text-primary focus:outline-none'
+                  className='block w-full bg-white-pure px-4 py-2 text-sm placeholder:text-primary focus:outline-none'
                   onChange={handleLocationSearchChange}
                   onClick={e => e.stopPropagation()}
                 />
                 <button
                   key='all'
                   onClick={() => handleLocationClick('')}
-                  className="role='menuitem' hover:bg-gray-10 hover:text-gray-90 block w-full px-4 py-2  text-left text-sm"
+                  className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
                 >
                   {t('All_Locations')}
                 </button>
@@ -259,7 +259,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
                   <button
                     key={location}
                     onClick={() => handleLocationClick(location)}
-                    className="role='menuitem' hover:bg-gray-10 hover:text-gray-90 block w-full px-4 py-2  text-left text-sm"
+                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
                   >
                     {location}
                   </button>
@@ -298,7 +298,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
 
           {isTypeDropdownOpen && (
             <div
-              className='bg-white-pure absolute left-0 z-10 mt-2 w-28 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none '
+              className='absolute left-0 z-10 mt-2 w-28 rounded-md bg-white-pure shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none '
               tabIndex={0}
             >
               <div
@@ -310,7 +310,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
                 <button
                   key='all'
                   onClick={() => handleTypeClick('')}
-                  className="role='menuitem' hover:bg-gray-10 hover:text-gray-90 block w-full px-4 py-2  text-left text-sm"
+                  className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
                 >
                   {t('All_Types')}
                 </button>
@@ -318,7 +318,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
                   <button
                     key={type}
                     onClick={() => handleTypeClick(type)}
-                    className="role='menuitem' hover:bg-gray-10 hover:text-gray-90 block w-full px-4 py-2  text-left text-sm"
+                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
                   >
                     {type}
                   </button>
@@ -368,8 +368,8 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
         selectedFieldsOfResearch={selectedFieldsOfResearch}
         onPublisherChange={handlePublisherChange}
         selectedPublisher={selectedPublisher}
-        submissionStartDate={submissionStartDate}
-        submissionEndDate={submissionEndDate}
+        subFromDate={subFromDate}
+        subToDate={subToDate}
         onSubmissionDateRangeChange={handleSubmissionDateRangeChange}
       />
     </div>

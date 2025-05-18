@@ -1023,5 +1023,6 @@
   "FloatingChat_Hide_Toolbar_Description": "Hide the toolbar for a cleaner chat interface.",
   "FloatingChat_Hide_Thought_Process_Description": "Hide the thought process for a more streamlined chat experience.",
   "Toggle user menu": "Toggle user menu",
-  "Unfollow": "Unfollow"
+  "Unfollow": "Unfollow",
+  "Explore_Button": "Explore"
 }

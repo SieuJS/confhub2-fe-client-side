@@ -22,8 +22,8 @@ interface SearchParamsForURL {
   toDate?: Date | null
   location?: string | null
   type?: 'Online' | 'Offline' | 'Hybrid' | null
-  submissionStartDate?: Date | null // <-- UPDATED
-  submissionEndDate?: Date | null // <-- UPDATED
+  subFromDate?: Date | null // <-- UPDATED
+  subToDate?: Date | null // <-- UPDATED
   publisher?: string | null
   rank?: string | null
   source?: string | null
@@ -77,20 +77,16 @@ export default function Conferences({
         newParams.set('publisher', searchParamsFromComponent.publisher)
 
       // --- MODIFIED SECTION FOR SUBMISSION DATE RANGE ---
-      if (searchParamsFromComponent.submissionStartDate) {
+      if (searchParamsFromComponent.subFromDate) {
         newParams.set(
           'subFromDate', // Parameter name expected by useSearchForm's getInitialDateFromUrl
-          searchParamsFromComponent.submissionStartDate
-            .toISOString()
-            .split('T')[0]
+          searchParamsFromComponent.subFromDate.toISOString().split('T')[0]
         )
       }
-      if (searchParamsFromComponent.submissionEndDate) {
+      if (searchParamsFromComponent.subToDate) {
         newParams.set(
           'subToDate', // Parameter name expected by useSearchForm's getInitialDateFromUrl
-          searchParamsFromComponent.submissionEndDate
-            .toISOString()
-            .split('T')[0]
+          searchParamsFromComponent.subToDate.toISOString().split('T')[0]
         )
       }
       // --- END MODIFIED SECTION ---
