@@ -1,4 +1,3 @@
-
 // components/Header/hooks/useSocketConnection.ts
 import { useState, useEffect, useRef, useCallback } from 'react';
 import io, { Socket } from 'socket.io-client';
@@ -10,20 +9,13 @@ interface UseSocketConnectionProps {
 }
 const NEXT_PUBLIC_DATABASE_URL = process.env.NEXT_PUBLIC_DATABASE_URL || "http://confhub.engineer"
 const socketInitializer = () => {
-  // // Lấy URL cơ sở từ biến môi trường (nếu có, hoặc để trống nếu chỉ dùng origin hiện tại)
-  // // Trong trường hợp này, vì NEXT_PUBLIC_DATABASE_URL chỉ là "/api", chúng ta không cần chỉ định URL cơ sở,
-  // // client sẽ tự dùng origin hiện tại (https://confhub.ddns.net).
-  // const backendNamespace = process.env.NEXT_PUBLIC_DATABASE_URL || '/'; // Dùng /api
-
-  // console.log(`Initializing socket connection to namespace: ${backendNamespace}`);
-  // console.log(`Explicitly setting path to: ${backendNamespace}/api/socket.io`); // Log đường dẫn sẽ dùng
-
-  // return io(backendNamespace, { // Kết nối đến namespace /api
-  //   path: `${backendNamespace}/api/socket.io` // Quan trọng: Chỉ định rõ đường dẫn transport
-  //   // transports: ['websocket', 'polling'] // Có thể thêm nếu muốn ưu tiên websocket
-  // });
-  return io(`${NEXT_PUBLIC_DATABASE_URL}`); // Your backend URL
-
+  console.log(`Initializing socket connection to: ${NEXT_PUBLIC_DATABASE_URL}`);
+  
+  return io(`${NEXT_PUBLIC_DATABASE_URL}`, {
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000,
+    transports: ['websocket', 'polling'],
+  }); 
 };
 
 export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionProps) => {
@@ -31,6 +23,8 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
   const [notificationEffect, setNotificationEffect] = useState(false);
   const [isLoadingNotifications, setIsLoadingNotifications] = useState(false);
   const socketRef = useRef<Socket | null>(null);
+  const [socketConnected, setSocketConnected] = useState(false);
+  const isInitializedRef = useRef(false);
 
   // Fetch notifications (no changes needed here)
   const fetchNotifications = useCallback(async () => {
@@ -90,49 +84,89 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
     }
   }, [user?.id]); // Add fetchNotifications if you choose to refetch
 
+  // Setup socket event listeners - this should only be called once after socket initialization
+  const setupSocketListeners = useCallback((socket: Socket) => {
+    console.log('Setting up socket listeners for user:', user?.id);
+    
+    // Setup new listeners - don't remove existing listeners to avoid reconnection issues
+    socket.on('connect', () => {
+      console.log('Socket connected successfully, registering user:', user?.id);
+      setSocketConnected(true);
+      if (user?.id) {
+        socket.emit('register', user.id);
+      }
+    });
+
+    socket.on('disconnect', (reason) => {
+      console.log('Socket disconnected:', reason);
+      setSocketConnected(false);
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+      setSocketConnected(false);
+    });
+
+    socket.on('notification', (newNotification: Notification) => {
+      console.log("Received new notification:", newNotification);
+      setNotifications(prevNotifications => {
+        if (prevNotifications.some(n => n.id === newNotification.id) || newNotification.deletedAt !== null) {
+          return prevNotifications;
+        }
+        return [newNotification, ...prevNotifications];
+      });
+      setNotificationEffect(true);
+      setTimeout(() => setNotificationEffect(false), 1000);
+    });
+  }, []); // Remove user?.id from dependency array to prevent reconnection on user changes
+
+  // Single initialization effect - runs only once when component mounts and user is logged in
   useEffect(() => {
-        const initializeSocket = async () => {
+    if (!loginStatus || !user || isInitializedRef.current) return;
+    
+    console.log('Initial socket setup for user:', user?.id);
+    isInitializedRef.current = true;
+    
+    // Initial fetch of notifications
+    fetchNotifications();
+    
+    // Initialize socket connection
+    const newSocket = socketInitializer();
+    socketRef.current = newSocket;
+    
+    // Setup event listeners
+    setupSocketListeners(newSocket);
+    
+    // Cleanup function
+    return () => {
+      console.log('Cleaning up socket on unmount');
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+        setSocketConnected(false);
+      }
+      isInitializedRef.current = false;
+    };
+  }, [loginStatus, user, fetchNotifications, setupSocketListeners]); // Only run on mount and when login/user changes
 
-        if (loginStatus && user && !socketRef.current) {
-            const newSocket = socketInitializer();
-            socketRef.current = newSocket;
-
-            newSocket.on('connect', () => {
-            newSocket.emit('register', user.id);
-            });
-
-            newSocket.on('notification', (newNotification: Notification) => {
-            setNotifications(prevNotifications => {
-                if (prevNotifications.some(n => n.id === newNotification.id) || newNotification.deletedAt !== null) {
-                return prevNotifications;
-                }
-                return [newNotification, ...prevNotifications];
-            });
-            setNotificationEffect(true);
-            setTimeout(() => setNotificationEffect(false), 1000);
-            });
-        }
-        };
-
-        if (loginStatus && user) {
-             fetchNotifications();
-             initializeSocket();
-        }
-
-        return () => {
-        if (socketRef.current) {
-            socketRef.current.disconnect();
-            socketRef.current = null;
-        }
-        };
-    }, [loginStatus, user, fetchNotifications]);
+  // Handle user changes - only reconnect if user ID actually changed
+  useEffect(() => {
+    const currentSocket = socketRef.current;
+    
+    // If socket exists but user changed, update the registration
+    if (currentSocket && currentSocket.connected && user?.id) {
+      console.log('User changed, re-registering with socket:', user.id);
+      currentSocket.emit('register', user.id);
+    }
+  }, [user?.id]); // Only depend on user ID changes
 
   return {
     notifications,
     notificationEffect,
-    markAllAsRead, // Return the new function
+    markAllAsRead,
     fetchNotifications,
     isLoadingNotifications,
     socketRef,
+    socketConnected
   };
 };
