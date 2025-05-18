@@ -1,6 +1,6 @@
 // src/components/IntroduceVisualization.tsx
 
-import React, { useState, useEffect, useMemo, useRef } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/src/navigation'
 import ReactECharts from 'echarts-for-react'

@@ -68,6 +68,27 @@ const rubik = localFont({
   display: 'swap'
 })
 
+// // Định nghĩa font Material Symbols Outlined cục bộ
+// const materialSymbolsOutlined = localFont({
+//   src: [
+//     // Thay đổi đường dẫn và tên file font cho phù hợp với font bạn đã tải về
+//     {
+//       path: '../../../public/fonts/Material-Symbols-Outlined-Regular.woff2', // Ví dụ với định dạng woff2
+//       weight: '400', // Hoặc trọng lượng font bạn đã tải về
+//       style: 'normal'
+//     },
+//     // Nếu có các biến thể khác (bold, fill, v.v.), bạn có thể thêm vào đây
+//     // {
+//     //   path: '../../../public/fonts/Material-Symbols-Outlined-Filled.woff2',
+//     //   weight: '400',
+//     //   style: 'normal'
+//     // },
+//   ],
+//   variable: '--font-material-symbols-outlined', // Đặt một biến CSS cho font này
+//   display: 'block', // Hoặc 'swap' tùy theo cách bạn muốn hiển thị font
+// })
+
+
 export const metadata: Metadata = {
   title: 'Global Conference Hub',
   description:
@@ -97,15 +118,17 @@ export default function RootLayout({
     <html
       lang={locale}
       dir={locale === 'ar' || locale == 'fa' ? 'rtl' : 'ltr'}
-      className={`${spaceGrotesk.variable} ${rubik.variable} scroll-smooth scrollbar scrollbar-track-background scrollbar-thumb-background-secondary  `}
+      // Thêm biến font Material Symbols Outlined vào className
+      className={`${spaceGrotesk.variable} ${rubik.variable}  scroll-smooth scrollbar scrollbar-track-background scrollbar-thumb-background-secondary  `}
+      // ${materialSymbolsOutlined.variable}
       suppressHydrationWarning
     >
       <head>
-        {/* Google Fonts link đã có */}
-        <link
+        {/* XÓA DÒNG NÀY ĐỂ LOẠI BỎ VIỆC FETCH FONT TỪ GOOGLE */}
+        {/* <link
           href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block'
           rel='stylesheet'
-        />
+        /> */}
       </head>
       <body>
         <AuthProvider> {/* Bọc toàn bộ ứng dụng hoặc phần cần xác thực */}
