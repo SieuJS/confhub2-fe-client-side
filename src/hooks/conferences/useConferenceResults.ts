@@ -16,8 +16,8 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
   const [currentPage, setCurrentPage] = useState(1);
   const [eventsPerPage, setEventPerPage] = useState<string>('5');
   //const eventsPerPage = 10;
-  const [sortBy, setSortBy] = useState<SortOption>('date');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  // const [sortBy, setSortBy] = useState<SortOption>('date');
+  // const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [totalItems, setTotalItems] = useState(initialData?.meta.totalItems || 0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,8 +45,8 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
         topics: searchParams.getAll('topics'), 
         publisher: searchParams.get('publisher') || undefined,
         page: searchParams.get('page') || '1',
-        sortBy: searchParams.get('sortBy') as SortOption || 'date',
-        sortOrder: searchParams.get('sortOrder') as SortOrder || 'asc',
+        // sortBy: searchParams.get('sortBy') as SortOption || 'date',
+        // sortOrder: searchParams.get('sortOrder') as SortOrder || 'asc',
         perPage: searchParams.get('perPage') || '5',
       };
 
@@ -55,8 +55,8 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
       setEvents(data);
       setTotalItems(data.meta.totalItems);
       setCurrentPage(data.meta.curPage); // Dùng page từ params (đã là string).
-      setSortBy(params.sortBy!);  // Đã được kiểm tra ở trên.
-      setSortOrder(params.sortOrder!); // Đã được kiểm tra ở trên
+      // setSortBy(params.sortBy!);  // Đã được kiểm tra ở trên.
+      // setSortOrder(params.sortOrder!); // Đã được kiểm tra ở trên
       setEventPerPage(params.perPage!);
     } catch (error: any) {
       console.error("Failed to fetch conferences:", error);
@@ -78,15 +78,15 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
       router.push(`/${localePrefix}/conferences?${newParams.toString()}`);
     };
 
-    const handleSortByChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-      const newSortBy = event.target.value as SortOption;
-      const newParams = new URLSearchParams(searchParams.toString());
-      newParams.set('sortBy', newSortBy);
-      newParams.delete('page'); // Reset to page 1 when sorting changes
+    // const handleSortByChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    //   const newSortBy = event.target.value as SortOption;
+    //   const newParams = new URLSearchParams(searchParams.toString());
+    //   newParams.set('sortBy', newSortBy);
+    //   newParams.delete('page'); // Reset to page 1 when sorting changes
 
-      const localePrefix = pathname.split('/')[1];
-      router.push(`/${localePrefix}/conferences?${newParams.toString()}`);
-    };
+    //   const localePrefix = pathname.split('/')[1];
+    //   router.push(`/${localePrefix}/conferences?${newParams.toString()}`);
+    // };
 
     const handleEventPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
       const newPerPage = event.target.value as string;
@@ -98,15 +98,15 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
       router.push(`/${localePrefix}/conferences?${newParams.toString()}`);
     }
 
-    const handleSortOrderChange = () => {
-      const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-      const newParams = new URLSearchParams(searchParams.toString());
-      newParams.set('sortOrder', newSortOrder);
-      newParams.delete('page'); // Reset to page 1 when sorting changes
+    // const handleSortOrderChange = () => {
+    //   const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+    //   const newParams = new URLSearchParams(searchParams.toString());
+    //   newParams.set('sortOrder', newSortOrder);
+    //   newParams.delete('page'); // Reset to page 1 when sorting changes
 
-      const localePrefix = pathname.split('/')[1];
-      router.push(`/${localePrefix}/conferences?${newParams.toString()}`);
-    };
+    //   const localePrefix = pathname.split('/')[1];
+    //   router.push(`/${localePrefix}/conferences?${newParams.toString()}`);
+    // };
 
     const sortedEvents = events;
 
@@ -115,11 +115,11 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
     totalItems,
     eventsPerPage,
     currentPage,
-    sortBy,
-    sortOrder,
+    // sortBy,
+    // sortOrder,
     paginate,
-    handleSortByChange,
-    handleSortOrderChange,
+    // handleSortByChange,
+    // handleSortOrderChange,
     handleEventPerPageChange,
     loading,
     error,
