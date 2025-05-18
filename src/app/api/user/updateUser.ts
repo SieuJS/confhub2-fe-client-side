@@ -12,7 +12,7 @@ export const updateUser = async (
   }
 
   const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/user/update`, {
-    method: 'PUT',
+    method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`, // <<<< THÊM AUTHORIZATION HEADER >>>>
