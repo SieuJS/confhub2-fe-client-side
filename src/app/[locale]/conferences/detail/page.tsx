@@ -16,13 +16,13 @@ import FloatingChatbot from '@/src/app/[locale]/floatingchatbot/FloatingChatbot'
 
 // Import the custom hooks
 import useSequentialConferenceData from '@/src/hooks/conferenceDetails/useSequentialConferenceData'
-import useFollowConference from '@/src/hooks/conferenceDetails/useFollowConference' // Path đã được sửa
-import useShareConference from '@/src/hooks/conferenceDetails/useShareConference' // Path đã được sửa
-import useTopicsDisplay from '@/src/hooks/conferenceDetails/useTopicsDisplay' // Path đã được sửa
-import useFormatConferenceDates from '@/src/hooks/conferenceDetails/useFormatConferenceDates' // Path đã được sửa
-import useAddToCalendar from '@/src/hooks/conferenceDetails/useAddToCalendar' // Path đã được sửa
-import useUpdateConference from '@/src/hooks/conferenceDetails/useUpdateConference' // Path đã được sửa
-import useBlacklistConference from '@/src/hooks/conferenceDetails/useBlacklistConference' // Path đã được sửa
+import useFollowConference from '@/src/hooks/conferenceDetails/useFollowConference'
+import useShareConference from '@/src/hooks/conferenceDetails/useShareConference'
+import useTopicsDisplay from '@/src/hooks/conferenceDetails/useTopicsDisplay'
+import useFormatConferenceDates from '@/src/hooks/conferenceDetails/useFormatConferenceDates'
+import useAddToCalendar from '@/src/hooks/conferenceDetails/useAddToCalendar'
+import useUpdateConference from '@/src/hooks/conferenceDetails/useUpdateConference'
+import useBlacklistConference from '@/src/hooks/conferenceDetails/useBlacklistConference'
 
 // Import new components
 import ConferenceHeader from './ConferenceHeader'
@@ -37,13 +37,16 @@ interface DetailContentProps {
   conferenceId: string | null
 }
 
-const DetailContent: React.FC<DetailContentProps> = ({ locale, conferenceId }) => {
+const DetailContent: React.FC<DetailContentProps> = ({
+  locale,
+  conferenceId
+}) => {
   const t = useTranslations('')
   const router = useRouter()
   const pathname = usePathname()
 
   // <<<< THAY ĐỔI QUAN TRỌNG: Sử dụng useAuth từ Context
-  const { isLoggedIn, isInitializing: isAuthInitializing, user } = useAuth(); // Lấy thêm user nếu cần
+  const { isLoggedIn, isInitializing: isAuthInitializing, user } = useAuth() // Lấy thêm user nếu cần
 
   const {
     conferenceDataFromDB,
@@ -53,7 +56,7 @@ const DetailContent: React.FC<DetailContentProps> = ({ locale, conferenceId }) =
 
   const lastOrganization =
     conferenceDataFromDB?.organizations?.[
-    conferenceDataFromDB.organizations.length - 1
+      conferenceDataFromDB.organizations.length - 1
     ]
   const firstRankData = conferenceDataFromDB?.ranks?.[0]
   const transformedDatesData = transformDates(lastOrganization?.conferenceDates)
@@ -92,23 +95,27 @@ const DetailContent: React.FC<DetailContentProps> = ({ locale, conferenceId }) =
 
   const checkLoginAndRedirect = useCallback(
     (callback: () => void) => {
-      if (isAuthInitializing) { // Đợi auth khởi tạo xong
-        console.log("[Detail Page] Auth still initializing, action deferred.");
+      if (isAuthInitializing) {
+        // Đợi auth khởi tạo xong
+        console.log('[Detail Page] Auth still initializing, action deferred.')
         // Có thể hiển thị thông báo hoặc không làm gì cả
-        return;
+        return
       }
       if (!isLoggedIn) {
-        console.log("[Detail Page] Not logged in, redirecting to login for action.");
-        const currentPath = pathname + (conferenceId ? `?id=${conferenceId}` : '');
-        localStorage.setItem('returnUrl', currentPath);
+        console.log(
+          '[Detail Page] Not logged in, redirecting to login for action.'
+        )
+        const currentPath =
+          pathname + (conferenceId ? `?id=${conferenceId}` : '')
+        localStorage.setItem('returnUrl', currentPath)
         // locale đã có trong pathname, hoặc có thể lấy từ props locale
-        router.push(`/${locale}/auth/login`);
+        router.push(`/${locale}/auth/login`)
       } else {
-        callback();
+        callback()
       }
     },
     [isLoggedIn, isAuthInitializing, pathname, router, locale, conferenceId]
-  );
+  )
 
   useEffect(() => {
     if (updateResult) {
@@ -124,29 +131,30 @@ const DetailContent: React.FC<DetailContentProps> = ({ locale, conferenceId }) =
   if (isAuthInitializing || (sequentialLoading && !conferenceDataFromDB)) {
     // Ưu tiên hiển thị loading auth nếu nó đang chạy
     // Hoặc loading data conference nếu auth đã xong
-    return <Loading />;
+    return <Loading />
   }
 
   if (dbError === 'Conference not found' || !conferenceId) {
     // Nếu không có conferenceId từ đầu (do URL sai) hoặc API trả về không tìm thấy
-    return <NotFoundPage />;
+    return <NotFoundPage />
   }
-  if (dbError) { // Các lỗi khác từ API
+  if (dbError) {
+    // Các lỗi khác từ API
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className='flex h-screen items-center justify-center'>
         <div>Error loading conference data: {dbError}</div>
       </div>
-    );
+    )
   }
-  if (!conferenceDataFromDB) { // Trường hợp không có data sau khi loading xong và không có lỗi cụ thể
-    return <NotFoundPage />; // Hoặc một thông báo lỗi khác
+  if (!conferenceDataFromDB) {
+    // Trường hợp không có data sau khi loading xong và không có lỗi cụ thể
+    return <NotFoundPage /> // Hoặc một thông báo lỗi khác
   }
-
 
   const displayOrganization =
-    lastOrganization ?? conferenceDataFromDB?.organizations?.[0];
-  const overallRating = calculateOverallRating(conferenceDataFromDB?.feedbacks);
-  const totalReviews = conferenceDataFromDB?.feedbacks?.length || 0;
+    lastOrganization ?? conferenceDataFromDB?.organizations?.[0]
+  const overallRating = calculateOverallRating(conferenceDataFromDB?.feedbacks)
+  const totalReviews = conferenceDataFromDB?.feedbacks?.length || 0
 
   return (
     <div className='flex min-h-screen flex-col'>
@@ -158,13 +166,8 @@ const DetailContent: React.FC<DetailContentProps> = ({ locale, conferenceId }) =
           </div>
         )}
 
-        {/* Hiển thị lỗi từ các action (follow, calendar, blacklist) */}
-        {followError && <div className="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">Follow Error: {followError}</div>}
-        {calendarError && <div className="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">Calendar Error: {calendarError}</div>}
-        {blacklistError && <div className="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">Blacklist Error: {blacklistError}</div>}
-
-
-        <div className='rounded-lg bg-white p-2 shadow-md md:p-4'> {/* Đổi white-pure thành white */}
+        <div className='rounded-lg bg-white-pure p-2 shadow-md md:p-4'>
+          {' '}
           <div className='flex flex-col gap-4 md:flex-row'>
             <div className='md:w-4/5'>
               <ConferenceHeader
@@ -200,17 +203,17 @@ const DetailContent: React.FC<DetailContentProps> = ({ locale, conferenceId }) =
                 handleBlacklistClick={handleBlacklistClick}
                 blacklistLoading={blacklistLoading}
                 checkLoginAndRedirect={checkLoginAndRedirect}
-              // Cân nhắc truyền user.roles vào đây nếu cần kiểm tra quyền hạn cụ thể
+                // Cân nhắc truyền user.roles vào đây nếu cần kiểm tra quyền hạn cụ thể
               />
             </div>
           </div>
-
           <div className='mt-6 border-t pt-6 md:mt-4 md:pt-4'>
             <ConferenceTabs conference={conferenceDataFromDB} />
           </div>
         </div>
 
-        <div className='mt-8 rounded-lg bg-white p-4 shadow-md md:p-6'> {/* Đổi white-pure thành white */}
+        <div className='mt-8 rounded-lg bg-white-pure p-4 shadow-md md:p-6'>
+          {' '}
           <ConferenceFeedback conferenceData={conferenceDataFromDB} />
         </div>
       </main>
@@ -221,24 +224,22 @@ const DetailContent: React.FC<DetailContentProps> = ({ locale, conferenceId }) =
 }
 
 // Component cha để bọc Suspense
-const DetailPage = ({
-  params: { locale }
-}: {
-  params: { locale: string }
-}) => {
+const DetailPage = ({ params: { locale } }: { params: { locale: string } }) => {
   return (
-    <Suspense fallback={<Loading />}> {/* Fallback chung cho cả trang */}
+    <Suspense fallback={<Loading />}>
+      {' '}
+      {/* Fallback chung cho cả trang */}
       <PageContent locale={locale} />
     </Suspense>
-  );
-};
+  )
+}
 
 // Component trung gian để lấy searchParams
 const PageContent = ({ locale }: { locale: string }) => {
-  const searchParams = useSearchParams();
-  const conferenceId = searchParams.get('id');
+  const searchParams = useSearchParams()
+  const conferenceId = searchParams.get('id')
 
-  return <DetailContent locale={locale} conferenceId={conferenceId} />;
+  return <DetailContent locale={locale} conferenceId={conferenceId} />
 }
 
-export default DetailPage;
+export default DetailPage
