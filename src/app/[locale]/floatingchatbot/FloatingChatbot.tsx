@@ -19,7 +19,7 @@ import ChatbotErrorDisplay from '../chatbot/ChatbotErrorDisplay' // Import Chatb
 const DynamicAnimatedIcon = dynamic(() => import('../utils/AnimatedIcon'), {
   ssr: false,
   loading: () => (
-    <div className='flex h-14 w-14 items-center justify-center rounded-full bg-blue-600'>
+    <div className='flex h-14 w-14 items-center justify-center rounded-full bg-blue-400'>
       {/* Placeholder tĩnh hoặc spinner nhỏ */}
     </div>
   )
@@ -42,97 +42,111 @@ const FloatingChatbot: React.FC = () => {
     state => state.activeConversationId
   )
   // Lắng nghe UiStore để biết khi nào có lỗi và cần hiển thị ChatbotErrorDisplay
-  const hasFatalError = useUiStore(state => state.hasFatalError);
-  const fatalErrorCode = useUiStore(state => state.fatalErrorCode); // Lấy thêm mã lỗi
+  const hasFatalError = useUiStore(state => state.hasFatalError)
+  const fatalErrorCode = useUiStore(state => state.fatalErrorCode) // Lấy thêm mã lỗi
 
-  useAppInitialization(); // Hook này chỉ nên chạy một lần, không phụ thuộc vào isChatOpen
+  useAppInitialization() // Hook này chỉ nên chạy một lần, không phụ thuộc vào isChatOpen
 
   const toggleChatbot = useCallback(() => {
     setIsChatOpen(prevIsChatOpen => {
-      const newIsChatOpen = !prevIsChatOpen;
+      const newIsChatOpen = !prevIsChatOpen
       if (newIsChatOpen) {
         if (currentStoreChatMode !== 'regular') {
-          setChatMode('regular');
+          setChatMode('regular')
         }
         // Reset conversation và UI chỉ khi mở chat *từ trạng thái đóng*
         // và không phải chỉ là đóng/mở settings.
-        if (!prevIsChatOpen) { // Chỉ reset nếu trước đó chat đang đóng
+        if (!prevIsChatOpen) {
+          // Chỉ reset nếu trước đó chat đang đóng
           if (activeConversationId !== null) {
-            setActiveConversationId(null);
+            setActiveConversationId(null)
           }
-          resetChatUIForNewConversation(true);
+          resetChatUIForNewConversation(true)
         }
-        setIsSettingsOpen(false);
+        setIsSettingsOpen(false)
       } else {
-        setIsSettingsOpen(false); // Luôn đóng settings khi đóng chat
+        setIsSettingsOpen(false) // Luôn đóng settings khi đóng chat
       }
-      return newIsChatOpen;
-    });
+      return newIsChatOpen
+    })
   }, [
-    currentStoreChatMode, setChatMode,
-    resetChatUIForNewConversation, setActiveConversationId, activeConversationId
-  ]);
+    currentStoreChatMode,
+    setChatMode,
+    resetChatUIForNewConversation,
+    setActiveConversationId,
+    activeConversationId
+  ])
 
   const toggleSettingsPanel = useCallback((e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setIsSettingsOpen(prev => !prev);
-  }, []);
+    e?.stopPropagation()
+    setIsSettingsOpen(prev => !prev)
+  }, [])
 
   // useEffect này để đảm bảo chatMode là 'regular' khi chat mở.
   // Nó có thể không cần thiết nếu logic trong toggleChatbot đã đủ.
   useEffect(() => {
     if (isChatOpen && currentStoreChatMode !== 'regular') {
-      console.log("[FloatingChatbot] Effect: Chat is open and mode is not regular. Setting to regular.");
-      setChatMode('regular');
+      console.log(
+        '[FloatingChatbot] Effect: Chat is open and mode is not regular. Setting to regular.'
+      )
+      setChatMode('regular')
     }
-  }, [isChatOpen, currentStoreChatMode, setChatMode]);
+  }, [isChatOpen, currentStoreChatMode, setChatMode])
 
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         if (isSettingsOpen) {
-          setIsSettingsOpen(false);
+          setIsSettingsOpen(false)
         } else if (isChatOpen) {
           // Khi đóng bằng Escape, logic trong toggleChatbot sẽ không chạy
           // nên cần set isChatOpen trực tiếp và đảm bảo settings cũng đóng
-          setIsChatOpen(false);
-          setIsSettingsOpen(false);
+          setIsChatOpen(false)
+          setIsSettingsOpen(false)
         }
       }
-    };
-    document.addEventListener('keydown', handleEscape);
+    }
+    document.addEventListener('keydown', handleEscape)
     return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [isChatOpen, isSettingsOpen]); // Thêm setIsChatOpen vào deps nếu bạn muốn clean hơn, nhưng nó sẽ không thay đổi
-
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [isChatOpen, isSettingsOpen]) // Thêm setIsChatOpen vào deps nếu bạn muốn clean hơn, nhưng nó sẽ không thay đổi
 
   // Điều kiện để render ChatbotErrorDisplay trong floating chat
   // Nó chỉ nên hiển thị nếu chat đang mở VÀ có lỗi nghiêm trọng
-  const shouldShowErrorDisplayInFloatingChat = isChatOpen && hasFatalError;
+  const shouldShowErrorDisplayInFloatingChat = isChatOpen && hasFatalError
 
   // Xác định xem lỗi có phải là lỗi nghiêm trọng cản trở việc chat không
   // Ví dụ: Lỗi xác thực sẽ cản trở, lỗi kết nối cũng vậy.
   // Lỗi không nghiêm trọng (warning) có thể không cần disable input.
-  const getIsAuthRelatedOrConnectionError = useCallback((code: string | null): boolean => {
-    if (!code) return false;
-    const criticalErrorCodes = [
-      'AUTH_REQUIRED', 'ACCESS_DENIED', 'TOKEN_EXPIRED',
-      'AUTH_CONNECTION_ERROR', 'AUTH_HANDSHAKE_FAILED',
-      'CONNECTION_FAILED', 'FATAL_SERVER_ERROR' // Coi lỗi server là nghiêm trọng
-    ];
-    return criticalErrorCodes.includes(code);
-  }, []);
+  const getIsAuthRelatedOrConnectionError = useCallback(
+    (code: string | null): boolean => {
+      if (!code) return false
+      const criticalErrorCodes = [
+        'AUTH_REQUIRED',
+        'ACCESS_DENIED',
+        'TOKEN_EXPIRED',
+        'AUTH_CONNECTION_ERROR',
+        'AUTH_HANDSHAKE_FAILED',
+        'CONNECTION_FAILED',
+        'FATAL_SERVER_ERROR' // Coi lỗi server là nghiêm trọng
+      ]
+      return criticalErrorCodes.includes(code)
+    },
+    []
+  )
 
-  const isChatInputDisabled = isChatOpen && hasFatalError && getIsAuthRelatedOrConnectionError(fatalErrorCode);
-
+  const isChatInputDisabled =
+    isChatOpen &&
+    hasFatalError &&
+    getIsAuthRelatedOrConnectionError(fatalErrorCode)
 
   return (
     <>
       {!isChatOpen && (
         <button
           onClick={toggleChatbot}
-          className='fixed bottom-5 right-5 z-[60] flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition-transform duration-150 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75'
+          className='fixed bottom-5 right-5 z-[60] flex h-14 w-14 items-center justify-center rounded-full bg-blue-400 text-white shadow-lg transition-transform duration-150 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75'
           aria-label={t('Open_Chat')}
           title={t('Open_Chat')}
         >
@@ -141,19 +155,31 @@ const FloatingChatbot: React.FC = () => {
       )}
 
       {isChatOpen && (
-        <div className='animate-slide-up-fade fixed bottom-5 right-5 z-50 flex h-[calc(100vh-6rem)] max-h-[600px] w-[90vw] max-w-md flex-col rounded-xl bg-white shadow-2xl dark:bg-gray-800 md:bottom-8 md:right-8 md:h-[calc(100vh-8rem)] md:max-h-[700px] md:max-w-lg dark:border dark:border-gray-700'>
+        <div className='animate-slide-up-fade fixed bottom-5 right-5 z-50 flex h-[calc(100vh-6rem)] max-h-[600px] w-[90vw] max-w-md flex-col rounded-xl bg-white-pure shadow-2xl dark:border dark:border-gray-700  md:bottom-8 md:right-8 md:h-[calc(100vh-8rem)] md:max-h-[700px] md:max-w-lg'>
           {/* ChatbotErrorDisplay được render có điều kiện bên trong container chính */}
           {/* Nó sẽ tự style dựa trên isFloatingContext={true} */}
-          {shouldShowErrorDisplayInFloatingChat && <ChatbotErrorDisplay isFloatingContext={true} />}
+          {shouldShowErrorDisplayInFloatingChat && (
+            <ChatbotErrorDisplay isFloatingContext={true} />
+          )}
 
           {/* Header của chatbot - KHÔNG còn bị làm mờ bởi shouldShowErrorDisplayInFloatingChat ở đây */}
-          <div className={`flex items-center justify-between rounded-t-xl bg-blue-600 px-4 py-3 text-white dark:bg-blue-700`}>
+          <div
+            className={`flex items-center justify-between rounded-t-xl bg-button px-4 py-3 text-button-text`}
+          >
             <div className='flex items-center space-x-3'>
               <button
                 onClick={toggleSettingsPanel}
                 className='rounded-full p-1.5 hover:bg-blue-700 focus:outline-none focus:ring-1 focus:ring-white dark:hover:bg-blue-800'
-                aria-label={isSettingsOpen ? t('Close_Chat_Settings') : t('Open_Chat_Settings')}
-                title={isSettingsOpen ? t('Close_Chat_Settings') : t('Open_Chat_Settings')}
+                aria-label={
+                  isSettingsOpen
+                    ? t('Close_Chat_Settings')
+                    : t('Open_Chat_Settings')
+                }
+                title={
+                  isSettingsOpen
+                    ? t('Close_Chat_Settings')
+                    : t('Open_Chat_Settings')
+                }
                 aria-expanded={isSettingsOpen}
               >
                 <Settings size={20} />
@@ -162,7 +188,7 @@ const FloatingChatbot: React.FC = () => {
             </div>
             <button
               onClick={toggleChatbot}
-              className='rounded-full p-1.5 text-gray-200 hover:bg-blue-700 hover:text-white focus:outline-none dark:hover:bg-blue-800'
+              className='rounded-full p-1.5  hover:bg-blue-700 hover:text-white focus:outline-none dark:hover:bg-blue-800'
               aria-label={t('Close_Chat')}
             >
               <X size={22} />
