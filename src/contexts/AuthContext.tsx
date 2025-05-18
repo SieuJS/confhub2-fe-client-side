@@ -242,7 +242,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     const currentPath = window.location.pathname + window.location.search;
     localStorage.setItem(LOCAL_STORAGE_KEYS.RETURN_URL, currentPath);
-    window.location.href = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/google`;
+    const currentOrigin = window.location.origin;
+    // Add redirectUrl parameter to the Google auth URL
+    const googleAuthUrl = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/google?redirectUrl=${encodeURIComponent(currentOrigin + '/api/auth/google-callback')}`;
+    window.location.href = googleAuthUrl;
   };
 
   const processTokenFromOAuth = useCallback(async (token: string, customRedirectPath?: string): Promise<void> => {
