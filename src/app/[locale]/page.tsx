@@ -1,15 +1,13 @@
 // src/app/[locale]/page.tsx
-'use client' // Giữ nguyên dòng này nếu toàn bộ trang là Client Component
+'use client'
 
 import dynamic from 'next/dynamic' // Import dynamic
 
 // Import các components khác
-import PopularConferences from './home/PopularConferences'
 import Footer from './utils/Footer'
 import { Header } from './utils/Header'
 import IntroduceVisualization from './home/IntroduceVisualization'
 import FeatureComparisonTable from './home/FeatureComparisonTable'
-import SuperBannerTree from './home/SuperBannerTree'
 import SuperBannerFor from './home/SuperBannerFor'
 // <<< Bỏ import FloatingChatbot thông thường ở đây >>>
 // --- Dynamic Import ConsumerInsights (đã làm ở bước trước) ---

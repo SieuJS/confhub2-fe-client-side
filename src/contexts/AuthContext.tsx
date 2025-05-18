@@ -1,8 +1,8 @@
 // src/contexts/AuthContext.tsx
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { useRouter } from 'next/navigation'; // Sử dụng từ 'next/navigation' cho App Router
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useMemo } from 'react'; // Thêm useMemo
+import { useRouter } from 'next/navigation';
 import { AuthResponse, UserResponse } from '@/src/models/response/user.response';
 import { appConfig } from '@/src/middleware';
 
@@ -11,7 +11,7 @@ import { useMessageStore } from '../app/[locale]/chatbot/stores/messageStore';
 import { useConversationStore } from '../app/[locale]/chatbot/stores/conversationStore';
 import { useSocketStore } from '../app/[locale]/chatbot/stores/socketStore';
 import { useUiStore } from '../app/[locale]/chatbot/stores/uiStore';
-import { useSettingsStore } from '../app/[locale]/chatbot/stores/setttingsStore'; // Thêm nếu cần reset settings
+// import { useSettingsStore } from '../app/[locale]/chatbot/stores/setttingsStore';
 
 // --- Helper: LocalStorage Management ---
 const LOCAL_STORAGE_KEYS = {
@@ -79,65 +79,52 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  // updateAuthUser đã được useCallback trong code gốc, giữ nguyên
   const updateAuthUser = useCallback((newUserData: UserResponse) => {
     console.log("[AuthProvider] Updating auth user state with new data:", newUserData);
     setUserState(newUserData);
     _persistUserToLocalStorage(newUserData);
   }, []);
 
+  // _handleAuthSuccess đã được useCallback trong code gốc, giữ nguyên
   const _handleAuthSuccess = useCallback((authData: AuthResponse, customRedirectPath?: string) => {
     _persistAuthDataToLocalStorage(authData);
     setUserState(authData.user);
     setIsLoggedIn(true);
     setError(null);
-
-    // Xóa mọi lỗi UI cũ khi đăng nhập thành công
     useUiStore.getState().clearFatalError();
-    // Reset MessageStore để đảm bảo không còn tin nhắn lỗi cũ
     useMessageStore.getState().clearAuthErrorMessages();
-
-
-    const returnUrl = customRedirectPath || localStorage.getItem(LOCAL_STORAGE_KEYS.RETURN_URL) || '/';
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.RETURN_URL);
+    const returnUrl = customRedirectPath || (typeof window !== 'undefined' ? localStorage.getItem(LOCAL_STORAGE_KEYS.RETURN_URL) : null) || '/';
+    if (typeof window !== 'undefined') localStorage.removeItem(LOCAL_STORAGE_KEYS.RETURN_URL);
     console.log("[AuthProvider] Auth success. Redirecting to:", returnUrl);
     router.push(returnUrl);
   }, [router]);
 
+  // _performLogout đã được useCallback trong code gốc, giữ nguyên
   const _performLogout = useCallback(async (options?: { preventRedirect?: boolean; callApi?: boolean }) => {
     console.log("[AuthProvider] Performing logout. Options:", options);
-    const previousToken = _getStoredToken(); // Lấy token cũ TRƯỚC KHI clear localStorage
-
+    const previousToken = _getStoredToken();
     _clearAuthDataFromLocalStorage();
     setUserState(null);
     setIsLoggedIn(false);
     setError(null);
-
-    // Reset các store liên quan đến chatbot
     console.log("[AuthProvider] Resetting related chatbot stores on logout.");
-    useMessageStore.getState().resetChatUIForNewConversation(true); // true để clear active ID và messages
-    useConversationStore.getState().resetConversationState(); // Reset danh sách conversation
-    useUiStore.getState().clearFatalError(); // Xóa mọi lỗi nghiêm trọng trên UI
-    // Nếu có SettingsStore cần reset (ví dụ: isStreamingEnabled, currentLanguage), thêm ở đây:
-    // useSettingsStore.getState().resetSettingsToDefaults(); // Giả sử có action này
-
-    // Reset trạng thái SocketStore
+    useMessageStore.getState().resetChatUIForNewConversation(true);
+    useConversationStore.getState().resetConversationState();
+    useUiStore.getState().clearFatalError();
     const socketStore = useSocketStore.getState();
-    socketStore.disconnectSocket(); // Chủ động ngắt kết nối socket
+    socketStore.disconnectSocket();
     socketStore.setCurrentAuthTokenForSocket(null);
     socketStore.setIsConnected(false, null);
     socketStore.setIsServerReadyForCommands(false);
     socketStore.setHasFatalConnectionError(false);
-
     if (options?.callApi) {
       try {
         const headers: HeadersInit = { 'Content-Type': 'application/json' };
-        // Gửi token cũ (nếu có) để server có thể hủy session/token phía server
         if (previousToken) {
             headers['Authorization'] = `Bearer ${previousToken}`;
         }
-        // Đảm bảo API route này tồn tại và xử lý đúng cách
-        // Sử dụng POST cho logout là một good practice
-        await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/logout`, { // Sử dụng URL đầy đủ nếu API ở domain khác
+        await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/logout`, {
             method: 'POST',
             headers: headers,
         });
@@ -146,23 +133,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.warn("[AuthProvider] Failed to call server logout API.", e);
       }
     }
-
     if (!options?.preventRedirect) {
       console.log("[AuthProvider] Redirecting to / after logout.");
-      router.push('/'); // Hoặc một trang đích logout cụ thể
+      router.push('/');
     } else {
       console.log("[AuthProvider] Logout performed, redirect prevented by options.");
     }
-  }, [router]); // Dependencies: router
+  }, [router]);
 
+  // useEffect của initializeAuth giữ nguyên, dependencies của nó đã ổn định
   useEffect(() => {
     let isMounted = true;
     console.log("[AuthProvider] Initializing authentication state...");
-
     const initializeAuth = async () => {
       const token = _getStoredToken();
       const storedLoginStatus = typeof window !== 'undefined' && localStorage.getItem(LOCAL_STORAGE_KEYS.LOGIN_STATUS) === 'true';
-
       if (token && storedLoginStatus) {
         console.log("[AuthProvider] Token found. Verifying with /me endpoint...");
         try {
@@ -170,21 +155,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           });
-
           if (!isMounted) return;
-
           if (response.ok) {
             const userData = await response.json() as UserResponse;
             console.log("[AuthProvider] /me verification successful. User:", userData.email);
             _persistAuthDataToLocalStorage({ user: userData, token });
             setUserState(userData);
             setIsLoggedIn(true);
-            // Sau khi xác thực thành công, xóa các lỗi UI cũ (nếu có từ lần load trước)
             useUiStore.getState().clearFatalError();
             useMessageStore.getState().clearAuthErrorMessages();
           } else if (response.status === 401 || response.status === 403) {
             console.warn(`[AuthProvider] /me verification failed (${response.status}). Token invalid or expired. Logging out.`);
-            await _performLogout({ preventRedirect: true, callApi: false }); // callApi: false vì server đã từ chối token
+            await _performLogout({ preventRedirect: true, callApi: false });
           } else {
             console.error(`[AuthProvider] /me verification failed with status: ${response.status}. Logging out.`);
             if (isMounted) setError(`Session check failed (Status: ${response.status})`);
@@ -194,29 +176,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           if (!isMounted) return;
           console.error("[AuthProvider] Network or fetch error during /me verification:", err);
           if (isMounted) setError("Network error during session verification.");
-          // Trong trường hợp lỗi mạng, không chắc token có hợp lệ không, có thể không cần gọi API logout
           await _performLogout({ preventRedirect: true, callApi: false });
         }
       } else {
         console.log("[AuthProvider] No valid token or login status. Ensuring logged out state.");
-        // Nếu client có state isLoggedIn=true hoặc user tồn tại mà không có token/loginStatus,
-        // đó là trạng thái không nhất quán, cần logout client-side.
         if (isLoggedIn || user) {
             await _performLogout({ preventRedirect: true, callApi: false });
         }
       }
       if (isMounted) setIsInitializing(false);
     };
-
     initializeAuth();
-
     return () => {
       isMounted = false;
     };
-  }, [_performLogout]); // Chỉ phụ thuộc vào _performLogout
+  }, [_performLogout]);
 
 
-  const signIn = async (credentials: Record<string, string>): Promise<void> => {
+  // Bọc các hàm này trong useCallback
+  const signIn = useCallback(async (credentials: Record<string, string>): Promise<void> => {
     setIsLoading(true);
     setError(null);
     try {
@@ -236,18 +214,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [_handleAuthSuccess]); // Phụ thuộc vào _handleAuthSuccess (đã ổn định)
 
-  const googleSignIn = async (): Promise<void> => {
+  const googleSignIn = useCallback(async (): Promise<void> => {
     setIsLoading(true);
-    const currentPath = window.location.pathname + window.location.search;
-    localStorage.setItem(LOCAL_STORAGE_KEYS.RETURN_URL, currentPath);
-    const currentOrigin = window.location.origin;
-    // Add redirectUrl parameter to the Google auth URL
+    const currentPath = typeof window !== 'undefined' ? (window.location.pathname + window.location.search) : '/';
+    if (typeof window !== 'undefined') localStorage.setItem(LOCAL_STORAGE_KEYS.RETURN_URL, currentPath);
+    const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
     const googleAuthUrl = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/google?redirectUrl=${encodeURIComponent(currentOrigin + '/api/auth/google-callback')}`;
-    window.location.href = googleAuthUrl;
-  };
+    if (typeof window !== 'undefined') window.location.href = googleAuthUrl;
+    // Không setIsLoading(false) ở đây vì trang sẽ redirect
+  }, []); // Không có dependencies thay đổi
 
+  // processTokenFromOAuth đã được useCallback trong code gốc, giữ nguyên
   const processTokenFromOAuth = useCallback(async (token: string, customRedirectPath?: string): Promise<void> => {
     setIsLoading(true);
     setError(null);
@@ -261,7 +240,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         _handleAuthSuccess({ user: userData as UserResponse, token }, customRedirectPath);
       } else {
         setError(userData.message || 'Failed to complete login after OAuth.');
-        await _performLogout({ preventRedirect: true, callApi: false }); // callApi: false vì lỗi có thể do token OAuth
+        await _performLogout({ preventRedirect: true, callApi: false });
       }
     } catch (err: any) {
       setError('Network error while completing login.');
@@ -271,30 +250,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [_handleAuthSuccess, _performLogout]);
 
-  const logout = async (options?: { callApi?: boolean; preventRedirect?: boolean }): Promise<void> => {
+  const logout = useCallback(async (options?: { callApi?: boolean; preventRedirect?: boolean }): Promise<void> => {
     setIsLoading(true);
     await _performLogout({
-        callApi: options?.callApi ?? true, // Mặc định gọi API logout
+        callApi: options?.callApi ?? true,
         preventRedirect: options?.preventRedirect ?? false
     });
     setIsLoading(false);
-  };
+  }, [_performLogout]); // Phụ thuộc vào _performLogout (đã ổn định)
 
+  // getToken đã được useCallback trong code gốc, giữ nguyên
   const getToken = useCallback((): string | null => _getStoredToken(), []);
 
-  const contextValue = {
+  // Memoize contextValue
+  const contextValue = useMemo(() => ({
     user,
     isLoggedIn,
     isLoading,
     isInitializing,
     error,
-    signIn,
+    signIn, // Tham chiếu đến signIn đã được useCallback
+    googleSignIn, // Tham chiếu đến googleSignIn đã được useCallback
+    processTokenFromOAuth, // Tham chiếu đến processTokenFromOAuth đã được useCallback
+    logout, // Tham chiếu đến logout đã được useCallback
+    getToken, // Tham chiếu đến getToken đã được useCallback
+    updateAuthUser, // Tham chiếu đến updateAuthUser đã được useCallback
+  }), [
+    user,
+    isLoggedIn,
+    isLoading,
+    isInitializing,
+    error,
+    signIn, // Các hàm này giờ là dependencies ổn định
     googleSignIn,
     processTokenFromOAuth,
     logout,
     getToken,
-    updateAuthUser,
-  };
+    updateAuthUser
+  ]);
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };
