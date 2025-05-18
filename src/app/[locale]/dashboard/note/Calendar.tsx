@@ -674,7 +674,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
         />
       )}
 
-      {showDialog && dialogDate && (
+      {/* {showDialog && dialogDate && (
         <div
           ref={dialogRef}
           style={{
@@ -693,7 +693,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
             loadingDetails={loadingDetails}
           />
         </div>
-      )}
+      )} */}
     </section>
   )
 }

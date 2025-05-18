@@ -87,17 +87,17 @@ const MonthView: React.FC<MonthViewProps> = ({
                   key={`${event.conferenceId}-${index}`}
                   className={`px-1 py-0.5 text-xs ${getEventTypeColor(event.type)} cursor-pointer truncate text-white`}
                   title={event.conference}
-                  onClick={e => {
-                    e.stopPropagation()
-                    if (e.target instanceof HTMLElement) {
-                      calendarRef.current?.dispatchEvent(
-                        new CustomEvent('open-event-details', {
-                          bubbles: true,
-                          detail: { event: event, clickEvent: e }
-                        })
-                      )
-                    }
-                  }} // Pass event data and click event
+                  // onClick={e => {
+                  //   e.stopPropagation()
+                  //   if (e.target instanceof HTMLElement) {
+                  //     calendarRef.current?.dispatchEvent(
+                  //       new CustomEvent('open-event-details', {
+                  //         bubbles: true,
+                  //         detail: { event: event, clickEvent: e }
+                  //       })
+                  //     )
+                  //   }
+                  // }}
                 >
                   {event.title || event.conference.split('-')[0].trim()}{' '}
                   {/* Display title or conference */}

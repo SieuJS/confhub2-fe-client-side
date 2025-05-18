@@ -22,8 +22,8 @@ interface SearchParams {
   location?: string | null;
   type?: ConferenceType | null;
   // submissionDate?: Date | null; // Keep Date | null
-  submissionStartDate?: Date | null; // NEW
-  submissionEndDate?: Date | null;   // NEW
+  subFromDate?: Date | null; // NEW
+  subToDate?: Date | null;   // NEW
   publisher?: string | null;
   rank?: string | null; // Keep string | null unless validating strictly
   source?: string | null;
@@ -112,7 +112,7 @@ const shouldShowAdvancedOptionsInitially = (searchParams: URLSearchParams): bool
     return advancedParams.some(param => searchParams.has(param));
 };
 
-
+const dbUrl = process.env.NEXT_PUBLIC_DATABASE_URL;
 // --- Custom Hook ---
 const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   // --- State Initialization ---
@@ -139,8 +139,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   const initialTopics = getInitialArrayParam(searchParams, 'topics');
   const initialFieldsOfResearch = getInitialArrayParam(searchParams, 'fieldOfResearch');
   const initialShowAdvanced = shouldShowAdvancedOptionsInitially(searchParams);
-  const initialSubmissionStartDate =  getInitialDateFromUrl(searchParams, 'subFromDate');
-  const initialSubmissionEndDate =  getInitialDateFromUrl(searchParams, 'subToDate');
+  const initialsubFromDate =  getInitialDateFromUrl(searchParams, 'subFromDate');
+  const initialsubToDate =  getInitialDateFromUrl(searchParams, 'subToDate');
 
   // --- State Variables ---
   // Basic
@@ -162,8 +162,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   // Advanced
   const [isAdvancedOptionsVisible, setIsAdvancedOptionsVisible] = useState<boolean>(initialShowAdvanced);
   // const [submissionDate, setSubmissionDate] = useState<Date | null>(initialSubmissionDate);
-  const [submissionStartDate, setSubmissionStartDate] = useState<Date | null>(initialSubmissionStartDate); // NEW
-  const [submissionEndDate, setSubmissionEndDate] = useState<Date | null>(initialSubmissionEndDate);     // NEW
+  const [subFromDate, setsubFromDate] = useState<Date | null>(initialsubFromDate); // NEW
+  const [subToDate, setsubToDate] = useState<Date | null>(initialsubToDate);     // NEW
   const [selectedPublisher, setSelectedPublisher] = useState<string | null>(initialPublisher);
   const [selectedRank, setSelectedRank] = useState<string | null>(initialRank);
   const [selectedSource, setSelectedSource] = useState<string | null>(initialSource);
@@ -211,8 +211,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   // NEW Handler for Date Range Picker
   const handleSubmissionDateRangeChange = (dates: [Date | null, Date | null]) => {
     const [start, end] = dates;
-    setSubmissionStartDate(start);
-    setSubmissionEndDate(end);
+    setsubFromDate(start);
+    setsubToDate(end);
 };
   const handlePublisherChange = (publisher: string | null) => { setSelectedPublisher(publisher); };
   const handleRankChange = (rank: string | null) => { setSelectedRank(rank); };
@@ -230,8 +230,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
       location: selectedLocation,
       type: selectedType,
       // submissionDate,
-      submissionStartDate, // NEW
-      submissionEndDate,   // NEW
+      subFromDate: subFromDate, // NEW
+      subToDate: subToDate,   // NEW
       publisher: selectedPublisher,
       rank: selectedRank,
       source: selectedSource,
@@ -267,8 +267,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
 
     // Reset Advanced state
     // setSubmissionDate(null);
-    setSubmissionStartDate(null); // NEW
-    setSubmissionEndDate(null);   // NEW
+    setsubFromDate(null); // NEW
+    setsubToDate(null);   // NEW
     setSelectedPublisher(null);
     setSelectedRank(null);
     setSelectedSource(null);
@@ -329,8 +329,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     // Advanced Search State & Handlers
     isAdvancedOptionsVisible, // Initialized based on URL
     // submissionDate,         // Initialized from URL
-    submissionStartDate, // NEW
-    submissionEndDate,   // NEW
+    subFromDate, // NEW
+    subToDate,   // NEW
     selectedPublisher,      // Initialized from URL
     selectedRank,           // Initialized from URL
     selectedSource,         // Initialized from URL

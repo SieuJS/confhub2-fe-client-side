@@ -1023,5 +1023,13 @@
   "FloatingChat_Hide_Toolbar_Description": "Hide the toolbar for a cleaner chat interface.",
   "FloatingChat_Hide_Thought_Process_Description": "Hide the thought process for a more streamlined chat experience.",
   "Toggle user menu": "Toggle user menu",
-  "Unfollow": "Unfollow"
+  "Unfollow": "Unfollow",
+  "Explore_Button": "Explore",
+  "Send_notification_through_email": "Send notification through email",
+  "Send_notification_through_email_describe": "Receive notifications via email for important updates.",
+  "You_have_no_conference_in_this_category": "You have no conference in this category.",
+  "View_all_conferences": "View all conferences",
+  "All_My_Conferences": "All My Conferences",
+  "Loading_your_conferences": "Loading your conferences...",
+  "Save_Changes": "Save Changes"
 }

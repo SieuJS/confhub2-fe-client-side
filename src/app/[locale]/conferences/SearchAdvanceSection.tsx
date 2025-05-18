@@ -13,8 +13,8 @@ interface SearchAdvanceSectionProps {
   toggleAdvancedOptionsVisibility: () => void
   // --- Updated Date Props ---
   onSubmissionDateRangeChange: (dates: [Date | null, Date | null]) => void
-  submissionStartDate: Date | null
-  submissionEndDate: Date | null
+  subFromDate: Date | null
+  subToDate: Date | null
   // --- End Updated Date Props ---
   onRankChange: (rank: string | null) => void
   selectedRank: string | null
@@ -35,8 +35,8 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
   toggleAdvancedOptionsVisibility,
   // --- Use Updated Date Props ---
   onSubmissionDateRangeChange,
-  submissionStartDate,
-  submissionEndDate,
+  subFromDate,
+  subToDate,
   // --- End Use Updated Date Props ---
   onRankChange,
   selectedRank,
@@ -116,8 +116,8 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
               </label>
               <DatePicker
                 selectsRange={true}
-                startDate={submissionStartDate}
-                endDate={submissionEndDate}
+                startDate={subFromDate}
+                endDate={subToDate}
                 onChange={onSubmissionDateRangeChange}
                 isClearable={true} // Allows clearing the date range
                 placeholderText={t('Select_Date_Range') ?? 'Select Date Range'} // Use translation

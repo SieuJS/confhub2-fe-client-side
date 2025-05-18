@@ -4,6 +4,7 @@
 import React from 'react' // Không cần useEffect, useRef nữa
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
+import { Link } from '@/src/navigation'
 
 // --- ECharts Core Imports (ĐÃ BỎ) ---
 // import * as echarts from 'echarts/core';
@@ -1768,13 +1769,14 @@ const SuperBannerFor: React.FC = () => {
         </motion.p>
 
         {/* Bạn có thể thêm nút Call to Action ở đây nếu cần */}
-        {/*
+
         <motion.div variants={itemVariants}>
-          <button className="px-6 py-3 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors">
-            {t('Explore_Button')}
-          </button>
+          <Link href={`/conferences`}>
+            <button className='hover:bg-primary-dark rounded-md bg-button px-6 py-3 font-bold text-button-text transition-colors'>
+              {t('Search_Conferences')}
+            </button>
+          </Link>
         </motion.div>
-        */}
       </div>
     </motion.section>
   )
