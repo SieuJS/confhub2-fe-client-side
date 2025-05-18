@@ -61,7 +61,7 @@ export const Header: FC<Props> = ({ locale }) => {
     return unread > 20 ? '20+' : unread;
   };
 
-  const displayedNotifications = notifications.slice(0, 20);
+  const displayedNotifications = notifications.slice(-20);
 
   // Nếu isInitializing là true, nghĩa là AuthProvider đang kiểm tra trạng thái đăng nhập ban đầu.
   // Bạn có thể hiển thị một spinner hoặc một phiên bản đơn giản của header.
