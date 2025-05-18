@@ -156,7 +156,7 @@ const SettingTab: React.FC = () => {
 
         <section className='mb-8'>
           {/* Option 1: Receive Notifications */}
-          <div className='mb-4 flex items-center justify-between'>
+          {/* <div className='mb-4 flex items-center justify-between'>
             <div>
               <h4 className='font-semibold'>{t('Receive_Notifications')}</h4>
               <p className=' text-sm'>
@@ -166,14 +166,13 @@ const SettingTab: React.FC = () => {
             <button
               data-testid='toggle-receiveNotifications'
               className={`h-6 w-12 min-w-[3rem] rounded-full transition-colors duration-200 focus:outline-none ${
-                // Fixed width
                 setting.receiveNotifications
                   ? 'bg-button'
                   : 'bg-background-secondary'
               }`}
               onClick={() => handleToggle('receiveNotifications')}
               disabled={updateLoading}
-              aria-pressed={setting.receiveNotifications} // Accessibility
+              aria-pressed={setting.receiveNotifications} 
             >
               <div
                 className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
@@ -183,10 +182,10 @@ const SettingTab: React.FC = () => {
                 }`}
               ></div>
             </button>
-          </div>
+          </div> */}
 
           {/* Option 2: Auto add events to schedule */}
-          <div className='mb-4 flex items-center justify-between'>
+          {/* <div className='mb-4 flex items-center justify-between'>
             <div>
               <h4 className='font-semibold'>
                 {t('Auto_add_events_to_schedule')}
@@ -214,7 +213,7 @@ const SettingTab: React.FC = () => {
                 }`}
               ></div>
             </button>
-          </div>
+          </div> */}
 
           {/* Option 3: Change and Update */}
           <div className='mb-4 flex items-center justify-between'>
@@ -266,14 +265,14 @@ const SettingTab: React.FC = () => {
             </button>
           </div>
 
-          {/* Option 5: Customize notification delivery (Combobox) */}
+          {/* Option 5: Send notification through email  */}
           <div className='mb-4 items-center justify-between md:flex'>
             <div>
               <h4 className='font-semibold'>
-                {t('Customize_notification_delivery')}
+                {t('Send_notification_through_email')}
               </h4>
               <p className=' text-sm'>
-                {t('Customize_notification_delivery_describe')}
+                {t('Send_notification_through_email_describe')}
               </p>
             </div>
             <button
@@ -298,7 +297,7 @@ const SettingTab: React.FC = () => {
           </div>
 
           {/* Option 6: Notification when update profile */}
-          <div className='mb-4 flex items-center justify-between'>
+          {/* <div className='mb-4 flex items-center justify-between'>
             <div>
               <h4 className='font-semibold'>
                 {t('Notification_when_update_profile')}
@@ -326,7 +325,7 @@ const SettingTab: React.FC = () => {
                 }`}
               ></div>
             </button>
-          </div>
+          </div> */}
 
           {/* Option 7: Notification when follow */}
           <div className='mb-4 flex items-center justify-between'>
@@ -421,7 +420,7 @@ const SettingTab: React.FC = () => {
         </section>
 
         {/* Delete Account */}
-        <section>
+        {/* <section>
           <button
             data-testid='delete-account-button'
             onClick={handleDeleteAccount}
@@ -443,11 +442,7 @@ const SettingTab: React.FC = () => {
             {t('Delete_Account_describe')}
           </p>
         </section>
-        {updateError && (
-          <p data-testid='update-error' className='mt-4 text-red-500'>
-            {t('Error_UpdateFailed')}: {updateError}
-          </p>
-        )}
+         */}
       </main>
     </div>
   )

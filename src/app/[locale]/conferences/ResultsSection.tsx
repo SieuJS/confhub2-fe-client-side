@@ -54,7 +54,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
 
         <div className='flex items-center space-x-2'>
           {/* Sort Controls */}
-          <div className='flex items-center space-x-2'>
+          {/* <div className='flex items-center space-x-2'>
             <label htmlFor='sort-by' className=' text-sm'>
               {t('Sort_by')}:
             </label>
@@ -134,7 +134,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
                 </svg>
               )}
             </button>
-          </div>
+          </div> */}
 
           {/* View Type Toggle */}
           <button
@@ -189,8 +189,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
           </button>
 
           {/* --- ADDED: Download CSV Button --- */}
-          <button
-            // onClick={handleDownloadCSV}
+          {/* <button
             className='rounded bg-gray-20 px-1 py-1 text-sm  hover:bg-gray-30 focus:outline-none focus:ring-2 focus:ring-blue-500 '
             title='Download CSV'
           >
@@ -211,7 +210,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
               <path d='M12 18v-6' />
               <path d='m9 15 3 3 3-3' />
             </svg>
-          </button>
+          </button> */}
         </div>
       </div>
 
