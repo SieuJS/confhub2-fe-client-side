@@ -5,6 +5,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const token = searchParams.get('token');
+    const redirectUrl = searchParams.get('redirectUrl') || '/en/dashboard';
 
     if (!token) {
       return NextResponse.redirect('/login?error=No token provided');
@@ -18,7 +19,7 @@ export async function GET(request: Request) {
       maxAge: 7 * 24 * 60 * 60, // 7 days
     });
 
-    // Return HTML with script to set localStorage
+    // Return HTML with script to set localStorage and redirect to the specified URL
     return new NextResponse(
       `
       <html>
@@ -27,7 +28,7 @@ export async function GET(request: Request) {
             localStorage.setItem('token', '${token}');
             localStorage.setItem('locale', 'en');
             localStorage.setItem('loginStatus', 'true');
-            window.location.href = '/en/dashboard';
+            window.location.href = '${redirectUrl}';
           </script>
         </body>
       </html>
