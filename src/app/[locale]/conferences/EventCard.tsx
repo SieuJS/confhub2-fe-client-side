@@ -288,13 +288,13 @@ const EventCard: React.FC<EventCardProps> = ({
                 onClick={handleAddCalendarClick}
                 onMouseEnter={() => setShowAddCalendarTooltip(true)}
                 onMouseLeave={() => setShowAddCalendarTooltip(false)}
-                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 p-2 transition hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:bg-gray-700 dark:hover:bg-gray-600 ${isBlacklisted ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''}  ${isAddToCalendar ? 'text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/20' : 'text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100'} ${isLoadingAction && calendarLoading ? 'opacity-70' : ''}`}
+                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 p-2 transition hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:bg-gray-700 dark:hover:bg-gray-600 ${isBlacklisted ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''}  ${isAddToCalendar ? 'text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/20' : 'text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100'} ${calendarLoading ? 'opacity-70' : ''}`}
                 style={{ minWidth: '36px', minHeight: '36px' }}
-                disabled={isBlacklisted || isLoadingAction}
+                disabled={isBlacklisted || calendarLoading}
                 title={isAddToCalendar ? t('Remove_from_Calendar') : t('Add_to_Calendar')}
               >
-                {isLoadingAction && calendarLoading ? (
-                  <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent'></div>
+                {calendarLoading ? (
+                  <div className={`h-4 w-4 animate-spin rounded-full border-2 ${isAddToCalendar ? 'border-blue-500 border-t-blue-100' : 'border-gray-400 border-t-transparent'}`}></div>
                 ) : (
                   <svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round' className='lucide lucide-calendar-plus'>
                     <path d='M8 2v4' /><path d='M16 2v4' /><path d='M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8' /><path d='M3 10h18' /><path d='M16 19h6' /><path d='M19 16v6' />
@@ -308,13 +308,13 @@ const EventCard: React.FC<EventCardProps> = ({
                 onClick={handleFavoriteClick}
                 onMouseEnter={() => setShowFavoriteTooltip(true)}
                 onMouseLeave={() => setShowFavoriteTooltip(false)}
-                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 p-2 text-gray-600 transition hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 ${isBlacklisted || isLoadingAction ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''}  ${isFollowing ? 'text-yellow-500 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300' : 'hover:text-gray-800 dark:hover:text-gray-100'}`}
+                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 p-2 transition hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1 dark:bg-gray-700 dark:hover:bg-gray-600 ${isBlacklisted ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''}  ${isFollowing ? 'text-yellow-500 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/20' : 'text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100'} ${followLoading ? 'opacity-70' : ''}`}
                 style={{ minWidth: '36px', minHeight: '36px' }}
-                disabled={isBlacklisted || isLoadingAction}
+                disabled={isBlacklisted || followLoading}
                 title={isFollowing ? t('Unfollow') : t('Follow')}
               >
-                {isLoadingAction && followLoading ? (
-                  <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent'></div>
+                {followLoading ? (
+                  <div className={`h-4 w-4 animate-spin rounded-full border-2 ${isFollowing ? 'border-yellow-500 border-t-yellow-100' : 'border-gray-400 border-t-transparent'}`}></div>
                 ) : (
                   <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill={isFollowing ? 'currentColor' : 'none'} stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'>
                     <path d='M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.122 2.122 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z' />
