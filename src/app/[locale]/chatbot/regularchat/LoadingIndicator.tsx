@@ -85,7 +85,12 @@ const getLoadingPhaseIcon = (step: string): React.ElementType => {
     normalizedStep.endsWith('action_prepared') ||
     normalizedStep.startsWith('determining') ||
     normalizedStep === 'processing_request' ||
-    normalizedStep === 'confirming_email'
+    normalizedStep === 'confirming_email' ||
+    // === BỔ SUNG STEP MỚI ===
+    normalizedStep === 'follow_check_clear_for_blacklist', // Liên quan đến kiểm tra/xử lý
+    normalizedStep === 'blacklist_check_clear_for_follow' // Liên quan đến kiểm tra/xử lý
+
+    // =======================
   ) {
     // Thêm confirming_email
     return FiSettings
@@ -95,7 +100,14 @@ const getLoadingPhaseIcon = (step: string): React.ElementType => {
   if (
     normalizedStep.startsWith('retrieving') ||
     normalizedStep.startsWith('finding') ||
-    normalizedStep.startsWith('checking')
+    normalizedStep.startsWith('checking') ||
+    // === BỔ SUNG STEP MỚI ===
+    normalizedStep === 'listing_followed_items' || // Liên quan đến truy xuất danh sách
+    normalizedStep === 'listing_calendar_items' || // Liên quan đến truy xuất danh sách
+    normalizedStep === 'listing_blacklisted_items' // Liên quan đến truy xuất danh sách
+
+
+    // =======================
   ) {
     return FiSearch
   }
@@ -108,7 +120,10 @@ const getLoadingPhaseIcon = (step: string): React.ElementType => {
     normalizedStep.endsWith('checked') ||
     normalizedStep.endsWith('determined') ||
     normalizedStep.endsWith('success') || // Có thể giữ lại hoặc chuyển về FiCpu
-    normalizedStep.startsWith('email_')
+    normalizedStep.startsWith('email_') ||
+    // === BỔ SUNG STEP MỚI ===
+    normalizedStep === 'function_result_processed' // Đã có từ trước, giữ nguyên
+    // =======================
   ) {
     // email_success, email_failed
     return FiDatabase
@@ -123,7 +138,7 @@ const getLoadingPhaseIcon = (step: string): React.ElementType => {
     return FiEdit
   }
 
-  // === CÁC STEP MỚI ĐƯỢC BỔ SUNG ===
+  // === CÁC STEP MỚI ĐƯỢC BỔ SUNG (VÀ CẬP NHẬT ICON NẾU CẦN) ===
 
   // sub_agent_thinking: Icon liên quan đến suy nghĩ của sub-agent
   if (normalizedStep === 'sub_agent_thinking') {
@@ -140,9 +155,20 @@ const getLoadingPhaseIcon = (step: string): React.ElementType => {
     return GoGear; // Sử dụng GoGear từ react-icons/go (có thể thay bằng icon khác tùy ý)
   }
 
-  // function_result_processed: Icon liên quan đến kết quả đã được xử lý
-  if (normalizedStep === 'function_result_processed') {
-    return FiDatabase; // Có thể dùng lại FiDatabase hoặc chọn icon khác liên quan đến dữ liệu/kết quả
+
+  // follow_no_action_needed: Icon cho trạng thái không cần hành động (hoàn thành kiểm tra)
+  if (normalizedStep === 'follow_no_action_needed') {
+    return FiCheckSquare; // Icon hoàn thành
+  }
+
+  // calendar_no_action_needed: Icon cho trạng thái không cần hành động (hoàn thành kiểm tra)
+  if (normalizedStep === 'calendar_no_action_needed') {
+    return FiCheckSquare; // Icon hoàn thành
+  }
+
+  // blacklist_no_action_needed: Icon cho trạng thái không cần hành động (hoàn thành kiểm tra)
+  if (normalizedStep === 'blacklist_no_action_needed') {
+    return FiCheckSquare; // Icon hoàn thành
   }
 
   // ===============================
@@ -178,16 +204,27 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
     'email_failed', // Tương tự email_success
     'email_cancelled', // Tương tự
     'sub_agent_processing_complete', // Có thể ẩn nếu không có message cuối cùng
+    // === BỔ SUNG STEP MỚI VÀO DANH SÁCH HOÀN THÀNH ===
+    'follow_no_action_needed', // Step này thường là kết quả cuối của một quy trình kiểm tra
+    'calendar_no_action_needed', // Step này thường là kết quả cuối của một quy trình kiểm tra
+    'blacklist_no_action_needed', // Step này thường là kết quả cuối của một quy trình kiểm tra
+
+    // ==============================================
     // Thêm các step khác nếu cần
   ]
 
-  // Ẩn indicator nếu step nằm trong danh sách hoàn thành
-  // Thêm logic để hiển thị lại nếu có message đặc biệt liên quan đến kết quả cuối
+  // Thêm các step có thể có message cuối cùng mà vẫn muốn hiển thị indicator một lúc
   const completedStepsWithOptionalMessage = [
     'email_success',
     'email_failed',
     'email_cancelled',
-    'sub_agent_processing_complete' // Ví dụ: Có thể có message "Sub-agent finished processing."
+    'sub_agent_processing_complete', // Ví dụ: Có thể có message "Sub-agent finished processing."
+    // === BỔ SUNG STEP MỚI VÀO DANH SÁCH CÓ MESSAGE TÙY CHỌN ===
+    'follow_no_action_needed', // Có thể có message "Không cần hành động."
+    'calendar_no_action_needed', // Có thể có message "Không cần hành động."
+
+    'blacklist_no_action_needed', // Có thể có message "Không cần hành động."
+    // =========================================================
   ];
 
 
@@ -211,6 +248,7 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
         className='inline-flex items-center rounded-md border border-gray-200 bg-gray-100 px-2 py-1 text-xs font-medium sm:px-2.5 sm:py-1.5 sm:text-sm dark:border-gray-600 dark:bg-gray-700'
         title={`Current step: ${step.replace(/_/g, ' ')}`}
       >
+        {/* Icon spin */}
         <svg
           aria-hidden='true'
           role='status'
@@ -231,7 +269,8 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
           />
         </svg>
 
-         {PhaseIconComponent && (
+        {/* Icon đại diện giai đoạn */}
+        {PhaseIconComponent && (
           // - `h-4 w-4 me-2` -> `h-3.5 w-3.5 me-1.5 sm:h-4 sm:w-4 sm:me-2`
           <PhaseIconComponent
             className='me-1.5 h-3.5 w-3.5 flex-shrink-0 sm:me-2 sm:h-4 sm:w-4'
@@ -239,16 +278,24 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
           />
         )}
 
-        {/* Thông điệp Step */}
-        {/* Chỉ hiển thị message nếu nó khác với các thông báo mặc định hoặc loading */}
-         {message &&
+        {/* Thông điệp Step / Message tùy chỉnh */}
+        {message &&
           ![
             'Loading history...',
             'Starting new chat...',
             '',
-            // Thêm các message mặc định khác bạn không muốn hiển thị cùng step
             'Thinking...', // Ví dụ: nếu bạn có message mặc định cho thinking
-            'Processing function result...' // Ví dụ
+            'Processing function result...', // Ví dụ
+            // Thêm các message mặc định khác bạn không muốn hiển thị cùng step
+            'Listing followed items...', // Thêm message mặc định cho step mới
+            'Listing calendar items...', // Thêm message mặc định cho step mới
+            'Listing blacklisted items...', // Thêm message mặc định cho step mới
+            'Checking for follow clearance...', // Thêm message mặc định cho step mới
+            'Checking for calendar clearance...', // Thêm message mặc định cho step mới
+            'Checking for blacklist clearance...', // Thêm message mặc định cho step mới
+            'No action needed for follow.', // Thêm message mặc định cho step mới
+            'No action needed for calendar.', // Thêm message mặc định cho step mới
+            'No action needed for blacklist.' // Thêm message mặc định cho step mới
           ].includes(message) && <span className='truncate'>{message}</span>}
 
         {/* Hiển thị message mặc định nếu không có message tùy chỉnh */}
@@ -262,17 +309,43 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
           <span className='truncate'>{t('Sending')}</span>
         )}
         {step === 'sub_agent_thinking' && !message && (
-            <span className='truncate'>{t('Sub_agent_thinking')}</span> // Thêm bản dịch cho step mới
+          <span className='truncate'>{t('Sub_agent_thinking')}</span> // Thêm bản dịch cho step mới
         )}
         {step === 'function_result_prepared' && !message && (
-             <span className='truncate'>{t('Function_result_prepared')}</span> // Thêm bản dịch cho step mới
+          <span className='truncate'>{t('Function_result_prepared')}</span> // Thêm bản dịch cho step mới
         )}
-         {step === 'sub_agent_processing_complete' && !message && (
-             <span className='truncate'>{t('Sub_agent_processing_complete')}</span> // Thêm bản dịch cho step mới
+        {step === 'sub_agent_processing_complete' && !message && (
+          <span className='truncate'>{t('Sub_agent_processing_complete')}</span> // Thêm bản dịch cho step mới
         )}
-         {step === 'function_result_processed' && !message && (
-             <span className='truncate'>{t('Function_result_processed')}</span> // Thêm bản dịch cho step mới
+        {step === 'function_result_processed' && !message && (
+          <span className='truncate'>{t('Function_result_processed')}</span> // Thêm bản dịch cho step mới
         )}
+        {/* === BỔ SUNG MESSAGE MẶC ĐỊNH CHO STEP MỚI === */}
+        {step === 'listing_followed_items' && !message && (
+          <span className='truncate'>{t('Listing_followed_items')}</span>
+        )}
+        {step === 'listing_calendar_items' && !message && (
+          <span className='truncate'>{t('Listing_calendar_items')}</span>
+        )}
+        {step === 'listing_blacklisted_items' && !message && (
+          <span className='truncate'>{t('Listing_blacklisted_items')}</span>
+        )}
+        {step === 'follow_check_clear_for_blacklist' && !message && (
+          <span className='truncate'>{t('Follow_check_clear_for_blacklist')}</span>
+        )}
+        {step === 'blacklist_check_clear_for_follow' && !message && (
+          <span className='truncate'>{t('blacklist_check_clear_for_follow')}</span>
+        )}
+        {step === 'follow_no_action_needed' && !message && (
+          <span className='truncate'>{t('follow_no_action_needed')}</span>
+        )}
+        {step === 'calendar_no_action_needed' && !message && (
+          <span className='truncate'>{t('calendar_no_action_needed')}</span>
+        )}
+        {step === 'blacklist_no_action_needed' && !message && (
+          <span className='truncate'>{t('Blacklist_no_action_needed')}</span>
+        )}
+        {/* =============================================== */}
         {/* Thêm các case khác cho step và message mặc định nếu cần */}
 
 
