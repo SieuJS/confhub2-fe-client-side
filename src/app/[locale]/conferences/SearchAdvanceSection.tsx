@@ -107,7 +107,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
           {/* Responsive grid layout */}
           <div className='mb-2 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5'>
             {/* --- Date Picker Section --- */}
-            {/* <div className='col-span-1'>
+            <div className='col-span-1'>
               <label
                 className='mb-1 block text-sm font-bold '
                 htmlFor='submissionDateRange' // Changed ID for clarity
@@ -126,7 +126,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 wrapperClassName='w-full' // Ensure wrapper takes full width if needed
                 id='submissionDateRange'
               />
-            </div> */}
+            </div>
             {/* --- End Date Picker Section --- */}
 
             {/* Other fields remain the same */}
@@ -215,7 +215,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
               </select>
             </div> */}
 
-            <div className='relative col-span-3'>
+            <div className='relative col-span-2'>
               <label className='mb-1 block text-sm font-bold' htmlFor='topics'>
                 {' '}
                 {/* Reduced mb */}

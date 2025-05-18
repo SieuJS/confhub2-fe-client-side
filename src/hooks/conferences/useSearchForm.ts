@@ -108,7 +108,7 @@ const getInitialDateFromUrl = (
 
 // Helper to check if any advanced params exist to auto-show the section
 const shouldShowAdvancedOptionsInitially = (searchParams: URLSearchParams): boolean => {
-    const advancedParams = ['submissionDate', 'publisher', 'rank', 'source', 'averageScore', 'topics', 'fieldOfResearch', 'subStartDate', 'subEndDate'];
+    const advancedParams = ['submissionDate', 'publisher', 'rank', 'source', 'averageScore', 'topics', 'fieldOfResearch', 'subFromDate', 'subToDate'];
     return advancedParams.some(param => searchParams.has(param));
 };
 
@@ -139,8 +139,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   const initialTopics = getInitialArrayParam(searchParams, 'topics');
   const initialFieldsOfResearch = getInitialArrayParam(searchParams, 'fieldOfResearch');
   const initialShowAdvanced = shouldShowAdvancedOptionsInitially(searchParams);
-  const initialSubmissionStartDate =  getInitialDateFromUrl(searchParams, 'subStartDate');
-  const initialSubmissionEndDate =  getInitialDateFromUrl(searchParams, 'subEndDate');
+  const initialSubmissionStartDate =  getInitialDateFromUrl(searchParams, 'subFromDate');
+  const initialSubmissionEndDate =  getInitialDateFromUrl(searchParams, 'subToDate');
 
   // --- State Variables ---
   // Basic
