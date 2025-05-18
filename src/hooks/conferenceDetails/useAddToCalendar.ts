@@ -94,7 +94,9 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
         }
   
         const updatedUser: Calendar[] = await response.json();
+        console.log("updatedUser",updatedUser);
         setIsAddToCalendar(updatedUser.some(conf => conf.conferenceId === conferenceId) ?? false); // FIXED HERE
+        console.log("isAddToCalendar",isAddToCalendar);
       } catch (err:any) {
         setError(err.message || 'Error addToCalendar/unAddToCalendar conference.');
         console.error('Error addToCalendar/unAddToCalendar conference:', err);

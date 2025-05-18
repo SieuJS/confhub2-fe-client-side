@@ -46,6 +46,7 @@ const EventCard: React.FC<EventCardProps> = ({
   const [showWebsiteTooltip, setShowWebsiteTooltip] = useState(false);
   const [showFavoriteTooltip, setShowFavoriteTooltip] = useState(false);
   const [showAddCalendarTooltip, setShowAddCalendarTooltip] = useState(false);
+  console.log("isAddToCalendar",conferenceDataForHook?.title,isAddToCalendar);
 
   const checkLoginAndRedirect = useCallback(
     (callback: () => void) => {
@@ -287,7 +288,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 onClick={handleAddCalendarClick}
                 onMouseEnter={() => setShowAddCalendarTooltip(true)}
                 onMouseLeave={() => setShowAddCalendarTooltip(false)}
-                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 p-2 text-gray-600 transition hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 ${isBlacklisted || isLoadingAction ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''}  ${isAddToCalendar ? 'text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300' : 'hover:text-gray-800 dark:hover:text-gray-100'}`}
+                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 p-2 transition hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:bg-gray-700 dark:hover:bg-gray-600 ${isBlacklisted ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''}  ${isAddToCalendar ? 'text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/20' : 'text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100'} ${isLoadingAction && calendarLoading ? 'opacity-70' : ''}`}
                 style={{ minWidth: '36px', minHeight: '36px' }}
                 disabled={isBlacklisted || isLoadingAction}
                 title={isAddToCalendar ? t('Remove_from_Calendar') : t('Add_to_Calendar')}
