@@ -10,6 +10,7 @@ import { Header } from './utils/Header'
 import IntroduceVisualization from './home/IntroduceVisualization'
 import FeatureComparisonTable from './home/FeatureComparisonTable'
 import SuperBannerTree from './home/SuperBannerTree'
+import SuperBannerFor from './home/SuperBannerFor'
 // <<< Bỏ import FloatingChatbot thông thường ở đây >>>
 // --- Dynamic Import ConsumerInsights (đã làm ở bước trước) ---
 const DynamicConsumerInsights = dynamic(
@@ -36,7 +37,8 @@ export default function HomePage({ locale }: { locale: string }) {
   return (
     <div className=''>
       <Header locale={locale} />
-      <SuperBannerTree />
+      {/* <SuperBannerTree /> */}
+      <SuperBannerFor />
       <PopularConferences />
       <DynamicConsumerInsights /> {/* Sử dụng Dynamic */}
       <IntroduceVisualization />
