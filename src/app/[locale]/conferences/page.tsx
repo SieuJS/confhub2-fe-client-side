@@ -2,14 +2,35 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import SearchSection from '../conferences/SearchSection'
-import ResultsSection from '../conferences/ResultsSection'
-import { Header } from '../utils/Header'
-import Footer from '../utils/Footer'
-import { useRouter } from 'next/navigation'
+import SearchSection from '../conferences/SearchSection' // Adjust path if necessary
+import ResultsSection from '../conferences/ResultsSection' // Adjust path if necessary
+import { Header } from '../utils/Header' // Adjust path if necessary
+import Footer from '../utils/Footer' // Adjust path if necessary
+import { useRouter, usePathname } from 'next/navigation' // Added usePathname
 import { useCallback } from 'react'
-import FloatingChatbot from '@/src/app/[locale]/floatingchatbot/FloatingChatbot'; // <-- IMPORT MỚI
-import useUserBlacklist from '@/src/hooks/auth/useUserBlacklist' // This is just an example hook name
+import FloatingChatbot from '@/src/app/[locale]/floatingchatbot/FloatingChatbot'
+import useUserBlacklist from '@/src/hooks/auth/useUserBlacklist'
+
+// It's good practice to import the type from the hook if it's exported.
+// If not, define it accurately here.
+// Assuming SearchParams type from useSearchForm.ts looks like this:
+interface SearchParamsForURL {
+  keyword?: string
+  title?: string
+  acronym?: string
+  fromDate?: Date | null
+  toDate?: Date | null
+  location?: string | null
+  type?: 'Online' | 'Offline' | 'Hybrid' | null
+  submissionStartDate?: Date | null // <-- UPDATED
+  submissionEndDate?: Date | null // <-- UPDATED
+  publisher?: string | null
+  rank?: string | null
+  source?: string | null
+  averageScore?: string | null
+  topics?: string[]
+  fieldOfResearch?: string[]
+}
 
 export default function Conferences({
   params: { locale }
@@ -17,26 +38,14 @@ export default function Conferences({
   params: { locale: string }
 }) {
   const t = useTranslations('')
-  const { blacklistedEventIds } = useUserBlacklist() // Example hook usage
+  const { blacklistedEventIds } = useUserBlacklist()
 
   const router = useRouter()
+  const pathname = usePathname() // Get the current pathname
+
   const handleSearch = useCallback(
-    async (searchParamsFromComponent: {
-      keyword?: string
-      title?: string
-      acronym?: string
-      fromDate?: Date | null
-      toDate?: Date | null
-      location?: string | null
-      type?: 'Online' | 'Offline' | 'Hybrid' | null
-      submissionDate?: Date | null
-      publisher?: string | null
-      rank?: string | null
-      source?: string | null
-      averageScore?: string | null
-      topics?: string[]
-      fieldOfResearch?: string[]
-    }) => {
+    async (searchParamsFromComponent: SearchParamsForURL) => {
+      // <-- Use the updated interface
       const newParams = new URLSearchParams()
       if (searchParamsFromComponent.keyword)
         newParams.set('keyword', searchParamsFromComponent.keyword)
@@ -45,7 +54,7 @@ export default function Conferences({
       if (searchParamsFromComponent.acronym)
         newParams.set('acronym', searchParamsFromComponent.acronym)
       if (searchParamsFromComponent.location)
-        newParams.set('country', searchParamsFromComponent.location)
+        newParams.set('country', searchParamsFromComponent.location) // 'country' is what useSearchForm reads
       if (searchParamsFromComponent.type)
         newParams.set('type', searchParamsFromComponent.type)
       if (searchParamsFromComponent.fromDate) {
@@ -66,12 +75,26 @@ export default function Conferences({
         newParams.set('source', searchParamsFromComponent.source)
       if (searchParamsFromComponent.publisher)
         newParams.set('publisher', searchParamsFromComponent.publisher)
-      if (searchParamsFromComponent.submissionDate) {
+
+      // --- MODIFIED SECTION FOR SUBMISSION DATE RANGE ---
+      if (searchParamsFromComponent.submissionStartDate) {
         newParams.set(
-          'submissionDate',
-          searchParamsFromComponent.submissionDate.toISOString().split('T')[0]
+          'subFromDate', // Parameter name expected by useSearchForm's getInitialDateFromUrl
+          searchParamsFromComponent.submissionStartDate
+            .toISOString()
+            .split('T')[0]
         )
       }
+      if (searchParamsFromComponent.submissionEndDate) {
+        newParams.set(
+          'subToDate', // Parameter name expected by useSearchForm's getInitialDateFromUrl
+          searchParamsFromComponent.submissionEndDate
+            .toISOString()
+            .split('T')[0]
+        )
+      }
+      // --- END MODIFIED SECTION ---
+
       if (searchParamsFromComponent.averageScore)
         newParams.set('averageScore', searchParamsFromComponent.averageScore)
 
@@ -93,16 +116,16 @@ export default function Conferences({
       }
 
       const paramsString = newParams.toString()
-      router.push(`/${locale}/conferences?${paramsString}`)
+      // Use pathname to ensure navigation is relative to the current page structure
+      router.push(`${pathname}${paramsString ? `?${paramsString}` : ''}`)
     },
-    [locale, router]
+    [pathname, router] // locale is implicitly part of pathname from next-intl routing
   )
 
   const handleClear = useCallback(() => {
-    const newParams = new URLSearchParams()
-    const paramsString = newParams.toString()
-    router.push(`/${locale}/conferences?${paramsString}`)
-  }, [locale, router])
+    // Navigate to the current page without any query parameters
+    router.push(pathname)
+  }, [pathname, router])
 
   return (
     <>
@@ -115,9 +138,8 @@ export default function Conferences({
         </div>
       </div>
       <Footer />
-    
-      <FloatingChatbot /> {/* <-- THÊM CHATBOT NỔI Ở ĐÂY */}
 
+      <FloatingChatbot />
     </>
   )
 }
