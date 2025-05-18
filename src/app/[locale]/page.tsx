@@ -39,7 +39,7 @@ export default function HomePage({ locale }: { locale: string }) {
       <Header locale={locale} />
       {/* <SuperBannerTree /> */}
       <SuperBannerFor />
-      <PopularConferences />
+      {/* <PopularConferences /> */}
       <DynamicConsumerInsights /> {/* Sử dụng Dynamic */}
       <IntroduceVisualization />
       <FeatureComparisonTable />
