@@ -1,9 +1,9 @@
 // src/app/[locale]/home/ConsumerInsights.tsx
 'use client' // Giữ nguyên dòng này
 
-import React, { useState, useEffect, useRef } from 'react'
 import { useTranslations } from 'next-intl'
-import Odometer from 'react-odometerjs' // Giữ nguyên import
+// Tạm thời bỏ Odometer để loại bỏ hiệu ứng và CSS liên quan
+// import Odometer from 'react-odometerjs'
 import Button from '../utils/Button'
 import { Link } from '@/src/navigation'
 import {
@@ -13,14 +13,9 @@ import {
   FaHandshake
 } from 'react-icons/fa'
 
-// --- IMPORT ODOMETER CSS ---
-// Giữ nguyên import CSS
-import 'odometer/themes/odometer-theme-default.css'
-
 interface ConsumerInsightsProps {}
 
 const ConsumerInsights: React.FC<ConsumerInsightsProps> = ({}) => {
-  // ... (giữ nguyên code logic và render)
   const t = useTranslations('ConsumerInsights')
   const title = t('title')
   const subtitle = t('subtitle')
@@ -34,40 +29,12 @@ const ConsumerInsights: React.FC<ConsumerInsightsProps> = ({}) => {
     { value: 75, label: t('stats.3'), Icon: FaHandshake, color: '#ef4444' }
   ]
 
-  const [isVisible, setIsVisible] = useState(false)
-  const componentRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-          observer.unobserve(entry.target)
-        }
-      },
-      {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.1
-      }
-    )
-
-    const currentRef = componentRef.current
-    if (currentRef) {
-      observer.observe(currentRef)
-    }
-
-    return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef)
-      }
-    }
-  }, [])
 
   return (
     <section
       id='consumer-insights'
-      ref={componentRef}
+      // Loại bỏ ref vì không còn IntersectionObserver
+      // ref={componentRef}
       className='mx-0 my-12 overflow-hidden rounded-lg bg-gray-5 py-8 shadow-lg  md:mx-12 md:py-16'
     >
       <div className='container mx-auto px-4 md:px-6'>
@@ -94,18 +61,14 @@ const ConsumerInsights: React.FC<ConsumerInsightsProps> = ({}) => {
                 <stat.Icon />
               </div>
 
-              {/* --- Animated Number Display using react-odometerjs --- */}
-              {/* The Odometer component itself will only render and execute on the client */}
+              {/* --- Static Number Display (loại bỏ Odometer) --- */}
               <div
                 className='mb-2 text-4xl font-bold md:text-5xl'
                 style={{ color: stat.color }}
               >
-                {/* Odometer is safely rendered inside a Client Component */}
-                <Odometer
-                  value={isVisible ? stat.value : 0} // Value updates when visible
-                  format='(,ddd)'
-                  duration={1000}
-                />
+                {/* Hiển thị giá trị tĩnh thay vì sử dụng Odometer */}
+                {/* Định dạng số thủ công đơn giản hoặc sử dụng Intl.NumberFormat */}
+                {stat.value.toLocaleString('en-US')} {/* Sử dụng toLocaleString để định dạng */}
               </div>
               {/* ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ */}
 
@@ -120,6 +83,7 @@ const ConsumerInsights: React.FC<ConsumerInsightsProps> = ({}) => {
         {/* Button */}
         <div className='mt-12 text-center md:mt-16'>
           <Link href='/conferences' legacyBehavior={false}>
+            {/* Giữ nguyên Button hoặc có thể đơn giản hóa nếu Button có hiệu ứng */}
             <Button className='hover:bg-button-dark inline-block transform rounded-lg bg-button px-8 py-3 text-lg font-bold text-button-text shadow transition duration-300 hover:-translate-y-1 hover:shadow-md'>
               {buttonText}
             </Button>
