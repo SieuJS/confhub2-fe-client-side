@@ -1,132 +1,103 @@
 // NotificationsTab.tsx
-import React, { useEffect, useCallback, useState, useMemo } from 'react'
-import NotificationItem from './NotificationItem' // Đảm bảo đúng đường dẫn
-import NotificationDetails from './NotificationDetails' // Đảm bảo đúng đường dẫn
+import React, { useEffect, useCallback, useState, useMemo } from 'react' // Thêm useMemo nếu chưa có
+import NotificationItem from './NotificationItem'
+import NotificationDetails from './NotificationDetails'
 import useNotifications from '../../../../hooks/dashboard/notification/useNotifications' // Đảm bảo đúng đường dẫn
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-// import { Notification } from '@/src/models/response/user.response'; // Chỉ import nếu type Notification cần ở đây
 
 const NotificationsTab: React.FC = () => {
   const t = useTranslations('')
-  const pathname = usePathname()
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const selectedNotificationId = searchParams.get('id')
-  const tabParam = searchParams.get('tab')
 
+  // console.log('NotificationsTab: Rendering');
   const {
-    notifications, // Danh sách gốc đã sắp xếp từ hook
+    notifications, // Giờ đây đã được sắp xếp từ hook
     checkedIndices,
-    setCheckedIndices, // Hàm để cập nhật checkedIndices từ hook
+    selectAllChecked,
     loading,
     loggedIn,
     searchTerm,
-    setSearchTerm,
-    fetchData, // Nếu có nút refresh
+    filteredNotifications, // Đã được lọc (và giữ nguyên thứ tự sắp xếp) từ hook
     handleUpdateSeenAt,
     handleToggleImportant,
     handleDeleteNotification,
     handleMarkUnseen,
-    handleCheckboxChangeTab, // Dùng cho từng item notification
+    handleCheckboxChangeTab,
     handleDeleteSelected,
+    handleSelectAllChange,
     handleMarkSelectedAsRead,
     handleMarkSelectedAsUnread,
+    allSelectedAreRead,
     handleMarkSelectedAsImportant,
-    handleMarkSelectedAsUnimportant
+    handleMarkSelectedAsUnimportant,
+    allSelectedAreImportant,
+    setSearchTerm
+    // fetchData không cần dùng trực tiếp ở đây trừ khi có nút refresh
   } = useNotifications()
 
+  // console.log('NotificationsTab: Received props from hook:', { notificationsCount: notifications.length, filteredCount: filteredNotifications.length });
+
+  const pathname = usePathname()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const selectedNotificationId = searchParams.get('id')
+  const tab = searchParams.get('tab')
+
+  // State cho bộ lọc UI (All, Unread, Read, Important)
   const [filter, setFilter] = useState<'all' | 'unread' | 'read' | 'important'>(
     'all'
   )
 
-  // Lọc lần 1: theo searchTerm (từ `notifications` gốc đã sắp xếp)
-  const searchedNotifications = useMemo(() => {
-    if (!searchTerm) {
-      return notifications // notifications từ hook đã được sắp xếp
-    }
-    return notifications.filter(
-      n => (n.message || '').toLowerCase().includes(searchTerm.toLowerCase())
-      // (n.title || '').toLowerCase().includes(searchTerm.toLowerCase()) // Giả sử có title
-    )
-  }, [notifications, searchTerm])
-
-  // Lọc lần 2: theo tab UI (từ `searchedNotifications`)
-  // Đây là danh sách thực sự hiển thị trên tab hiện tại
-  const displayedNotifications = useMemo(() => {
-    if (filter === 'unread') {
-      return searchedNotifications.filter(n => !n.seenAt)
-    } else if (filter === 'read') {
-      return searchedNotifications.filter(n => !!n.seenAt) // Đảm bảo seenAt có giá trị (không null/undefined)
-    } else if (filter === 'important') {
-      return searchedNotifications.filter(n => n.isImportant)
-    }
-    return searchedNotifications // filter 'all'
-  }, [searchedNotifications, filter])
-
-  // --- Logic Select All và trạng thái cho tab hiện tại ---
-  const displayedNotificationIds = useMemo(
-    () => displayedNotifications.map(n => n.id),
-    [displayedNotifications]
-  )
-
-  const selectAllForCurrentTabChecked = useMemo(() => {
-    if (displayedNotificationIds.length === 0) return false
-    return displayedNotificationIds.every(id => checkedIndices.includes(id))
-  }, [displayedNotificationIds, checkedIndices])
-
-  const handleSelectAllForCurrentTabChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const isChecked = event.target.checked
-      if (isChecked) {
-        // Chọn tất cả items trong view hiện tại, thêm vào checkedIndices
-        // Giữ lại những cái đã chọn từ các view khác nếu có (bằng cách dùng Set để tránh trùng lặp)
-        setCheckedIndices(prev => [
-          ...new Set([...prev, ...displayedNotificationIds])
-        ])
-      } else {
-        // Bỏ chọn tất cả items trong view hiện tại
-        // Xóa chúng khỏi checkedIndices, giữ lại những cái đã chọn từ view khác
-        setCheckedIndices(prev =>
-          prev.filter(id => !displayedNotificationIds.includes(id))
-        )
-      }
-    },
-    [displayedNotificationIds, setCheckedIndices]
-  )
-
-  // Các mục đang được chọn VÀ hiển thị trong tab hiện tại
-  const selectedAndDisplayedItems = useMemo(() => {
-    return displayedNotifications.filter(n => checkedIndices.includes(n.id))
-  }, [displayedNotifications, checkedIndices])
-
-  const allSelectedInCurrentTabAreRead = useMemo(() => {
-    if (selectedAndDisplayedItems.length === 0) return false
-    return selectedAndDisplayedItems.every(n => !!n.seenAt)
-  }, [selectedAndDisplayedItems])
-
-  const allSelectedInCurrentTabAreImportant = useMemo(() => {
-    if (selectedAndDisplayedItems.length === 0) return false
-    return selectedAndDisplayedItems.every(n => n.isImportant)
-  }, [selectedAndDisplayedItems])
-  // --- Kết thúc Logic Select All và trạng thái cho tab hiện tại ---
-
+  // Xử lý đánh dấu đã xem khi xem chi tiết
   useEffect(() => {
     if (selectedNotificationId) {
+      // Tìm trong danh sách gốc (notifications) vì filteredNotifications có thể không chứa nó
       const notification = notifications.find(
         n => n.id === selectedNotificationId
       )
       if (notification && !notification.seenAt) {
+        // console.log(`NotificationsTab: useEffect - Updating seenAt for id: ${selectedNotificationId}`);
         handleUpdateSeenAt(selectedNotificationId)
       }
     }
-  }, [selectedNotificationId, handleUpdateSeenAt, notifications])
+    // Không cần phụ thuộc vào filteredNotifications ở đây
+  }, [selectedNotificationId, handleUpdateSeenAt, notifications]) // Phụ thuộc vào notifications gốc
 
   const handleBackToNotifications = () => {
+    // console.log('NotificationsTab: handleBackToNotifications called');
     const newSearchParams = new URLSearchParams(searchParams.toString())
     newSearchParams.delete('id')
     router.push(`${pathname}?${newSearchParams.toString()}`)
   }
+
+  // Sử dụng lại hàm từ hook
+  const handleCheckboxChange = useCallback(
+    (notificationId: string, checked: boolean) => {
+      // console.log(`NotificationsTab: handleCheckboxChange called for id: ${notificationId}, checked: ${checked}`);
+      handleCheckboxChangeTab(notificationId, checked)
+    },
+    [handleCheckboxChangeTab]
+  )
+
+  // --- ÁP DỤNG BỘ LỌC GIAO DIỆN ---
+  // Lọc bổ sung dựa trên state `filter` của component này
+  // Đầu vào là `filteredNotifications` từ hook (đã được lọc bởi searchTerm và đã sắp xếp)
+  const displayedNotifications = useMemo(() => {
+    // console.log(`NotificationsTab: Applying UI filter: ${filter}`);
+    if (filter === 'unread') {
+      return filteredNotifications.filter(n => !n.seenAt)
+    } else if (filter === 'read') {
+      return filteredNotifications.filter(n => n.seenAt)
+    } else if (filter === 'important') {
+      return filteredNotifications.filter(n => n.isImportant)
+    }
+    // Nếu filter là 'all', trả về trực tiếp filteredNotifications (đã được lọc bởi search và sắp xếp)
+    return filteredNotifications
+    // --- KHÔNG CẦN SẮP XẾP LẠI Ở ĐÂY ---
+  }, [filteredNotifications, filter]) // Phụ thuộc vào danh sách đã lọc/sắp xếp từ hook và bộ lọc UI
+  // --- KẾT THÚC LỌC GIAO DIỆN ---
+
+  // --- Các phần còn lại của Component giữ nguyên ---
 
   if (!loggedIn) {
     return (
@@ -136,7 +107,8 @@ const NotificationsTab: React.FC = () => {
     )
   }
 
-  if (tabParam !== 'notifications') {
+  // Kiểm tra tab để ẩn/hiện component (logic này giữ nguyên)
+  if (tab !== 'notifications') {
     return null
   }
 
@@ -144,7 +116,9 @@ const NotificationsTab: React.FC = () => {
     return <div className='container mx-auto p-4'>{t('Loading')}</div>
   }
 
+  // Hiển thị chi tiết thông báo (logic này giữ nguyên)
   if (selectedNotificationId) {
+    // Tìm trong danh sách gốc (notifications) đã sắp xếp
     const notification = notifications.find(
       n => n.id === selectedNotificationId
     )
@@ -153,12 +127,15 @@ const NotificationsTab: React.FC = () => {
         <NotificationDetails
           notification={notification}
           onBack={handleBackToNotifications}
-          onDelete={handleDeleteNotification} // Hàm từ hook
-          onToggleImportant={handleToggleImportant} // Hàm từ hook
+          onDelete={handleDeleteNotification} // Sử dụng hàm từ hook
+          onToggleImportant={handleToggleImportant} // Sử dụng hàm từ hook
         />
       )
     } else {
-      console.warn(`Notification with id ${selectedNotificationId} not found.`)
+      // Xử lý trường hợp không tìm thấy ID (có thể đã bị xóa hoặc lỗi)
+      console.warn(
+        `Notification with id ${selectedNotificationId} not found in the list.`
+      )
       return (
         <div className='container mx-auto p-4'>
           {t('Notification_not_found')}{' '}
@@ -173,19 +150,24 @@ const NotificationsTab: React.FC = () => {
     }
   }
 
+  // Hiển thị danh sách thông báo
   return (
     <div className='container mx-auto p-2 md:p-6'>
-      <div className='mb-4'>
+      {/* Thanh tìm kiếm */}
+      <div className='mb-4 '>
         <input
           type='text'
-          placeholder={t('Search_notifications') || 'Search notifications...'}
+          placeholder={t('Search_notifications') || 'Search notifications...'} // Cung cấp fallback
           className='w-full rounded-full border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-button'
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
         />
       </div>
 
+      {/* Các nút lọc UI */}
       <div className='mb-4 flex flex-wrap gap-2'>
+        {' '}
+        {/* Sử dụng flex-wrap và gap cho responsive */}
         <button
           onClick={() => setFilter('all')}
           className={`rounded px-3 py-1 text-sm md:px-4 md:py-2 ${filter === 'all' ? 'bg-button text-white' : 'bg-gray-20 hover:bg-gray-30'}`}
@@ -212,43 +194,44 @@ const NotificationsTab: React.FC = () => {
         </button>
       </div>
 
+      {/* Thanh hành động hàng loạt */}
       <div className='mb-4 flex flex-wrap items-center gap-2'>
+        {' '}
+        {/* Sử dụng flex-wrap và gap */}
         <div className='flex items-center'>
+          {' '}
+          {/* Nhóm checkbox và label */}
           <input
             type='checkbox'
-            id='select-all-current-tab' // ID duy nhất
+            id='select-all'
             className='ml-4 mr-2 h-4 w-4 cursor-pointer rounded border-gray-30 text-blue-600 focus:ring-button'
-            checked={selectAllForCurrentTabChecked}
-            onChange={handleSelectAllForCurrentTabChange}
-            aria-label='Select all notifications in current tab'
-            disabled={displayedNotifications.length === 0}
+            checked={selectAllChecked}
+            onChange={handleSelectAllChange}
+            aria-label='Select all notifications'
+            disabled={filteredNotifications.length === 0} // Vô hiệu hóa nếu không có gì để chọn
           />
-          <label
-            htmlFor='select-all-current-tab'
-            className='mr-4 cursor-pointer text-sm'
-          >
+          <label htmlFor='select-all' className='mr-4 cursor-pointer text-sm'>
             {t('Select_All')}
           </label>
         </div>
-
-        {/* Hiển thị nút nếu có BẤT KỲ mục nào được chọn (trong checkedIndices tổng) */}
-        {/* vì các hành động này sẽ áp dụng cho TẤT CẢ các mục trong checkedIndices */}
         {checkedIndices.length > 0 && (
           <>
+            {/* Nút Mark Read/Unread */}
             <button
               onClick={
-                allSelectedInCurrentTabAreRead // UI dựa trên trạng thái của tab
-                  ? handleMarkSelectedAsUnread // Action từ hook (hoạt động trên checkedIndices)
+                allSelectedAreRead
+                  ? handleMarkSelectedAsUnread
                   : handleMarkSelectedAsRead
               }
               className='flex min-w-[110px] items-center justify-center rounded bg-button px-2 py-1 text-sm font-bold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 md:min-w-[140px] md:px-3 md:text-base'
               aria-label={
-                allSelectedInCurrentTabAreRead
+                allSelectedAreRead
                   ? t('Mark_Selected_as_Unread')
                   : t('Mark_Selected_as_Read')
               }
             >
-              {allSelectedInCurrentTabAreRead ? (
+              {/* Icons and Text */}
+              {allSelectedAreRead ? (
                 <>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
@@ -288,20 +271,22 @@ const NotificationsTab: React.FC = () => {
                 </>
               )}
             </button>
+            {/* Nút Mark Important/Unimportant */}
             <button
               onClick={
-                allSelectedInCurrentTabAreImportant // UI dựa trên trạng thái của tab
-                  ? handleMarkSelectedAsUnimportant // Action từ hook
+                allSelectedAreImportant
+                  ? handleMarkSelectedAsUnimportant
                   : handleMarkSelectedAsImportant
               }
               className='flex min-w-[110px] items-center justify-center rounded bg-yellow-500 px-2 py-1 text-sm font-bold text-white hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 md:min-w-[140px] md:px-3 md:text-base'
               aria-label={
-                allSelectedInCurrentTabAreImportant
+                allSelectedAreImportant
                   ? t('Mark_Selected_as_Unimportant')
                   : t('Mark_Selected_as_Important')
               }
             >
-              {allSelectedInCurrentTabAreImportant ? (
+              {/* Icons and Text */}
+              {allSelectedAreImportant ? (
                 <>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
@@ -339,8 +324,9 @@ const NotificationsTab: React.FC = () => {
                 </>
               )}
             </button>
+            {/* Nút Delete Selected */}
             <button
-              onClick={handleDeleteSelected} // Action từ hook
+              onClick={handleDeleteSelected}
               className='flex min-w-[110px] items-center justify-center rounded bg-red-500 px-2 py-1 text-sm font-bold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 md:min-w-[140px] md:px-3 md:text-base'
               aria-label={t('Delete_Selected')}
             >
@@ -368,25 +354,29 @@ const NotificationsTab: React.FC = () => {
         )}
       </div>
 
+      {/* Danh sách thông báo */}
       <div className='overflow-hidden rounded border bg-white-pure shadow'>
+        {' '}
+        {/* Thêm border và rounded */}
         {displayedNotifications.length === 0 ? (
-          <p className='p-4 text-center'>
+          <p className='p-4 text-center '>
             {t('You_have_no_notifications_matching_criteria') ||
               'No notifications match your current filters.'}
           </p>
         ) : (
+          // --- Sử dụng `displayedNotifications` đã được lọc và SẮP XẾP TỪ HOOK ---
           displayedNotifications.map(notification => (
             <NotificationItem
               key={notification.id}
-              notification={notification}
-              onDelete={() => handleDeleteNotification(notification.id)}
-              isChecked={checkedIndices.includes(notification.id)} // checkedIndices từ hook
-              onCheckboxChange={checked =>
-                handleCheckboxChangeTab(notification.id, checked)
-              } // Dùng hàm từ hook
-              onToggleImportant={handleToggleImportant}
-              onMarkUnseen={handleMarkUnseen}
-              notificationId={notification.id} // Prop này không cần thiết nếu đã có notification.id
+              notification={notification} // notification này đã đúng thứ tự
+              onDelete={() => handleDeleteNotification(notification.id)} // Hàm từ hook
+              isChecked={checkedIndices.includes(notification.id)} // State từ hook
+              onCheckboxChange={
+                checked => handleCheckboxChange(notification.id, checked) // Hàm đã được useCallback
+              }
+              onToggleImportant={handleToggleImportant} // Hàm từ hook
+              onMarkUnseen={handleMarkUnseen} // Hàm từ hook
+              notificationId={notification.id} // Prop này có vẻ dư thừa nếu đã có notification.id
             />
           ))
         )}
