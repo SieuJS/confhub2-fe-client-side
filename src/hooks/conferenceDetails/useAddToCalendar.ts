@@ -28,7 +28,7 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
       }
       const user = JSON.parse(userData);
       try {
-        const response = await fetch(`${API_ENDPOINT}/calendar/events`,
+        const response = await fetch(`${API_ENDPOINT}/calendar/conference-events`,
           {
             method: 'GET',
             headers: {
