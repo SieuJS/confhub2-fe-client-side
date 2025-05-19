@@ -1,7 +1,7 @@
 // src/app/api/logAnalysis/saveConferences.ts
 import axios, { AxiosError } from 'axios';
 
-const API_SAVE_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/save-conference`; // Or read from config
+const API_SAVE_ENDPOINT = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/save-conferences`; // Or read from config
 
 interface SaveResult {
     title: string;
