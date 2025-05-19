@@ -97,6 +97,8 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
 
       if (response.status === 201) { // Successfully created, awaiting verification
         console.log('Registration pending verification:', data.message);
+        localStorage.setItem('token', data.token);
+
         // Redirect to a page informing the user to check their email.
         // Pass email as query param if the verification page needs it to display a message.
         router.push({
