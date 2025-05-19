@@ -94,7 +94,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
       <div className='mt-2 flex justify-end'>
         <button
           onClick={toggleAdvancedOptionsVisibility}
-          className='text-sm hover:text-gray-800 focus:outline-none'
+          className='text-sm hover:text-gray-80 focus:outline-none'
         >
           {isAdvancedOptionsVisible
             ? t('Hide_advanced_search_options')

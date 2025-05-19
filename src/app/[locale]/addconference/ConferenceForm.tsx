@@ -855,7 +855,7 @@ const ConferenceForm: React.FC = () => {
               {/* <p className='text-xs sm:text-sm'>Step add conference here</p> */}
             </div>
             {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
-            <div className='mx-2 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
+            <div className='ml-2 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
           </div>
 
           {/* Step 2 */}
@@ -863,7 +863,7 @@ const ConferenceForm: React.FC = () => {
             className={`flex w-full items-center ${currentStep === 2 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 2 ? 'text-button' : ''}`}
           >
             {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
-            <div className='mx-2 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
+            <div className='mr-6 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
             <span
               className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 2 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}
             >
@@ -883,7 +883,7 @@ const ConferenceForm: React.FC = () => {
               {/* <p className='text-xs sm:text-sm'>Step review here</p> */}
             </div>
             {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
-            <div className='mx-2 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
+            <div className=' hidden h-0.5 w-full bg-gray-300 lg:block'></div>
           </div>
 
           {/* Step 3 */}
@@ -891,7 +891,7 @@ const ConferenceForm: React.FC = () => {
             className={`flex w-full items-center ${currentStep === 3 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 3 ? 'text-button' : ''}`}
           >
             {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
-            <div className='mx-2 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
+            <div className='mr-6 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
             <span
               className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 3 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}
             >
@@ -929,7 +929,7 @@ const ConferenceForm: React.FC = () => {
             <button
               type='button'
               onClick={goToPreviousStep}
-              className='w-full rounded bg-gray-500 px-4 py-2 text-sm text-white hover:bg-gray-700 focus:outline-none sm:w-auto' // w-full trên mobile, w-auto trên sm+
+              className='w-full rounded bg-gray-50 px-4 py-2 text-sm text-white hover:bg-gray-700 focus:outline-none sm:w-auto' // w-full trên mobile, w-auto trên sm+
             >
               {t('Back')}
             </button>

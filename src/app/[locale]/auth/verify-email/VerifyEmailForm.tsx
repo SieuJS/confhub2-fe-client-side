@@ -95,6 +95,7 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = () => {
         //     router.push(pathWithLocale);
         // }, 3000);
         // --- KẾT THÚC BỎ ---
+
       } else {
         // Lỗi từ backend (400, 404, 500)
         setError(data.message || t('verifyEmail.error.backendFailed'))
@@ -306,7 +307,7 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = () => {
           {' '}
           {/* Thêm khoảng cách trên nếu cần */}
           <Link
-            href='/auth/login' // Quan trọng: Dùng đường dẫn không có locale, Link của next-intl sẽ tự xử lý
+            href='/conferences' // Quan trọng: Dùng đường dẫn không có locale, Link của next-intl sẽ tự xử lý
             className='hover:bg-button/90 flex w-full justify-center rounded-md border border-transparent bg-button px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
           >
             {t('verifyEmail.returnToHomeButton')}

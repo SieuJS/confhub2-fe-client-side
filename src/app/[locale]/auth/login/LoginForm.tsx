@@ -16,7 +16,7 @@ type LoginFormProps = {
 
 const LoginForm: React.FC<LoginFormProps> = (/* props: LoginFormProps */) => {
   const t = useTranslations('')
-  const nextIntlRouter = useNextIntlRouter(); // For navigation that preserves locale
+  const nextIntlRouter = useNextIntlRouter() // For navigation that preserves locale
   const [showPassword, setShowPassword] = useState(false)
 
   const {
@@ -57,7 +57,7 @@ const LoginForm: React.FC<LoginFormProps> = (/* props: LoginFormProps */) => {
                 type='button'
                 onClick={handleGoogleLogin} // Use the handler from useLoginForm
                 disabled={isLoading}
-                className='flex w-full items-center justify-center space-x-2 rounded-md border border-gray-300 bg-white-pure px-4 py-2.5 text-sm font-medium shadow-sm  hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+                className='flex w-full items-center justify-center space-x-2 rounded-md border border-gray-300 bg-white-pure px-4 py-2.5 text-sm font-medium shadow-sm  hover:bg-gray-5 focus:outline-none focus:ring-2 focus:ring-gray-50 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
               >
                 <svg className='h-5 w-5' viewBox='0 0 24 24'>
                   <path
@@ -104,7 +104,7 @@ const LoginForm: React.FC<LoginFormProps> = (/* props: LoginFormProps */) => {
                     required
                     value={email}
                     onChange={handleEmailChange}
-                    className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm'
+                    className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-50 focus:outline-none focus:ring-gray-50 sm:text-sm'
                     placeholder='you@example.com'
                     disabled={isLoading}
                   />
@@ -138,21 +138,28 @@ const LoginForm: React.FC<LoginFormProps> = (/* props: LoginFormProps */) => {
                       required
                       value={password}
                       onChange={handlePasswordChange}
-                      className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm'
+                      className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-50 focus:outline-none focus:ring-gray-50 sm:text-sm'
                       placeholder='••••••••'
                       disabled={isLoading}
                     />
                     {/* Thay thế biểu tượng mắt thủ công bằng icon từ lucide-react */}
-                    {password && // Hiển thị nút toggle chỉ khi có mật khẩu
+                    {password && ( // Hiển thị nút toggle chỉ khi có mật khẩu
                       <button
                         type='button'
                         onClick={() => setShowPassword(!showPassword)}
-                        className='absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-0' // Thêm một số style cho nút
-                        aria-label={showPassword ? t('Hide password') : t('Show password')} // Thêm aria-label cho accessibility
+                        className='absolute right-2 top-1/2 -translate-y-1/2 text-gray-50 hover:text-gray-70 focus:outline-none focus:ring-0' // Thêm một số style cho nút
+                        aria-label={
+                          showPassword ? t('Hide password') : t('Show password')
+                        } // Thêm aria-label cho accessibility
                       >
-                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />} {/* Sử dụng icon lucide-react */}
+                        {showPassword ? (
+                          <EyeOff size={20} />
+                        ) : (
+                          <Eye size={20} />
+                        )}{' '}
+                        {/* Sử dụng icon lucide-react */}
                       </button>
-                    }
+                    )}
                   </div>
                 </div>
               </div>
@@ -161,8 +168,18 @@ const LoginForm: React.FC<LoginFormProps> = (/* props: LoginFormProps */) => {
                 <div className='rounded-md bg-red-50 p-4'>
                   <div className='flex'>
                     <div className='flex-shrink-0'>
-                       {/* SVG for error icon */}
-                       <svg className='h-5 w-5 text-red-400' viewBox='0 0 20 20' fill='currentColor'><path fillRule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z' clipRule='evenodd' /></svg>
+                      {/* SVG for error icon */}
+                      <svg
+                        className='h-5 w-5 text-red-400'
+                        viewBox='0 0 20 20'
+                        fill='currentColor'
+                      >
+                        <path
+                          fillRule='evenodd'
+                          d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'
+                          clipRule='evenodd'
+                        />
+                      </svg>
                     </div>
                     <div className='ml-3'>
                       <p className='text-sm text-red-700'>{error}</p>
@@ -175,12 +192,31 @@ const LoginForm: React.FC<LoginFormProps> = (/* props: LoginFormProps */) => {
                 <button
                   type='submit'
                   disabled={isLoading}
-                  className='hover:bg-button/90 flex w-full justify-center rounded-md border border-transparent bg-button px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+                  className='hover:bg-button/90 flex w-full justify-center rounded-md border border-transparent bg-button px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                 >
                   {isLoading && isClient ? ( // isClient check to prevent hydration mismatch for spinner
                     <div className='flex items-center'>
                       {/* SVG for loading spinner */}
-                      <svg className='-ml-1 mr-3 h-5 w-5 animate-spin text-white' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'><circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle><path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path></svg>
+                      <svg
+                        className='-ml-1 mr-3 h-5 w-5 animate-spin text-white'
+                        xmlns='http://www.w3.org/2000/svg'
+                        fill='none'
+                        viewBox='0 0 24 24'
+                      >
+                        <circle
+                          className='opacity-25'
+                          cx='12'
+                          cy='12'
+                          r='10'
+                          stroke='currentColor'
+                          strokeWidth='4'
+                        ></circle>
+                        <path
+                          className='opacity-75'
+                          fill='currentColor'
+                          d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                        ></path>
+                      </svg>
                       {t('Signing_in')}
                     </div>
                   ) : (
@@ -200,7 +236,7 @@ const LoginForm: React.FC<LoginFormProps> = (/* props: LoginFormProps */) => {
                   {t('Sign_Up_Now')}
                 </Link>
               </div>
-              <div className='flex items-center justify-center space-x-1 mt-2'>
+              <div className='mt-2 flex items-center justify-center space-x-1'>
                 <Link
                   href='/' // Use next-intl Link
                   className='hover:text-button/80 font-medium text-button'

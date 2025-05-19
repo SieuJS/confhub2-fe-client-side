@@ -2,6 +2,7 @@
 import cn from 'classnames'
 import React from 'react'
 import AudioPulse from '../AudioPulse'
+import { Mic, MicOff } from 'lucide-react'
 
 type MicButtonProps = {
   muted: boolean
@@ -29,7 +30,7 @@ const MicButton: React.FC<MicButtonProps> = ({
       onClick={() => setMuted(!muted)}
     >
       <span className='material-symbols-outlined filled'>
-        {muted ? 'mic_off' : 'mic'}
+        {muted ? <MicOff /> : <Mic />}
       </span>
       {!muted && (
         <div
