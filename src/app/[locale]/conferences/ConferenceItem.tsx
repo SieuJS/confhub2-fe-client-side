@@ -74,7 +74,7 @@ const ConferenceItem: React.FC<ConferenceItemProps> = ({ conference }) => {
   )
 
   return (
-    <div className='mb-4 grid grid-cols-1 items-start gap-4 rounded-md bg-background p-2 shadow-md md:grid-cols-9 md:items-center md:p-4'>
+    <div className='mb-0 grid grid-cols-1 items-start gap-4  bg-background p-2  md:grid-cols-9 md:items-center md:p-4'>
       {/* Image Column (Hidden on Mobile) */}
       <div className='relative col-span-1 hidden items-center justify-center md:flex'>
         <Image

@@ -947,7 +947,9 @@
   "By_Users": "By Users",
   "Save_Changes": "Save Changes",
   "Location_Not_Available": "Location Not Available",
+  "Add_Conference_Info": "Add Conference Information",
   "Change": "Change",
+  "Loading_authentication": "Loading authentication...",
   "SupportPage": {
     "howCanWeHelpYou": "How can we help you?",
     "searchPlaceholder": "Search FAQ...",

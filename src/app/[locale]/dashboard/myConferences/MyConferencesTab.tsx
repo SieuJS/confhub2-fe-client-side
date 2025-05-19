@@ -13,9 +13,9 @@ import { useAuth } from '@/src/contexts/AuthContext' // <<<< THAY ĐỔI QUAN TR
 
 // Enum for conference status
 enum ConferenceStatus {
-  Approve = 'Approved', // Giữ nguyên giá trị từ backend nếu nó là string
-  Pending = 'Pending',
-  Rejected = 'Rejected'
+  Approve = 'APPROVED', // Giữ nguyên giá trị từ backend nếu nó là string
+  Pending = 'PENDING',
+  Rejected = 'REJECTED'
   // Thêm các status khác nếu có từ backend, ví dụ: 'Draft', 'Cancelled'
 }
 
@@ -97,6 +97,8 @@ const MyConferencesTab: React.FC = () => {
     }
     return transformedConferences.filter(conf => conf.status === displayStatus)
   }, [transformedConferences, displayStatus])
+
+  // console.log('[MyConferencesTab] filteredConferences:', filteredConferences)
 
   // Chờ AuthProvider khởi tạo xong
   if (isAuthInitializing) {
@@ -229,10 +231,10 @@ const MyConferencesTab: React.FC = () => {
         <div className='space-y-6'>
           {filteredConferences.map(conference => (
             <div
-              className='rounded-lg border bg-white-pure p-4 shadow-md transition-shadow hover:shadow-lg' // Cải thiện styling
+              className='rounded-lg border p-2 shadow-md transition-shadow hover:shadow-lg' // Cải thiện styling
               key={conference.id}
             >
-              <div className='mb-2 flex items-center text-xs '>
+              <div className='mb-2 flex items-center text-base '>
                 <span className='mr-1'>{t('Created_Time')}: </span>
                 <Tooltip text={formatDateFull(conference.createdAt, language)}>
                   <span>{timeAgo(conference.createdAt, language)}</span>

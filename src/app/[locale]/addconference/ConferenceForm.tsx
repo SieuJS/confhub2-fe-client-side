@@ -24,7 +24,6 @@ const ConferenceForm: React.FC = () => {
   const pathname = usePathname()
 
   const [currentStep, setCurrentStep] = useState(1)
-  // ... (rest of your state declarations) ...
   const [title, setTitle] = useState('')
   const [acronym, setAcronym] = useState('')
   const [link, setLink] = useState('')
@@ -59,7 +58,6 @@ const ConferenceForm: React.FC = () => {
   const [selectedContinent, setSelectedContinent] = useState<string>('')
   const [filteredCountries, setFilteredCountries] = useState<Country[]>([])
 
-  // ... (useEffect hooks and handlers - giữ nguyên) ...
   const continentOptions = ['Americas', 'Europe', 'Asia', 'Africa', 'Oceania']
   const dateTypeOptions = [
     { value: 'submissionDate', name: t('Submission_Date') },
@@ -90,12 +88,12 @@ const ConferenceForm: React.FC = () => {
     setSelectedCountry('')
     setSelectedState('')
     setSelectedCity('')
-    setLocation({
-      ...location,
+    setLocation(prevLocation => ({
+      ...prevLocation,
       country: '',
       cityStateProvince: '',
       continent: selectedContinent
-    })
+    }))
   }, [selectedContinent, countries])
 
   useEffect(() => {
@@ -188,28 +186,27 @@ const ConferenceForm: React.FC = () => {
     setSelectedCountry(countryIso2)
     setSelectedState('')
     setSelectedCity('')
-    setLocation({
-      ...location,
+    setLocation(prevLocation => ({
+      ...prevLocation,
       country: filteredCountries.find(c => c.iso2 === countryIso2)?.name || '',
       cityStateProvince: ''
-    })
+    }))
   }
 
   const handleStateChange = (stateIso2: string) => {
     setSelectedState(stateIso2)
-    console.log(states)
-    setLocation({
-      ...location,
+    setLocation(prevLocation => ({
+      ...prevLocation,
       cityStateProvince: states.find(s => s.iso2 === stateIso2)?.name || ''
-    })
+    }))
   }
 
   const handleCityChange = (cityName: string) => {
     setSelectedCity(cityName)
-    setLocation({
-      ...location,
+    setLocation(prevLocation => ({
+      ...prevLocation,
       cityStateProvince: cityName
-    })
+    }))
   }
   const handleAddTopic = () => {
     if (newTopic.trim() !== '') {
@@ -228,43 +225,154 @@ const ConferenceForm: React.FC = () => {
     value: string
   ) => {
     const newDates = [...dates]
-    newDates[index] = {
-      ...newDates[index],
-      [field]: value
+    const updatedDateEntry = { ...newDates[index] } // Create a mutable copy
+
+    // Apply the change to the copied entry
+    ;(updatedDateEntry as any)[field] = value
+
+    // Perform validations using the potentially updated values in updatedDateEntry
+    const fromDateStr = updatedDateEntry.fromDate
+    const toDateStr = updatedDateEntry.toDate
+
+    // Check date consistency only if both dates are present
+    if (
+      (field === 'fromDate' || field === 'toDate') &&
+      fromDateStr &&
+      toDateStr
+    ) {
+      const fromDateObj = new Date(fromDateStr)
+      const toDateObj = new Date(toDateStr)
+
+      if (toDateObj < fromDateObj) {
+        if (field === 'toDate') {
+          alert(t('End_date_cannot_be_before_start_date'))
+        } else {
+          // field === 'fromDate'
+          alert(t('Start_date_cannot_be_after_end_date_please_adjust_dates'))
+        }
+        // The state will be set with this invalid combination,
+        // and goToNextStep will perform the strict validation.
+        // The alert provides immediate feedback.
+      }
     }
+
+    newDates[index] = updatedDateEntry
     setDates(newDates)
   }
+
   const addDate = () => {
     setDates([...dates, { type: '', name: '', fromDate: '', toDate: '' }])
   }
 
   const removeDate = (index: number) => {
     if (index !== 0) {
+      // Ensure the first date entry (Conference Dates) is not removed
       setDates(dates.filter((_, i) => i !== index))
     }
   }
   const handleLocationChange = (field: keyof LocationInput, value: string) => {
-    setLocation({
-      ...location,
+    setLocation(prevLocation => ({
+      ...prevLocation,
       [field]: value
-    })
+    }))
   }
 
   const goToNextStep = () => {
-    // Add validation for step 1
     if (currentStep === 1) {
-      if (
-        !title ||
-        !acronym ||
-        !link ||
-        !type ||
-        !location.address ||
-        dates.some(date => !date.fromDate || !date.toDate || !date.name)
-      ) {
-        alert('Please complete all required fields in Step 1.')
+      // Basic fields validation
+      if (!title.trim()) {
+        alert(t('Please_enter_the_conference_name'))
         return
       }
+      if (!acronym.trim()) {
+        alert(t('Please_enter_the_acronym'))
+        return
+      }
+      if (!link.trim()) {
+        // Basic URL validation (can be improved with regex if needed)
+        if (!link.startsWith('http://') && !link.startsWith('https://')) {
+          alert(t('Please_enter_a_valid_link_starting_with_http_or_https'))
+          return
+        }
+        alert(t('Please_enter_the_conference_link')) // This might be redundant if the above catches it.
+        // Or, this is for empty link.
+        return
+      }
+      if (!type) {
+        alert(t('Please_select_the_conference_type')) // Should not happen due to default
+        return
+      }
+
+      // Location fields (conditionally required based on type)
+      if (type === 'Offline' || type === 'Hybrid') {
+        if (!location.address.trim()) {
+          alert(t('Please_enter_the_address'))
+          return
+        }
+        if (!location.continent) {
+          alert(t('Please_select_the_continent'))
+          return
+        }
+        if (!location.country) {
+          alert(t('Please_select_the_country'))
+          return
+        }
+        if (!location.cityStateProvince) {
+          alert(t('Please_select_the_city_state_province'))
+          return
+        }
+      }
+
+      // Dates validation
+      for (let i = 0; i < dates.length; i++) {
+        const date = dates[i]
+        const dateIdentifier = date.name || `${t('Date_entry')} ${i + 1}`
+
+        // Name and Type are required for dates added by the user (index > 0)
+        // The first date entry has fixed name and type and its inputs are disabled.
+        if (i > 0) {
+          // For user-added dates
+          if (!date.name.trim()) {
+            alert(t('Please_provide_a_name_for_date_entry', { number: i + 1 }))
+            return
+          }
+          if (!date.type) {
+            alert(
+              t('Please_select_a_type_for_date_entry', {
+                name: date.name || i + 1
+              })
+            )
+            return
+          }
+        }
+
+        if (!date.fromDate) {
+          alert(t('Please_provide_a_start_date_for', { name: dateIdentifier }))
+          return
+        }
+        if (!date.toDate) {
+          alert(t('Please_provide_an_end_date_for', { name: dateIdentifier }))
+          return
+        }
+
+        // Date order validation: End date must be after or same as start date
+        if (new Date(date.toDate) < new Date(date.fromDate)) {
+          alert(
+            t('End_date_cannot_be_before_start_date_for', {
+              name: dateIdentifier
+            })
+          )
+          return
+        }
+      }
+      // Topics validation (optional, but if you want to make it required)
+      // if (topics.length === 0) {
+      //   alert(t('Please_add_at_least_one_topic'));
+      //   return;
+      // }
     }
+
+    // If all validations pass for the current step
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1)
     }
@@ -278,8 +386,31 @@ const ConferenceForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Final validation check, especially if user could bypass goToNextStep somehow
+    // or if some fields are only relevant at the final submission.
+    // For now, assuming goToNextStep covers Step 1, and Step 3 has its own check.
+    if (currentStep === 1) {
+      // If somehow submit is pressed on step 1
+      goToNextStep() // Run step 1 validation
+      if (
+        !title.trim() ||
+        !acronym.trim() ||
+        !link.trim() ||
+        dates.some(
+          d =>
+            !d.fromDate ||
+            !d.toDate ||
+            new Date(d.toDate) < new Date(d.fromDate)
+        )
+      ) {
+        // Check if validation failed by re-checking critical fields
+        return // Don't proceed if validation would fail
+      }
+    }
+
     if (!agreedToTerms) {
-      alert('Please agree to the terms and conditions.')
+      alert(t('Please_agree_to_the_terms_and_conditions'))
       return
     }
 
@@ -303,13 +434,13 @@ const ConferenceForm: React.FC = () => {
     }
     const user = JSON.parse(userData)
     const userId = user.id
-    console.log(conferenceData)
+    console.log('Submitting conferenceData:', conferenceData)
     try {
       const response = await fetch(API_ADD_CONFERENCE_ENDPOINT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}` // Thêm token vào header
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({ ...conferenceData, userId })
       })
@@ -317,7 +448,9 @@ const ConferenceForm: React.FC = () => {
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(
-          `HTTP error! status: ${response.status}, message: ${errorData.message}`
+          `HTTP error! status: ${response.status}, message: ${
+            errorData.message || 'Unknown error'
+          }`
         )
       }
 
@@ -330,12 +463,13 @@ const ConferenceForm: React.FC = () => {
       router.push(pathWithLocale)
     } catch (error: any) {
       console.error('Error adding conference:', error.message)
+      alert(`${t('Error_adding_conference')}: ${error.message}`)
     }
   }
 
   const renderStepOne = () => (
     <>
-      {/* Step 1 Form Fields (giữ nguyên nội dung) */}
+      {/* Step 1 Form Fields (Content largely unchanged, focus was on logic) */}
       <div className='sm:col-span-2'>
         <label htmlFor='title' className='block text-sm  '>
           * {t('Conference_Name')}:
@@ -406,7 +540,6 @@ const ConferenceForm: React.FC = () => {
         <label className='block text-base  '>* {t('Location')}:</label>
         <div className='grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-4 md:grid-cols-4'>
           {' '}
-          {/* Responsive Grid */}
           <div>
             <label htmlFor='address' className='block text-sm  '>
               {t('Address')}:
@@ -418,7 +551,7 @@ const ConferenceForm: React.FC = () => {
               value={location.address}
               onChange={e => handleLocationChange('address', e.target.value)}
               title={t('Enter_the_address_of_the_conference')}
-              required
+              required={type === 'Offline' || type === 'Hybrid'}
             />
           </div>
           <div>
@@ -431,7 +564,8 @@ const ConferenceForm: React.FC = () => {
               value={selectedContinent}
               onChange={e => handleContinentChange(e.target.value)}
               title={t('Select_the_continent_where_the_conference_is_located')}
-              required
+              required={type === 'Offline' || type === 'Hybrid'}
+              disabled={type === 'Online'}
             >
               <option value=''>{t('Select_Continent')}</option>
               {continentOptions.map(continent => (
@@ -451,8 +585,8 @@ const ConferenceForm: React.FC = () => {
               value={selectedCountry}
               onChange={e => handleCountryChange(e.target.value)}
               title={t('Select_the_country_where_the_conference_is_located')}
-              required
-              disabled={!selectedContinent}
+              required={type === 'Offline' || type === 'Hybrid'}
+              disabled={type === 'Online' || !selectedContinent}
             >
               <option value=''>{t('Select_Country')}</option>
               {filteredCountries.map(country => (
@@ -475,17 +609,17 @@ const ConferenceForm: React.FC = () => {
                   ? handleStateChange(e.target.value)
                   : handleCityChange(e.target.value)
               }
-              required
+              required={type === 'Offline' || type === 'Hybrid'}
               title={t(
                 'Select_the_state_province_or_city_where_the_conference_is_located'
               )}
-              disabled={!selectedCountry}
+              disabled={type === 'Online' || !selectedCountry}
             >
               <option value=''>
                 {t('Select')}{' '}
                 {cities.length > 0
-                  ? `${t('City')}:`
-                  : `${t('State_Province')}:`}
+                  ? `${t('City')}` // Simpler label
+                  : `${t('State_Province')}`}
               </option>
               {states.length > 0
                 ? states.map(state => (
@@ -503,9 +637,8 @@ const ConferenceForm: React.FC = () => {
         </div>
       </div>
       <div className='sm:col-span-2'>
-        <label className='block text-sm  '>{t('Important_Dates')}:</label>
+        <label className='block text-sm  '>* {t('Important_Dates')}:</label>
         {dates.map((date, index) => (
-          // Grid cho Dates: 1 cột mặc định, 2 cột trên sm, 4 cột trên lg
           <div
             key={index}
             className='mt-1 grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-4 lg:gap-x-4'
@@ -520,9 +653,9 @@ const ConferenceForm: React.FC = () => {
                 value={date.name}
                 onChange={e => handleDateChange(index, 'name', e.target.value)}
                 className={`mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm
-                    ${index === 0 ? 'pointer-events-none opacity-50' : ''}`} // Dùng pointer-events-none thay vì readOnly
-                required
-                disabled={index === 0} // Dùng disabled thay vì readOnly
+                    ${index === 0 ? 'pointer-events-none bg-gray-100 opacity-70' : ''}`}
+                required={index > 0} // Only required for user-added dates
+                disabled={index === 0}
               />
             </div>
             <div>
@@ -534,21 +667,29 @@ const ConferenceForm: React.FC = () => {
                 value={date.type}
                 onChange={e => handleDateChange(index, 'type', e.target.value)}
                 className={`mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm ${
-                  index === 0 ? 'pointer-events-none opacity-50' : ''
+                  index === 0
+                    ? 'pointer-events-none bg-gray-100 opacity-70'
+                    : ''
                 }`}
+                required={index > 0} // Only required for user-added dates
                 disabled={index === 0}
               >
                 <option value=''>{t('Select_Type')}</option>
-                {dateTypeOptions.map(type => (
-                  <option key={type.value} value={type.value}>
-                    {type.name}
-                  </option>
-                ))}
+                {dateTypeOptions.map(
+                  (
+                    opt // Renamed 'type' to 'opt' to avoid conflict
+                  ) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.name}
+                    </option>
+                  )
+                )}
               </select>
             </div>
             <div>
               <label htmlFor={`fromDate-${index}`} className='block text-sm  '>
-                {t('Start')}: {/* Đổi label cho ngắn gọn */}
+                * {t('Start_Date')}:{' '}
+                {/* Made label more explicit for required field */}
               </label>
               <input
                 type='date'
@@ -563,10 +704,9 @@ const ConferenceForm: React.FC = () => {
               />
             </div>
             <div className='relative'>
-              {' '}
-              {/* Container cho nút xóa */}
               <label htmlFor={`toDate-${index}`} className='block text-sm  '>
-                {t('End')}: {/* Đổi label */}
+                * {t('End_Date')}:{' '}
+                {/* Made label more explicit for required field */}
               </label>
               <input
                 type='date'
@@ -575,16 +715,16 @@ const ConferenceForm: React.FC = () => {
                 onChange={e =>
                   handleDateChange(index, 'toDate', e.target.value)
                 }
+                min={date.fromDate} // HTML5 validation for end date >= start date
                 className='mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
                 required
                 title={t('Select_the_end_date')}
               />
-              {/* Nút xóa: Đặt cạnh input cuối cùng */}
               {index !== 0 && (
                 <button
                   type='button'
                   onClick={() => removeDate(index)}
-                  className='absolute -right-6 top-1/2 mt-2 -translate-y-1/2 text-red-500 hover:text-red-700 focus:outline-none sm:-right-8' // Điều chỉnh vị trí nút xóa
+                  className='absolute -right-6 top-1/2 mt-2 -translate-y-1/2 text-red-500 hover:text-red-700 focus:outline-none sm:-right-8'
                   aria-label='Remove date'
                 >
                   <svg
@@ -607,15 +747,12 @@ const ConferenceForm: React.FC = () => {
         <button
           type='button'
           onClick={addDate}
-          className='mt-4 rounded bg-button px-4 py-2 text-sm font-bold text-button-text hover:bg-button focus:ring-2 focus:ring-button focus:ring-offset-2 hover:focus:outline-none' // Giảm kích thước nút
+          className='mt-4 rounded bg-button px-4 py-2 text-sm font-bold text-button-text hover:bg-button focus:ring-2 focus:ring-button focus:ring-offset-2 hover:focus:outline-none'
         >
           {t('Add_Date')}
         </button>
       </div>
-      {/* Topics Section: Sắp xếp lại input và button */}
       <div className='sm:col-span-2'>
-        {' '}
-        {/* Để chiếm toàn bộ chiều rộng trên mobile */}
         <label htmlFor='newTopic' className='block text-sm  '>
           {t('Topics')}:
         </label>
@@ -625,18 +762,17 @@ const ConferenceForm: React.FC = () => {
             id='newTopic'
             value={newTopic}
             onChange={e => setNewTopic(e.target.value)}
-            className='flex-grow rounded-md border border-button px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm' // flex-grow để chiếm không gian còn lại
+            className='flex-grow rounded-md border border-button px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm'
             placeholder={t('Add_a_topic')}
           />
           <button
             type='button'
             onClick={handleAddTopic}
-            className='mt-2 w-full rounded-md bg-button px-4 py-2 text-sm text-button-text hover:bg-button focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2 sm:mt-0 sm:w-auto' // w-full trên mobile, w-auto trên sm+
+            className='mt-2 w-full rounded-md bg-button px-4 py-2 text-sm text-button-text hover:bg-button focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2 sm:mt-0 sm:w-auto'
           >
             {t('Add')}
           </button>
         </div>
-        {/* Hiển thị topics đã chọn */}
         <div className='mt-3 flex flex-wrap gap-2'>
           {topics.map((topic, index) => (
             <span
@@ -667,10 +803,7 @@ const ConferenceForm: React.FC = () => {
           ))}
         </div>
       </div>
-      {/* Image URL và Description (giữ nguyên hoặc điều chỉnh grid nếu cần) */}
       <div className='sm:col-span-2'>
-        {' '}
-        {/* Có thể cho Image URL chiếm 1 cột trên md+ */}
         <label htmlFor='imageUrl' className='block text-sm  '>
           {t('Image_URL')}:
         </label>
@@ -698,10 +831,7 @@ const ConferenceForm: React.FC = () => {
   )
 
   const renderStepTwo = () => (
-    // Step 2 Content (giữ nguyên nội dung, Tailwind sẽ tự xuống dòng)
     <div className='space-y-3 sm:col-span-2'>
-      {' '}
-      {/* Thêm space-y để tạo khoảng cách giữa các dòng */}
       <h2 className='mb-4 text-lg font-semibold sm:text-xl'>
         {t('Review_Information')}
       </h2>
@@ -719,8 +849,6 @@ const ConferenceForm: React.FC = () => {
           rel='noopener noreferrer'
           className='break-all text-button hover:underline'
         >
-          {' '}
-          {/* break-all để xuống dòng nếu link quá dài */}
           {link}
         </a>
       </p>
@@ -728,44 +856,58 @@ const ConferenceForm: React.FC = () => {
         <strong>{t('Type')}:</strong> {t(type)}
       </p>
       <p>
-        <strong>{t('Address')}:</strong> {location.address}
+        <strong>{t('Address')}:</strong>{' '}
+        {location.address ||
+          (type === 'Online'
+            ? t('Not_applicable_for_online')
+            : t('Not_provided'))}
       </p>
       <p>
-        <strong>{t('Continent')}:</strong> {location.continent}
+        <strong>{t('Continent')}:</strong>{' '}
+        {location.continent ||
+          (type === 'Online'
+            ? t('Not_applicable_for_online')
+            : t('Not_provided'))}
       </p>
       <p>
-        <strong>{t('Country')}:</strong> {location.country}
+        <strong>{t('Country')}:</strong>{' '}
+        {location.country ||
+          (type === 'Online'
+            ? t('Not_applicable_for_online')
+            : t('Not_provided'))}
       </p>
       <p>
         <strong>
-          {states.length > 0 ? t('State_Province') : t('City')}:{' '}
-          {/* Sửa logic hiển thị label */}
+          {states.length > 0 ||
+          (!states.length && !cities.length && location.cityStateProvince)
+            ? t('State_Province')
+            : t('City')}
+          :
         </strong>{' '}
-        {location.cityStateProvince}
+        {location.cityStateProvince ||
+          (type === 'Online'
+            ? t('Not_applicable_for_online')
+            : t('Not_provided'))}
       </p>
       <div>
-        {' '}
-        {/* Bọc list dates trong div để dễ quản lý */}
         <strong>{t('Important_Dates')}:</strong>
         <ul className='mt-1 list-disc space-y-1 pl-5'>
-          {' '}
-          {/* Thêm style cho list */}
           {dates.map((date, index) => (
             <li key={index}>
-              {date.name || 'Unnamed Date'}: {date.fromDate || 'N/A'} -{' '}
-              {date.toDate || 'N/A'} ({date.type || 'N/A'})
+              {date.name || t('Unnamed_Date')}: {date.fromDate || t('N_A')} -{' '}
+              {date.toDate || t('N_A')} ({date.type || t('N_A')})
             </li>
           ))}
         </ul>
       </div>
       <div>
-        {' '}
-        {/* Bọc list topics */}
         <strong>{t('Topics')}:</strong>
         {topics.length > 0 ? (
           <span className='ml-2'>{topics.join(', ')}</span>
         ) : (
-          <span className='ml-2 italic text-gray-500'>No topics added</span>
+          <span className='ml-2 italic text-gray-500'>
+            {t('No_topics_added')}
+          </span>
         )}
       </div>
       {imageUrl && (
@@ -784,30 +926,28 @@ const ConferenceForm: React.FC = () => {
       <p>
         <strong>{t('Description')}:</strong>{' '}
         {description || (
-          <span className='italic text-gray-500'>No description provided</span>
+          <span className='italic text-gray-500'>
+            {t('No_description_provided')}
+          </span>
         )}
       </p>
     </div>
   )
 
   const renderStepThree = () => (
-    // Step 3 Content (giữ nguyên nội dung)
     <div className='sm:col-span-2'>
       <h2 className='mb-4 text-lg font-semibold sm:text-xl'>
         {t('Terms_and_Conditions')}
       </h2>
       <div className='mb-4 max-h-60 overflow-y-auto rounded border p-4'>
-        {' '}
-        {/* Giới hạn chiều cao và cho phép cuộn */}
         <p>{t('Terms_and_Conditions_Description')}</p>
-        {/* Thêm nội dung điều khoản dài hơn nếu cần */}
       </div>
       <label className='flex items-center'>
         <input
           type='checkbox'
           checked={agreedToTerms}
           onChange={e => setAgreedToTerms(e.target.checked)}
-          className='mr-2 h-4 w-4 rounded border-gray-300 text-button focus:ring-button' // Style checkbox
+          className='mr-2 h-4 w-4 rounded border-gray-300 text-button focus:ring-button'
         />
         <span className='text-sm'>
           {t('I_agree_to_the_terms_and_conditions')}
@@ -818,11 +958,7 @@ const ConferenceForm: React.FC = () => {
 
   return (
     <div className='mx-auto  px-4 py-8 sm:px-6 lg:px-8'>
-      {' '}
-      {/* Container chính */}
-      {/* Stepper */}
       <div className='mb-8 sm:mb-10'>
-        {/* Luôn hiển thị div chứa stepper */}
         <div className='flex items-center justify-center sm:justify-start'>
           {/* Step 1 */}
           <div
@@ -831,7 +967,6 @@ const ConferenceForm: React.FC = () => {
             <span
               className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 1 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}
             >
-              {/* SVG Icon 1 */}
               <svg
                 className='h-3.5 w-3.5'
                 aria-hidden='true'
@@ -850,11 +985,9 @@ const ConferenceForm: React.FC = () => {
             </span>
             <div className='ml-2 w-full'>
               <h3 className='font-medium leading-tight'>
-                {t('Add_Conference')}
+                {t('Add_Conference_Info')} {/* More specific */}
               </h3>
-              {/* <p className='text-xs sm:text-sm'>Step add conference here</p> */}
             </div>
-            {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
             <div className='ml-2 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
           </div>
 
@@ -862,12 +995,10 @@ const ConferenceForm: React.FC = () => {
           <div
             className={`flex w-full items-center ${currentStep === 2 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 2 ? 'text-button' : ''}`}
           >
-            {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
             <div className='mr-6 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
             <span
               className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 2 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}
             >
-              {/* SVG Icon 2 */}
               <svg
                 className='h-3.5 w-3.5'
                 aria-hidden='true'
@@ -880,9 +1011,7 @@ const ConferenceForm: React.FC = () => {
             </span>
             <div className='ml-2 w-full'>
               <h3 className='font-medium leading-tight'>{t('Review')}</h3>
-              {/* <p className='text-xs sm:text-sm'>Step review here</p> */}
             </div>
-            {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
             <div className=' hidden h-0.5 w-full bg-gray-300 lg:block'></div>
           </div>
 
@@ -890,12 +1019,10 @@ const ConferenceForm: React.FC = () => {
           <div
             className={`flex w-full items-center ${currentStep === 3 ? 'flex' : 'hidden lg:flex'} ${currentStep >= 3 ? 'text-button' : ''}`}
           >
-            {/* Đường nối ngang - chỉ hiển thị trên lg+ */}
             <div className='mr-6 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
             <span
               className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ring-2 ${currentStep >= 3 ? 'bg-background-secondary ring-button' : 'ring-primary'}`}
             >
-              {/* SVG Icon 3 */}
               <svg
                 className='h-3.5 w-3.5'
                 aria-hidden='true'
@@ -908,13 +1035,10 @@ const ConferenceForm: React.FC = () => {
             </span>
             <div className='ml-2 w-full'>
               <h3 className='font-medium leading-tight'>{t('Confirmation')}</h3>
-              {/* <p className='text-xs sm:text-sm'>Step confirmation here</p> */}
             </div>
           </div>
         </div>
       </div>
-      {/* Form Content */}
-      {/* Grid cho nội dung form: 1 cột mặc định, 2 cột trên sm+ */}
       <form
         onSubmit={handleSubmit}
         className='grid grid-cols-1 gap-y-5 sm:grid-cols-2 sm:gap-x-6'
@@ -923,13 +1047,12 @@ const ConferenceForm: React.FC = () => {
         {currentStep === 2 && renderStepTwo()}
         {currentStep === 3 && renderStepThree()}
 
-        {/* Navigation Buttons: Đặt ở cuối, chiếm toàn bộ chiều rộng trên mobile */}
         <div className='col-span-1 mt-6 flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:justify-start'>
           {currentStep > 1 && (
             <button
               type='button'
               onClick={goToPreviousStep}
-              className='w-full rounded bg-gray-50 px-4 py-2 text-sm text-white hover:bg-gray-700 focus:outline-none sm:w-auto' // w-full trên mobile, w-auto trên sm+
+              className='w-full rounded bg-gray-500 px-4 py-2 text-sm text-white hover:bg-gray-700 focus:outline-none sm:w-auto' // Changed background for better contrast
             >
               {t('Back')}
             </button>
@@ -939,7 +1062,7 @@ const ConferenceForm: React.FC = () => {
             <button
               type='button'
               onClick={goToNextStep}
-              className='hover:bg-button-hover w-full rounded bg-button px-4 py-2 text-sm text-button-text focus:outline-none sm:w-auto' // w-full trên mobile, w-auto trên sm+
+              className='hover:bg-button-hover w-full rounded bg-button px-4 py-2 text-sm text-button-text focus:outline-none sm:w-auto'
             >
               {t('Next')}
             </button>
@@ -948,11 +1071,11 @@ const ConferenceForm: React.FC = () => {
           {currentStep === 3 && (
             <button
               type='submit'
-              // onClick={handleSubmit} // onSubmit của form đã xử lý
-              className='hover:bg-button-hover w-full rounded bg-button px-4 py-2 text-sm text-button-text focus:outline-none sm:w-auto' // w-full trên mobile, w-auto trên sm+
+              className='hover:bg-button-hover w-full rounded bg-button px-4 py-2 text-sm text-button-text focus:outline-none sm:w-auto'
               disabled={!agreedToTerms}
             >
-              {t('Add_Conference')}
+              {t('Add_Conference_Submit')}{' '}
+              {/* More specific for submit button */}
             </button>
           )}
         </div>
