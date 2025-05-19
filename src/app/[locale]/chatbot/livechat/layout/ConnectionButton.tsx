@@ -1,5 +1,6 @@
 // ConnectionButton.tsx
 import cn from 'classnames'
+import { Hourglass, Pause, Play } from 'lucide-react'
 import React from 'react' // No longer need useState here
 
 type ConnectionButtonProps = {
@@ -52,7 +53,7 @@ const ConnectionButton: React.FC<ConnectionButtonProps> = ({
     >
       <span className='material-symbols-outlined filled'>
         {/* Icon depends on connection and connecting states */}
-        {connected ? 'pause' : isConnecting ? 'hourglass_empty' : 'play_arrow'}
+        {connected ? <Pause /> : isConnecting ? <Hourglass /> : <Play />}
       </span>
     </button>
   )
