@@ -164,7 +164,7 @@ const ProfileTab: React.FC = () => {
       </div>
       {/* Profile Info Section */}
       <div className='relative -mt-16 flex flex-col items-center px-4 pb-6 md:-mt-20 md:flex-row md:items-end md:space-x-5'>
-        <div className='relative h-32 w-32 overflow-hidden rounded-full border-4 border-white shadow-lg dark:border-gray-800 md:h-40 md:w-40'>
+        <div className='relative h-32 min-w-32 overflow-hidden rounded-full border-4 border-white shadow-lg dark:border-gray-800 md:h-40 md:min-w-40'>
           {/* Sử dụng Image component cho avatar nếu có thể, hoặc img nếu URL là external hoàn toàn */}
           <Image
             src={displayAvatarUrl}
@@ -498,7 +498,7 @@ const ProfileTab: React.FC = () => {
                           query: { topics: topic }
                         }}
                       >
-                        <span className='cursor-pointer rounded-full bg-button bg-opacity-10 px-3 py-1.5 text-xs font-medium text-button transition-colors hover:bg-opacity-20 dark:bg-opacity-20 dark:hover:bg-opacity-30'>
+                        <span className='cursor-pointer rounded-full bg-button bg-opacity-10 px-3 py-1.5 text-xs font-medium text-button-text transition-colors hover:bg-opacity-20 dark:bg-opacity-20 dark:hover:bg-opacity-30'>
                           {topic}
                         </span>
                       </Link>
