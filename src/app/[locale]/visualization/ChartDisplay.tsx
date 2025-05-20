@@ -117,10 +117,10 @@ const ChartDisplay: React.FC<ChartDisplayProps> = ({
         if (!yAxis?.fieldId)
           return t('Please_select_a_field_for_Value_Slice_Size_Measure')
         break
-      case 'scatter':
-        if (!xAxis?.fieldId) return t('Please_select_a_field_for_the_XAxis')
-        if (!yAxis?.fieldId) return t('Please_select_a_field_for_the_YAxis')
-        break
+      // case 'scatter':
+      //   if (!xAxis?.fieldId) return t('Please_select_a_field_for_the_XAxis')
+      //   if (!yAxis?.fieldId) return t('Please_select_a_field_for_the_YAxis')
+      //   break
       case 'bar':
       case 'line':
       default:
@@ -140,7 +140,7 @@ const ChartDisplay: React.FC<ChartDisplayProps> = ({
       className='relative h-full flex-grow overflow-hidden rounded-lg bg-gray-5 p-4 pt-10 shadow-inner'
     >
       {/* Action Buttons */}
-      <div className='absolute right-3 top-2.5 z-10 flex space-x-1.5'>
+      {/* <div className='absolute right-3 top-2.5 z-10 flex space-x-1.5'>
         <button
           onClick={onDownloadSvg}
           className='rounded p-1.5  transition-colors duration-150 hover:bg-gray-20 hover:text-gray-80 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent'
@@ -150,7 +150,7 @@ const ChartDisplay: React.FC<ChartDisplayProps> = ({
         >
           <ArrowDownTrayIcon className='h-5 w-5' />
         </button>
-      </div>
+      </div> */}
       {/* Loading Overlay */}
       {isLoading && (
         <div className='absolute inset-0 z-20 flex items-center justify-center bg-white-pure backdrop-blur-sm'>

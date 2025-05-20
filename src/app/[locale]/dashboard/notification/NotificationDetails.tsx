@@ -74,7 +74,7 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
       <div className='mb-4 border-b border-gray-300 pb-2 text-sm '>
         {formatDateFull(notification.createdAt, language)}
       </div>
-      <div className='rounded-lg bg-white p-4 shadow'>
+      <div className='rounded-lg bg-white-pure p-4 shadow'>
         {/* Use ReactMarkdown to render the message */}
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
@@ -122,7 +122,7 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
               query: { id: notification.conferenceId }
             }}
           >
-            <Button variant='primary' size={'small'} rounded className='m-2'>
+            <Button variant='primary' size={'small'} className='m-2'>
               {t('Details_about_conference')}
             </Button>
           </Link>

@@ -138,7 +138,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       <div className='grid flex-1 grid-cols-[2fr_7fr_1fr] items-center gap-2'>
         {/* Column 1: Type (1fr) */}
         <div className='overflow-hidden text-ellipsis whitespace-nowrap'>
-          <span className={`${!isSeen ? 'font-bold' : ''}`}>
+          <span className={`${!isSeen ? 'font-bold' : ''} text-gray-700`}>
             {notification.type.replace(/_/g, ' ')}
           </span>
         </div>
@@ -152,7 +152,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
             }}
             className=''
           >
-            <p className={`${!isSeen ? 'font-bold' : ''} text-sm`}>
+            <p
+              className={`${!isSeen ? 'font-bold' : ''} text-sm text-gray-700`}
+            >
               {notification.message}
             </p>
           </Link>
@@ -162,7 +164,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         <div className='text-right'>
           {!isHovered && (
             <span
-              className={`${!isSeen ? 'font-bold' : ''} whitespace-nowrap text-xs`}
+              className={`${!isSeen ? 'font-bold' : ''} whitespace-nowrap text-xs text-gray-700`}
             >
               {formatDate(notification.createdAt)}
             </span>
@@ -171,7 +173,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
             <div className='flex items-center justify-end space-x-2'>
               <button
                 onClick={handleMarkUnseenCallback}
-                className='hover:text-blue-500 focus:outline-none'
+                className='text-gray-700 hover:text-blue-500 focus:outline-none'
                 aria-label='Mark as unseen'
               >
                 <svg
@@ -192,7 +194,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
               </button>
               <button
                 onClick={handleDeleteClick}
-                className='hover:text-red-500 focus:outline-none'
+                className='text-gray-700 hover:text-red-500 focus:outline-none'
                 aria-label='Delete notification'
               >
                 <svg

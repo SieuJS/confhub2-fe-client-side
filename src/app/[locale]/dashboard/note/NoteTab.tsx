@@ -59,19 +59,19 @@ const NoteTab: React.FC<NoteTabProps> = () => {
   const getTypeText = (type: NoteType) => {
     switch (type) {
       case 'conferenceDates':
-        return 'Conference Date'
+        return t('Conference_Dates')
       case 'submissionDate':
-        return 'Submission Date'
+        return t('Submission_Dates')
       case 'notificationDate':
-        return 'Notification Date'
+        return t('Notification_Dates')
       case 'cameraReadyDate':
-        return 'Camera Ready Date'
+        return t('Camera_Ready_Dates')
       case 'registrationDate':
-        return 'Registration Date'
+        return t('Registration_Dates')
       case 'yourNote':
-        return 'Your Note'
+        return t('Your_Notes')
       default:
-        return 'Other Date'
+        return t('Other')
     }
   }
 
@@ -449,12 +449,12 @@ const NoteTab: React.FC<NoteTabProps> = () => {
             <span className='text-sm '>{t('Registration')}</span>
           </li>
           <li className='flex items-center'>
-            <div className='mr-2 h-4 w-4 rounded-full bg-gray-400'></div>
-            <span className='text-sm '>{t('Other')}</span>
-          </li>
-          <li className='flex items-center'>
             <div className='mr-2 h-4 w-4 rounded-full bg-yellow-400'></div>
             <span className='text-sm '>{t('Your_notes')}</span>
+          </li>
+          <li className='flex items-center'>
+            <div className='mr-2 h-4 w-4 rounded-full bg-gray-400'></div>
+            <span className='text-sm '>{t('Other')}</span>
           </li>
         </ul>
       </section>
@@ -486,7 +486,7 @@ const NoteTab: React.FC<NoteTabProps> = () => {
                       ${getEventTypeColor(note.type as NoteType)}
                     `}
                   >
-                    <div className='flex h-full flex-col'>
+                    <div className='flex h-full flex-col text-gray-700'>
                       <div className='h-3/4'>
                         <h3 className='text-lg font-semibold'>
                           {note.conference}

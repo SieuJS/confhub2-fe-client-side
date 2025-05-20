@@ -240,17 +240,17 @@ const AVAILABLE_FIELDS_TEMPLATE: DataField[] = [
 
     // Measures (Quantitative values)
     { id: 'count_records', name: 'Record Count', type: 'measure', aggregation: 'count' }, // Special measure to count items
-    { id: 'count_followers', name: '# Followers', type: 'measure', accessor: accessors.followersCount, aggregation: 'sum' },
-    { id: 'count_feedbacks', name: '# Feedbacks', type: 'measure', accessor: accessors.feedbacksCount, aggregation: 'sum' },
+    // { id: 'count_followers', name: '# Followers', type: 'measure', accessor: accessors.followersCount, aggregation: 'sum' },
+    // { id: 'count_feedbacks', name: '# Feedbacks', type: 'measure', accessor: accessors.feedbacksCount, aggregation: 'sum' },
     { id: 'count_topics', name: '# Topics', type: 'measure', accessor: accessors.topicsCount, aggregation: 'sum' },
-    {
-        id: 'feedback_star_avg',
-        name: 'Avg. Feedback Star',
-        type: 'measure',
-        accessor: accessors.feedbacksArray, // Accessor provides the array of feedbacks
-        aggregation: 'average',
-        // avgTargetProperty: 'star' // Keep this if your aggregation logic uses it (e.g., in aggregateData)
-    },
+    // {
+    //     id: 'feedback_star_avg',
+    //     name: 'Avg. Feedback Star',
+    //     type: 'measure',
+    //     accessor: accessors.feedbacksArray, 
+    //     aggregation: 'average',
+        
+    // },
 ];
 
 /**

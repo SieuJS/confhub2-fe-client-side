@@ -57,7 +57,7 @@ const DataFieldPanel: React.FC<DataFieldPanelProps> = React.memo(
           <h3 className='whitespace-nowrap text-sm font-semibold uppercase tracking-wide '>
             {' '}
             {/* Added whitespace-nowrap */}
-            Fields
+            {'Fields'}
           </h3>
         </div>
 

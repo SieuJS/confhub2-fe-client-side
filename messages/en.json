@@ -950,6 +950,12 @@
   "Add_Conference_Info": "Add Conference Information",
   "Change": "Change",
   "Loading_authentication": "Loading authentication...",
+  "Submission_Dates": "Submission Dates",
+  "Registration_Dates": "Registration Dates",
+  "Notification_Dates": "Notification Dates",
+  "Camera_Ready_Dates": "Camera Ready Dates",
+  "Your_Notes": "Your Notes",
+  "Fields": "Fields",
   "SupportPage": {
     "howCanWeHelpYou": "How can we help you?",
     "searchPlaceholder": "Search FAQ...",

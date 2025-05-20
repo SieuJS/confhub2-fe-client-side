@@ -12,7 +12,7 @@ export interface DataField {
   aggregation?: 'count' | 'average' | 'sum' | 'none'; // 'none' for pre-aggregated or direct values
 }
 
-export type ChartType = 'none'| 'bar' | 'line' | 'pie' | 'scatter'; // Add more as needed
+export type ChartType = 'none'| 'bar' | 'line' | 'pie' ; // Add more as needed
 
 export interface ChartAxisConfig {
   fieldId: string | null; // ID of the field dropped here
@@ -55,5 +55,5 @@ export const AVAILABLE_CHART_TYPES: { id: ChartType, name: string }[] = [
     { id: 'bar', name: 'Bar Chart' },
     { id: 'line', name: 'Line Chart' },
     { id: 'pie', name: 'Pie Chart' },
-    { id: 'scatter', name: 'Scatter Plot' },
+    // { id: 'scatter', name: 'Scatter Plot' },
 ];
