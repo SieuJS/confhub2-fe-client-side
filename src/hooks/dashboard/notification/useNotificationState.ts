@@ -1,7 +1,7 @@
 // src/hooks/useNotificationState.ts
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Notification } from '@/src/models/response/user.response';
-import { updateNotifications } from '../../../app/api/user/updateNotifications';
+import { updateNotifications } from '../../../app/apis/user/updateNotifications';
 
 const useNotificationState = (initialNotifications: Notification[], userId: string) => {
     // console.log('useNotificationState: Initializing with initialNotifications:', initialNotifications, 'userId:', userId); // Log initialization

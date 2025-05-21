@@ -1,7 +1,7 @@
 // hooks/useSequentialConferenceData.ts
 import { useState, useEffect } from 'react';
 import { ConferenceResponse } from '../../models/response/conference.response';
-import { getConferenceFromDB } from '../../app/api/conference/getConferenceDetails';
+import { getConferenceFromDB } from '../../app/apis/conference/getConferenceDetails';
 
 const useSequentialConferenceData = (id: string | null) => {
     const [conferenceDataFromDB, setDbData] = useState<ConferenceResponse | null>(null);

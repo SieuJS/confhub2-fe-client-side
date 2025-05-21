@@ -1,7 +1,7 @@
 // src/hooks/useUpdateUser.ts
 import { useState } from 'react';
 import { UserResponse, Setting } from '@/src/models/response/user.response';  // Import your UserResponse and Setting type
-import { updateUser } from '../../../app/api/user/updateUser'; // Adjust path if needed.
+import { updateUser } from '../../../app/apis/user/updateUser'; // Adjust path if needed.
 import { appConfig } from '@/src/middleware';
 
 interface UpdateUserResult {

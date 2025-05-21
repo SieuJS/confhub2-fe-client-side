@@ -10,7 +10,7 @@ import AddNoteDialog from './AddNoteDialog'
 import { ConferenceResponse } from '../../../../models/response/conference.response'
 import useDialogPosition from '../../../../hooks/dashboard/note/useDialogPosition'
 import { useTranslations } from 'next-intl'
-import { getConferenceFromDB } from '@/src/app/api/conference/getConferenceDetails'
+import { getConferenceFromDB } from '@/src/app/apis/conference/getConferenceDetails'
 
 const DEFAULT_DOM_RECT: DOMRect = {
   x: 0,

@@ -9,7 +9,7 @@ import {
 import { Link } from '@/src/navigation'
 import Button from '../../utils/Button'
 import { useTranslations } from 'next-intl'
-import { getConferenceFromDB } from '@/src/app/api/conference/getConferenceDetails'
+import { getConferenceFromDB } from '@/src/app/apis/conference/getConferenceDetails'
 import { appConfig } from '@/src/middleware'
 
 interface NoteTabProps {}

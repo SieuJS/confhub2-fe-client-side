@@ -1,7 +1,7 @@
 // src/hooks/logAnalysis/useConferenceTableManager.ts
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ConferenceAnalysisDetail } from '@/src/models/logAnalysis/logAnalysis';
-import { saveConferenceToJson } from '../../app/api/logAnalysis/saveConferences';
+import { saveConferenceToJson } from '../../app/apis/logAnalysis/saveConferences';
 
 // --- EXPORT CÁC TYPE CẦN THIẾT ---
 export type SortableColumn = 'title' | 'acronym' | 'status' | 'durationSeconds' | 'errorCount' | 'validationWarningCount';

@@ -8,7 +8,7 @@ import SettingTab from '@/src/app/[locale]/dashboard/setting/SettingTab' // ƒêi·
 import { useTranslations } from 'next-intl'
 import { useLocalStorage } from 'usehooks-ts'
 import { useRouter, usePathname } from 'next/navigation'
-import deleteUser from '../../../../app/api/user/deleteUser' // Adjust path if needed
+import deleteUser from '../../../apis/user/deleteUser' // Adjust path if needed
 import { useUpdateUser } from '../../../../hooks/dashboard/setting/useUpdateSettings' // Adjust path if needed
 import { useGetUser } from '../../../../hooks/dashboard/setting/useGetUser' // Adjust path if needed
 import { Setting } from '@/src/models/response/user.response' // Adjust path if needed

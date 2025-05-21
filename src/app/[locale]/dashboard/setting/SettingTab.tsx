@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { useLocalStorage } from 'usehooks-ts'
 import { useRouter, usePathname } from 'next/navigation'
-import deleteUser from '../../../../app/api/user/deleteUser' // Adjust path if needed
+import deleteUser from '../../../apis/user/deleteUser' // Adjust path if needed
 import {
   getUserSettings,
   useUpdateUser
@@ -11,7 +11,7 @@ import {
 import { useGetUser } from '../../../../hooks/dashboard/setting/useGetUser' // Adjust path if needed
 import { Setting } from '@/src/models/response/user.response' // Adjust path if needed
 import { get } from 'lodash'
-import { updateNotifications } from '@/src/app/api/user/updateNotifications'
+import { updateNotifications } from '@/src/app/apis/user/updateNotifications'
 
 // Helper type for setting keys used in toggles
 type ToggleSettingKey = keyof Pick<

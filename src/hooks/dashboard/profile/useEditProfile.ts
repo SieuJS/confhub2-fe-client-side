@@ -1,7 +1,7 @@
 // src/hooks/dashboard/profile/useEditProfile.ts
 import { useState, useEffect, useCallback } from 'react'; // Thêm useCallback
 import { UserResponse } from '@/src/models/response/user.response';
-import { updateUser } from '@/src/app/api/user/updateUser'; // Đường dẫn này cần kiểm tra lại
+import { updateUser } from '@/src/app/apis/user/updateUser'; // Đường dẫn này cần kiểm tra lại
 import { useAuth } from '@/src/contexts/AuthContext'; // <<<< THAY ĐỔI QUAN TRỌNG
 
 export const useEditProfile = (

@@ -1,6 +1,6 @@
 // hooks/useAddFeedback.ts
 import { useState } from 'react';
-import { addFeedback } from '../../app/api/conference/addFeedBack'; // Path to your API function
+import { addFeedback } from '../../app/apis/conference/addFeedBack'; // Path to your API function
 import { Feedback } from '../../models/send/feedback.send';
 
 const useAddFeedback = () => {
