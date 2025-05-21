@@ -1,0 +1,18 @@
+quay chức năng:
+
+1. đăng nhập, đăng kí, đăng nhập bằng GG, quên mk
+2. tìm kiếm hội nghị, filter
+3. xem chi tiết thông tin
+4. follow, add calendar, add blacklist, mở link chính, chia sẻ, update
+5. feedback hội nghị
+6. xem danh sách follow, calendar, blacklist
+7. xem profile, sửa thông tin, sửa mật khẩu
+8. xem thông báo
+9. thêm hội nghị - admin duyệt hội nghị
+10. chatbot thường 
+11. chatbot voice
+12. visualization
+13. support page
+
+14. xem trang quản lý conferences
+15. trang crawl

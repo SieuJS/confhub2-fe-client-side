@@ -63,27 +63,41 @@ const MyConferencesTab: React.FC = () => {
       return []
     }
     return conferences
-      .map(conf => ({
-        id: conf.id,
-        title: conf.title,
-        acronym: conf.acronym,
-        // Cẩn thận với optional chaining và truy cập mảng
-        location: conf.organizations?.[0]?.locations?.[0]
-          ? `${conf.organizations[0].locations[0].cityStateProvince || t('N/A')}, ${conf.organizations[0].locations[0].country || t('N/A')}`
-          : t('Location_Not_Available'),
-        year: conf.organizations?.[0]?.year?.toString() || t('N/A'), // Đảm bảo là string
-        summerize: conf.organizations?.[0]?.summary || '', // Summary có thể là string rỗng
-        fromDate: conf.organizations?.[0]?.conferenceDates?.find(
-          d => d.type === 'conferenceDates'
-        )?.fromDate,
-        toDate: conf.organizations?.[0]?.conferenceDates?.find(
-          d => d.type === 'conferenceDates'
-        )?.toDate,
-        websiteUrl: conf.organizations?.[0]?.link || '#', // Cung cấp fallback cho link
-        status: conf.status as ConferenceStatus, // Ép kiểu nếu bạn chắc chắn giá trị status từ backend khớp với enum
-        createdAt: conf.createdAt
-        // Thêm các trường cần thiết khác từ conf
-      }))
+      .map(conf => {
+        // Bỏ qua các mục không có status hoặc status không phải là string hợp lệ
+        if (typeof conf.status !== 'string') {
+          // console.warn(`Conference ID ${conf.id} has invalid status:`, conf.status);
+          return null // Trả về null để loại bỏ mục này sau
+        }
+        const normalizedStatus = conf.status.toUpperCase()
+        const statusEnum = Object.values(ConferenceStatus).includes(
+          normalizedStatus as ConferenceStatus
+        )
+          ? (normalizedStatus as ConferenceStatus)
+          : ConferenceStatus.Pending // Hoặc một giá trị mặc định khác, hoặc loại bỏ nó
+        return {
+          id: conf.id,
+          title: conf.title,
+          acronym: conf.acronym,
+          // Cẩn thận với optional chaining và truy cập mảng
+          location: conf.organizations?.[0]?.locations?.[0]
+            ? `${conf.organizations[0].locations[0].cityStateProvince || t('N/A')}, ${conf.organizations[0].locations[0].country || t('N/A')}`
+            : t('Location_Not_Available'),
+          year: conf.organizations?.[0]?.year?.toString() || t('N/A'), // Đảm bảo là string
+          summerize: conf.organizations?.[0]?.summary || '', // Summary có thể là string rỗng
+          fromDate: conf.organizations?.[0]?.conferenceDates?.find(
+            d => d.type === 'conferenceDates'
+          )?.fromDate,
+          toDate: conf.organizations?.[0]?.conferenceDates?.find(
+            d => d.type === 'conferenceDates'
+          )?.toDate,
+          websiteUrl: conf.organizations?.[0]?.link || '#', // Cung cấp fallback cho link
+          status: statusEnum, // Ép kiểu nếu bạn chắc chắn giá trị status từ backend khớp với enum
+          createdAt: conf.createdAt
+          // Thêm các trường cần thiết khác từ conf
+        }
+      })
+      .filter(conf => conf !== null)
       .sort((a, b) => {
         if (!a.createdAt) return 1 // Đẩy các item không có createdAt về cuối
         if (!b.createdAt) return -1
@@ -98,7 +112,7 @@ const MyConferencesTab: React.FC = () => {
     return transformedConferences.filter(conf => conf.status === displayStatus)
   }, [transformedConferences, displayStatus])
 
-  // console.log('[MyConferencesTab] filteredConferences:', filteredConferences)
+  console.log('[MyConferencesTab] filteredConferences:', filteredConferences)
 
   // Chờ AuthProvider khởi tạo xong
   if (isAuthInitializing) {

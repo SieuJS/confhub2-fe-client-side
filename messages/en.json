@@ -1282,5 +1282,31 @@
     "faq_a_features_1_guest_and_loggedin": "The following features can be accessed and used by anyone visiting the website, regardless of whether they are logged in:\n*   **Account Access (Sign Up / Sign In):** Create a new account or log in using personal information or Google.\n*   **Search Conferences:** Search for conferences based on criteria such as Location, Dates, Rank, Source, Organization Type, and other advanced filters.\n*   **View Conference Location Map:** View the conference location on an interactive map on the conference detail page (if location information is available).\n*   **Search Scientific Journals:** Search for relevant scientific journals using the search tool, including advanced filters.\n*   **AI Assistant (Chatbot):** Get instant answers about conferences and journals, receive assistance in navigating the platform, and quickly go to relevant sections. Can interact via text or voice through the Live Chat page or a popup window on the homepage.",
     "faq_q_features_2_loggedin_only": "What features require me to be logged in to use?",
     "faq_a_features_2_loggedin_only": "To access and use the following features, you **are required to be logged in** to your account:\n*   **Follow Conferences:** Save conferences you are interested in ('Follow') to receive notifications about important dates, changes...\n*   **Rate & Comment on Conferences:** Share your experience by rating the conference (1-5 stars) and leaving comments on the conference detail page.\n*   **Personal Calendar & Notes:** View saved events and notes on your personal calendar in the Dashboard. You can also add custom notes for specific dates to organize your work.\n*   **Contribute New Conferences:** Submit information about new conferences for review and inclusion in the website's listing through the publish process.\n*   **Receive Notifications:** Get important notifications directly within the application (via the bell icon and the Notifications page in the Dashboard) and optionally receive email alerts.\n*   **Customize Experience (Settings):** Manage personal settings such as email notification preferences, and choose to automatically add followed conferences to your personal calendar.\n*   **Manage Profile:** Access and edit your personal information such as updating display name, changing password, or address information.\n*   **Visualize Conference Data:** Explore information and trends about conferences by creating and customizing interactive charts on the Visualize page."
-  }
+  },
+  "ChatbotError": {
+    "title": {
+      "authRequired": "Authentication Required",
+      "connectionFailed": "Connection Failed",
+      "serverError": "Chatbot Server Error",
+      "unknown": "Unknown Error"
+    },
+    "message": {
+      "authRequiredNotLoggedIn": "You need to log in to use this feature. Please log in.",
+      "authRelated": "Your login session is invalid, expired, or there was an authentication connection issue. (Error code: {code}). Please log in again.",
+      "connectionFailed": "Cannot connect to the chatbot server. Please check your network connection and try again.",
+      "serverError": "A serious error occurred on the chatbot server. Please try again later.",
+      "unknown": "An error occurred during chatbot operation (Code: {code}). Please try again."
+    },
+    "button": {
+      "login": "Log In",
+      "relogin": "Log In Again",
+      "dismissOrRetry": "Dismiss / Retry"
+    },
+    "ariaLabel": {
+      "dismiss": "Dismiss notification"
+    }
+  },
+  "No_topics_added": "No topics added",
+  "No_description_provided": "No description provided",
+  "Add_Conference_Submit": "Submit Conference"
 }

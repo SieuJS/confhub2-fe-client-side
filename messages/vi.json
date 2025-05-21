@@ -1282,5 +1282,28 @@
     "faq_a_features_1_guest_and_loggedin": "Các tính năng sau có thể được truy cập và sử dụng bởi bất kỳ ai truy cập trang web, bất kể họ có đăng nhập hay không:\n*   **Truy cập Tài khoản (Đăng ký / Đăng nhập):** Tạo tài khoản mới hoặc đăng nhập bằng thông tin cá nhân hoặc Google.\n*   **Tìm Hội nghị:** Tìm kiếm hội nghị dựa trên các tiêu chí như Địa điểm, Ngày, Xếp hạng, Nguồn, Loại hình Tổ chức và các bộ lọc nâng cao khác.\n*   **Xem Bản đồ Địa điểm Hội nghị:** Xem địa điểm hội nghị trên bản đồ tương tác trên trang chi tiết hội nghị (nếu có thông tin địa điểm).\n*   **Tìm kiếm Tạp chí Khoa học:** Tìm kiếm các tạp chí khoa học liên quan bằng công cụ tìm kiếm, bao gồm các bộ lọc nâng cao.\n*   **Trợ lý AI (Chatbot):** Nhận câu trả lời tức thì về hội nghị và tạp chí, nhận hỗ trợ điều hướng nền tảng và nhanh chóng đến các mục liên quan. Có thể tương tác qua văn bản hoặc giọng nói thông qua trang Trò chuyện Trực tiếp hoặc cửa sổ bật lên trên trang chủ.",
     "faq_q_features_2_loggedin_only": "Những tính năng nào yêu cầu tôi phải đăng nhập để sử dụng?",
     "faq_a_features_2_loggedin_only": "Để truy cập và sử dụng các tính năng sau, bạn **bắt buộc phải đăng nhập** vào tài khoản của mình:\n*   **Theo dõi Hội nghị:** Lưu các hội nghị bạn quan tâm ('Theo dõi') để nhận thông báo về các ngày quan trọng, thay đổi...\n*   **Đánh giá & Bình luận về Hội nghị:** Chia sẻ kinh nghiệm của bạn bằng cách xếp hạng hội nghị (1-5 sao) và để lại bình luận trên trang chi tiết hội nghị.\n*   **Lịch & Ghi chú Cá nhân:** Xem các sự kiện và ghi chú đã lưu trên lịch cá nhân của bạn trong Bảng điều khiển. Bạn cũng có thể thêm ghi chú tùy chỉnh cho các ngày cụ thể để tổ chức công việc của mình.\n*   **Đóng góp Hội nghị Mới:** Gửi thông tin về các hội nghị mới để xem xét và đưa vào danh sách của trang web thông qua quy trình xuất bản.\n*   **Nhận Thông báo:** Nhận các thông báo quan trọng trực tiếp trong ứng dụng (qua biểu tượng chuông và trang Thông báo trong Bảng điều khiển) và tùy chọn nhận thông báo qua email.\n*   **Tùy chỉnh Trải nghiệm (Cài đặt):** Quản lý các cài đặt cá nhân như tùy chọn thông báo email, và chọn tự động thêm các hội nghị đã theo dõi vào lịch cá nhân của bạn.\n*   **Quản lý Hồ sơ:** Truy cập và chỉnh sửa thông tin cá nhân của bạn như cập nhật tên hiển thị, thay đổi mật khẩu hoặc thông tin địa chỉ.\n*   **Trực quan hóa Dữ liệu Hội nghị:** Khám phá thông tin và xu hướng về hội nghị bằng cách tạo và tùy chỉnh các biểu đồ tương tác trên trang Trực quan hóa."
+  },
+  "ChatbotError": {
+    "title": {
+      "authRequired": "Yêu Cầu Xác Thực",
+      "connectionFailed": "Lỗi Kết Nối",
+      "serverError": "Lỗi Máy Chủ Chatbot",
+      "unknown": "Lỗi Không Xác Định"
+    },
+    "message": {
+      "authRequiredNotLoggedIn": "Bạn cần đăng nhập để sử dụng tính năng này. Vui lòng đăng nhập.",
+      "authRelated": "Phiên đăng nhập của bạn không hợp lệ, đã hết hạn hoặc có sự cố kết nối xác thực. (Mã lỗi: {code}). Vui lòng đăng nhập lại.",
+      "connectionFailed": "Không thể kết nối đến máy chủ chatbot. Vui lòng kiểm tra lại đường truyền mạng và thử lại.",
+      "serverError": "Đã có lỗi nghiêm trọng xảy ra phía máy chủ chatbot. Vui lòng thử lại sau.",
+      "unknown": "Đã có lỗi xảy ra trong quá trình hoạt động của chatbot (Mã: {code}). Vui lòng thử lại."
+    },
+    "button": {
+      "login": "Đăng nhập",
+      "relogin": "Đăng nhập lại",
+      "dismissOrRetry": "Đã hiểu / Thử lại"
+    },
+    "ariaLabel": {
+      "dismiss": "Đóng thông báo"
+    }
   }
 }

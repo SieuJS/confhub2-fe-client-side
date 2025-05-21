@@ -37,10 +37,10 @@ const ConferenceItem: React.FC<ConferenceItemProps> = ({ conference }) => {
   }
 
   const showDetailButton = !(
-    conference.status === 'Pending' || conference.status === 'Rejected'
+    conference.status === 'PENDING' || conference.status === 'REJECTED'
   )
   const showEditButton =
-    conference.status === 'Pending' || conference.status === 'Approved'
+    conference.status === 'PENDING' || conference.status === 'APPROVED'
 
   // Helper function/component to render buttons to avoid repetition
   const renderButtons = () => (
@@ -58,7 +58,7 @@ const ConferenceItem: React.FC<ConferenceItemProps> = ({ conference }) => {
         </Link>
       )}
 
-      {showEditButton && (
+      {/* {showEditButton && (
         <Link
           href={{
             pathname: '/updateconference',
@@ -69,7 +69,7 @@ const ConferenceItem: React.FC<ConferenceItemProps> = ({ conference }) => {
             {t('Edit')}
           </Button>
         </Link>
-      )}
+      )} */}
     </>
   )
 

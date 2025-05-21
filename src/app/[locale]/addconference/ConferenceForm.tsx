@@ -783,7 +783,7 @@ const ConferenceForm: React.FC = () => {
               <button
                 type='button'
                 onClick={() => handleRemoveTopic(topic)}
-                className='hover: ml-1.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-gray-300 focus:bg-gray-400 focus:text-white focus:outline-none'
+                className='hover: ml-1.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full  hover:bg-gray-300 focus:bg-gray-400 focus:text-white focus:outline-none'
                 aria-label={`Remove ${topic}`}
               >
                 <svg
@@ -905,9 +905,7 @@ const ConferenceForm: React.FC = () => {
         {topics.length > 0 ? (
           <span className='ml-2'>{topics.join(', ')}</span>
         ) : (
-          <span className='ml-2 italic text-gray-500'>
-            {t('No_topics_added')}
-          </span>
+          <span className='ml-2 italic '>{t('No_topics_added')}</span>
         )}
       </div>
       {imageUrl && (
@@ -926,9 +924,7 @@ const ConferenceForm: React.FC = () => {
       <p>
         <strong>{t('Description')}:</strong>{' '}
         {description || (
-          <span className='italic text-gray-500'>
-            {t('No_description_provided')}
-          </span>
+          <span className='italic '>{t('No_description_provided')}</span>
         )}
       </p>
     </div>
