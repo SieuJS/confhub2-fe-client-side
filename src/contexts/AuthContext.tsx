@@ -221,7 +221,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const currentPath = typeof window !== 'undefined' ? (window.location.pathname + window.location.search) : '/';
     if (typeof window !== 'undefined') localStorage.setItem(LOCAL_STORAGE_KEYS.RETURN_URL, currentPath);
     const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
-    const googleAuthUrl = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/google?redirectUrl=${encodeURIComponent(currentOrigin + '/api/auth/google-callback')}`;
+    const googleAuthUrl = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/google?redirectUrl=${encodeURIComponent(currentOrigin + '/apis/auth/google-callback')}`;
     if (typeof window !== 'undefined') window.location.href = googleAuthUrl;
     // Không setIsLoading(false) ở đây vì trang sẽ redirect
   }, []); // Không có dependencies thay đổi
