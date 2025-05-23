@@ -70,6 +70,8 @@ const SettingTab: React.FC = () => {
       setSetting(prev =>
         prev ? { ...prev, [settingKey]: !currentValue } : null
       )
+      console.log('Setting Key:', settingKey)
+      console.log('New Setting:', newSetting)
       try {
         await updateUserSetting(newSetting)
         await fetchUserSettings() // Refetch settings after update
@@ -288,7 +290,7 @@ const SettingTab: React.FC = () => {
             >
               <div
                 className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
-                  setting.notificationWhenUpdateProfile
+                  setting.notificationThroughEmail
                     ? 'translate-x-7'
                     : 'translate-x-1'
                 }`}

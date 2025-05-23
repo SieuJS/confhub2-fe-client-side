@@ -14,5 +14,5 @@ quay chức năng:
 12. visualization
 13. support page
 
-14. xem trang quản lý conferences
+14. xem trang quản lý conferences - xóa sửa thông tin conferences
 15. trang crawl

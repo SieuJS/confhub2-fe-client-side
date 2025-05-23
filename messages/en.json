@@ -1308,5 +1308,12 @@
   },
   "No_topics_added": "No topics added",
   "No_description_provided": "No description provided",
-  "Add_Conference_Submit": "Submit Conference"
+  "Add_Conference_Submit": "Submit Conference",
+  "Reset_code_sent": "Reset code sent",
+  "Failed_to_send_reset_code": "Failed to send reset code",
+  "Error_Invalid_Password_Format": "Invalid password format",
+  "Password_reset_successful": "Password reset successful",
+  "Failed_to_reset_password": "Failed to reset password",
+  "Reset_Password": "Reset Password",
+  "Enter_reset_code_and_new_password": "Enter the reset code and new password"
 }

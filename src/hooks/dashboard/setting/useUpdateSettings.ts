@@ -18,6 +18,7 @@ export const useUpdateUser = (): UpdateUserResult => {
   const updateUserSetting = async (updatedSetting: Partial<Setting>) => {
     setLoading(true);
     setError(null);
+    console.log('Updated Setting:', updatedSetting);
     try {
       const updateResponse = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/user/setting`, {
         method: 'PUT',
