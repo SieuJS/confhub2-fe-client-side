@@ -405,7 +405,10 @@ const NoteTab: React.FC<NoteTabProps> = () => {
   if (!loggedIn) {
     return (
       <div className='container mx-auto p-4'>
-        {t('Please_log_in_to_view_your_calendar')}
+        <p className='mb-4'>{t('Please_log_in_to_view_your_calendar')}</p>
+        <Link href='/auth/login'>
+          <Button variant='primary'>{t('Sign_In')}</Button>
+        </Link>
       </div>
     )
   }

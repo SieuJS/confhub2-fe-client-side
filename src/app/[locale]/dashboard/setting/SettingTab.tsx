@@ -1,5 +1,7 @@
 // SettingTab.tsx
 import React, { useState, useEffect } from 'react'
+import Button from '../../utils/Button'
+import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
 import { useLocalStorage } from 'usehooks-ts'
 import { useRouter, usePathname } from 'next/navigation'
@@ -143,7 +145,12 @@ const SettingTab: React.FC = () => {
   // }
 
   if (!setting) {
-    return <div data-testid='no-data-state'>{t('No_user_data_available')}</div>
+    return <div data-testid='no-data-state'>
+      <p className='mb-4'>{t('No_user_data_available')}</p>
+        <Link href='/auth/login'>
+          <Button variant='primary'>{t('Sign_In')}</Button>
+        </Link>
+      </div>
   }
 
   // --- Main Component Render ---

@@ -1,5 +1,7 @@
 // NotificationsTab.tsx
 import React, { useEffect, useCallback, useState, useMemo } from 'react' // Thêm useMemo nếu chưa có
+import Button from '../../utils/Button'
+import { Link } from '@/src/navigation'
 import NotificationItem from './NotificationItem'
 import NotificationDetails from './NotificationDetails'
 import useNotifications from '../../../../hooks/dashboard/notification/useNotifications' // Đảm bảo đúng đường dẫn
@@ -102,7 +104,10 @@ const NotificationsTab: React.FC = () => {
   if (!loggedIn) {
     return (
       <div className='container mx-auto p-4'>
-        {t('Please_log_in_to_view_notifications')}
+        <p className='mb-4'>{t('Please_log_in_to_view_notifications')}</p>
+        <Link href='/auth/login'>
+          <Button variant='primary'>{t('Sign_In')}</Button>
+        </Link>
       </div>
     )
   }

@@ -1,5 +1,7 @@
 // BlacklistTab.tsx
 import React, { useState, useEffect, useCallback } from 'react'
+import { Link } from '@/src/navigation'
+import Button from '../../utils/Button' // Kiểm tra lại đường dẫn
 import ConferenceItem from '../../conferences/ConferenceItem'
 import { ConferenceInfo } from '../../../../models/response/conference.list.response'
 import { timeAgo, formatDateFull } from '../timeFormat'
@@ -84,7 +86,10 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
     }
     return (
       <div className='container mx-auto p-4'>
-        {t('Please_log_in_to_view_blacklisted_conferences')}{' '}
+        <p className='mb-4'>{t('Please_log_in_to_view_blacklisted_conferences')}</p>
+        <Link href='/auth/login'>
+          <Button variant='primary'>{t('Sign_In')}</Button>
+        </Link>
         {/* Updated message */}
       </div>
     )

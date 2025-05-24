@@ -126,7 +126,7 @@ const MyConferencesTab: React.FC = () => {
   // Nếu chưa đăng nhập sau khi AuthProvider đã khởi tạo
   if (!isLoggedIn) {
     return (
-      <div className='flex h-60 flex-col items-center justify-center'>
+      <div className='container mx-auto p-4'>
         <p className='mb-4'>{t('Please_log_in_to_view_your_conferences')}</p>
         <Link href='/auth/login'>
           <Button variant='primary'>{t('Sign_In')}</Button>

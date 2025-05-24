@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 import { Link } from '@/src/navigation' // Assuming this is your next-intl Link
-import Analysis from './logAnalysis/Analysis'
 import Moderation from './moderation/Moderation'
 import RequestAdminTab from './requestAdminTab/RequestAdminTab'
 import SettingTab from './setting/SettingTab'
