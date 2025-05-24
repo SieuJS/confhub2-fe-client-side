@@ -623,7 +623,6 @@
     "new": "NEU"
   },
   "Publish": "Veröffentlichen",
-  "No_summary_available": "Keine Zusammenfassung verfügbar.",
   "FieldOfResearch_and_Topics": "Forschungsbereich und Themen",
   "fieldOfResearch_not_available": "Forschungsbereich nicht verfügbar.",
   "Field_Of_Research": "Forschungsbereich",
@@ -1282,5 +1281,38 @@
     "faq_a_features_1_guest_and_loggedin": "Die folgenden Funktionen können von jedem Besucher der Webseite genutzt werden, unabhängig davon, ob er angemeldet ist oder nicht:\n* **Kontozugriff (Registrieren / Anmelden):** Ein neues Konto erstellen oder sich mit persönlichen Informationen oder Google anmelden.\n* **Konferenzen suchen:** Nach Konferenzen suchen anhand von Kriterien wie Standort, Daten, Rang, Quelle, Organisationstyp und anderen erweiterten Filtern.\n* **Konferenzstandortkarte anzeigen:** Den Konferenzstandort auf einer interaktiven Karte auf der Konferenzdetailseite anzeigen (sofern Standortinformationen verfügbar sind).\n* **Wissenschaftliche Fachzeitschriften suchen:** Nach relevanten wissenschaftlichen Fachzeitschriften suchen mithilfe des Suchwerkzeugs, einschließlich erweiterter Filter.\n* **KI-Assistent (Chatbot):** Sofortige Antworten zu Konferenzen und Fachzeitschriften erhalten, Unterstützung bei der Navigation auf der Plattform erhalten und schnell zu relevanten Abschnitten gelangen. Kann per Text oder Sprache über die Live-Chat-Seite oder ein Popup-Fenster auf der Startseite interagieren.",
     "faq_q_features_2_loggedin_only": "Welche Funktionen erfordern eine Anmeldung, um sie nutzen zu können?",
     "faq_a_features_2_loggedin_only": "Um die folgenden Funktionen nutzen zu können, **müssen Sie in Ihrem Konto angemeldet sein**:\n* **Konferenzen folgen:** Konferenzen speichern, an denen Sie interessiert sind ('Folgen'), um Benachrichtigungen über wichtige Termine, Änderungen usw. zu erhalten.\n* **Konferenzen bewerten & kommentieren:** Teilen Sie Ihre Erfahrungen, indem Sie die Konferenz bewerten (1-5 Sterne) und Kommentare auf der Konferenzdetailseite hinterlassen.\n* **Persönlicher Kalender & Notizen:** Gespeicherte Ereignisse und Notizen in Ihrem persönlichen Kalender im Dashboard anzeigen. Sie können auch benutzerdefinierte Notizen für bestimmte Daten hinzufügen, um Ihre Arbeit zu organisieren.\n* **Neue Konferenzen beitragen:** Informationen über neue Konferenzen zur Überprüfung und Aufnahme in die Auflistung der Webseite über den Veröffentlichungsprozess einreichen.\n* **Benachrichtigungen erhalten:** Wichtige Benachrichtigungen direkt in der Anwendung erhalten (über das Glockensymbol und die Benachrichtigungsseite im Dashboard) und optional E-Mail-Benachrichtigungen erhalten.\n* **Erfahrung anpassen (Einstellungen):** Persönliche Einstellungen wie E-Mail-Benachrichtigungspräferenzen verwalten und auswählen, ob gefolgte Konferenzen automatisch zu Ihrem persönlichen Kalender hinzugefügt werden sollen.\n* **Profil verwalten:** Auf Ihre persönlichen Informationen zugreifen und diese bearbeiten, z.B. Anzeigenamen aktualisieren, Passwort ändern oder Adressinformationen ändern.\n* **Konferenzdaten visualisieren:** Informationen und Trends zu Konferenzen durch Erstellen und Anpassen interaktiver Diagramme auf der Visualisierungsseite erkunden."
-  }
+  },
+  "ChatbotError": {
+    "title": {
+      "authRequired": "Authentifizierung erforderlich",
+      "connectionFailed": "Verbindung fehlgeschlagen",
+      "serverError": "Chatbot-Serverfehler",
+      "unknown": "Unbekannter Fehler"
+    },
+    "message": {
+      "authRequiredNotLoggedIn": "Sie müssen sich anmelden, um diese Funktion nutzen zu können. Bitte melden Sie sich an.",
+      "authRelated": "Ihre Anmeldesitzung ist ungültig, abgelaufen oder es gab ein Problem mit der Authentifizierungsverbindung. (Fehlercode: {code}). Bitte melden Sie sich erneut an.",
+      "connectionFailed": "Verbindung zum Chatbot-Server nicht möglich. Bitte überprüfen Sie Ihre Netzwerkverbindung und versuchen Sie es erneut.",
+      "serverError": "Auf dem Chatbot-Server ist ein schwerwiegender Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
+      "unknown": "Während des Chatbot-Betriebs ist ein Fehler aufgetreten (Code: {code}). Bitte versuchen Sie es erneut."
+    },
+    "button": {
+      "login": "Anmelden",
+      "relogin": "Erneut anmelden",
+      "dismissOrRetry": "Schließen / Wiederholen"
+    },
+    "ariaLabel": {
+      "dismiss": "Benachrichtigung schließen"
+    }
+  },
+  "No_topics_added": "Keine Themen hinzugefügt",
+  "No_description_provided": "Keine Beschreibung angegeben",
+  "Add_Conference_Submit": "Konferenz einreichen",
+  "Reset_code_sent": "Zurücksetzungscode gesendet",
+  "Failed_to_send_reset_code": "Senden des Zurücksetzungscodes fehlgeschlagen",
+  "Error_Invalid_Password_Format": "Ungültiges Passwortformat",
+  "Password_reset_successful": "Passwort erfolgreich zurückgesetzt",
+  "Failed_to_reset_password": "Zurücksetzen des Passworts fehlgeschlagen",
+  "Reset_Password": "Passwort zurücksetzen",
+  "Enter_reset_code_and_new_password": "Geben Sie den Zurücksetzungscode und das neue Passwort ein"
 }

@@ -1282,5 +1282,38 @@
     "faq_a_features_1_guest_and_loggedin": "Les fonctionnalités suivantes peuvent être consultées et utilisées par toute personne visitant le site Web, qu'elle soit connectée ou non :\n*   **Accès au compte (S'inscrire / Se connecter) :** Créer un nouveau compte ou se connecter en utilisant des informations personnelles ou Google.\n*   **Rechercher des conférences :** Rechercher des conférences en fonction de critères tels que Lieu, Dates, Classement, Source, Type d'organisation, et autres filtres avancés.\n*   **Voir la carte de localisation de la conférence :** Voir le lieu de la conférence sur une carte interactive sur la page de détail de la conférence (si les informations de localisation sont disponibles).\n*   **Rechercher des revues scientifiques :** Rechercher des revues scientifiques pertinentes à l'aide de l'outil de recherche, y compris les filtres avancés.\n*   **Assistant IA (Chatbot) :** Obtenir des réponses instantanées sur les conférences et les revues, recevoir de l'aide pour naviguer sur la plateforme, et accéder rapidement aux sections pertinentes. Peut interagir par texte ou voix via la page de Chat en direct ou une fenêtre contextuelle sur la page d'accueil.",
     "faq_q_features_2_loggedin_only": "Quelles fonctionnalités nécessitent que je sois connecté pour les utiliser ?",
     "faq_a_features_2_loggedin_only": "Pour accéder et utiliser les fonctionnalités suivantes, vous **devez être connecté** à votre compte :\n*   **Suivre les conférences :** Enregistrer les conférences qui vous intéressent ('Suivre') pour recevoir des notifications sur les dates importantes, les changements...\n*   **Évaluer et commenter les conférences :** Partager votre expérience en évaluant la conférence (1-5 étoiles) et en laissant des commentaires sur la page de détail de la conférence.\n*   **Calendrier personnel et Notes :** Visualiser les événements et notes enregistrés sur votre calendrier personnel dans le Tableau de bord. Vous pouvez également ajouter des notes personnalisées pour des dates spécifiques afin d'organiser votre travail.\n*   **Contribuer à de nouvelles conférences :** Soumettre des informations sur de nouvelles conférences pour examen et inclusion dans la liste du site Web via le processus de publication.\n*   **Recevoir des notifications :** Obtenir des notifications importantes directement dans l'application (via l'icône en forme de cloche et la page Notifications du Tableau de bord) et éventuellement recevoir des alertes par e-mail.\n*   **Personnaliser l'expérience (Paramètres) :** Gérer les paramètres personnels tels que les préférences de notification par e-mail, et choisir d'ajouter automatiquement les conférences suivies à votre calendrier personnel.\n*   **Gérer le profil :** Accéder et modifier vos informations personnelles telles que la mise à jour du nom d'affichage, le changement de mot de passe ou les informations d'adresse.\n*   **Visualiser les données des conférences :** Explorer les informations et les tendances sur les conférences en créant et en personnalisant des graphiques interactifs sur la page Visualiser."
-  }
+  },
+  "ChatbotError": {
+    "title": {
+      "authRequired": "Authentification requise",
+      "connectionFailed": "Échec de la connexion",
+      "serverError": "Erreur du serveur de chatbot",
+      "unknown": "Erreur inconnue"
+    },
+    "message": {
+      "authRequiredNotLoggedIn": "Vous devez vous connecter pour utiliser cette fonctionnalité. Veuillez vous connecter.",
+      "authRelated": "Votre session de connexion est invalide, expirée ou il y a eu un problème de connexion d'authentification. (Code d'erreur : {code}). Veuillez vous reconnecter.",
+      "connectionFailed": "Impossible de se connecter au serveur de chatbot. Veuillez vérifier votre connexion réseau et réessayer.",
+      "serverError": "Une erreur grave est survenue sur le serveur de chatbot. Veuillez réessayer ultérieurement.",
+      "unknown": "Une erreur est survenue pendant le fonctionnement du chatbot (Code : {code}). Veuillez réessayer."
+    },
+    "button": {
+      "login": "Se connecter",
+      "relogin": "Se reconnecter",
+      "dismissOrRetry": "Ignorer / Réessayer"
+    },
+    "ariaLabel": {
+      "dismiss": "Ignorer la notification"
+    }
+  },
+  "No_topics_added": "Aucun sujet ajouté",
+  "No_description_provided": "Aucune description fournie",
+  "Add_Conference_Submit": "Soumettre la conférence",
+  "Reset_code_sent": "Code de réinitialisation envoyé",
+  "Failed_to_send_reset_code": "Échec de l'envoi du code de réinitialisation",
+  "Error_Invalid_Password_Format": "Format de mot de passe invalide",
+  "Password_reset_successful": "Réinitialisation du mot de passe réussie",
+  "Failed_to_reset_password": "Échec de la réinitialisation du mot de passe",
+  "Reset_Password": "Réinitialiser le mot de passe",
+  "Enter_reset_code_and_new_password": "Entrez le code de réinitialisation et le nouveau mot de passe"
 }

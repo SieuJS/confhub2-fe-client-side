@@ -1282,5 +1282,38 @@
     "faq_a_features_1_guest_and_loggedin": "Las siguientes características pueden ser accedidas y usadas por cualquier persona que visite el sitio web, independientemente de si han iniciado sesión:\n*   **Acceso a la Cuenta (Registrarse / Iniciar Sesión):** Crear una nueva cuenta o iniciar sesión usando información personal o Google.\n*   **Buscar Conferencias:** Buscar conferencias basándose en criterios como Ubicación, Fechas, Clasificación, Fuente, Tipo de Organización y otros filtros avanzados.\n*   **Ver Mapa de Ubicación de la Conferencia:** Ver la ubicación de la conferencia en un mapa interactivo en la página de detalles de la conferencia (si la información de ubicación está disponible).\n*   **Buscar Revistas Científicas:** Buscar revistas científicas relevantes usando la herramienta de búsqueda, incluyendo filtros avanzados.\n*   **Asistente de IA (Chatbot):** Obtener respuestas instantáneas sobre conferencias y revistas, recibir asistencia para navegar la plataforma e ir rápidamente a secciones relevantes. Puede interactuar vía texto o voz a través de la página de Chat en Vivo o una ventana emergente en la página de inicio.",
     "faq_q_features_2_loggedin_only": "¿Qué características requieren que haya iniciado sesión para usarlas?",
     "faq_a_features_2_loggedin_only": "Para acceder y usar las siguientes características, **se requiere que hayas iniciado sesión** en tu cuenta:\n*   **Seguir Conferencias:** Guardar conferencias que te interesan ('Seguir') para recibir notificaciones sobre fechas importantes, cambios...\n*   **Valorar y Comentar Conferencias:** Compartir tu experiencia valorando la conferencia (1-5 estrellas) y dejando comentarios en la página de detalles de la conferencia.\n*   **Calendario Personal y Notas:** Ver eventos guardados y notas en tu calendario personal en el Panel de Control. También puedes añadir notas personalizadas para fechas específicas para organizar tu trabajo.\n*   **Contribuir Nuevas Conferencias:** Enviar información sobre nuevas conferencias para revisión e inclusión en el listado del sitio web a través del proceso de publicación.\n*   **Recibir Notificaciones:** Obtener notificaciones importantes directamente dentro de la aplicación (vía el ícono de la campana y la página de Notificaciones en el Panel de Control) y opcionalmente recibir alertas por correo electrónico.\n*   **Personalizar Experiencia (Configuración):** Gestionar configuraciones personales como preferencias de notificación por correo electrónico, y elegir añadir automáticamente conferencias seguidas a tu calendario personal.\n*   **Gestionar Perfil:** Acceder y editar tu información personal como actualizar nombre de visualización, cambiar contraseña o información de dirección.\n*   **Visualizar Datos de Conferencias:** Explorar información y tendencias sobre conferencias creando y personalizando gráficos interactivos en la página de Visualización."
-  }
+  },
+  "ChatbotError": {
+    "title": {
+      "authRequired": "Autenticación requerida",
+      "connectionFailed": "Conexión fallida",
+      "serverError": "Error del servidor del chatbot",
+      "unknown": "Error desconocido"
+    },
+    "message": {
+      "authRequiredNotLoggedIn": "Necesitas iniciar sesión para usar esta función. Por favor, inicia sesión.",
+      "authRelated": "Tu sesión de inicio de sesión no es válida, ha caducado o hubo un problema de conexión de autenticación. (Código de error: {code}). Por favor, inicia sesión de nuevo.",
+      "connectionFailed": "No se puede conectar al servidor del chatbot. Por favor, verifica tu conexión de red e inténtalo de nuevo.",
+      "serverError": "Ocurrió un error grave en el servidor del chatbot. Por favor, inténtalo de nuevo más tarde.",
+      "unknown": "Ocurrió un error durante la operación del chatbot (Código: {code}). Por favor, inténtalo de nuevo."
+    },
+    "button": {
+      "login": "Iniciar sesión",
+      "relogin": "Iniciar sesión de nuevo",
+      "dismissOrRetry": "Descartar / Reintentar"
+    },
+    "ariaLabel": {
+      "dismiss": "Descartar notificación"
+    }
+  },
+  "No_topics_added": "No se han añadido temas",
+  "No_description_provided": "No se ha proporcionado descripción",
+  "Add_Conference_Submit": "Enviar conferencia",
+  "Reset_code_sent": "Código de restablecimiento enviado",
+  "Failed_to_send_reset_code": "Error al enviar código de restablecimiento",
+  "Error_Invalid_Password_Format": "Formato de contraseña inválido",
+  "Password_reset_successful": "Restablecimiento de contraseña exitoso",
+  "Failed_to_reset_password": "Error al restablecer contraseña",
+  "Reset_Password": "Restablecer contraseña",
+  "Enter_reset_code_and_new_password": "Introduce el código de restablecimiento y la nueva contraseña"
 }

@@ -653,7 +653,7 @@ const ConferenceForm: React.FC = () => {
                 value={date.name}
                 onChange={e => handleDateChange(index, 'name', e.target.value)}
                 className={`mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm
-                    ${index === 0 ? 'pointer-events-none bg-gray-100 opacity-70' : ''}`}
+                    ${index === 0 ? 'pointer-events-none bg-gray-10 opacity-70' : ''}`}
                 required={index > 0} // Only required for user-added dates
                 disabled={index === 0}
               />
@@ -667,9 +667,7 @@ const ConferenceForm: React.FC = () => {
                 value={date.type}
                 onChange={e => handleDateChange(index, 'type', e.target.value)}
                 className={`mt-1 block w-full rounded-md border border-button  px-3 py-2 shadow-sm focus:border-button focus:outline-none focus:ring-button sm:text-sm ${
-                  index === 0
-                    ? 'pointer-events-none bg-gray-100 opacity-70'
-                    : ''
+                  index === 0 ? 'pointer-events-none bg-gray-10 opacity-70' : ''
                 }`}
                 required={index > 0} // Only required for user-added dates
                 disabled={index === 0}
@@ -777,13 +775,13 @@ const ConferenceForm: React.FC = () => {
           {topics.map((topic, index) => (
             <span
               key={index}
-              className='inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold '
+              className='inline-flex items-center rounded-full bg-gray-20 px-3 py-1 text-sm font-semibold '
             >
               {topic}
               <button
                 type='button'
                 onClick={() => handleRemoveTopic(topic)}
-                className='hover: ml-1.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full  hover:bg-gray-300 focus:bg-gray-400 focus:text-white focus:outline-none'
+                className='hover: ml-1.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full  hover:bg-gray-30 focus:bg-gray-40 focus:text-white focus:outline-none'
                 aria-label={`Remove ${topic}`}
               >
                 <svg

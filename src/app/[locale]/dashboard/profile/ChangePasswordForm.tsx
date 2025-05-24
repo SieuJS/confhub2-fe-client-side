@@ -34,14 +34,11 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
-      <div className='w-full max-w-md rounded-lg bg-white p-6 shadow-lg'>
+      <div className='w-full max-w-md rounded-lg bg-white-pure p-6 shadow-lg'>
         <h2 className='mb-4 text-lg font-semibold'>{t('Change_Password')}</h2>
 
         {/* Old password */}
-        <label
-          htmlFor='currentPassword'
-          className='block text-sm font-medium'
-        >
+        <label htmlFor='currentPassword' className='block text-sm font-medium'>
           {t('Current_Password')}
         </label>
         <div className='relative'>
@@ -54,30 +51,27 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
             className='mt-1 block w-full rounded-md border p-2 focus:border-blue-500 focus:ring-blue-500'
             aria-label={t('Current_Password')} // Added aria-label for better testing if needed
           />
-          {oldPassword && 
+          {oldPassword && (
             <button
               type='button'
               onClick={() => setShowOldPassword(!showOldPassword)}
               className='absolute right-2 top-1/2 -translate-y-1/2 text-xl'
             >
-              <span className="relative inline-block w-6 text-xl leading-none">
+              <span className='relative inline-block w-6 text-xl leading-none'>
                 👁️
                 {showOldPassword && (
-                  <span className="absolute left-0 top-1/2 h-[2px] w-[28px] -translate-y-1/2 -rotate-45 bg-black"></span>
+                  <span className='absolute left-0 top-1/2 h-[2px] w-[28px] -translate-y-1/2 -rotate-45 bg-black'></span>
                 )}
               </span>
             </button>
-          }
+          )}
         </div>
 
         {/* New password */}
         <div className='mt-4'>
-        <label
-            htmlFor='newPassword'
-            className='block text-sm font-medium'
-          >
+          <label htmlFor='newPassword' className='block text-sm font-medium'>
             {t('New_Password')}
-        </label>
+          </label>
           <div className='relative'>
             <input
               type={showNewPassword ? 'text' : 'password'}
@@ -88,20 +82,20 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
               className='mt-1 block w-full rounded-md border p-2 focus:border-blue-500 focus:ring-blue-500'
               aria-label={t('New_Password')} // Added aria-label for better testing if needed
             />
-            {newPassword && 
+            {newPassword && (
               <button
-              type='button'
-              onClick={() => setShowNewPassword(!showNewPassword)}
-              className='absolute right-2 top-1/2 -translate-y-1/2 text-xl'
-            >
-              <span className="relative inline-block w-6 text-xl leading-none">
-                👁️
-                {showNewPassword && (
-                  <span className="absolute left-0 top-1/2 h-[2px] w-[28px] -translate-y-1/2 -rotate-45 bg-black"></span>
-                )}
-              </span>
-            </button>
-            }
+                type='button'
+                onClick={() => setShowNewPassword(!showNewPassword)}
+                className='absolute right-2 top-1/2 -translate-y-1/2 text-xl'
+              >
+                <span className='relative inline-block w-6 text-xl leading-none'>
+                  👁️
+                  {showNewPassword && (
+                    <span className='absolute left-0 top-1/2 h-[2px] w-[28px] -translate-y-1/2 -rotate-45 bg-black'></span>
+                  )}
+                </span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -123,20 +117,20 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
               className='mt-1 block w-full rounded-md border p-2 focus:border-blue-500 focus:ring-blue-500'
               aria-label={t('Confirm_New_Password')} // Added aria-label for better testing if needed
             />
-            {confirmNewPassword && 
+            {confirmNewPassword && (
               <button
-              type='button'
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className='absolute right-2 top-1/2 -translate-y-1/2 text-xl'
-            >
-              <span className="relative inline-block w-6 text-xl leading-none">
-                👁️
-                {showConfirmPassword && (
-                  <span className="absolute left-0 top-1/2 h-[2px] w-[28px] -translate-y-1/2 -rotate-45 bg-black"></span>
-                )}
-              </span>
-            </button>
-            }
+                type='button'
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className='absolute right-2 top-1/2 -translate-y-1/2 text-xl'
+              >
+                <span className='relative inline-block w-6 text-xl leading-none'>
+                  👁️
+                  {showConfirmPassword && (
+                    <span className='absolute left-0 top-1/2 h-[2px] w-[28px] -translate-y-1/2 -rotate-45 bg-black'></span>
+                  )}
+                </span>
+              </button>
+            )}
           </div>
         </div>
         {error && <p className='mt-2 text-sm text-red-500'>{error}</p>}

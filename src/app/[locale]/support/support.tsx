@@ -859,7 +859,7 @@ const Support = () => {
               <ul className='space-y-1'>
                 <li
                   key='all'
-                  className={`cursor-pointer rounded px-2 py-1 font-medium transition-colors duration-150 hover:bg-gray-100  ${
+                  className={`cursor-pointer rounded px-2 py-1 font-medium transition-colors duration-150 hover:bg-gray-10  ${
                     selectedCategory === null
                       ? 'dark:text-button-dark font-semibold text-button'
                       : ' '
@@ -871,7 +871,7 @@ const Support = () => {
                 {faqCategories.map(category => (
                   <li
                     key={category.value}
-                    className={`cursor-pointer rounded px-2 py-1 font-medium transition-colors duration-150 hover:bg-gray-100  ${
+                    className={`cursor-pointer rounded px-2 py-1 font-medium transition-colors duration-150 hover:bg-gray-10  ${
                       selectedCategory === category.value
                         ? 'dark:text-button-dark font-semibold text-button'
                         : ' '

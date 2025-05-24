@@ -1305,5 +1305,15 @@
     "ariaLabel": {
       "dismiss": "Đóng thông báo"
     }
-  }
+  },
+  "No topics added": "Chưa có chủ đề nào được thêm",
+  "No description provided": "Không có mô tả",
+  "Add Conference Submit": "Gửi Hội nghị",
+  "Reset code sent": "Mã đặt lại đã được gửi",
+  "Failed to send reset code": "Không gửi được mã đặt lại",
+  "Error Invalid Password Format": "Định dạng mật khẩu không hợp lệ",
+  "Password reset successful": "Đặt lại mật khẩu thành công",
+  "Failed to reset password": "Không đặt lại được mật khẩu",
+  "Reset Password": "Đặt lại mật khẩu",
+  "Enter the reset code and new password": "Nhập mã đặt lại và mật khẩu mới"
 }
