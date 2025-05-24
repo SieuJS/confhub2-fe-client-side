@@ -1,14 +1,30 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { useAuth } from '@/src/contexts/AuthContext'; // <<<< THAY ĐỔI QUAN TRỌNG
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const token = searchParams.get('token');
-    const redirectUrl = searchParams.get('redirectUrl') || '/en/dashboard';
+    const error = searchParams.get('error');
 
-    if (!token) {
-      return NextResponse.redirect('/login?error=No token provided');
+    if (error || !token) {
+      return new NextResponse(
+        `
+        <html>
+          <body>
+            <script>
+              window.location.href = 'localStorage.getItem('returnUrl')';
+            </script>
+          </body>
+        </html>
+        `,
+        {
+          headers: {
+            'Content-Type': 'text/html',
+          },
+        }
+    );
     }
 
     cookies().set('auth_token', token, {
@@ -26,9 +42,8 @@ export async function GET(request: Request) {
         <body>
           <script>
             localStorage.setItem('token', '${token}');
-            localStorage.setItem('locale', 'en');
             localStorage.setItem('loginStatus', 'true');
-            window.location.href = '${redirectUrl}';
+            window.location.href = localStorage.getItem('returnUrl');
           </script>
         </body>
       </html>
@@ -41,6 +56,21 @@ export async function GET(request: Request) {
     );
   } catch (error) {
     console.error('Error in backend callback:', error);
-    return NextResponse.redirect('/login?error=Authentication failed');
+    return new NextResponse(
+        `
+        <html>
+          <body>
+            <script>
+              window.location.href = '/';
+            </script>
+          </body>
+        </html>
+        `,
+        {
+          headers: {
+            'Content-Type': 'text/html',
+          },
+        }
+    );
   }
 }

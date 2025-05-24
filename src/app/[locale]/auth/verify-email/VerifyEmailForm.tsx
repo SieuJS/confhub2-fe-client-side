@@ -307,10 +307,10 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = () => {
           {' '}
           {/* Thêm khoảng cách trên nếu cần */}
           <Link
-            href='/conferences' // Quan trọng: Dùng đường dẫn không có locale, Link của next-intl sẽ tự xử lý
+            href='/auth/login' // Quan trọng: Dùng đường dẫn không có locale, Link của next-intl sẽ tự xử lý
             className='hover:bg-button/90 flex w-full justify-center rounded-md border border-transparent bg-button px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
           >
-            {t('verifyEmail.returnToHomeButton')}
+            {t('verifyEmail.backToLogin')}
           </Link>
         </div>
       )}
