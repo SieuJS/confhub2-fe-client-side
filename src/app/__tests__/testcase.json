@@ -5945,5 +5945,1774 @@
     ],
     "tester": "",
     "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Login_002",
+    "testCaseName": "Đăng nhập thất bại với thông tin không hợp lệ",
+    "description": "Kiểm tra hệ thống xử lý khi người dùng nhập sai Email hoặc Mật khẩu hoặc cả hai.",
+    "preconditions": [
+      "Người dùng đang ở trang Đăng nhập (URL: /auth/login)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập Email không hợp lệ (ví dụ: sai định dạng, không tồn tại) hoặc Email hợp lệ nhưng Mật khẩu sai vào trường 'Email'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhập Mật khẩu không hợp lệ hoặc Mật khẩu sai tương ứng với Email đã nhập vào trường 'Password'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Sign In'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo lỗi xác thực. Người dùng vẫn ở trang Đăng nhập.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_DN_002_DangNhapSai"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Navigation_001",
+    "testCaseName": "Truy cập trang Moderation từ Sidebar",
+    "description": "Kiểm tra người dùng có thể điều hướng đến trang quản lý Moderation thông qua menu Sidebar.",
+    "preconditions": [
+      "Người dùng đã đăng nhập thành công và đang ở bất kỳ trang nào có hiển thị Sidebar menu.",
+      "Sidebar menu 'Moderation' hiển thị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào liên kết 'Moderation' trong Sidebar menu."
+      }
+    ],
+    "expectedResult": "Hệ thống chuyển hướng người dùng đến trang 'Conference Listing Moderation'. Tiêu đề trang hiển thị 'Conference Listing Moderation'. URL của trang kết thúc bằng '/moderation'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_DN_001_DangNhap",
+      "YC_MOD_001_XemDS"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Moderation_View_001",
+    "testCaseName": "Hiển thị danh sách hội nghị chờ duyệt (mặc định)",
+    "description": "Kiểm tra trang Moderation hiển thị danh sách các hội nghị cần được duyệt theo trạng thái mặc định khi truy cập.",
+    "preconditions": [
+      "Người dùng đã đăng nhập thành công và đang ở trang Moderation (URL: /moderation).",
+      "Có ít nhất một hội nghị trong hệ thống."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Truy cập trang Moderation."
+      }
+    ],
+    "expectedResult": "Trang hiển thị danh sách các hội nghị. Mặc định, bộ lọc trạng thái (Filter by Status) hiển thị 'All' hoặc 'Pending'. Các hội nghị với thông tin chi tiết (Title, URL, Status, Dates, Location, User Message) được liệt kê.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_001_XemDS"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Filter_Status_001",
+    "testCaseName": "Lọc danh sách theo trạng thái 'Pending'",
+    "description": "Kiểm tra chức năng lọc danh sách hội nghị theo trạng thái 'Pending'.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có chứa hội nghị ở trạng thái 'Pending'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào dropdown 'Filter by Status'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn tùy chọn 'Pending'."
+      }
+    ],
+    "expectedResult": "Danh sách hội nghị được cập nhật chỉ hiển thị các hội nghị có trạng thái là 'Pending'. Dropdown 'Filter by Status' hiển thị 'Pending'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_002_LocDS"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Filter_Status_002",
+    "testCaseName": "Lọc danh sách theo trạng thái 'Approved'",
+    "description": "Kiểm tra chức năng lọc danh sách hội nghị theo trạng thái 'Approved'.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có chứa hội nghị ở trạng thái 'Approved'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào dropdown 'Filter by Status'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn tùy chọn 'Approved'."
+      }
+    ],
+    "expectedResult": "Danh sách hội nghị được cập nhật chỉ hiển thị các hội nghị có trạng thái là 'Approved'. Dropdown 'Filter by Status' hiển thị 'Approved'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_002_LocDS"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Filter_Status_003",
+    "testCaseName": "Lọc danh sách theo trạng thái 'Rejected'",
+    "description": "Kiểm tra chức năng lọc danh sách hội nghị theo trạng thái 'Rejected'.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có chứa hội nghị ở trạng thái 'Rejected'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào dropdown 'Filter by Status'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn tùy chọn 'Rejected'."
+      }
+    ],
+    "expectedResult": "Danh sách hội nghị được cập nhật chỉ hiển thị các hội nghị có trạng thái là 'Rejected'. Dropdown 'Filter by Status' hiển thị 'Rejected'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_002_LocDS"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Filter_Status_004",
+    "testCaseName": "Bỏ lọc trạng thái (chọn 'All')",
+    "description": "Kiểm tra chức năng bỏ lọc trạng thái bằng cách chọn 'All'.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Đang có bộ lọc trạng thái khác 'All' được áp dụng."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào dropdown 'Filter by Status'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn tùy chọn 'All'."
+      }
+    ],
+    "expectedResult": "Danh sách hội nghị được cập nhật hiển thị tất cả các hội nghị bất kể trạng thái. Dropdown 'Filter by Status' hiển thị 'All'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_002_LocDS"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Search_001",
+    "testCaseName": "Tìm kiếm hội nghị theo tiêu đề (tìm thấy)",
+    "description": "Kiểm tra chức năng tìm kiếm hội nghị theo tiêu đề khi có kết quả khớp.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có chứa ít nhất một hội nghị có tiêu đề trùng khớp với từ khóa tìm kiếm dự kiến."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập một phần hoặc toàn bộ tiêu đề của một hội nghị đang hiển thị vào trường 'Search by Title'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấn Enter hoặc nhấp vào biểu tượng tìm kiếm (nếu có)."
+      }
+    ],
+    "expectedResult": "Danh sách hội nghị được cập nhật chỉ hiển thị các hội nghị có tiêu đề chứa từ khóa đã nhập. Các hội nghị không khớp sẽ bị ẩn đi.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_003_TimKiem"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Search_002",
+    "testCaseName": "Tìm kiếm hội nghị theo tiêu đề (không tìm thấy)",
+    "description": "Kiểm tra chức năng tìm kiếm hội nghị theo tiêu đề khi không có kết quả khớp.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập một chuỗi ký tự không có trong bất kỳ tiêu đề hội nghị nào vào trường 'Search by Title'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấn Enter hoặc nhấp vào biểu tượng tìm kiếm (nếu có)."
+      }
+    ],
+    "expectedResult": "Danh sách hội nghị trống rỗng hoặc hiển thị thông báo 'No results found'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_003_TimKiem"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Sort_001",
+    "testCaseName": "Sắp xếp danh sách theo Tiêu đề (A-Z)",
+    "description": "Kiểm tra chức năng sắp xếp danh sách hội nghị theo thứ tự bảng chữ cái của tiêu đề.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có chứa nhiều hội nghị với các tiêu đề khác nhau."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào dropdown 'Sort by'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn tùy chọn 'Title (A-Z)'."
+      }
+    ],
+    "expectedResult": "Danh sách hội nghị được sắp xếp lại theo thứ tự bảng chữ cái tăng dần (A-Z) dựa trên tiêu đề. Dropdown 'Sort by' hiển thị 'Title (A-Z)'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_004_SapXep"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Sort_002",
+    "testCaseName": "Sắp xếp danh sách theo Ngày thêm (Mới nhất)",
+    "description": "Kiểm tra chức năng sắp xếp danh sách hội nghị theo ngày thêm gần nhất.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có chứa nhiều hội nghị được thêm vào các ngày khác nhau."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào dropdown 'Sort by'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn tùy chọn 'Added Date (Newest First)'."
+      }
+    ],
+    "expectedResult": "Danh sách hội nghị được sắp xếp lại theo thứ tự giảm dần dựa trên 'Requested Date' (hoặc 'Added Date'), hội nghị mới nhất hiển thị đầu tiên. Dropdown 'Sort by' hiển thị 'Added Date (Newest First)'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_004_SapXep"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Sort_003",
+    "testCaseName": "Sắp xếp danh sách theo Ngày cập nhật (Mới nhất)",
+    "description": "Kiểm tra chức năng sắp xếp danh sách hội nghị theo ngày cập nhật gần nhất.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có chứa nhiều hội nghị được cập nhật vào các thời điểm khác nhau."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào dropdown 'Sort by'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn tùy chọn 'Updated Date (Newest First)'."
+      }
+    ],
+    "expectedResult": "Danh sách hội nghị được sắp xếp lại theo thứ tự giảm dần dựa trên 'Last Updated' date, hội nghị được cập nhật gần nhất hiển thị đầu tiên. Dropdown 'Sort by' hiển thị 'Updated Date (Newest First)'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_004_SapXep"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Action_Approve_001",
+    "testCaseName": "Duyệt hội nghị thành công (không nhập comment)",
+    "description": "Kiểm tra người dùng có thể duyệt một hội nghị ở trạng thái Pending sang Approved mà không cần nhập comment.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có ít nhất một hội nghị ở trạng thái 'Pending'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm một hội nghị có trạng thái 'Pending'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Approve' cho hội nghị đó."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Trong modal 'Approve Conference', để trống trường comment."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Approve' trong modal."
+      }
+    ],
+    "expectedResult": "Modal 'Approve Conference' đóng lại. Trạng thái của hội nghị đó trong danh sách được cập nhật thành 'Approved'. Thời gian 'Last Updated' được cập nhật.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_005_Duyet"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Action_Approve_002",
+    "testCaseName": "Duyệt hội nghị thành công (nhập comment)",
+    "description": "Kiểm tra người dùng có thể duyệt một hội nghị ở trạng thái Pending sang Approved và nhập comment.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có ít nhất một hội nghị ở trạng thái 'Pending'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm một hội nghị có trạng thái 'Pending'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Approve' cho hội nghị đó."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Trong modal 'Approve Conference', nhập comment vào trường nhập liệu."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Approve' trong modal."
+      }
+    ],
+    "expectedResult": "Modal 'Approve Conference' đóng lại. Trạng thái của hội nghị đó trong danh sách được cập nhật thành 'Approved'. Comment được lưu lại (nếu hệ thống có chức năng lưu comment). Thời gian 'Last Updated' được cập nhật.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_005_Duyet"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Action_Approve_003",
+    "testCaseName": "Hủy thao tác duyệt hội nghị",
+    "description": "Kiểm tra người dùng có thể hủy bỏ thao tác duyệt hội nghị từ modal.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có ít nhất một hội nghị ở trạng thái 'Pending'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm một hội nghị có trạng thái 'Pending'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Approve' cho hội nghị đó."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Trong modal 'Approve Conference', nhấp vào nút 'Cancel'."
+      }
+    ],
+    "expectedResult": "Modal 'Approve Conference' đóng lại. Trạng thái của hội nghị đó trong danh sách vẫn là 'Pending' (không thay đổi).",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_MOD_005_Duyet"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Action_SetPending_001",
+    "testCaseName": "Chuyển trạng thái hội nghị sang 'Pending' thành công (không nhập comment)",
+    "description": "Kiểm tra người dùng có thể chuyển trạng thái một hội nghị từ 'Approved' hoặc 'Rejected' trở lại 'Pending' mà không cần nhập comment.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có ít nhất một hội nghị ở trạng thái 'Approved' hoặc 'Rejected'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm một hội nghị có trạng thái 'Approved' hoặc 'Rejected'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Set to Pending' cho hội nghị đó."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Trong modal 'Set Conference to Pending', để trống trường comment."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Set Pending' trong modal."
+      }
+    ],
+    "expectedResult": "Modal 'Set Conference to Pending' đóng lại. Trạng thái của hội nghị đó trong danh sách được cập nhật thành 'Pending'. Thời gian 'Last Updated' được cập nhật.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_006_SetPending"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Action_SetPending_002",
+    "testCaseName": "Chuyển trạng thái hội nghị sang 'Pending' thành công (nhập comment)",
+    "description": "Kiểm tra người dùng có thể chuyển trạng thái một hội nghị từ 'Approved' hoặc 'Rejected' trở lại 'Pending' và nhập comment.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có ít nhất một hội nghị ở trạng thái 'Approved' hoặc 'Rejected'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm một hội nghị có trạng thái 'Approved' hoặc 'Rejected'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Set to Pending' cho hội nghị đó."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Trong modal 'Set Conference to Pending', nhập comment vào trường nhập liệu."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Set Pending' trong modal."
+      }
+    ],
+    "expectedResult": "Modal 'Set Conference to Pending' đóng lại. Trạng thái của hội nghị đó trong danh sách được cập nhật thành 'Pending'. Comment được lưu lại (nếu hệ thống có chức năng lưu comment). Thời gian 'Last Updated' được cập nhật.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_006_SetPending"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Action_SetPending_003",
+    "testCaseName": "Hủy thao tác chuyển trạng thái sang 'Pending'",
+    "description": "Kiểm tra người dùng có thể hủy bỏ thao tác chuyển trạng thái hội nghị sang 'Pending' từ modal.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có ít nhất một hội nghị ở trạng thái 'Approved' hoặc 'Rejected'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm một hội nghị có trạng thái 'Approved' hoặc 'Rejected'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Set to Pending' cho hội nghị đó."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Trong modal 'Set Conference to Pending', nhấp vào nút 'Cancel'."
+      }
+    ],
+    "expectedResult": "Modal 'Set Conference to Pending' đóng lại. Trạng thái của hội nghị đó trong danh sách vẫn giữ nguyên (không thay đổi).",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_MOD_006_SetPending"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Action_Reject_001",
+    "testCaseName": "Từ chối hội nghị thành công (nhập lý do)",
+    "description": "Kiểm tra người dùng có thể từ chối một hội nghị và cung cấp lý do.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có ít nhất một hội nghị ở trạng thái 'Pending' hoặc 'Approved'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm một hội nghị có trạng thái 'Pending'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Reject' cho hội nghị đó."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Trong modal 'Reject Conference', nhập lý do từ chối vào trường nhập liệu."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Reject' trong modal."
+      }
+    ],
+    "expectedResult": "Modal 'Reject Conference' đóng lại. Trạng thái của hội nghị đó trong danh sách được cập nhật thành 'Rejected'. Lý do từ chối được lưu lại. Thời gian 'Last Updated' được cập nhật.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_007_TuChoi"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Action_Reject_002",
+    "testCaseName": "Từ chối hội nghị (để trống lý do - bắt buộc)",
+    "description": "Kiểm tra hệ thống yêu cầu nhập lý do khi từ chối hội nghị.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có ít nhất một hội nghị ở trạng thái 'Pending' hoặc 'Approved'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm một hội nghị có trạng thái 'Pending'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Reject' cho hội nghị đó."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Trong modal 'Reject Conference', để trống trường nhập liệu lý do."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Reject' trong modal."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo lỗi yêu cầu nhập lý do từ chối. Modal 'Reject Conference' không đóng lại. Trạng thái hội nghị không thay đổi.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_007_TuChoi"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Action_Reject_003",
+    "testCaseName": "Hủy thao tác từ chối hội nghị",
+    "description": "Kiểm tra người dùng có thể hủy bỏ thao tác từ chối hội nghị từ modal.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có ít nhất một hội nghị ở trạng thái 'Pending' hoặc 'Approved'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm một hội nghị có trạng thái 'Pending'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Reject' cho hội nghị đó."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Trong modal 'Reject Conference', nhấp vào nút 'Cancel'."
+      }
+    ],
+    "expectedResult": "Modal 'Reject Conference' đóng lại. Trạng thái của hội nghị đó trong danh sách vẫn giữ nguyên (không thay đổi).",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_MOD_007_TuChoi"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Combined_001",
+    "testCaseName": "Kết hợp Lọc theo Trạng thái ('Pending') và Tìm kiếm theo Tiêu đề",
+    "description": "Kiểm tra khả năng hiển thị danh sách các hội nghị có trạng thái 'Pending' VÀ tiêu đề chứa từ khóa tìm kiếm.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Hệ thống có ít nhất một hội nghị ở trạng thái 'Pending' với tiêu đề chứa từ khóa tìm kiếm dự kiến.",
+      "Hệ thống có các hội nghị khác ở trạng thái 'Pending' NHƯNG không chứa từ khóa."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào dropdown 'Filter by Status' và chọn 'Pending'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhập từ khóa tìm kiếm vào trường 'Search by Title'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấn Enter hoặc chờ kết quả tìm kiếm được lọc."
+      }
+    ],
+    "expectedResult": "Danh sách hội nghị được cập nhật chỉ hiển thị các hội nghị có trạng thái 'Pending' VÀ tiêu đề chứa từ khóa đã nhập. Các hội nghị khác (Pending không khớp từ khóa, hoặc trạng thái khác) bị ẩn đi.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_002_LocDS",
+      "YC_MOD_003_TimKiem"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Combined_002",
+    "testCaseName": "Kết hợp Lọc theo Trạng thái ('Approved') và Sắp xếp theo Ngày thêm",
+    "description": "Kiểm tra khả năng hiển thị danh sách các hội nghị có trạng thái 'Approved' và sắp xếp chúng theo ngày thêm gần nhất.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Hệ thống có ít nhất một số hội nghị ở trạng thái 'Approved' được thêm vào các ngày khác nhau."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào dropdown 'Filter by Status' và chọn 'Approved'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào dropdown 'Sort by' và chọn 'Added Date (Newest First)'."
+      }
+    ],
+    "expectedResult": "Danh sách hội nghị được cập nhật chỉ hiển thị các hội nghị có trạng thái 'Approved'. Các hội nghị này được sắp xếp theo ngày 'Requested Date' (hoặc 'Added Date') giảm dần (mới nhất ở trên).",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_002_LocDS",
+      "YC_MOD_004_SapXep"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Combined_003",
+    "testCaseName": "Kết hợp Tìm kiếm theo Tiêu đề và Sắp xếp theo Tiêu đề",
+    "description": "Kiểm tra khả năng tìm kiếm hội nghị theo tiêu đề và sau đó sắp xếp kết quả tìm kiếm theo thứ tự bảng chữ cái.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Hệ thống có ít nhất một số hội nghị có tiêu đề chứa từ khóa tìm kiếm dự kiến."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập từ khóa tìm kiếm vào trường 'Search by Title'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấn Enter hoặc chờ kết quả tìm kiếm được lọc."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào dropdown 'Sort by' và chọn 'Title (A-Z)'."
+      }
+    ],
+    "expectedResult": "Danh sách hội nghị được cập nhật chỉ hiển thị các hội nghị có tiêu đề chứa từ khóa đã nhập. Các hội nghị này được sắp xếp theo thứ tự bảng chữ cái tăng dần (A-Z) dựa trên tiêu đề.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_003_TimKiem",
+      "YC_MOD_004_SapXep"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Combined_004",
+    "testCaseName": "Kết hợp Lọc theo Trạng thái, Tìm kiếm theo Tiêu đề và Sắp xếp theo Ngày cập nhật",
+    "description": "Kiểm tra khả năng áp dụng đồng thời bộ lọc trạng thái, tìm kiếm theo tiêu đề và sắp xếp kết quả theo ngày cập nhật gần nhất.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Hệ thống có ít nhất một hội nghị ở trạng thái cụ thể, tiêu đề chứa từ khóa và được cập nhật vào các thời điểm khác nhau."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào dropdown 'Filter by Status' và chọn một trạng thái bất kỳ (ví dụ: 'All')."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhập từ khóa tìm kiếm vào trường 'Search by Title'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấn Enter hoặc chờ kết quả tìm kiếm được lọc."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào dropdown 'Sort by' và chọn 'Updated Date (Newest First)'."
+      }
+    ],
+    "expectedResult": "Danh sách hội nghị được cập nhật chỉ hiển thị các hội nghị khớp với bộ lọc trạng thái và chứa từ khóa tìm kiếm. Các hội nghị này được sắp xếp theo ngày 'Last Updated' giảm dần (mới nhất ở trên).",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_002_LocDS",
+      "YC_MOD_003_TimKiem",
+      "YC_MOD_004_SapXep"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Combined_005",
+    "testCaseName": "Kết hợp Lọc theo Ngày thêm và Lọc theo Trạng thái",
+    "description": "Kiểm tra khả năng hiển thị các hội nghị được thêm trong một khoảng ngày cụ thể VÀ có một trạng thái nhất định.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Hệ thống có ít nhất một hội nghị ở trạng thái cụ thể, được thêm trong khoảng ngày tìm kiếm dự kiến."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập khoảng ngày vào trường 'Added Date Range'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào dropdown 'Filter by Status' và chọn một trạng thái (ví dụ: 'Rejected')."
+      }
+    ],
+    "expectedResult": "Danh sách hội nghị được cập nhật chỉ hiển thị các hội nghị được thêm trong khoảng ngày đã chọn VÀ có trạng thái là 'Rejected'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_MOD_002_LocDS",
+      "YC_MOD_005_LocTheoNgayThem"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Link_001",
+    "testCaseName": "Nhấp vào liên kết URL của hội nghị",
+    "description": "Kiểm tra người dùng có thể mở URL của hội nghị trong một tab mới.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có ít nhất một hội nghị với một URL hợp lệ được hiển thị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm một hội nghị trong danh sách và nhấp vào liên kết URL."
+      }
+    ],
+    "expectedResult": "Một tab trình duyệt mới được mở ra và điều hướng đến địa chỉ URL đã nhấp. Trang Moderation hiện tại vẫn mở trong tab ban đầu.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_MOD_008_XemChiTietNhanh"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Link_002",
+    "testCaseName": "Nhấp vào Tiêu đề của hội nghị",
+    "description": "Kiểm tra người dùng có thể nhấp vào tiêu đề hội nghị để xem chi tiết hoặc thông tin liên quan.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Moderation.",
+      "Danh sách hiển thị có ít nhất một hội nghị với tiêu đề là liên kết."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm một hội nghị trong danh sách và nhấp vào tiêu đề (ví dụ: hội nghị A (HNA))."
+      }
+    ],
+    "expectedResult": "Hệ thống điều hướng người dùng đến một trang mới hiển thị thông tin chi tiết về hội nghị đó (ví dụ: trang chi tiết hội nghị trong admin panel).",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_MOD_009_XemChiTietDayDu"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Language_001",
+    "testCaseName": "Thay đổi ngôn ngữ giao diện (sang Tiếng Việt)",
+    "description": "Kiểm tra người dùng có thể thay đổi ngôn ngữ hiển thị của giao diện.",
+    "preconditions": [
+      "Người dùng đã đăng nhập.",
+      "Đang ở bất kỳ trang nào có hiển thị dropdown ngôn ngữ (ví dụ: trang Moderation)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào dropdown chọn ngôn ngữ trên Header."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn tùy chọn 'Vi' (Tiếng Việt)."
+      }
+    ],
+    "expectedResult": "Giao diện người dùng (các nhãn, tiêu đề, nút, v.v.) trên trang hiện tại được cập nhật sang Tiếng Việt. Dropdown ngôn ngữ hiển thị cờ Việt Nam hoặc nhãn 'Vi'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_UI_001_DaNgonNgu"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Theme_001",
+    "testCaseName": "Thay đổi giao diện chủ đề (sang Dark)",
+    "description": "Kiểm tra người dùng có thể thay đổi giao diện chủ đề sang chế độ tối.",
+    "preconditions": [
+      "Người dùng đã đăng nhập.",
+      "Đang ở bất kỳ trang nào có hiển thị dropdown Theme (ví dụ: trang Moderation)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào dropdown chọn Theme trên Header."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn tùy chọn 'Dark'."
+      }
+    ],
+    "expectedResult": "Giao diện người dùng (màu sắc nền, chữ, các thành phần khác) trên trang hiện tại được chuyển sang tông màu tối. Dropdown Theme hiển thị 'Dark'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_UI_002_Theme"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Logout_001",
+    "testCaseName": "Đăng xuất khỏi hệ thống",
+    "description": "Kiểm tra người dùng có thể đăng xuất khỏi tài khoản hiện tại.",
+    "preconditions": [
+      "Người dùng đã đăng nhập thành công."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào biểu tượng profile/avatar người dùng trên Header."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Trong dropdown menu, nhấp vào tùy chọn 'Logout'."
+      }
+    ],
+    "expectedResult": "Hệ thống đăng xuất người dùng thành công. Người dùng được chuyển hướng trở lại trang Đăng nhập. Không thể truy cập các trang yêu cầu đăng nhập nếu không đăng nhập lại.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_DN_003_DangXuat"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfMgt_Navigation_001",
+    "testCaseName": "Truy cập trang Conference Management từ Sidebar",
+    "description": "Kiểm tra người dùng có thể điều hướng đến trang quản lý Hội nghị thông qua menu Sidebar.",
+    "preconditions": [
+      "Người dùng đã đăng nhập thành công và đang ở bất kỳ trang nào có hiển thị Sidebar menu.",
+      "Sidebar menu 'Conferences' hiển thị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào liên kết 'Conferences' trong Sidebar menu."
+      }
+    ],
+    "expectedResult": "Hệ thống chuyển hướng người dùng đến trang 'Conference Management'. Tiêu đề trang hiển thị 'Conference Management'. URL của trang kết thúc bằng '/conferences'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_DN_001_DangNhap",
+      "YC_CM_001_XemDS"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfMgt_View_001",
+    "testCaseName": "Hiển thị danh sách hội nghị (mặc định)",
+    "description": "Kiểm tra trang Conference Management hiển thị danh sách các hội nghị theo cài đặt mặc định khi truy cập.",
+    "preconditions": [
+      "Người dùng đã đăng nhập thành công và đang ở trang Conference Management (URL: /conferences).",
+      "Có ít nhất một hội nghị trong hệ thống."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Truy cập trang Conference Management."
+      }
+    ],
+    "expectedResult": "Trang hiển thị bảng danh sách các hội nghị với các cột Title, Acronym, Sources, Research Fields, Ranks, Status, Actions. Mặc định, các bộ lọc (Status, Sources, Fields, Rank) hiển thị 'All...'. Phân trang hiển thị (ví dụ: '100 per page').",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_001_XemDS"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfMgt_Search_001",
+    "testCaseName": "Tìm kiếm hội nghị theo Tiêu đề hoặc Viết tắt (tìm thấy)",
+    "description": "Kiểm tra chức năng tìm kiếm hội nghị theo tiêu đề hoặc viết tắt khi có kết quả khớp.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Conference Management.",
+      "Danh sách hiển thị có chứa ít nhất một hội nghị có tiêu đề hoặc viết tắt trùng khớp với từ khóa tìm kiếm dự kiến."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập một phần hoặc toàn bộ tiêu đề hoặc viết tắt của một hội nghị đang hiển thị vào trường 'Search by title or acronym'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấn Enter hoặc chờ kết quả tìm kiếm được lọc."
+      }
+    ],
+    "expectedResult": "Bảng danh sách hội nghị được cập nhật chỉ hiển thị các hội nghị có tiêu đề hoặc viết tắt chứa từ khóa đã nhập. Các hội nghị không khớp sẽ bị ẩn đi.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_002_TimKiem"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfMgt_Filter_Status_001",
+    "testCaseName": "Lọc danh sách theo trạng thái cụ thể",
+    "description": "Kiểm tra chức năng lọc danh sách hội nghị theo một trạng thái cụ thể (ví dụ: 'DRAFT').",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Conference Management.",
+      "Danh sách hiển thị có chứa hội nghị ở trạng thái 'DRAFT' và các trạng thái khác."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào dropdown 'Status'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn tùy chọn 'DRAFT'."
+      }
+    ],
+    "expectedResult": "Bảng danh sách hội nghị được cập nhật chỉ hiển thị các hội nghị có cột 'Status' là 'DRAFT'. Dropdown 'Status' hiển thị 'DRAFT'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_003_LocDS"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfMgt_Filter_Rank_001",
+    "testCaseName": "Lọc danh sách theo xếp hạng cụ thể",
+    "description": "Kiểm tra chức năng lọc danh sách hội nghị theo một xếp hạng cụ thể (ví dụ: 'A*').",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Conference Management.",
+      "Danh sách hiển thị có chứa hội nghị ở xếp hạng 'A*' và các xếp hạng khác."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào dropdown 'Rank'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn tùy chọn 'A*'."
+      }
+    ],
+    "expectedResult": "Bảng danh sách hội nghị được cập nhật chỉ hiển thị các hội nghị có cột 'Ranks' là 'A*'. Dropdown 'Rank' hiển thị 'A*'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_003_LocDS"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfMgt_Pagination_001",
+    "testCaseName": "Thay đổi số lượng mục hiển thị trên mỗi trang",
+    "description": "Kiểm tra người dùng có thể thay đổi số lượng hàng hiển thị trong bảng danh sách.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Conference Management.",
+      "Danh sách có nhiều hơn số lượng mục hiển thị mặc định (ví dụ: >100)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào dropdown chọn số lượng mục trên mỗi trang ('100 per page')."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn một tùy chọn khác (ví dụ: '10 per page')."
+      }
+    ],
+    "expectedResult": "Số lượng hàng trong bảng danh sách được cập nhật hiển thị đúng số lượng đã chọn (ví dụ: 10 hàng). Dropdown hiển thị số lượng đã chọn. Phân trang cập nhật tương ứng (ví dụ: '1 to 10 of ...').",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_CM_004_PhanTrang"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfMgt_Pagination_002",
+    "testCaseName": "Điều hướng đến trang kế tiếp",
+    "description": "Kiểm tra người dùng có thể chuyển sang trang dữ liệu kế tiếp trong danh sách.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Conference Management.",
+      "Danh sách có nhiều hơn một trang dữ liệu.",
+      "Đang ở trang đầu tiên hoặc một trang ở giữa."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Next'."
+      }
+    ],
+    "expectedResult": "Bảng danh sách hiển thị các mục của trang kế tiếp. Số trang hiện tại trong phân trang được cập nhật (ví dụ: từ 'Page 1' sang 'Page 2').",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_CM_004_PhanTrang"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfMgt_ResetFilters_001",
+    "testCaseName": "Đặt lại tất cả bộ lọc",
+    "description": "Kiểm tra chức năng 'Reset Filters' đưa tất cả các bộ lọc về trạng thái mặc định.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Conference Management.",
+      "Ít nhất một bộ lọc (Search, Status, Sources, Fields, Rank) đang được áp dụng (không phải 'All...' hoặc trống)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Reset Filters'."
+      }
+    ],
+    "expectedResult": "Trường 'Search by title or acronym' trở về trống. Tất cả các dropdown bộ lọc (Status, Sources, Research Fields, Rank) trở về tùy chọn mặc định ('All...'). Bảng danh sách hiển thị lại tất cả các mục (hoặc theo cài đặt phân trang mặc định) mà không áp dụng lọc/tìm kiếm.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_005_DatLaiBoLoc"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Combined_ConfMgt_001",
+    "testCaseName": "Kết hợp Tìm kiếm theo Tiêu đề/Viết tắt và Lọc theo Trạng thái",
+    "description": "Kiểm tra khả năng hiển thị danh sách các hội nghị khớp với từ khóa tìm kiếm VÀ có một trạng thái cụ thể.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Conference Management.",
+      "Hệ thống có ít nhất một hội nghị ở trạng thái cụ thể với tiêu đề/viết tắt chứa từ khóa tìm kiếm dự kiến."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập từ khóa tìm kiếm vào trường 'Search by title or acronym'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấn Enter hoặc chờ kết quả tìm kiếm được lọc."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào dropdown 'Status' và chọn một trạng thái (ví dụ: 'CRAWLED')."
+      }
+    ],
+    "expectedResult": "Bảng danh sách hội nghị được cập nhật chỉ hiển thị các hội nghị có tiêu đề hoặc viết tắt chứa từ khóa ĐỒNG THỜI có trạng thái khớp với bộ lọc. Các hội nghị khác bị ẩn đi.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_002_TimKiem",
+      "YC_CM_003_LocDS"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Combined_ConfMgt_002",
+    "testCaseName": "Kết hợp Lọc theo Xếp hạng và Sắp xếp theo Tiêu đề",
+    "description": "Kiểm tra khả năng hiển thị danh sách các hội nghị có xếp hạng cụ thể và sắp xếp chúng theo tiêu đề (A-Z).",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Conference Management.",
+      "Hệ thống có ít nhất một số hội nghị ở xếp hạng cụ thể với các tiêu đề khác nhau."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào dropdown 'Rank' và chọn một xếp hạng (ví dụ: 'A')."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào tiêu đề cột 'Title' để sắp xếp theo A-Z (nếu chưa phải A-Z)."
+      }
+    ],
+    "expectedResult": "Bảng danh sách hội nghị được cập nhật chỉ hiển thị các hội nghị có cột 'Ranks' khớp với bộ lọc. Các hội nghị này được sắp xếp theo thứ tự bảng chữ cái tăng dần (A-Z) dựa trên tiêu đề.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_003_LocDS",
+      "YC_CM_006_SapXep"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Combined_ConfMgt_003",
+    "testCaseName": "Kết hợp Tìm kiếm, Lọc theo trạng thái, Lọc theo Xếp hạng",
+    "description": "Kiểm tra khả năng áp dụng đồng thời tìm kiếm theo tiêu đề/viết tắt, lọc theo trạng thái và lọc theo xếp hạng.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Conference Management.",
+      "Hệ thống có ít nhất một hội nghị khớp với tất cả các tiêu chí lọc/tìm kiếm dự kiến."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập từ khóa tìm kiếm vào trường 'Search by title or acronym'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào dropdown 'Status' và chọn một trạng thái."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào dropdown 'Rank' và chọn một xếp hạng."
+      }
+    ],
+    "expectedResult": "Bảng danh sách hội nghị được cập nhật chỉ hiển thị các hội nghị khớp với từ khóa tìm kiếm ĐỒNG THỜI có trạng thái VÀ xếp hạng khớp với các bộ lọc đã chọn.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_002_TimKiem",
+      "YC_CM_003_LocDS"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfMgt_ViewHistory_001",
+    "testCaseName": "Nhấp vào nút 'View History'",
+    "description": "Kiểm tra người dùng có thể mở trang chi tiết lịch sử của một hội nghị.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang Conference Management.",
+      "Danh sách hiển thị có ít nhất một hội nghị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm một hội nghị trong bảng danh sách."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'View History' tương ứng với hội nghị đó."
+      }
+    ],
+    "expectedResult": "Hệ thống chuyển hướng người dùng đến một trang mới có tiêu đề 'Conference History - [Tên hội nghị]' hoặc tương tự, hiển thị thông tin chi tiết và lịch sử của hội nghị đó (Basic Information, Links, Locations, Topics, Dates). URL thay đổi sang định dạng '/edit/eclla/...'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_007_XemLichSu"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_View_001",
+    "testCaseName": "Hiển thị thông tin chi tiết lịch sử hội nghị",
+    "description": "Kiểm tra trang lịch sử hội nghị hiển thị đầy đủ các phần thông tin.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị (sau khi nhấp 'View History')."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Quan sát các phần thông tin trên trang."
+      }
+    ],
+    "expectedResult": "Trang hiển thị các phần: Basic Information, Links, Locations, Topics, Dates. Các thông tin chi tiết của hội nghị (Year, Access Type, Summary, Call for Papers, URL links, Locations, Topics, Dates) được hiển thị chính xác.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_007_XemLichSu"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Link_ConfHist_001",
+    "testCaseName": "Nhấp vào liên kết URL trong phần 'Links'",
+    "description": "Kiểm tra người dùng có thể mở các liên kết (Main Link, CFP Link, Important Link) trong phần 'Links' của lịch sử hội nghị.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị.",
+      "Phần 'Links' hiển thị với các URL hợp lệ."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong phần 'Links', nhấp vào liên kết 'Main Link'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Trong phần 'Links', nhấp vào liên kết 'CFP Link'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Trong phần 'Links', nhấp vào liên kết 'Important Link'."
+      }
+    ],
+    "expectedResult": "Mỗi liên kết khi nhấp vào sẽ mở một tab trình duyệt mới và điều hướng đến địa chỉ URL tương ứng. Trang lịch sử hội nghị hiện tại vẫn mở trong tab ban đầu.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_007_XemLichSu"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_EditMode_001",
+    "testCaseName": "Chuyển sang chế độ chỉnh sửa thông tin cơ bản",
+    "description": "Kiểm tra người dùng có thể chuyển phần Basic Information sang chế độ chỉnh sửa.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong phần 'Basic Information', nhấp vào nút 'Edit'."
+      }
+    ],
+    "expectedResult": "Các trường thông tin trong phần 'Basic Information' (Year, Access Type, Publisher, Summary, Call for Papers) chuyển sang trạng thái có thể chỉnh sửa (ví dụ: hiển thị input fields). Nút 'Edit' được thay thế bằng các nút 'Cancel' và 'Save'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_CM_008_ChinhSuaLichSu"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_EditMode_002",
+    "testCaseName": "Hủy bỏ chỉnh sửa thông tin cơ bản",
+    "description": "Kiểm tra người dùng có thể hủy bỏ thao tác chỉnh sửa Basic Information.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị.",
+      "Đang ở chế độ chỉnh sửa phần Basic Information."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong phần 'Basic Information' đang ở chế độ chỉnh sửa, nhấp vào nút 'Cancel'."
+      }
+    ],
+    "expectedResult": "Phần 'Basic Information' quay trở lại chế độ chỉ xem. Các trường thông tin hiển thị dữ liệu ban đầu (trước khi chỉnh sửa). Các nút 'Cancel' và 'Save' biến mất, nút 'Edit' hiển thị lại.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_CM_008_ChinhSuaLichSu"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_Delete_001",
+    "testCaseName": "Nhấp vào nút 'Delete' lịch sử hội nghị",
+    "description": "Kiểm tra việc nhấp vào nút Delete trên trang lịch sử hội nghị.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Delete' ở trên cùng của trang."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị một hộp thoại xác nhận xóa (confirmation dialog/modal) hỏi người dùng có chắc chắn muốn xóa mục lịch sử này không.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_009_XoaLichSu"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_EditBasic_003",
+    "testCaseName": "Chỉnh sửa thành công Basic Information",
+    "description": "Kiểm tra người dùng có thể sửa đổi thông tin cơ bản của hội nghị (Year, Access Type, Summary, Call for Papers) và lưu lại thành công.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị.",
+      "Đang ở chế độ chỉnh sửa phần Basic Information (sau khi nhấp nút 'Edit')."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Sửa đổi giá trị trong một hoặc nhiều trường nhập liệu của phần Basic Information (ví dụ: thay đổi 'Year' thành 2026, chỉnh sửa 'Summary')."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Save'."
+      }
+    ],
+    "expectedResult": "Các trường thông tin trong phần 'Basic Information' hiển thị dữ liệu mới đã lưu. Phần Basic Information quay trở lại chế độ chỉ xem. Hệ thống hiển thị thông báo lưu thành công (nếu có). Thời gian 'Last Updated' của hội nghị có thể được cập nhật.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_008_ChinhSuaLichSu"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_EditLinks_001",
+    "testCaseName": "Chuyển sang chế độ chỉnh sửa Links",
+    "description": "Kiểm tra người dùng có thể chuyển phần Links sang chế độ chỉnh sửa để cập nhật các liên kết.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong phần 'Links', nhấp vào nút 'Edit'."
+      }
+    ],
+    "expectedResult": "Các liên kết trong phần 'Links' hiển thị dưới dạng các trường nhập liệu (Input fields) có thể chỉnh sửa (Main Link, CFP Link, Important Link). Nút 'Edit' được thay thế bằng  nút 'Cancel' .",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_CM_010_ChinhSuaLinks"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_EditLinks_002",
+    "testCaseName": "Hủy bỏ chỉnh sửa Links",
+    "description": "Kiểm tra người dùng có thể hủy bỏ thao tác chỉnh sửa Links từ chế độ chỉnh sửa.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị.",
+      "Đang ở chế độ chỉnh sửa phần Links (sau khi nhấp nút 'Edit')."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong phần 'Links' đang ở chế độ chỉnh sửa, nhấp vào nút 'Cancel'."
+      }
+    ],
+    "expectedResult": "Phần 'Links' quay trở lại chế độ chỉ xem. Các liên kết hiển thị lại dữ liệu ban đầu (trước khi chỉnh sửa). Các nút 'Cancel' và 'Save' biến mất, nút 'Edit' hiển thị lại.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_CM_010_ChinhSuaLinks"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_EditLinks_003",
+    "testCaseName": "Chỉnh sửa thành công Links",
+    "description": "Kiểm tra người dùng có thể sửa đổi các liên kết trong phần Links và lưu lại thành công.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị.",
+      "Đang ở chế độ chỉnh sửa phần Links (sau khi nhấp nút 'Edit')."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Sửa đổi giá trị trong một hoặc nhiều trường liên kết của phần Links (ví dụ: thay đổi 'Main Link' thành một URL mới)."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Save'."
+      }
+    ],
+    "expectedResult": "Các liên kết trong phần 'Links' hiển thị dữ liệu mới đã lưu. Phần Links quay trở lại chế độ chỉ xem. Hệ thống hiển thị thông báo lưu thành công (nếu có).",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_010_ChinhSuaLinks"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_EditLocations_001",
+    "testCaseName": "Chuyển sang chế độ chỉnh sửa Locations",
+    "description": "Kiểm tra người dùng có thể chuyển phần Locations sang chế độ chỉnh sửa để cập nhật thông tin địa điểm.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong phần 'Locations', nhấp vào nút 'Edit'."
+      }
+    ],
+    "expectedResult": "Thông tin địa điểm trong phần 'Locations' hiển thị dưới dạng các trường nhập liệu có thể chỉnh sửa (ví dụ: các trường cho Thành phố, Quốc gia, Khu vực, v.v.). Nút 'Edit' được thay thế bằng nút 'Cancel'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_CM_011_ChinhSuaLocations"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_EditLocations_002",
+    "testCaseName": "Hủy bỏ chỉnh sửa Locations",
+    "description": "Kiểm tra người dùng có thể hủy bỏ thao tác chỉnh sửa Locations từ chế độ chỉnh sửa.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị.",
+      "Đang ở chế độ chỉnh sửa phần Locations (sau khi nhấp nút 'Edit')."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong phần 'Locations' đang ở chế độ chỉnh sửa, nhấp vào nút 'Cancel'."
+      }
+    ],
+    "expectedResult": "Phần 'Locations' quay trở lại chế độ chỉ xem. Thông tin địa điểm hiển thị lại dữ liệu ban đầu (trước khi chỉnh sửa). Các nút 'Cancel' và 'Save' biến mất, nút 'Edit' hiển thị lại.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_CM_011_ChinhSuaLocations"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_EditLocations_003",
+    "testCaseName": "Chỉnh sửa thành công Locations",
+    "description": "Kiểm tra người dùng có thể sửa đổi thông tin địa điểm trong phần Locations và lưu lại thành công.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị.",
+      "Đang ở chế độ chỉnh sửa phần Locations (sau khi nhấp nút 'Edit')."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Sửa đổi giá trị trong một hoặc nhiều trường nhập liệu của phần Locations (ví dụ: thay đổi tên thành phố, quốc gia)."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Save'."
+      }
+    ],
+    "expectedResult": "Thông tin địa điểm trong phần 'Locations' hiển thị dữ liệu mới đã lưu. Phần Locations quay trở lại chế độ chỉ xem. Hệ thống hiển thị thông báo lưu thành công (nếu có).",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_011_ChinhSuaLocations"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_AddTopic_001",
+    "testCaseName": "Thêm Topic mới thành công",
+    "description": "Kiểm tra người dùng có thể thêm một mục Topic mới vào danh sách.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị.",
+      "Phần 'Topics' hiển thị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Add Topic'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Một trường nhập liệu mới xuất hiện (thường ở cuối danh sách). Nhập tên topic mới vào trường này (ví dụ: 'New Research Area')."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Save' ở cuối phần Topics."
+      }
+    ],
+    "expectedResult": "Topic mới ('New Research Area') xuất hiện trong danh sách các Topics. Trường nhập liệu trống có thể biến mất hoặc được đặt lại. Hệ thống hiển thị thông báo lưu thành công (nếu có).",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_012_QuanLyTopics"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_RemoveTopic_001",
+    "testCaseName": "Xóa Topic thành công",
+    "description": "Kiểm tra người dùng có thể xóa một mục Topic hiện có khỏi danh sách.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị.",
+      "Phần 'Topics' hiển thị và chứa ít nhất một mục có thể xóa."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm một Topic trong danh sách muốn xóa (ví dụ: 'Privacy')."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Remove' tương ứng với Topic đó."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Save' ở cuối phần Topics."
+      }
+    ],
+    "expectedResult": "Topic đã chọn bị xóa khỏi danh sách các Topics. Hệ thống hiển thị thông báo lưu thành công (nếu có).",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_012_QuanLyTopics"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_AddDate_001",
+    "testCaseName": "Thêm mục Date mới thành công",
+    "description": "Kiểm tra người dùng có thể thêm một mục Date mới (loại ngày, tên ngày, ngày bắt đầu, ngày kết thúc) vào danh sách.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị.",
+      "Phần 'Dates' hiển thị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Add Date'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Một hàng mới với các trường nhập liệu xuất hiện. Chọn 'Date Type', nhập 'Date Name', chọn 'Start Date' và 'End Date' hợp lệ."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Save' ở cuối phần Dates."
+      }
+    ],
+    "expectedResult": "Mục Date mới với thông tin đã nhập xuất hiện trong danh sách các Dates. Hàng nhập liệu trống có thể biến mất hoặc được đặt lại. Hệ thống hiển thị thông báo lưu thành công (nếu có).",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_013_QuanLyDates"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_RemoveDate_001",
+    "testCaseName": "Xóa mục Date thành công",
+    "description": "Kiểm tra người dùng có thể xóa một mục Date hiện có khỏi danh sách.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị.",
+      "Phần 'Dates' hiển thị và chứa ít nhất một mục có thể xóa."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm một mục Date trong danh sách muốn xóa."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Remove' tương ứng với mục Date đó."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Save' ở cuối phần Dates."
+      }
+    ],
+    "expectedResult": "Mục Date đã chọn bị xóa khỏi danh sách các Dates. Hệ thống hiển thị thông báo lưu thành công (nếu có).",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CM_013_QuanLyDates"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_DatesPagination_001",
+    "testCaseName": "Thay đổi số lượng mục hiển thị trên mỗi trang (Dates)",
+    "description": "Kiểm tra người dùng có thể thay đổi số lượng hàng hiển thị trong bảng danh sách Dates.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị.",
+      "Phần 'Dates' hiển thị và chứa nhiều hơn số lượng mục hiển thị mặc định (ví dụ: >10)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong phần 'Dates', nhấp vào dropdown chọn số lượng mục trên mỗi trang ('Page Size')."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn một tùy chọn khác (ví dụ: '25 per page')."
+      }
+    ],
+    "expectedResult": "Số lượng hàng trong bảng Dates được cập nhật hiển thị đúng số lượng đã chọn. Dropdown 'Page Size' hiển thị số lượng đã chọn. Phân trang cập nhật tương ứng.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_CM_014_PhanTrangDates"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_DatesPagination_002",
+    "testCaseName": "Điều hướng phân trang trong phần Dates",
+    "description": "Kiểm tra người dùng có thể điều hướng qua các trang dữ liệu trong danh sách Dates.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang lịch sử chi tiết của một hội nghị.",
+      "Phần 'Dates' hiển thị và chứa nhiều hơn một trang dữ liệu."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong phần 'Dates', nhấp vào nút 'Next'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào một số trang cụ thể (ví dụ: '2')."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Last'."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Previous'."
+      },
+      {
+        "stepNumber": 5,
+        "action": "Nhấp vào nút 'First'."
+      }
+    ],
+    "expectedResult": "Nội dung bảng Dates hiển thị các mục của trang tương ứng với nút điều hướng đã nhấp. Số trang hiện tại và trạng thái các nút điều hướng (enabled/disabled) cập nhật chính xác.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_CM_014_PhanTrangDates"
+    ],
+    "tester": "",
+    "executionDate": ""
   }
 ]
