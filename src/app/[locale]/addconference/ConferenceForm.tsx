@@ -235,26 +235,27 @@ const ConferenceForm: React.FC = () => {
     const toDateStr = updatedDateEntry.toDate
 
     // Check date consistency only if both dates are present
-    if (
-      (field === 'fromDate' || field === 'toDate') &&
-      fromDateStr &&
-      toDateStr
-    ) {
-      const fromDateObj = new Date(fromDateStr)
-      const toDateObj = new Date(toDateStr)
+    // Removed the alert calls here, validation will now happen in goToNextStep
+    // if (
+    //   (field === 'fromDate' || field === 'toDate') &&
+    //   fromDateStr &&
+    //   toDateStr
+    // ) {
+    //   const fromDateObj = new Date(fromDateStr)
+    //   const toDateObj = new Date(toDateStr)
 
-      if (toDateObj < fromDateObj) {
-        if (field === 'toDate') {
-          alert(t('End_date_cannot_be_before_start_date'))
-        } else {
-          // field === 'fromDate'
-          alert(t('Start_date_cannot_be_after_end_date_please_adjust_dates'))
-        }
-        // The state will be set with this invalid combination,
-        // and goToNextStep will perform the strict validation.
-        // The alert provides immediate feedback.
-      }
-    }
+    //   if (toDateObj < fromDateObj) {
+    //     if (field === 'toDate') {
+    //       alert(t('End_date_cannot_be_before_start_date'))
+    //     } else {
+    //       // field === 'fromDate'
+    //       alert(t('Start_date_cannot_be_after_end_date_please_adjust_dates'))
+    //     }
+    //     // The state will be set with this invalid combination,
+    //     // and goToNextStep will perform the strict validation.
+    //     // The alert provides immediate feedback.
+    //   }
+    // }
 
     newDates[index] = updatedDateEntry
     setDates(newDates)
