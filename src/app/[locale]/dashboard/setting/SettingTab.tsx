@@ -73,7 +73,9 @@ const SettingTab: React.FC = () => {
         prev ? { ...prev, [settingKey]: !currentValue } : null
       )
       try {
-        await updateUserSetting(newSetting)
+        await updateUserSetting({
+          [settingKey]: !currentValue
+        })
         await fetchUserSettings() // Refetch settings after update
       } catch (error) {
         // Revert optimistic update on error

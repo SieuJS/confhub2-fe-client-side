@@ -41,9 +41,10 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const userData: Calendar[] = await response.json();
+        console.log("conferenceData",);
         setIsAddToCalendar(
           userData.some(
-            (calendarConf) => calendarConf.conferenceId === conferenceData?.id
+            (calendarConf) => calendarConf.id === conferenceData?.id
           ) ?? false
         );
       } catch (err: any) {
