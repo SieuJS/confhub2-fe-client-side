@@ -250,7 +250,7 @@ const redirectToWebsiteIntroductions: IntroductionType = {
       suggestions: [
         'Go to the website for the "International Joint Conference on Knowledge Discovery, Knowledge Engineering and Knowledge Management".',
         'Direct me to the official site of "AAAI".',
-        'Open the website for "RAID 2025".',
+        'Open the website for "RAID".',
       ],
     },
     vi: {
@@ -259,7 +259,7 @@ const redirectToWebsiteIntroductions: IntroductionType = {
       suggestions: [
         'Truy cập trang web của hội nghị "International Joint Conference on Knowledge Discovery, Knowledge Engineering and Knowledge Management".',
         'Chuyển hướng tôi đến trang web chính thức của "AAAI".',
-        'Mở trang web cho "RAID 2025".',
+        'Mở trang web cho "RAID".',
       ],
     },
     zh: {
@@ -268,7 +268,7 @@ const redirectToWebsiteIntroductions: IntroductionType = {
       suggestions: [
         '前往“International Joint Conference on Knowledge Discovery, Knowledge Engineering and Knowledge Management”的网站。',
         '带我去“AAAI”的官方网站。',
-        '打开“RAID 2025”的网站。',
+        '打开“RAID”的网站。',
       ],
     },
     de: { // German added
@@ -277,7 +277,7 @@ const redirectToWebsiteIntroductions: IntroductionType = {
       suggestions: [
         'Gehen Sie zur Website der "International Joint Conference on Knowledge Discovery, Knowledge Engineering and Knowledge Management".',
         'Leiten Sie mich zur offiziellen Seite von "AAAI" weiter.',
-        'Öffnen Sie die Website für "RAID 2025".',
+        'Öffnen Sie die Website für "RAID".',
       ],
     },
     es: { // Spanish added
@@ -286,7 +286,7 @@ const redirectToWebsiteIntroductions: IntroductionType = {
       suggestions: [
         'Ir al sitio web de la "International Joint Conference on Knowledge Discovery, Knowledge Engineering and Knowledge Management".',
         'Dirígeme al sitio oficial de "AAAI".',
-        'Abrir el sitio web de "RAID 2025".',
+        'Abrir el sitio web de "RAID".',
       ],
     },
     ko: { // Korean added
@@ -295,7 +295,7 @@ const redirectToWebsiteIntroductions: IntroductionType = {
       suggestions: [
         '"International Joint Conference on Knowledge Discovery, Knowledge Engineering and Knowledge Management" 웹사이트로 이동해주세요.',
         '"AAAI"의 공식 사이트로 안내해주세요.',
-        '"RAID 2025" 웹사이트를 열어주세요.',
+        '"RAID" 웹사이트를 열어주세요.',
       ],
     },
     ru: { // Russian added
@@ -304,7 +304,7 @@ const redirectToWebsiteIntroductions: IntroductionType = {
       suggestions: [
         'Перейти на веб-сайт "International Joint Conference on Knowledge Discovery, Knowledge Engineering and Knowledge Management".',
         'Направьте меня на официальный сайт "AAAI".',
-        'Открыть веб-сайт "RAID 2025".',
+        'Открыть веб-сайт "RAID".',
       ],
     },
     ar: { // Arabic added
@@ -313,7 +313,7 @@ const redirectToWebsiteIntroductions: IntroductionType = {
       suggestions: [
         'اذهب إلى موقع الويب الخاص بـ "International Joint Conference on Knowledge Discovery, Knowledge Engineering and Knowledge Management".',
         'وجهني إلى الموقع الرسمي لـ "AAAI".',
-        'افتح موقع الويب الخاص بـ "RAID 2025".',
+        'افتح موقع الويب الخاص بـ "RAID".',
       ],
     },
     fa: { // Persian added
@@ -322,7 +322,7 @@ const redirectToWebsiteIntroductions: IntroductionType = {
       suggestions: [
         'به وب سایت "International Joint Conference on Knowledge Discovery, Knowledge Engineering and Knowledge Management" بروید.',
         'مرا به سایت رسمی "AAAI" هدایت کنید.',
-        'وب سایت "RAID 2025" را باز کنید.',
+        'وب سایت "RAID" را باز کنید.',
       ],
     },
     fr: { // French added
@@ -331,7 +331,7 @@ const redirectToWebsiteIntroductions: IntroductionType = {
       suggestions: [
         'Aller sur le site web de l\'"International Joint Conference on Knowledge Discovery, Knowledge Engineering and Knowledge Management".',
         'Dirigez-moi vers le site officiel de "AAAI".',
-        'Ouvrez le site web de "RAID 2025".',
+        'Ouvrez le site web de "RAID".',
       ],
     },
     ja: { // Japanese added
@@ -340,7 +340,7 @@ const redirectToWebsiteIntroductions: IntroductionType = {
       suggestions: [
         '"International Joint Conference on Knowledge Discovery, Knowledge Engineering and Knowledge Management"のウェブサイトに移動してください。',
         '"AAAI"の公式サイトに案内してください。',
-        '"RAID 2025"のウェブサイトを開いてください。',
+        '"RAID"のウェブサイトを開いてください。',
       ],
     },
   },
@@ -565,7 +565,7 @@ const followUnfollowIntroductions: IntroductionType = {
       suggestions: [
         'List the conferences I am following.',
         'How to follow a conference?',
-        'Show me conferences I have unfollowed.', // Example, might not be implemented
+        'Show me conferences I have followed.', // Example, might not be implemented
       ],
     },
     vi: {
