@@ -1334,5 +1334,20 @@
   "Please_provide_an_end_date_for": "Vui lòng cung cấp ngày kết thúc cho mục nhập ngày",
   "End_date_cannot_be_before_start_date_for": "Ngày kết thúc không thể trước ngày bắt đầu cho mục nhập ngày",
   "Please_agree_to_the_terms_and_conditions": "Vui lòng đồng ý với các điều khoản và điều kiện",
-  "Error_adding_conference": "Lỗi khi thêm hội nghị"
+  "Error_adding_conference": "Lỗi khi thêm hội nghị",
+  "Sub_agent_thinking": "Tiểu tác nhân đang suy nghĩ...",
+  "Function_result_prepared": "Kết quả chức năng đã sẵn sàng",
+  "Sub_agent_processing_complete": "Quá trình xử lý của tiểu tác nhân đã hoàn tất",
+  "Function_result_processed": "Kết quả chức năng đã được xử lý",
+  "Listing_followed_items": "Liệt kê các mục đang theo dõi",
+  "Listing_calendar_items": "Liệt kê các mục lịch",
+  "Listing_blacklisted_items": "Liệt kê các mục trong danh sách đen",
+  "Follow_check_clear_for_blacklist": "Kiểm tra theo dõi: không có trong danh sách đen",
+  "blacklist_check_clear_for_follow": "Kiểm tra danh sách đen: được phép theo dõi",
+  "follow_no_action_needed": "Theo dõi: không cần thao tác",
+  "calendar_no_action_needed": "Lịch: không cần thao tác",
+  "Blacklist_no_action_needed": "Danh sách đen: không cần thao tác",
+  "Followed_status": "Trạng thái: Đã theo dõi",
+  "Unfollowed_status": "Trạng thái: Đã bỏ theo dõi",
+  "View_Details": "Xem chi tiết"
 }
