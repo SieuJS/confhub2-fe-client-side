@@ -1334,5 +1334,20 @@
   "Please_provide_an_end_date_for": "Please provide an end date for the date entry",
   "End_date_cannot_be_before_start_date_for": "End date cannot be before start date for the date entry",
   "Please_agree_to_the_terms_and_conditions": "Please agree to the terms and conditions",
-  "Error_adding_conference": "Error adding conference"
+  "Error_adding_conference": "Error adding conference",
+  "Sub_agent_thinking": "Sub-agent thinking...",
+  "Function_result_prepared": "Function result prepared",
+  "Sub_agent_processing_complete": "Sub-agent processing complete",
+  "Function_result_processed": "Function result processed",
+  "Listing_followed_items": "Listing followed items",
+  "Listing_calendar_items": "Listing calendar items",
+  "Listing_blacklisted_items": "Listing blacklisted items",
+  "Follow_check_clear_for_blacklist": "Follow check clear for blacklist",
+  "blacklist_check_clear_for_follow": "Blacklist check clear for follow",
+  "follow_no_action_needed": "Follow no action needed",
+  "calendar_no_action_needed": "Calendar no action needed",
+  "Blacklist_no_action_needed": "Blacklist no action needed",
+  "Followed_status": "Followed status",
+  "Unfollowed_status": "Unfollowed status",
+  "View_Details": "View Details"
 }
