@@ -47,7 +47,7 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
         page: searchParams.get('page') || '1',
         // sortBy: searchParams.get('sortBy') as SortOption || 'date',
         // sortOrder: searchParams.get('sortOrder') as SortOrder || 'asc',
-        perPage: searchParams.get('perPage') || '5',
+        perPage: searchParams.get('perPage') || '4',
       };
 
       const data = await fetchConferences(params); // Gọi API.
