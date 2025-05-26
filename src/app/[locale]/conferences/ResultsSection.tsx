@@ -54,8 +54,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
 
         <div className='flex items-center space-x-2'>
           {/* Sort Controls */}
-          {/* <div className='flex items-center space-x-2'>
-            <label htmlFor='sort-by' className=' text-sm'>
+          <div className='flex items-center space-x-2'>
+            {/* <label htmlFor='sort-by' className=' text-sm'>
               {t('Sort_by')}:
             </label>
             <select
@@ -70,7 +70,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
               <option value='name'>{t('Name')}</option>
               <option value='fromDate'>{t('Start_Date')}</option>
               <option value='toDate'>{t('End_Date')}</option>
-            </select>
+            </select> */}
 
             <label htmlFor='event-per-page' className=' text-sm'>
               {t('Events_per_page')}:
@@ -89,7 +89,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
               <option value='100'>100</option>
             </select>
 
-            <button
+            {/* <button
               onClick={handleSortOrderChange}
               className='rounded bg-gray-20 px-1 py-1 text-sm hover:bg-gray-30 focus:outline-none focus:ring-2 focus:ring-blue-500  '
               title={sortOrder === 'asc' ? 'Sort Ascending' : 'Sort Descending'}
@@ -133,8 +133,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
                   <path d='M11 12h4' />
                 </svg>
               )}
-            </button>
-          </div> */}
+            </button> */}
+          </div>
 
           {/* View Type Toggle */}
           <button
