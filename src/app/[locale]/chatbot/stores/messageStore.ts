@@ -400,7 +400,10 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
                     resetAwaitFlag,
                 } = get();
 
-                const { currentLocale, isStreamingEnabled } = useSettingsStore.getState();
+                // <<< Cập nhật ở đây >>>
+                const { currentLanguage, isStreamingEnabled } = useSettingsStore.getState();
+                const currentLocale = currentLanguage.code; // Lấy mã locale từ currentLanguage
+                // <<< Kết thúc cập nhật >>>
                 const { setShowConfirmationDialog } = useUiStore.getState();
 
                 animationControls?.completeStream();
@@ -500,7 +503,9 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
                 // Handle side-effects of actions
                 const action = result.action;
                 if (action?.type === 'navigate' && action.url) {
+                    // Đảm bảo BASE_WEB_URL là cái bạn muốn (http://localhost:8386)
                     const finalUrl = constructNavigationUrl(BASE_WEB_URL, currentLocale, action.url);
+                    console.log(`[MessageStore _onSocketChatResult] Final URL to open: ${finalUrl}`); // Debug thêm
                     openUrlInNewTab(finalUrl);
                 } else if (action?.type === 'confirmEmailSend' && action.payload) {
                     setShowConfirmationDialog(true, action.payload as ConfirmSendEmailAction);
