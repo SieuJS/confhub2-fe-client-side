@@ -53,22 +53,22 @@ const ToolResponseLog: React.FC<ToolResponseLogProps> = ({ message }) => {
 
           return (
             <div
-              key={`tool-response-${fc.id || index}`}
-              // Adjusted padding, margin, and border color to fit amber theme
-              className="part mt-2 pt-2 border-t border-amber-300 dark:border-amber-600 first:mt-0 first:pt-0 first:border-t-0"
+              // key={`tool-response-${fc.id || index}`}
+              // // Adjusted padding, margin, and border color to fit amber theme
+              // className="part mt-2 pt-2 border-t border-amber-300 dark:border-amber-600 first:mt-0 first:pt-0 first:border-t-0"
             >
-              <h5 className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1 uppercase tracking-wide">
+              {/* <h5 className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1 uppercase tracking-wide">
                 Function Response ({fc.id || `index-${index}`})
-              </h5>
+              </h5> */}
               
-              {messageForModelText && (
+              {/* {messageForModelText && (
                 // text-inherit will take color from LogEntry (amber-800 / dark:amber-200)
                 <p className="text-inherit mb-1 whitespace-pre-wrap">{messageForModelText}</p>
-              )}
+              )} */}
 
               {customUI /* This is where the map should be rendered */}
 
-              {!customUI && responseContent && ( // Only show syntax highlighter if there's content and no custom UI
+              {/* {!customUI && responseContent && ( // Only show syntax highlighter if there's content and no custom UI
                 <div className="mt-1 text-xs rounded-md bg-gray-800 text-gray-100 p-2 overflow-x-auto">
                   <SyntaxHighlighter
                     language="json"
@@ -87,7 +87,7 @@ const ToolResponseLog: React.FC<ToolResponseLogProps> = ({ message }) => {
               )}
               {!customUI && !responseContent && ( // Case where responseContent is null/undefined
                  <p className="text-inherit italic text-xs mt-1">No content in function response.</p>
-              )}
+              )} */}
             </div>
           );
         },

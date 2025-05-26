@@ -148,7 +148,7 @@ async function handleManageCalendar(fc: LiveFunctionCall, config: HandlerConfig)
 
   let modelMessage = "";
   if (action === 'list') {
-    const listUrl = `${config.databaseUrl}/calendar/events`;
+    const listUrl = `${config.databaseUrl}/calendar/conference-events`;
     const calendarItems = await makeFrontendApiCall(listUrl, 'GET', token);
     modelMessage = formatItemsForModel(calendarItems, 'conference in calendar');
   } else {
