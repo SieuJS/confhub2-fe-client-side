@@ -14,7 +14,7 @@ interface UseConferenceResultsProps {
 const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) => {
   const [events, setEvents] = useState<ConferenceListResponse | undefined>(initialData);
   const [currentPage, setCurrentPage] = useState(1);
-  const [eventsPerPage, setEventPerPage] = useState<string>('5');
+  const [eventsPerPage, setEventPerPage] = useState<string>('4');
   //const eventsPerPage = 10;
   // const [sortBy, setSortBy] = useState<SortOption>('date');
   // const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
