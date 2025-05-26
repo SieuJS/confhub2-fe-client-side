@@ -47,7 +47,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
 
   useEffect(() => {
     if (!isEditing) {
-        setEditText(conv.title || '');
+      setEditText(conv.title || '');
     }
   }, [conv.title, isEditing]);
 
@@ -91,7 +91,8 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
   const handleTogglePinClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (itemIsEffectivelyDisabled) return; // Kiểm tra
-    onTogglePin(conv.id, conv.isPinned); // Truyền trạng thái pin hiện tại
+    // TRUYỀN TRẠNG THÁI PIN MỚI (NGƯỢC LẠI VỚI HIỆN TẠI)
+    onTogglePin(conv.id, !conv.isPinned); // <<<< THAY ĐỔI Ở ĐÂY
   };
 
   const handleSelectConvClick = () => {
@@ -107,7 +108,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
         ${isBeingDeleted ? 'opacity-70 cursor-default animate-pulse' : ''}
         ${itemIsEffectivelyDisabled && !isBeingDeleted ? 'opacity-60 cursor-not-allowed' : ''}
       `}
-      // Không cần aria-disabled ở đây vì button bên trong sẽ xử lý
+    // Không cần aria-disabled ở đây vì button bên trong sẽ xử lý
     >
       {isEditing ? (
         <form onSubmit={handleEditSave} className='flex items-center p-2 space-x-1'>
