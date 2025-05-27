@@ -1,4 +1,4 @@
-// hooks/useLoggerScroll.ts
+// hooks// src/app/[locale]/chatbot/livechat/hooks/useLoggerScroll.ts
 import { useEffect, useRef } from "react";
 
 const useLoggerScroll = (loggerRef: React.RefObject<HTMLDivElement>) => {

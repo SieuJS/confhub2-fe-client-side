@@ -1,19 +1,30 @@
-// MessageRenderer.tsx
-// import React from "react";
+// src/app/[locale]/chatbot/livechat/logger/MessageRenderer.tsx
+import React, { ReactNode } from "react";
 import {
   StreamingLog,
+  // Type guards for SDK messages
   isClientContentMessage,
   isToolCallMessage,
   isToolCallCancellationMessage,
   isToolResponseMessage,
   isServerContentMessage,
+  // Type guards for parts of ServerContentPayload
   isInterrupted,
   isTurnComplete,
   isModelTurn,
+  // Application-specific types and guards
   isClientAudioMessage,
   isServerAudioMessage,
-  ToolResponseMessage
-} from "../multimodal-live-types";
+  ClientAudioMessage, // Import for casting if needed
+  ServerAudioMessage, // Import for casting if needed
+  // Payload types from unified types
+  ClientContentPayload,
+  ToolCallPayload,
+  ToolCallCancellationPayload,
+  ServerContentPayload,
+  ToolResponsePayload, // This is SDKLiveClientToolResponse
+} from "../../lib/live-chat.types"; // Updated import path
+
 import ClientContentLog from "./ClientContentLog";
 import ToolCallLog from "./ToolCallLog";
 import ToolCallCancellationLog from "./ToolCallCancellationLog";
@@ -22,78 +33,70 @@ import ModelTurnLog from "./ModelTurnLog";
 import PlainTextMessage from "./PlainTextMessage";
 import ClientAudioLog from "./ClientAudioLog";
 import ServerAudioLog from "./ServerAudioLog";
-import AnyMessage from "./AnyMessage";
-import { ReactNode } from "react";
-
+import AnyMessage from "./AnyMessage"; // Assuming this handles unknown/default cases
 
 const CustomPlainTextLog = ({ msg }: { msg: string }): ReactNode => {
   return <PlainTextMessage message={msg} />;
 };
 
-// Define the props for MessageRenderer
 interface MessageRendererProps {
-  message: StreamingLog["message"];
-  type?: string; // Make type optional here as well, or required if always passed
+  message: StreamingLog["message"]; // message is SDKLiveClientMessage | SDKLiveServerMessage | string | ClientAudioMessage | ServerAudioMessage
+  type?: string;
 }
 
-const MessageRenderer = ({ message, type }: MessageRendererProps) => { // Use the interface
-  // --- LOGS FROM PREVIOUS STEP ---
-  // console.log(`[MessageRenderer] Received message with type: ${type}`, JSON.stringify(message, null, 2));
-  if (type) { // Only log these if type is present
-    // console.log("[MessageRenderer] Is it ToolResponse (via type)?", type === "client.toolResponse");
+const MessageRenderer = ({ message, type }: MessageRendererProps) => {
+  if (typeof message === 'string') {
+    return <PlainTextMessage message={message} />;
   }
-  // console.log("[MessageRenderer] Is it ToolResponse (via isToolResponseMessage)?", isToolResponseMessage(message));
-  // --- END LOGS ---
 
   if (isClientAudioMessage(message)) {
-    return <ClientAudioLog message={message} />;
+    return <ClientAudioLog message={message as ClientAudioMessage} />;
   }
 
   if (isServerAudioMessage(message)) {
-    return <ServerAudioLog message={message} />;
+    return <ServerAudioLog message={message as ServerAudioMessage} />;
   }
 
+  // At this point, message is SDKLiveClientMessage or SDKLiveServerMessage
+  // The type guards will correctly narrow down based on the fields present.
+
   if (isClientContentMessage(message)) {
+    // message.clientContent is ClientContentPayload
     return <ClientContentLog message={message.clientContent} />;
   }
   if (isToolCallMessage(message)) {
-    return <ToolCallLog message={message} />;
+    // message.toolCall is ToolCallPayload
+    return <ToolCallLog message={message.toolCall} />;
   }
   if (isToolCallCancellationMessage(message)) {
-    return <ToolCallCancellationLog message={message} />;
+    // message.toolCallCancellation is ToolCallCancellationPayload
+    return <ToolCallCancellationLog message={message.toolCallCancellation} />;
   }
 
-  // Updated logic to prioritize type, then structure
-  if (type === "client.toolResponse") { // Check specific type first
-    if (isToolResponseMessage(message)) { // Also ensure structure matches
-      // console.log("[MessageRenderer] Rendering ToolResponseLog for (type client.toolResponse):", JSON.stringify(message, null, 2));
-      return <ToolResponseLog message={message as ToolResponseMessage} />;
-    } else {
-      // console.warn("[MessageRenderer] Message type is 'client.toolResponse' but structure doesn't match isToolResponseMessage. Message:", message);
-      // Fallback or render an error/default view
-    }
-  } else if (isToolResponseMessage(message)) { // Fallback to structure check if type isn't 'client.toolResponse'
-    //  console.log("[MessageRenderer] Rendering ToolResponseLog for (isToolResponseMessage, type was not client.toolResponse):", JSON.stringify(message, null, 2));
-    return <ToolResponseLog message={message} />;
+  // For ToolResponse, the type guard isToolResponseMessage checks if message is an SDKLiveClientMessage
+  // AND has the toolResponse field.
+  if (isToolResponseMessage(message)) {
+    // message.toolResponse is ToolResponsePayload
+    return <ToolResponseLog message={message.toolResponse} />;
   }
 
   if (isServerContentMessage(message)) {
-    const { serverContent } = message;
-    if (isInterrupted(serverContent)) {
+    // message.serverContent is ServerContentPayload (SDKLiveServerContent)
+    const serverContent = message.serverContent;
+    if (isInterrupted(serverContent)) { // isInterrupted now takes SDKLiveServerContent
       return <CustomPlainTextLog msg="interrupted" />;
     }
-    if (isTurnComplete(serverContent)) {
+    if (isTurnComplete(serverContent)) { // isTurnComplete now takes SDKLiveServerContent
       return <CustomPlainTextLog msg="turnComplete" />;
     }
-    if (isModelTurn(serverContent)) {
-      // console.log("isModelTurn", message); // Reduced verbosity
+    if (isModelTurn(serverContent)) { // isModelTurn now takes SDKLiveServerContent
+      // ModelTurnLog expects the full ServerContentMessage (SDKLiveServerMessage with serverContent field)
       return <ModelTurnLog message={message} />;
     }
+    // Potentially render other aspects of serverContent if needed, e.g., transcriptions
   }
-  if (typeof message === "string") {
-    // console.log("PlainTextMessage", message); // Reduced verbosity
-    return <PlainTextMessage message={message} />;
-  }
+
+  // Fallback for any other structured message not caught above
   return <AnyMessage message={message} />;
 };
 

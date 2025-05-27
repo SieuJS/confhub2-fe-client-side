@@ -1,13 +1,12 @@
 // src/app/[locale]/chatbot/lib/constants.ts
+import { Modality } from '@google/genai';
 import {
     LanguageOption as LiveChatLanguageOption,
     PrebuiltVoice,
     Language as LiveChatLanguageCode,
-    OutputModality
 } from './live-chat.types';
 
 import { LanguageOption as RegularChatLanguageOption } from './regular-chat.types';
-
 // --- Constants cho Live Chat ---
 export const AVAILABLE_VOICES_LIVE_CHAT: PrebuiltVoice[] = ["Puck", "Charon", "Kore", "Fenrir", "Aoede", "Orus", "Zephyr"];
 
@@ -28,7 +27,7 @@ export const AVAILABLE_LANGUAGES_LIVE_CHAT: LiveChatLanguageOption[] = [
 
 export const DEFAULT_LANGUAGE_LIVE_CHAT: LiveChatLanguageCode = 'vi';
 export const DEFAULT_VOICE_LIVE_CHAT: PrebuiltVoice = 'Puck';
-export const DEFAULT_MODALITY_LIVE_CHAT: OutputModality = 'audio';
+export const DEFAULT_MODALITY_LIVE_CHAT = Modality.AUDIO;
 
 // --- Constants cho Regular Chat (VÀ CÓ THỂ DÙNG CHUNG) ---
 export const AVAILABLE_LANGUAGES_REGULAR_CHAT: RegularChatLanguageOption[] = [

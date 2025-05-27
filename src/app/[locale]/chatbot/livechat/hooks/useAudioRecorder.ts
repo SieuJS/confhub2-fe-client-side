@@ -1,4 +1,4 @@
-// hooks/useAudioRecorder.ts
+// src/app/[locale]/chatbot/livechat/hooks/useAudioRecorder.ts
 import { useEffect } from "react";
 import { AudioRecorder } from "../lib/audio-recorder";
 

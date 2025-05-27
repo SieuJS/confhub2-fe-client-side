@@ -1,3 +1,4 @@
+// src/app/[locale]/chatbot/utis/chatUtils.ts
 /**
  * Generates a unique message ID.
  * Combines timestamp and a random alphanumeric string for better uniqueness.

@@ -1,4 +1,4 @@
-// src/app/[locale]/chatbot/regularchat/components/ChatArea.tsx
+// src/app/[locale]/chatbot/regularchat/ChatArea.tsx
 import React, { useRef, useEffect } from 'react';
 import ChatHistory from './ChatHistory';
 import ChatIntroductionDisplay from './ChatIntroduction';

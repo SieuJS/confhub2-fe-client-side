@@ -1,4 +1,4 @@
-// src/app/[locale]/chatbot/regular/LoadingIndicator.tsx
+// src/app/[locale]/chatbot/regularchat/LoadingIndicator.tsx
 import React from 'react'
 import {
   FiDownloadCloud,

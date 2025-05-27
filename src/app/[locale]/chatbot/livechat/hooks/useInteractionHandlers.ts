@@ -1,16 +1,21 @@
-// hooks/useInteractionHandlers.ts
-import { ClientContentMessage, StreamingLog } from "../multimodal-live-types"; // Import StreamingLog if not already
-import { useLoggerStore } from "../lib/store-logger"; // Import store to get current logs length
+// src/app/[locale]/chatbot/livechat/hooks/useInteractionHandlers.ts
+import {
+    StreamingLog,
+    // ClientContentMessage, // This was a custom type, we'll construct SDKLiveClientMessage
+    LiveOutgoingMessage, // This is SDKLiveClientMessage
+} from "../../lib/live-chat.types"; // Adjusted path
+import { useLoggerStore } from "../lib/store-logger";
+import { MultimodalLiveClient } from "../lib/multimodal-live-client"; // Import your client class
+import { Part, Content } from "@google/genai"; // SDK types
 
 interface InteractionHandlersProps {
     connected: boolean;
     connectWithPermissions: () => Promise<void>;
     setMuted: (muted: boolean) => void;
-    client: any;
-    log: (logEntry: StreamingLog) => void; // Make sure type is specific
-    // Modify to accept the index of the sent log
+    client: MultimodalLiveClient; // Type the client correctly
+    log: (logEntry: StreamingLog) => void;
     startLoading: (sentLogIndex: number) => void;
-    stopLoading: () => void; // Add a separate function for stopping on error
+    stopLoading: () => void;
 }
 
 const useInteractionHandlers = ({
@@ -19,75 +24,111 @@ const useInteractionHandlers = ({
     setMuted,
     client,
     log,
-    // Use the new props
     startLoading,
     stopLoading
 }: InteractionHandlersProps) => {
-    // Get current logs length to determine the index of the next log
-    // Note: This assumes log() adds to the end synchronously or predictably.
-    // If log is async, this might need adjustment. Zustand's set is sync by default.
 
     const handleSendMessage = async (textInput: string) => {
-        if (!connected || textInput.trim() === "") {
+        if (!connected) {
+            // Optionally, attempt to connect if not connected
+            // console.log("[handleSendMessage] Not connected. Attempting to connect...");
+            // await connectWithPermissions(); // This might change the `connected` state asynchronously
+            // if (!client.isConnected()) { // Re-check after attempting connection
+            //     log({
+            //         date: new Date(),
+            //         type: "error",
+            //         message: "Connection failed. Cannot send message.",
+            //     });
+            //     stopLoading(); // Ensure loading stops if connection fails
+            //     return;
+            // }
+            // For now, let's stick to original logic: do nothing if not connected.
+             log({
+                 date: new Date(),
+                 type: "info.sendAttempt",
+                 message: "Send message attempt while not connected.",
+             });
+            return;
+        }
+        if (textInput.trim() === "") {
+            log({
+                 date: new Date(),
+                 type: "info.sendAttempt",
+                 message: "Attempted to send empty message.",
+             });
             return;
         }
 
-        // Get the index where the new log will be added
         const currentLogs = useLoggerStore.getState().logs;
         const nextLogIndex = currentLogs.length;
 
         console.log(`[handleSendMessage] Triggered. Next log index: ${nextLogIndex}. Setting loading TRUE.`);
-        // Pass the index where the 'send.text' log will be
         startLoading(nextLogIndex);
 
         try {
-            const parts = [{ text: textInput }];
-            // It's better to log *before* the async call if possible,
-            // or handle potential state changes if log happens after await
-            const clientContentMessage: ClientContentMessage = {
+            const parts: Part[] = [{ text: textInput }];
+            const userContent: Content = { role: "user", parts };
+
+            // Construct the SDKLiveClientMessage for logging
+            const messageToSendForLog: LiveOutgoingMessage = {
                 clientContent: {
-                    turns: [{ role: "user", parts }],
+                    turns: [userContent],
                     turnComplete: true,
                 },
             };
 
-            const sendLogEntry: StreamingLog = { // Define the log entry explicitly
+            const sendLogEntry: StreamingLog = {
                  date: new Date(),
-                 type: "send.text",
-                 message: clientContentMessage,
-                 count: 1, // Assuming count is needed by store logic
+                 type: "client.send.text", // More specific type for client sending text
+                 message: messageToSendForLog, // Log the SDK-compatible message
+                 count: 1,
             };
+            log(sendLogEntry);
 
-            log(sendLogEntry); // Log the message *before* sending if safe
+            // client.send will internally wrap this in the full LiveOutgoingMessage
+            await client.send(parts, true); // true for turnComplete
 
-            // If log must happen after: Be aware the index might change if other logs occur between
-            // getting length and logging here. Logging before is safer for index stability.
-            await client.send(parts);
-
-            // Log *after* send if required by logic (less safe for index tracking)
-            // log(sendLogEntry);
-
-            // DO NOT stop loading here. Let the useEffect handle it based on server response.
+            // Loading is stopped by useEffect in the component listening to server responses/errors
 
         } catch (error) {
-            console.error("Failed to send message:", error);
-            log({ // Optionally log the error
+            console.error("Failed to send message via client.send:", error);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            log({
                 date: new Date(),
-                type: "error",
-                message: `Failed to send message: ${error instanceof Error ? error.message : String(error)}`,
-                count: 1,
+                type: "error.send",
+                message: `Failed to send message: ${errorMessage}`,
             });
-            console.log("[handleSendMessage] Error occurred. Setting loading FALSE.");
-            // Stop loading only if the send itself fails
-            stopLoading();
+            console.log("[handleSendMessage] Error during client.send. Setting loading FALSE.");
+            stopLoading(); // Stop loading if the send operation itself throws an error
         }
     };
 
     const handleStartVoice = async () => {
-        if (!connected) {
-            await connectWithPermissions();
+        // Ensure client.isConnected() is a reliable way to check connection status
+        // or rely on the `connected` prop which should be updated by the `useLiveApi` hook.
+        if (!connected) { // Use the connected prop from useLiveApi
+            try {
+                await connectWithPermissions();
+                // After successful connection, `connected` prop should become true via useLiveApi's events
+            } catch (error) {
+                console.error("Failed to connect with permissions for voice:", error);
+                log({
+                    date: new Date(),
+                    type: "error.connectVoice",
+                    message: `Failed to connect for voice: ${error instanceof Error ? error.message : String(error)}`,
+                });
+                return; // Don't proceed to setMuted if connection failed
+            }
         }
+        // At this point, connection should be established or was already established.
+        // Re-check `connected` state if connectWithPermissions doesn't guarantee it before resolving
+        // However, typically the `connected` prop itself would trigger UI changes.
         setMuted(false);
+         log({
+            date: new Date(),
+            type: "client.voice.start",
+            message: "Voice input started (unmuted).",
+        });
     };
 
     return { handleSendMessage, handleStartVoice };

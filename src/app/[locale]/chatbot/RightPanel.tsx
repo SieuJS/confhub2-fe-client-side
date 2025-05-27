@@ -1,3 +1,4 @@
+// src/app/[locale]/chatbot/RightPanel.tsx
 import React from 'react';
 import { X, Settings } from 'lucide-react';
 import LanguageDropdown from './LanguageDropdown';

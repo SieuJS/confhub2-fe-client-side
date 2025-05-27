@@ -3,12 +3,11 @@
 
 import React from 'react';
 import { useTranslations } from 'next-intl';
-import { useLiveChatSettings } from './contexts/LiveChatSettingsContext'; // Hook cho context
-import OutputFormatSelector from './OutputFormatSelector'; // Giả sử path đúng
-import VoiceDropdown from './VoiceDropdown'; // Giả sử path đúng
-
+import { useLiveChatSettings } from './contexts/LiveChatSettingsContext';
+import VoiceDropdown from './VoiceDropdown';
+import { Modality as SDKModality } from '@google/genai'; // Import SDK Modality
+import OutputFormatSelector from './OutputFormatSelector';
 interface LiveChatSpecificSettingsProps {
-  // isLiveServiceConnected?: boolean; // <-- ĐÃ XÓA TRONG PHIÊN BẢN TRƯỚC
   currentChatMode: 'live' | 'regular';
 }
 
@@ -17,18 +16,17 @@ const LiveChatSpecificSettings: React.FC<LiveChatSpecificSettingsProps> = ({
 }) => {
   const t = useTranslations();
   const {
-    currentModality,
-    setCurrentModality,
+    currentModality,    // This should be of type SDKModality from the context
+    setCurrentModality, // This should accept SDKModality
     currentVoice,
     setCurrentVoice,
     availableVoices,
-    isLiveChatConnected, // Lấy trạng thái kết nối từ context
+    isLiveChatConnected,
   } = useLiveChatSettings();
 
-  // Disable settings nếu đang kết nối live chat HOẶC không ở chế độ live
   const disableLiveSettings = isLiveChatConnected || currentChatMode === 'regular';
-  const isAudioSelected = currentModality === 'audio';
-  // Disable voice dropdown nếu live settings bị disable HOẶC output modality không phải là audio
+  // Compare with SDK enum member
+  const isAudioSelected = currentModality === SDKModality.AUDIO;
   const disableVoiceDropdown = disableLiveSettings || !isAudioSelected;
 
   return (
@@ -41,8 +39,8 @@ const LiveChatSpecificSettings: React.FC<LiveChatSpecificSettingsProps> = ({
     >
        <legend className='sr-only'>{t('Live_Stream_Output_Settings')}</legend>
       <OutputFormatSelector
-        currentModality={currentModality}
-        onModalityChange={setCurrentModality}
+        currentModality={currentModality} // Pass SDKModality
+        onModalityChange={setCurrentModality} // Expects SDKModality
         disabled={disableLiveSettings}
       />
       <div

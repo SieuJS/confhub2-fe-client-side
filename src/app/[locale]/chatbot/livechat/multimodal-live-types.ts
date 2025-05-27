@@ -1,257 +1,257 @@
-// src/app/[locale]/chatbot/livechat/multimodal-live-types.ts
-import type {
-  Content,
-  FunctionCall,
-  GenerationConfig,
-  GenerativeContentBlob,
-  Part,
-  Tool,
-} from "@google/generative-ai";
+// // src/app/[locale]/chatbot/livechat/multimodal-live-types.ts
+// import type {
+//   Content,
+//   FunctionCall,
+//   GenerationConfig,
+//   GenerativeContentBlob,
+//   Part,
+//   Tool,
+// } from "@google/generative-ai";
 
-/**
- * this module contains type-definitions and Type-Guards
- */
+// /**
+//  * this module contains type-definitions and Type-Guards
+//  */
 
-// Type-definitions
+// // Type-definitions
 
-/* outgoing types */
+// /* outgoing types */
 
-/**
- * the config to initiate the session
- */
-export type LiveConfig = {
-  model: string;
-  systemInstruction?: { parts: Part[] };
-  generationConfig?: Partial<LiveGenerationConfig>;
-  tools?: Array<Tool | { googleSearch: {} } | { codeExecution: {} }>;
-};
+// /**
+//  * the config to initiate the session
+//  */
+// export type LiveConfig = {
+//   model: string;
+//   systemInstruction?: { parts: Part[] };
+//   generationConfig?: Partial<LiveGenerationConfig>;
+//   tools?: Array<Tool | { googleSearch: {} } | { codeExecution: {} }>;
+// };
 
-export type PrebuiltVoice = "Puck" | "Charon" | "Kore" | "Fenrir" | "Aoede" | "Orus" | "Zephyr";
-export type OutputModality = "text" | "audio" | "image";
-export type Language = 'en' | 'vi' | 'zh';
-export type ChatMode = 'live' | 'regular';
-
-
-export type LiveGenerationConfig = GenerationConfig & {
-  responseModalities: OutputModality;
-  speechConfig?: {
-    voiceConfig?: {
-      prebuiltVoiceConfig?: {
-        voiceName: PrebuiltVoice
-      };
-    };
-  };
-};
+// export type PrebuiltVoice = "Puck" | "Charon" | "Kore" | "Fenrir" | "Aoede" | "Orus" | "Zephyr";
+// export type OutputModality = "text" | "audio" | "image";
+// export type Language = 'en' | 'vi' | 'zh';
+// export type ChatMode = 'live' | 'regular';
 
 
-export type LiveOutgoingMessage =
-  | SetupMessage
-  | ClientContentMessage
-  | RealtimeInputMessage
-  | ToolResponseMessage;
+// export type LiveGenerationConfig = GenerationConfig & {
+//   responseModalities: OutputModality;
+//   speechConfig?: {
+//     voiceConfig?: {
+//       prebuiltVoiceConfig?: {
+//         voiceName: PrebuiltVoice
+//       };
+//     };
+//   };
+// };
 
-export type SetupMessage = {
-  setup: LiveConfig;
-};
 
-export type ClientContentMessage = {
-  clientContent: {
-    turns: Content[];
-    turnComplete: boolean;
-  };
-};
+// export type LiveOutgoingMessage =
+//   | SetupMessage
+//   | ClientContentMessage
+//   | RealtimeInputMessage
+//   | ToolResponseMessage;
 
-export type RealtimeInputMessage = {
-  realtimeInput: {
-    mediaChunks: GenerativeContentBlob[];
-  };
-};
+// export type SetupMessage = {
+//   setup: LiveConfig;
+// };
 
-export type ToolResponseMessage = {
-  toolResponse: {
-    functionResponses: LiveFunctionResponse[];
-  };
-};
+// export type ClientContentMessage = {
+//   clientContent: {
+//     turns: Content[];
+//     turnComplete: boolean;
+//   };
+// };
 
-export type ToolResponse = ToolResponseMessage["toolResponse"];
+// export type RealtimeInputMessage = {
+//   realtimeInput: {
+//     mediaChunks: GenerativeContentBlob[];
+//   };
+// };
 
-export type LiveFunctionResponse = {
-  response: object;
-  id: string;
-};
+// export type ToolResponseMessage = {
+//   toolResponse: {
+//     functionResponses: LiveFunctionResponse[];
+//   };
+// };
 
-/** Incoming types */
+// export type ToolResponse = ToolResponseMessage["toolResponse"];
 
-export type LiveIncomingMessage =
-  | ToolCallCancellationMessage
-  | ToolCallMessage
-  | ServerContentMessage
-  | SetupCompleteMessage;
+// export type LiveFunctionResponse = {
+//   response: object;
+//   id: string;
+// };
 
-export type SetupCompleteMessage = { setupComplete: {} };
+// /** Incoming types */
 
-export type ServerContentMessage = {
-  serverContent: ServerContent;
-};
+// export type LiveIncomingMessage =
+//   | ToolCallCancellationMessage
+//   | ToolCallMessage
+//   | ServerContentMessage
+//   | SetupCompleteMessage;
 
-export type ServerContent = ModelTurn | TurnComplete | Interrupted;
+// export type SetupCompleteMessage = { setupComplete: {} };
 
-export type ModelTurn = {
-  modelTurn: {
-    parts: Part[];
-  };
-};
+// export type ServerContentMessage = {
+//   serverContent: ServerContent;
+// };
 
-export type TurnComplete = { turnComplete: boolean };
+// export type ServerContent = ModelTurn | TurnComplete | Interrupted;
 
-export type Interrupted = { interrupted: true };
+// export type ModelTurn = {
+//   modelTurn: {
+//     parts: Part[];
+//   };
+// };
 
-export type ToolCallCancellationMessage = {
-  toolCallCancellation: {
-    ids: string[];
-  };
-};
+// export type TurnComplete = { turnComplete: boolean };
 
-export type ToolCallCancellation =
-  ToolCallCancellationMessage["toolCallCancellation"];
+// export type Interrupted = { interrupted: true };
 
-export type ToolCallMessage = {
-  toolCall: ToolCall;
-};
+// export type ToolCallCancellationMessage = {
+//   toolCallCancellation: {
+//     ids: string[];
+//   };
+// };
 
-export type LiveFunctionCall = FunctionCall & {
-  id: string;
-};
+// export type ToolCallCancellation =
+//   ToolCallCancellationMessage["toolCallCancellation"];
 
-/**
- * A `toolCall` message
- */
-export type ToolCall = {
-  functionCalls: LiveFunctionCall[];
-};
+// export type ToolCallMessage = {
+//   toolCall: ToolCall;
+// };
 
-// ========= Audio Player Types ============
-export type ClientAudioMessage = {
-  clientAudio: {
-    audioData: string; // Base64 encoded audio
-  };
-};
+// export type LiveFunctionCall = FunctionCall & {
+//   id: string;
+// };
 
-export type ServerAudioMessage = {
-  serverAudio: {
-    audioData: string;
-  }
-}
+// /**
+//  * A `toolCall` message
+//  */
+// export type ToolCall = {
+//   functionCalls: LiveFunctionCall[];
+// };
 
-export function isClientAudioMessage(msg: any): msg is ClientAudioMessage {
-  return msg && typeof msg === "object" && msg.clientAudio && typeof msg.clientAudio.audioData === 'string';
-}
+// // ========= Audio Player Types ============
+// export type ClientAudioMessage = {
+//   clientAudio: {
+//     audioData: string; // Base64 encoded audio
+//   };
+// };
 
-export function isServerAudioMessage(msg: any): msg is ServerAudioMessage {
-    return msg && typeof msg === "object" && msg.serverAudio && typeof msg.serverAudio.audioData === 'string';
-}
+// export type ServerAudioMessage = {
+//   serverAudio: {
+//     audioData: string;
+//   }
+// }
 
-// =========================================
+// export function isClientAudioMessage(msg: any): msg is ClientAudioMessage {
+//   return msg && typeof msg === "object" && msg.clientAudio && typeof msg.clientAudio.audioData === 'string';
+// }
 
-/** log types */
-export type StreamingLog = {
-  date: Date;
-  type: string;
-  count?: number;
-  message: string | LiveOutgoingMessage | LiveIncomingMessage | ClientAudioMessage | ServerAudioMessage; // Include Audio Messages
-};
+// export function isServerAudioMessage(msg: any): msg is ServerAudioMessage {
+//     return msg && typeof msg === "object" && msg.serverAudio && typeof msg.serverAudio.audioData === 'string';
+// }
 
-// Type-Guards
+// // =========================================
 
-const prop = (a: any, prop: string, kind: string = "object") =>
-  typeof a === "object" && typeof a[prop] === "object";
+// /** log types */
+// export type StreamingLog = {
+//   date: Date;
+//   type: string;
+//   count?: number;
+//   message: string | LiveOutgoingMessage | LiveIncomingMessage | ClientAudioMessage | ServerAudioMessage; // Include Audio Messages
+// };
 
-// outgoing messages
-export const isSetupMessage = (a: unknown): a is SetupMessage =>
-  prop(a, "setup");
+// // Type-Guards
 
-export const isClientContentMessage = (a: unknown): a is ClientContentMessage =>
-  prop(a, "clientContent");
+// const prop = (a: any, prop: string, kind: string = "object") =>
+//   typeof a === "object" && typeof a[prop] === "object";
 
-export const isRealtimeInputMessage = (a: unknown): a is RealtimeInputMessage =>
-  prop(a, "realtimeInput");
+// // outgoing messages
+// export const isSetupMessage = (a: unknown): a is SetupMessage =>
+//   prop(a, "setup");
 
-export const isToolResponseMessage = (a: unknown): a is ToolResponseMessage =>
-  prop(a, "toolResponse");
+// export const isClientContentMessage = (a: unknown): a is ClientContentMessage =>
+//   prop(a, "clientContent");
 
-// incoming messages
-export const isSetupCompleteMessage = (a: unknown): a is SetupCompleteMessage =>
-  prop(a, "setupComplete");
+// export const isRealtimeInputMessage = (a: unknown): a is RealtimeInputMessage =>
+//   prop(a, "realtimeInput");
 
-export const isServerContentMessage = (a: any): a is ServerContentMessage =>
-  prop(a, "serverContent");
+// export const isToolResponseMessage = (a: unknown): a is ToolResponseMessage =>
+//   prop(a, "toolResponse");
 
-export const isToolCallMessage = (a: any): a is ToolCallMessage =>
-  prop(a, "toolCall");
+// // incoming messages
+// export const isSetupCompleteMessage = (a: unknown): a is SetupCompleteMessage =>
+//   prop(a, "setupComplete");
 
-export const isToolCallCancellationMessage = (
-  a: unknown,
-): a is ToolCallCancellationMessage =>
-  prop(a, "toolCallCancellation") &&
-  isToolCallCancellation((a as any).toolCallCancellation);
+// export const isServerContentMessage = (a: any): a is ServerContentMessage =>
+//   prop(a, "serverContent");
 
-export const isModelTurn = (a: any): a is ModelTurn =>
-  typeof (a as ModelTurn).modelTurn === "object";
+// export const isToolCallMessage = (a: any): a is ToolCallMessage =>
+//   prop(a, "toolCall");
 
-export const isTurnComplete = (a: any): a is TurnComplete =>
-  typeof (a as TurnComplete).turnComplete === "boolean";
+// export const isToolCallCancellationMessage = (
+//   a: unknown,
+// ): a is ToolCallCancellationMessage =>
+//   prop(a, "toolCallCancellation") &&
+//   isToolCallCancellation((a as any).toolCallCancellation);
 
-export const isInterrupted = (a: any): a is Interrupted =>
-  (a as Interrupted).interrupted;
+// export const isModelTurn = (a: any): a is ModelTurn =>
+//   typeof (a as ModelTurn).modelTurn === "object";
 
-export function isToolCall(value: unknown): value is ToolCall {
-  if (!value || typeof value !== "object") return false;
+// export const isTurnComplete = (a: any): a is TurnComplete =>
+//   typeof (a as TurnComplete).turnComplete === "boolean";
 
-  const candidate = value as Record<string, unknown>;
+// export const isInterrupted = (a: any): a is Interrupted =>
+//   (a as Interrupted).interrupted;
 
-  return (
-    Array.isArray(candidate.functionCalls) &&
-    candidate.functionCalls.every((call) => isLiveFunctionCall(call))
-  );
-}
+// export function isToolCall(value: unknown): value is ToolCall {
+//   if (!value || typeof value !== "object") return false;
 
-export function isToolResponse(value: unknown): value is ToolResponse {
-  if (!value || typeof value !== "object") return false;
+//   const candidate = value as Record<string, unknown>;
 
-  const candidate = value as Record<string, unknown>;
+//   return (
+//     Array.isArray(candidate.functionCalls) &&
+//     candidate.functionCalls.every((call) => isLiveFunctionCall(call))
+//   );
+// }
 
-  return (
-    Array.isArray(candidate.functionResponses) &&
-    candidate.functionResponses.every((resp) => isLiveFunctionResponse(resp))
-  );
-}
+// export function isToolResponse(value: unknown): value is ToolResponse {
+//   if (!value || typeof value !== "object") return false;
 
-export function isLiveFunctionCall(value: unknown): value is LiveFunctionCall {
-  if (!value || typeof value !== "object") return false;
+//   const candidate = value as Record<string, unknown>;
 
-  const candidate = value as Record<string, unknown>;
+//   return (
+//     Array.isArray(candidate.functionResponses) &&
+//     candidate.functionResponses.every((resp) => isLiveFunctionResponse(resp))
+//   );
+// }
 
-  return (
-    typeof candidate.name === "string" &&
-    typeof candidate.id === "string" &&
-    typeof candidate.args === "object" &&
-    candidate.args !== null
-  );
-}
+// export function isLiveFunctionCall(value: unknown): value is LiveFunctionCall {
+//   if (!value || typeof value !== "object") return false;
 
-export function isLiveFunctionResponse(
-  value: unknown,
-): value is LiveFunctionResponse {
-  if (!value || typeof value !== "object") return false;
+//   const candidate = value as Record<string, unknown>;
 
-  const candidate = value as Record<string, unknown>;
+//   return (
+//     typeof candidate.name === "string" &&
+//     typeof candidate.id === "string" &&
+//     typeof candidate.args === "object" &&
+//     candidate.args !== null
+//   );
+// }
 
-  return (
-    typeof candidate.response === "object" && typeof candidate.id === "string"
-  );
-}
+// export function isLiveFunctionResponse(
+//   value: unknown,
+// ): value is LiveFunctionResponse {
+//   if (!value || typeof value !== "object") return false;
 
-export const isToolCallCancellation = (
-  a: unknown,
-): a is ToolCallCancellationMessage["toolCallCancellation"] =>
-  typeof a === "object" && Array.isArray((a as any).ids);
+//   const candidate = value as Record<string, unknown>;
+
+//   return (
+//     typeof candidate.response === "object" && typeof candidate.id === "string"
+//   );
+// }
+
+// export const isToolCallCancellation = (
+//   a: unknown,
+// ): a is ToolCallCancellationMessage["toolCallCancellation"] =>
+//   typeof a === "object" && Array.isArray((a as any).ids);

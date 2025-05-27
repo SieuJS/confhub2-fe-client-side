@@ -1,4 +1,4 @@
-// components/RestartStreamButton.tsx
+// src/app/[locale]/chatbot/livechat/layout/RestartStreamButton.tsx
 
 import React from "react";
 

@@ -7,11 +7,10 @@ import {
   isTurnComplete,
   isInterrupted,
   isServerAudioMessage,
-  ServerContent,
-  ModelTurn
-} from '../multimodal-live-types';
-// We don't need to import Part from @google/generative-ai directly here
-// as its structure is implicitly handled by the type guards on serverContent.modelTurn.parts
+  ServerContentPayload,
+  // Import the actual SDK message types if needed for more specific checks
+} from '../../lib/live-chat.types';
+import { LiveServerMessage as SDKLiveServerMessage } from '@google/genai';
 
 interface UseMessageSendingManagerProps {
   logs: StreamingLog[];
@@ -33,7 +32,7 @@ export function useMessageSendingManager({ logs }: UseMessageSendingManagerProps
     lastSentLogIndexRef.current = null;
   }, []);
 
-  useEffect(() => {
+   useEffect(() => {
     if (!isSendingMessage || lastSentLogIndexRef.current === null) {
       return;
     }
@@ -41,39 +40,55 @@ export function useMessageSendingManager({ logs }: UseMessageSendingManagerProps
     const startIndexToCheck = lastSentLogIndexRef.current + 1;
     for (let i = startIndexToCheck; i < logs.length; i++) {
       const currentLog = logs[i];
-      if (!currentLog?.message) continue;
+      const message = currentLog?.message;
+
+      if (!message || typeof message === 'string') continue;
 
       let shouldStopLoading = false;
-      let serverContentFromLog: ServerContent | undefined = undefined;
+      let serverContentFromLog: ServerContentPayload | undefined = undefined;
 
-      if (isServerContentMessage(currentLog.message)) {
-        serverContentFromLog = currentLog.message.serverContent;
-
-        if (isModelTurn(serverContentFromLog)) {
-          const modelTurnData = serverContentFromLog.modelTurn;
-          // Check if any part has 'text' or 'functionCall'
-          // Your 'Part' type is a union, so 'part.text' or 'part.functionCall' will exist
-          // on the respective members of that union.
-          if (modelTurnData?.parts?.some(part => {
-            // Type casting or type guards might be needed if TypeScript can't infer narrow enough
-            // For now, direct property access often works with union types if properties are distinct.
-            return (part as any).text || (part as any).functionCall;
-          })) {
-             console.log(`[useMessageSendingManager] Model turn content (text or functionCall) received. Continuing loading. Parts:`, modelTurnData.parts);
-             // Don't stop loading yet, wait for TurnComplete or Interrupted
-          } else if (modelTurnData?.parts?.length > 0) {
-            console.log(`[useMessageSendingManager] Model turn received with parts, but no immediate text/functionCall. Parts:`, modelTurnData.parts);
-          }
-        } else if (isTurnComplete(serverContentFromLog)) {
-          console.log(`[useMessageSendingManager] TurnComplete received. Stopping loading.`);
-          shouldStopLoading = true;
-        } else if (isInterrupted(serverContentFromLog)) {
-          console.log(`[useMessageSendingManager] Interrupted received. Stopping loading.`);
-          shouldStopLoading = true;
-        }
-      } else if (isServerAudioMessage(currentLog.message)) {
+      if (isServerAudioMessage(message)) {
         console.log(`[useMessageSendingManager] ServerAudio received. Stopping loading.`);
         shouldStopLoading = true;
+      }
+      else if (
+        typeof message === 'object' && message !== null &&
+        !('clientAudio' in message) &&
+        !('setup' in message) &&
+        !('clientContent' in message) &&
+        !('realtimeInput' in message) &&
+        !('toolResponse' in message)
+      ) {
+        const potentialServerMessage = message as SDKLiveServerMessage;
+
+        if (isServerContentMessage(potentialServerMessage)) {
+          serverContentFromLog = potentialServerMessage.serverContent;
+
+          if (serverContentFromLog && isModelTurn(serverContentFromLog)) {
+            const modelTurnData = serverContentFromLog.modelTurn; // modelTurnData is SDK Content
+
+            // Check if modelTurnData and modelTurnData.parts are defined
+            if (modelTurnData && modelTurnData.parts) { // <<<< FIX: Check modelTurnData.parts
+              if (modelTurnData.parts.some(part => part.text !== undefined || part.functionCall !== undefined)) {
+                console.log(`[useMessageSendingManager] Model turn content (text or functionCall) received. Continuing loading. Parts:`, modelTurnData.parts);
+              } else if (modelTurnData.parts.length > 0) { // Now safe to access .length
+                console.log(`[useMessageSendingManager] Model turn received with parts, but no immediate text/functionCall. Parts:`, modelTurnData.parts);
+              }
+              // else: modelTurnData.parts is an empty array, or all parts are empty/non-text/non-functionCall
+            }
+            // else: modelTurnData itself might be defined but modelTurnData.parts is undefined.
+            // This case means a modelTurn was indicated, but it had no parts array.
+            // Depending on requirements, you might log this or handle it.
+            // For now, the existing logic doesn't stop loading on just any modelTurn, so this is fine.
+
+          } else if (serverContentFromLog && isTurnComplete(serverContentFromLog)) {
+            console.log(`[useMessageSendingManager] TurnComplete received. Stopping loading.`);
+            shouldStopLoading = true;
+          } else if (serverContentFromLog && isInterrupted(serverContentFromLog)) {
+            console.log(`[useMessageSendingManager] Interrupted received. Stopping loading.`);
+            shouldStopLoading = true;
+          }
+        }
       }
 
       if (shouldStopLoading) {

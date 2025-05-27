@@ -1,4 +1,4 @@
-// hooks/useConnection.ts
+// src/app/[locale]/chatbot/livechat/hooks/useConnection.ts
 import { useState, useCallback, useEffect, useRef } from "react"; // Added useEffect, useRef
 import { useLiveAPIContext } from "../contexts/LiveAPIContext";
 import { useLoggerStore } from "../lib/store-logger";

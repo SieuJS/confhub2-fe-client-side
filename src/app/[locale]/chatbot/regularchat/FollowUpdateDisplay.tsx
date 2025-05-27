@@ -1,4 +1,4 @@
-// src/app/[locale]/chatbot/chat/FollowUpdateDisplay.tsx
+// src/app/[locale]/chatbot/regularchat/FollowUpdateDisplay.tsx
 import React from 'react'
 // Ensure ItemFollowStatusUpdatePayload, FollowItem etc. are correctly imported.
 // If they come from `shared/types` directly, update the import path.

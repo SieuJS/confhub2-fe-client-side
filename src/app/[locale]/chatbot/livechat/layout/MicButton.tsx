@@ -1,4 +1,4 @@
-// MicButton.tsx
+// src/app/[locale]/chatbot/livechat/layout/MicButton.tsx
 import cn from 'classnames'
 import React from 'react'
 import AudioPulse from '../AudioPulse'

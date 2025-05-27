@@ -1,4 +1,4 @@
-// src/app/[locale]/chatbot/livechat/audioPlayerUtils.ts
+// src/app/[locale]/chatbot/livechat/utils/audioPlayerUtils.ts
 export const formatTimeDisplay = (time: number): string => {
   const validTime = isNaN(time) || !isFinite(time) || time < 0 ? 0 : time;
   const minutes = Math.floor(validTime / 60);

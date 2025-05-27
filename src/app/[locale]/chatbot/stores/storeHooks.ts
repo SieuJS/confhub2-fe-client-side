@@ -1,4 +1,4 @@
-// src/hooks/storeHooks.ts
+// src/app/[locale]/chatbot/stores/storeHooks.ts
 import { useCallback } from 'react';
 import {
     useSocketStore,

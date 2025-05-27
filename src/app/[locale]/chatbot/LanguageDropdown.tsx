@@ -1,4 +1,4 @@
-// src/components/layout/sidepanel/LanguageDropdown.tsx
+// src/app/[locale]/chatbot/LanguageDropdown.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import {

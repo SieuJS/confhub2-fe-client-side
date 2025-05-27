@@ -1,4 +1,4 @@
-// hooks/useVolumeControl.ts
+// src/app/[locale]/chatbot/livechat/hooks/useVolumeControl.ts
 import { useEffect } from "react";
 
 const useVolumeControl = (inVolume: number) => {

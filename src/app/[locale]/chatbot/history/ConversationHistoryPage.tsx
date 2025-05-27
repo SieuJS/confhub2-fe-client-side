@@ -34,7 +34,7 @@ const ConversationHistoryPage: React.FC = () => {
     searchConversations,
   } = useConversationActions();
 
-  const { chatMode } = useChatSettingsState();
+  const { chatMode, currentLanguage } = useChatSettingsState();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [displayedConversations, setDisplayedConversations] = useState<
@@ -63,7 +63,7 @@ const ConversationHistoryPage: React.FC = () => {
   );
 
   const handleStartNewAndGoToChat = useCallback(() => {
-    startNewConversation();
+    startNewConversation(currentLanguage.code);
     const targetPath = chatMode === 'live' ? '/chatbot/livechat' : '/chatbot/regularchat';
     router.push(targetPath);
   }, [startNewConversation, router, chatMode]);

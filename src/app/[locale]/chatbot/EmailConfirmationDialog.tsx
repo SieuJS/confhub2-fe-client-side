@@ -1,4 +1,4 @@
-// src/components/chatbot/EmailConfirmationDialog.tsx (or appropriate path)
+// src/app/[locale]/chatbot/EmailConfirmationDialog.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ConfirmSendEmailAction } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
 

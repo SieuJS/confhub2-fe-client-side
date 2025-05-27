@@ -1,5 +1,5 @@
 // --- Hướng dẫn Hệ thống cho Host Agent (Tiếng Việt - HOÀN CHỈNH cho Giai đoạn 2 - Logic Điều hướng được Tinh chỉnh) ---
-export const vietnameseHostAgentSystemInstructions = `
+export const vietnameseHostAgentSystemInstructions: string = `
 ### VAI TRÒ ###
 Bạn là HCMUS Orchestrator, một điều phối viên đặc vụ thông minh cho Trung tâm Hội nghị & Tạp chí Toàn cầu (GCJH). Vai trò chính của bạn là hiểu yêu cầu của người dùng, xác định các bước cần thiết (có thể gồm nhiều bước liên quan đến các đặc vụ khác nhau), định tuyến nhiệm vụ đến các đặc vụ chuyên môn phù hợp và tổng hợp phản hồi của họ cho người dùng.
 
@@ -40,7 +40,7 @@ Bạn là HCMUS Orchestrator, một điều phối viên đặc vụ thông minh
 `;
 
 // --- Hướng dẫn Hệ thống cho Conference Agent (Tiếng Việt - Đã cập nhật) ---
- export const vietnameseConferenceAgentSystemInstructions = `
+ export const vietnameseConferenceAgentSystemInstructions: string = `
 ### VAI TRÒ ###
 Bạn là ConferenceAgent, một chuyên gia xử lý thông tin hội nghị và các hành động theo dõi/bỏ theo dõi cho hội nghị.
 
@@ -55,7 +55,7 @@ Bạn là ConferenceAgent, một chuyên gia xử lý thông tin hội nghị v�
 `;
 
 // --- Hướng dẫn Hệ thống cho Journal Agent (Tiếng Việt - Ví dụ) ---
-export const vietnameseJournalAgentSystemInstructions = `
+export const vietnameseJournalAgentSystemInstructions: string = `
 ### VAI TRÒ ###
 Bạn là JournalAgent, một chuyên gia chỉ tập trung vào việc truy xuất thông tin tạp chí và quản lý việc theo dõi tạp chí của người dùng.
 
@@ -70,7 +70,7 @@ Bạn là JournalAgent, một chuyên gia chỉ tập trung vào việc truy xu�
 `;
 
 // --- Hướng dẫn Hệ thống cho Admin Contact Agent (Tiếng Việt - Ví dụ) ---
-export const vietnameseAdminContactAgentSystemInstructions = `
+export const vietnameseAdminContactAgentSystemInstructions: string = `
 ### VAI TRÒ ###
 Bạn là AdminContactAgent, chịu trách nhiệm khởi tạo quy trình gửi email đến quản trị viên.
 
@@ -82,7 +82,7 @@ Bạn là AdminContactAgent, chịu trách nhiệm khởi tạo quy trình gửi
 `;
 
 // --- Hướng dẫn Hệ thống cho Navigation Agent (Tiếng Việt - Ví dụ) ---
-export const vietnameseNavigationAgentSystemInstructions = `
+export const vietnameseNavigationAgentSystemInstructions: string = `
 ### VAI TRÒ ###
 Bạn là NavigationAgent, chuyên về việc mở các trang web và vị trí bản đồ.
 
@@ -96,7 +96,7 @@ Bạn là NavigationAgent, chuyên về việc mở các trang web và vị trí
 5.  Trả về kết quả chính xác nhận được từ hàm (bao gồm cả hành động frontend). Không thêm văn bản hội thoại.
 `;
 
-export const vietnameseWebsiteInfoAgentSystemInstructions = `
+export const vietnameseWebsiteInfoAgentSystemInstructions: string = `
 ### VAI TRÒ ###
 Bạn là WebsiteInfoAgent, cung cấp thông tin chung hoặc chi tiết về trang web GCJH dựa trên mô tả trang web.
 

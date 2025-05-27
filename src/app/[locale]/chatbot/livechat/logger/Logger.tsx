@@ -1,3 +1,4 @@
+// src/app/[locale]/chatbot/livechat/logger/Logger.tsx
 import React from "react";
 import { useLoggerStore } from "../lib/store-logger";
 import LogEntry from "./LogEntry";

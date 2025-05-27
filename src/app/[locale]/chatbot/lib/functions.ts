@@ -1,7 +1,7 @@
 import {
     FunctionDeclaration,
-    SchemaType,
-} from "@google/generative-ai";
+    Type,
+} from "@google/genai";
 
 
 
@@ -246,14 +246,14 @@ GCJH is a comprehensive online platform designed to connect researchers, academi
 //     name: "routeToAgent",
 //     description: "Routes a specific task to a designated specialist agent.",
 //     parameters: {
-//         type: SchemaType.OBJECT,
+//         type: Type.OBJECT,
 //         properties: {
 //             targetAgent: {
-//                 type: SchemaType.STRING,
+//                 type: Type.STRING,
 //                 description: "The unique identifier of the specialist agent to route the task to (e.g., 'ConferenceAgent').",
 //             },
 //             taskDescription: {
-//                 type: SchemaType.STRING,
+//                 type: Type.STRING,
 //                 description: "A details natural language description of the task for the target agent.",
 //             }
 //         },
@@ -270,11 +270,11 @@ export const englishGetConferencesDeclaration: FunctionDeclaration = {
         " The backend API may be case-sensitive for certain parameters (e.g., `country`, `continent`). Ensure the casing of the values matches the expected format." +
         " A comprehensive example combining multiple criteria: `acronym=AAAI&topics=AI&topics=Machine+Learning&country=Vietnam&fromDate=2024-01-01&toDate=2024-12-31&rank=A*`",
     parameters: {
-        type: SchemaType.OBJECT, // Vẫn là OBJECT theo cấu trúc chung
+        type: Type.OBJECT, // Vẫn là OBJECT theo cấu trúc chung
         properties: {
             // Định nghĩa một tham số duy nhất để chứa query string
             searchQuery: {
-                type: SchemaType.STRING,
+                type: Type.STRING,
                 // Hướng dẫn chi tiết cách tạo query string
                 description: "A URL-encoded query string constructed from the user's search criteria for conferences. Format as key=value pairs separated by '&'. " +
                     "**Crucially, regardless of the input language (e.g., Vietnamese, English, French, etc.), all values used in the query string MUST be in English.** " +
@@ -334,94 +334,94 @@ export const englishGetJournalsDeclaration: FunctionDeclaration = {
     name: "getJournals",
     description: "Retrieves information about journals based on filtering criteria.",
     parameters: {
-        type: SchemaType.OBJECT,
+        type: Type.OBJECT,
         properties: {
             "Rank": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "List of journal ranks to filter by.",
                 "items": {
-                    "type": SchemaType.NUMBER
+                    "type": Type.NUMBER
                 }
             },
             "Title": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "List of journal titles to filter by.",
                 "items": {
-                    "type": SchemaType.STRING
+                    "type": Type.STRING
                 }
             },
             "Issn": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "List of journal ISSNs to filter by.",
                 "items": {
-                    "type": SchemaType.STRING
+                    "type": Type.STRING
                 }
             },
             "SJR": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "List of journal SJR values to filter by.",
                 "items": {
-                    "type": SchemaType.NUMBER
+                    "type": Type.NUMBER
                 }
             },
             "SJRBestQuartile": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "List of journal SJR Best Quartile values to filter by.",
                 "items": {
-                    "type": SchemaType.STRING
+                    "type": Type.STRING
                 }
             },
             "HIndex": {
-                "type": SchemaType.INTEGER,
+                "type": Type.INTEGER,
                 "description": "Journal H index to filter by."
             },
             "Country": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "List of countries to filter journals by.",
                 "items": {
-                    "type": SchemaType.STRING
+                    "type": Type.STRING
                 }
             },
             "Region": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "List of regions to filter journals by.",
                 "items": {
-                    "type": SchemaType.STRING
+                    "type": Type.STRING
                 }
             },
             "Publisher": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "List of publishers to filter journals by.",
                 "items": {
-                    "type": SchemaType.STRING
+                    "type": Type.STRING
                 }
             },
             "Areas": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "List of areas to filter journals by.",
                 "items": {
-                    "type": SchemaType.STRING
+                    "type": Type.STRING
                 }
             },
             "Categories": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "List of categories to filter journals by.",
                 "items": {
-                    "type": SchemaType.STRING
+                    "type": Type.STRING
                 }
             },
             "Overton": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "List of Overton values to filter journals by.",
                 "items": {
-                    "type": SchemaType.NUMBER
+                    "type": Type.NUMBER
                 }
             },
             "SDG": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "List of SDGs to filter journals by.",
                 "items": {
-                    "type": SchemaType.STRING
+                    "type": Type.STRING
                 }
             }
         }
@@ -437,10 +437,10 @@ export const englishDrawChartDeclaration: FunctionDeclaration = {
     name: "drawChart",
     description: "Draws a chart based on the provided data.",
     parameters: {
-        type: SchemaType.OBJECT,
+        type: Type.OBJECT,
         properties: {
             chartType: {
-                type: SchemaType.STRING,
+                type: Type.STRING,
                 description: "The type of chart (e.g., bar, line, pie).",
             }
         },
@@ -479,10 +479,10 @@ export const englishNavigationDeclaration: FunctionDeclaration = {
     - Specifically for the '/dashboard' path, you can navigate to specific tabs by appending '?tab=' followed by the tab name. Allowed dashboard tabs are: 'profile', 'myconferences', 'followed', 'note', 'notifications', 'blacklisted', 'setting'. Example for navigating to the profile tab: {"url": "/dashboard?tab=profile"}.
     - For EXTERNAL conference/journal sites: Provide the full, valid URL starting with 'http://' or 'https://'.`,
     parameters: {
-        type: SchemaType.OBJECT,
+        type: Type.OBJECT,
         properties: {
             url: {
-                type: SchemaType.STRING,
+                type: Type.STRING,
                 description: `The internal path (starting with '/', e.g., '/dashboard?tab=profile') or the full external URL (starting with 'http://' or 'https://', e.g., 'https://some-journal.com/article') to navigate to.`
             }
         },
@@ -494,10 +494,10 @@ export const englishOpenGoogleMapDeclaration: FunctionDeclaration = {
     name: "openGoogleMap",
     description: "Opens Google Maps in a new browser tab directed to a specific location string (e.g., city, address, landmark).",
     parameters: {
-        type: SchemaType.OBJECT,
+        type: Type.OBJECT,
         properties: {
             location: {
-                type: SchemaType.STRING,
+                type: Type.STRING,
                 description: "The geographical location string to search for on Google Maps (e.g., 'Delphi, Greece', 'Eiffel Tower, Paris', '1600 Amphitheatre Parkway, Mountain View, CA').",
             },
         },
@@ -509,26 +509,26 @@ export const englishManageFollowDeclaration: FunctionDeclaration = {
     name: "manageFollow", // Hoặc tên hàm thực tế của bạn
     description: "Follows, unfollows, or lists followed conferences or journals for the user.",
     parameters: {
-        type: SchemaType.OBJECT,
+        type: Type.OBJECT,
         properties: {
             itemType: {
-                type: SchemaType.STRING,
+                type: Type.STRING,
                 description: "The type of item.",
                 format: 'enum',
                 enum: ["conference", "journal"]
             },
             action: {
-                type: SchemaType.STRING,
+                type: Type.STRING,
                 description: "The desired action: 'follow', 'unfollow', or 'list'.",
                 format: 'enum',
                 enum: ["follow", "unfollow", "list"] // Thêm 'list'
             },
             identifier: { // Optional when action is 'list'
-                type: SchemaType.STRING,
+                type: Type.STRING,
                 description: "A unique identifier for the item (e.g., acronym, title, ID). Required for 'follow'/'unfollow'.",
             },
             identifierType: { // Optional when action is 'list'
-                type: SchemaType.STRING,
+                type: Type.STRING,
                 description: "The type of the identifier. Required for 'follow'/'unfollow'.",
                 format: 'enum',
                 enum: ["acronym", "title", "id"],
@@ -546,26 +546,26 @@ export const englishManageCalendarDeclaration: FunctionDeclaration = {
     name: "manageCalendar", // Hoặc tên hàm thực tế của bạn
     description: "Adds, removes, or lists conferences in the user's calendar.",
     parameters: {
-        type: SchemaType.OBJECT,
+        type: Type.OBJECT,
         properties: {
             itemType: {
-                type: SchemaType.STRING,
+                type: Type.STRING,
                 description: "The type of item. Must be 'conference' for calendar actions.",
                 format: 'enum',
                 enum: ["conference"]
             },
             action: {
-                type: SchemaType.STRING,
+                type: Type.STRING,
                 description: "The desired action: 'add', 'remove', or 'list'.",
                 format: 'enum',
                 enum: ["add", "remove", "list"] // Thêm 'list'
             },
             identifier: { // Optional when action is 'list'
-                type: SchemaType.STRING,
+                type: Type.STRING,
                 description: "A unique identifier for the conference. Required for 'add'/'remove'.",
             },
             identifierType: { // Optional when action is 'list'
-                type: SchemaType.STRING,
+                type: Type.STRING,
                 description: "The type of the identifier. Required for 'add'/'remove'.",
                 format: 'enum',
                 enum: ["acronym", "title", "id"],
@@ -579,20 +579,20 @@ export const englishSendEmailToAdminDeclaration: FunctionDeclaration = {
     name: "sendEmailToAdmin",
     description: "Sends an email to the website administrator on behalf of the user. Use this function when the user explicitly wants to contact the admin, report an issue, provide feedback, or request specific help that requires admin intervention. You should help the user formulate the subject, message, and confirm the request type ('contact' or 'report') before calling this function.",
     parameters: {
-        type: SchemaType.OBJECT,
+        type: Type.OBJECT,
         properties: {
             subject: {
-                type: SchemaType.STRING,
+                type: Type.STRING,
                 description: "The subject line for the email to the admin. Should be concise and reflect the email's purpose.",
             },
             requestType: {
-                type: SchemaType.STRING,
+                type: Type.STRING,
                 description: "The type of request. Use 'contact' for general inquiries, feedback, or contact requests. Use 'report' for reporting issues, errors, or problems with the website or its content.",
                 format: 'enum',
                 enum: ["contact", "report"], // Specify allowed values
             },
             message: {
-                type: SchemaType.STRING,
+                type: Type.STRING,
                 description: "The main body/content of the email message detailing the user's request, report, or feedback.",
             },
         },
@@ -610,11 +610,11 @@ export const englishSendEmailToAdminDeclaration: FunctionDeclaration = {
 //         " API backend có thể phân biệt chữ hoa chữ thường đối với một số tham số (ví dụ: `country`, `continent`). Đảm bảo kiểu chữ hoa/thường của các giá trị khớp với định dạng mong đợi." +
 //         " Một ví dụ toàn diện kết hợp nhiều tiêu chí: `title=International+Conference+on+AI&topics=AI&topics=Machine+Learning&country=USA&fromDate=2024-01-01&toDate=2024-12-31&rank=A*`",
 //     parameters: {
-//         type: SchemaType.OBJECT, // Vẫn là OBJECT theo cấu trúc chung
+//         type: Type.OBJECT, // Vẫn là OBJECT theo cấu trúc chung
 //         properties: {
 //             // Định nghĩa một tham số duy nhất để chứa query string
 //             searchQuery: {
-//                 type: SchemaType.STRING,
+//                 type: Type.STRING,
 //                 // Hướng dẫn chi tiết cách tạo query string
 //                 description: "Một chuỗi truy vấn được mã hóa URL được xây dựng từ tiêu chí tìm kiếm hội nghị của người dùng. Định dạng dưới dạng các cặp key=value được phân tách bằng dấu '&'. " +
 //                     "Các khóa (key) có sẵn dựa trên các truy vấn tiềm năng của người dùng bao gồm: " +
@@ -669,94 +669,94 @@ export const englishSendEmailToAdminDeclaration: FunctionDeclaration = {
 //     name: "getJournals",
 //     description: "Truy xuất thông tin về các tạp chí dựa trên tiêu chí lọc.",
 //     parameters: {
-//         type: SchemaType.OBJECT,
+//         type: Type.OBJECT,
 //         properties: {
 //             "Rank": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "Danh sách các hạng tạp chí để lọc theo.",
 //                 "items": {
-//                     "type": SchemaType.NUMBER
+//                     "type": Type.NUMBER
 //                 }
 //             },
 //             "Title": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "Danh sách các tiêu đề tạp chí để lọc theo.",
 //                 "items": {
-//                     "type": SchemaType.STRING
+//                     "type": Type.STRING
 //                 }
 //             },
 //             "Issn": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "Danh sách các mã ISSN của tạp chí để lọc theo.",
 //                 "items": {
-//                     "type": SchemaType.STRING
+//                     "type": Type.STRING
 //                 }
 //             },
 //             "SJR": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "Danh sách các giá trị SJR của tạp chí để lọc theo.",
 //                 "items": {
-//                     "type": SchemaType.NUMBER
+//                     "type": Type.NUMBER
 //                 }
 //             },
 //             "SJRBestQuartile": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "Danh sách các giá trị Phân vị Tốt nhất SJR (SJR Best Quartile) của tạp chí để lọc theo.",
 //                 "items": {
-//                     "type": SchemaType.STRING // Có thể là Q1, Q2, Q3, Q4
+//                     "type": Type.STRING // Có thể là Q1, Q2, Q3, Q4
 //                 }
 //             },
 //             "HIndex": {
-//                 "type": SchemaType.INTEGER,
+//                 "type": Type.INTEGER,
 //                 "description": "Chỉ số H (H index) của tạp chí để lọc theo."
 //             },
 //             "Country": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "Danh sách các quốc gia để lọc tạp chí theo.",
 //                 "items": {
-//                     "type": SchemaType.STRING
+//                     "type": Type.STRING
 //                 }
 //             },
 //             "Region": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "Danh sách các khu vực để lọc tạp chí theo.",
 //                 "items": {
-//                     "type": SchemaType.STRING
+//                     "type": Type.STRING
 //                 }
 //             },
 //             "Publisher": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "Danh sách các nhà xuất bản để lọc tạp chí theo.",
 //                 "items": {
-//                     "type": SchemaType.STRING
+//                     "type": Type.STRING
 //                 }
 //             },
 //             "Areas": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "Danh sách các lĩnh vực (areas) để lọc tạp chí theo.",
 //                 "items": {
-//                     "type": SchemaType.STRING
+//                     "type": Type.STRING
 //                 }
 //             },
 //             "Categories": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "Danh sách các danh mục (categories) để lọc tạp chí theo.",
 //                 "items": {
-//                     "type": SchemaType.STRING
+//                     "type": Type.STRING
 //                 }
 //             },
 //             "Overton": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "Danh sách các giá trị Overton để lọc tạp chí theo.",
 //                 "items": {
-//                     "type": SchemaType.NUMBER
+//                     "type": Type.NUMBER
 //                 }
 //             },
 //             "SDG": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "Danh sách các Mục tiêu Phát triển Bền vững (SDGs) để lọc tạp chí theo.",
 //                 "items": {
-//                     "type": SchemaType.STRING // Thường là số hoặc mã của SDG
+//                     "type": Type.STRING // Thường là số hoặc mã của SDG
 //                 }
 //             }
 //         }
@@ -772,10 +772,10 @@ export const englishSendEmailToAdminDeclaration: FunctionDeclaration = {
 //     name: "drawChart",
 //     description: "Vẽ biểu đồ dựa trên dữ liệu được cung cấp.",
 //     parameters: {
-//         type: SchemaType.OBJECT,
+//         type: Type.OBJECT,
 //         properties: {
 //             chartType: {
-//                 type: SchemaType.STRING,
+//                 type: Type.STRING,
 //                 description: "Loại biểu đồ (ví dụ: bar (cột), line (đường), pie (tròn)).",
 //             }
 //         },
@@ -793,11 +793,11 @@ export const englishSendEmailToAdminDeclaration: FunctionDeclaration = {
 //         " 后端 API 对某些参数（例如 `country`、`continent`）可能区分大小写。请确保值的字母大小写与预期格式匹配。" +
 //         " 一个结合多个标准的综合示例：`title=International+Conference+on+AI&topics=AI&topics=Machine+Learning&country=USA&fromDate=2024-01-01&toDate=2024-12-31&rank=A*`",
 //     parameters: {
-//         type: SchemaType.OBJECT, // 仍然是 OBJECT 以符合通用结构
+//         type: Type.OBJECT, // 仍然是 OBJECT 以符合通用结构
 //         properties: {
 //             // 定义一个单一参数来包含查询字符串
 //             searchQuery: {
-//                 type: SchemaType.STRING,
+//                 type: Type.STRING,
 //                 // 描述：关于如何创建查询字符串的详细说明
 //                 description: "根据用户的会议搜索标准构建的 URL 编码查询字符串。格式为以 '&' 分隔的 key=value 对。" +
 //                     "基于潜在用户查询的可用键包括：" +
@@ -852,94 +852,94 @@ export const englishSendEmailToAdminDeclaration: FunctionDeclaration = {
 //     name: "getJournals",
 //     description: "根据筛选条件检索期刊信息。",
 //     parameters: {
-//         type: SchemaType.OBJECT,
+//         type: Type.OBJECT,
 //         properties: {
 //             "Rank": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "用于筛选的期刊排名列表。",
 //                 "items": {
-//                     "type": SchemaType.NUMBER
+//                     "type": Type.NUMBER
 //                 }
 //             },
 //             "Title": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "用于筛选的期刊标题列表。",
 //                 "items": {
-//                     "type": SchemaType.STRING
+//                     "type": Type.STRING
 //                 }
 //             },
 //             "Issn": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "用于筛选的期刊 ISSN 列表。",
 //                 "items": {
-//                     "type": SchemaType.STRING
+//                     "type": Type.STRING
 //                 }
 //             },
 //             "SJR": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "用于筛选的期刊 SJR 值列表。",
 //                 "items": {
-//                     "type": SchemaType.NUMBER
+//                     "type": Type.NUMBER
 //                 }
 //             },
 //             "SJRBestQuartile": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "用于筛选的期刊 SJR 最佳分区 (SJR Best Quartile) 值列表。",
 //                 "items": {
-//                     "type": SchemaType.STRING // 可能是 Q1, Q2, Q3, Q4
+//                     "type": Type.STRING // 可能是 Q1, Q2, Q3, Q4
 //                 }
 //             },
 //             "HIndex": {
-//                 "type": SchemaType.INTEGER,
+//                 "type": Type.INTEGER,
 //                 "description": "用于筛选的期刊 H 指数 (H index)。"
 //             },
 //             "Country": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "用于筛选期刊的国家列表。",
 //                 "items": {
-//                     "type": SchemaType.STRING
+//                     "type": Type.STRING
 //                 }
 //             },
 //             "Region": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "用于筛选期刊的地区列表。",
 //                 "items": {
-//                     "type": SchemaType.STRING
+//                     "type": Type.STRING
 //                 }
 //             },
 //             "Publisher": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "用于筛选期刊的出版商列表。",
 //                 "items": {
-//                     "type": SchemaType.STRING
+//                     "type": Type.STRING
 //                 }
 //             },
 //             "Areas": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "用于筛选期刊的领域 (areas) 列表。",
 //                 "items": {
-//                     "type": SchemaType.STRING
+//                     "type": Type.STRING
 //                 }
 //             },
 //             "Categories": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "用于筛选期刊的类别 (categories) 列表。",
 //                 "items": {
-//                     "type": SchemaType.STRING
+//                     "type": Type.STRING
 //                 }
 //             },
 //             "Overton": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "用于筛选期刊的 Overton 值列表。",
 //                 "items": {
-//                     "type": SchemaType.NUMBER
+//                     "type": Type.NUMBER
 //                 }
 //             },
 //             "SDG": {
-//                 "type": SchemaType.ARRAY,
+//                 "type": Type.ARRAY,
 //                 "description": "用于筛选期刊的可持续发展目标 (SDGs) 列表。",
 //                 "items": {
-//                     "type": SchemaType.STRING // 通常是 SDG 的编号或代码
+//                     "type": Type.STRING // 通常是 SDG 的编号或代码
 //                 }
 //             }
 //         }
@@ -955,10 +955,10 @@ export const englishSendEmailToAdminDeclaration: FunctionDeclaration = {
 //     name: "drawChart",
 //     description: "根据提供的数据绘制图表。",
 //     parameters: {
-//         type: SchemaType.OBJECT,
+//         type: Type.OBJECT,
 //         properties: {
 //             chartType: {
-//                 type: SchemaType.STRING,
+//                 type: Type.STRING,
 //                 description: "图表的类型（例如：bar (柱状图), line (折线图), pie (饼图)）。",
 //             }
 //         },
@@ -972,18 +972,18 @@ export const englishSendEmailToAdminDeclaration: FunctionDeclaration = {
 //     name: "routeToAgent",
 //     description: "Routes a specific task to a designated specialist agent.",
 //     parameters: {
-//         type: SchemaType.OBJECT,
+//         type: Type.OBJECT,
 //         properties: {
 //             targetAgent: {
-//                 type: SchemaType.STRING,
+//                 type: Type.STRING,
 //                 description: "The unique identifier of the specialist agent to route the task to (e.g., 'ConferenceAgent').",
 //             },
 //             taskDescription: {
-//                 type: SchemaType.STRING,
+//                 type: Type.STRING,
 //                 description: "A natural language description of the task for the target agent.",
 //             },
 //             inputData: {
-//                 type: SchemaType.STRING, // Or SchemaType.STRING if passing simple queries
+//                 type: Type.STRING, // Or Type.STRING if passing simple queries
 //                 description: "Full user question and require",
 //             },
 //         },
