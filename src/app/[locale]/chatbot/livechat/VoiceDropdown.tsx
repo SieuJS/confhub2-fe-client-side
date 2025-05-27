@@ -1,4 +1,4 @@
-// src/components/layout/sidepanel/VoiceDropdown.tsx
+// src/app/[locale]/chatbot/livechat/VoiceDropdown.tsx
 import React, { useState, useRef, useEffect } from 'react'
 import { PrebuiltVoice } from '@/src/app/[locale]/chatbot/lib/live-chat.types'
 import { ChevronDown } from 'lucide-react'

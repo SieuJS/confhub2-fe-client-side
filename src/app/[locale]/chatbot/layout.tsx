@@ -4,11 +4,11 @@
 import { LiveAPIProvider } from '@/src/app/[locale]/chatbot/livechat/contexts/LiveAPIContext';
 import MainLayoutComponent from '@/src/app/[locale]/chatbot/MainLayout';
 import { LiveChatSettingsProvider } from '@/src/app/[locale]/chatbot/livechat/contexts/LiveChatSettingsContext';
-import { API_URI } from '@/src/app/[locale]/chatbot/lib/constants';
+// import { API_URI } from '@/src/app/[locale]/chatbot/lib/constants'; // Loại bỏ API_URI vì không còn dùng
 import { usePathname } from '@/src/navigation';
-import { useSettingsStore } from './stores/setttingsStore';
+import { useSettingsStore } from './stores/setttingsStore'; // Đảm bảo đường dẫn đúng
 import { useEffect } from 'react';
-import ChatbotErrorDisplay from './ChatbotErrorDisplay';
+import ChatbotErrorDisplay from './ChatbotErrorDisplay'; // Đảm bảo đường dẫn đúng
 
 const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
@@ -22,7 +22,7 @@ export default function ChatbotRootLayout({
     const currentStoreChatMode = useSettingsStore(state => state.chatMode);
 
     const isLiveChatPage = unlocalizedPathname.includes('/chatbot/livechat');
-    const isLandingChatbotPage = unlocalizedPathname === '/chatbot/landingchatbot'; // Thêm biến này cho rõ ràng
+    const isLandingChatbotPage = unlocalizedPathname === '/chatbot/landingchatbot';
 
     useEffect(() => {
         const newMode = isLiveChatPage ? 'live' : 'regular';
@@ -41,30 +41,24 @@ export default function ChatbotRootLayout({
         );
     }
 
-    // Chỉ hiển thị ChatbotErrorDisplay nếu không phải là trang landing
-    // Và chỉ khi các trang chatbot khác đang hoạt động (ví dụ, không phải lỗi config API_KEY)
     const shouldShowChatbotErrorDisplay = !isLandingChatbotPage;
 
     return (
         <>
-            {/* Chỉ render ChatbotErrorDisplay nếu cần */}
             {shouldShowChatbotErrorDisplay && <ChatbotErrorDisplay />}
 
             {isLiveChatPage ? (
-                <LiveAPIProvider url={API_URI} apiKey={API_KEY}>
+                // Loại bỏ prop 'url' không còn cần thiết
+                <LiveAPIProvider apiKey={API_KEY}>
                     <LiveChatSettingsProvider>
                         <MainLayoutComponent isLiveChatContextActive={true}>
                             {children}
                         </MainLayoutComponent>
                     </LiveChatSettingsProvider>
                 </LiveAPIProvider>
-            ) : isLandingChatbotPage ? ( // Sử dụng biến đã tạo
-                // Trang landing, không có ChatbotErrorDisplay bao bọc trực tiếp ở đây nữa
-                // (nó sẽ được bao bọc bởi điều kiện shouldShowChatbotErrorDisplay ở trên nếu logic thay đổi)
-                // Với logic hiện tại, nó sẽ không có ChatbotErrorDisplay
+            ) : isLandingChatbotPage ? (
                 <>{children}</>
             ) : (
-                // Các trang chatbot regular khác
                 <MainLayoutComponent isLiveChatContextActive={false}>
                     {children}
                 </MainLayoutComponent>

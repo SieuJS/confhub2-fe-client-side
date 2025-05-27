@@ -1,6 +1,6 @@
 
 // src/shared/types.ts
-import { FunctionCall, Part } from "@google/generative-ai"; // Import necessary types
+import { FunctionCall, Part } from "@google/genai"; // Import necessary types
 
 // Ensure HistoryItem part can hold various types
 export interface HistoryItem {

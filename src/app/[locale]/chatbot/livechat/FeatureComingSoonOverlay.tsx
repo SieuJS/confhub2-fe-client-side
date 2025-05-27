@@ -1,4 +1,4 @@
-// src/app/[locale]/chatbot/livechat/components/FeatureComingSoonOverlay.tsx
+// src/app/[locale]/chatbot/livechat/FeatureComingSoonOverlay.tsx
 import React from 'react';
 
 interface FeatureComingSoonOverlayProps {

@@ -1,5 +1,5 @@
 // --- Host Agent System Instructions (English - FINAL for Phase 2 - Refined Navigation Logic) ---
-export const englishHostAgentSystemInstructions = `
+export const englishHostAgentSystemInstructions: string = `
 ### ROLE ###
 You are HCMUS Orchestrator, an intelligent agent coordinator for the Global Conference & Journal Hub (GCJH). Your primary role is to understand user requests, determine the necessary steps (potentially multi-step involving different agents), route tasks to the appropriate specialist agents, and synthesize their responses for the user.
 
@@ -40,7 +40,7 @@ You are HCMUS Orchestrator, an intelligent agent coordinator for the Global Conf
 `;
 
 // --- Conference Agent System Instructions (English - Updated) ---
- export const englishConferenceAgentSystemInstructions = `
+ export const englishConferenceAgentSystemInstructions: string = `
 ### ROLE ###
 You are ConferenceAgent, a specialist handling conference information and follow/unfollow actions for conferences.
 
@@ -55,7 +55,7 @@ You are ConferenceAgent, a specialist handling conference information and follow
 `;
 
 // --- Journal Agent System Instructions (English Example) ---
-export const englishJournalAgentSystemInstructions = `
+export const englishJournalAgentSystemInstructions: string = `
 ### ROLE ###
 You are JournalAgent, a specialist focused solely on retrieving journal information and managing user follows for journals.
 
@@ -70,7 +70,7 @@ You are JournalAgent, a specialist focused solely on retrieving journal informat
 `;
 
 // --- Admin Contact Agent System Instructions (English Example) ---
-export const englishAdminContactAgentSystemInstructions = `
+export const englishAdminContactAgentSystemInstructions: string = `
 ### ROLE ###
 You are AdminContactAgent, responsible for initiating the process of sending emails to the administrator.
 
@@ -82,7 +82,7 @@ You are AdminContactAgent, responsible for initiating the process of sending ema
 `;
 
 // --- Navigation Agent System Instructions (English Example) ---
-export const englishNavigationAgentSystemInstructions = `
+export const englishNavigationAgentSystemInstructions: string = `
 ### ROLE ###
 You are NavigationAgent, specializing in opening web pages and map locations.
 
@@ -96,7 +96,7 @@ You are NavigationAgent, specializing in opening web pages and map locations.
 5.  Return the exact result received from the function (including the frontend action). Do not add conversational text.
 `;
 
-export const englishWebsiteInfoAgentSystemInstructions = `
+export const englishWebsiteInfoAgentSystemInstructions: string = `
 ### ROLE ###
 You are WebsiteInfoAgent, providing general or details information about the GCJH website based on a predefined description.
 

@@ -1,3 +1,4 @@
+// src/app/[locale]/cahtbot/stores/uiStore.ts
 import { create } from 'zustand';
 import { persist, createJSONStorage, devtools } from 'zustand/middleware';
 import { ConfirmSendEmailAction, ErrorUpdate, ThoughtStep } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Adjust path

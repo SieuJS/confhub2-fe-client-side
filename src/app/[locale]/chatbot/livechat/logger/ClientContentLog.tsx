@@ -1,27 +1,26 @@
+// src/app/[locale]/chatbot/livechat/logger/ClientContentLog.tsx
 import React from 'react'
-import { ClientContentMessage } from '../multimodal-live-types'
+import { ClientContentPayload } from '@/src/app/[locale]/chatbot/lib/live-chat.types';
 import RenderPart from './RenderPart'
 
 type ClientContentLogProps = {
-  message: ClientContentMessage['clientContent']
+  message: ClientContentPayload
 }
 
 const ClientContentLog: React.FC<ClientContentLogProps> = ({ message }) => {
   const { turns, turnComplete } = message
 
-  // Removed outer div styling (m-4, rounded-lg, bg-blue-100, p-4, shadow-md, dark:bg-gray-900)
-  // LogEntry now handles the bubble styling.
   return (
-    <div className='text-sm text-inherit'> {/* Ensure consistent text size and color inheritance */}
-      {turns.map((turn, i) => (
-        <div key={`message-turn-${i}`} className='mb-2 last:mb-0'> {/* Reduced margin for multi-part consistency */}
+    <div className='text-sm text-inherit'>
+      {turns?.map((turn, i) => (
+        <div key={`message-turn-${i}`} className='mb-2 last:mb-0'>
+          {/* Add optional chaining here: turn.parts?.filter(...) */}
           {turn.parts
-            .filter(part => !(part.text && part.text === '\n'))
+            ?.filter(part => !(part.text && part.text === '\n'))
             .map((part, j) =>
               part.text ? (
                 <p
                   key={`message-turn-${i}-part-${j}`}
-                  // Using Tailwind for whitespace, added text-sm for consistency
                   className='part part-text whitespace-pre-wrap text-inherit'
                 >
                   {part.text}
@@ -33,7 +32,7 @@ const ClientContentLog: React.FC<ClientContentLogProps> = ({ message }) => {
         </div>
       ))}
       {!turnComplete && (
-        <span className='mt-2 block text-xs font-medium text-red-500 dark:text-red-400'> {/* Adjusted styling and added dark mode */}
+        <span className='mt-2 block text-xs font-medium text-red-500 dark:text-red-400'>
           turnComplete: false
         </span>
       )}

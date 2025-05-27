@@ -1,6 +1,7 @@
-import React from "react"; // Added React import
-import { ServerAudioMessage } from "../multimodal-live-types";
-import AudioPlayer from "../AudioPlayer"; // Assuming AudioPlayer is styled or unstyled but fits well
+// src/app/[locale]/chatbot/livechat/logger/ServerAudioLog.tsx
+import React from "react";
+import { ServerAudioMessage } from "@/src/app/[locale]/chatbot/lib/live-chat.types"; // Updated import path
+import AudioPlayer from "../AudioPlayer";
 
 type ServerAudioLogProps = {
   message: ServerAudioMessage;
@@ -8,15 +9,14 @@ type ServerAudioLogProps = {
 
 const ServerAudioLog: React.FC<ServerAudioLogProps> = ({ message }) => {
   const { audioData } = message.serverAudio;
-  // Similar to ClientAudioLog, "rich-log server-audio" can be kept or removed.
   return (
-    <div className="rich-log server-audio"> {/* Consider if these classes are still needed */}
+    <div className="rich-log server-audio">
       {audioData ? (
         <AudioPlayer
-          key={audioData} // Using audioData as key might cause re-renders if it's a new object each time. Consider a more stable key if issues arise.
+          key={audioData}
           audioData={audioData}
           sampleRate={24000}
-          autoPlay={false} // Gán false tường minh
+          autoPlay={false}
         />
       ) : (
         <p className="text-sm text-inherit italic">Loading audio...</p>

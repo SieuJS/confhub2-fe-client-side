@@ -1,4 +1,4 @@
-// src/app/[locale]/chatbot/chat/ThoughtProcess.tsx
+// src/app/[locale]/chatbot/regularchat/ThoughtProcess.tsx
 import React, { useState } from 'react';
 import { ThoughtStep, AgentId } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Adjust path if needed
 import {

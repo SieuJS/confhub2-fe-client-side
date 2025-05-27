@@ -17,7 +17,7 @@ export class AudioStreamer {
   private initialBufferTime: number = 0.1; //0.1 // 100ms initial buffer
   private endOfQueueAudioSource: AudioBufferSourceNode | null = null;
 
-  public onComplete = () => {};
+  public onComplete = () => { };
 
   constructor(public context: AudioContext) {
     this.gainNode = this.context.createGain();
@@ -58,8 +58,9 @@ export class AudioStreamer {
     return this;
   }
 
-  addPCM16(chunk: Uint8Array) {
+  addPCM16(chunk: Uint8Array) { // Nhận Uint8Array
     const float32Array = new Float32Array(chunk.length / 2);
+    // chunk.buffer ở đây sẽ là ArrayBuffer của Uint8Array đó.
     const dataView = new DataView(chunk.buffer);
 
     for (let i = 0; i < chunk.length / 2; i++) {

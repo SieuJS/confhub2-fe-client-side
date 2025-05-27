@@ -1,6 +1,8 @@
 // src/app/[locale]/chatbot/livechat/services/tool.handlers.ts
-// import { FunctionCall } from "@google/generative-ai"; // No longer need the direct import if LiveFunctionCall is used
-import { LiveFunctionCall } from '../../lib/live-chat.types'; // Correctly import your custom type
+
+// Import FunctionCall from the new SDK
+import { FunctionCall as SDKFunctionCall } from '@google/genai';
+
 import {
   getAuthTokenClientSide,
   makeFrontendApiCall,
@@ -8,9 +10,10 @@ import {
   formatItemsForModel,
   getUrlArg
 } from '../utils/api.helpers';
-import { websiteInfo } from "../../lib/functions";
+import { websiteInfo } from "../../lib/functions"; // Assuming this is a data object
 import { transformConferenceData } from '../../utils/transformApiData';
-import { appConfig } from "@/src/middleware";
+// appConfig import seems to be missing, ensure it's correctly imported if used
+// import { appConfig } from "@/src/middleware"; // Uncomment and verify path if needed
 
 // Define a common config type for handlers
 interface HandlerConfig {
@@ -20,16 +23,20 @@ interface HandlerConfig {
 }
 
 // Define a structure for the response part needed by client.sendToolResponse
-export interface ToolHandlerResponse { // Export if needed elsewhere, or keep local
-  response: { content: any };
-  id: string;
+// This structure is what each handler function will return.
+// LiveChatAPIConfig.tsx will use this to construct an SDKFunctionResponse.
+export interface ToolHandlerResponse {
+  response: Record<string, unknown>; // The actual data payload for the function response.
+                                     // Can be { content: any } as before, or any other valid JSON object.
+  id: string; // The ID of the function call, to be passed back.
 }
 
-// Individual Handlers - Update fc type to LiveFunctionCall
-async function handleGetConferences(fc: LiveFunctionCall, config: HandlerConfig): Promise<ToolHandlerResponse> {
+// Individual Handlers - Update fc type to SDKFunctionCall
+async function handleGetConferences(fc: SDKFunctionCall, config: HandlerConfig): Promise<ToolHandlerResponse> {
   const apiUrl = `${config.databaseUrl}/conference`;
-  const searchQuery = fc.args && typeof fc.args === 'object' && typeof (fc.args as any).searchQuery === 'string'
-    ? (fc.args as any).searchQuery
+  // fc.args is Record<string, unknown> | undefined. Access properties carefully.
+  const searchQuery = fc.args && typeof fc.args['searchQuery'] === 'string'
+    ? fc.args['searchQuery']
     : undefined;
   const finalUrl = searchQuery ? `${apiUrl}?${searchQuery}` : apiUrl;
 
@@ -41,13 +48,14 @@ async function handleGetConferences(fc: LiveFunctionCall, config: HandlerConfig)
   }
   const responseData = await response.json();
   const contentToSend = transformConferenceData(responseData, searchQuery);
-  return { response: { content: contentToSend }, id: fc.id }; // Now fc.id is valid
+  // fc.id is optional in SDKFunctionCall, provide a fallback if it could be missing, though server should always send it.
+  return { response: { content: contentToSend }, id: fc.id || `conf-fallback-${Date.now()}` };
 }
 
-async function handleGetJournals(fc: LiveFunctionCall, config: HandlerConfig): Promise<ToolHandlerResponse> {
+async function handleGetJournals(fc: SDKFunctionCall, config: HandlerConfig): Promise<ToolHandlerResponse> {
   const apiUrl = `${config.databaseUrl}/journal`;
-  const searchQuery = fc.args && typeof fc.args === 'object' && typeof (fc.args as any).searchQuery === 'string'
-    ? (fc.args as any).searchQuery
+  const searchQuery = fc.args && typeof fc.args['searchQuery'] === 'string'
+    ? fc.args['searchQuery']
     : undefined;
   const finalUrl = searchQuery ? `${apiUrl}?${searchQuery}` : apiUrl;
 
@@ -58,15 +66,15 @@ async function handleGetJournals(fc: LiveFunctionCall, config: HandlerConfig): P
     throw new Error(`API Error (${response.status}) for getJournals: ${errorText.substring(0, 200)}`);
   }
   const responseData = await response.json();
-  return { response: { content: responseData }, id: fc.id }; // Now fc.id is valid
+  return { response: { content: responseData }, id: fc.id || `journal-fallback-${Date.now()}` };
 }
 
-async function handleGetWebsiteInfo(fc: LiveFunctionCall, _config: HandlerConfig): Promise<ToolHandlerResponse> {
-  return { response: { content: websiteInfo }, id: fc.id }; // Now fc.id is valid
+async function handleGetWebsiteInfo(fc: SDKFunctionCall, _config: HandlerConfig): Promise<ToolHandlerResponse> {
+  return { response: { content: websiteInfo }, id: fc.id || `webinfo-fallback-${Date.now()}` };
 }
 
-async function handleNavigation(fc: LiveFunctionCall, config: HandlerConfig): Promise<ToolHandlerResponse> {
-  const targetUrl = getUrlArg(fc.args);
+async function handleNavigation(fc: SDKFunctionCall, config: HandlerConfig): Promise<ToolHandlerResponse> {
+  const targetUrl = getUrlArg(fc.args); // getUrlArg needs to handle fc.args being Record<string, unknown> | undefined
   if (!targetUrl) throw new Error("Missing 'url' argument for navigation.");
 
   let urlToOpen = '';
@@ -84,12 +92,16 @@ async function handleNavigation(fc: LiveFunctionCall, config: HandlerConfig): Pr
   } else {
     console.warn("window object not available for navigation.");
   }
-  return { response: { content: { message: `Navigating to ${urlToOpen}`, status: 'success' } }, id: fc.id }; // Now fc.id is valid
+  return { response: { content: { message: `Navigating to ${urlToOpen}`, status: 'success' } }, id: fc.id || `nav-fallback-${Date.now()}` };
 }
 
-async function handleManageFollow(fc: LiveFunctionCall, config: HandlerConfig): Promise<ToolHandlerResponse> {
-  const args = fc.args as any;
-  const { itemType, action, identifier, identifierType } = args;
+async function handleManageFollow(fc: SDKFunctionCall, config: HandlerConfig): Promise<ToolHandlerResponse> {
+  const args = fc.args || {}; // Ensure args is an object
+  const itemType = args['itemType'] as string | undefined;
+  const action = args['action'] as string | undefined;
+  const identifier = args['identifier'] as string | undefined;
+  const identifierType = args['identifierType'] as string | undefined;
+
 
   if (!itemType || !['conference', 'journal'].includes(itemType)) {
     throw new Error("Invalid or missing 'itemType' for manageFollow. Must be 'conference' or 'journal'.");
@@ -127,12 +139,16 @@ async function handleManageFollow(fc: LiveFunctionCall, config: HandlerConfig): 
     await makeFrontendApiCall(actionUrl, 'POST', token, payload);
     modelMessage = `Successfully ${action === 'follow' ? 'followed' : 'unfollowed'} ${itemType}: "${itemName}".`;
   }
-  return { response: { content: modelMessage }, id: fc.id }; // Now fc.id is valid
+  return { response: { content: modelMessage }, id: fc.id || `follow-fallback-${Date.now()}` };
 }
 
-async function handleManageCalendar(fc: LiveFunctionCall, config: HandlerConfig): Promise<ToolHandlerResponse> {
-  const args = fc.args as any;
-  const { itemType, action, identifier, identifierType } = args;
+async function handleManageCalendar(fc: SDKFunctionCall, config: HandlerConfig): Promise<ToolHandlerResponse> {
+  const args = fc.args || {};
+  const itemType = args['itemType'] as string | undefined;
+  const action = args['action'] as string | undefined;
+  const identifier = args['identifier'] as string | undefined;
+  const identifierType = args['identifierType'] as string | undefined;
+
 
   if (itemType !== 'conference') {
     throw new Error("Invalid 'itemType' for manageCalendar. Must be 'conference'.");
@@ -170,12 +186,12 @@ async function handleManageCalendar(fc: LiveFunctionCall, config: HandlerConfig)
     await makeFrontendApiCall(actionUrl, 'POST', token, payload);
     modelMessage = `Successfully ${action === 'add' ? 'added' : 'removed'} conference "${itemName}" ${action === 'add' ? 'to' : 'from'} your calendar.`;
   }
-  return { response: { content: modelMessage }, id: fc.id }; // Now fc.id is valid
+  return { response: { content: modelMessage }, id: fc.id || `calendar-fallback-${Date.now()}` };
 }
 
-async function handleOpenGoogleMap(fc: LiveFunctionCall, _config: HandlerConfig): Promise<ToolHandlerResponse> {
-  const args = fc.args as any;
-  const location = args?.location as string | undefined;
+async function handleOpenGoogleMap(fc: SDKFunctionCall, _config: HandlerConfig): Promise<ToolHandlerResponse> {
+  const args = fc.args || {};
+  const location = args['location'] as string | undefined;
 
   if (!location || typeof location !== 'string' || location.trim() === '') {
     throw new Error("Missing or invalid 'location' argument for openGoogleMap.");
@@ -183,7 +199,7 @@ async function handleOpenGoogleMap(fc: LiveFunctionCall, _config: HandlerConfig)
 
   return {
     response: {
-      content: {
+      content: { // This structure is fine for Record<string, unknown>
         messageForModel: `Map for "${location}" is being prepared for display.`,
         uiAction: {
           type: "display_map",
@@ -191,12 +207,12 @@ async function handleOpenGoogleMap(fc: LiveFunctionCall, _config: HandlerConfig)
         }
       }
     },
-    id: fc.id // Now fc.id is valid
+    id: fc.id || `map-fallback-${Date.now()}`
   };
 }
 
-// Dispatcher for tool handlers - Update fc type to LiveFunctionCall
-export const toolHandlers: Record<string, (fc: LiveFunctionCall, config: HandlerConfig) => Promise<ToolHandlerResponse>> = {
+// Dispatcher for tool handlers - Update fc type to SDKFunctionCall
+export const toolHandlers: Record<string, (fc: SDKFunctionCall, config: HandlerConfig) => Promise<ToolHandlerResponse>> = {
   "getConferences": handleGetConferences,
   "getJournals": handleGetJournals,
   "getWebsiteInfo": handleGetWebsiteInfo,

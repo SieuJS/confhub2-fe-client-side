@@ -1,4 +1,5 @@
-// ChatInput.tsx
+// src/app/[locale]/chatbot/livechat/layout/ChatInput.tsx
+
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import TextareaAutosize from 'react-textarea-autosize'
 import Button from '../../../utils/Button' // Assuming Button component path

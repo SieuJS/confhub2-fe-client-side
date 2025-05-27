@@ -1,5 +1,5 @@
+// src/app/[locale]/chatbot/livechat/layout/ChatIntroduction.tsx
 import React from 'react'
-import { BsMic } from 'react-icons/bs'
 import { useTranslations } from 'next-intl'
 
 interface ChatIntroductionProps {

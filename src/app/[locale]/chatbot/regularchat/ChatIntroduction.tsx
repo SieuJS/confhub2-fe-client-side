@@ -1,4 +1,4 @@
-// src/app/[locale]/chatbot/chat/ChatIntroduction.tsx
+// src/app/[locale]/chatbot/chat/regularchat/ChatIntroduction.tsx
 import React, { useEffect, useState, useRef } from 'react';
 import { Language } from '@/src/app/[locale]/chatbot/lib/live-chat.types';
 

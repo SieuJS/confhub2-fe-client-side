@@ -1,5 +1,5 @@
 // --- 主机代理系统指令 (简体中文 - 第二阶段最终版 - 优化的导航逻辑) ---
-export const chineseHostAgentSystemInstructions = `
+export const chineseHostAgentSystemInstructions: string = `
 ### 角色 ###
 你是 HCMUS Orchestrator，一个为全球会议与期刊中心 (GCJH) 服务的智能代理协调器。你的主要职责是理解用户请求，确定必要的步骤（可能涉及不同代理的多步骤），将任务路由到合适的专业代理，并为用户整合它们的响应。
 
@@ -40,7 +40,7 @@ export const chineseHostAgentSystemInstructions = `
 `;
 
 // --- 会议代理系统指令 (简体中文 - 更新版) ---
- export const chineseConferenceAgentSystemInstructions = `
+ export const chineseConferenceAgentSystemInstructions: string = `
 ### 角色 ###
 你是 ConferenceAgent，一个处理会议信息以及会议关注/取消关注操作的专家。
 
@@ -55,7 +55,7 @@ export const chineseHostAgentSystemInstructions = `
 `;
 
 // --- 期刊代理系统指令 (简体中文 - 示例) ---
-export const chineseJournalAgentSystemInstructions = `
+export const chineseJournalAgentSystemInstructions: string = `
 ### 角色 ###
 你是 JournalAgent，一个专注于检索期刊信息和管理用户对期刊关注的专家。
 
@@ -70,7 +70,7 @@ export const chineseJournalAgentSystemInstructions = `
 `;
 
 // --- 管理员联系代理系统指令 (简体中文 - 示例) ---
-export const chineseAdminContactAgentSystemInstructions = `
+export const chineseAdminContactAgentSystemInstructions: string = `
 ### 角色 ###
 你是 AdminContactAgent，负责启动向管理员发送邮件的流程。
 
@@ -82,7 +82,7 @@ export const chineseAdminContactAgentSystemInstructions = `
 `;
 
 // --- 导航代理系统指令 (简体中文 - 示例) ---
-export const chineseNavigationAgentSystemInstructions = `
+export const chineseNavigationAgentSystemInstructions: string = `
 ### 角色 ###
 你是 NavigationAgent，专注于打开网页和地图位置。
 
@@ -96,7 +96,7 @@ export const chineseNavigationAgentSystemInstructions = `
 5.  返回从函数收到的确切结果（包括前端操作）。不要添加对话式文本。
 `;
 
-export const chineseWebsiteInfoAgentSystemInstructions = `
+export const chineseWebsiteInfoAgentSystemInstructions: string = `
 ### 角色 ###
 你是 WebsiteInfoAgent，根据预定义的描述提供关于 GCJH 网站的常规或详细信息。
 

@@ -1,3 +1,5 @@
+// src/app/[locale]/chatbot/livechat/AudioPlayer.tsx
+
 import React from 'react'
 import { useAudioEngine, AudioEngineControls } from './hooks/useAudioEngine'
 import {

@@ -1,7 +1,7 @@
 import {
     FunctionDeclaration,
-    SchemaType,
-} from "@google/generative-ai";
+    Type,
+} from "@google/genai";
 
 
 
@@ -39,14 +39,14 @@ export const vietnameseRouteToAgentDeclaration: FunctionDeclaration = {
     name: "routeToAgent",
     description: "Định tuyến một nhiệm vụ cụ thể đến một đặc vụ chuyên môn được chỉ định.",
     parameters: {
-        type: SchemaType.OBJECT, // Kiểu SchemaType.OBJECT
+        type: Type.OBJECT, // Kiểu Type.OBJECT
         properties: { // Thuộc tính
             targetAgent: {
-                type: SchemaType.STRING, // Kiểu SchemaType.STRING
+                type: Type.STRING, // Kiểu Type.STRING
                 description: "Định danh duy nhất của đặc vụ chuyên môn để định tuyến nhiệm vụ đến (ví dụ: 'ConferenceAgent').",
             },
             taskDescription: {
-                type: SchemaType.STRING, // Kiểu SchemaType.STRING
+                type: Type.STRING, // Kiểu Type.STRING
                 description: "Mô tả chi tiết bằng ngôn ngữ tự nhiên về nhiệm vụ cho đặc vụ mục tiêu.",
             }
         },
@@ -63,11 +63,11 @@ export const vietnamGetConferencesDeclaration: FunctionDeclaration = {
         " API backend có thể phân biệt chữ hoa chữ thường đối với một số tham số (ví dụ: `country`, `continent`). Đảm bảo kiểu chữ hoa/thường của các giá trị khớp với định dạng mong đợi." +
         " Một ví dụ toàn diện kết hợp nhiều tiêu chí: `title=International+Conference+on+AI&topics=AI&topics=Machine+Learning&country=USA&fromDate=2024-01-01&toDate=2024-12-31&rank=A*`",
     parameters: {
-        type: SchemaType.OBJECT, // Vẫn là OBJECT theo cấu trúc chung
+        type: Type.OBJECT, // Vẫn là OBJECT theo cấu trúc chung
         properties: {
             // Định nghĩa một tham số duy nhất để chứa query string
             searchQuery: {
-                type: SchemaType.STRING,
+                type: Type.STRING,
                 // Hướng dẫn chi tiết cách tạo query string
                 description: "Một chuỗi truy vấn được mã hóa URL được xây dựng từ tiêu chí tìm kiếm hội nghị của người dùng. Định dạng dưới dạng các cặp key=value được phân tách bằng dấu '&'. " +
                     "Các khóa (key) có sẵn dựa trên các truy vấn tiềm năng của người dùng bao gồm: " +
@@ -122,94 +122,94 @@ export const vietnamGetJournalsDeclaration: FunctionDeclaration = {
     name: "getJournals",
     description: "Truy xuất thông tin về các tạp chí dựa trên tiêu chí lọc.",
     parameters: {
-        type: SchemaType.OBJECT,
+        type: Type.OBJECT,
         properties: {
             "Rank": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "Danh sách các hạng tạp chí để lọc theo.",
                 "items": {
-                    "type": SchemaType.NUMBER
+                    "type": Type.NUMBER
                 }
             },
             "Title": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "Danh sách các tiêu đề tạp chí để lọc theo.",
                 "items": {
-                    "type": SchemaType.STRING
+                    "type": Type.STRING
                 }
             },
             "Issn": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "Danh sách các mã ISSN của tạp chí để lọc theo.",
                 "items": {
-                    "type": SchemaType.STRING
+                    "type": Type.STRING
                 }
             },
             "SJR": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "Danh sách các giá trị SJR của tạp chí để lọc theo.",
                 "items": {
-                    "type": SchemaType.NUMBER
+                    "type": Type.NUMBER
                 }
             },
             "SJRBestQuartile": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "Danh sách các giá trị Phân vị Tốt nhất SJR (SJR Best Quartile) của tạp chí để lọc theo.",
                 "items": {
-                    "type": SchemaType.STRING // Có thể là Q1, Q2, Q3, Q4
+                    "type": Type.STRING // Có thể là Q1, Q2, Q3, Q4
                 }
             },
             "HIndex": {
-                "type": SchemaType.INTEGER,
+                "type": Type.INTEGER,
                 "description": "Chỉ số H (H index) của tạp chí để lọc theo."
             },
             "Country": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "Danh sách các quốc gia để lọc tạp chí theo.",
                 "items": {
-                    "type": SchemaType.STRING
+                    "type": Type.STRING
                 }
             },
             "Region": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "Danh sách các khu vực để lọc tạp chí theo.",
                 "items": {
-                    "type": SchemaType.STRING
+                    "type": Type.STRING
                 }
             },
             "Publisher": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "Danh sách các nhà xuất bản để lọc tạp chí theo.",
                 "items": {
-                    "type": SchemaType.STRING
+                    "type": Type.STRING
                 }
             },
             "Areas": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "Danh sách các lĩnh vực (areas) để lọc tạp chí theo.",
                 "items": {
-                    "type": SchemaType.STRING
+                    "type": Type.STRING
                 }
             },
             "Categories": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "Danh sách các danh mục (categories) để lọc tạp chí theo.",
                 "items": {
-                    "type": SchemaType.STRING
+                    "type": Type.STRING
                 }
             },
             "Overton": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "Danh sách các giá trị Overton để lọc tạp chí theo.",
                 "items": {
-                    "type": SchemaType.NUMBER
+                    "type": Type.NUMBER
                 }
             },
             "SDG": {
-                "type": SchemaType.ARRAY,
+                "type": Type.ARRAY,
                 "description": "Danh sách các Mục tiêu Phát triển Bền vững (SDGs) để lọc tạp chí theo.",
                 "items": {
-                    "type": SchemaType.STRING // Thường là số hoặc mã của SDG
+                    "type": Type.STRING // Thường là số hoặc mã của SDG
                 }
             }
         }
@@ -225,10 +225,10 @@ export const vietnamDrawChartDeclaration: FunctionDeclaration = {
     name: "drawChart",
     description: "Vẽ biểu đồ dựa trên dữ liệu được cung cấp.",
     parameters: {
-        type: SchemaType.OBJECT,
+        type: Type.OBJECT,
         properties: {
             chartType: {
-                type: SchemaType.STRING,
+                type: Type.STRING,
                 description: "Loại biểu đồ (ví dụ: bar (cột), line (đường), pie (tròn)).",
             }
         },
@@ -242,10 +242,10 @@ export const vietnameseNavigationDeclaration: FunctionDeclaration = {
     - Đối với điều hướng NỘI BỘ: Cung cấp đường dẫn tương đối bắt đầu bằng '/'. Hệ thống sẽ tự động thêm URL gốc và ngôn ngữ (locale). Các đường dẫn nội bộ được phép là: ${internalPaths.join(', ')}. Ví dụ: {"url": "/conferences"}
     - Đối với các trang hội nghị/tạp chí BÊN NGOÀI: Cung cấp URL đầy đủ, hợp lệ bắt đầu bằng 'http://' hoặc 'https://'.`,
     parameters: {
-        type: SchemaType.OBJECT, // Kiểu SchemaType.OBJECT
+        type: Type.OBJECT, // Kiểu Type.OBJECT
         properties: { // Thuộc tính
             url: {
-                type: SchemaType.STRING, // Kiểu SchemaType.STRING
+                type: Type.STRING, // Kiểu Type.STRING
                 description: `Đường dẫn nội bộ (bắt đầu bằng '/', ví dụ: '/dashboard') hoặc URL đầy đủ bên ngoài (bắt đầu bằng 'http://' hoặc 'https://', ví dụ: 'https://some-journal.com/article') để điều hướng đến.`
             }
         },
@@ -257,10 +257,10 @@ export const vietnameseOpenGoogleMapDeclaration: FunctionDeclaration = {
     name: "openGoogleMap",
     description: "Mở Google Maps trong một tab trình duyệt mới, hướng đến một chuỗi địa điểm cụ thể (ví dụ: thành phố, địa chỉ, địa danh). CHỈ sử dụng chức năng này SAU KHI đã lấy được chuỗi địa điểm, thường là từ các hàm 'getConferences' hoặc 'getJournals'.",
     parameters: {
-        type: SchemaType.OBJECT, // Kiểu SchemaType.OBJECT
+        type: Type.OBJECT, // Kiểu Type.OBJECT
         properties: { // Thuộc tính
             location: {
-                type: SchemaType.STRING, // Kiểu SchemaType.STRING
+                type: Type.STRING, // Kiểu Type.STRING
                 description: "Chuỗi địa điểm địa lý để tìm kiếm trên Google Maps (ví dụ: 'Delphi, Hy Lạp', 'Tháp Eiffel, Paris', '1600 Amphitheatre Parkway, Mountain View, CA').",
             },
         },
@@ -272,24 +272,24 @@ export const vietnameseFollowUnfollowItemDeclaration: FunctionDeclaration = {
     name: "followUnfollowItem",
     description: "Theo dõi hoặc bỏ theo dõi một hội nghị hoặc tạp chí cụ thể cho người dùng đang đăng nhập. Yêu cầu xác định mục trước (ví dụ: sử dụng getConferences/getJournals).",
     parameters: {
-        type: SchemaType.OBJECT, // Kiểu SchemaType.OBJECT
+        type: Type.OBJECT, // Kiểu Type.OBJECT
         properties: { // Thuộc tính
             itemType: {
-                type: SchemaType.STRING, // Kiểu SchemaType.STRING
+                type: Type.STRING, // Kiểu Type.STRING
                 description: "Loại của mục.",
                 enum: ["conference", "journal"] // Giá trị được phép
             },
             identifier: {
-                type: SchemaType.STRING, // Kiểu SchemaType.STRING
+                type: Type.STRING, // Kiểu Type.STRING
                 description: "Một định danh duy nhất cho mục, chẳng hạn như từ viết tắt hoặc tiêu đề chính xác của nó, đã được truy xuất trước đó.",
             },
             identifierType: {
-                 type: SchemaType.STRING, // Kiểu SchemaType.STRING
+                 type: Type.STRING, // Kiểu Type.STRING
                  description: "Loại định danh được cung cấp.",
                  enum: ["acronym", "title", "id"], // Cho phép Model chỉ định nếu biết loại
             },
             action: {
-                type: SchemaType.STRING, // Kiểu SchemaType.STRING
+                type: Type.STRING, // Kiểu Type.STRING
                 description: "Hành động mong muốn thực hiện.",
                 enum: ["follow", "unfollow"] // Giá trị được phép
             },
@@ -302,19 +302,19 @@ export const vietnameseSendEmailToAdminDeclaration: FunctionDeclaration = {
     name: "sendEmailToAdmin",
     description: "Gửi một email đến quản trị viên trang web thay mặt cho người dùng. Sử dụng chức năng này khi người dùng muốn liên hệ rõ ràng với quản trị viên, báo cáo sự cố, cung cấp phản hồi, hoặc yêu cầu trợ giúp cụ thể cần sự can thiệp của quản trị viên. Bạn nên giúp người dùng soạn thảo chủ đề, nội dung thư và xác nhận loại yêu cầu ('contact' hoặc 'report') trước khi gọi hàm này.",
     parameters: {
-        type: SchemaType.OBJECT, // Kiểu SchemaType.OBJECT
+        type: Type.OBJECT, // Kiểu Type.OBJECT
         properties: { // Thuộc tính
             subject: {
-                type: SchemaType.STRING, // Kiểu SchemaType.STRING
+                type: Type.STRING, // Kiểu Type.STRING
                 description: "Dòng chủ đề cho email gửi đến quản trị viên. Nên ngắn gọn và phản ánh mục đích của email.",
             },
             requestType: {
-                type: SchemaType.STRING, // Kiểu SchemaType.STRING
+                type: Type.STRING, // Kiểu Type.STRING
                 description: "Loại yêu cầu. Sử dụng 'contact' cho các yêu cầu chung, phản hồi, hoặc yêu cầu liên hệ. Sử dụng 'report' để báo cáo sự cố, lỗi, hoặc vấn đề với trang web hoặc nội dung của nó.",
                 enum: ["contact", "report"], // Chỉ định các giá trị được phép
             },
             message: {
-                type: SchemaType.STRING, // Kiểu SchemaType.STRING
+                type: Type.STRING, // Kiểu Type.STRING
                 description: "Nội dung chính của thư email, trình bày chi tiết yêu cầu, báo cáo hoặc phản hồi của người dùng.",
             },
         },

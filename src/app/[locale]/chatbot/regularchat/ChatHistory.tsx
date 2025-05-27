@@ -1,4 +1,4 @@
-// src/app/[locale]/chatbot/chat/ChatHistory.tsx
+// src/app/[locale]/chatbot/regularchat/ChatHistory.tsx
 import React from 'react';
 import ChatMessageDisplay from './ChatMessageDisplay';
 import { ChatMessageType } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';

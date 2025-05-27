@@ -1,4 +1,5 @@
-// hooks/useTimer.ts
+// src/app/[locale]/chatbot/livechat/hooks/useTimer.ts
+
 import { useState, useEffect } from "react";
 
 const useTimer = (isConnecting: boolean, connected: boolean, streamStartTime: number | null) => {

@@ -1,4 +1,4 @@
-// src/app/[locale]/chatbot/ConversationToolbar.tsx
+// src/app/[locale]/chatbot/regularchat/ConversationToolbar.tsx
 'use client'
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';

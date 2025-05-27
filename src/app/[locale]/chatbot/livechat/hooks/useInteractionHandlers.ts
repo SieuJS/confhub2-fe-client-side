@@ -1,93 +1,120 @@
-// hooks/useInteractionHandlers.ts
-import { ClientContentMessage, StreamingLog } from "../multimodal-live-types"; // Import StreamingLog if not already
-import { useLoggerStore } from "../lib/store-logger"; // Import store to get current logs length
+// src/app/[locale]/chatbot/livechat/hooks/useInteractionHandlers.ts
+import {
+    StreamingLog,
+    LiveOutgoingMessage, // SDKLiveClientMessage
+} from "../../lib/live-chat.types";
+import { useLoggerStore } from "../lib/store-logger";
+import { Part, Content as SDKContent } from "@google/genai"; // SDK types
 
 interface InteractionHandlersProps {
-    connected: boolean;
-    connectWithPermissions: () => Promise<void>;
+    connected: boolean; // Trạng thái kết nối (từ useConnection, đã đồng bộ với SDK)
+    connectWithPermissions: () => Promise<void>; // Từ useConnection
     setMuted: (muted: boolean) => void;
-    client: any;
-    log: (logEntry: StreamingLog) => void; // Make sure type is specific
-    // Modify to accept the index of the sent log
+    // client: MultimodalLiveClient; // Loại bỏ client cũ
+    sendClientContent: (params: { turns: SDKContent[] | SDKContent, turnComplete?: boolean }) => void; // Hàm mới từ useLiveAPI
+    log: (logEntry: StreamingLog) => void;
     startLoading: (sentLogIndex: number) => void;
-    stopLoading: () => void; // Add a separate function for stopping on error
+    stopLoading: () => void;
 }
 
 const useInteractionHandlers = ({
     connected,
     connectWithPermissions,
     setMuted,
-    client,
+    sendClientContent, // Sử dụng hàm này
     log,
-    // Use the new props
     startLoading,
     stopLoading
 }: InteractionHandlersProps) => {
-    // Get current logs length to determine the index of the next log
-    // Note: This assumes log() adds to the end synchronously or predictably.
-    // If log is async, this might need adjustment. Zustand's set is sync by default.
 
     const handleSendMessage = async (textInput: string) => {
-        if (!connected || textInput.trim() === "") {
+        if (!connected) {
+            log({
+                 date: new Date(),
+                 type: "info.sendAttempt",
+                 message: "Send message attempt while not connected.",
+            });
+            // Cân nhắc: có nên tự động gọi connectWithPermissions() ở đây không?
+            // await connectWithPermissions(); // Nếu muốn tự động kết nối
+            // if(!useLiveAPIContext().connected) return; // Kiểm tra lại sau khi connect
+            return;
+        }
+        if (textInput.trim() === "") {
+            log({
+                 date: new Date(),
+                 type: "info.sendAttempt",
+                 message: "Attempted to send empty message.",
+            });
             return;
         }
 
-        // Get the index where the new log will be added
         const currentLogs = useLoggerStore.getState().logs;
         const nextLogIndex = currentLogs.length;
 
-        console.log(`[handleSendMessage] Triggered. Next log index: ${nextLogIndex}. Setting loading TRUE.`);
-        // Pass the index where the 'send.text' log will be
+        console.log(`[InteractionHandlers] Triggered handleSendMessage. Next log index: ${nextLogIndex}. Setting loading TRUE.`);
         startLoading(nextLogIndex);
 
         try {
-            const parts = [{ text: textInput }];
-            // It's better to log *before* the async call if possible,
-            // or handle potential state changes if log happens after await
-            const clientContentMessage: ClientContentMessage = {
+            const parts: Part[] = [{ text: textInput }];
+            const userContent: SDKContent = { role: "user", parts }; // Đảm bảo đúng kiểu SDKContent
+
+            // Log message sẽ được gửi
+            const messageToSendForLog: LiveOutgoingMessage = { // SDKLiveClientMessage
                 clientContent: {
-                    turns: [{ role: "user", parts }],
+                    turns: [userContent],
                     turnComplete: true,
                 },
             };
-
-            const sendLogEntry: StreamingLog = { // Define the log entry explicitly
+            log({
                  date: new Date(),
-                 type: "send.text",
-                 message: clientContentMessage,
-                 count: 1, // Assuming count is needed by store logic
-            };
+                 type: "client.send.text",
+                 message: messageToSendForLog,
+                 count: 1,
+            });
 
-            log(sendLogEntry); // Log the message *before* sending if safe
+            // Gọi hàm sendClientContent từ useLiveAPI
+            sendClientContent({ turns: [userContent], turnComplete: true });
 
-            // If log must happen after: Be aware the index might change if other logs occur between
-            // getting length and logging here. Logging before is safer for index stability.
-            await client.send(parts);
-
-            // Log *after* send if required by logic (less safe for index tracking)
-            // log(sendLogEntry);
-
-            // DO NOT stop loading here. Let the useEffect handle it based on server response.
+            // Loading sẽ được dừng bởi useEffect trong component chính khi có phản hồi hoặc lỗi
 
         } catch (error) {
-            console.error("Failed to send message:", error);
-            log({ // Optionally log the error
+            console.error("Failed to send message via sendClientContent:", error);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            log({
                 date: new Date(),
-                type: "error",
-                message: `Failed to send message: ${error instanceof Error ? error.message : String(error)}`,
-                count: 1,
+                type: "error.send",
+                message: `Failed to send message: ${errorMessage}`,
             });
-            console.log("[handleSendMessage] Error occurred. Setting loading FALSE.");
-            // Stop loading only if the send itself fails
+            console.log("[InteractionHandlers] Error during sendClientContent. Setting loading FALSE.");
             stopLoading();
         }
     };
 
     const handleStartVoice = async () => {
         if (!connected) {
-            await connectWithPermissions();
+            try {
+                log({ date: new Date(), type: "info.voice", message: "Not connected. Attempting to connect for voice."});
+                await connectWithPermissions();
+                // Sau khi connectWithPermissions() thành công, `connected` prop sẽ được cập nhật
+                // và useEffect trong component chính sẽ re-render.
+                // Không cần kiểm tra lại `connected` ngay tại đây.
+            } catch (error) {
+                console.error("Failed to connect with permissions for voice:", error);
+                log({
+                    date: new Date(),
+                    type: "error.connectVoice",
+                    message: `Failed to connect for voice: ${error instanceof Error ? error.message : String(error)}`,
+                });
+                return;
+            }
         }
+        // Nếu đã connected hoặc vừa connect thành công ở trên:
         setMuted(false);
+        log({
+            date: new Date(),
+            type: "client.voice.start",
+            message: "Voice input started (unmuted).",
+        });
     };
 
     return { handleSendMessage, handleStartVoice };

@@ -1,163 +1,174 @@
-// hooks/useConnection.ts
-import { useState, useCallback, useEffect, useRef } from "react"; // Added useEffect, useRef
+// src/app/[locale]/chatbot/livechat/hooks/useConnection.ts
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useLiveAPIContext } from "../contexts/LiveAPIContext";
 import { useLoggerStore } from "../lib/store-logger";
 
-const useConnection = () => {
-    // Get connection state and functions from the context
-    const { connected, connect: liveAPIConnect, disconnect: liveAPIDisconnect } = useLiveAPIContext();
-    const { log } = useLoggerStore(); // Logger function
+// Interface để định nghĩa props cho useConnection nếu truyền từ bên ngoài
+// Hiện tại, chúng ta lấy trực tiếp từ context nên không cần props này nữa.
+// interface UseConnectionProps {
+//   sdkConnect: () => Promise<void>;
+//   sdkDisconnect: () => void;
+//   sdkConnected: boolean;
+//   sdkIsConnecting: boolean;
+// }
 
-    // State variables for managing connection flow
-    const [isConnecting, setIsConnecting] = useState(false); // Tracks if connection attempt is in progress
-    const [streamStartTime, setStreamStartTime] = useState<number | null>(null); // Timestamp when connection started
-    const [connectionStatusMessage, setConnectionStatusMessage] = useState<string | null>(null); // User-facing status message
-    const [error, setError] = useState<Error | null>(null); // Explicit error state
+const useConnection = (/* props: UseConnectionProps */) => {
+    // Lấy trực tiếp từ context
+    const {
+        connect: sdkConnect,
+        disconnect: sdkDisconnect,
+        connected: sdkConnected,
+        isConnecting: sdkIsConnecting,
+        on, // Để lắng nghe các event open, close, serverError từ SDK hook
+        off,
+    } = useLiveAPIContext();
+    const { log } = useLoggerStore();
 
-    const previousConnected = useRef(connected); // Store previous connection state
+    // State của hook này, một số có thể không cần thiết nữa nếu sdkIsConnecting đã đủ
+    // const [isConnectingLocal, setIsConnectingLocal] = useState(false); // Có thể dùng sdkIsConnecting
+    const [streamStartTime, setStreamStartTime] = useState<number | null>(null);
+    const [connectionStatusMessage, setConnectionStatusMessage] = useState<string | null>(null);
+    const [error, setError] = useState<Error | null>(null);
 
-    /**
-     * Requests audio permissions and initiates the connection via LiveAPIContext.
-     */
+    const hasAttemptedConnect = useRef(false); // Để tránh gọi connect nhiều lần không cần thiết
+
     const connectWithPermissions = useCallback(async () => {
-        // Prevent multiple simultaneous connection attempts
-        if (isConnecting || connected) return;
+        if (sdkIsConnecting || sdkConnected) {
+            log({ date: new Date(), type: "info.connectAttempt", message: `Connect attempt skipped: sdkIsConnecting=${sdkIsConnecting}, sdkConnected=${sdkConnected}` });
+            return;
+        }
 
-        setIsConnecting(true);
-        setError(null); // Clear previous errors on new attempt
+        hasAttemptedConnect.current = true;
+        // setIsConnectingLocal(true); // sdkIsConnecting sẽ được cập nhật bởi useLiveAPI
+        setError(null);
         setConnectionStatusMessage("Requesting mic permission...");
-        log({ date: new Date(), type: "system", message: "Attempting to connect (audio only)..." });
+        log({ date: new Date(), type: "system.permission", message: "Requesting microphone permission..." });
 
         try {
-            // Request ONLY audio permissions.
             const stream = await navigator.mediaDevices.getUserMedia({
                 audio: true,
                 video: false,
             });
-
-            log({ date: new Date(), type: "system", message: "Microphone permission granted." });
-            setConnectionStatusMessage("Connecting...");
-
-            // Stop the tracks from the permission stream immediately, we don't send it directly.
-            // AudioRecorder handles the actual mic input stream later.
             stream.getTracks().forEach(track => track.stop());
+            log({ date: new Date(), type: "system.permission", message: "Microphone permission granted." });
+            setConnectionStatusMessage("Connecting to live service...");
 
-            // Initiate the actual connection using the context's connect function.
-            await liveAPIConnect(); // Assume this updates the 'connected' context state
-
-            // The 'connected' state might update asynchronously via context provider.
-            // We will rely on the useEffect below to set the final connected state.
-            // Set start time optimistically here, or wait for useEffect confirmation.
-            // Setting it here provides a slightly earlier timer start.
-            setStreamStartTime(Date.now());
-            // Don't set "Connected" message here, let the useEffect handle it based on context state.
-
+            await sdkConnect(); // Gọi hàm connect từ useLiveAPI
+            // Trạng thái connected và isConnecting sẽ được cập nhật bởi useLiveAPI thông qua context
+            // streamStartTime sẽ được set trong useEffect khi 'open' event được nhận
 
         } catch (err) {
-            console.error("Error getting media permissions or connecting:", err);
+            console.error("Error getting media permissions or connecting via SDK:", err);
             const connectionError = err instanceof Error ? err : new Error(String(err));
-            setError(connectionError); // Set the error state
-            log({ date: new Date(), type: "error", message: `Connection failed: ${connectionError.message}` });
+            setError(connectionError);
+            log({ date: new Date(), type: "error.connection", message: `Connection failed: ${connectionError.message}` });
 
-            // Set appropriate error message for the user
             if (connectionError.message.toLowerCase().includes('permission denied') || connectionError.message.toLowerCase().includes('not allowed')) {
                 setConnectionStatusMessage("Mic permission denied. Please grant access.");
             } else {
-                setConnectionStatusMessage(`Connection failed: ${connectionError.message}`);
+                setConnectionStatusMessage(`Connection failed: ${connectionError.message.substring(0, 100)}...`);
             }
-            setStreamStartTime(null); // Reset start time on failure
-            setIsConnecting(false); // Ensure connecting is false on error
+            // setIsConnectingLocal(false); // sdkIsConnecting sẽ tự cập nhật
+            setStreamStartTime(null);
+            hasAttemptedConnect.current = false; // Cho phép thử lại
         }
-        // We intentionally don't set isConnecting=false in the success path here.
-        // The useEffect observing 'connected' will handle it. This prevents race conditions
-        // where isConnecting becomes false before 'connected' becomes true.
+    }, [sdkConnect, sdkIsConnecting, sdkConnected, log]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isConnecting, connected, liveAPIConnect, log]); // Dependencies
-
-
-    /**
-     * Disconnects using the LiveAPIContext function and resets local state.
-     */
     const handleDisconnect = useCallback(() => {
-        liveAPIDisconnect(); // Call the disconnect function from the context
-        setIsConnecting(false); // Ensure connecting state is false
-        setStreamStartTime(null); // Clear the start time
-        setConnectionStatusMessage("Disconnected."); // Set status on explicit disconnect
-        setError(null); // Clear any errors
-        // log({ date: new Date(), type: "system", message: "Disconnected." }); // Context listener might log this already
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [liveAPIDisconnect, log]); // Dependencies
-
-
-    /**
-     * Attempts to reconnect by calling connectWithPermissions again.
-     */
-    const handleReconnect = useCallback(async () => {
-        log({ date: new Date(), type: "system", message: "Attempting to reconnect..." });
-        // Reset relevant states before attempting reconnect
+        log({ date: new Date(), type: "system.disconnect", message: "Disconnect requested by user." });
+        sdkDisconnect(); // Gọi hàm disconnect từ useLiveAPI
+        // Các state khác (connected, isConnecting, streamStartTime) sẽ được cập nhật thông qua event 'close' từ useLiveAPI
+        // setConnectionStatusMessage("Disconnected."); // Có thể để event 'close' xử lý
         setError(null);
-        setConnectionStatusMessage(null); // Clear old status/error messages
-        await connectWithPermissions(); // Re-run the connection logic
-    }, [connectWithPermissions, log]); // Dependency on the connect function
+        hasAttemptedConnect.current = false;
+    }, [sdkDisconnect, log]);
 
-    // Effect to react to changes in the context's 'connected' state
-    useEffect(() => {
-        if (connected) {
-            // Successfully connected (or remained connected)
-            if (isConnecting) { // Was in the process of connecting
-                 setConnectionStatusMessage("Connected"); // Set final status
-                 log({ date: new Date(), type: "system", message: "Connection successful." });
-            }
-             // If we just connected, streamStartTime should already be set by connectWithPermissions
-             // If it wasn't (e.g., connection happened very fast), set it now.
-             if (streamStartTime === null) {
-                 setStreamStartTime(Date.now());
-             }
-            setIsConnecting(false); // Now safe to set connecting to false
-            setError(null); // Clear any previous errors
-        } else {
-            // Not connected
-            if (previousConnected.current && !isConnecting) {
-                // Condition: Was previously connected, and not currently in a connecting attempt
-                // This indicates an unexpected drop or server-side disconnect.
-                log({ date: new Date(), type: "error", message: "Connection lost unexpectedly." });
-                setError(new Error("Connection lost unexpectedly.")); // Set a generic error
-                setConnectionStatusMessage("Connection lost."); // Update status
-                setStreamStartTime(null); // Reset timer
-                setIsConnecting(false); // Ensure this is false
-            } else if (!isConnecting && streamStartTime !== null) {
-                 // Condition: Not connecting, but streamStartTime exists - implies a disconnect occurred
-                 // This could be from handleDisconnect or an unexpected drop handled above.
-                 // Reset start time if not already null.
-                 setStreamStartTime(null);
-                 // Don't overwrite specific messages like "Disconnected." or "Connection lost."
-                 if (!connectionStatusMessage) {
-                     setConnectionStatusMessage(null); // Clear status if none set
-                 }
-             }
-             // If isConnecting is true and connected is false, it means the connection attempt is still in progress or failed.
-             // The error handling within connectWithPermissions covers the failure case.
+    const handleReconnect = useCallback(async () => {
+        log({ date: new Date(), type: "system.reconnect", message: "Reconnect attempt..." });
+        if (sdkConnected) { // Nếu đang kết nối, ngắt trước
+            handleDisconnect();
+            // Chờ một chút để đảm bảo disconnect hoàn tất trước khi connect lại
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
+        setError(null);
+        setConnectionStatusMessage(null);
+        await connectWithPermissions();
+    }, [connectWithPermissions, handleDisconnect, sdkConnected, log]);
 
-        // Update previous connected state for the next render cycle
-        previousConnected.current = connected;
+    // Lắng nghe các event từ useLiveAPI để cập nhật state của hook này
+    useEffect(() => {
+        const onOpen = () => {
+            // sdkConnected và sdkIsConnecting đã được cập nhật bởi useLiveAPI
+            setStreamStartTime(Date.now());
+            setConnectionStatusMessage("Connected");
+            setError(null);
+            log({ date: new Date(), type: "connection.event.open", message: "Session opened." });
+            hasAttemptedConnect.current = false; // Reset sau khi kết nối thành công
+        };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [connected, isConnecting, log]); // Run when connection state or connecting status changes
+        const onClose = (closeEvent?: CloseEvent) => { // closeEvent có thể là undefined nếu tự gọi
+            // sdkConnected và sdkIsConnecting đã được cập nhật
+            setStreamStartTime(null);
+            // Chỉ đặt lỗi nếu đây là một ngắt kết nối không mong muốn và chưa có lỗi nào được đặt
+            if (!error && hasAttemptedConnect.current && !sdkIsConnecting) { // hasAttemptedConnect để biết là đã từng cố kết nối
+                const reason = closeEvent?.reason || "Connection closed without specific reason.";
+                const code = closeEvent?.code;
+                log({ date: new Date(), type: "connection.event.close", message: `Session closed. Code: ${code}, Reason: ${reason}` });
+                if (code !== 1000 && code !== 1005) { // 1000 = Normal Closure, 1005 = No Status Rcvd (thường do client tự đóng)
+                    setError(new Error(`Connection closed unexpectedly. Code: ${code}. ${reason}`));
+                    setConnectionStatusMessage("Connection lost.");
+                } else if (!connectionStatusMessage || connectionStatusMessage === "Connected") {
+                    // Nếu client chủ động disconnect, connectionStatusMessage có thể đã là "Disconnected."
+                    setConnectionStatusMessage("Disconnected.");
+                }
+            } else if (connectionStatusMessage === "Connected") {
+                 setConnectionStatusMessage("Disconnected.");
+            }
+            hasAttemptedConnect.current = false; // Reset
+        };
+
+        const onServerError = (err: Error | string) => {
+            // sdkConnected và sdkIsConnecting đã được cập nhật
+            const e = typeof err === 'string' ? new Error(err) : err;
+            setError(e);
+            setConnectionStatusMessage(`Error: ${e.message.substring(0,100)}...`);
+            setStreamStartTime(null);
+            log({ date: new Date(), type: "connection.event.error", message: `Server error: ${e.message}` });
+            hasAttemptedConnect.current = false; // Cho phép thử lại
+        };
+
+        on('open', onOpen);
+        on('close', onClose);
+        on('serverError', onServerError);
+
+        return () => {
+            off('open', onOpen);
+            off('close', onClose);
+            off('serverError', onServerError);
+        };
+    }, [on, off, log, error, connectionStatusMessage, sdkIsConnecting]); // Thêm sdkIsConnecting để xử lý trường hợp đang connect mà bị lỗi
+
+    // Đồng bộ trạng thái isConnecting của hook này với sdkIsConnecting từ context
+    // và connectionStatusMessage khi sdkIsConnecting thay đổi
+    useEffect(() => {
+        if (sdkIsConnecting) {
+            setConnectionStatusMessage("Connecting...");
+            setError(null); // Xóa lỗi cũ khi bắt đầu kết nối mới
+        }
+        // Không cần setIsConnectingLocal(sdkIsConnecting) vì chúng ta sẽ trả về sdkIsConnecting
+    }, [sdkIsConnecting]);
 
 
-    // Return the state and handler functions for use in components
     return {
-        connected, // The connection state from context
-        isConnecting, // Whether a connection attempt is active
-        streamStartTime, // When the stream started (for timer)
-        connectionStatusMessage, // User-facing message
-        setConnectionStatusMessage, // Allow external updates if needed (e.g., specific API errors)
-        connectWithPermissions, // Function to initiate connection (audio only)
-        handleDisconnect, // Function to disconnect
-        handleReconnect, // Function to attempt reconnection (audio only)
-        error // Expose the error state
+        connected: sdkConnected, // Trả về trạng thái từ SDK hook
+        isConnecting: sdkIsConnecting, // Trả về trạng thái từ SDK hook
+        streamStartTime,
+        connectionStatusMessage,
+        setConnectionStatusMessage, // Vẫn giữ lại nếu cần set message từ bên ngoài
+        connectWithPermissions,
+        handleDisconnect,
+        handleReconnect,
+        error
     };
 };
 

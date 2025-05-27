@@ -1,4 +1,4 @@
-// src/stores/messageStore.ts
+// src/app/[locale]/chatbot/stores/messageStore.ts
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import {

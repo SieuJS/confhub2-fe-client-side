@@ -1,4 +1,4 @@
-// src/app/[locale]/chatbot/chat/ChatInput.tsx
+// src/app/[locale]/chatbot/chat/regularchat/ChatInput.tsx
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import Button from '../../utils/Button'; // Assuming this is your custom Button component

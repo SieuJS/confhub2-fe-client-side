@@ -1,3 +1,5 @@
+// src/app/[locale]/chatbot/regularchat/ChartDisplay.tsx
+
 import React, { useEffect, useRef } from 'react';
 import * as echarts from 'echarts';
 import ReactMarkdown from 'react-markdown';

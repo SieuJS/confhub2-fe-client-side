@@ -1,4 +1,4 @@
-// src/app/[locale]/chatbot/livechat/lib/languageUtils.ts (hoặc một tên file phù hợp)
+// src/app/[locale]/chatbot/livechat/utils/languageUtils.ts (hoặc một tên file phù hợp)
 import { Language } from '@/src/app/[locale]/chatbot/lib/live-chat.types';
 
 // Định nghĩa các mã BCP-47 cho các ngôn ngữ của bạn

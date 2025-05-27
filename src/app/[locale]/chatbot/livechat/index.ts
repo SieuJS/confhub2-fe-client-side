@@ -4,7 +4,7 @@
 export * from './contexts/LiveAPIContext';
 
 // --- Types & Utils ---
-export * from './multimodal-live-types'; // Exports isServerContentMessage, isModelTurn, etc.
+export * from '../lib/live-chat.types'; // Exports isServerContentMessage, isModelTurn, etc.
 
 // --- Lib (Store, Recorder, etc.) ---
 export * from './lib/store-logger';

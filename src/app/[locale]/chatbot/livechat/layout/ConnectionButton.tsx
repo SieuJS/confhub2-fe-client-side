@@ -1,4 +1,4 @@
-// ConnectionButton.tsx
+// src/app/[locale]/chatbot/livechat/layout/ConnectionButton.tsx
 import cn from 'classnames'
 import { Hourglass, Pause, Play } from 'lucide-react'
 import React from 'react' // No longer need useState here

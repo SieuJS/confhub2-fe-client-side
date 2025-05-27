@@ -1,5 +1,5 @@
 // AnyMessage.tsx
-import { StreamingLog } from "../multimodal-live-types";
+import { StreamingLog } from "../../lib/live-chat.types";
 
 type Message = { message: StreamingLog["message"] };
 
