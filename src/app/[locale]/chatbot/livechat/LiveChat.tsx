@@ -186,10 +186,10 @@ export default function LiveChatExperience() {
         isSendingMessage={isSendingMessage}
       />
 
-      <FeatureComingSoonOverlay
+      {/* <FeatureComingSoonOverlay
         isVisible={showLiveChatOverlay}
         featureName="Live Chat"
-      />
+      /> */}
     </div>
   )
 }
