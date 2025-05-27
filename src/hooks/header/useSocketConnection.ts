@@ -7,7 +7,7 @@ interface UseSocketConnectionProps {
   loginStatus: string | null;
   user: UserResponse  | null;
 }
-const NEXT_PUBLIC_DATABASE_URL = process.env.NEXT_PUBLIC_DATABASE_URL || "http://confhub.engineer"
+const NEXT_PUBLIC_DATABASE_URL = process.env.NEXT_PUBLIC_DATABASE_URL
 const socketInitializer = () => {
   console.log(`Initializing socket connection to: ${NEXT_PUBLIC_DATABASE_URL}`);
   
