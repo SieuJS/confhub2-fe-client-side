@@ -63,26 +63,26 @@ const RenderPart: React.FC<RenderPartProps> = ({ part }) => {
       </div>
     );
   }
-  if (part.functionCall) {
-    return (
-        <div className="part part-functionCall my-1 rounded bg-gray-800 p-2 text-xs text-gray-50">
-            <h5 className="mb-1 font-semibold">Function Call: {part.functionCall.name}</h5>
-            <SyntaxHighlighter language="json" style={dark} customStyle={{ margin: 0, padding: 0, background: 'transparent' }}>
-                {JSON.stringify(part.functionCall.args, null, 2)}
-            </SyntaxHighlighter>
-        </div>
-    );
-  }
-  if (part.functionResponse) {
-    return (
-        <div className="part part-functionResponse my-1 rounded bg-gray-800 p-2 text-xs text-gray-50">
-            <h5 className="mb-1 font-semibold">Function Response: {part.functionResponse.name} (ID: {part.functionResponse.id})</h5>
-            <SyntaxHighlighter language="json" style={dark} customStyle={{ margin: 0, padding: 0, background: 'transparent' }}>
-                {JSON.stringify(part.functionResponse.response, null, 2)}
-            </SyntaxHighlighter>
-        </div>
-    );
-  }
+  // if (part.functionCall) {
+  //   return (
+  //       <div className="part part-functionCall my-1 rounded bg-gray-800 p-2 text-xs text-gray-50">
+  //           <h5 className="mb-1 font-semibold">Function Call: {part.functionCall.name}</h5>
+  //           <SyntaxHighlighter language="json" style={dark} customStyle={{ margin: 0, padding: 0, background: 'transparent' }}>
+  //               {JSON.stringify(part.functionCall.args, null, 2)}
+  //           </SyntaxHighlighter>
+  //       </div>
+  //   );
+  // }
+  // if (part.functionResponse) {
+  //   return (
+  //       <div className="part part-functionResponse my-1 rounded bg-gray-800 p-2 text-xs text-gray-50">
+  //           <h5 className="mb-1 font-semibold">Function Response: {part.functionResponse.name} (ID: {part.functionResponse.id})</h5>
+  //           <SyntaxHighlighter language="json" style={dark} customStyle={{ margin: 0, padding: 0, background: 'transparent' }}>
+  //               {JSON.stringify(part.functionResponse.response, null, 2)}
+  //           </SyntaxHighlighter>
+  //       </div>
+  //   );
+  // }
   // Fallback for any other part type or empty part
   return <div className="part part-unknown my-1 text-xs italic">(Unsupported or empty part)</div>;
 };

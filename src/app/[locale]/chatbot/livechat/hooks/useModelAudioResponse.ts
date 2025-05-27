@@ -14,11 +14,11 @@ const useModelAudioResponse = (
 ) => {
   useEffect(() => {
     const onAudioResponseCallback: LiveAPIEvents["audioResponse"] = (audioResponse) => {
-      log({
-        date: new Date(),
-        type: "receive.serverAudio",
-        message: { serverAudio: { audioData: audioResponse.data } },
-      } as StreamingLog); // Cast to StreamingLog if necessary
+      // log({
+      //   date: new Date(),
+      //   type: "receive.serverAudio",
+      //   message: { serverAudio: { audioData: audioResponse.data } },
+      // } as StreamingLog); // Cast to StreamingLog if necessary
     };
 
     on("audioResponse", onAudioResponseCallback); // "audioResponse" is known

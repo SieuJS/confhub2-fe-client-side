@@ -1,4 +1,4 @@
-// src/app/[locale]/chatbot/lib/unified-live-chat.types.ts
+// src/app/[locale]/chatbot/lib/live-chat.types.ts
 
 import type {
   Content,
@@ -23,8 +23,7 @@ import type {
   SessionResumptionConfig as SDKSessionResumptionConfig, // This is in LiveClientSetup
   ContextWindowCompressionConfig as SDKContextWindowCompressionConfig, // This is in LiveClientSetup
   AudioTranscriptionConfig as SDKAudioTranscriptionConfig, // This is in LiveClientSetup
-  // LiveConnectConfig is the type for the parameters to the SDK's connect() method
-  LiveConnectConfig as SDKLiveConnectConfig
+  Transcription as SDKTranscription, // Import the SDK's Transcription type
 } from '@google/genai'; // Adjust if SDK path is different
 
 /**
@@ -52,11 +51,6 @@ export interface LanguageOption {
  * This is an application-level config that holds parameters for BOTH:
  * 1. The SDK's `live.connect(params: LiveConnectParameters)` method.
  * 2. The `SDKLiveClientSetup` payload sent as the first message.
- *
- * `LiveConnectParameters` includes `model` and `config?: LiveConnectConfig`.
- * `LiveConnectConfig` includes `responseModalities`, `speechConfig`, `generationConfig`, `tools`, etc.
- * `SDKLiveClientSetup` (the message payload) includes `model`, `generationConfig`, `tools`, `systemInstruction`, etc.
- * but NOT `responseModalities` or `speechConfig` directly.
  */
 export type LiveChatSessionConfig = {
     // Fields primarily for SDK's live.connect() or overall session setup
@@ -66,8 +60,19 @@ export type LiveChatSessionConfig = {
 
     // Fields primarily for the SDKLiveClientSetup message payload
     systemInstruction?: Content;
-    generationConfig?: Partial<GenerationConfig>; // Base SDK GenerationConfig for the setup message
     tools?: Tool[];
+
+    // --- Generation Parameters (Flattened for LiveConnectConfig as per SDK recommendation) ---
+    // These will be used by the SDK to construct the 'generationConfig' object
+    // for the LiveClientSetup message if needed, and also directly by LiveConnectConfig.
+    temperature?: number;
+    topP?: number;
+    topK?: number;
+    candidateCount?: number;
+    maxOutputTokens?: number;
+    stopSequences?: string[];
+    // responseMimeType?: string; // Nếu bạn sử dụng
+    // responseSchema?: SDKSchema; // Nếu bạn sử dụng
 
     // Other SDKLiveClientSetup fields (can also be in LiveConnectConfig if SDK merges them)
     realtimeInputConfig?: SDKRealtimeInputConfig;
@@ -75,7 +80,13 @@ export type LiveChatSessionConfig = {
     contextWindowCompression?: SDKContextWindowCompressionConfig;
     inputAudioTranscription?: SDKAudioTranscriptionConfig;
     outputAudioTranscription?: SDKAudioTranscriptionConfig;
+
+    // Thêm các trường khác của LiveConnectConfig nếu cần, ví dụ:
+    // mediaResolution?: MediaResolution; (từ @google/genai)
+    // enableAffectiveDialog?: boolean;
+    // proactivity?: ProactivityConfig; (từ @google/genai)
 };
+
 
 
 // --- Outgoing Messages (Client to Server) ---
@@ -122,12 +133,16 @@ export type StreamingLog = {
   date: Date;
   type: string;
   count?: number;
-  message: string | SDKLiveClientMessage | SDKLiveServerMessage | ClientAudioMessage | ServerAudioMessage;
+  // Mở rộng kiểu message để bao gồm TranscriptionPayload
+  message: string | SDKLiveClientMessage | SDKLiveServerMessage | ClientAudioMessage | ServerAudioMessage | TranscriptionPayload;
 };
 
 // Type alias for the message union after basic filtering
 export type SDKMessageUnion = SDKLiveClientMessage | SDKLiveServerMessage;
 
+
+// Specific type for SDK's Transcription object
+export type TranscriptionPayload = SDKTranscription;
 
 // Type-Guards
 // Helper for checking properties
@@ -168,6 +183,14 @@ export const isTurnComplete = (content: SDKLiveServerContent | undefined): conte
   !!content && hasProperty(content, 'turnComplete') && content.turnComplete === true;
 export const isInterrupted = (content: SDKLiveServerContent | undefined): content is SDKLiveServerContent & { interrupted: true } =>
   !!content && hasProperty(content, 'interrupted') && content.interrupted === true;
+
+// --- V ADDED: Type guards for transcription data within ServerContentPayload ---
+export const hasInputTranscription = (content: ServerContentPayload | undefined): content is ServerContentPayload & { inputTranscription: TranscriptionPayload } =>
+  !!content && hasProperty(content, 'inputTranscription') && typeof content.inputTranscription === 'object' && content.inputTranscription !== null && typeof content.inputTranscription.text === 'string';
+
+export const hasOutputTranscription = (content: ServerContentPayload | undefined): content is ServerContentPayload & { outputTranscription: TranscriptionPayload } =>
+  !!content && hasProperty(content, 'outputTranscription') && typeof content.outputTranscription === 'object' && content.outputTranscription !== null && typeof content.outputTranscription.text === 'string';
+// --- ^ ADDED ---
 
 export function isSDKFunctionCall(value: unknown): value is FunctionCall {
   if (!value || typeof value !== "object") return false;

@@ -5,7 +5,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { OutputModality, PrebuiltVoice } from '../../lib/live-chat.types';
 import { AVAILABLE_VOICES_LIVE_CHAT, DEFAULT_MODALITY_LIVE_CHAT, DEFAULT_VOICE_LIVE_CHAT } from '../../lib/constants';
-
+import { Modality as SDKModality } from '@google/genai';
 // --- Interface cho Context Value ---
 interface LiveChatSettingsContextType {
     currentModality: OutputModality;
@@ -33,10 +33,14 @@ export const useLiveChatSettings = (): LiveChatSettingsContextType => {
 };
 
 export const LiveChatSettingsProvider: React.FC<LiveChatSettingsProviderProps> = ({ children }) => {
-    const [currentModality, setCurrentModality] = useState<OutputModality>(DEFAULT_MODALITY_LIVE_CHAT);
+    const [currentModality, _setCurrentModality] = useState<OutputModality>(DEFAULT_MODALITY_LIVE_CHAT);
     const [currentVoice, setCurrentVoice] = useState<PrebuiltVoice>(DEFAULT_VOICE_LIVE_CHAT);
-    // --- STATE MỚI CHO KẾT NỐI LIVE CHAT ---
     const [isLiveChatConnected, setLiveChatConnected] = useState<boolean>(false);
+
+    const setCurrentModality = (modality: OutputModality) => {
+        console.log('[LiveChatSettingsContext] Setting modality to:', modality, SDKModality[modality]); // Log the enum value and its string name
+        _setCurrentModality(modality);
+    };
 
     return (
         <LiveChatSettingsContext.Provider

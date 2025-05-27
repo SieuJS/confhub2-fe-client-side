@@ -2,102 +2,137 @@
 import React, { ReactNode } from "react";
 import {
   StreamingLog,
-  // Type guards for SDK messages
   isClientContentMessage,
-  isToolCallMessage,
-  isToolCallCancellationMessage,
-  isToolResponseMessage,
   isServerContentMessage,
-  // Type guards for parts of ServerContentPayload
   isInterrupted,
   isTurnComplete,
   isModelTurn,
-  // Application-specific types and guards
   isClientAudioMessage,
   isServerAudioMessage,
-  ClientAudioMessage, // Import for casting if needed
-  ServerAudioMessage, // Import for casting if needed
-  // Payload types from unified types
-  ClientContentPayload,
-  ToolCallPayload,
-  ToolCallCancellationPayload,
+  ClientAudioMessage,
+  ServerAudioMessage,
   ServerContentPayload,
-  ToolResponsePayload, // This is SDKLiveClientToolResponse
-} from "../../lib/live-chat.types"; // Updated import path
-
+  TranscriptionPayload,
+  SDKMessageUnion,
+  ToolResponsePayload, // <-- THÊM IMPORT NÀY
+} from "../../lib/live-chat.types";
+import { Content, LiveServerMessage as SDKLiveServerMessage } from "@google/genai";
 import ClientContentLog from "./ClientContentLog";
-import ToolCallLog from "./ToolCallLog";
-import ToolCallCancellationLog from "./ToolCallCancellationLog";
-import ToolResponseLog from "./ToolResponseLog";
 import ModelTurnLog from "./ModelTurnLog";
 import PlainTextMessage from "./PlainTextMessage";
 import ClientAudioLog from "./ClientAudioLog";
 import ServerAudioLog from "./ServerAudioLog";
-import AnyMessage from "./AnyMessage"; // Assuming this handles unknown/default cases
+import AnyMessage from "./AnyMessage";
+import InputTranscriptionLog from "./InputTranscriptionLog";
+import OutputTranscriptionLog from "./OutputTranscriptionLog";
+import ToolResponseLog from "./ToolResponseLog"; // <-- THÊM IMPORT NÀY
 
 const CustomPlainTextLog = ({ msg }: { msg: string }): ReactNode => {
   return <PlainTextMessage message={msg} />;
 };
 
 interface MessageRendererProps {
-  message: StreamingLog["message"]; // message is SDKLiveClientMessage | SDKLiveServerMessage | string | ClientAudioMessage | ServerAudioMessage
-  type?: string;
+  logEntry: StreamingLog;
 }
 
-const MessageRenderer = ({ message, type }: MessageRendererProps) => {
-  if (typeof message === 'string') {
-    return <PlainTextMessage message={message} />;
+type ModelTurnLogMessagePropType = SDKLiveServerMessage & {
+    serverContent: ServerContentPayload & {
+        modelTurn: Content;
+    };
+};
+
+const isSDKMessage = (msg: any): msg is SDKMessageUnion => {
+  return (
+    typeof msg === 'object' &&
+    msg !== null &&
+    ('setup' in msg || 'clientContent' in msg || 'realtimeInput' in msg || 'toolResponse' in msg ||
+     'setupComplete' in msg || 'serverContent' in msg || 'toolCall' in msg || 'toolCallCancellation' in msg || 'usageMetadata' in msg)
+  );
+};
+
+// Helper type guard cho ToolResponsePayload
+const isToolResponsePayload = (payload: any): payload is ToolResponsePayload => {
+  return payload && typeof payload === 'object' &&
+         'functionResponses' in payload && Array.isArray(payload.functionResponses);
+};
+
+const MessageRenderer = ({ logEntry }: MessageRendererProps) => {
+  const { message, type } = logEntry;
+
+  // ƯU TIÊN XỬ LÝ TOOL RESPONSE LOG
+  if (type === "client.toolResponseSent" && isToolResponsePayload(message)) {
+    return <ToolResponseLog message={message} />;
   }
 
-  if (isClientAudioMessage(message)) {
+  // // 1. Xử lý các kiểu không phải SDKMessageUnion trước (ngoại trừ ToolResponsePayload đã xử lý ở trên)
+  // if (typeof message === 'string') {
+  //   // Nếu logEntry có summary (đã thêm ở bước 1 cho client.toolResponseSent),
+  //   // và message không phải là ToolResponsePayload (đã được xử lý),
+  //   // bạn có thể muốn hiển thị summary thay vì message object nếu nó lọt xuống đây.
+  //   // Tuy nhiên, với type guard ở trên, điều này không nên xảy ra cho client.toolResponseSent.
+  //   if (logEntry.summary && typeof logEntry.summary === 'string' && type === "client.toolResponseSent") {
+  //       return <PlainTextMessage message={logEntry.summary} />;
+  //   }
+  //   return <PlainTextMessage message={message} />;
+  // }
+
+  if (isClientAudioMessage(message) && type === "send.clientAudio.sessionComplete") {
     return <ClientAudioLog message={message as ClientAudioMessage} />;
   }
 
-  if (isServerAudioMessage(message)) {
+  if (type === "receive.serverAudioDebounced" && isServerAudioMessage(message)) {
     return <ServerAudioLog message={message as ServerAudioMessage} />;
   }
 
-  // At this point, message is SDKLiveClientMessage or SDKLiveServerMessage
-  // The type guards will correctly narrow down based on the fields present.
-
-  if (isClientContentMessage(message)) {
-    // message.clientContent is ClientContentPayload
-    return <ClientContentLog message={message.clientContent} />;
-  }
-  if (isToolCallMessage(message)) {
-    // message.toolCall is ToolCallPayload
-    return <ToolCallLog message={message.toolCall} />;
-  }
-  if (isToolCallCancellationMessage(message)) {
-    // message.toolCallCancellation is ToolCallCancellationPayload
-    return <ToolCallCancellationLog message={message.toolCallCancellation} />;
-  }
-
-  // For ToolResponse, the type guard isToolResponseMessage checks if message is an SDKLiveClientMessage
-  // AND has the toolResponse field.
-  if (isToolResponseMessage(message)) {
-    // message.toolResponse is ToolResponsePayload
-    return <ToolResponseLog message={message.toolResponse} />;
-  }
-
-  if (isServerContentMessage(message)) {
-    // message.serverContent is ServerContentPayload (SDKLiveServerContent)
-    const serverContent = message.serverContent;
-    if (isInterrupted(serverContent)) { // isInterrupted now takes SDKLiveServerContent
-      return <CustomPlainTextLog msg="interrupted" />;
+  if (
+    (type === "transcription.inputEvent.final" || type === "transcription.outputEvent.final") &&
+    typeof message === 'object' && message !== null && 'text' in message && (message as TranscriptionPayload).finished === true
+  ) {
+    const transcription = message as TranscriptionPayload;
+    if (type === "transcription.inputEvent.final") {
+        return <InputTranscriptionLog transcription={transcription} />;
     }
-    if (isTurnComplete(serverContent)) { // isTurnComplete now takes SDKLiveServerContent
-      return <CustomPlainTextLog msg="turnComplete" />;
+    if (type === "transcription.outputEvent.final") {
+        return <OutputTranscriptionLog transcription={transcription} />;
     }
-    if (isModelTurn(serverContent)) { // isModelTurn now takes SDKLiveServerContent
-      // ModelTurnLog expects the full ServerContentMessage (SDKLiveServerMessage with serverContent field)
-      return <ModelTurnLog message={message} />;
-    }
-    // Potentially render other aspects of serverContent if needed, e.g., transcriptions
   }
 
-  // Fallback for any other structured message not caught above
-  return <AnyMessage message={message} />;
+  // 2. Xử lý SDKMessageUnion
+  if (isSDKMessage(message)) {
+    if (isClientContentMessage(message)) {
+      return <ClientContentLog message={message.clientContent} />;
+    }
+
+    if (isServerContentMessage(message)) {
+      const serverContent = message.serverContent;
+      if (isInterrupted(serverContent)) {
+        return <CustomPlainTextLog msg="[Model Interrupted]" />;
+      }
+      if (isModelTurn(serverContent)) {
+        if ('serverContent' in message && message.serverContent && 'modelTurn' in message.serverContent) {
+             return <ModelTurnLog message={message as ModelTurnLogMessagePropType} />;
+        }
+      }
+    }
+  }
+
+  // Fallback:
+  if (
+    type.includes("transcription.inputEvent.partial") ||
+    type.includes("transcription.outputEvent.partial") ||
+    type === "receive.serverAudio"
+  ) {
+      return null;
+  }
+
+  // // Nếu có summary, hiển thị nó cho các log chưa được xử lý thay vì object message
+  // if (logEntry.summary && typeof logEntry.summary === 'string') {
+  //   console.warn("[MessageRenderer] Rendering summary for unhandled/debug log type:", type, "Summary:", logEntry.summary);
+  //   return <PlainTextMessage message={logEntry.summary} />;
+  // }
+
+  console.warn("[MessageRenderer] Rendering with AnyMessage for unhandled/debug log type:", type, "Message:", message);
+  return <AnyMessage message={message as any} />;
 };
 
 export default MessageRenderer;

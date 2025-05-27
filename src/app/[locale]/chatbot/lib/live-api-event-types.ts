@@ -3,33 +3,36 @@ import {
   LiveChatSessionConfig,
   StreamingLog,
   ToolCallPayload,
-  ServerContentPayload, // This is SDKLiveServerContent
+  ToolCallCancellationPayload,
+  TranscriptionPayload,
+  ServerContentPayload // Import type này từ live-chat.types.ts
 } from '@/src/app/[locale]/chatbot/lib/live-chat.types';
-import { LiveServerMessage as SDKLiveServerMessage } from "@google/genai";
+// import { LiveServerMessage as SDKLiveServerMessage } from "@google/genai"; // Không cần nếu không dùng server_message
 
 
 // This is the SINGLE SOURCE OF TRUTH for Live API events
 export interface LiveAPIEvents {
   // Events from useLiveApi
-  close: () => void;
+  close: (event?: CloseEvent) => void;
   open: () => void;
   config: (config: LiveChatSessionConfig) => void;
-  log: (logEntry: StreamingLog) => void; // Callback for the "log" event
+  log: (logEntry: StreamingLog) => void;
   interrupted: () => void;
   audio: (audioData: ArrayBuffer) => void;
-  audioResponse: (audioResponsePayload: { data: string }) => void; // Callback for "audioResponse"
+  audioResponse: (audioResponsePayload: { data: string }) => void;
+  inputTranscription: (transcription: TranscriptionPayload) => void;
+  outputTranscription: (transcription: TranscriptionPayload) => void;
   toolcall: (toolCallPayload: ToolCallPayload) => void;
+  toolcallcancellation: (payload: ToolCallCancellationPayload) => void;
   text: (textPart: string) => void;
   serverError: (error: Error | string) => void;
   generate: (generateData: any) => void;
   reset: () => void;
   turncomplete: () => void;
   setupcomplete: () => void;
+  content: (payload: ServerContentPayload) => void; // THÊM EVENT NÀY
 
-  // Potentially other events your MultimodalLiveClient might emit directly
-  // that are aligned with SDK server messages, if not already covered by 'content', 'toolcall' etc.
-  // For example, if your client directly emits the full SDKLiveServerMessage:
-  server_message: (message: SDKLiveServerMessage) => void;
+  // server_message: (message: SDKLiveServerMessage) => void;
 }
 
 export type EventType = keyof LiveAPIEvents;

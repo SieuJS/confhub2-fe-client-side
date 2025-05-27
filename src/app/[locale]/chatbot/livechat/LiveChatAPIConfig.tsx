@@ -17,69 +17,81 @@ import {
 import {
   LiveChatSessionConfig,
   PrebuiltVoice,
-  Language as AppLanguage, // Rename to avoid conflict with SDK Language if any
-  ToolCallPayload,
-} from '@/src/app/[locale]/chatbot/lib/live-chat.types'; // Using unified types
+  Language as AppLanguage,
+  ToolCallPayload, // ToolCallPayload của bạn là SDKLiveServerToolCall
+  ToolResponsePayload, // <-- THÊM IMPORT NÀY
+
+} from '@/src/app/[locale]/chatbot/lib/live-chat.types';
 
 import {
   FunctionDeclaration as SDKFunctionDeclaration,
-  Tool as SDKTool,
+  // Tool as SDKTool, // Không dùng trực tiếp
   FunctionResponse as SDKFunctionResponse,
-  LiveClientMessage as SDKLiveClientMessage,
+  // LiveClientMessage as SDKLiveClientMessage, // Không dùng trực tiếp
   Content as SDKContent,
-  GenerationConfig as SDKGenerationConfig,
+  // GenerationConfig as SDKGenerationConfig, // Không dùng trực tiếp
   SpeechConfig as SDKSpeechConfig,
   Modality as SDKModality,
+  AudioTranscriptionConfig as SDKAudioTranscriptionConfig,
 } from '@google/genai';
 
-import { appConfig } from "@/src/middleware";
-import { usePathname } from 'next/navigation';
+import { appConfig } from "@/src/middleware"; // Đảm bảo đường dẫn đúng
+import { usePathname } from 'next/navigation'; // Sử dụng next/navigation thay vì src/navigation nếu đó là alias
 import { useLoggerStore } from '@/src/app/[locale]/chatbot/livechat/lib/store-logger';
 import { toolHandlers } from './services/tool.handlers';
-import { getBcp47LanguageCode } from './utils/languageUtils'; // Import the new utility
+import { getBcp47LanguageCode } from './utils/languageUtils';
 
-export type OutputModalityString = "text" | "audio" | "image";
+// export type OutputModalityString = "text" | "audio" | "image"; // Không còn dùng
 
 export type LiveChatAPIConfigProps = {
   outputModality: SDKModality;
   selectedVoice: PrebuiltVoice;
-  language: AppLanguage; // Use your application's Language type
+  language: AppLanguage;
   systemInstructions: string;
 };
 
 function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructions }: LiveChatAPIConfigProps) {
-  const { client, setConfig } = useLiveAPIContext();
+  const {
+    session, // session là SDKSession | null
+    setConfig,
+    sendToolResponse,
+    on,
+    off
+  } = useLiveAPIContext();
   const { log: logToStore } = useLoggerStore();
   const pathname = usePathname();
   const currentLocale = pathname.split('/')[1] as AppLanguage;
 
   useEffect(() => {
-    console.log(`Constructing LiveChatSessionConfig for: Modality=${outputModality}, Voice=${selectedVoice}, AppLanguage=${language}, Locale=${currentLocale}`);
-
-    const bcp47LanguageCode = getBcp47LanguageCode(language); // Get BCP-47 code
-    console.log(`Using BCP-47 language code for speechConfig: ${bcp47LanguageCode}`);
+    console.log(
+      `[LiveChatAPIConfig] useEffect: Constructing LiveChatSessionConfig for: Modality=${SDKModality[outputModality]} (raw: ${outputModality}), Voice=${selectedVoice}, AppLanguage=${language}, Locale=${currentLocale}`
+    );
+    const bcp47LanguageCode = getBcp47LanguageCode(language);
 
     const appLevelConfig: LiveChatSessionConfig = {
-      model: "models/gemini-2.0-flash-live-001", // Ensure this model supports live/bidi
+      model: "models/gemini-2.0-flash-live-001",
       systemInstruction: {
         parts: [{ text: systemInstructions }],
       } as SDKContent,
-      generationConfig: {} as Partial<SDKGenerationConfig>,
       tools: [],
-
-      // Now outputModality is already SDKModality, so direct usage
-      responseModalities: [outputModality], // Simpler: just use the passed enum member in an array
-      // Or, if you only support AUDIO/TEXT:
-      // outputModality === SDKModality.AUDIO ? [SDKModality.AUDIO] : [SDKModality.TEXT]
-      // The simpler [outputModality] assumes it's already one of the desired values.
+      responseModalities: [outputModality],
+      temperature: 0.7,
+      topK: 40,
+      topP: 0.95,
+      maxOutputTokens: 1024,
     };
 
-    // Compare with SDKModality enum member
     if (outputModality === SDKModality.AUDIO) {
       appLevelConfig.speechConfig = {
-        voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedVoice } },
         languageCode: bcp47LanguageCode,
-      } as SDKSpeechConfig;
+        voiceConfig: {
+          prebuiltVoiceConfig: {
+            voiceName: selectedVoice,
+          }
+        }
+      };
+      appLevelConfig.inputAudioTranscription = {};
+      appLevelConfig.outputAudioTranscription = {};
     }
 
     const activeFunctionDeclarations: SDKFunctionDeclaration[] = [
@@ -94,36 +106,40 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
     ];
 
     if (activeFunctionDeclarations.length > 0) {
-      appLevelConfig.tools = [
-        {
-          functionDeclarations: activeFunctionDeclarations,
-        },
-      ];
+      appLevelConfig.tools = [{ functionDeclarations: activeFunctionDeclarations }];
     }
 
-    console.log("Calling setConfig with appLevelConfig:", JSON.stringify(appLevelConfig, null, 2));
-    logToStore({
-      date: new Date(),
-      type: "client.setConfigAttempt",
-      message: `Attempting to set config: ${JSON.stringify({
-        model: appLevelConfig.model,
-        outputModality,
-        selectedVoice,
-        language: language, // Log app language
-        bcp47Language: bcp47LanguageCode, // Log BCP-47 code used
-        systemInstructionLength: systemInstructions.length,
-        numTools: appLevelConfig.tools?.[0]?.functionDeclarations?.length || 0
-      })}`
-    });
+    console.log("[LiveChatAPIConfig] Attempting to set appLevelConfig:", JSON.stringify(appLevelConfig, null, 2));
+
+    // logToStore({
+    //   date: new Date(),
+    //   type: "client.setConfigAttempt",
+    //   message: `Attempting to set config: ${JSON.stringify({
+    //     model: appLevelConfig.model,
+    //     outputModality: SDKModality[outputModality],
+    //     selectedVoice,
+    //     language: language,
+    //     bcp47Language: bcp47LanguageCode,
+    //     speechConfigIncluded: !!appLevelConfig.speechConfig,
+    //     systemInstructionLength: systemInstructions.length,
+    //     numTools: appLevelConfig.tools?.[0]?.functionDeclarations?.length || 0,
+    //     inputTranscriptionEnabled: !!appLevelConfig.inputAudioTranscription,
+    //     outputTranscriptionEnabled: !!appLevelConfig.outputAudioTranscription,
+    //     temperature: appLevelConfig.temperature,
+    //     topK: appLevelConfig.topK,
+    //     topP: appLevelConfig.topP,
+    //     maxOutputTokens: appLevelConfig.maxOutputTokens,
+    //   }, null, 2)}`
+    // });
+
     setConfig(appLevelConfig);
 
   }, [setConfig, outputModality, selectedVoice, language, systemInstructions, currentLocale, logToStore]);
 
-  // ... (useEffect for tool calls remains the same as the previous correct version)
+  // useEffect này để đăng ký tool call event
   useEffect(() => {
-    const onToolCall = async (toolCallPayload: ToolCallPayload) => {
-      console.log(`Got toolcall payload`, toolCallPayload);
-      logToStore({ date: new Date(), type: "server.toolCall", message: JSON.stringify(toolCallPayload) });
+    const onToolCallCallback = async (toolCallPayload: ToolCallPayload) => {
+      console.log(`[LiveChatAPIConfig] Got toolcall payload (inside callback):`, toolCallPayload);
 
       const NEXT_PUBLIC_DATABASE_URL = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1` || "https://confhub.westus3.cloudapp.azure.com/api/v1";
       const NEXT_PUBLIC_FRONTEND_URL = appConfig.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:8386";
@@ -131,7 +147,7 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
       const handlerConfig = {
         databaseUrl: NEXT_PUBLIC_DATABASE_URL,
         frontendUrl: NEXT_PUBLIC_FRONTEND_URL,
-        currentLocale: currentLocale, // currentLocale is AppLanguage here
+        currentLocale: currentLocale,
       };
 
       const responsesForSDK: SDKFunctionResponse[] = [];
@@ -139,74 +155,85 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
       if (toolCallPayload.functionCalls) {
         for (const fc of toolCallPayload.functionCalls) {
           if (fc.name && fc.id) {
-            try {
-              const handler = toolHandlers[fc.name];
-              if (handler) {
-                console.log(`Executing handler for ${fc.name} with id ${fc.id}`);
+            console.log(`[LiveChatAPIConfig] Processing function call: Name='${fc.name}', ID='${fc.id}'`);
+            console.log(`[LiveChatAPIConfig] Available tool handlers:`, Object.keys(toolHandlers));
+            const handler = toolHandlers[fc.name];
+            if (handler) {
+              console.log(`[LiveChatAPIConfig] Executing handler for ${fc.name} with id ${fc.id}`);
+              try {
                 const resultFromHandler = await handler(fc, handlerConfig);
-
-                const sdkResponse = new SDKFunctionResponse();
-                sdkResponse.name = fc.name;
-                sdkResponse.id = resultFromHandler.id;
-                sdkResponse.response = resultFromHandler.response;
-                responsesForSDK.push(sdkResponse);
-
-              } else {
-                console.warn(`Unknown function call name received: ${fc.name}`);
-                const sdkErrorResponse = new SDKFunctionResponse();
-                sdkErrorResponse.name = fc.name;
-                sdkErrorResponse.id = fc.id;
-                sdkErrorResponse.response = { content: { type: "error", message: `Unknown function: ${fc.name}` } };
-                responsesForSDK.push(sdkErrorResponse);
+                responsesForSDK.push({
+                  id: fc.id, // Luôn dùng fc.id để khớp với FunctionCall gốc
+                  name: fc.name,
+                  response: resultFromHandler.response,
+                });
+                console.log(`[LiveChatAPIConfig] Handler for ${fc.name} executed. Response added.`);
+              } catch (error: any) {
+                console.error(`[LiveChatAPIConfig] Error in handler for ${fc.name}:`, error);
+                let errorMessage = error.message || "An unexpected error occurred in handler.";
+                if (errorMessage.length > 300) errorMessage = errorMessage.substring(0, 297) + "...";
+                responsesForSDK.push({
+                  id: fc.id,
+                  name: fc.name,
+                  response: { content: { type: "error", message: `Handler error for ${fc.name}: ${errorMessage}` } },
+                });
               }
-            } catch (error: any) {
-              console.error(`Error processing function call ${fc.name}:`, error);
-              let errorMessage = error.message || "An unexpected error occurred.";
-              if (errorMessage.length > 300) errorMessage = errorMessage.substring(0, 297) + "...";
-
-              const sdkCatchResponse = new SDKFunctionResponse();
-              sdkCatchResponse.name = fc.name;
-              sdkCatchResponse.id = fc.id;
-              sdkCatchResponse.response = { content: { type: "error", message: `Failed to execute ${fc.name}: ${errorMessage}` } };
-              responsesForSDK.push(sdkCatchResponse);
+            } else {
+              console.warn(`[LiveChatAPIConfig] No handler found for function: ${fc.name}`);
+              responsesForSDK.push({
+                id: fc.id,
+                name: fc.name,
+                response: { content: { type: "error", message: `Unknown function: ${fc.name}` } },
+              });
             }
           } else {
-            console.error(`Received function call with missing name or id:`, fc);
+            console.error(`[LiveChatAPIConfig] Received function call with missing name or id:`, fc);
             if (fc.id) {
-              const sdkMissingInfoResponse = new SDKFunctionResponse();
-              sdkMissingInfoResponse.name = fc.name || "unknownFunction";
-              sdkMissingInfoResponse.id = fc.id;
-              sdkMissingInfoResponse.response = { content: { type: "error", message: `Function call received with missing name.` } };
-              responsesForSDK.push(sdkMissingInfoResponse);
+              responsesForSDK.push({
+                id: fc.id,
+                name: fc.name || "unknownFunction",
+                response: { content: { type: "error", message: `Function call received with missing name.` } },
+              });
             }
           }
         }
       }
 
-      if (responsesForSDK.length > 0) {
-        const toolResponsePayloadToSend = { functionResponses: responsesForSDK };
-        console.log("Sending tool responses:", toolResponsePayloadToSend);
-        const toolResponseMessageForLog: SDKLiveClientMessage = {
-          toolResponse: toolResponsePayloadToSend
-        };
+       if (responsesForSDK.length > 0) {
+        const toolResponseData: ToolResponsePayload = { functionResponses: responsesForSDK }; // <-- TẠO PAYLOAD
+
+        console.log("[LiveChatAPIConfig] Sending tool responses:", JSON.stringify(toolResponseData, null, 2));
+        sendToolResponse(toolResponseData); // sendToolResponse vẫn nhận { functionResponses: ... }
+
         logToStore({
           date: new Date(),
-          type: "client.toolResponse",
-          message: JSON.stringify(toolResponseMessageForLog),
+          type: "client.toolResponseSent",
+          message: toolResponseData, // <-- LƯU TRỮ OBJECT PAYLOAD THỰC SỰ
+          summary: `Sent tool responses for ${responsesForSDK.length} function calls.`, // (Tùy chọn) Giữ lại summary dạng string nếu cần
           count: responsesForSDK.length
         });
-        client.sendToolResponse(toolResponsePayloadToSend);
       } else {
-        console.log("No responses generated for this tool call batch.");
+        console.log("[LiveChatAPIConfig] No responses generated for this tool call batch (after processing).");
       }
     };
 
-    client.on("toolcall", onToolCall);
-    return () => {
-      client.off("toolcall", onToolCall);
-    };
-  }, [client, currentLocale, logToStore]);
 
+    // Chỉ đăng ký khi session thực sự tồn tại và các hàm on/off cũng đã sẵn sàng
+    // (on/off thường ổn định, nhưng session là yếu tố chính ở đây)
+    if (session && typeof on === 'function' && typeof off === 'function') {
+      console.log("[LiveChatAPIConfig] Session is available. Subscribing to 'toolcall' event.");
+      on("toolcall", onToolCallCallback);
+      return () => {
+        console.log("[LiveChatAPIConfig] Cleaning up 'toolcall' event subscription.");
+        off("toolcall", onToolCallCallback);
+      };
+    } else {
+      console.log("[LiveChatAPIConfig] Session not available or on/off not ready, not subscribing to 'toolcall'. Current session:", session);
+      // Không return gì cả, useEffect sẽ chạy lại khi session hoặc on/off thay đổi
+    }
+    // Thêm session, on, off vào dependency array.
+    // sendToolResponse, currentLocale, logToStore cũng cần nếu chúng thay đổi và bạn muốn đăng ký lại.
+  }, [session, on, off, sendToolResponse, currentLocale, logToStore]); // QUAN TRỌNG: session, on, off ở đây
 
   return null;
 }
