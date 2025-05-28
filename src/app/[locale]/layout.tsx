@@ -96,7 +96,50 @@ export const metadata: Metadata = {
   keywords:
     'conferences, academic conferences, conference management, research conferences',
   authors: [{ name: 'ConFHub Team' }],
-  robots: 'index, follow'
+  robots: 'index, follow',
+  manifest: '/manifest.json',
+  themeColor: '#000000',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'ConFHub',
+  },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
+  icons: {
+    icon: '/icons/icon-192x192.png',
+    shortcut: '/icons/icon-192x192.png',
+    apple: '/icons/icon-180x180.png',
+    other: [
+      {
+        rel: 'apple-touch-icon',
+        url: '/icons/icon-180x180.png',
+      },
+      {
+        rel: 'apple-touch-icon-precomposed',
+        url: '/icons/icon-180x180.png',
+      },
+      {
+        rel: 'apple-touch-icon',
+        sizes: '152x152',
+        url: '/icons/icon-152x152.png',
+      },
+      {
+        rel: 'apple-touch-icon',
+        sizes: '167x167',
+        url: '/icons/icon-167x167.png',
+      },
+      {
+        rel: 'apple-touch-icon',
+        sizes: '180x180',
+        url: '/icons/icon-180x180.png',
+      }
+    ],
+  },
 }
 export const viewport: Viewport = {
   // Sử dụng type Viewport
