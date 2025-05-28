@@ -24,7 +24,7 @@ const useUpdateConference = () => {
     setUpdateResult(null); // Clear previous results
 
     try {
-      const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/conference/update/${conferenceId}`, {
+      const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/conference-crawl-job/update/${conferenceId}`, {
         method: 'POST', // Changed to PUT for updates (more standard RESTful practice), can also be PATCH
         headers: {
           'Content-Type': 'application/json',
