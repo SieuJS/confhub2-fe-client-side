@@ -439,7 +439,7 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
             setIsConnecting(false);
             setSession(null);
             emitter.emit("close", e);
-            emitter.emit("log", { date: new Date(), type: "connection.close", message: `WebSocket closed. Code: ${e.code}, Reason: ${e.reason}` });
+            // emitter.emit("log", { date: new Date(), type: "connection.close", message: `WebSocket closed. Code: ${e.code}, Reason: ${e.reason}` });
             audioStreamerRef.current?.stop();
             accumulatedServerAudioRef.current = "";
             debouncedEmitServerAudioLog.cancel();
@@ -544,7 +544,7 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
   useEffect(() => {
     return () => {
       if (session) {
-        emitter.emit("log", { date: new Date(), type: "client.unmountDisconnect", message: "Component unmounting, closing session." });
+        // emitter.emit("log", { date: new Date(), type: "client.unmountDisconnect", message: "Component unmounting, closing session." });
         session.close();
         setSession(null);
       }
