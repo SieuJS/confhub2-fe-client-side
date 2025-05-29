@@ -8,19 +8,14 @@ import { useUiStore, useSettingsStore } from './stores';
 import { useShallow } from 'zustand/react/shallow';
 import { useLiveChatSettings } from './livechat/contexts/LiveChatSettingsContext';
 import { LanguageOption } from './stores';
-import { UserResponse } from '@/src/models/response/user.response'; // <<< IMPORT UserResponse type
-import { useAuth } from '@/src/contexts/AuthContext'; // <<< IMPORT useAuth
+import { UserResponse } from '@/src/models/response/user.response';
+import { useAuth } from '@/src/contexts/AuthContext';
+import PersonalizationConfirmationModal from './PersonalizationConfirmationModal'; // <<< IMPORT MODAL
 
-
-interface RightSettingsPanelProps {
-  isLiveChatContextActive?: boolean;
-}
-
-// --- SỬA ĐỔI ĐỊNH NGHĨA PROPS CHO LiveAwareLanguageDropdown ---
 const LiveAwareLanguageDropdown: React.FC<{
-  currentLanguage: LanguageOption; // Sử dụng kiểu LanguageOption trực tiếp
-  availableLanguages: LanguageOption[]; // Sử dụng mảng LanguageOption
-  setCurrentLanguage: (language: LanguageOption) => void; // Định nghĩa kiểu hàm trực tiếp
+  currentLanguage: LanguageOption;
+  availableLanguages: LanguageOption[];
+  setCurrentLanguage: (language: LanguageOption) => void;
 }> = ({ currentLanguage, availableLanguages, setCurrentLanguage }) => {
   const { isLiveChatConnected } = useLiveChatSettings();
 
@@ -34,12 +29,16 @@ const LiveAwareLanguageDropdown: React.FC<{
   );
 };
 
+
+interface RightSettingsPanelProps {
+  isLiveChatContextActive?: boolean;
+}
+
 const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
   isLiveChatContextActive
 }) => {
   const t = useTranslations();
-  const { user, isLoggedIn } = useAuth(); // <<< GET USER AND LOGIN STATUS
-
+  const { user, isLoggedIn } = useAuth();
 
   const { isRightPanelOpen, setRightPanelOpen } = useUiStore(
     useShallow(state => ({
@@ -53,28 +52,29 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
     currentLanguage,
     availableLanguages,
     isStreamingEnabled,
-    isPersonalizationEnabled, // <<< GET PERSONALIZATION STATE
+    isPersonalizationEnabled,
     setCurrentLanguage,
     setIsStreamingEnabled,
-    setIsPersonalizationEnabled, // <<< GET PERSONALIZATION ACTION
+    setIsPersonalizationEnabled,
   } = useSettingsStore(
     useShallow(state => ({
       chatMode: state.chatMode,
       currentLanguage: state.currentLanguage,
       availableLanguages: state.availableLanguages,
       isStreamingEnabled: state.isStreamingEnabled,
-      isPersonalizationEnabled: state.isPersonalizationEnabled, // <<< GET
+      isPersonalizationEnabled: state.isPersonalizationEnabled,
       setCurrentLanguage: state.setCurrentLanguage,
       setIsStreamingEnabled: state.setIsStreamingEnabled,
-      setIsPersonalizationEnabled: state.setIsPersonalizationEnabled, // <<< GET
+      setIsPersonalizationEnabled: state.setIsPersonalizationEnabled,
     }))
   );
 
+  // State for managing modals
+  const [isBenefitModalOpen, setIsBenefitModalOpen] = useState(false);
+  const [isMissingInfoModalOpen, setIsMissingInfoModalOpen] = useState(false);
+  const [missingInfoFieldsText, setMissingInfoFieldsText] = useState('');
 
-  // Local state to manage if the initial benefit popup has been shown for the session/login
-  // This is a simple way, could be persisted if needed across sessions more robustly
-  const [benefitPopupShownThisSession, setBenefitPopupShownThisSession] = useState(false);
-
+  // Removed benefitPopupShownThisSession, as modal logic will handle display
 
   const handleStreamingToggle = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -82,6 +82,10 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
     setIsStreamingEnabled(event.target.checked);
   };
 
+  const proceedToEnablePersonalization = () => {
+    setIsPersonalizationEnabled(true);
+    // setBenefitPopupShownThisSession(true); // No longer needed if modal is shown each time
+  };
 
   const handlePersonalizationToggle = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -89,8 +93,9 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
     const enable = event.target.checked;
 
     if (enable) {
-      // User is trying to enable
-      if (!user) { // Should be covered by isLoggedIn check for disabled, but good practice
+      if (!user) {
+        // This case should ideally be prevented by disabling the toggle,
+        // but as a fallback, an alert can be used or a more styled notification.
         alert(t('Error_Login_Required_Generic'));
         return;
       }
@@ -105,33 +110,16 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
       }
 
       if (missingFields.length > 0) {
-        const missingFieldsText = missingFields.join(', ');
-        const confirmMissing = window.confirm(
-          t('Personalization_Warning_Missing_Info_Message', { fields: missingFieldsText }) +
-          "\n\n" +
-          t('Personalization_Warning_Missing_Info_Enable_Anyway')
-        );
-        if (!confirmMissing) {
-          // User cancelled, do not enable
-          return;
-        }
-      }
-
-      // Show benefit/privacy popup only if not shown before in this "session" or if it's the first time enabling
-      // For simplicity, we'll show it every time they toggle from off to on for now.
-      // A more sophisticated approach might use another flag in localStorage.
-      const confirmBenefit = window.confirm(
-        t('Personalization_Benefit_Privacy_Popup_Title') +
-        "\n\n" +
-        t('Personalization_Benefit_Privacy_Popup_Message')
-      );
-
-      if (confirmBenefit) {
-        setIsPersonalizationEnabled(true);
-        setBenefitPopupShownThisSession(true); // Mark as shown
+        setMissingInfoFieldsText(missingFields.join(', '));
+        setIsMissingInfoModalOpen(true);
+        // We don't change the toggle state here. It will be changed if user confirms in modal.
+        // To prevent the toggle from visually changing before confirmation,
+        // we can revert it if the modals are cancelled.
+        event.target.checked = false; // Revert optimistic UI change of the toggle
       } else {
-        // User cancelled benefit popup, do not enable
-        return;
+        // No missing info, directly show benefit modal
+        setIsBenefitModalOpen(true);
+        event.target.checked = false; // Revert optimistic UI change
       }
     } else {
       // User is disabling
@@ -140,115 +128,137 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
   };
 
   useEffect(() => {
-    // If user logs out, reset the "benefit popup shown" flag
     if (!isLoggedIn) {
-      setBenefitPopupShownThisSession(false);
-      // Optionally, also turn off personalization if it was on
-      // if (isPersonalizationEnabled) {
-      //   setIsPersonalizationEnabled(false);
-      // }
+      // setBenefitPopupShownThisSession(false); // No longer needed
+      // Optionally turn off personalization if user logs out
+      if (isPersonalizationEnabled) {
+         setIsPersonalizationEnabled(false);
+      }
     }
   }, [isLoggedIn, isPersonalizationEnabled, setIsPersonalizationEnabled]);
+
 
   if (!isRightPanelOpen) {
     return null;
   }
 
-
   return (
-    <div
-      className={`bg-white-pure h-full flex-shrink-0 shadow-xl transition-all duration-300 ease-in-out  ${isRightPanelOpen ? 'w-72 opacity-100' : 'pointer-events-none w-0 opacity-0'
-        }`}
-      aria-hidden={!isRightPanelOpen}
-    >
-      <div className='flex h-full w-full flex-col overflow-y-auto px-4'>
-        <div className='border-gray-200 flex flex-shrink-0 items-center justify-between border-b pb-4 pt-4'>
-          <div className='flex items-center space-x-2'>
-            <Settings size={20} className='' />
-            <h2 id='right-panel-title' className='text-lg font-semibold '>
-              {t('Settings')}
-            </h2>
-          </div>
-          <button
-            onClick={() => setRightPanelOpen(false)}
-            className='flex h-8 w-8 items-center justify-center rounded-full  hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:hover:bg-black dark:hover:text-gray-300'
-            title={t('Close_settings')}
-            aria-label={t('Close_settings')}
-          >
-            <X size={20} strokeWidth={1.5} className='h-5 w-5' aria-hidden='true' />
-          </button>
-        </div>
-
-        <div className='flex-grow space-y-6  pt-4'>
-          {/* Streaming Toggle */}
-          {chatMode === 'regular' && (
-            <div className='space-y-2 '>
-              <label htmlFor='streaming-toggle-settings' className='block text-sm font-medium '>{t('Stream_Response')}</label>
-              <label htmlFor='streaming-toggle-settings' className='inline-flex cursor-pointer items-center'>
-                <input
-                  type='checkbox'
-                  id='streaming-toggle-settings'
-                  className='peer sr-only'
-                  checked={isStreamingEnabled}
-                  onChange={handleStreamingToggle}
-                />
-                <div className="peer relative h-6 w-10 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:peer-checked:bg-blue-600 dark:peer-focus:ring-blue-800 rtl:peer-checked:after:-translate-x-full"></div>
-              </label>
+    <> {/* Use Fragment to return multiple root elements (Panel + Modals) */}
+      <div
+        className={`bg-white-pure h-full flex-shrink-0 shadow-xl transition-all duration-300 ease-in-out  ${isRightPanelOpen ? 'w-72 opacity-100' : 'pointer-events-none w-0 opacity-0'
+          }`}
+        aria-hidden={!isRightPanelOpen}
+      >
+        <div className='flex h-full w-full flex-col overflow-y-auto px-4'>
+          <div className='border-gray-200 flex flex-shrink-0 items-center justify-between border-b pb-4 pt-4'>
+            <div className='flex items-center space-x-2'>
+                <Settings size={20} className='' />
+                <h2 id='right-panel-title' className='text-lg font-semibold '>
+                {t('Settings')}
+                </h2>
             </div>
-          )}
+            <button
+                onClick={() => setRightPanelOpen(false)}
+                className='flex h-8 w-8 items-center justify-center rounded-full  hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:hover:bg-black dark:hover:text-gray-300'
+                title={t('Close_settings')}
+                aria-label={t('Close_settings')}
+            >
+                <X size={20} strokeWidth={1.5} className='h-5 w-5' aria-hidden='true' />
+            </button>
+            </div>
 
-          {/* Personalization Toggle <<< NEW SECTION >>> */}
-          {chatMode === 'regular' && ( // Assuming personalization is for regular chat mode
-            <div className='space-y-2'>
-              <div className="flex items-center justify-between">
-                <label htmlFor='personalization-toggle-settings' className='block text-sm font-medium'>
-                  {t('Personalize_Responses_Toggle_Label')}
+
+          <div className='flex-grow space-y-6  pt-4'>
+            {/* Streaming Toggle */}
+            {chatMode === 'regular' && (
+              <div className='space-y-2 '>
+                <label htmlFor='streaming-toggle-settings' className='block text-sm font-medium '>{t('Stream_Response')}</label>
+                <label htmlFor='streaming-toggle-settings' className='inline-flex cursor-pointer items-center'>
+                  <input
+                    type='checkbox'
+                    id='streaming-toggle-settings'
+                    className='peer sr-only'
+                    checked={isStreamingEnabled}
+                    onChange={handleStreamingToggle}
+                  />
+                  <div className="peer relative h-6 w-10 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:peer-checked:bg-blue-600 dark:peer-focus:ring-blue-800 rtl:peer-checked:after:-translate-x-full"></div>
                 </label>
-                {/* Optional: Info icon with tooltip for more details */}
-                {/* <Info size={16} className="text-gray-400 hover:text-gray-600 cursor-pointer" title={t('Personalization_Tooltip_Info')} /> */}
               </div>
-              <label htmlFor='personalization-toggle-settings' className={`inline-flex cursor-pointer items-center ${!isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                <input
-                  type='checkbox'
-                  id='personalization-toggle-settings'
-                  className='peer sr-only'
-                  checked={isPersonalizationEnabled}
-                  onChange={handlePersonalizationToggle}
-                  disabled={!isLoggedIn}
+            )}
+
+            {/* Personalization Toggle */}
+            {chatMode === 'regular' && (
+              <div className='space-y-2'>
+                <div className="flex items-center justify-between">
+                  <label htmlFor='personalization-toggle-settings' className='block text-sm font-medium'>
+                    {t('Personalize_Responses_Toggle_Label')}
+                  </label>
+                </div>
+                <label htmlFor='personalization-toggle-settings' className={`inline-flex items-center ${!isLoggedIn ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                  <input
+                    type='checkbox'
+                    id='personalization-toggle-settings'
+                    className='peer sr-only'
+                    checked={isPersonalizationEnabled} // This will reflect the actual store state
+                    onChange={handlePersonalizationToggle}
+                    disabled={!isLoggedIn}
+                  />
+                  <div className="peer relative h-6 w-10 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:peer-checked:bg-blue-600 dark:peer-focus:ring-blue-800 rtl:peer-checked:after:-translate-x-full"></div>
+                </label>
+                {!isLoggedIn && (
+                  <p className="text-xs text-gray-500 mt-1">{t('Personalization_Login_Required_Message')}</p>
+                )}
+              </div>
+            )}
+
+            {isLiveChatContextActive && chatMode === 'live' ? (
+                <LiveAwareLanguageDropdown
+                currentLanguage={currentLanguage}
+                availableLanguages={availableLanguages}
+                setCurrentLanguage={setCurrentLanguage}
                 />
-                <div className="peer relative h-6 w-10 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:peer-checked:bg-blue-600 dark:peer-focus:ring-blue-800 rtl:peer-checked:after:-translate-x-full"></div>
-              </label>
-              {!isLoggedIn && (
-                <p className="text-xs text-gray-500 mt-1">{t('Personalization_Login_Required_Message')}</p>
-              )}
-            </div>
-          )}
+            ) : (
+                <LanguageDropdown
+                currentLanguage={currentLanguage}
+                availableLanguages={availableLanguages}
+                onLanguageChange={setCurrentLanguage}
+                disabled={false}
+                />
+            )}
 
-          {/* Language Dropdown */}
-          {isLiveChatContextActive && chatMode === 'live' ? (
-            <LiveAwareLanguageDropdown
-              currentLanguage={currentLanguage}
-              availableLanguages={availableLanguages}
-              setCurrentLanguage={setCurrentLanguage}
-            />
-          ) : (
-            <LanguageDropdown
-              currentLanguage={currentLanguage}
-              availableLanguages={availableLanguages}
-              onLanguageChange={setCurrentLanguage}
-              disabled={false} // Not disabled if not in live chat context or not connected
-            />
-          )}
-
-          {/* Live Chat Specific Settings */}
-          {isLiveChatContextActive && chatMode === 'live' && (
-            <LiveChatSpecificSettings
-              currentChatMode={chatMode}
-            />
-          )}
+            {isLiveChatContextActive && chatMode === 'live' && (
+                <LiveChatSpecificSettings
+                currentChatMode={chatMode}
+                />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Modals */}
+      <PersonalizationConfirmationModal
+        isOpen={isMissingInfoModalOpen}
+        onClose={() => setIsMissingInfoModalOpen(false)}
+        onConfirm={() => {
+          // User chose "Enable Anyway"
+          setIsMissingInfoModalOpen(false); // Close this modal
+          setIsBenefitModalOpen(true);     // Open the benefit modal
+        }}
+        type="missingInfo"
+        missingFieldsText={missingInfoFieldsText}
+      />
+
+      <PersonalizationConfirmationModal
+        isOpen={isBenefitModalOpen}
+        onClose={() => setIsBenefitModalOpen(false)}
+        onConfirm={() => {
+          // User confirmed to enable personalization
+          proceedToEnablePersonalization();
+          setIsBenefitModalOpen(false);
+        }}
+        type="enableBenefit"
+      />
+    </>
   );
 };
 

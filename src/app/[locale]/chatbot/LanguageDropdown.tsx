@@ -68,7 +68,7 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
         id='language-select-label'
         className='mb-2 block text-sm font-medium '
       >
-        {t('Language')}
+        {t('Response_language')}
       </label>
       <div ref={dropdownRef} className='relative'>
         <button
