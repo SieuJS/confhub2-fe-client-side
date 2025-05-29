@@ -107,13 +107,15 @@ const MessageRenderer = ({ logEntry }: MessageRendererProps) => {
       return <ClientContentLog message={message.clientContent} />;
     }
 
-    if (isServerContentMessage(message)) {
-      const serverContent = message.serverContent;
-      if (isInterrupted(serverContent)) {
-        return <CustomPlainTextLog msg="[Model Interrupted]" />;
-      }
-      if (isModelTurn(serverContent)) {
-        if ('serverContent' in message && message.serverContent && 'modelTurn' in message.serverContent) {
+    if (isSDKMessage(message)) {
+      if (isServerContentMessage(message)) {
+        const serverContent = message.serverContent;
+        if (isInterrupted(serverContent)) {
+          return <CustomPlainTextLog msg="[Model Interrupted]" />;
+        }
+        if (isModelTurn(serverContent)) { // This will now be true for your emitted log
+          // The `message` prop passed to ModelTurnLog should be `logEntry.message` itself
+          // as it now has the correct structure: { serverContent: { modelTurn: ... } }
           return <ModelTurnLog message={message as ModelTurnLogMessagePropType} />;
         }
       }

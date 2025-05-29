@@ -143,6 +143,7 @@ export default function LiveChatExperience() {
   }, []);
 
   // Callback to handle when Google VAD determines a client speech segment has ended
+  // Callback to handle when Google VAD (or client timeout) determines a client speech segment has ended
   const handleClientSpeechSegmentEnd = useCallback(() => {
     const chunks = getAndClearAudioChunksForClientPlayer();
     if (chunks.length > 0) {
@@ -152,7 +153,8 @@ export default function LiveChatExperience() {
         if (combinedBase64.length > 0) {
           const logEntry: StreamingLog = {
             date: new Date(),
-            type: "send.clientAudio.segmentComplete", // Use a specific type
+            // Sử dụng một type log nhất quán cho audio client, ví dụ:
+            type: "send.clientAudio.segmentComplete",
             message: { clientAudio: { audioData: combinedBase64 } },
           };
           log(logEntry);
