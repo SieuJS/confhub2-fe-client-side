@@ -1,17 +1,17 @@
 // src/app/[locale]/chatbot/livechat/LiveChat.tsx
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react' // Added useCallback
 import { useLiveAPIContext } from './contexts/LiveAPIContext'
 import { useLoggerStore } from './lib/store-logger'
 import { LiveChatAPIConfig } from './LiveChatAPIConfig'
 
 // Hooks
-import useConnection from './hooks/useConnection' // Hook này giờ không nhận props
+import useConnection from './hooks/useConnection'
 import useTimer from './hooks/useTimer'
 import useLoggerScroll from './hooks/useLoggerScroll'
 import useLoggerEvents from './hooks/useLoggerEvents';
-import useAudioRecorder from './hooks/useAudioRecorder'
+import useAudioRecorder from './hooks/useAudioRecorder' // Ensure this path is correct
 import useModelAudioResponse from './hooks/useModelAudioResponse';
 import useVolumeControl from './hooks/useVolumeControl'
 import useInteractionHandlers from './hooks/useInteractionHandlers'
@@ -25,12 +25,14 @@ import ChatInputBar from './layout/ChatInputBar'
 
 // Types and Constants
 import { getSystemInstructions } from '../lib/instructions'
-import { AudioRecorder } from './lib/audio-recorder'
-import { Language as AppLanguage } from '../lib/live-chat.types';
+import { AudioRecorder } from './lib/audio-recorder' // Ensure this path is correct
+import { Language as AppLanguage, StreamingLog } from '../lib/live-chat.types'; // Added StreamingLog
+import { concatenateUint8Arrays } from './utils/audioUtils'; // Import the new helper
 
 // Contexts and Stores
 import { useLiveChatSettings } from './contexts/LiveChatSettingsContext'
 import { useChatSettingsState } from '@/src/app/[locale]/chatbot/stores/storeHooks';
+import { Buffer } from 'buffer'; // Needed for base64 operations
 
 export default function LiveChatExperience() {
   const {
@@ -44,21 +46,13 @@ export default function LiveChatExperience() {
   const currentAppLanguageCode: AppLanguage = currentLanguageOptionFromStore.code;
 
   const {
-    // session,
-    // appConfig,
-    // setConfig,
-    // sdkConnected,
-    // sdkIsConnecting,
-    // sdkConnect,
-    // sdkDisconnect,
-    volume, // SỬA Ở ĐÂY: Sử dụng tên gốc 'volume'
+    volume, // This is modelOutputVolume
     on,
     off,
     sendClientContent,
     sendRealtimeInput,
   } = useLiveAPIContext();
 
-  // SỬA Ở ĐÂY: Gọi useConnection() không có đối số
   const {
     connected,
     isConnecting,
@@ -68,7 +62,7 @@ export default function LiveChatExperience() {
     handleDisconnect,
     handleReconnect,
     error: connectionError
-  } = useConnection(); // Hook useConnection sẽ tự lấy các giá trị từ useLiveAPIContext
+  } = useConnection();
 
   const { elapsedTime, showTimer, handleCloseTimer } = useTimer(
     isConnecting,
@@ -80,8 +74,11 @@ export default function LiveChatExperience() {
 
   const loggerRef = useRef<HTMLDivElement>(null);
   const [inputMicVolume, setInputMicVolume] = useState(0);
-  const [audioRecorder] = useState(() => new AudioRecorder());
+  const audioRecorderRef = useRef<AudioRecorder | null>(null); // Use ref for AudioRecorder instance
   const [muted, setMuted] = useState(false);
+
+  // Ref to store audio chunks for the client's audio player display
+  const audioChunksForClientPlayerRef = useRef<Uint8Array[]>([]);
 
   const { hasInteracted, recordInteraction } = useInteractionState({
     connected,
@@ -98,11 +95,23 @@ export default function LiveChatExperience() {
     connected,
     connectWithPermissions,
     setMuted,
-    sendClientContent, // Truyền hàm này vào
+    sendClientContent,
     log,
     startLoading: startSending,
     stopLoading: () => stopSending('direct send error'),
   });
+
+  // Initialize AudioRecorder instance once
+  useEffect(() => {
+    audioRecorderRef.current = new AudioRecorder();
+    return () => {
+      if (audioRecorderRef.current?.recording) {
+        audioRecorderRef.current.stop();
+      }
+      audioRecorderRef.current = null;
+    };
+  }, []);
+
 
   useEffect(() => {
     setLiveChatConnected(connected);
@@ -123,18 +132,74 @@ export default function LiveChatExperience() {
   }, [connected, isSendingMessage, clearLogs, stopSending]);
 
   useLoggerScroll(loggerRef);
-  useLoggerEvents(on, off, log);
-  useModelAudioResponse(on, off, log);
-  useAudioRecorder(
+  useLoggerEvents(on, off, log); // This will log SDK events, including transcriptions
+  useModelAudioResponse(on, off, log); // This handles server audio playback and logging
+
+  // Callback to get and clear accumulated audio chunks for the client player
+  const getAndClearAudioChunksForClientPlayer = useCallback((): Uint8Array[] => {
+    const chunks = [...audioChunksForClientPlayerRef.current];
+    audioChunksForClientPlayerRef.current = [];
+    return chunks;
+  }, []);
+
+  // Callback to handle when Google VAD determines a client speech segment has ended
+  // Callback to handle when Google VAD (or client timeout) determines a client speech segment has ended
+  const handleClientSpeechSegmentEnd = useCallback(() => {
+    const chunks = getAndClearAudioChunksForClientPlayer();
+    if (chunks.length > 0) {
+      try {
+        const combinedBinary = concatenateUint8Arrays(chunks);
+        const combinedBase64 = Buffer.from(combinedBinary).toString('base64');
+        if (combinedBase64.length > 0) {
+          const logEntry: StreamingLog = {
+            date: new Date(),
+            // Sử dụng một type log nhất quán cho audio client, ví dụ:
+            type: "send.clientAudio.segmentComplete",
+            message: { clientAudio: { audioData: combinedBase64 } },
+          };
+          log(logEntry);
+        }
+      } catch (error) {
+        console.error("Error encoding base64 for client audio segment:", error);
+        const errorLogEntry: StreamingLog = {
+          date: new Date(),
+          type: "error.clientAudioSegment",
+          message: (error instanceof Error ? error.message : String(error)),
+        };
+        log(errorLogEntry);
+      }
+    }
+  }, [log, getAndClearAudioChunksForClientPlayer]);
+
+  // Subscribe to the clientSpeechSegmentEnd event from useLiveAPI
+  useEffect(() => {
+    on("clientSpeechSegmentEnd", handleClientSpeechSegmentEnd);
+    return () => {
+      off("clientSpeechSegmentEnd", handleClientSpeechSegmentEnd);
+    };
+  }, [on, off, handleClientSpeechSegmentEnd]);
+
+
+  // useAudioRecorder hook - manages the AudioRecorder lifecycle and sends data
+  // It no longer manages the VAD-based segmentation for client player logging.
+  useAudioRecorder({
     connected,
     muted,
-    audioRecorder,
+    // Pass the AudioRecorder instance from the ref
+    audioRecorder: audioRecorderRef.current!,
     sendRealtimeInput,
-    log,
-    setInputMicVolume
-  );
-  // Truyền 'volume' (là modelOutputVolume) vào useVolumeControl
-  useVolumeControl(volume); // 'volume' ở đây chính là âm lượng đầu ra của model
+    log, // For logging errors within useAudioRecorder
+    setInVolume: setInputMicVolume,
+    // These are for handling the final segment when recording stops completely
+    // onClientSpeechSegmentEnd: handleClientSpeechSegmentEnd, // REMOVE THIS LINE
+    getAndClearAudioChunks: getAndClearAudioChunksForClientPlayer,
+    // Add a way for useAudioRecorder to push chunks to audioChunksForClientPlayerRef
+    accumulateAudioChunk: useCallback((chunk: Uint8Array) => {
+      audioChunksForClientPlayerRef.current.push(chunk);
+    }, [])
+  });
+
+  useVolumeControl(volume); // 'volume' here is modelOutputVolume
 
   const systemInstructions = getSystemInstructions(currentAppLanguageCode);
 
@@ -152,7 +217,16 @@ export default function LiveChatExperience() {
   const shouldShowRestartButton = connectionStatusType === 'error';
 
   const handleStartVoiceAndInteract = () => {
-    handleStartVoice();
+    if (!audioRecorderRef.current) {
+      console.error("AudioRecorder not initialized yet.");
+      return;
+    }
+    // When user starts voice, clear any pending chunks from a previous segment
+    // that might not have been finalized by 'clientSpeechSegmentEnd' if user stopped mic early.
+    // This ensures each new voice interaction starts with a fresh audio log for the client player.
+    getAndClearAudioChunksForClientPlayer();
+
+    handleStartVoice(); // This will setMuted(false) etc.
     recordInteraction();
   };
 
@@ -178,7 +252,7 @@ export default function LiveChatExperience() {
       <ChatArea
         connected={connected}
         hasInteracted={hasInteracted}
-        onStartVoice={handleStartVoiceAndInteract}
+        onStartVoice={handleStartVoiceAndInteract} // Use the wrapped handler
         loggerRef={loggerRef}
       />
 

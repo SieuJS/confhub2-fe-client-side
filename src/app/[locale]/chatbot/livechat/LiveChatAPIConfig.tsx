@@ -79,6 +79,8 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
       topK: 40,
       topP: 0.95,
       maxOutputTokens: 1024,
+      // LUÔN BẬT INPUT AUDIO TRANSCRIPTION NẾU GIAO DIỆN CHO PHÉP NHẬP LIỆU ÂM THANH
+      inputAudioTranscription: {}, // <--- ĐẢM BẢO DÒNG NÀY LUÔN CÓ
     };
 
     if (outputModality === SDKModality.AUDIO) {
@@ -90,7 +92,6 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
           }
         }
       };
-      appLevelConfig.inputAudioTranscription = {};
       appLevelConfig.outputAudioTranscription = {};
     }
 
@@ -110,27 +111,6 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
     }
 
     console.log("[LiveChatAPIConfig] Attempting to set appLevelConfig:", JSON.stringify(appLevelConfig, null, 2));
-
-    // logToStore({
-    //   date: new Date(),
-    //   type: "client.setConfigAttempt",
-    //   message: `Attempting to set config: ${JSON.stringify({
-    //     model: appLevelConfig.model,
-    //     outputModality: SDKModality[outputModality],
-    //     selectedVoice,
-    //     language: language,
-    //     bcp47Language: bcp47LanguageCode,
-    //     speechConfigIncluded: !!appLevelConfig.speechConfig,
-    //     systemInstructionLength: systemInstructions.length,
-    //     numTools: appLevelConfig.tools?.[0]?.functionDeclarations?.length || 0,
-    //     inputTranscriptionEnabled: !!appLevelConfig.inputAudioTranscription,
-    //     outputTranscriptionEnabled: !!appLevelConfig.outputAudioTranscription,
-    //     temperature: appLevelConfig.temperature,
-    //     topK: appLevelConfig.topK,
-    //     topP: appLevelConfig.topP,
-    //     maxOutputTokens: appLevelConfig.maxOutputTokens,
-    //   }, null, 2)}`
-    // });
 
     setConfig(appLevelConfig);
 
@@ -199,7 +179,7 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
         }
       }
 
-       if (responsesForSDK.length > 0) {
+      if (responsesForSDK.length > 0) {
         const toolResponseData: ToolResponsePayload = { functionResponses: responsesForSDK }; // <-- TẠO PAYLOAD
 
         console.log("[LiveChatAPIConfig] Sending tool responses:", JSON.stringify(toolResponseData, null, 2));
@@ -209,7 +189,6 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
           date: new Date(),
           type: "client.toolResponseSent",
           message: toolResponseData, // <-- LƯU TRỮ OBJECT PAYLOAD THỰC SỰ
-          summary: `Sent tool responses for ${responsesForSDK.length} function calls.`, // (Tùy chọn) Giữ lại summary dạng string nếu cần
           count: responsesForSDK.length
         });
       } else {

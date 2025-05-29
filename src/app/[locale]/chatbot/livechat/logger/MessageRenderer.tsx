@@ -36,9 +36,9 @@ interface MessageRendererProps {
 }
 
 type ModelTurnLogMessagePropType = SDKLiveServerMessage & {
-    serverContent: ServerContentPayload & {
-        modelTurn: Content;
-    };
+  serverContent: ServerContentPayload & {
+    modelTurn: Content;
+  };
 };
 
 const isSDKMessage = (msg: any): msg is SDKMessageUnion => {
@@ -46,14 +46,14 @@ const isSDKMessage = (msg: any): msg is SDKMessageUnion => {
     typeof msg === 'object' &&
     msg !== null &&
     ('setup' in msg || 'clientContent' in msg || 'realtimeInput' in msg || 'toolResponse' in msg ||
-     'setupComplete' in msg || 'serverContent' in msg || 'toolCall' in msg || 'toolCallCancellation' in msg || 'usageMetadata' in msg)
+      'setupComplete' in msg || 'serverContent' in msg || 'toolCall' in msg || 'toolCallCancellation' in msg || 'usageMetadata' in msg)
   );
 };
 
 // Helper type guard cho ToolResponsePayload
 const isToolResponsePayload = (payload: any): payload is ToolResponsePayload => {
   return payload && typeof payload === 'object' &&
-         'functionResponses' in payload && Array.isArray(payload.functionResponses);
+    'functionResponses' in payload && Array.isArray(payload.functionResponses);
 };
 
 const MessageRenderer = ({ logEntry }: MessageRendererProps) => {
@@ -76,7 +76,11 @@ const MessageRenderer = ({ logEntry }: MessageRendererProps) => {
   //   return <PlainTextMessage message={message} />;
   // }
 
-  if (isClientAudioMessage(message) && type === "send.clientAudio.sessionComplete") {
+  if (
+    (isClientAudioMessage(message) && type === "send.clientAudio.sessionComplete") ||
+    (isClientAudioMessage(message) && type === "send.clientAudio.segmentComplete") || // THÊM TYPE NÀY
+    (isClientAudioMessage(message) && type === "send.clientAudio.finalSegment")    // THÊM TYPE NÀY
+  ) {
     return <ClientAudioLog message={message as ClientAudioMessage} />;
   }
 
@@ -90,10 +94,10 @@ const MessageRenderer = ({ logEntry }: MessageRendererProps) => {
   ) {
     const transcription = message as TranscriptionPayload;
     if (type === "transcription.inputEvent.final") {
-        return <InputTranscriptionLog transcription={transcription} />;
+      return <InputTranscriptionLog transcription={transcription} />;
     }
     if (type === "transcription.outputEvent.final") {
-        return <OutputTranscriptionLog transcription={transcription} />;
+      return <OutputTranscriptionLog transcription={transcription} />;
     }
   }
 
@@ -103,14 +107,16 @@ const MessageRenderer = ({ logEntry }: MessageRendererProps) => {
       return <ClientContentLog message={message.clientContent} />;
     }
 
-    if (isServerContentMessage(message)) {
-      const serverContent = message.serverContent;
-      if (isInterrupted(serverContent)) {
-        return <CustomPlainTextLog msg="[Model Interrupted]" />;
-      }
-      if (isModelTurn(serverContent)) {
-        if ('serverContent' in message && message.serverContent && 'modelTurn' in message.serverContent) {
-             return <ModelTurnLog message={message as ModelTurnLogMessagePropType} />;
+    if (isSDKMessage(message)) {
+      if (isServerContentMessage(message)) {
+        const serverContent = message.serverContent;
+        if (isInterrupted(serverContent)) {
+          return <CustomPlainTextLog msg="[Model Interrupted]" />;
+        }
+        if (isModelTurn(serverContent)) { // This will now be true for your emitted log
+          // The `message` prop passed to ModelTurnLog should be `logEntry.message` itself
+          // as it now has the correct structure: { serverContent: { modelTurn: ... } }
+          return <ModelTurnLog message={message as ModelTurnLogMessagePropType} />;
         }
       }
     }
@@ -122,7 +128,7 @@ const MessageRenderer = ({ logEntry }: MessageRendererProps) => {
     type.includes("transcription.outputEvent.partial") ||
     type === "receive.serverAudio"
   ) {
-      return null;
+    return null;
   }
 
   // // Nếu có summary, hiển thị nó cho các log chưa được xử lý thay vì object message
