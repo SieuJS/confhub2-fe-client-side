@@ -209,7 +209,7 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
           date: new Date(),
           type: "client.toolResponseSent",
           message: toolResponseData, // <-- LƯU TRỮ OBJECT PAYLOAD THỰC SỰ
-          summary: `Sent tool responses for ${responsesForSDK.length} function calls.`, // (Tùy chọn) Giữ lại summary dạng string nếu cần
+          // summary: `Sent tool responses for ${responsesForSDK.length} function calls.`, // (Tùy chọn) Giữ lại summary dạng string nếu cần
           count: responsesForSDK.length
         });
       } else {

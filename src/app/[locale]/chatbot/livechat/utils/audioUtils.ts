@@ -46,3 +46,20 @@ export const base64ToAudioBuffer = async (
     throw new Error(e.message || "Failed to process raw audio data. Ensure it's base64 16-bit PCM.");
   }
 };
+
+
+
+// Helper function (moved here for better organization)
+export function concatenateUint8Arrays(arrays: Uint8Array[]): Uint8Array {
+  if (arrays.length === 1) {
+    return arrays[0];
+  }
+  const totalLength = arrays.reduce((acc, val) => acc + val.length, 0);
+  const result = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const arr of arrays) {
+    result.set(arr, offset);
+    offset += arr.length;
+  }
+  return result;
+}

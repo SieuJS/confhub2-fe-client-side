@@ -1,5 +1,5 @@
 // src/app/[locale]/chatbot/livechat/hooks/useLiveApi.ts
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"; // Thêm useState
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"; // Đảm bảo useRef được import
 import {
   GoogleGenAI, // SDK: Main entry point
   Session as SDKSession, // SDK: Represents the live session
@@ -43,6 +43,11 @@ import VolMeterWorket from "../lib/worklets/vol-meter";
 import EventEmitter from "eventemitter3";
 import { debounce } from 'lodash';
 import { Buffer } from 'buffer'; // Needed for base64 operations if not in global scope
+
+
+// Thêm các dòng này ở đầu hook useLiveApi
+const INPUT_TRANSCRIPTION_SILENCE_DURATION = 1500; // 1.5 giây, bạn có thể điều chỉnh
+
 
 const toSDKLiveConnectConfig = (appConfig: LiveChatSessionConfig): SDKLiveConnectConfig => {
   const sdkConfig: SDKLiveConnectConfig = {
@@ -88,6 +93,10 @@ export type UseLiveAPIResults = {
 };
 
 export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
+
+  const inputTranscriptionSilenceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+
   const genAI = useMemo(() => new GoogleGenAI({ apiKey }), [apiKey]);
   const [session, setSession] = useState<SDKSession | null>(null);
   const audioStreamerRef = useRef<AudioStreamer | null>(null);
@@ -143,6 +152,8 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
   }, []); // setVolume là stable từ useState
 
   const handleServerMessage = useCallback((message: SDKLiveServerMessage) => {
+    // Log toàn bộ message thô từ server để kiểm tra timing và nội dung
+    console.log("RAW SERVER MESSAGE:", JSON.stringify(message, null, 2));
     if (message.setupComplete) {
       emitter.emit("setupcomplete");
       // emitter.emit("log", { date: new Date(), type: "receive.setupComplete", message: "Setup complete received" });
@@ -168,32 +179,66 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
       const serverContent = message.serverContent;
       emitter.emit("content", serverContent);
 
-      // Xử lý Input Transcription (giữ nguyên logic log của bạn nếu đang hoạt động tốt)
+      // Xử lý Input Transcription với cơ chế timeout
       if (serverContent.inputTranscription) {
-        const transcription: TranscriptionPayload = {
-          text: serverContent.inputTranscription.text || "",
-          finished: serverContent.inputTranscription.finished || false,
-        };
-        if (transcription.text) {
-          accumulatedInputTranscriptionRef.current += transcription.text;
+        // Xóa timer cũ nếu có, vì đã nhận được transcription mới
+        if (inputTranscriptionSilenceTimerRef.current) {
+          clearTimeout(inputTranscriptionSilenceTimerRef.current);
+          inputTranscriptionSilenceTimerRef.current = null;
         }
-        // Log cho input transcription (ví dụ: chỉ log final hoặc cả partial tùy nhu cầu debug)
-        if (transcription.finished) {
-          emitter.emit("log", {
-            date: new Date(),
-            type: "transcription.inputEvent.final", // Log final input
-            message: { text: accumulatedInputTranscriptionRef.current, finished: true }
-          });
-          accumulatedInputTranscriptionRef.current = ""; // Reset khi final
-        } else if (transcription.text) { // Chỉ log partial nếu có text
-          // emitter.emit("log", { date: new Date(), type: "transcription.inputEvent.partial", message: transcription });
+
+        const currentChunkText = serverContent.inputTranscription.text || "";
+        const isFinishedByServer = serverContent.inputTranscription.finished || false;
+
+        // Cập nhật accumulatedInputTranscriptionRef với toàn bộ partial text mới nhất từ server.
+        // Chỉ cập nhật nếu text mới khác với text đã tích lũy, hoặc là chunk đầu tiên.
+        let hasTextChangedSignificantly = false;
+        if (currentChunkText.trim() && accumulatedInputTranscriptionRef.current !== currentChunkText) {
+          accumulatedInputTranscriptionRef.current = currentChunkText;
+          hasTextChangedSignificantly = true;
+        } else if (currentChunkText.trim() && !accumulatedInputTranscriptionRef.current) {
+          accumulatedInputTranscriptionRef.current = currentChunkText;
+          hasTextChangedSignificantly = true;
         }
-        emitter.emit("inputTranscription", transcription);
+
+        if (isFinishedByServer) { // Nếu server chủ động báo finished
+          if (accumulatedInputTranscriptionRef.current.trim()) {
+            emitter.emit("log", {
+              date: new Date(),
+              type: "transcription.inputEvent.final",
+              message: { text: accumulatedInputTranscriptionRef.current, finished: true }
+            });
+            emitter.emit("clientSpeechSegmentEnd"); // Kích hoạt ghi log audio client
+          }
+          accumulatedInputTranscriptionRef.current = ""; // Reset
+        } else if (hasTextChangedSignificantly && accumulatedInputTranscriptionRef.current.trim()) {
+          // Nếu text thay đổi và chưa finished, (lại) bắt đầu timer
+          inputTranscriptionSilenceTimerRef.current = setTimeout(() => {
+            if (accumulatedInputTranscriptionRef.current.trim()) { // Kiểm tra lại trước khi finalize
+              console.log(`[useLiveAPI] Input transcription SILENCE timer expired. Finalizing: "${accumulatedInputTranscriptionRef.current}"`);
+              emitter.emit("log", {
+                date: new Date(),
+                type: "transcription.inputEvent.final",
+                message: { text: accumulatedInputTranscriptionRef.current, finished: true } // Tự đánh dấu finished
+              });
+              emitter.emit("clientSpeechSegmentEnd"); // Kích hoạt ghi log audio client
+              accumulatedInputTranscriptionRef.current = ""; // Reset
+            }
+            inputTranscriptionSilenceTimerRef.current = null;
+          }, INPUT_TRANSCRIPTION_SILENCE_DURATION);
+        }
+
+        // Luôn phát sự kiện inputTranscription gốc để UI có thể cập nhật real-time
+        emitter.emit("inputTranscription", {
+          text: currentChunkText, // Gửi text của chunk hiện tại
+          finished: isFinishedByServer
+        });
       }
 
       // Xử lý Output Transcription
+      // KIỂM TRA KỸ PHẦN NÀY: Xử lý Output Transcription
       if (serverContent.outputTranscription) {
-        const transcriptionChunk: TranscriptionPayload = { // Đổi tên để rõ ràng là chunk
+        const transcriptionChunk: TranscriptionPayload = {
           text: serverContent.outputTranscription.text || "",
           finished: serverContent.outputTranscription.finished || false,
         };
@@ -202,10 +247,9 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
           accumulatedOutputTranscriptionRef.current += transcriptionChunk.text;
         }
 
-        // SỬA LOGIC LOG Ở ĐÂY:
+        // Logic log cho output transcription:
         if (transcriptionChunk.finished) {
           // Khi server báo finished, log toàn bộ accumulated text là "final"
-          // và đây là bản ghi duy nhất MessageRenderer nên hiển thị cho output transcription.
           emitter.emit("log", {
             date: new Date(),
             type: "transcription.outputEvent.final", // Type này sẽ được MessageRenderer bắt
@@ -216,14 +260,16 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
           // Nếu là partial và có text, bạn có thể chọn không log nó vào store logger
           // để tránh làm nhiễu MessageRenderer, hoặc log với type "partial"
           // mà MessageRenderer sẽ bỏ qua.
+          // Ví dụ:
           // emitter.emit("log", {
           //   date: new Date(),
-          //   type: "transcription.outputEvent.partial", // Type này sẽ bị MessageRenderer bỏ qua
+          //   type: "transcription.outputEvent.partial",
           //   message: transcriptionChunk
           // });
         }
         // Vẫn emit event "outputTranscription" cho các listener khác nếu cần xử lý từng chunk
-        emitter.emit("outputTranscription", transcriptionChunk);
+        // Event này có thể được dùng bởi các thành phần khác không phải là logger chính.
+        emitter.emit("outputTranscription", transcriptionChunk); // Đảm bảo event này vẫn được phát ra
       }
 
 
@@ -262,7 +308,25 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
         // Reset accumulatedOutputTranscriptionRef nếu logic yêu cầu.
         // accumulatedOutputTranscriptionRef.current = ""; // Cân nhắc
 
+        // Dừng timer nếu bị interrupt
+        if (inputTranscriptionSilenceTimerRef.current) {
+          clearTimeout(inputTranscriptionSilenceTimerRef.current);
+          inputTranscriptionSilenceTimerRef.current = null;
+        }
+        // Cần đảm bảo accumulatedOutputTranscriptionRef cũng được xử lý/reset khi interrupted
+        if (accumulatedOutputTranscriptionRef.current.trim()) {
+          // Có thể bạn muốn log phần output transcription còn lại trước khi reset
+          // Hoặc chỉ đơn giản là reset nó
+          console.warn("[useLiveAPI] Interrupted with pending output transcription:", accumulatedOutputTranscriptionRef.current);
+          // emitter.emit("log", {
+          //   date: new Date(),
+          //   type: "transcription.outputEvent.final", // Coi như final khi bị interrupt
+          //   message: { text: accumulatedOutputTranscriptionRef.current, finished: true }
+          // });
+        }
+        accumulatedOutputTranscriptionRef.current = ""; // Reset khi bị interrupt
       }
+
       if (serverContent.turnComplete) {
         if (accumulatedServerAudioRef.current) {
           debouncedEmitServerAudioLog(accumulatedServerAudioRef.current);
@@ -273,10 +337,10 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
           const completeModelTurnContent: SDKContent = { role: "model", parts: accumulatedTextPartsRef.current };
           // emitter.emit("log", { date: new Date(), type: "receive.turnComplete.content", message: JSON.stringify(completeModelTurnContent) });
         }
+
         // KHI TURN COMPLETE:
-        // Nếu vẫn còn output transcription chưa được đánh dấu là finished (do server không gửi finished:true cho chunk cuối)
-        // thì coi phần tích lũy còn lại là final.
-        if (accumulatedOutputTranscriptionRef.current) {
+        // Xử lý output transcription còn lại (NẾU CÓ và timer chưa xử lý)
+        if (accumulatedOutputTranscriptionRef.current.trim()) {
           console.warn("[useLiveAPI] Turn complete with pending accumulated output transcription:", accumulatedOutputTranscriptionRef.current);
           emitter.emit("log", {
             date: new Date(),
@@ -285,17 +349,23 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
           });
           accumulatedOutputTranscriptionRef.current = ""; // Reset
         }
-        // Tương tự cho input nếu cần
-        if (accumulatedInputTranscriptionRef.current) {
-          console.warn("[useLiveAPI] Turn complete with pending accumulated input transcription:", accumulatedInputTranscriptionRef.current);
+
+        // Dừng timer nếu còn chạy, vì turnComplete là kết thúc rõ ràng cho lượt này.
+        if (inputTranscriptionSilenceTimerRef.current) {
+          clearTimeout(inputTranscriptionSilenceTimerRef.current);
+          inputTranscriptionSilenceTimerRef.current = null;
+        }
+        // Xử lý input transcription còn lại (NẾU CÓ và timer chưa xử lý)
+        if (accumulatedInputTranscriptionRef.current.trim()) {
+          console.warn("[useLiveAPI] Turn complete with pending accumulated input transcription (timer didn't catch or server sent more):", accumulatedInputTranscriptionRef.current);
           emitter.emit("log", {
             date: new Date(),
             type: "transcription.inputEvent.final",
             message: { text: accumulatedInputTranscriptionRef.current, finished: true }
           });
+          emitter.emit("clientSpeechSegmentEnd"); // Kích hoạt ghi log audio client
           accumulatedInputTranscriptionRef.current = "";
         }
-
         emitter.emit("turncomplete");
         // emitter.emit("log", { date: new Date(), type: "receive.turnComplete", message: "Model turn complete" });
       }
@@ -345,7 +415,11 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
             accumulatedServerAudioRef.current = "";
             debouncedEmitServerAudioLog.cancel();
             accumulatedTextPartsRef.current = [];
-            accumulatedInputTranscriptionRef.current = "";
+            if (inputTranscriptionSilenceTimerRef.current) { // Xóa timer
+              clearTimeout(inputTranscriptionSilenceTimerRef.current);
+              inputTranscriptionSilenceTimerRef.current = null;
+            }
+            accumulatedInputTranscriptionRef.current = ""; // Reset accumulator
             accumulatedOutputTranscriptionRef.current = "";
           },
         },
@@ -446,8 +520,12 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
         setSession(null);
       }
       debouncedEmitServerAudioLog.cancel();
+      if (inputTranscriptionSilenceTimerRef.current) { // Xóa timer
+        clearTimeout(inputTranscriptionSilenceTimerRef.current);
+        inputTranscriptionSilenceTimerRef.current = null;
+      }
     };
-  }, [session, emitter, debouncedEmitServerAudioLog]);
+  }, [session, emitter, debouncedEmitServerAudioLog]); // Thêm dependencies nếu cần
 
   return {
     session: session,

@@ -21,6 +21,11 @@ export interface LiveAPIEvents {
   audio: (audioData: ArrayBuffer) => void;
   audioResponse: (audioResponsePayload: { data: string }) => void;
   inputTranscription: (transcription: TranscriptionPayload) => void;
+ /**
+   * Fired when Google's VAD determines a client speech segment has ended,
+   * based on inputTranscription.finished === true.
+   */
+  clientSpeechSegmentEnd: () => void; // THÊM EVENT NÀY
   outputTranscription: (transcription: TranscriptionPayload) => void;
   toolcall: (toolCallPayload: ToolCallPayload) => void;
   toolcallcancellation: (payload: ToolCallCancellationPayload) => void;

@@ -1,7 +1,7 @@
 // src/app/[locale]/chatbot/livechat/AudioPlayerControls.tsx
 
 import React from 'react'
-import { formatTimeDisplay } from './utils/audioPlayerUtils'
+import { formatTimeDisplay } from './utils/audioUtils'
 import { Pause, Play, Volume2, VolumeOff } from 'lucide-react'
 
 interface ControlButtonProps
