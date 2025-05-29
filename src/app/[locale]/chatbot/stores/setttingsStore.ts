@@ -8,7 +8,7 @@ import {
 } from '@/src/app/[locale]/chatbot/lib/constants'; // Adjust path
 
 // --- Types for Settings Store ---
-export type LanguageCode = 'en' | 'vi' | 'zh' | 'de' | 'fr'| 'es'| 'ru' | 'ja'| 'ko'| 'ar';
+export type LanguageCode = 'en' | 'vi' | 'zh' | 'de' | 'fr' | 'es' | 'ru' | 'ja' | 'ko' | 'ar';
 export type ChatMode = 'live' | 'regular';
 export interface LanguageOption {
     code: LanguageCode;
@@ -24,6 +24,8 @@ export interface SettingsStoreState {
     isThoughtProcessHiddenInFloatingChat: boolean; // <-- NEW STATE
     currentLanguage: LanguageOption;
     availableLanguages: LanguageOption[];
+    isPersonalizationEnabled: boolean; // <<< NEW STATE
+
 }
 
 export interface SettingsStoreActions {
@@ -33,6 +35,8 @@ export interface SettingsStoreActions {
     setIsConversationToolbarHiddenInFloatingChat: (hidden: boolean) => void;
     setIsThoughtProcessHiddenInFloatingChat: (hidden: boolean) => void; // <-- NEW ACTION
     setCurrentLanguage: (language: LanguageOption) => void;
+    setIsPersonalizationEnabled: (enabled: boolean) => void; // <<< NEW ACTION
+
 }
 
 const initialSettingsStoreState: SettingsStoreState = {
@@ -43,6 +47,8 @@ const initialSettingsStoreState: SettingsStoreState = {
     isThoughtProcessHiddenInFloatingChat: true, // <-- Default to hidden for floating chat
     currentLanguage: DEFAULT_LANGUAGE_REGULAR_CHAT,
     availableLanguages: AVAILABLE_LANGUAGES_REGULAR_CHAT,
+    isPersonalizationEnabled: false, // <<< Default to false
+
 };
 
 export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions>()(
@@ -63,6 +69,8 @@ export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions
                 setIsConversationToolbarHiddenInFloatingChat: (hidden) => set({ isConversationToolbarHiddenInFloatingChat: hidden }, false, 'setIsConversationToolbarHiddenInFloatingChat'),
                 setIsThoughtProcessHiddenInFloatingChat: (hidden) => set({ isThoughtProcessHiddenInFloatingChat: hidden }, false, 'setIsThoughtProcessHiddenInFloatingChat'), // <-- IMPLEMENT NEW ACTION
                 setCurrentLanguage: (language) => set({ currentLanguage: language }, false, 'setCurrentLanguage'),
+                setIsPersonalizationEnabled: (enabled) => set({ isPersonalizationEnabled: enabled }, false, 'setIsPersonalizationEnabled'), // <<< IMPLEMENT NEW ACTION
+
             }),
             {
                 name: 'chatbot-settings-storage-v1',
@@ -74,6 +82,8 @@ export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions
                     isConversationToolbarHiddenInFloatingChat: state.isConversationToolbarHiddenInFloatingChat,
                     isThoughtProcessHiddenInFloatingChat: state.isThoughtProcessHiddenInFloatingChat, // <-- PERSIST NEW STATE
                     currentLanguage: state.currentLanguage,
+                    isPersonalizationEnabled: state.isPersonalizationEnabled, // <<< PERSIST NEW STATE
+
                 }),
                 onRehydrateStorage: () => (state) => {
                     if (state) {
@@ -81,7 +91,10 @@ export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions
                         if (!AVAILABLE_LANGUAGES_REGULAR_CHAT.find(lang => lang.code === state.currentLanguage?.code)) {
                             state.currentLanguage = DEFAULT_LANGUAGE_REGULAR_CHAT;
                         }
-                        // console.log('[SettingsStore] Rehydrated:', state);
+                        // Ensure isPersonalizationEnabled has a default if not present in older storage
+                        if (typeof state.isPersonalizationEnabled === 'undefined') {
+                            state.isPersonalizationEnabled = false;
+                        }
                     }
                 }
             }

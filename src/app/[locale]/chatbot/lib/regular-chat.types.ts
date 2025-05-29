@@ -360,11 +360,32 @@ export interface ConversationMetadata { // Hoặc ClientConversationMetadata
     // snippet?: string; // Cho kết quả tìm kiếm
 }
 
+
+export interface PersonalizationPayload {
+    firstName?: string;
+    lastName?: string;
+    aboutMe?: string;
+    interestedTopics?: string[];
+}
+
+
 export interface EditUserMessagePayload {
     conversationId: string;
     messageIdToEdit: string;
     newText: string;
-    language: string; // Good to include for context if backend needs it
+    language: string; // Or LanguageCode
+    personalizationData?: PersonalizationPayload | null; // <<< ADDED
+}
+
+
+
+export interface SendMessagePayload { // Example, if you have a specific type for sendMessage
+    userInput: string;
+    isStreaming: boolean;
+    language: string; // Or LanguageCode
+    conversationId: string | null;
+    frontendMessageId: string;
+    personalizationData?: PersonalizationPayload | null; // <<< ADDED
 }
 
 export interface ConversationUpdatedAfterEditPayload {

@@ -4,7 +4,7 @@ import { devtools } from 'zustand/middleware'; // Loại bỏ persist và create
 import { Socket } from 'socket.io-client';
 import { useMessageStore } from './messageStore';
 import { useUiStore } from './uiStore';
-import { EditUserMessagePayload } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // <<< NEW
+import { EditUserMessagePayload, PersonalizationPayload } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // <<< NEW
 
 // --- Types for Socket Store State ---
 export interface SocketStoreState {
@@ -17,13 +17,13 @@ export interface SocketStoreState {
     hasFatalConnectionError: boolean;
 }
 
-// --- Types for Socket Store Actions --- (Giữ nguyên SendMessagePayload)
-export interface SendMessagePayload {
+export interface SendMessagePayload { // Example, if you have a specific type for sendMessage
     userInput: string;
     isStreaming: boolean;
-    language: string;
-    conversationId?: string | null;
-    frontendMessageId?: string;
+    language: string; // Or LanguageCode
+    conversationId: string | null;
+    frontendMessageId: string;
+    personalizationData?: PersonalizationPayload | null; // <<< ADDED
 }
 
 export interface SocketStoreActions {
@@ -222,7 +222,7 @@ export const useSocketStore = create<SocketStoreState & SocketStoreActions>()(
                     useUiStore.getState().handleError({ message: "Cannot send message: Not connected or server not ready.", type: 'error' }, false, false);
                     return;
                 }
-                console.log(`[SocketStore] Emitting 'send_message'. ConvID: ${payload.conversationId}, Lang: ${payload.language}, Stream: ${payload.isStreaming}. Socket ID: ${socketRef.current?.id}`);
+                console.log(`[SocketStore] Emitting 'send_message'. ConvID: ${payload.conversationId}, Lang: ${payload.language}, Stream: ${payload.isStreaming}. Socket ID: ${socketRef.current?.id}. User Info: ${payload.personalizationData}`);
                 socketRef.current.emit('send_message', payload);
             },
             emitEditUserMessage: (payload) => {

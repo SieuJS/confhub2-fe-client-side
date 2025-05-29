@@ -23,8 +23,20 @@ import { useSettingsStore } from './setttingsStore';
 import { useSocketStore } from './socketStore';
 import { useUiStore } from './uiStore';
 import { useConversationStore } from './conversationStore';
+import { UserResponse } from '@/src/models/response/user.response';
 
 const BASE_WEB_URL = appConfig.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:8386";
+
+
+// Define a type for the personalization data to be sent to backend
+interface PersonalizationPayload {
+    firstName?: string;
+    lastName?: string;
+    aboutMe?: string;
+    interestedTopics?: string[];
+}
+
+
 
 export interface EditingMessageState {
     id: string;
@@ -49,7 +61,7 @@ export interface MessageStoreActions {
     setAnimationControls: (controls: StreamingTextAnimationControls | null) => void;
     resetAwaitFlag: () => void;
     setPendingBotMessageId: (id: string | null) => void;
-    sendMessage: (userInput: string) => void;
+    sendMessage: (userInput: string) => void; // Signature might need update if we pass more
     resetChatUIForNewConversation: (clearActiveIdInOtherStores?: boolean) => void;
     setEditingMessage: (editingState: EditingMessageState | null) => void; // <<< NEW
     submitEditedMessage: (messageIdToEdit: string, newText: string) => void; // <<< THAY ĐỔI SIGNATURE
@@ -75,6 +87,33 @@ const initialMessageStoreState: MessageStoreState = {
     editingMessageId: null,
 
 };
+
+// Helper function to get personalization data
+const getPersonalizationData = (): PersonalizationPayload | null => {
+    const { isPersonalizationEnabled } = useSettingsStore.getState();
+    if (!isPersonalizationEnabled) {
+        return null;
+    }
+
+    const userStr = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
+    if (!userStr) {
+        return null;
+    }
+
+    try {
+        const userData = JSON.parse(userStr) as UserResponse; // Assuming UserResponse type from your AuthContext
+        return {
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            aboutMe: userData.aboutMe,
+            interestedTopics: userData.interestedTopics,
+        };
+    } catch (error) {
+        console.error("Error parsing user data from localStorage for personalization:", error);
+        return null;
+    }
+};
+
 
 export const useMessageStore = create<MessageStoreState & MessageStoreActions>()(
     devtools(
@@ -142,7 +181,7 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
                     setPendingBotMessageId, // <<< Get setPendingBotMessageId
                     // chatMessages, // We'll get this from the updater function
                 } = get();
-                const { currentLanguage } = useSettingsStore.getState();
+                const { currentLanguage } = useSettingsStore.getState(); // isPersonalizationEnabled is also here
                 const { activeConversationId } = useConversationStore.getState();
 
                 if (!activeConversationId) {
@@ -207,14 +246,16 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
                 setLoadingState({ isLoading: true, step: 'updating_message', message: 'Updating message...', agentId: undefined });
                 // get().setEditingMessageId(null); // Clear editing mode UI state
 
-                console.log(`[MessageStore submitEditedMessage] Preparing to emit 'edit_user_message'. MessageIDToEdit: "${messageIdToEdit}", NewText: "${trimmedNewText}"`);
+                const personalizationInfo = getPersonalizationData(); // <<< GET PERSONALIZATION DATA
 
 
-                const payload: EditUserMessagePayload = {
-                    conversationId: activeConversationId,
-                    messageIdToEdit: messageIdToEdit, // This is the original ID of the user message
+
+                const payload: EditUserMessagePayload & { personalizationData?: PersonalizationPayload | null } = { // <<< UPDATE PAYLOAD TYPE
+                    conversationId: activeConversationId!,
+                    messageIdToEdit: messageIdToEdit,
                     newText: trimmedNewText,
                     language: currentLanguage.code,
+                    personalizationData: personalizationInfo, // <<< ADD TO PAYLOAD
                 };
                 useSocketStore.getState().emitEditUserMessage(payload);
             },
@@ -222,7 +263,7 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
 
             sendMessage: (userInput) => {
                 const { addChatMessage, setLoadingState, animationControls, resetAwaitFlag, setPendingBotMessageId } = get();
-                const { isStreamingEnabled, currentLanguage } = useSettingsStore.getState();
+                const { isStreamingEnabled, currentLanguage } = useSettingsStore.getState(); // isPersonalizationEnabled is also here
                 const { hasFatalConnectionError } = useSocketStore.getState();
                 const { handleError, hasFatalError: uiHasFatalError } = useUiStore.getState();
                 const { activeConversationId } = useConversationStore.getState();
@@ -247,12 +288,18 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
                 const botPlaceholderId = `bot-pending-${generateMessageId()}`;
                 setPendingBotMessageId(botPlaceholderId);
 
+                const personalizationInfo = getPersonalizationData(); // <<< GET PERSONALIZATION DATA
+
+
+                // Adjust the type of payload for emitSendMessage if it's strictly typed
+                // For now, assuming it can take extra properties or you'll adjust its type definition.
                 useSocketStore.getState().emitSendMessage({
                     userInput: trimmedMessage,
                     isStreaming: isStreamingEnabled,
                     language: currentLanguage.code,
                     conversationId: activeConversationId,
                     frontendMessageId: newUserMessage.id,
+                    personalizationData: personalizationInfo, // <<< ADD TO PAYLOAD
                 });
             },
 

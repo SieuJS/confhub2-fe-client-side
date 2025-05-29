@@ -187,6 +187,7 @@ export const useChatSettingsState = () => {
             isStreamingEnabled: state.isStreamingEnabled,
             currentLanguage: state.currentLanguage,
             availableLanguages: state.availableLanguages,
+            isPersonalizationEnabled: state.isPersonalizationEnabled, // <<< ADDED
         }))
     );
 };
@@ -198,10 +199,12 @@ export const useChatSettingsActions = () => {
             setCurrentLocale: state.setCurrentLocale,
             setIsStreamingEnabled: state.setIsStreamingEnabled,
             setCurrentLanguage: state.setCurrentLanguage,
-            // resetSettingsToDefaults: state.resetSettingsToDefaults, // Thêm nếu có action này
+            setIsPersonalizationEnabled: state.setIsPersonalizationEnabled, // <<< ADDED
+            // resetSettingsToDefaults: state.resetSettingsToDefaults,
         }))
     );
 };
+
 
 
 // === UiStore Hooks === (Giữ nguyên)
@@ -328,10 +331,9 @@ export const useLeftPanelCore = () => {
     };
 };
 
-
 export const useRightSettingsPanelCore = () => {
-    const settingsState = useChatSettingsState();
-    const settingsActions = useChatSettingsActions();
+    const settingsState = useChatSettingsState(); // This will now include isPersonalizationEnabled
+    const settingsActions = useChatSettingsActions(); // This will now include setIsPersonalizationEnabled
     const { isRightPanelOpen } = useUIState();
     const { setRightPanelOpen } = useUIActions();
 
