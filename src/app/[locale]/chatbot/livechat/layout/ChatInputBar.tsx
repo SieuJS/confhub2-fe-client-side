@@ -11,7 +11,8 @@ interface ChatInputBarProps {
   disconnect: () => void
   muted: boolean
   setMuted: (muted: boolean) => void
-  micVolume: number // Renamed from volume to avoid conflict if other volumes are passed
+  micVolume: number // Đây là userMicVolume
+  modelVolume: number // Thêm prop cho model volume
   onSendMessage: (message: string) => void
   isSendingMessage: boolean
 }
@@ -23,7 +24,8 @@ export default function ChatInputBar({
   disconnect,
   muted,
   setMuted,
-  micVolume,
+  micVolume,    // userMicVolume
+  modelVolume,  // modelOutputVolume
   onSendMessage,
   isSendingMessage
 }: ChatInputBarProps) {
@@ -38,7 +40,8 @@ export default function ChatInputBar({
       <MicButton
         muted={muted}
         setMuted={setMuted}
-        volume={micVolume}
+        userMicVolume={micVolume}       // Truyền userMicVolume
+        modelOutputVolume={modelVolume} // Truyền modelOutputVolume
         connected={connected}
       />
       <div className='flex-grow'>

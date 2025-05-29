@@ -46,7 +46,7 @@ export default function LiveChatExperience() {
   const currentAppLanguageCode: AppLanguage = currentLanguageOptionFromStore.code;
 
   const {
-    volume, // This is modelOutputVolume
+    volume: modelOutputVolume, // Đây là modelOutputVolume từ useLiveAPIContext
     on,
     off,
     sendClientContent,
@@ -199,7 +199,7 @@ export default function LiveChatExperience() {
     }, [])
   });
 
-  useVolumeControl(volume); // 'volume' here is modelOutputVolume
+  useVolumeControl(modelOutputVolume); // 'volume' here is modelOutputVolume
 
   const systemInstructions = getSystemInstructions(currentAppLanguageCode);
 
@@ -263,7 +263,8 @@ export default function LiveChatExperience() {
         disconnect={handleDisconnect}
         muted={muted}
         setMuted={setMuted}
-        micVolume={inputMicVolume}
+        micVolume={inputMicVolume}      // Âm lượng micro người dùng
+        modelVolume={modelOutputVolume} // Âm lượng model
         onSendMessage={handleSendMessage}
         isSendingMessage={isSendingMessage}
       />
