@@ -1,7 +1,7 @@
 // src/app/api/conference/getConferenceDetails.ts
 import { appConfig } from '@/src/middleware';
 import { ConferenceResponse} from '../../../models/response/conference.response';
-const API_GET_CONFERENCE_ENDPOINT = appConfig.NEXT_PUBLIC_DATABASE_URL || "http://confhub.engineer"; //  3005 for details
+const API_GET_CONFERENCE_ENDPOINT = appConfig.NEXT_PUBLIC_DATABASE_URL || 'http://localhost:3000'; //  3005 for details
 
 
 async function getConferenceFromDB(id: string): Promise<ConferenceResponse> {
