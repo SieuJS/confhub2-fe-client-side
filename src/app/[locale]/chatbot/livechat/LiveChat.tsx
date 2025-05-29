@@ -75,7 +75,7 @@ export default function LiveChatExperience() {
   const loggerRef = useRef<HTMLDivElement>(null);
   const [inputMicVolume, setInputMicVolume] = useState(0);
   const audioRecorderRef = useRef<AudioRecorder | null>(null); // Use ref for AudioRecorder instance
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState(true);
 
   // Ref to store audio chunks for the client's audio player display
   const audioChunksForClientPlayerRef = useRef<Uint8Array[]>([]);
