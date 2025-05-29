@@ -46,7 +46,7 @@ import { Buffer } from 'buffer'; // Needed for base64 operations if not in globa
 
 
 // Thêm các dòng này ở đầu hook useLiveApi
-const INPUT_TRANSCRIPTION_SILENCE_DURATION = 1500; // 1.5 giây, bạn có thể điều chỉnh
+const INPUT_TRANSCRIPTION_SILENCE_DURATION = 500;
 
 
 const toSDKLiveConnectConfig = (appConfig: LiveChatSessionConfig): SDKLiveConnectConfig => {
@@ -109,6 +109,8 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
   const accumulatedInputTranscriptionRef = useRef<string>("");
   const accumulatedOutputTranscriptionRef = useRef<string>("");
   const emitter = useRef(new EventEmitter<LiveAPIEvents>()).current;
+  const appConfigRef = useRef<LiveChatSessionConfig | undefined>();
+
 
   const setConfig = useCallback((newConfig: LiveChatSessionConfig) => {
     setAppConfigInternal(newConfig);
@@ -151,8 +153,32 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
     }
   }, []); // setVolume là stable từ useState
 
+  useEffect(() => {
+    appConfigRef.current = appConfig;
+  }, [appConfig]);
+
+  // Listener mới trong useLiveApi để xử lý việc finalize input transcription
+  useEffect(() => {
+    const handleFinalizeInputTranscription = () => {
+      if (accumulatedInputTranscriptionRef.current.trim()) {
+        console.log(`[useLiveAPI] Finalizing input transcription via clientSpeechSegmentEnd event: "${accumulatedInputTranscriptionRef.current}"`);
+        emitter.emit("log", {
+          date: new Date(),
+          type: "transcription.inputEvent.final",
+          message: { text: accumulatedInputTranscriptionRef.current, finished: true }
+        });
+      }
+      accumulatedInputTranscriptionRef.current = ""; // Reset sau khi đã log
+    };
+
+    emitter.on("clientSpeechSegmentEnd", handleFinalizeInputTranscription);
+    return () => {
+      emitter.off("clientSpeechSegmentEnd", handleFinalizeInputTranscription);
+    };
+  }, [emitter]); // emitter là stable
+
   const handleServerMessage = useCallback((message: SDKLiveServerMessage) => {
-    // console.log("RAW SERVER MESSAGE:", JSON.stringify(message, null, 2)); // Bỏ comment nếu cần debug sâu
+    console.log("RAW SERVER MESSAGE:", JSON.stringify(message, null, 2)); // Bỏ comment nếu cần debug sâu
 
     // Xử lý các message không thuộc serverContent trước
     if (message.setupComplete) {
@@ -181,80 +207,63 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
     if (message.serverContent) {
       const serverContent = message.serverContent;
       emitter.emit("content", serverContent);
-      const currentOutputModality = appConfig?.responseModalities?.[0];
-      let inputFinalizedThisCycle = false; // Cờ để theo dõi input đã được finalize trong lần gọi này chưa
+      const currentOutputModality = appConfig?.responseModalities?.[0]; // Sử dụng appConfig trực tiếp nếu nó là dependency của useCallback
+      // Hoặc appConfigRef.current nếu không muốn rebind useCallback thường xuyên
+      let serverIndicatedInputFinishedThisCycle = false;
 
-      // --- 1. Xử lý Input Transcription (ƯU TIÊN HÀNG ĐẦU) ---
+      // --- 1. Xử lý Input Transcription (ƯU TIÊN CAO NHẤT) ---
       if (serverContent.inputTranscription) {
         const currentChunkText = serverContent.inputTranscription.text || "";
         const isFinishedByServer = serverContent.inputTranscription.finished || false;
 
-        // Luôn xóa timer cũ khi nhận được inputTranscription mới, vì đây là tín hiệu mới nhất.
         if (inputTranscriptionSilenceTimerRef.current) {
           clearTimeout(inputTranscriptionSilenceTimerRef.current);
           inputTranscriptionSilenceTimerRef.current = null;
         }
 
-        // Cập nhật accumulatedInputTranscriptionRef với text mới nhất từ server.
-        // Giả định server gửi toàn bộ partial transcript.
-        if (currentChunkText.trim()) {
-          accumulatedInputTranscriptionRef.current = currentChunkText;
-        } else if (!isFinishedByServer && !currentChunkText.trim()) {
-          // Nếu chunk rỗng và server không báo finished, không làm gì với accumulated,
-          // nhưng timer đã được xóa, sẽ được đặt lại nếu accumulated có nội dung.
+        // SỬA LỖI CẬP NHẬT: Nối chuỗi thay vì ghi đè
+        if (currentChunkText) { // Chỉ nối nếu chunk có nội dung (kể cả chỉ là dấu cách)
+          // Xử lý khoảng trắng đơn giản: nếu accumulated rỗng hoặc chunk bắt đầu bằng dấu cách thì nối trực tiếp.
+          // Nếu không, thêm một dấu cách trước khi nối chunk (nếu chunk không bắt đầu bằng dấu cách).
+          // Server thường gửi các chunk đã có khoảng trắng phù hợp nếu chúng là các từ riêng biệt.
+          // Cách đơn giản nhất là chỉ += và để trim() ở cuối xử lý.
+          accumulatedInputTranscriptionRef.current += currentChunkText;
         }
 
         if (isFinishedByServer) {
-          const finalText = accumulatedInputTranscriptionRef.current.trim();
-          if (finalText) {
-            console.log(`[useLiveAPI] Input finalized BY SERVER: "${finalText}"`);
-            emitter.emit("log", {
-              date: new Date(),
-              type: "transcription.inputEvent.final",
-              message: { text: finalText, finished: true }
-            });
-            emitter.emit("clientSpeechSegmentEnd");
-          }
-          accumulatedInputTranscriptionRef.current = ""; // Reset ngay
+          // accumulatedInputTranscriptionRef.current giờ đã chứa toàn bộ text từ các chunk
+          console.log(`[useLiveAPI] Server indicated input finished. Emitting clientSpeechSegmentEnd. Accumulated: "${accumulatedInputTranscriptionRef.current.trim()}"`);
+          emitter.emit("clientSpeechSegmentEnd");
+          serverIndicatedInputFinishedThisCycle = true; // Đánh dấu server đã chốt hạ input
+          // Listener của clientSpeechSegmentEnd sẽ log và reset accumulatedInputTranscriptionRef
         } else if (accumulatedInputTranscriptionRef.current.trim()) {
-          // Nếu chưa finished bởi server, và có nội dung tích lũy -> đặt/đặt lại timer
+          // Nếu CHƯA finished bởi server, và CÓ nội dung tích lũy -> đặt/đặt lại timer VAD.
           inputTranscriptionSilenceTimerRef.current = setTimeout(() => {
-            if (accumulatedInputTranscriptionRef.current.trim()) {
-              console.log(`[useLiveAPI] Input SILENCE timer expired. Finalizing: "${accumulatedInputTranscriptionRef.current}"`);
-              emitter.emit("log", {
-                date: new Date(),
-                type: "transcription.inputEvent.final",
-                message: { text: accumulatedInputTranscriptionRef.current, finished: true }
-              });
-              emitter.emit("clientSpeechSegmentEnd");
-              // inputFinalizedThisCycle = true; // Không cần thiết vì đây là async
-            }
-            accumulatedInputTranscriptionRef.current = "";
+            // Timer hết hạn, chỉ phát clientSpeechSegmentEnd. Listener sẽ lo phần còn lại.
+            console.log(`[useLiveAPI] Input SILENCE timer expired. Emitting clientSpeechSegmentEnd. Accumulated: "${accumulatedInputTranscriptionRef.current.trim()}"`);
+            emitter.emit("clientSpeechSegmentEnd");
             inputTranscriptionSilenceTimerRef.current = null;
           }, INPUT_TRANSCRIPTION_SILENCE_DURATION);
         }
         emitter.emit("inputTranscription", { text: currentChunkText, finished: isFinishedByServer });
       }
 
-      // --- 2. Logic "Finalize Early" cho Input (CHỈ NẾU CHƯA BỊ FINALIZE Ở BƯỚC 1) ---
-      if (!inputFinalizedThisCycle && // Quan trọng: chỉ chạy nếu input chưa được finalize ở trên
+      // --- 2. Logic khi Model bắt đầu gửi Text Output (trước đây là "Finalize Early") ---
+      // Chỉ xem xét nếu server CHƯA chốt hạ input trong message này.
+      if (!serverIndicatedInputFinishedThisCycle &&
         serverContent.modelTurn?.parts?.some(part => part.text) &&
         currentOutputModality === SDKModality.TEXT &&
-        accumulatedInputTranscriptionRef.current.trim()
+        accumulatedInputTranscriptionRef.current.trim() &&
+        inputTranscriptionSilenceTimerRef.current // Quan trọng: chỉ can thiệp nếu VAD client (timer) đang chạy
       ) {
-        console.log(`[useLiveAPI] Model sent TEXT. Finalizing client input EARLY: "${accumulatedInputTranscriptionRef.current}"`);
-        if (inputTranscriptionSilenceTimerRef.current) {
-          clearTimeout(inputTranscriptionSilenceTimerRef.current);
-          inputTranscriptionSilenceTimerRef.current = null;
-        }
-        emitter.emit("log", {
-          date: new Date(),
-          type: "transcription.inputEvent.final",
-          message: { text: accumulatedInputTranscriptionRef.current, finished: true }
-        });
-        emitter.emit("clientSpeechSegmentEnd");
-        accumulatedInputTranscriptionRef.current = "";
-        inputFinalizedThisCycle = true;
+        // Model bắt đầu trả lời text, VAD client đang hoạt động.
+        // Dấu hiệu lượt nói user có thể đã kết thúc. Dừng VAD client.
+        console.log(`[useLiveAPI] Model sent TEXT & client VAD active. Clearing VAD timer. Input: "${accumulatedInputTranscriptionRef.current.trim()}"`);
+        clearTimeout(inputTranscriptionSilenceTimerRef.current);
+        inputTranscriptionSilenceTimerRef.current = null;
+        // KHÔNG phát clientSpeechSegmentEnd ở đây.
+        // Việc finalize sẽ do turnComplete (nếu không có input nào nữa) hoặc inputTranscription tiếp theo (nếu user vẫn nói) đảm nhận.
+        // Mục đích là không cắt ngang nếu user vẫn đang nói và model chỉ mới bắt đầu xử lý/trả lời sớm.
       }
 
 
@@ -336,27 +345,12 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
           clearTimeout(inputTranscriptionSilenceTimerRef.current);
           inputTranscriptionSilenceTimerRef.current = null;
         }
-        if (!inputFinalizedThisCycle && accumulatedInputTranscriptionRef.current.trim()) {
-          console.log(`[useLiveAPI] INTERRUPTED. Finalizing input: "${accumulatedInputTranscriptionRef.current}"`);
-          emitter.emit("log", { // Log phần input còn lại khi bị interrupt
-            date: new Date(),
-            type: "transcription.inputEvent.final",
-            message: { text: accumulatedInputTranscriptionRef.current, finished: true }
-          });
-          // Không phát clientSpeechSegmentEnd ở đây vì audio recorder đã/sẽ dừng
+        // Nếu còn input chưa được finalize (ví dụ, server chưa bao giờ gửi finished:true cho nó)
+        if (accumulatedInputTranscriptionRef.current.trim()) {
+          console.log(`[useLiveAPI] INTERRUPTED. Emitting clientSpeechSegmentEnd for input: "${accumulatedInputTranscriptionRef.current.trim()}"`);
+          emitter.emit("clientSpeechSegmentEnd"); // Listener sẽ log và reset
         }
-        accumulatedInputTranscriptionRef.current = "";
-
-        if (currentOutputModality !== SDKModality.TEXT && accumulatedOutputTranscriptionRef.current.trim()) {
-          emitter.emit("log", { // Log phần output còn lại khi bị interrupt
-            date: new Date(),
-            type: "transcription.outputEvent.final",
-            message: { text: accumulatedOutputTranscriptionRef.current, finished: true }
-          });
-        }
-        accumulatedOutputTranscriptionRef.current = "";
-        inputFinalizedThisCycle = true; // Đánh dấu đã xử lý input cho chu kỳ này
-
+        // Không reset accumulatedInputTranscriptionRef ở đây, listener sẽ làm
       }
 
       // --- 6. Xử lý TurnComplete ---
@@ -396,21 +390,16 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
           clearTimeout(inputTranscriptionSilenceTimerRef.current);
           inputTranscriptionSilenceTimerRef.current = null;
         }
-        // Chỉ finalize input ở đây nếu nó chưa được finalize bởi các cơ chế trước đó trong cùng lần gọi handleServerMessage này
-        if (!inputFinalizedThisCycle && accumulatedInputTranscriptionRef.current.trim()) {
-          console.log(`[useLiveAPI] TURN COMPLETE. Finalizing input: "${accumulatedInputTranscriptionRef.current}"`);
-          emitter.emit("log", {
-            date: new Date(),
-            type: "transcription.inputEvent.final",
-            message: { text: accumulatedInputTranscriptionRef.current, finished: true }
-          });
-            emitter.emit("clientSpeechSegmentEnd");
+        // Nếu còn input chưa được finalize (ví dụ, server không gửi finished, timer không hết hạn kịp)
+        if (accumulatedInputTranscriptionRef.current.trim()) {
+          console.log(`[useLiveAPI] TURN COMPLETE. Emitting clientSpeechSegmentEnd for input: "${accumulatedInputTranscriptionRef.current.trim()}"`);
+          emitter.emit("clientSpeechSegmentEnd"); // Listener sẽ log và reset
         }
-        accumulatedInputTranscriptionRef.current = "";
         emitter.emit("turncomplete");
+
       }
     }
-  }, [emitter, debouncedEmitServerAudioLog, appConfig, INPUT_TRANSCRIPTION_SILENCE_DURATION]);
+  }, [emitter, debouncedEmitServerAudioLog, appConfig, INPUT_TRANSCRIPTION_SILENCE_DURATION]); // Đảm bảo appConfig là dependency nếu dùng trực tiếp
 
   const connect = useCallback(async () => {
     if (!appConfig) {
