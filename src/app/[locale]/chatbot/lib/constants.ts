@@ -8,7 +8,7 @@ import {
 
 import { LanguageOption as RegularChatLanguageOption } from './regular-chat.types';
 // --- Constants cho Live Chat ---
-export const AVAILABLE_VOICES_LIVE_CHAT: PrebuiltVoice[] = ["Puck", "Charon", "Kore", "Fenrir", "Aoede", "Orus", "Zephyr"];
+export const AVAILABLE_VOICES_LIVE_CHAT: PrebuiltVoice[] = ["Puck", "Charon", "Kore", "Fenrir", "Aoede", "Leda", "Orus", "Zephyr"];
 
 // BỎ thuộc tính 'value' nếu không cần thiết
 export const AVAILABLE_LANGUAGES_LIVE_CHAT: LiveChatLanguageOption[] = [
