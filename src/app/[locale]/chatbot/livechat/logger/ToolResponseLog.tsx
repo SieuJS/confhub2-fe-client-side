@@ -1,173 +1,245 @@
-// src/app/[locale]/chatbot/livechat/logger/ToolResponseLog.tsx
-import React from "react";
-import { ToolResponsePayload } from "@/src/app/[locale]/chatbot/lib/live-chat.types";
-import { FunctionResponse as SDKFunctionResponse } from "@google/genai";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { vs2015 as syntaxHighlightStyle } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import Map from "../../../conferences/detail/Map"; // Đảm bảo đường dẫn này đúng
-
-type ToolResponseLogProps = {
-  message: ToolResponsePayload;
-};
-
-const ToolResponseLog: React.FC<ToolResponseLogProps> = ({ message }) => {
-  const functionResponses = message.functionResponses;
-
-  return (
-    <div className="text-sm text-inherit">
-      {functionResponses && functionResponses.map(
-        (sdkResponse: SDKFunctionResponse, index: number) => {
-          const rawResponsePayload = sdkResponse.response; // Đây là Record<string, unknown>
-          // Ví dụ: { content: { uiAction: ..., messageForModel: ... } }
-
-          let customUI: React.ReactNode = null;
-          let messageForModelText: string | null = null;
-
-          // Kiểm tra xem rawResponsePayload có phải là object và có key 'content' không
-          if (rawResponsePayload && typeof rawResponsePayload === 'object' && 'content' in rawResponsePayload) {
-            const actualContent = rawResponsePayload.content as any; // actualContent là object bên trong key "content"
-
-            if (actualContent && typeof actualContent === 'object') {
-              // Bây giờ kiểm tra uiAction và messageForModel trên actualContent
-              if (actualContent.uiAction?.type === 'display_map' && actualContent.uiAction.location) {
-                customUI = (
-                  // THÊM Chiều cao vào đây để đảm bảo Map có không gian hiển thị
-                  // Ví dụ: h-[250px] hoặc min-h-[250px] (Tailwind CSS)
-                  <div className="my-2 rounded-md overflow-hidden border border-amber-300 dark:border-amber-600 h-[300px]"> {/* HOẶC min-h-[300px] */}
-                    <Map location={actualContent.uiAction.location} />
-                  </div>
-                );
-                messageForModelText = actualContent.messageForModel || `Displayed map for: ${actualContent.uiAction.location}`;
-              }
-              // Bạn có thể thêm các điều kiện else if khác ở đây để xử lý các loại uiAction khác
-              // hoặc các cấu trúc content khác từ các tool handler khác.
-            }
-          }
-
-          // Nếu không có customUI và không có messageForModelText được trích xuất ở trên,
-          // nhưng vẫn có rawResponsePayload, thì hiển thị JSON của nó.
-          // Điều này hữu ích cho các tool response không có UI đặc biệt.
-          if (!customUI && !messageForModelText && rawResponsePayload) {
-            if (typeof rawResponsePayload === 'object' && rawResponsePayload !== null) {
-              // Nếu rawResponsePayload.content là một string (ví dụ từ getConferences)
-              if ('content' in rawResponsePayload && typeof rawResponsePayload.content === 'string') {
-                messageForModelText = rawResponsePayload.content;
-              } else {
-                // Mặc định hiển thị toàn bộ JSON của rawResponsePayload
-                messageForModelText = `Tool response data:`; // Để có context
-                // customUI sẽ là SyntaxHighlighter hiển thị JSON
-                // (để tránh lặp lại SyntaxHighlighter, có thể gán vào customUI)
-              }
-            } else if (typeof rawResponsePayload === 'string') {
-              messageForModelText = rawResponsePayload;
-            }
-          }
-
-
-          return (
-            <div
-              key={sdkResponse.id || `tool-response-${index}`}
-              className="part mt-2 pt-2 border-t border-amber-300 dark:border-amber-600 first:mt-0 first:pt-0 first:border-t-0"
-            >
-              <h5 className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1 uppercase tracking-wide">
-                Function Response: {sdkResponse.name} (ID: {sdkResponse.id})
-              </h5>
-
-              {messageForModelText && (
-                <p className="text-inherit mb-1 whitespace-pre-wrap">{messageForModelText}</p>
-              )}
-
-              {customUI}
-
-              {/* Hiển thị JSON nếu không có customUI và messageForModelText chưa được set từ logic trên,
-                  NHƯNG rawResponsePayload lại là một object phức tạp cần hiển thị.
-                  Điều chỉnh điều kiện này cho phù hợp.
-              */}
-              {!customUI && !messageForModelText && rawResponsePayload && typeof rawResponsePayload === 'object' &&
-                !('content' in rawResponsePayload && typeof rawResponsePayload.content === 'string') && (
-                  <div className="mt-1 text-xs rounded-md bg-gray-800 text-gray-100 p-2 overflow-x-auto">
-                    <SyntaxHighlighter
-                      language="json"
-                      style={syntaxHighlightStyle}
-                      customStyle={{ margin: 0, padding: 0, background: 'transparent' }}
-                    >
-                      {JSON.stringify(rawResponsePayload, null, 2)}
-                    </SyntaxHighlighter>
-                  </div>
-                )}
-
-              {!customUI && !rawResponsePayload && ( // Nếu không có customUI và cũng không có rawResponsePayload
-                <p className="text-inherit italic text-xs mt-1">No content in function response.</p>
-              )}
-            </div>
-          );
-        },
-      )}
-    </div>
-  );
-};
-
-export default ToolResponseLog;
-
-
-
 // // src/app/[locale]/chatbot/livechat/logger/ToolResponseLog.tsx
-// import React from "react";
-// import { ToolResponsePayload } from "@/src/app/[locale]/chatbot/lib/live-chat.types";
-// import { FunctionResponse as SDKFunctionResponse } from "@google/genai";
+// import React, { useState } from 'react';
+// import { ToolResponsePayload,  } from '../../lib/live-chat.types';
+// import cn from 'classnames';
+// import { ChevronDown, ChevronRight } from 'lucide-react';
+// import { FunctionResponse as SDKFunctionResponse } from '@google/genai';
+// // Import Map component từ code gốc của bạn
+// // QUAN TRỌNG: Đảm bảo đường dẫn này chính xác!
 // import Map from "../../../conferences/detail/Map"; // Đảm bảo đường dẫn này đúng
 
-// type ToolResponseLogProps = {
-//   message: ToolResponsePayload;
+// // Import SyntaxHighlighter
+// import SyntaxHighlighter from 'react-syntax-highlighter';
+// // Chọn một style, ví dụ: vs2015, atomOneDark, etc.
+// import { vs2015 as syntaxHighlightStyle } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+
+// // Helper component cho từng FunctionResponse
+// const FunctionResponseItem = ({ funcResponse }: { funcResponse: SDKFunctionResponse }) => {
+//   const [isExpanded, setIsExpanded] = useState(false); // Mặc định narrow
+
+//   const functionName = funcResponse.name;
+//   const functionId = funcResponse.id;
+
+//   // funcResponse.response là Record<string, any> từ SDK.
+//   // Tool handler của bạn có thể trả về { content: { actual_data } } hoặc chỉ { actual_data }
+//   // responseDataFromHandler sẽ là object chứa uiAction, messageForModel, hoặc string, hoặc object JSON khác.
+//   const responseDataFromHandler = funcResponse.response?.content || funcResponse.response;
+
+//   let customUI: React.ReactNode = null;
+//   let messageForModelText: string | null = null;
+//   let dataToHighlightAsJson: any = null;
+//   let isMapDisplayAction = false;
+
+//   if (responseDataFromHandler && typeof responseDataFromHandler === 'object') {
+//     const contentObject = responseDataFromHandler as any; // Để truy cập uiAction, messageForModel
+
+//     // 1. Kiểm tra uiAction cho display_map (dựa trên logic code gốc)
+//     if (contentObject.uiAction?.type === 'display_map' && contentObject.uiAction.location) {
+//       isMapDisplayAction = true;
+//       customUI = (
+//         <div className="my-2 rounded-md overflow-hidden border border-gray-300 dark:border-gray-600 h-[310px] min-h-[310px] max-w-[500px]">
+//           <Map location={contentObject.uiAction.location} />
+//         </div>
+//       );
+//       messageForModelText = contentObject.messageForModel || `Displayed map for: ${contentObject.uiAction.location}`;
+//       // Không cần dataToHighlightAsJson cho map vì đã có customUI
+//     } else {
+//       // 2. Nếu không phải map, kiểm tra messageForModel và dữ liệu còn lại cho JSON
+//       if (contentObject.messageForModel && typeof contentObject.messageForModel === 'string') {
+//         messageForModelText = contentObject.messageForModel;
+//       }
+//       // Dữ liệu còn lại của contentObject (hoặc toàn bộ nếu không có messageForModel riêng) sẽ là JSON
+//       dataToHighlightAsJson = contentObject;
+//     }
+//   } else if (typeof responseDataFromHandler === 'string') {
+//     // Nếu responseDataFromHandler là một string đơn giản
+//     messageForModelText = responseDataFromHandler;
+//     // Không có dataToHighlightAsJson trong trường hợp này (hoặc có thể coi chính string đó là data)
+//   } else {
+//     // Trường hợp không xác định hoặc responseDataFromHandler là null/undefined
+//     messageForModelText = "No displayable content in function response.";
+//   }
+
+//   // A. Nếu là action hiển thị Map (không expand/narrow, không bubble vàng đặc trưng)
+//   if (isMapDisplayAction) {
+//     return (
+//       <div className="mb-2 p-0 text-sm"> {/* Container đơn giản, không bubble */}
+//         {/* <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-1">
+//           Tool Executed: {functionName}
+//           {functionId && <span className="text-xs ml-1 text-gray-500 dark:text-gray-400"> (ID: {functionId})</span>}
+//         </h5> */}
+//         {/* {messageForModelText && (
+//           <p className="text-gray-800 dark:text-gray-200 mb-1">{messageForModelText}</p>
+//         )} */}
+//         {customUI}
+//       </div>
+//     );
+//   }
+
+//   // // B. Các function response khác (có expand/narrow, bubble màu vàng)
+//   // const summaryText = messageForModelText || `Tool Info: ${functionName}`;
+
+//   return (
+//     <div
+//       className={cn(
+//         "mb-2 rounded-lg border shadow-sm",
+//         "bg-amber-50 text-amber-800 border-amber-300 dark:bg-amber-900/70 dark:text-amber-200 dark:border-amber-700"
+//       )}
+//     >
+//       <details className="group" open={isExpanded} onToggle={(e) => setIsExpanded((e.target as HTMLDetailsElement).open)}>
+//         <summary
+//           className={cn(
+//             "flex items-center justify-between list-none p-3 cursor-pointer font-medium text-sm",
+//             "hover:bg-amber-100 dark:hover:bg-amber-800/50 rounded-t-lg",
+//             { "rounded-b-lg": !isExpanded }
+//           )}
+//         >
+//           {/* <span className="truncate pr-2" title={summaryText}>
+//             {summaryText}
+//             {functionId && !messageForModelText && <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">(ID: {functionId})</span>}
+//           </span> */}
+//           {isExpanded ? (
+//             <ChevronDown size={20} className="text-amber-700 dark:text-amber-300 flex-shrink-0" />
+//           ) : (
+//             <ChevronRight size={20} className="text-amber-700 dark:text-amber-300 flex-shrink-0" />
+//           )}
+//         </summary>
+//         {isExpanded && dataToHighlightAsJson && (
+//           <div className="p-3 border-t border-amber-200 dark:border-amber-600 bg-white dark:bg-amber-900/30 rounded-b-lg">
+//             <p className="text-xs text-amber-600 dark:text-amber-400 mb-1 font-semibold">Data provided to the model:</p>
+//             <div className="text-xs rounded-md bg-gray-800 text-gray-100 p-0.5 overflow-x-auto max-h-96">
+//                 <SyntaxHighlighter
+//                     language="json"
+//                     style={syntaxHighlightStyle}
+//                     customStyle={{ margin: 0, padding: '0.25rem', background: 'transparent', fontSize: '0.75rem' }}
+//                     wrapLongLines={true}
+//                 >
+//                     {JSON.stringify(dataToHighlightAsJson, null, 2)}
+//                 </SyntaxHighlighter>
+//             </div>
+//           </div>
+//         )}
+//          {isExpanded && !dataToHighlightAsJson && !messageForModelText && (
+//             <div className="p-3 border-t border-amber-200 dark:border-amber-600 bg-white dark:bg-amber-900/30 rounded-b-lg">
+//                  <p className="text-xs text-gray-500 italic">No additional data to display.</p>
+//             </div>
+//         )}
+//       </details>
+//     </div>
+//   );
 // };
 
-// const ToolResponseLog: React.FC<ToolResponseLogProps> = ({ message }) => {
-//   const functionResponses = message.functionResponses;
-
-//   // Nếu không có functionResponses hoặc mảng rỗng, không có gì để hiển thị
-//   if (!functionResponses || functionResponses.length === 0) {
+// // Component chính cho ToolResponsePayload
+// const ToolResponseLog = ({ message }: { message: ToolResponsePayload }) => {
+//   if (!message || !message.functionResponses || message.functionResponses.length === 0) {
 //     return null;
 //   }
 
-//   const renderedMaps = functionResponses
-//     .map((sdkResponse: SDKFunctionResponse, index: number) => {
-//       const rawResponsePayload = sdkResponse.response;
-//       let customUI: React.ReactNode = null;
-
-//       if (rawResponsePayload && typeof rawResponsePayload === 'object' && 'content' in rawResponsePayload) {
-//         const actualContent = rawResponsePayload.content as any;
-//         if (actualContent && typeof actualContent === 'object') {
-//           if (actualContent.uiAction?.type === 'display_map' && actualContent.uiAction.location) {
-//             customUI = (
-//               <div className="my-2 rounded-md overflow-hidden border border-amber-300 dark:border-amber-600 h-[300px]">
-//                 <Map location={actualContent.uiAction.location} />
-//               </div>
-//             );
-//           }
-//         }
-//       }
-
-//       // Trả về customUI (Map) nếu nó được tạo, nếu không thì null.
-//       // Div bọc ngoài cùng với key sẽ được thêm nếu customUI tồn tại.
-//       return customUI ? (
-//         <div key={sdkResponse.id || `tool-response-${index}`}>
-//           {customUI}
-//         </div>
-//       ) : null;
-//     })
-//     .filter(Boolean); // Lọc bỏ tất cả các giá trị null (những response không phải là map)
-
-//   // Nếu sau khi lọc, không còn map nào để hiển thị, trả về null
-//   if (renderedMaps.length === 0) {
-//     return null;
-//   }
-
-//   // Chỉ khi có map để hiển thị, mới trả về div bọc chúng
 //   return (
-//     <div className="text-sm text-inherit">
-//       {renderedMaps}
+//     <div className="space-y-1 w-full">
+//       {message.functionResponses.map((response, index) => (
+//         <FunctionResponseItem
+//           key={response.id || `fr-${index}-${new Date().getTime()}`}
+//           funcResponse={response}
+//         />
+//       ))}
 //     </div>
 //   );
 // };
 
 // export default ToolResponseLog;
+
+
+
+// src/app/[locale]/chatbot/livechat/logger/ToolResponseLog.tsx
+import React from 'react'; // Bỏ useState, cn, ChevronDown, ChevronRight nếu không dùng
+import { ToolResponsePayload } from '../../lib/live-chat.types';
+import { FunctionResponse as SDKFunctionResponse } from '@google/genai';
+
+// QUAN TRỌNG: Đảm bảo đường dẫn này chính xác!
+import Map from "../../../conferences/detail/Map"; // Đảm bảo đường dẫn này đúng
+
+// Bỏ import SyntaxHighlighter và style nếu không dùng nữa
+
+// Helper component cho từng FunctionResponse
+const FunctionResponseItem = ({ funcResponse }: { funcResponse: SDKFunctionResponse }) => {
+  // const functionName = funcResponse.name; // Không cần nữa nếu chỉ hiển thị map
+  // const functionId = funcResponse.id; // Không cần nữa
+
+  const responseDataFromHandler = funcResponse.response?.content || funcResponse.response;
+
+  let customUI: React.ReactNode = null;
+  // let messageForModelText: string | null = null; // Không cần nữa nếu chỉ hiển thị map
+
+  if (responseDataFromHandler && typeof responseDataFromHandler === 'object') {
+    const contentObject = responseDataFromHandler as any;
+
+    // Chỉ kiểm tra uiAction cho display_map
+    if (contentObject.uiAction?.type === 'display_map' && contentObject.uiAction.location) {
+      customUI = (
+        <div className="my-2 rounded-md overflow-hidden border border-gray-300 dark:border-gray-600 h-[310px] min-h-[310px] max-w-[500px]">
+          <Map location={contentObject.uiAction.location} />
+        </div>
+      );
+      // messageForModelText = contentObject.messageForModel || `Displayed map for: ${contentObject.uiAction.location}`;
+    }
+  }
+
+  // Chỉ render nếu customUI (tức là Map) được tạo
+  if (customUI) {
+    return (
+      <div className="mb-2 p-0 text-sm"> {/* Container đơn giản, không bubble */}
+        {/* Bạn có thể bỏ hoàn toàn tiêu đề và messageForModelText nếu muốn chỉ có bản đồ */}
+        {/*
+        <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-1">
+          Tool Executed: {functionName}
+        </h5>
+        {messageForModelText && (
+          <p className="text-gray-800 dark:text-gray-200 mb-1">{messageForModelText}</p>
+        )}
+        */}
+        {customUI}
+      </div>
+    );
+  }
+
+  // Nếu không phải là action hiển thị map, không render gì cả
+  return null;
+};
+
+// Component chính cho ToolResponsePayload
+const ToolResponseLog = ({ message }: { message: ToolResponsePayload }) => {
+  if (!message || !message.functionResponses || message.functionResponses.length === 0) {
+    return null;
+  }
+
+  // Lọc ra chỉ những response có thể tạo ra UI (hiện tại là map)
+  // và sau đó map qua chúng.
+  // Hoặc đơn giản là để FunctionResponseItem tự quyết định trả về null.
+  const displayableResponses = message.functionResponses.filter(response => {
+    const responseData = response.response?.content || response.response;
+    if (responseData && typeof responseData === 'object') {
+      const content = responseData as any;
+      return content.uiAction?.type === 'display_map' && content.uiAction.location;
+    }
+    return false;
+  });
+
+  // Nếu không có response nào có thể hiển thị (không có map nào), thì không render gì cả.
+  if (displayableResponses.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="space-y-1 w-full">
+      {displayableResponses.map((response, index) => (
+        <FunctionResponseItem
+          key={response.id || `fr-${index}-${new Date().getTime()}`}
+          funcResponse={response}
+        />
+      ))}
+    </div>
+  );
+};
+
+export default ToolResponseLog;

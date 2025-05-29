@@ -59,27 +59,16 @@ const isToolResponsePayload = (payload: any): payload is ToolResponsePayload => 
 const MessageRenderer = ({ logEntry }: MessageRendererProps) => {
   const { message, type } = logEntry;
 
+
   // ƯU TIÊN XỬ LÝ TOOL RESPONSE LOG
   if (type === "client.toolResponseSent" && isToolResponsePayload(message)) {
-    return <ToolResponseLog message={message} />;
+    return <ToolResponseLog message={message} />; // <-- SỬ DỤNG COMPONENT MỚI
   }
 
-  // // 1. Xử lý các kiểu không phải SDKMessageUnion trước (ngoại trừ ToolResponsePayload đã xử lý ở trên)
-  // if (typeof message === 'string') {
-  //   // Nếu logEntry có summary (đã thêm ở bước 1 cho client.toolResponseSent),
-  //   // và message không phải là ToolResponsePayload (đã được xử lý),
-  //   // bạn có thể muốn hiển thị summary thay vì message object nếu nó lọt xuống đây.
-  //   // Tuy nhiên, với type guard ở trên, điều này không nên xảy ra cho client.toolResponseSent.
-  //   if (logEntry.summary && typeof logEntry.summary === 'string' && type === "client.toolResponseSent") {
-  //       return <PlainTextMessage message={logEntry.summary} />;
-  //   }
-  //   return <PlainTextMessage message={message} />;
-  // }
-
-  if (
+   if (
     (isClientAudioMessage(message) && type === "send.clientAudio.sessionComplete") ||
-    (isClientAudioMessage(message) && type === "send.clientAudio.segmentComplete") || // THÊM TYPE NÀY
-    (isClientAudioMessage(message) && type === "send.clientAudio.finalSegment")    // THÊM TYPE NÀY
+    (isClientAudioMessage(message) && type === "send.clientAudio.segmentComplete") ||
+    (isClientAudioMessage(message) && type === "send.clientAudio.finalSegment")
   ) {
     return <ClientAudioLog message={message as ClientAudioMessage} />;
   }
@@ -101,28 +90,25 @@ const MessageRenderer = ({ logEntry }: MessageRendererProps) => {
     }
   }
 
-  // 2. Xử lý SDKMessageUnion
   if (isSDKMessage(message)) {
     if (isClientContentMessage(message)) {
       return <ClientContentLog message={message.clientContent} />;
     }
 
-    if (isSDKMessage(message)) {
-      if (isServerContentMessage(message)) {
-        const serverContent = message.serverContent;
-        if (isInterrupted(serverContent)) {
-          return <CustomPlainTextLog msg="[Model Interrupted]" />;
-        }
-        if (isModelTurn(serverContent)) { // This will now be true for your emitted log
-          // The `message` prop passed to ModelTurnLog should be `logEntry.message` itself
-          // as it now has the correct structure: { serverContent: { modelTurn: ... } }
-          return <ModelTurnLog message={message as ModelTurnLogMessagePropType} />;
-        }
+    // Bỏ if (isSDKMessage(message)) lồng nhau không cần thiết
+    if (isServerContentMessage(message)) {
+      const serverContent = message.serverContent;
+      if (isInterrupted(serverContent)) {
+        return <CustomPlainTextLog msg="[Model Interrupted]" />;
       }
+      if (isModelTurn(serverContent)) {
+        return <ModelTurnLog message={message as ModelTurnLogMessagePropType} />;
+      }
+      // Bạn có thể muốn thêm logic cho toolCall từ server ở đây nếu cần hiển thị khác
+      // Ví dụ: if (serverContent.toolCall) { return <SomeToolCallDisplayComponent ... />; }
     }
   }
 
-  // Fallback:
   if (
     type.includes("transcription.inputEvent.partial") ||
     type.includes("transcription.outputEvent.partial") ||
@@ -130,12 +116,6 @@ const MessageRenderer = ({ logEntry }: MessageRendererProps) => {
   ) {
     return null;
   }
-
-  // // Nếu có summary, hiển thị nó cho các log chưa được xử lý thay vì object message
-  // if (logEntry.summary && typeof logEntry.summary === 'string') {
-  //   console.warn("[MessageRenderer] Rendering summary for unhandled/debug log type:", type, "Summary:", logEntry.summary);
-  //   return <PlainTextMessage message={logEntry.summary} />;
-  // }
 
   console.warn("[MessageRenderer] Rendering with AnyMessage for unhandled/debug log type:", type, "Message:", message);
   return <AnyMessage message={message as any} />;
