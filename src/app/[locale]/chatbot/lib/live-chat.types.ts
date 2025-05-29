@@ -37,7 +37,7 @@ import type {
 export type PrebuiltVoice = "Puck" | "Charon" | "Kore" | "Fenrir" | "Aoede" | "Orus" | "Zephyr";
 export type OutputModality = Modality;
 
-export type Language = 'en' | 'vi' | 'zh' | 'de' | 'fr' | 'es' | 'ru' | 'ja' | 'ko' | 'ar' | 'fa';
+export type Language = 'en' | 'vi' | 'zh' | 'de' | 'fr' | 'es' | 'ru' | 'ja' | 'ko' | 'ar' ;
 export type ChatMode = 'live' | 'regular';
 
 export interface LanguageOption {
@@ -133,8 +133,7 @@ export type StreamingLog = {
   date: Date;
   type: string;
   count?: number;
-  // Mở rộng kiểu message để bao gồm TranscriptionPayload
-  message: string | SDKLiveClientMessage | SDKLiveServerMessage | ClientAudioMessage | ServerAudioMessage | TranscriptionPayload;
+  message: string | SDKLiveClientMessage | SDKLiveServerMessage | ClientAudioMessage | ServerAudioMessage | TranscriptionPayload | ToolResponsePayload; // <-- ADDED ToolResponsePayload
 };
 
 // Type alias for the message union after basic filtering

@@ -6,7 +6,7 @@ import { Language } from '@/src/app/[locale]/chatbot/lib/live-chat.types';
 const languageToBcp47Map: Record<Language, string> = {
   'en': 'en-US', // Tiếng Anh (Mỹ)
   'vi': 'vi-VN', // Tiếng Việt (Việt Nam)
-  'zh': 'zh-CN', // Tiếng Trung (Giản thể, Trung Quốc) - hoặc zh-TW cho Phồn thể
+  'zh': 'cmn-CN', // Tiếng Trung (Giản thể, Trung Quốc) - hoặc zh-TW cho Phồn thể
   'de': 'de-DE', // Tiếng Đức (Đức)
   'fr': 'fr-FR', // Tiếng Pháp (Pháp)
   'es': 'es-ES', // Tiếng Tây Ban Nha (Tây Ban Nha)
@@ -14,7 +14,6 @@ const languageToBcp47Map: Record<Language, string> = {
   'ja': 'ja-JP', // Tiếng Nhật (Nhật Bản)
   'ko': 'ko-KR', // Tiếng Hàn (Hàn Quốc)
   'ar': 'ar-XA', // Tiếng Ả Rập (Một mã chung, hoặc chọn cụ thể như ar-SA)
-  'fa': 'fa-IR', // Tiếng Ba Tư (Iran)
 };
 
 export const getBcp47LanguageCode = (lang: Language): string => {

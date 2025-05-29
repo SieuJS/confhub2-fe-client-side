@@ -305,7 +305,7 @@ export interface ConfirmationResultPayload {
 
 
 export type ChatMode = 'live' | 'regular';
-export type LanguageCode = 'en' | 'vi' | 'zh' | 'de' | 'fr' | 'es' | 'ru' | 'ja' | 'ko' | 'ar' | 'fa';
+export type LanguageCode = 'en' | 'vi' | 'zh' | 'de' | 'fr' | 'es' | 'ru' | 'ja' | 'ko' | 'ar' ;
 
 export interface LanguageOption {
     code: LanguageCode;

@@ -12,7 +12,7 @@ import {
   englishNavigationDeclaration,
   englishSendEmailToAdminDeclaration,
   englishOpenGoogleMapDeclaration,
-} from "../lib/functions";
+} from "../language/functions";
 
 import {
   LiveChatSessionConfig,
@@ -78,7 +78,7 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
       temperature: 0.7,
       topK: 40,
       topP: 0.95,
-      maxOutputTokens: 1024,
+      maxOutputTokens: 8192,
       // LUÔN BẬT INPUT AUDIO TRANSCRIPTION NẾU GIAO DIỆN CHO PHÉP NHẬP LIỆU ÂM THANH
       inputAudioTranscription: {}, // <--- ĐẢM BẢO DÒNG NÀY LUÔN CÓ
     };
@@ -143,7 +143,7 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
               try {
                 const resultFromHandler = await handler(fc, handlerConfig);
                 responsesForSDK.push({
-                  id: fc.id, // Luôn dùng fc.id để khớp với FunctionCall gốc
+                  id: fc.id,
                   name: fc.name,
                   response: resultFromHandler.response,
                 });
@@ -180,15 +180,23 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
       }
 
       if (responsesForSDK.length > 0) {
-        const toolResponseData: ToolResponsePayload = { functionResponses: responsesForSDK }; // <-- TẠO PAYLOAD
+        // Create the payload for sending.
+        // The inferred type of `payloadForSend` will be `{ functionResponses: SDKFunctionResponse[] }`
+        // because `responsesForSDK` is `SDKFunctionResponse[]`.
+        // This matches the expected parameter type of `sendToolResponse`.
+        const payloadForSend = { functionResponses: responsesForSDK };
 
-        console.log("[LiveChatAPIConfig] Sending tool responses:", JSON.stringify(toolResponseData, null, 2));
-        sendToolResponse(toolResponseData); // sendToolResponse vẫn nhận { functionResponses: ... }
+        console.log("[LiveChatAPIConfig] Sending tool responses:", JSON.stringify(payloadForSend, null, 2));
+        sendToolResponse(payloadForSend); // Now type-correct
+
+        // For logging, we can use the ToolResponsePayload type.
+        // This assignment is safe because `payloadForSend` is more specific than `ToolResponsePayload`.
+        const toolResponseDataForLog: ToolResponsePayload = payloadForSend;
 
         logToStore({
           date: new Date(),
           type: "client.toolResponseSent",
-          message: toolResponseData, // <-- LƯU TRỮ OBJECT PAYLOAD THỰC SỰ
+          message: toolResponseDataForLog, // This will be correct if StreamingLog.message includes ToolResponsePayload
           count: responsesForSDK.length
         });
       } else {
@@ -196,9 +204,6 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
       }
     };
 
-
-    // Chỉ đăng ký khi session thực sự tồn tại và các hàm on/off cũng đã sẵn sàng
-    // (on/off thường ổn định, nhưng session là yếu tố chính ở đây)
     if (session && typeof on === 'function' && typeof off === 'function') {
       console.log("[LiveChatAPIConfig] Session is available. Subscribing to 'toolcall' event.");
       on("toolcall", onToolCallCallback);
@@ -208,12 +213,8 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
       };
     } else {
       console.log("[LiveChatAPIConfig] Session not available or on/off not ready, not subscribing to 'toolcall'. Current session:", session);
-      // Không return gì cả, useEffect sẽ chạy lại khi session hoặc on/off thay đổi
     }
-    // Thêm session, on, off vào dependency array.
-    // sendToolResponse, currentLocale, logToStore cũng cần nếu chúng thay đổi và bạn muốn đăng ký lại.
-  }, [session, on, off, sendToolResponse, currentLocale, logToStore]); // QUAN TRỌNG: session, on, off ở đây
-
+  }, [session, on, off, sendToolResponse, currentLocale, logToStore]);
   return null;
 }
 

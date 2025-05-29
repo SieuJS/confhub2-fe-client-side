@@ -8,7 +8,7 @@ import {
 } from '@/src/app/[locale]/chatbot/lib/constants'; // Adjust path
 
 // --- Types for Settings Store ---
-export type LanguageCode = 'en' | 'vi' | 'zh' | 'de' | 'fr'| 'es'| 'ru' | 'ja'| 'ko'| 'ar'| 'fa';
+export type LanguageCode = 'en' | 'vi' | 'zh' | 'de' | 'fr'| 'es'| 'ru' | 'ja'| 'ko'| 'ar';
 export type ChatMode = 'live' | 'regular';
 export interface LanguageOption {
     code: LanguageCode;

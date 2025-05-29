@@ -10,7 +10,7 @@ import {
   formatItemsForModel,
   getUrlArg
 } from '../utils/api.helpers';
-import { websiteInfo } from "../../lib/functions"; // Assuming this is a data object
+import { websiteInfo } from "../../language/functions"; // Assuming this is a data object
 import { transformConferenceData } from '../../utils/transformApiData';
 // appConfig import seems to be missing, ensure it's correctly imported if used
 // import { appConfig } from "@/src/middleware"; // Uncomment and verify path if needed

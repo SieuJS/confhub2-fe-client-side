@@ -24,7 +24,7 @@ import ChatArea from './layout/ChatArea'
 import ChatInputBar from './layout/ChatInputBar'
 
 // Types and Constants
-import { getSystemInstructions } from '../lib/instructions'
+import { getSystemInstructions } from '../language/instructions'
 import { AudioRecorder } from './lib/audio-recorder' // Ensure this path is correct
 import { Language as AppLanguage, StreamingLog } from '../lib/live-chat.types'; // Added StreamingLog
 import { concatenateUint8Arrays } from './utils/audioUtils'; // Import the new helper

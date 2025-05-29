@@ -22,7 +22,6 @@ export const AVAILABLE_LANGUAGES_LIVE_CHAT: LiveChatLanguageOption[] = [
     { name: '日本語', code: 'ja', flagCode: 'jp' },
     { name: '한국어', code: 'ko', flagCode: 'kr' },
     { name: 'العربية', code: 'ar', flagCode: 'sa' },
-    { name: 'فارسی', code: 'fa', flagCode: 'ir' }
 ];
 
 export const DEFAULT_LANGUAGE_LIVE_CHAT: LiveChatLanguageCode = 'vi';
@@ -41,7 +40,6 @@ export const AVAILABLE_LANGUAGES_REGULAR_CHAT: RegularChatLanguageOption[] = [
     { name: '日本語', code: 'ja', flagCode: 'jp' },
     { name: '한국어', code: 'ko', flagCode: 'kr' },
     { name: 'العربية', code: 'ar', flagCode: 'sa' },
-    { name: 'فارسی', code: 'fa', flagCode: 'ir' }
 ];
 
 export const DEFAULT_LANGUAGE_REGULAR_CHAT: RegularChatLanguageOption = AVAILABLE_LANGUAGES_REGULAR_CHAT[0];
