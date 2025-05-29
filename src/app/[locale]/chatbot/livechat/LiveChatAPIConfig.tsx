@@ -12,6 +12,7 @@ import {
   englishNavigationDeclaration,
   englishSendEmailToAdminDeclaration,
   englishOpenGoogleMapDeclaration,
+  englishManageBlacklistDeclaration,
 } from "../language/functions";
 
 import {
@@ -102,6 +103,7 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
       englishNavigationDeclaration,
       englishManageFollowDeclaration,
       englishManageCalendarDeclaration,
+      englishManageBlacklistDeclaration,
       englishSendEmailToAdminDeclaration,
       englishOpenGoogleMapDeclaration,
     ];

@@ -240,27 +240,6 @@ GCJH is a comprehensive online platform designed to connect researchers, academi
 *   **AI Limitations:** A clear statement outlining the limitations of the AI chatbot. This includes the possibility that the chatbot may provide information that is not entirely accurate or complete, especially with AI-generated summaries. Always emphasize the importance of consulting and verifying information from official sources (conference/journal websites, organizers).`
 
 
-// // English
-// // --- New Function Declaration for Host Agent ---
-// export const englishRouteToAgentDeclaration: FunctionDeclaration = {
-//     name: "routeToAgent",
-//     description: "Routes a specific task to a designated specialist agent.",
-//     parameters: {
-//         type: Type.OBJECT,
-//         properties: {
-//             targetAgent: {
-//                 type: Type.STRING,
-//                 description: "The unique identifier of the specialist agent to route the task to (e.g., 'ConferenceAgent').",
-//             },
-//             taskDescription: {
-//                 type: Type.STRING,
-//                 description: "A details natural language description of the task for the target agent.",
-//             }
-//         },
-//         required: ["targetAgent", "taskDescription"],
-//     },
-// };
-
 export const englishGetConferencesDeclaration: FunctionDeclaration = {
     name: "getConferences",
     // Mô tả rõ mục đích là tạo query string
@@ -541,7 +520,6 @@ export const englishManageFollowDeclaration: FunctionDeclaration = {
     },
 };
 
-
 export const englishManageCalendarDeclaration: FunctionDeclaration = {
     name: "manageCalendar", // Hoặc tên hàm thực tế của bạn
     description: "Adds, removes, or lists conferences in the user's calendar.",
@@ -568,6 +546,37 @@ export const englishManageCalendarDeclaration: FunctionDeclaration = {
                 type: Type.STRING,
                 description: "The type of the identifier. Required for 'add'/'remove'.",
                 format: 'enum',
+                enum: ["acronym", "title", "id"],
+            },
+        },
+        required: ["itemType", "action"],
+    },
+};
+
+
+export const englishManageBlacklistDeclaration: FunctionDeclaration = {
+    name: "manageBlacklist",
+    description: "Adds, removes, or lists conferences in the user's blacklist.",
+    parameters: {
+        type: Type.OBJECT,
+        properties: {
+            itemType: {
+                type: Type.STRING,
+                description: "The type of item. Must be 'conference' for blacklist actions.",
+                enum: ["conference"]
+            },
+            action: {
+                type: Type.STRING,
+                description: "The desired action: 'add', 'remove', or 'list'.",
+                enum: ["add", "remove", "list"]
+            },
+            identifier: { // Optional when action is 'list'
+                type: Type.STRING,
+                description: "A unique identifier for the conference. Required for 'add'/'remove'.",
+            },
+            identifierType: { // Optional when action is 'list'
+                type: Type.STRING,
+                description: "The type of the identifier. Required for 'add'/'remove'.",
                 enum: ["acronym", "title", "id"],
             },
         },
