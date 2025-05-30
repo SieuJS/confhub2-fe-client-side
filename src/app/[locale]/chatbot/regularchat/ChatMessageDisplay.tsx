@@ -1,33 +1,37 @@
 // src/app/[locale]/chatbot/regularchat/ChatMessageDisplay.tsx
 import React from 'react';
 import {
-  MessageType,
+  MessageType, // This should be ChatMessageType['type']
   ThoughtStep,
-  FrontendAction
+  FrontendAction,
+  ChatMessageType // <<< IMPORT ChatMessageType for files/botFiles
 } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
 import { TriangleAlert } from 'lucide-react';
 import ThoughtProcess from './ThoughtProcess';
 import { useSettingsStore } from '../stores';
 import { useShallow } from 'zustand/react/shallow';
 
-// Import Hooks
-import { useMessageEditing } from '@/src/hooks/regularchat/useMessageEditing'; // Adjust path
-import { useMessageCopy } from '@/src/hooks/regularchat/useMessageCopy';     // Adjust path
-import { useMessageBubbleLogic } from '@/src/hooks/regularchat/useMessageBubbleLogic'; // Adjust path
+import { useMessageEditing } from '@/src/hooks/regularchat/useMessageEditing';
+import { useMessageCopy } from '@/src/hooks/regularchat/useMessageCopy';
+import { useMessageBubbleLogic } from '@/src/hooks/regularchat/useMessageBubbleLogic';
 
-// Impor.
-import EditMessageForm from './EditMessageForm';         // Adjust path
-import MessageContentRenderer from './MessageContentRenderer'; // Adjust path
-import MessageActionsBar from './MessageActionsBar';       // Adjust path
-
+import EditMessageForm from './EditMessageForm';
+import MessageContentRenderer from './MessageContentRenderer'; // This will need significant updates
+import MessageActionsBar from './MessageActionsBar';
+import { Part } from '@google/genai';
 interface ChatMessageDisplayProps {
   id: string;
-  message: string; // Renamed back to message, initialMessage was for internal state
+  // message: string; // <<< OLD: Remove this
+  text?: string; // <<< NEW: Primary textual content
+  parts?: Part[]; // <<< NEW: For multimodal content
+  files?: ChatMessageType['files']; // <<< NEW: User uploaded files
+  botFiles?: ChatMessageType['botFiles']; // <<< NEW: Bot sent files
   isUser: boolean;
-  type: MessageType;
+  type: MessageType; // This is ChatMessageType['type']
   thoughts?: ThoughtStep[];
   location?: string;
   action?: FrontendAction;
+  timestamp?: string | Date; // <<< NEW: Add timestamp
   isInsideSmallContainer?: boolean;
   isLatestUserMessage: boolean;
   onConfirmEdit: (messageId: string, newText: string) => void;
@@ -35,12 +39,16 @@ interface ChatMessageDisplayProps {
 
 const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
   id,
-  message, // Use 'message' as the prop name for the current message content
+  text, // <<< USE text
+  parts, // <<< USE parts
+  files, // <<< USE files
+  botFiles, // <<< USE botFiles
   isUser,
-  type = 'text',
+  type = 'text', // Default type
   thoughts,
   location,
   action,
+  timestamp, // <<< USE timestamp
   isInsideSmallContainer = false,
   isLatestUserMessage,
   onConfirmEdit,
@@ -50,6 +58,10 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
       isThoughtProcessHiddenInFloatingChat: state.isThoughtProcessHiddenInFloatingChat,
     }))
   );
+
+  // The primary text content for editing and copying should come from `text` prop.
+  // If `text` is undefined (e.g., a message with only an image), provide a fallback.
+  const primaryTextContent = text || (parts?.find(p => p.text)?.text) || "";
 
   const {
     isEditing,
@@ -62,17 +74,17 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
     handleKeyDown,
   } = useMessageEditing({
     messageId: id,
-    initialMessage: message, // Pass current message as initialMessage to the hook
+    initialMessage: primaryTextContent, // <<< USE primaryTextContent
     isUser,
     isLatestUserMessage,
     onConfirmEdit,
   });
 
-  const { isCopied, handleCopy } = useMessageCopy(message); // Use current message for copy
+  const { isCopied, handleCopy } = useMessageCopy(primaryTextContent); // <<< USE primaryTextContent
 
   const { bubbleRef, bubbleClasses } = useMessageBubbleLogic({
     id,
-    initialMessage: message,
+    initialMessage: primaryTextContent, // <<< USE primaryTextContent (or consider full parts for logic if needed)
     isUser,
     type,
     isInsideSmallContainer,
@@ -83,10 +95,6 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
     thoughts &&
     thoughts.length > 0 &&
     (!isInsideSmallContainer || (isInsideSmallContainer && !isThoughtProcessHiddenInFloatingChat));
-
-  // Event handlers for MessageActionsBar (need to be defined here or passed directly from hooks)
-  // We can pass hook functions directly to MessageActionsBar if their signatures match.
-  // For example, `startEdit` from `useMessageEditing` can be `onStartEdit`.
 
   const handleEditButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -100,6 +108,8 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
     event.stopPropagation();
     cancelEdit();
   };
+
+  // TODO: Add rendering for timestamp, e.g., below the message content or on hover
 
   return (
     <div ref={bubbleRef} className={bubbleClasses}>
@@ -119,28 +129,42 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
         />
       ) : (
         <MessageContentRenderer
-          message={message} // Pass current message
+          // Pass all necessary props for rendering multimodal content
+          text={text}
+          parts={parts}
+          files={files}
+          botFiles={botFiles}
           type={type}
           location={location}
           action={action}
+          // Consider passing isUser if rendering differs for user vs bot images/files
         />
       )}
 
       <MessageActionsBar
         isUser={isUser}
         isLatestUserMessage={isLatestUserMessage}
-        messageType={type}
+        messageType={type} // Pass the message type
         isEditing={isEditing}
         isCopied={isCopied}
         onCopy={handleCopy}
-        onStartEdit={handleEditButtonClick} // Pass the wrapper or directly `startEdit`
-        onConfirmEdit={handleConfirmEditClick} // Pass the wrapper or directly `confirmEdit`
-        onCancelEdit={handleCancelEditClick} // Pass the wrapper or directly `cancelEdit`
+        onStartEdit={handleEditButtonClick}
+        onConfirmEdit={handleConfirmEditClick}
+        onCancelEdit={handleCancelEditClick}
+        // Disable editing for non-text messages or messages with files for now
+        // Or allow editing only the text part if `text` is present.
+        canEditText={type === 'text' || (type === 'multimodal' && !!text)}
       />
 
       {shouldShowThoughtProcess && (
         <div className='mt-2 border-t border-black/10 pt-1.5 sm:mt-3 sm:pt-2 dark:border-white/20'>
           <ThoughtProcess thoughts={thoughts} />
+        </div>
+      )}
+       {/* Optional: Display timestamp */}
+       {timestamp && (
+        <div className={`text-xs mt-1 ${isUser ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400 dark:text-gray-500'} ${isUser ? 'text-right' : 'text-left'}`}>
+          {new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
         </div>
       )}
     </div>

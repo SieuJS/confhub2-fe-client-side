@@ -140,6 +140,8 @@ export function useChatSocketManager() {
         if (!socketInstanceRef.current) {
             console.log(`[SocketManager Connect Effect] Attempting to create socket instance. Token for auth: ${currentAuthToken ? 'VALID' : 'NULL'}`);
 
+    
+
             const newSocket = io(socketIoBaseUrl, {
                 // ... (options của socket giữ nguyên)
                 reconnectionAttempts: 5,

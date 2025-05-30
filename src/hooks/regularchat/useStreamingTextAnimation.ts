@@ -2,9 +2,9 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 
 const ANIMATION_INTERVAL_MS = 10;
-const MIN_CHARS_PER_INTERVAL = 10;
-const MAX_CHARS_PER_INTERVAL = 20;
-const EASING_THRESHOLD_CHARS = MAX_CHARS_PER_INTERVAL * 1.5; // ~30 chars
+const MIN_CHARS_PER_INTERVAL = 20;
+const MAX_CHARS_PER_INTERVAL = 30;
+const EASING_THRESHOLD_CHARS = MAX_CHARS_PER_INTERVAL * 2.5; // ~30 chars
 
 export interface StreamingTextAnimationConfig {
     animationIntervalMs?: number;

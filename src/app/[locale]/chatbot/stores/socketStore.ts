@@ -5,6 +5,7 @@ import { Socket } from 'socket.io-client';
 import { useMessageStore } from './messageStore';
 import { useUiStore } from './uiStore';
 import { EditUserMessagePayload, PersonalizationPayload } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // <<< NEW
+import { Part } from "@google/genai"; // <<< IMPORT Part
 
 // --- Types for Socket Store State ---
 export interface SocketStoreState {
@@ -17,13 +18,14 @@ export interface SocketStoreState {
     hasFatalConnectionError: boolean;
 }
 
-export interface SendMessagePayload { // Example, if you have a specific type for sendMessage
-    userInput: string;
+export interface SendMessagePayload { // This is the type for emitSendMessage
+    // userInput: string; // OLD
+    parts: Part[]; // <<< NEW: The actual content to send to the model
     isStreaming: boolean;
-    language: string; // Or LanguageCode
+    language: string;
     conversationId: string | null;
-    frontendMessageId: string;
-    personalizationData?: PersonalizationPayload | null; // <<< ADDED
+    frontendMessageId: string; // ID of the user's message in the UI
+    personalizationData?: PersonalizationPayload | null;
 }
 
 export interface SocketStoreActions {
@@ -216,15 +218,17 @@ export const useSocketStore = create<SocketStoreState & SocketStoreActions>()(
                     socketRef.current.emit('pin_conversation', { conversationId, isPinned });
                 }
             },
-            emitSendMessage: (payload) => {
+            emitSendMessage: (payload) => { // payload is already of type SendMessagePayload
                 const { socketRef, isConnected, isServerReadyForCommands } = get();
                 if (!socketRef.current || !isConnected || !isServerReadyForCommands) {
                     useUiStore.getState().handleError({ message: "Cannot send message: Not connected or server not ready.", type: 'error' }, false, false);
                     return;
                 }
-                console.log(`[SocketStore] Emitting 'send_message'. ConvID: ${payload.conversationId}, Lang: ${payload.language}, Stream: ${payload.isStreaming}. Socket ID: ${socketRef.current?.id}. User Info: ${payload.personalizationData}`);
-                socketRef.current.emit('send_message', payload);
+                // Log the parts to verify
+                console.log(`[SocketStore] Emitting 'send_message'. ConvID: ${payload.conversationId}, Lang: ${payload.language}, Stream: ${payload.isStreaming}. Parts:`, payload.parts);
+                socketRef.current.emit('send_message', payload); // Backend will receive the payload with `parts`
             },
+
             emitEditUserMessage: (payload) => {
                 const { socketRef, isConnected, isServerReadyForCommands } = get();
                 if (!socketRef.current || !isConnected || !isServerReadyForCommands) {

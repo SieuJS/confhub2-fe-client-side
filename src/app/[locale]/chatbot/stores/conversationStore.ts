@@ -8,6 +8,7 @@ import {
 import { useMessageStore } from './messageStore';
 import { useSocketStore } from './socketStore';
 import { useUiStore } from './uiStore';
+import { HistoryItem, ChatMessageType } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
 
 // Define default titles for fallback on frontend if needed (though backend should provide it)
 const FE_DEFAULT_TITLES: { [key: string]: string } = {
@@ -15,6 +16,55 @@ const FE_DEFAULT_TITLES: { [key: string]: string } = {
     vi: "Cuộc trò chuyện mới",
 };
 const FE_FALLBACK_DEFAULT_TITLE = "New Chat";
+
+// Helper function để map (nếu cần, hoặc có thể làm inline)
+function mapBackendHistoryItemToFrontendChatMessage(backendItem: HistoryItem): ChatMessageType {
+    // backendItem.parts là Part[]
+    const textContent = backendItem.parts?.find(p => p.text)?.text ||
+        (backendItem.parts?.some(p => p.inlineData || p.fileData) ? `[${backendItem.parts.length} parts content]` : "");
+
+    let messageType: ChatMessageType['type'] = 'text';
+    const botFilesForDisplay: ChatMessageType['botFiles'] = [];
+    let hasNonTextPart = false;
+
+    backendItem.parts?.forEach(part => {
+        if (part.fileData) {
+            const mimeType = part.fileData.mimeType || 'application/octet-stream';
+            botFilesForDisplay.push({ uri: part.fileData.fileUri, mimeType: mimeType });
+            hasNonTextPart = true;
+        } else if (part.inlineData) {
+            if (part.inlineData.data && part.inlineData.mimeType) {
+                botFilesForDisplay.push({
+                    mimeType: part.inlineData.mimeType,
+                    inlineData: {
+                        data: part.inlineData.data,
+                        mimeType: part.inlineData.mimeType
+                    }
+                });
+                hasNonTextPart = true;
+            }
+        }
+    });
+
+    if (hasNonTextPart) {
+        messageType = 'multimodal';
+    }
+    // TODO: Logic để xác định messageType dựa trên action (ví dụ: 'map') nếu có action trong backendItem.parts
+    // (Hiện tại HistoryItem không có trường 'action' trực tiếp, nó nằm trong Part.functionCall/Response)
+
+    return {
+        id: backendItem.uuid || `msg-${Date.now()}-${Math.random()}`, // Đảm bảo có id
+        role: backendItem.role, // Giữ lại role nếu ChatMessageType có
+        parts: backendItem.parts, // Giữ lại parts gốc
+        text: textContent,
+        isUser: backendItem.role === 'user',
+        type: messageType,
+        timestamp: backendItem.timestamp || new Date().toISOString(),
+        thoughts: undefined, // backendItem không có thoughts trực tiếp, thoughts thường đi kèm ResultUpdate
+        botFiles: botFilesForDisplay.length > 0 ? botFilesForDisplay : undefined,
+        // files: undefined, // 'files' trong ChatMessageType là cho file người dùng gửi, không áp dụng ở đây
+    };
+}
 
 
 // --- Types for Conversation Store State ---
@@ -278,26 +328,27 @@ export const useConversationStore = create<ConversationStoreState & Conversation
                 }, false, '_onSocketConversationList');
             },
 
-            _onSocketInitialHistory: (payload) => {
-                // Khi initial history của một conversation cụ thể được load,
-                // ta có thể chắc chắn set isLoadingHistory = false và isHistoryLoaded = true.
+              _onSocketInitialHistory: (payload: InitialHistoryPayload) => { // payload.messages là ChatHistoryItem[] từ backend
+                // Lấy actions từ messageStore
+                const { setChatMessages, setLoadingState } = useMessageStore.getState();
+
+                // Cập nhật state của conversationStore
                 set({
-                    isLoadingHistory: false,
+                    isLoadingHistory: false, // Đã sửa: không dùng get() ở đây
                     activeConversationId: payload.conversationId,
                     isHistoryLoaded: true,
                 }, false, `_onSocketInitialHistory/${payload.conversationId}`);
 
-                useMessageStore.getState().setChatMessages(Array.isArray(payload.messages) ? payload.messages : []);
+                // Map ChatHistoryItem[] từ backend sang ChatMessageType[] của frontend
+                const frontendMessages: ChatMessageType[] = Array.isArray(payload.messages)
+                    ? payload.messages.map(mapBackendHistoryItemToFrontendChatMessage)
+                    : [];
 
-                const messagesFromBackend = Array.isArray(payload.messages) ? payload.messages : [];
-                console.log('[ConversationStore _onSocketInitialHistory] Payload messages from backend:', JSON.parse(JSON.stringify(messagesFromBackend.map(m => ({ id: m.id, text: m.message?.substring(0, 20), isUser: m.isUser })))));
-                useMessageStore.getState().setChatMessages(messagesFromBackend); // <--- Quan trọng
-                // Log state của messageStore sau khi cập nhật
-                const currentChatMessages = useMessageStore.getState().chatMessages;
-                console.log('[ConversationStore _onSocketInitialHistory] messageStore.chatMessages AFTER update:', JSON.parse(JSON.stringify(currentChatMessages.map(m => ({ id: m.id, text: m.message?.substring(0, 20), isUser: m.isUser })))));
-
-                useMessageStore.getState().setLoadingState({ isLoading: false, step: 'history_loaded', message: '' });
+                // Gọi actions của messageStore
+                setChatMessages(frontendMessages);
+                setLoadingState({ isLoading: false, step: 'history_loaded', message: '' });
             },
+
             _onSocketNewConversationStarted: (payload) => { // << MODIFIED: Payload includes title
                 console.log(`[ConversationStore _onSocketNewConversationStarted] New Conversation ID: ${payload.conversationId}. Title: "${payload.title}". Explicit flow: ${get().isProcessingExplicitNewChat}`);
                 set(state => {

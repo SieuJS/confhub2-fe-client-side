@@ -160,8 +160,20 @@ export const useMessageActions = () => {
 
 export const useUpdateChatMessageCallbackForAnimation = () => {
     const storeUpdateMessageById = useMessageStore(state => state.updateMessageById);
-    return useCallback((messageId: string, newContent: string) => {
-        storeUpdateMessageById(messageId, (prevMsg) => ({ ...prevMsg, message: newContent, timestamp: new Date().toISOString() }));
+
+    return useCallback((messageId: string, newFullDisplayText: string) => {
+        // newFullDisplayText ở đây là TOÀN BỘ nội dung text cần hiển thị
+        // được gửi từ useStreamingTextAnimation.
+        // Chúng ta sẽ GHI ĐÈ trường 'text' bằng nội dung này.
+        storeUpdateMessageById(messageId, (prevMsg) => {
+            return {
+                ...prevMsg,
+                text: newFullDisplayText, // <<< SỬA Ở ĐÂY: Ghi đè bằng nội dung đầy đủ mới
+                // Cân nhắc việc cập nhật timestamp ở đây nếu muốn nó phản ánh lần cập nhật cuối cùng của animation
+                // Hoặc chỉ cập nhật khi _onSocketChatResult.
+                // timestamp: new Date().toISOString()
+            };
+        });
     }, [storeUpdateMessageById]);
 };
 

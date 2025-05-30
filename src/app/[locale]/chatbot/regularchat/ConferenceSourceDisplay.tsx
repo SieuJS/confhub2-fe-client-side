@@ -1,9 +1,10 @@
 // src/app/[locale]/chatbot/regularchat/ConferenceSourceDisplay.tsx
 import React, {useState} from 'react';
 import { Link } from '@/src/navigation'; // Sử dụng Link từ next-intl/navigation
-import { ExternalLink, CalendarDays, MapPin, Award, Info, ChevronDown, ChevronUp } from 'lucide-react'; // <<< Thêm ChevronDown, ChevronUp
+import { ExternalLink, CalendarDays, MapPin, Award, Info, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import { DisplayConferenceSourcesPayload } from '../lib/regular-chat.types';
+import type { AppPathname } from '@/src/navigation'; // Import AppPathname for clarity if needed, though not strictly necessary for the fix itself
 
 interface ConferenceSourceDisplayProps {
   payload: DisplayConferenceSourcesPayload;
@@ -11,15 +12,24 @@ interface ConferenceSourceDisplayProps {
 
 const ConferenceSourceCard: React.FC<DisplayConferenceSourcesPayload['conferences'][0]> = (conference) => {
   const t = useTranslations('Chatbot'); // Namespace cho translations
-  const locale = useLocale(); // Lấy locale hiện tại
+  // const locale = useLocale(); // locale is not used in this component, can be removed if not needed elsewhere
 
-  const detailUrl = `/conferences/detail?id=${conference.id}`;
+  // Remove the old detailUrl string construction:
+  // const detailUrl = `/conferences/detail?id=${conference.id}`;
 
+  // Define the pathname that matches your pathnames configuration
+  const detailPathname: AppPathname = '/conferences/detail';
 
-    return (
+  return (
     <div className="mb-2 rounded-lg border border-gray-200 bg-white p-3 shadow-sm transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600">
       <h4 className="mb-1.5 text-sm font-semibold text-blue-600 dark:text-blue-400">
-        <Link href={detailUrl} className="hover:underline">
+        <Link
+          href={{
+            pathname: detailPathname,
+            query: { id: conference.id.toString() }, // Ensure id is a string for query params
+          }}
+          className="hover:underline"
+        >
           {conference.title} {conference.acronym && `(${conference.acronym})`}
         </Link>
       </h4>
@@ -47,7 +57,10 @@ const ConferenceSourceCard: React.FC<DisplayConferenceSourcesPayload['conference
       </div>
       <div className="mt-2.5 flex justify-end">
         <Link
-          href={detailUrl}
+          href={{
+            pathname: detailPathname,
+            query: { id: conference.id.toString() }, // Ensure id is a string for query params
+          }}
           className="inline-flex items-center rounded-md bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:focus:ring-offset-gray-850"
         >
           {t('View_Details')}
@@ -58,12 +71,12 @@ const ConferenceSourceCard: React.FC<DisplayConferenceSourcesPayload['conference
   );
 };
 
-
-const MAX_INITIAL_DISPLAY_SOURCES = 1; // Số lượng item hiển thị ban đầu khi thu hẹp
+// ... rest of the ConferenceSourceDisplay component remains the same
+const MAX_INITIAL_DISPLAY_SOURCES = 1;
 
 const ConferenceSourceDisplay: React.FC<ConferenceSourceDisplayProps> = ({ payload }) => {
   const t = useTranslations('Chatbot');
-  const [isExpanded, setIsExpanded] = useState(false); // <<< State để quản lý trạng thái mở rộng
+  const [isExpanded, setIsExpanded] = useState(false);
 
   if (!payload || !payload.conferences || payload.conferences.length === 0) {
     return null;
@@ -85,21 +98,19 @@ const ConferenceSourceDisplay: React.FC<ConferenceSourceDisplayProps> = ({ paylo
           {payload.title}
         </p>
       )}
-      {/* Container cho các card, không cần scroll ở đây nữa nếu isExpanded=false */}
       <div className={`space-y-1 ${!isExpanded && totalConferences > MAX_INITIAL_DISPLAY_SOURCES ? 'overflow-hidden' : ''}`}>
         {conferencesToDisplay.map((conf) => (
           <ConferenceSourceCard key={conf.id} {...conf} />
         ))}
       </div>
 
-      {/* Nút Expand/Narrow */}
       {canToggle && (
         <div className="mt-2 flex justify-center">
           <button
             onClick={toggleExpand}
             className="flex items-center rounded-md px-3 py-1.5 text-xs font-medium text-sky-600 hover:bg-sky-100 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-1 dark:text-sky-400 dark:hover:bg-sky-800 dark:focus:ring-offset-sky-900/30"
             aria-expanded={isExpanded}
-            aria-controls="conference-source-list" // ID cho vùng nội dung được expand/collapse
+            aria-controls="conference-source-list"
           >
             {isExpanded ? (
               <>

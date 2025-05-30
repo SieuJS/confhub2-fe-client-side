@@ -103,16 +103,6 @@ const defaultIntroductions: Record<Language, IntroductionContent> = {
       'أريد أن أعرف عن مؤتمرات البلوك تشين في أوروبا.',
     ],
   },
-  fa: { // Persian added
-    greeting: 'سلام',
-    description:
-      'من یک ربات چت دستیار برای یافتن اطلاعات کنفرانس هستم. برای شروع سوالی بپرسید یا یکی از پیشنهادات زیر را انتخاب کنید:',
-    suggestions: [
-      'چند کنفرانس هوش مصنوعی در آسیا را لیست کن.',
-      'کنفرانس های بیگ دیتا امسال (2025) را پیدا کن.',
-      'می خواهم درباره کنفرانس های بلاک چین در اروپا بدانم.',
-    ],
-  },
   fr: { // French added
     greeting: 'Bonjour',
     description:
@@ -211,15 +201,7 @@ const findInfoIntroductions: IntroductionType = {
         'أريد أن أعرف عن مؤتمرات البلوك تشين في أوروبا.',
       ],
     },
-    fa: { // Persian added
-      greeting: 'سلام',
-      description: 'من اینجا هستم تا به شما در یافتن اطلاعات کنفرانس کمک کنم. این پیشنهاد را امتحان کنید:',
-      suggestions: [
-        'چند کنفرانس هوش مصنوعی در آسیا را لیست کن.',
-        'کنفرانس های بیگ دیتا امسال (2025) را پیدا کن.',
-        'می خواهم درباره کنفرانس های بلاک چین در اروپا بدانم.',
-      ],
-    },
+
     fr: { // French added
       greeting: 'Bonjour',
       description: 'Je suis là pour vous aider à trouver des informations sur les conférences. Essayez cette suggestion :',
@@ -316,15 +298,7 @@ const redirectToWebsiteIntroductions: IntroductionType = {
         'افتح موقع الويب الخاص بـ "RAID".',
       ],
     },
-    fa: { // Persian added
-      greeting: 'سلام',
-      description: 'نیاز به بازدید از وب سایت کنفرانس دارید؟ از من بپرسید!',
-      suggestions: [
-        'به وب سایت "International Joint Conference on Knowledge Discovery, Knowledge Engineering and Knowledge Management" بروید.',
-        'مرا به سایت رسمی "AAAI" هدایت کنید.',
-        'وب سایت "RAID" را باز کنید.',
-      ],
-    },
+
     fr: { // French added
       greeting: 'Bonjour',
       description: 'Besoin de visiter le site web d\'une conférence ? Demandez-moi !',
@@ -421,15 +395,7 @@ const openMapIntroductions: IntroductionType = {
         'افتح خريطة "SIGIR".',
       ],
     },
-    fa: { // Persian added
-      greeting: 'سلام',
-      description: 'می خواهید مکان یک کنفرانس را پیدا کنید؟ می توانم کمک کنم!',
-      suggestions: [
-        'مکان "SERA" را در نقشه گوگل نشان بده.',
-        'محل برگزاری "ACM International Symposium on Computer Architecture" کجا واقع شده است؟',
-        'نقشه "SIGIR" را باز کن.',
-      ],
-    },
+
     fr: { // French added
       greeting: 'Bonjour',
       description: 'Vous voulez trouver l\'emplacement d\'une conférence ? Je peux vous aider !',
@@ -526,15 +492,7 @@ const contactAdminIntroductions: IntroductionType = {
         'أرسل ملاحظات للمسؤول.',
       ],
     },
-    fa: { // Persian added
-      greeting: 'سلام',
-      description: 'نیاز به تماس با مدیر یا گزارش مشکل دارید؟ به من اطلاع دهید.',
-      suggestions: [
-        'چگونه می توانم با مدیر تماس بگیرم؟',
-        'می خواهم مشکلی را گزارش کنم.',
-        'ارسال بازخورد به مدیر.',
-      ],
-    },
+
     fr: { // French added
       greeting: 'Bonjour',
       description: 'Besoin de contacter l\'administrateur ou de signaler un problème ? Faites-le moi savoir.',
@@ -631,15 +589,7 @@ const followUnfollowIntroductions: IntroductionType = {
         'أظهر لي المؤتمرات التي ألغيت متابعتها.', // مثال، قد لا يكون مطبقًا
       ],
     },
-    fa: { // Persian added
-      greeting: 'سلام',
-      description: 'کنفرانس های دنبال شده خود را در اینجا مدیریت کنید:',
-      suggestions: [
-        'کنفرانس هایی که دنبال می کنم را لیست کن.',
-        'چگونه یک کنفرانس را دنبال کنم؟',
-        'کنفرانس هایی که لغو دنبال کردن کرده ام را نشان بده.', // مثال، ممکن است پیاده سازی نشده باشد
-      ],
-    },
+
     fr: { // French added
       greeting: 'Bonjour',
       description: 'Gérez vos conférences suivies ici :',
@@ -736,15 +686,7 @@ const calendarIntroductions: IntroductionType = {
         'إزالة "مؤتمر IC3K" من تقويمي.',
       ],
     },
-    fa: { // Persian added
-      greeting: 'سلام',
-      description: 'تقویم کنفرانس خود را مدیریت کنید:',
-      suggestions: [
-        '"کنفرانس AAAI" را به تقویم من اضافه کن.',
-        'تقویم کنفرانس من را نشان بده.',
-        '"کنفرانس IC3K" را از تقویم من حذف کن.',
-      ],
-    },
+
     fr: { // French added
       greeting: 'Bonjour',
       description: 'Gérez votre calendrier de conférences :',
@@ -842,15 +784,7 @@ const learnWebsiteIntroductions: IntroductionType = {
         'هل يوجد قسم مساعدة للموقع؟',
       ],
     },
-    fa: { // Persian added
-      greeting: 'سلام',
-      description: 'می خواهید درباره این وب سایت بیشتر بدانید؟ از من بپرسید!',
-      suggestions: [
-        'این وب سایت چه ویژگی هایی دارد؟',
-        'این وب سایت توسط چه کسی توسعه یافته است؟',
-        'آیا بخشی برای راهنمایی در وب سایت وجود دارد؟',
-      ],
-    },
+
     fr: { // French added
       greeting: 'Bonjour',
       description: 'Vous voulez en savoir plus sur ce site web ? Demandez-moi !',
@@ -966,8 +900,8 @@ const ChatIntroductionDisplay: React.FC<ChatIntroductionProps> = ({
       {displayedIntroductions.map((intro, index) => {
         return (
           <div key={index} className="mb-4 last:mb-0">
-             {/* You could display the type title here if desired */}
-             {/* <h3 className="text-base font-medium mb-2">{intro.type}</h3> */}
+            {/* You could display the type title here if desired */}
+            {/* <h3 className="text-base font-medium mb-2">{intro.type}</h3> */}
             <p className='mb-3 text-sm  sm:mb-4'>{intro.description}</p>
             <div className='flex flex-wrap justify-center gap-1.5 sm:gap-2'>
               {/* Only display the single random suggestion */}

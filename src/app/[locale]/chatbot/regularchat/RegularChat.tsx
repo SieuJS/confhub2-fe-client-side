@@ -6,9 +6,9 @@ import ChatInput from './ChatInput';
 import LoadingIndicator from './LoadingIndicator';
 import EmailConfirmationDialog from '../EmailConfirmationDialog';
 import ConversationToolbar from './ConversationToolbar';
-import ChatArea from './ChatArea'; // Component con mới
+import ChatArea from './ChatArea';
 import { useTimer } from '@/src/hooks/regularchat/useTimer';
-import { useChatInteractions } from '@/src/hooks/regularchat/useChatInteractions'; // Hook mới
+import { useChatInteractions } from '@/src/hooks/regularchat/useChatInteractions';
 import { useTranslations } from 'next-intl';
 import {
   useChatSettingsState,
@@ -20,7 +20,7 @@ import {
   useConversationListState,
 } from '@/src/app/[locale]/chatbot/stores/storeHooks';
 import { useSettingsStore } from '@/src/app/[locale]/chatbot/stores';
-import { useMessageStore } from '@/src/app/[locale]/chatbot/stores/messageStore'; // << IMPORT TRỰC TIẾP useMessageStore
+import { useMessageStore } from '@/src/app/[locale]/chatbot/stores/messageStore';
 
 interface RegularChatProps {
   isSmallContext?: boolean;
@@ -29,30 +29,22 @@ interface RegularChatProps {
 function RegularChat({ isSmallContext = false }: RegularChatProps) {
   const t = useTranslations();
 
-  // --- Lấy state từ các store ---
   const { currentLanguage } = useChatSettingsState();
   const isConversationToolbarHiddenInFloatingChat = useSettingsStore(
     state => state.isConversationToolbarHiddenInFloatingChat
   );
-
-  // Lấy editingMessageId từ messageStore
   const editingMessageId = useMessageStore(state => state.editingMessageId);
-
-
   const { chatMessages, loadingState: messageLoadingState } = useChatMessageState();
   const { isConnected, socketId } = useSocketConnectionStatus();
   const { showConfirmationDialog, confirmationData } = useUIState();
   const { handleConfirmSend, handleCancelSend, setShowConfirmationDialog } = useUIActions();
   const { activeConversationId } = useActiveConversationState();
   const { isLoadingHistory } = useConversationListState();
-
-  // --- State và Hooks cục bộ ---
   const { timeCounter, startTimer, stopTimer } = useTimer();
   const [hasChatStarted, setHasChatStarted] = useState<boolean>(false);
 
-
   const {
-    handleSendNewMessage,
+    handleSendNewFilesAndMessage,
     handleConfirmEdit,
     handleSetFillInput,
     handleSuggestionClick,
@@ -61,15 +53,12 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
     startTimer: startTimer,
   });
 
-  // --- useEffects ---
   useEffect(() => {
-    // Dừng timer khi loading hoàn tất hoặc dialog xác nhận hiện ra
     if ((!messageLoadingState.isLoading || showConfirmationDialog) && timeCounter !== '0.0s') {
       stopTimer();
     }
   }, [messageLoadingState.isLoading, showConfirmationDialog, stopTimer, timeCounter]);
 
-  // --- Logic tính toán điều kiện hiển thị ---
   const showIntroduction = !activeConversationId && chatMessages.length === 0 && !isLoadingHistory;
   const shouldShowToolbar = activeConversationId && (!isSmallContext || (isSmallContext && !isConversationToolbarHiddenInFloatingChat));
   const showLoadingIndicator = (messageLoadingState.isLoading || isLoadingHistory) && !showConfirmationDialog;
@@ -77,6 +66,11 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
   const handleDialogClose = useCallback(() => {
     setShowConfirmationDialog(false, null);
   }, [setShowConfirmationDialog]);
+
+  // Find the original text of the message being edited
+  const messageToEditText = editingMessageId
+    ? chatMessages.find(msg => msg.id === editingMessageId)?.text || '' // <<< CHANGED .message to .text
+    : '';
 
   return (
     <div className='bg-white-pure relative mx-auto flex h-full w-full flex-col overflow-hidden border border-gray-200 shadow-lg dark:bg-gray-850 dark:border-gray-700'>
@@ -93,12 +87,12 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
         </div>
       </div>
 
-      {/* Conversation Toolbar (nếu có active conversation và không bị ẩn) */}
+      {/* Conversation Toolbar */}
       {shouldShowToolbar && <ConversationToolbar />}
 
-      {/* Khu vực hiển thị chat chính */}
+      {/* Chat Area */}
       <ChatArea
-        messages={chatMessages}
+        messages={chatMessages} // Pass the full chatMessages array
         showIntroduction={showIntroduction}
         isSmallContext={isSmallContext}
         languageCode={currentLanguage.code}
@@ -107,7 +101,7 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
         onConfirmEdit={handleConfirmEdit}
       />
 
-      {/* Footer Area: Loading Indicator and Chat Input */}
+      {/* Loading Indicator */}
       {showLoadingIndicator && (
         <div className='flex-shrink-0 border-t border-gray-200 px-3 py-1.5 sm:px-4 sm:py-2 dark:border-gray-700 dark:bg-gray-800'>
           <LoadingIndicator
@@ -118,21 +112,27 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
         </div>
       )}
 
+      {/* Chat Input Area */}
       <div className='flex-shrink-0 border-t border-gray-200 p-1 sm:p-2 md:p-3 dark:border-gray-700 dark:bg-gray-800'>
         <ChatInput
-          onSendMessage={handleSendNewMessage}
+          onSendFilesAndMessage={
+            editingMessageId
+              ? (newText, _files) => handleConfirmEdit(editingMessageId, newText)
+              : handleSendNewFilesAndMessage
+          }
           disabled={
             messageLoadingState.isLoading ||
             isLoadingHistory ||
             !isConnected ||
-            showConfirmationDialog ||
-            !!editingMessageId // << THÊM ĐIỀU KIỆN NÀY: disable nếu có tin nhắn đang được edit
+            showConfirmationDialog
           }
           onRegisterFillFunction={handleSetFillInput}
+          isEditing={!!editingMessageId}
+          initialEditText={messageToEditText} // Pass the correctly retrieved text
         />
       </div>
 
-      {/* Dialog xác nhận email (nếu cần) */}
+      {/* Email Confirmation Dialog */}
       <EmailConfirmationDialog
         isOpen={showConfirmationDialog}
         data={confirmationData}
