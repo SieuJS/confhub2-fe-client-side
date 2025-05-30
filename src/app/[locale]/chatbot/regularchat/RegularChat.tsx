@@ -2,7 +2,7 @@
 'use client'
 
 import React, { useState, useCallback, useEffect } from 'react';
-import ChatInput from './ChatInput';
+import ChatInput from './ChatInput'; // Sẽ không dùng cho edit nữa
 import LoadingIndicator from './LoadingIndicator';
 import EmailConfirmationDialog from '../EmailConfirmationDialog';
 import ConversationToolbar from './ConversationToolbar';
@@ -20,7 +20,7 @@ import {
   useConversationListState,
 } from '@/src/app/[locale]/chatbot/stores/storeHooks';
 import { useSettingsStore } from '@/src/app/[locale]/chatbot/stores';
-import { useMessageStore } from '@/src/app/[locale]/chatbot/stores/messageStore';
+import { useMessageStore } from '@/src/app/[locale]/chatbot/stores/messageStore'; // Import trực tiếp để lấy editingMessageId
 
 interface RegularChatProps {
   isSmallContext?: boolean;
@@ -33,6 +33,7 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
   const isConversationToolbarHiddenInFloatingChat = useSettingsStore(
     state => state.isConversationToolbarHiddenInFloatingChat
   );
+  // Lấy editingMessageId trực tiếp từ store
   const editingMessageId = useMessageStore(state => state.editingMessageId);
   const { chatMessages, loadingState: messageLoadingState } = useChatMessageState();
   const { isConnected, socketId } = useSocketConnectionStatus();
@@ -43,9 +44,12 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
   const { timeCounter, startTimer, stopTimer } = useTimer();
   const [hasChatStarted, setHasChatStarted] = useState<boolean>(false);
 
+  // State để quản lý giá trị của ChatInput, tách biệt khỏi logic edit
+  const [chatInputValue, setChatInputValue] = useState('');
+
   const {
     handleSendNewFilesAndMessage,
-    handleConfirmEdit,
+    handleConfirmEdit, // Vẫn dùng hàm này, nhưng nó sẽ được gọi từ ChatMessageDisplay/EditMessageForm
     handleSetFillInput,
     handleSuggestionClick,
   } = useChatInteractions({
@@ -67,10 +71,11 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
     setShowConfirmationDialog(false, null);
   }, [setShowConfirmationDialog]);
 
-  // Find the original text of the message being edited
-  const messageToEditText = editingMessageId
-    ? chatMessages.find(msg => msg.id === editingMessageId)?.text || '' // <<< CHANGED .message to .text
-    : '';
+  // Hàm xử lý khi ChatInput gửi tin nhắn (chỉ cho tin nhắn mới)
+  const handleSendFromChatInput = (message: string, files: File[]) => {
+    handleSendNewFilesAndMessage(message, files);
+    setChatInputValue(''); // Xóa input sau khi gửi
+  };
 
   return (
     <div className='bg-white-pure relative mx-auto flex h-full w-full flex-col overflow-hidden border border-gray-200 shadow-lg dark:bg-gray-850 dark:border-gray-700'>
@@ -92,12 +97,13 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
 
       {/* Chat Area */}
       <ChatArea
-        messages={chatMessages} // Pass the full chatMessages array
+        messages={chatMessages}
         showIntroduction={showIntroduction}
         isSmallContext={isSmallContext}
         languageCode={currentLanguage.code}
         showConfirmationDialog={showConfirmationDialog}
         onSuggestionClick={handleSuggestionClick}
+        // onConfirmEdit được truyền xuống đây, và ChatArea sẽ truyền nó cho ChatMessageDisplay
         onConfirmEdit={handleConfirmEdit}
       />
 
@@ -115,20 +121,21 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
       {/* Chat Input Area */}
       <div className='flex-shrink-0 border-t border-gray-200 p-1 sm:p-2 md:p-3 dark:border-gray-700 dark:bg-gray-800'>
         <ChatInput
-          onSendFilesAndMessage={
-            editingMessageId
-              ? (newText, _files) => handleConfirmEdit(editingMessageId, newText)
-              : handleSendNewFilesAndMessage
-          }
+          // Truyền giá trị và hàm cập nhật cho ChatInput
+          inputValue={chatInputValue} // Đổi tên prop để rõ ràng hơn
+          onInputChange={setChatInputValue} // Hàm để ChatInput cập nhật state này
+
+          // ChatInput chỉ dùng để gửi tin nhắn mới
+          onSendFilesAndMessage={handleSendFromChatInput}
           disabled={
+            !!editingMessageId || // <<<< KHÓA CHAT INPUT KHI ĐANG EDIT
             messageLoadingState.isLoading ||
             isLoadingHistory ||
             !isConnected ||
             showConfirmationDialog
           }
           onRegisterFillFunction={handleSetFillInput}
-          isEditing={!!editingMessageId}
-          initialEditText={messageToEditText} // Pass the correctly retrieved text
+        // Các prop isEditing và initialEditText không cần thiết cho ChatInput nữa
         />
       </div>
 
