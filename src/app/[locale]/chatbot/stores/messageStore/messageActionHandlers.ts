@@ -11,7 +11,7 @@ import {
     LanguageCode,
     EditUserMessagePayload,
     PersonalizationPayload
-} from './messageState'; // Import from the new state file
+} from './messageState';
 import { useSettingsStore } from '../setttingsStore';
 import { useSocketStore } from '../socketStore';
 import { useUiStore } from '../uiStore';
@@ -20,24 +20,14 @@ import { generateMessageId } from '@/src/app/[locale]/chatbot/utils/chatUtils';
 import { mapBackendHistoryItemToFrontendChatMessage } from './messageMappers';
 import { getPersonalizationData } from './messageSelectors';
 
-// StoreGet remains the same
 type StoreGet = () => MessageStoreState & MessageStoreActions;
-
-// Updated DevtoolsAction to be more compatible
+// ... (DevtoolsAction, StoreSet giữ nguyên) ...
 interface DevtoolsAction {
     type: string;
     [key: string]: any;
-    [key: number]: any; // Add number index signature
-    // We could add [key: symbol]: any; but it's often less common for plain action objects
-    // and might not be strictly necessary if the underlying type is just `any` for extra props.
-    // Let's try without it first, as the error specifically mentioned 'symbol' was missing
-    // from *my* DevtoolsAction when comparing to the target.
-    // The target type is `{ [x: string]: unknown; [x: number]: unknown; [x: symbol]: unknown; type: string; }`
-    // So, to be fully compatible, we should add it.
-    [key: symbol]: any; // Add symbol index signature
+    [key: number]: any; 
+    [key: symbol]: any; 
 }
-
-// Updated StoreSet
 type StoreSet = (
     partial: MessageStoreState | Partial<MessageStoreState> | ((state: MessageStoreState) => MessageStoreState | Partial<MessageStoreState>),
     replace?: false | undefined,
@@ -48,7 +38,8 @@ type StoreSet = (
 export const handleSendMessage = (
     get: StoreGet,
     set: StoreSet,
-    parts: Part[],
+    partsForBackend: Part[], // <<< THAM SỐ MỚI
+    partsForDisplay: Part[], // <<< THAM SỐ MỚI
     userFilesForDisplayOptimistic?: UserFile[],
     originalUserFilesInfo?: OriginalUserFileInfo[]
 ) => {
@@ -58,11 +49,14 @@ export const handleSendMessage = (
     const { handleError, hasFatalError: uiHasFatalError } = useUiStore.getState();
     const { activeConversationId } = useConversationStore.getState();
 
-    if (parts.length === 0) {
-        console.warn("[MessageStore] sendMessage called with empty parts.");
+    // partsForBackend được dùng để kiểm tra có gì để gửi không
+    if (partsForBackend.length === 0) {
+        console.warn("[MessageStore] sendMessage called with empty partsForBackend.");
         setLoadingState({ isLoading: false, step: 'idle', message: '' });
         return;
     }
+    // partsForDisplay có thể rỗng nếu user chỉ gửi @currentpage (không có query text)
+    // nhưng vẫn phải có partsForBackend (chứa context)
 
     if (hasFatalConnectionError || uiHasFatalError) {
         handleError({ message: "Cannot send message: A critical error occurred.", type: 'error', step: 'send_message_fail_fatal' } as any, false, false);
@@ -74,14 +68,15 @@ export const handleSendMessage = (
     resetAwaitFlag();
     setLoadingState({ isLoading: true, step: 'sending_to_bot', message: 'Sending...', agentId: undefined });
 
-    const textContentFromParts = parts.find(part => 'text' in part)?.text || '';
+    // Sử dụng partsForDisplay để tạo text hiển thị trên UI
+    const textContentFromDisplayParts = partsForDisplay.find(part => 'text' in part)?.text || '';
     const filesToDisplay = userFilesForDisplayOptimistic || [];
 
     const newUserMessage: ChatMessageType = {
         id: generateMessageId(),
         role: 'user',
-        parts: parts,
-        text: textContentFromParts,
+        parts: partsForDisplay, // <<< SỬ DỤNG partsForDisplay CHO UI
+        text: textContentFromDisplayParts, // Text từ partsForDisplay
         isUser: true,
         type: filesToDisplay.length > 0 ? 'multimodal' : 'text',
         timestamp: new Date().toISOString(),
@@ -94,24 +89,25 @@ export const handleSendMessage = (
     const personalizationInfo = getPersonalizationData();
 
     const payloadForSocket: SendMessageData = {
-        parts: parts,
+        parts: partsForBackend, // <<< SỬ DỤNG partsForBackend CHO SOCKET
         isStreaming: isStreamingEnabled,
         language: currentLanguage.code as LanguageCode,
         conversationId: activeConversationId,
-        frontendMessageId: newUserMessage.id,
+        frontendMessageId: newUserMessage.id, // ID của tin nhắn hiển thị trên UI
         personalizationData: personalizationInfo,
         originalUserFiles: originalUserFilesInfo,
     };
     useSocketStore.getState().emitSendMessage(payloadForSocket);
 };
 
+// ... (handleLoadHistoryMessages, handleSubmitEditedMessage, etc. giữ nguyên) ...
 export const handleLoadHistoryMessages = (
     set: StoreSet,
     historyItems: HistoryItem[]
 ) => {
     const frontendMessages = historyItems
         .map(mapBackendHistoryItemToFrontendChatMessage)
-        .filter(msg => msg !== null) as ChatMessageType[]; // Filter out nulls and assert type
+        .filter(msg => msg !== null) as ChatMessageType[]; 
 
     set({
         chatMessages: frontendMessages,
@@ -127,7 +123,7 @@ export const handleSubmitEditedMessage = (
     messageIdToEdit: string,
     newText: string
 ) => {
-    const { setChatMessages, setLoadingState, animationControls, resetAwaitFlag, setPendingBotMessageId } = get(); // removed storeSetEditingMessageId as it's handled by setEditingMessageId in main store
+    const { setChatMessages, setLoadingState, animationControls, resetAwaitFlag, setPendingBotMessageId } = get(); 
     const { currentLanguage } = useSettingsStore.getState();
     const { activeConversationId } = useConversationStore.getState();
 
@@ -216,9 +212,7 @@ export const handleResetChatUIForNewConversation = (
     get().animationControls?.stopStreaming();
     get().resetAwaitFlag();
     if (clearActiveIdInOtherStores) {
-        // Potentially clear active conversation ID in conversationStore if needed
-        // This part of logic might need adjustment based on how conversationStore handles it
-        // For now, assuming it's handled or not strictly needed by this store directly.
+        //
     }
     useUiStore.getState().setShowConfirmationDialog(false);
 };

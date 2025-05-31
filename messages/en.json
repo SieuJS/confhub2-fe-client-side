@@ -1368,9 +1368,12 @@
   "Personalization_Privacy_Subheading": "Your Privacy Matters",
   "Personalization_Privacy_Detail": "We are committed to protecting your data. The information used for personalization is processed securely and is not shared with third parties. You can disable this feature at any time from settings.",
   "Response_language": "Response language",
-  "Type_message_or_attach_files": "Type message or attach files...",
-  "ChatInput_Attach_File_Button_Label": "Attach file",
+  "ChatInput_Suggestion_CurrentPage": "Use text from the current page as context",
+  "ChatInput_Info_UsingCurrentPageContext": "Context from the current page will be used for this message.",
+  "ChatInput_Error_CurrentPageDisabled": "This feature is not available on the main chatbot page.",
+  "ChatInput_Error_MaxFiles": "You can upload a maximum of {max} files.",
+  "ChatInput_Error_FileSize": "File \"{name}\" is too large. Maximum size is {maxSize}MB.",
   "ChatInput_Remove_File": "Remove file {fileName}",
-  "ChatInput_Error_MaxFiles": "You can select a maximum of {max} files.",
-  "ChatInput_Error_FileSize": "File {name} is too large. Maximum size is {maxSize}MB."
+  "ChatInput_Attach_File_Button_Label": "Attach file",
+  "Type_message_or_attach_files": "Type message or attach files..."
 }

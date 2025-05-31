@@ -48,3 +48,14 @@ export const IS_STREAMING_ENABLED_DEFAULT: boolean = true;
 // --- API Configuration ---
 export const API_HOST = "generativelanguage.googleapis.com";
 export const API_URI = `wss://${API_HOST}/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent`;
+
+
+
+// Đường dẫn đến trang chatbot chính (không có locale prefix)
+// Đảm bảo nó khớp với định nghĩa trong `pathnames` của `src/navigation.ts`
+export const MAIN_CHATBOT_PAGE_PATH = '/chatbot/regularchat';
+
+export const CURRENT_PAGE_CONTEXT_COMMAND = "@currentpage";
+export const CURRENT_PAGE_CONTEXT_SUGGESTION_KEY = "ChatInput_Suggestion_CurrentPage";
+export const CURRENT_PAGE_CONTEXT_INFO_TEXT_KEY = "ChatInput_Info_UsingCurrentPageContext";
+export const CURRENT_PAGE_CONTEXT_DISABLED_TEXT_KEY = "ChatInput_Error_CurrentPageDisabled";

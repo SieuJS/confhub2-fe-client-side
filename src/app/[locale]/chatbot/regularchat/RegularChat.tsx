@@ -48,8 +48,8 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
   const [chatInputValue, setChatInputValue] = useState('');
 
   const {
-    handleSendNewFilesAndMessage,
-    handleConfirmEdit, // Vẫn dùng hàm này, nhưng nó sẽ được gọi từ ChatMessageDisplay/EditMessageForm
+    handleSendNewFilesAndMessage, // Signature của hàm này đã thay đổi trong useChatInteractions
+    handleConfirmEdit,
     handleSetFillInput,
     handleSuggestionClick,
   } = useChatInteractions({
@@ -72,11 +72,12 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
   }, [setShowConfirmationDialog]);
 
   // Hàm xử lý khi ChatInput gửi tin nhắn (chỉ cho tin nhắn mới)
-  const handleSendFromChatInput = (message: string, files: File[]) => {
-    handleSendNewFilesAndMessage(message, files);
+  // Phải truyền thêm tham số thứ 3 (shouldUsePageContext)
+  const handleSendFromChatInput = (message: string, files: File[], shouldUsePageContext: boolean) => {
+    handleSendNewFilesAndMessage(message, files, shouldUsePageContext); // <<< TRUYỀN THAM SỐ THỨ 3
     setChatInputValue(''); // Xóa input sau khi gửi
   };
-
+  
   return (
     <div className='bg-white-pure relative mx-auto flex h-full w-full flex-col overflow-hidden border border-gray-200 shadow-lg dark:bg-gray-850 dark:border-gray-700'>
       {/* Header: Connection Status */}

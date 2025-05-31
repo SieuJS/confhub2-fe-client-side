@@ -92,6 +92,7 @@ export interface SendMessageData {
   frontendMessageId: string; // ID do frontend tạo cho tin nhắn user
   personalizationData?: PersonalizationPayload | null;
   originalUserFiles?: OriginalUserFileInfo[]; // Thông tin file gốc của user
+  
 }
 
 

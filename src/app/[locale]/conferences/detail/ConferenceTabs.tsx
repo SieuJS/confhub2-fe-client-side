@@ -66,7 +66,6 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
 
   // --- Find the LATEST organization based on createdAt ---
   const findLatestOrganization = (): OrgType | null => {
-    // ... (findLatestOrganization function remains the same)
     if (!conference?.organizations || conference.organizations.length === 0)
       return null
     const latestOrg = conference.organizations.reduce(
@@ -75,12 +74,12 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         try {
           const date = new Date(current.createdAt)
           if (!isNaN(date.getTime())) currentCreatedAt = date
-        } catch {}
+        } catch { }
         let latestCreatedAt: Date | null = null
         try {
           const date = new Date(latest.createdAt)
           if (!isNaN(date.getTime())) latestCreatedAt = date
-        } catch {}
+        } catch { }
         if (
           currentCreatedAt &&
           (!latestCreatedAt || currentCreatedAt > latestCreatedAt)
@@ -228,25 +227,25 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
     // This calculation remains useful for the dedicated "Field of Research" section
     return conference?.ranks
       ? [
-          ...new Set(
-            conference.ranks
-              .map(rank => rank.fieldOfResearch)
-              .filter((field): field is string => !!field) // Type guard for filtering
-          )
-        ]
+        ...new Set(
+          conference.ranks
+            .map(rank => rank.fieldOfResearch)
+            .filter((field): field is string => !!field) // Type guard for filtering
+        )
+      ]
       : []
   }, [conference?.ranks])
 
   // --- Hooks ---
   const sectionKeys = conference
     ? [
-        'overview',
-        'important-dates',
-        'call-for-papers',
-        'fieldOfResearch-topics', // Combined section
-        ...(processedRanks.length > 0 ? ['source-rank'] : []), // Use processedRanks check
-        'map'
-      ]
+      'overview',
+      'important-dates',
+      'call-for-papers',
+      'fieldOfResearch-topics', // Combined section
+      ...(processedRanks.length > 0 ? ['source-rank'] : []), // Use processedRanks check
+      'map'
+    ]
     : []
   const sectionTranslationMap: { [key: string]: string } = {
     overview: 'Overview',
@@ -400,57 +399,50 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         )}
       </section>
 
-      {/* Call for Papers Section */}
+      {/* Call for Papers Section - ÁP DỤNG TYPOGRAPHY TẠI ĐÂY */}
       <section
         id='call-for-papers'
         className='bg-white-pure mt-6 rounded-lg px-2 py-4 shadow-md  md:px-4'
       >
-        {/* ... (Call for Papers section remains the same) ... */}
         <h2 className='mb-4 text-xl font-semibold md:text-2xl '>
           {t('Call_for_papers')}
         </h2>
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm, remarkBreaks]}
-          rehypePlugins={[rehypeRaw]}
-          components={{
-            p: ({ node, ...props }) => <p className='mb-2' {...props} />,
-            a: ({ ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
-              <a
-                {...props}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-blue-500 hover:underline'
-              />
-            ),
-            pre: ({ node, ...props }) => (
-              <pre
-                className='bg-gray-10 overflow-x-auto rounded-md p-2 '
-                {...props}
-              />
-            ),
-            code: ({ node, ...props }) => (
-              <code className='bg-gray-10 rounded px-1 ' {...props} />
-            ),
-            h1: ({ node, ...props }) => (
-              <h1 className='my-4 text-2xl font-bold' {...props} />
-            ),
-            h2: ({ node, ...props }) => (
-              <h2 className='my-3 text-xl font-semibold' {...props} />
-            ),
-            h3: ({ node, ...props }) => (
-              <h3 className='my-2 text-lg font-medium' {...props} />
-            ),
-            ul: ({ node, ...props }) => (
-              <ul className='my-2 list-inside list-disc' {...props} />
-            ),
-            ol: ({ node, ...props }) => (
-              <ol className='my-2 list-inside list-decimal' {...props} />
-            ),
-            li: ({ node, ...props }) => <li className='my-1' {...props} />
-          }}
-        >
-          {callForPaper || t('No_call_for_papers_available')}
-        </ReactMarkdown>
+        {callForPaper ? (
+          // Bọc ReactMarkdown bằng div với class `prose`
+          <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none">
+            {/*
+              prose: class chính của plugin
+              prose-sm sm:prose-base: Điều chỉnh kích thước font. Bạn có thể chọn `prose-sm` nếu nội dung CFP thường ngắn gọn,
+                                      hoặc `prose-base` (hoặc chỉ `prose`) cho kích thước tiêu chuẩn.
+              dark:prose-invert: Tự động đổi màu cho dark mode
+              max-w-none: Để nội dung markdown chiếm hết chiều rộng của container.
+            */}
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm, remarkBreaks]}
+              rehypePlugins={[rehypeRaw]}
+              components={{
+                // Bỏ hầu hết các custom styles.
+                // Chỉ giữ lại những gì thực sự cần, ví dụ: target, rel cho <a>
+                a: ({ ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
+                  <a
+                    {...props}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                  // Classname cho màu sắc và gạch chân sẽ được `prose` xử lý.
+                  // Nếu bạn muốn màu link cụ thể khác với `prose` (ví dụ: màu thương hiệu),
+                  // bạn có thể thêm lại class ở đây, ví dụ: className='text-your-brand-blue hover:underline'
+                  />
+                ),
+                // Các thẻ p, pre, code, h1-h3, ul, ol, li sẽ được `prose` tự động style.
+                // Bạn có thể xóa các class như 'mb-2' cho <p>, 'bg-gray-10' cho <pre>/<code>, etc.
+              }}
+            >
+              {callForPaper}
+            </ReactMarkdown>
+          </div>
+        ) : (
+          <p className=''>{t('No_call_for_papers_available')}</p>
+        )}
       </section>
 
       {/* Field of Research and Topics Section */}

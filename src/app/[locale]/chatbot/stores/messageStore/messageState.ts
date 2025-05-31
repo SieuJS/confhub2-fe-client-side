@@ -46,10 +46,12 @@ export interface MessageStoreActions {
     resetAwaitFlag: () => void;
     setPendingBotMessageId: (id: string | null) => void;
     sendMessage: (
-        parts: Part[],
+        partsForBackend: Part[], // Parts để gửi lên backend (có thể chứa context)
+        partsForDisplay: Part[], // Parts chỉ để hiển thị trên UI (chỉ query user)
         userFilesForDisplayOptimistic?: UserFile[],
         originalUserFilesInfo?: OriginalUserFileInfo[]
     ) => void;
+
     resetChatUIForNewConversation: (clearActiveIdInOtherStores?: boolean) => void;
     submitEditedMessage: (messageIdToEdit: string, newText: string) => void;
     setEditingMessageId: (messageId: string | null) => void;

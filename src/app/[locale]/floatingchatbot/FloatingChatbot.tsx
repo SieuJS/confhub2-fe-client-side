@@ -2,144 +2,149 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { X, Settings } from 'lucide-react' // MessageCircle không còn dùng ở đây
+import { X, Settings } from 'lucide-react'
 import RegularChat from '../chatbot/regularchat/RegularChat'
 import FloatingChatbotSettings from './FloatingChatbotSettings'
 import {
   useSettingsStore,
   useMessageStore,
   useConversationStore,
-  useUiStore // Import useUiStore
+  useUiStore
 } from '@/src/app/[locale]/chatbot/stores'
+import { usePageContextStore } from '@/src/app/[locale]/chatbot/stores/pageContextStore'; // <<< IMPORT MỚI
 import { useTranslations } from 'next-intl'
 import { useAppInitialization } from '@/src/hooks/regularchat/useAppInitialization'
 import dynamic from 'next/dynamic'
-import ChatbotErrorDisplay from '../chatbot/ChatbotErrorDisplay' // Import ChatbotErrorDisplay
+import ChatbotErrorDisplay from '../chatbot/ChatbotErrorDisplay'
+import { usePathname } from '@/src/navigation'; // <<< IMPORT usePathname
+import { MAIN_CHATBOT_PAGE_PATH } from '@/src/app/[locale]/chatbot/lib/constants'; // <<< TẠO FILE NÀY
 
 const DynamicAnimatedIcon = dynamic(() => import('../utils/AnimatedIcon'), {
   ssr: false,
   loading: () => (
     <div className='flex h-14 w-14 items-center justify-center rounded-full bg-blue-400'>
-      {/* Placeholder tĩnh hoặc spinner nhỏ */}
     </div>
   )
 })
 
-const FloatingChatbot: React.FC = () => {
-  const t = useTranslations('')
-  const [isChatOpen, setIsChatOpen] = useState(false)
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+// Helper để lấy text, có thể giới hạn độ dài
+const getCurrentPageTextContent = (maxLength: number = 20000): string | null => {
+  if (typeof window !== 'undefined' && document?.body?.innerText) {
+    const text = document.body.innerText;
+    return text.length > maxLength ? text.substring(0, maxLength) + "\n[...content truncated]" : text;
+  }
+  return null;
+};
 
-  const setChatMode = useSettingsStore(state => state.setChatMode)
-  const currentStoreChatMode = useSettingsStore(state => state.chatMode)
+const FloatingChatbot: React.FC = () => {
+  const t = useTranslations('');
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const setChatMode = useSettingsStore(state => state.setChatMode);
+  const currentStoreChatMode = useSettingsStore(state => state.chatMode);
   const resetChatUIForNewConversation = useMessageStore(
     state => state.resetChatUIForNewConversation
-  )
+  );
   const setActiveConversationId = useConversationStore(
     state => state.setActiveConversationId
-  )
+  );
   const activeConversationId = useConversationStore(
     state => state.activeConversationId
-  )
-  // Lắng nghe UiStore để biết khi nào có lỗi và cần hiển thị ChatbotErrorDisplay
-  const hasFatalError = useUiStore(state => state.hasFatalError)
-  const fatalErrorCode = useUiStore(state => state.fatalErrorCode) // Lấy thêm mã lỗi
+  );
+  const hasFatalError = useUiStore(state => state.hasFatalError);
+  const fatalErrorCode = useUiStore(state => state.fatalErrorCode);
 
-  useAppInitialization() // Hook này chỉ nên chạy một lần, không phụ thuộc vào isChatOpen
+  const { setPageContext, clearPageContext } = usePageContextStore.getState(); // <<< LẤY ACTIONS
+  const pathname = usePathname(); // <<< LẤY PATHNAME HIỆN TẠI
+
+  useAppInitialization();
 
   const toggleChatbot = useCallback(() => {
     setIsChatOpen(prevIsChatOpen => {
-      const newIsChatOpen = !prevIsChatOpen
+      const newIsChatOpen = !prevIsChatOpen;
       if (newIsChatOpen) {
+        // Logic cho context trang hiện tại
+        const isMainChatPage = pathname === MAIN_CHATBOT_PAGE_PATH; // So sánh với path của trang chatbot chính
+        if (!isMainChatPage) {
+          const pageText = getCurrentPageTextContent();
+          setPageContext(pageText, true);
+        } else {
+          setPageContext(null, false); // Vô hiệu hóa tính năng trên trang chatbot chính
+        }
+
         if (currentStoreChatMode !== 'regular') {
-          setChatMode('regular')
+          setChatMode('regular');
         }
-        // Reset conversation và UI chỉ khi mở chat *từ trạng thái đóng*
-        // và không phải chỉ là đóng/mở settings.
         if (!prevIsChatOpen) {
-          // Chỉ reset nếu trước đó chat đang đóng
           if (activeConversationId !== null) {
-            setActiveConversationId(null)
+            setActiveConversationId(null);
           }
-          resetChatUIForNewConversation(true)
+          resetChatUIForNewConversation(true);
         }
-        setIsSettingsOpen(false)
+        setIsSettingsOpen(false);
       } else {
-        setIsSettingsOpen(false) // Luôn đóng settings khi đóng chat
+        setIsSettingsOpen(false);
+        clearPageContext(); // Xóa context khi đóng chatbot
       }
-      return newIsChatOpen
-    })
+      return newIsChatOpen;
+    });
   }, [
     currentStoreChatMode,
     setChatMode,
     resetChatUIForNewConversation,
     setActiveConversationId,
-    activeConversationId
-  ])
+    activeConversationId,
+    pathname, // <<< THÊM PATHNAME VÀO DEPENDENCIES
+    setPageContext,
+    clearPageContext
+  ]);
 
   const toggleSettingsPanel = useCallback((e?: React.MouseEvent) => {
-    e?.stopPropagation()
-    setIsSettingsOpen(prev => !prev)
-  }, [])
+    e?.stopPropagation();
+    setIsSettingsOpen(prev => !prev);
+  }, []);
 
-  // useEffect này để đảm bảo chatMode là 'regular' khi chat mở.
-  // Nó có thể không cần thiết nếu logic trong toggleChatbot đã đủ.
   useEffect(() => {
     if (isChatOpen && currentStoreChatMode !== 'regular') {
-      console.log(
-        '[FloatingChatbot] Effect: Chat is open and mode is not regular. Setting to regular.'
-      )
-      setChatMode('regular')
+      setChatMode('regular');
     }
-  }, [isChatOpen, currentStoreChatMode, setChatMode])
+  }, [isChatOpen, currentStoreChatMode, setChatMode]);
 
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         if (isSettingsOpen) {
-          setIsSettingsOpen(false)
+          setIsSettingsOpen(false);
         } else if (isChatOpen) {
-          // Khi đóng bằng Escape, logic trong toggleChatbot sẽ không chạy
-          // nên cần set isChatOpen trực tiếp và đảm bảo settings cũng đóng
-          setIsChatOpen(false)
-          setIsSettingsOpen(false)
+          setIsChatOpen(false);
+          setIsSettingsOpen(false);
+          clearPageContext(); // Xóa context khi đóng bằng Escape
         }
       }
-    }
-    document.addEventListener('keydown', handleEscape)
+    };
+    document.addEventListener('keydown', handleEscape);
     return () => {
-      document.removeEventListener('keydown', handleEscape)
-    }
-  }, [isChatOpen, isSettingsOpen]) // Thêm setIsChatOpen vào deps nếu bạn muốn clean hơn, nhưng nó sẽ không thay đổi
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isChatOpen, isSettingsOpen, clearPageContext]); // Thêm clearPageContext
 
-  // Điều kiện để render ChatbotErrorDisplay trong floating chat
-  // Nó chỉ nên hiển thị nếu chat đang mở VÀ có lỗi nghiêm trọng
-  const shouldShowErrorDisplayInFloatingChat = isChatOpen && hasFatalError
+  const shouldShowErrorDisplayInFloatingChat = isChatOpen && hasFatalError;
 
-  // Xác định xem lỗi có phải là lỗi nghiêm trọng cản trở việc chat không
-  // Ví dụ: Lỗi xác thực sẽ cản trở, lỗi kết nối cũng vậy.
-  // Lỗi không nghiêm trọng (warning) có thể không cần disable input.
   const getIsAuthRelatedOrConnectionError = useCallback(
     (code: string | null): boolean => {
-      if (!code) return false
+      if (!code) return false;
       const criticalErrorCodes = [
-        'AUTH_REQUIRED',
-        'ACCESS_DENIED',
-        'TOKEN_EXPIRED',
-        'AUTH_CONNECTION_ERROR',
-        'AUTH_HANDSHAKE_FAILED',
-        'CONNECTION_FAILED',
-        'FATAL_SERVER_ERROR' // Coi lỗi server là nghiêm trọng
-      ]
-      return criticalErrorCodes.includes(code)
+        'AUTH_REQUIRED', 'ACCESS_DENIED', 'TOKEN_EXPIRED',
+        'AUTH_CONNECTION_ERROR', 'AUTH_HANDSHAKE_FAILED',
+        'CONNECTION_FAILED', 'FATAL_SERVER_ERROR'
+      ];
+      return criticalErrorCodes.includes(code);
     },
     []
-  )
+  );
 
-  const isChatInputDisabled =
-    isChatOpen &&
-    hasFatalError &&
-    getIsAuthRelatedOrConnectionError(fatalErrorCode)
+  // isChatInputDisabled không cần thay đổi
 
   return (
     <>
@@ -156,13 +161,9 @@ const FloatingChatbot: React.FC = () => {
 
       {isChatOpen && (
         <div className='animate-slide-up-fade fixed bottom-5 right-5 z-50 flex h-[calc(100vh-6rem)] max-h-[600px] w-[90vw] max-w-md flex-col rounded-xl bg-white-pure shadow-2xl dark:border dark:border-gray-700  md:bottom-8 md:right-8 md:h-[calc(100vh-8rem)] md:max-h-[700px] md:max-w-lg'>
-          {/* ChatbotErrorDisplay được render có điều kiện bên trong container chính */}
-          {/* Nó sẽ tự style dựa trên isFloatingContext={true} */}
           {shouldShowErrorDisplayInFloatingChat && (
             <ChatbotErrorDisplay isFloatingContext={true} />
           )}
-
-          {/* Header của chatbot - KHÔNG còn bị làm mờ bởi shouldShowErrorDisplayInFloatingChat ở đây */}
           <div
             className={`flex items-center justify-between rounded-t-xl bg-button px-4 py-3 text-button-text`}
           >
@@ -170,16 +171,8 @@ const FloatingChatbot: React.FC = () => {
               <button
                 onClick={toggleSettingsPanel}
                 className='rounded-full p-1.5 hover:bg-blue-700 focus:outline-none focus:ring-1 focus:ring-white dark:hover:bg-blue-800'
-                aria-label={
-                  isSettingsOpen
-                    ? t('Close_Chat_Settings')
-                    : t('Open_Chat_Settings')
-                }
-                title={
-                  isSettingsOpen
-                    ? t('Close_Chat_Settings')
-                    : t('Open_Chat_Settings')
-                }
+                aria-label={isSettingsOpen ? t('Close_Chat_Settings') : t('Open_Chat_Settings')}
+                title={isSettingsOpen ? t('Close_Chat_Settings') : t('Open_Chat_Settings')}
                 aria-expanded={isSettingsOpen}
               >
                 <Settings size={20} />
@@ -187,7 +180,7 @@ const FloatingChatbot: React.FC = () => {
               <h3 className='text-lg font-semibold'>{t('Chat_With_Us')}</h3>
             </div>
             <button
-              onClick={toggleChatbot}
+              onClick={toggleChatbot} // toggleChatbot đã bao gồm clearPageContext
               className='rounded-full p-1.5  hover:bg-blue-700 hover:text-white focus:outline-none dark:hover:bg-blue-800'
               aria-label={t('Close_Chat')}
             >
@@ -199,10 +192,7 @@ const FloatingChatbot: React.FC = () => {
             <div
               className={`h-full w-full transition-opacity duration-200 ${isSettingsOpen ? 'pointer-events-none opacity-30' : 'opacity-100'}`}
             >
-              <RegularChat
-                isSmallContext={true}
-                // isDisabledDueToError={isChatInputDisabled} // <<<< TRUYỀN PROP MỚI
-              />
+              <RegularChat isSmallContext={true} />
             </div>
             {isSettingsOpen && (
               <FloatingChatbotSettings
@@ -214,7 +204,7 @@ const FloatingChatbot: React.FC = () => {
         </div>
       )}
     </>
-  )
-}
+  );
+};
 
-export default FloatingChatbot
+export default FloatingChatbot;
