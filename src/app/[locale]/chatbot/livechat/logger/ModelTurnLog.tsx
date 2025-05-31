@@ -7,80 +7,69 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkBreaks from 'remark-breaks'
 import rehypeRaw from 'rehype-raw'
+// Không cần type MarkdownComponentProps<'p'> ở đây vì ta sẽ bỏ custom components
 
 type ModelTurnLogProps = {
-  // The component receives the full SDKLiveServerMessage that has passed isServerContentMessage
-  // and where serverContent has passed isModelTurn.
   message: SDKLiveServerMessage & { serverContent: ServerContentPayload & { modelTurn: NonNullable<ServerContentPayload['modelTurn']> } }
 }
 
 const ModelTurnLog: React.FC<ModelTurnLogProps> = ({
   message
 }): JSX.Element => {
-  // serverContent and modelTurn are guaranteed to exist due to the refined prop type
   const { modelTurn } = message.serverContent;
-  // Fix: Provide an empty array as default if 'parts' is undefined
-  const { parts = [] } = modelTurn; // parts is SDK Part[] | undefined -> now guaranteed to be Part[]
+  const { parts = [] } = modelTurn;
 
   const combinedText = parts
     .filter(
       part =>
-        part.text !== undefined && part.text !== null && part.text !== '\n'
+        part.text !== undefined && part.text !== null && part.text !== '\n' // Giữ nguyên logic lọc này
     )
     .map(part => part.text)
-    .join('')
+    .join(''); // Nối các phần text lại, có thể thêm "\n\n" nếu muốn các part cách nhau bằng đoạn mới
+
+  // Nếu combinedText rỗng, không render gì cả để tránh div rỗng
+  if (!combinedText.trim()) {
+    return <></>; // Hoặc null
+  }
 
   return (
+    // Class `text-sm text-inherit` ở đây có thể vẫn hữu ích nếu component này
+    // được đặt trong một context có font-size hoặc color khác.
+    // `prose` sẽ override màu chữ và một số thuộc tính font bên trong nó.
     <div className='text-sm text-inherit'>
-      {combinedText && (
+      {/*
+        Áp dụng Tailwind Typography:
+        - prose: class chính
+        - prose-sm: kích thước nhỏ, phù hợp với log/chat. Bạn có thể dùng prose-base nếu muốn to hơn.
+        - dark:prose-invert: cho dark mode
+        - max-w-none: để nội dung markdown chiếm hết chiều rộng của container cha,
+                      quan trọng trong layout hẹp như log.
+      */}
+      <div className="prose prose-sm dark:prose-invert max-w-none">
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkBreaks]}
           rehypePlugins={[rehypeRaw]}
           components={{
-            p: ({ node, ...props }) => (
-              <p className='part part-text mb-2 last:mb-0' {...props} />
-            ),
+            // BỎ HẦU HẾT CÁC CUSTOM STYLES.
+            // Chỉ giữ lại những gì thực sự cần, ví dụ: target, rel cho <a>
             a: ({ ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
               <a
                 {...props}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='text-blue-500 hover:underline dark:text-blue-400'
+                // className của plugin typography sẽ tự xử lý màu sắc và gạch chân
               />
             ),
-            pre: ({ node, ...props }) => (
-              <pre
-                className='my-2 overflow-x-auto rounded-md bg-gray-100 p-2 dark:bg-gray-800 dark:text-gray-50'
-                {...props}
-              />
-            ),
-            code: ({ node, ...props }) => (
-              <code
-                className='rounded bg-gray-100 px-1 py-0.5 text-sm dark:bg-gray-800 dark:text-gray-50'
-                {...props}
-              />
-            ),
-            h1: ({ node, ...props }) => (
-              <h1 className='my-4 text-2xl font-bold text-inherit' {...props} />
-            ),
-            h2: ({ node, ...props }) => (
-              <h2 className='my-3 text-xl font-semibold text-inherit' {...props} />
-            ),
-            h3: ({ node, ...props }) => (
-              <h3 className='my-2 text-lg font-medium text-inherit' {...props} />
-            ),
-            ul: ({ node, ...props }) => (
-              <ul className='my-2 list-inside list-disc pl-4 text-inherit' {...props} />
-            ),
-            ol: ({ node, ...props }) => (
-              <ol className='my-2 list-inside list-decimal pl-4 text-inherit' {...props} />
-            ),
-            li: ({ node, ...props }) => <li className='my-1 text-inherit' {...props} />
+            // Các thẻ p, pre, code, h1-h3, ul, ol, li sẽ được `prose` tự động style.
+            // Ví dụ, class `part part-text mb-2 last:mb-0` trên <p> không còn cần thiết
+            // vì `prose` sẽ quản lý margin giữa các đoạn văn.
+            // Nếu `part` và `part-text` có ý nghĩa đặc biệt khác (ví dụ, cho testing selectors),
+            // bạn có thể xem xét giữ lại, nhưng thường là không cần cho styling.
           }}
         >
           {combinedText}
         </ReactMarkdown>
-      )}
+      </div>
     </div>
   )
 }

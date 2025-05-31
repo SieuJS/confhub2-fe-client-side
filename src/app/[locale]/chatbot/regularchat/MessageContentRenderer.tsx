@@ -61,30 +61,44 @@ const MessageContentRenderer: React.FC<MessageContentRendererProps> = ({
     // console.log("[MessageContentRenderer] No displayable content found, returning null. Type:", type, "Text:", text, "Parts:", parts);
     return null; // Không render gì cả cho các message chỉ chứa function call/response
   }
-
   const renderMarkdown = (content: string | undefined) => {
     if (!content) return null;
     return (
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkBreaks]}
-        rehypePlugins={[rehypeRaw]}
-        components={{
-          p: ({ node: _, ...props }: MarkdownComponentProps<'p'>) => <p {...props} />,
-          a: ({ ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
-            <a {...props} target='_blank' rel='noopener noreferrer' className='text-blue-600 hover:underline dark:text-blue-400' />
-          ),
-          pre: ({ node, ...props }) => <pre className='my-2 overflow-x-auto rounded-md bg-gray-200 p-1.5 text-xs sm:p-2 sm:text-sm dark:bg-gray-800 dark:text-gray-300' {...props} />,
-          code: ({ node, ...props }) => <code className='rounded bg-gray-200 px-0.5 py-0.5 text-xs font-mono text-red-600 sm:px-1 dark:bg-gray-600 dark:text-red-400' {...props} />,
-          h1: ({ node, ...props }) => <h1 className='my-3 text-xl font-bold sm:my-4 sm:text-2xl dark:text-white' {...props} />,
-          h2: ({ node, ...props }) => <h2 className='my-2 text-lg font-semibold sm:my-3 sm:text-xl dark:text-gray-100' {...props} />,
-          h3: ({ node, ...props }) => <h3 className='my-1.5 text-base font-medium sm:my-2 sm:text-lg dark:text-gray-200' {...props} />,
-          ul: ({ node, ...props }) => <ul className='my-1.5 list-inside list-disc pl-0.5 sm:my-2 sm:pl-1 dark:text-gray-300' {...props} />,
-          ol: ({ node, ...props }) => <ol className='my-1.5 list-inside list-decimal pl-0.5 sm:my-2 sm:pl-1 dark:text-gray-300' {...props} />,
-          li: ({ node, ...props }) => <li className='my-0.5 sm:my-1 dark:text-gray-300' {...props} />,
-        }}
-      >
-        {content}
-      </ReactMarkdown>
+      // ÁP DỤNG TAILWIND TYPOGRAPHY TẠI ĐÂY
+      <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none">
+        {/*
+          prose: class chính của plugin
+          prose-sm sm:prose-base: Điều chỉnh kích thước font chữ (tùy chọn, có thể bỏ nếu mặc định đã ổn)
+          dark:prose-invert: Tự động đổi màu cho dark mode (nếu bạn dùng class 'dark' ở thẻ html/body)
+          max-w-none: Mặc định `prose` sẽ giới hạn chiều rộng của nội dung.
+                      Trong chat bubble, ta thường muốn nó chiếm hết chiều rộng có thể, nên dùng `max-w-none`.
+        */}
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm, remarkBreaks]}
+          rehypePlugins={[rehypeRaw]}
+          components={{
+            // GIỜ BẠN CÓ THỂ BỎ HẦU HẾT CÁC CUSTOM STYLES Ở ĐÂY
+            // @tailwindcss/typography sẽ lo việc này
+            // Chỉ giữ lại những gì thực sự cần override hoặc những thuộc tính không liên quan đến style trực tiếp
+            // Ví dụ: target, rel cho thẻ <a>
+            a: ({ ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
+              <a {...props} target='_blank' rel='noopener noreferrer' />
+              // Plugin typography sẽ tự style màu sắc, gạch chân cho link
+              // Nếu muốn màu cụ thể, bạn vẫn có thể thêm class: className='text-blue-600 hover:underline dark:text-blue-400'
+              // nhưng thường thì màu mặc định của prose đã khá ổn.
+            ),
+            // Các thẻ h1, h2, h3, p, ul, ol, li, pre, code sẽ được `prose` style.
+            // Bạn có thể xóa các class tùy chỉnh ở đây để xem `prose` hoạt động ra sao.
+            // Nếu cần tinh chỉnh nhỏ, bạn có thể thêm lại class, nhưng nên hạn chế.
+            // Ví dụ, nếu bạn muốn code block có nền khác biệt một chút so với prose mặc định:
+            // pre: ({ node, ...props }) => <pre className='bg-gray-100 dark:bg-gray-800 rounded-md' {...props} />,
+            // code: ({ node, ...props }) => <code className='text-red-600 dark:text-red-400 px-1 rounded' {...props} />,
+            // Nhưng hãy thử bỏ trống trước!
+          }}
+        >
+          {content}
+        </ReactMarkdown>
+      </div>
     );
   };
 
@@ -173,6 +187,7 @@ const MessageContentRenderer: React.FC<MessageContentRendererProps> = ({
         hasRenderedTextFromParts = true;
       }
     }
+
   }
 
   // 3. Render Bot Files (from prop `botFiles`) - ONLY if it's a bot message
@@ -206,6 +221,8 @@ const MessageContentRenderer: React.FC<MessageContentRendererProps> = ({
     const markdownOutput = renderMarkdown(text);
     if (markdownOutput) {
       textElements.push(
+        // Không cần class "message-content break-words" ở đây nữa nếu `prose` đã đủ
+        // Hoặc nếu "message-content" có mục đích khác (ví dụ: padding/margin tổng thể cho khối text) thì giữ lại
         <div key="primary-text-prop" className="message-content break-words">
           {markdownOutput}
         </div>
