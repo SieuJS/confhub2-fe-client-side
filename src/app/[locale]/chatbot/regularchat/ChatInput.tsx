@@ -7,7 +7,7 @@ import { Paperclip, X as LucideX, FileText, ImageIcon, AlertTriangle } from 'luc
 import { useTranslations } from 'next-intl';
 
 const ACCEPTED_FILE_TYPES = "image/jpeg,image/png,application/pdf,text/csv";
-const MAX_FILE_SIZE_MB = 25; // Increased limit, backend will handle Google's limit
+const MAX_FILE_SIZE_MB = 50; // <--- ĐIỀU CHỈNH TẠI ĐÂY
 const MAX_TOTAL_FILES = 5;
 
 interface ChatInputProps {
@@ -68,20 +68,22 @@ const ChatInput: React.FC<ChatInputProps> = ({
     if (event.target.files) {
       const newFiles = Array.from(event.target.files);
       let validFiles: File[] = [];
-      let alertShown = false;
+      let alertShownForSize = false; // Flag for file size alert
+      let alertShownForMaxFiles = false; // Flag for max files alert
 
       newFiles.forEach(file => {
         if (selectedFiles.length + validFiles.length >= MAX_TOTAL_FILES) {
-          if (!alertShown) {
+          if (!alertShownForMaxFiles) {
             alert(t('ChatInput_Error_MaxFiles', { max: MAX_TOTAL_FILES }));
-            alertShown = true;
+            alertShownForMaxFiles = true;
           }
           return;
         }
+        // Kiểm tra kích thước file
         if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-          if (!alertShown) {
+          if (!alertShownForSize) {
             alert(t('ChatInput_Error_FileSize', { name: file.name, maxSize: MAX_FILE_SIZE_MB }));
-            alertShown = true;
+            alertShownForSize = true;
           }
           return;
         }
