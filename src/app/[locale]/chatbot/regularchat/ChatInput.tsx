@@ -6,8 +6,8 @@ import { GrSend } from 'react-icons/gr';
 import { Paperclip, X as LucideX, FileText, ImageIcon, AlertTriangle, Info } from 'lucide-react'; // Thêm Info
 import { useTranslations } from 'next-intl';
 import { usePageContextStore } from '@/src/app/[locale]/chatbot/stores/pageContextStore'; // <<< IMPORT MỚI
-import { 
-  CURRENT_PAGE_CONTEXT_COMMAND, 
+import {
+  CURRENT_PAGE_CONTEXT_COMMAND,
   CURRENT_PAGE_CONTEXT_SUGGESTION_KEY,
   CURRENT_PAGE_CONTEXT_INFO_TEXT_KEY,
   CURRENT_PAGE_CONTEXT_DISABLED_TEXT_KEY
@@ -33,7 +33,7 @@ const getFileIcon = (mimeType: string) => {
 
 const ChatInput: React.FC<ChatInputProps> = ({
   inputValue,
-  onInputChange,
+  onInputChange, // Prop này vẫn cần thiết để ChatInput có thể tự cập nhật giá trị của nó
   onSendFilesAndMessage,
   onRegisterFillFunction,
   disabled = false,
@@ -48,9 +48,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const [contextSuggestionMessage, setContextSuggestionMessage] = useState<string | null>(null);
 
 
-  const { 
-    isCurrentPageFeatureEnabled, 
-    isContextAttachedNextSend, 
+  const {
+    isCurrentPageFeatureEnabled,
+    isContextAttachedNextSend,
     toggleContextAttachedNextSend,
     resetContextAttachedNextSend
   } = usePageContextStore();
@@ -88,7 +88,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
       } else {
         setShowContextSuggestions(false);
       }
-      
+
       // Tự động bật/tắt cờ isContextAttachedNextSend dựa trên input
       if (value.includes(CURRENT_PAGE_CONTEXT_COMMAND) && isCurrentPageFeatureEnabled) {
         toggleContextAttachedNextSend(true);
@@ -160,32 +160,55 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const handleSendMessageInternal = useCallback(() => {
     let messageToSend = inputValue.trim();
     let shouldUseContext = false;
+    let originalInputHadContextCommand = false; // Cờ mới để theo dõi
 
     if (isContextAttachedNextSend && isCurrentPageFeatureEnabled) {
-        // Kiểm tra lại xem command có thực sự trong input không, phòng trường hợp cờ chưa reset
-        if (messageToSend.includes(CURRENT_PAGE_CONTEXT_COMMAND)) {
-            shouldUseContext = true;
-            // Xóa command khỏi message người dùng sẽ thấy và LLM nhận (phần query)
-            messageToSend = messageToSend.replace(new RegExp(CURRENT_PAGE_CONTEXT_COMMAND.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*', 'g'), '').trim();
-        } else {
-            // Cờ đang bật nhưng command không có trong input, có thể là lỗi logic, reset cờ
-            resetContextAttachedNextSend();
-        }
+      if (inputValue.includes(CURRENT_PAGE_CONTEXT_COMMAND)) { // Kiểm tra inputValue gốc
+        shouldUseContext = true;
+        originalInputHadContextCommand = true;
+        // Xóa command khỏi message người dùng sẽ thấy và LLM nhận (phần query)
+        // Chỉ xóa command nếu nó thực sự là một phần của message, không phải toàn bộ message
+        // Nếu inputValue CHỈ là "@currentpage" hoặc "@currentpage ", messageToSend sẽ là ""
+        const commandPattern = new RegExp(CURRENT_PAGE_CONTEXT_COMMAND.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*', 'g');
+        messageToSend = inputValue.replace(commandPattern, '').trim();
+
+      } else {
+        resetContextAttachedNextSend(); // Cờ bật nhưng command không có, reset cờ
+      }
     }
-    
-    if (!disabled && (messageToSend || selectedFiles.length > 0)) {
+
+    if (!disabled && (messageToSend || selectedFiles.length > 0 || shouldUseContext)) { // Thêm điều kiện shouldUseContext
       onSendFilesAndMessage(messageToSend, selectedFiles, shouldUseContext);
       setSelectedFiles([]);
-      resetContextAttachedNextSend(); // Reset cờ sau khi gửi
-      if (inputRef.current) {
-        inputRef.current.style.height = 'auto'; // Reset chiều cao textarea
+
+      // Quyết định nội dung input mới sau khi gửi
+      if (shouldUseContext && originalInputHadContextCommand) {
+        // Nếu context đã được sử dụng và command có trong input gốc,
+        // giữ lại command trong input cho lần gửi tiếp theo.
+        onInputChange(CURRENT_PAGE_CONTEXT_COMMAND + ' ');
+        // Không cần gọi toggleContextAttachedNextSend(true) vì nó đã được xử lý bởi onInputChange
+      } else {
+        // Nếu không dùng context, hoặc command không có sẵn, xóa input
+        onInputChange('');
+        resetContextAttachedNextSend(); // Đảm bảo cờ được reset nếu không giữ lại command
       }
-    } else if (!disabled && !messageToSend && selectedFiles.length === 0 && shouldUseContext) {
-      // Trường hợp chỉ có @currentpage và không có text/file khác
-      onSendFilesAndMessage("", selectedFiles, shouldUseContext); // Gửi message rỗng với context
-      resetContextAttachedNextSend();
+
+      if (inputRef.current) {
+        inputRef.current.style.height = 'auto';
+      }
     }
-  }, [inputValue, selectedFiles, onSendFilesAndMessage, disabled, isCurrentPageFeatureEnabled, isContextAttachedNextSend, resetContextAttachedNextSend]);
+    // Không cần xử lý trường hợp chỉ có @currentpage và không có text/file khác ở đây nữa,
+    // vì logic trên đã bao gồm (messageToSend có thể rỗng nếu input chỉ là command)
+  }, [
+    inputValue,
+    selectedFiles,
+    onSendFilesAndMessage,
+    disabled,
+    isCurrentPageFeatureEnabled,
+    isContextAttachedNextSend,
+    resetContextAttachedNextSend,
+    onInputChange // Thêm onInputChange vào dependencies
+  ]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -232,12 +255,12 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
       {/* Thông báo lỗi/info cho context */}
       {contextSuggestionMessage && (
-         <div className="mb-1 px-3 py-1.5 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-md flex items-center">
-           <AlertTriangle size={14} className="mr-2 flex-shrink-0" />
-           {contextSuggestionMessage}
-         </div>
+        <div className="mb-1 px-3 py-1.5 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-md flex items-center">
+          <AlertTriangle size={14} className="mr-2 flex-shrink-0" />
+          {contextSuggestionMessage}
+        </div>
       )}
-      
+
       {/* Thông báo đang sử dụng context */}
       {isContextAttachedNextSend && isCurrentPageFeatureEnabled && (
         <div className="mb-1 px-3 py-1.5 text-xs text-blue-600 dark:text-blue-300 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-md flex items-center">
@@ -315,9 +338,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
           disabled={disabled}
           onBlur={() => setTimeout(() => setShowContextSuggestions(false), 150)} // Hide suggestions on blur with delay
           onFocus={() => { // Show suggestions if relevant on focus
-             if (inputValue.endsWith('@') && isCurrentPageFeatureEnabled) {
-                setShowContextSuggestions(true);
-             }
+            if (inputValue.endsWith('@') && isCurrentPageFeatureEnabled) {
+              setShowContextSuggestions(true);
+            }
           }}
         />
         <Button

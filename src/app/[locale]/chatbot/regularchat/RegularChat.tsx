@@ -75,7 +75,7 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
   // Phải truyền thêm tham số thứ 3 (shouldUsePageContext)
   const handleSendFromChatInput = (message: string, files: File[], shouldUsePageContext: boolean) => {
     handleSendNewFilesAndMessage(message, files, shouldUsePageContext); // <<< TRUYỀN THAM SỐ THỨ 3
-    setChatInputValue(''); // Xóa input sau khi gửi
+    // setChatInputValue(''); // Xóa input sau khi gửi
   };
   
   return (
