@@ -65,7 +65,7 @@ const MessageContentRenderer: React.FC<MessageContentRendererProps> = ({
     if (!content) return null;
     return (
       // ÁP DỤNG TAILWIND TYPOGRAPHY TẠI ĐÂY
-      <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none">
+      <div className="prose prose-xs sm:prose-sm dark:prose-invert max-w-none">
         {/*
           prose: class chính của plugin
           prose-sm sm:prose-base: Điều chỉnh kích thước font chữ (tùy chọn, có thể bỏ nếu mặc định đã ổn)
