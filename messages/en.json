@@ -1372,5 +1372,10 @@
   "ChatInput_Attach_File_Button_Label": "Attach file",
   "ChatInput_Remove_File": "Remove file {fileName}",
   "ChatInput_Error_MaxFiles": "You can select a maximum of {max} files.",
-  "ChatInput_Error_FileSize": "File {name} is too large. Maximum size is {maxSize}MB."
+  "ChatInput_Error_FileSize": "File {name} is too large. Maximum size is {maxSize}MB.",
+  "Enable_Google_Search_Toggle_Label": "Google Search",
+  "Google_Search_Confirmation_Modal_Title": "Enhance with Google Search?",
+  "Google_Search_Confirmation_Modal_Message": "Enable this to allow the assistant to search Google for relevant, up-to-date information, enriching its answers beyond its current knowledge base. This can provide more comprehensive and timely responses.\n\nDo you want to activate this feature?",
+  "Google_Search_Privacy_Subheading": "How it Works",
+  "Google_Search_Privacy_Detail": "When enabled, your query may be used to perform targeted Google searches. Only relevant search snippets are used to augment the assistant's response. This feature can be disabled at any time."
 }

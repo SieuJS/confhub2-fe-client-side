@@ -13,12 +13,13 @@ import {
     EditUserMessagePayload,
     BackendConversationUpdatedAfterEditPayload,
     ItemFollowStatusUpdatePayload,
-    PersonalizationPayload,
+    CombinedSettingsPayload,
     HistoryItem,
     UserFile,
     OriginalUserFileInfo,
     SendMessageData,
-    LanguageCode
+    LanguageCode,
+    UserProfileData
 } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
 import { StreamingTextAnimationControls } from '@/src/hooks/regularchat/useStreamingTextAnimation';
 import { Part } from "@google/genai";
@@ -88,12 +89,13 @@ export type {
     EditUserMessagePayload,
     BackendConversationUpdatedAfterEditPayload,
     ItemFollowStatusUpdatePayload,
-    PersonalizationPayload,
+    CombinedSettingsPayload,
     HistoryItem,
     UserFile,
     OriginalUserFileInfo,
     SendMessageData,
     LanguageCode,
-    Part
+    Part,
+    UserProfileData
 };
 export type { StreamingTextAnimationControls };

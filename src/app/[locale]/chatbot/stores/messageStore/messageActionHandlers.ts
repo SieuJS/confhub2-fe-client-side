@@ -10,15 +10,15 @@ import {
     SendMessageData,
     LanguageCode,
     EditUserMessagePayload,
-    PersonalizationPayload
-} from './messageState'; // Import from the new state file
+    CombinedSettingsPayload // Đảm bảo import này đúng
+} from './messageState';
 import { useSettingsStore } from '../setttingsStore';
 import { useSocketStore } from '../socketStore';
 import { useUiStore } from '../uiStore';
 import { useConversationStore } from '../conversationStore/conversationStore';
 import { generateMessageId } from '@/src/app/[locale]/chatbot/utils/chatUtils';
 import { mapBackendHistoryItemToFrontendChatMessage } from './messageMappers';
-import { getPersonalizationData } from './messageSelectors';
+import { getCombinedSettingsData } from './messageSelectors';
 
 // StoreGet remains the same
 type StoreGet = () => MessageStoreState & MessageStoreActions;
@@ -27,14 +27,8 @@ type StoreGet = () => MessageStoreState & MessageStoreActions;
 interface DevtoolsAction {
     type: string;
     [key: string]: any;
-    [key: number]: any; // Add number index signature
-    // We could add [key: symbol]: any; but it's often less common for plain action objects
-    // and might not be strictly necessary if the underlying type is just `any` for extra props.
-    // Let's try without it first, as the error specifically mentioned 'symbol' was missing
-    // from *my* DevtoolsAction when comparing to the target.
-    // The target type is `{ [x: string]: unknown; [x: number]: unknown; [x: symbol]: unknown; type: string; }`
-    // So, to be fully compatible, we should add it.
-    [key: symbol]: any; // Add symbol index signature
+    [key: number]: any; 
+    [key: symbol]: any; 
 }
 
 // Updated StoreSet
@@ -43,6 +37,7 @@ type StoreSet = (
     replace?: false | undefined,
     action?: string | DevtoolsAction | undefined
 ) => void;
+
 
 
 export const handleSendMessage = (
@@ -91,7 +86,7 @@ export const handleSendMessage = (
     const botPlaceholderId = `bot-pending-${generateMessageId()}`;
     setPendingBotMessageId(botPlaceholderId);
 
-    const personalizationInfo = getPersonalizationData();
+    const combinedSettings = getCombinedSettingsData(); // <<< CALL THE CORRECT SELECTOR
 
     const payloadForSocket: SendMessageData = {
         parts: parts,
@@ -99,19 +94,20 @@ export const handleSendMessage = (
         language: currentLanguage.code as LanguageCode,
         conversationId: activeConversationId,
         frontendMessageId: newUserMessage.id,
-        personalizationData: personalizationInfo,
+        personalizationData: combinedSettings, // <<< ASSIGN THE RESULT
         originalUserFiles: originalUserFilesInfo,
     };
     useSocketStore.getState().emitSendMessage(payloadForSocket);
 };
 
+// ... (handleLoadHistoryMessages không thay đổi) ...
 export const handleLoadHistoryMessages = (
     set: StoreSet,
     historyItems: HistoryItem[]
 ) => {
     const frontendMessages = historyItems
         .map(mapBackendHistoryItemToFrontendChatMessage)
-        .filter(msg => msg !== null) as ChatMessageType[]; // Filter out nulls and assert type
+        .filter(msg => msg !== null) as ChatMessageType[]; 
 
     set({
         chatMessages: frontendMessages,
@@ -121,13 +117,14 @@ export const handleLoadHistoryMessages = (
     }, false, 'loadHistoryMessages');
 };
 
+
 export const handleSubmitEditedMessage = (
     get: StoreGet,
     set: StoreSet,
     messageIdToEdit: string,
     newText: string
 ) => {
-    const { setChatMessages, setLoadingState, animationControls, resetAwaitFlag, setPendingBotMessageId } = get(); // removed storeSetEditingMessageId as it's handled by setEditingMessageId in main store
+    const { setChatMessages, setLoadingState, animationControls, resetAwaitFlag, setPendingBotMessageId } = get();
     const { currentLanguage } = useSettingsStore.getState();
     const { activeConversationId } = useConversationStore.getState();
 
@@ -191,17 +188,19 @@ export const handleSubmitEditedMessage = (
     setPendingBotMessageId(newBotResponsePlaceholderId);
     setLoadingState({ isLoading: true, step: 'updating_message', message: 'Updating message...', agentId: undefined });
 
-    const personalizationInfo = getPersonalizationData();
-    const payload: EditUserMessagePayload & { personalizationData?: PersonalizationPayload | null } = {
+    const combinedSettings = getCombinedSettingsData(); // <<< CALL THE CORRECT SELECTOR
+    // Đảm bảo EditUserMessagePayload có thể nhận personalizationData
+    const payload: EditUserMessagePayload = {
         conversationId: activeConversationId,
         messageIdToEdit: messageIdToEdit,
         newText: trimmedNewText,
         language: currentLanguage.code,
-        personalizationData: personalizationInfo,
+        personalizationData: combinedSettings, // <<< ASSIGN THE RESULT
     };
     useSocketStore.getState().emitEditUserMessage(payload);
 };
 
+// ... (handleResetChatUIForNewConversation, handleClearAuthErrorMessages không thay đổi) ...
 export const handleResetChatUIForNewConversation = (
     get: StoreGet,
     set: StoreSet,
@@ -217,8 +216,6 @@ export const handleResetChatUIForNewConversation = (
     get().resetAwaitFlag();
     if (clearActiveIdInOtherStores) {
         // Potentially clear active conversation ID in conversationStore if needed
-        // This part of logic might need adjustment based on how conversationStore handles it
-        // For now, assuming it's handled or not strictly needed by this store directly.
     }
     useUiStore.getState().setShowConfirmationDialog(false);
 };

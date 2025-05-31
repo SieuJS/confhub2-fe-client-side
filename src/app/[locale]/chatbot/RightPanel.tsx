@@ -10,7 +10,8 @@ import { useLiveChatSettings } from './livechat/contexts/LiveChatSettingsContext
 import { LanguageOption } from './stores';
 import { UserResponse } from '@/src/models/response/user.response';
 import { useAuth } from '@/src/contexts/AuthContext';
-import PersonalizationConfirmationModal from './PersonalizationConfirmationModal'; // <<< IMPORT MODAL
+import PersonalizationConfirmationModal from './PersonalizationConfirmationModal';
+import GoogleSearchConfirmationModal from './GoogleSearchConfirmationModal'; // <<< IMPORT MODAL MỚI
 
 const LiveAwareLanguageDropdown: React.FC<{
   currentLanguage: LanguageOption;
@@ -53,9 +54,11 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
     availableLanguages,
     isStreamingEnabled,
     isPersonalizationEnabled,
+    isGoogleSearchEnabled, // <<< LẤY STATE MỚI
     setCurrentLanguage,
     setIsStreamingEnabled,
     setIsPersonalizationEnabled,
+    setIsGoogleSearchEnabled, // <<< LẤY ACTION MỚI
   } = useSettingsStore(
     useShallow(state => ({
       chatMode: state.chatMode,
@@ -63,9 +66,11 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
       availableLanguages: state.availableLanguages,
       isStreamingEnabled: state.isStreamingEnabled,
       isPersonalizationEnabled: state.isPersonalizationEnabled,
+      isGoogleSearchEnabled: state.isGoogleSearchEnabled, // <<<
       setCurrentLanguage: state.setCurrentLanguage,
       setIsStreamingEnabled: state.setIsStreamingEnabled,
       setIsPersonalizationEnabled: state.setIsPersonalizationEnabled,
+      setIsGoogleSearchEnabled: state.setIsGoogleSearchEnabled, // <<<
     }))
   );
 
@@ -73,8 +78,7 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
   const [isBenefitModalOpen, setIsBenefitModalOpen] = useState(false);
   const [isMissingInfoModalOpen, setIsMissingInfoModalOpen] = useState(false);
   const [missingInfoFieldsText, setMissingInfoFieldsText] = useState('');
-
-  // Removed benefitPopupShownThisSession, as modal logic will handle display
+  const [isGoogleSearchModalOpen, setIsGoogleSearchModalOpen] = useState(false); // <<< STATE CHO MODAL MỚI
 
   const handleStreamingToggle = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -84,7 +88,6 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
 
   const proceedToEnablePersonalization = () => {
     setIsPersonalizationEnabled(true);
-    // setBenefitPopupShownThisSession(true); // No longer needed if modal is shown each time
   };
 
   const handlePersonalizationToggle = (
@@ -94,9 +97,8 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
 
     if (enable) {
       if (!user) {
-        // This case should ideally be prevented by disabling the toggle,
-        // but as a fallback, an alert can be used or a more styled notification.
         alert(t('Error_Login_Required_Generic'));
+        event.target.checked = false; // Revert toggle if login required
         return;
       }
 
@@ -112,28 +114,34 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
       if (missingFields.length > 0) {
         setMissingInfoFieldsText(missingFields.join(', '));
         setIsMissingInfoModalOpen(true);
-        // We don't change the toggle state here. It will be changed if user confirms in modal.
-        // To prevent the toggle from visually changing before confirmation,
-        // we can revert it if the modals are cancelled.
-        event.target.checked = false; // Revert optimistic UI change of the toggle
+        event.target.checked = false; 
       } else {
-        // No missing info, directly show benefit modal
         setIsBenefitModalOpen(true);
-        event.target.checked = false; // Revert optimistic UI change
+        event.target.checked = false; 
       }
     } else {
-      // User is disabling
       setIsPersonalizationEnabled(false);
+    }
+  };
+
+  const handleGoogleSearchToggle = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const enable = event.target.checked;
+    if (enable) {
+      setIsGoogleSearchModalOpen(true);
+      event.target.checked = false; // Revert optimistic UI change, actual change on modal confirm
+    } else {
+      setIsGoogleSearchEnabled(false);
     }
   };
 
   useEffect(() => {
     if (!isLoggedIn) {
-      // setBenefitPopupShownThisSession(false); // No longer needed
-      // Optionally turn off personalization if user logs out
       if (isPersonalizationEnabled) {
          setIsPersonalizationEnabled(false);
       }
+      // Google Search can remain enabled even if logged out, so no change here for isGoogleSearchEnabled
     }
   }, [isLoggedIn, isPersonalizationEnabled, setIsPersonalizationEnabled]);
 
@@ -143,7 +151,7 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
   }
 
   return (
-    <> {/* Use Fragment to return multiple root elements (Panel + Modals) */}
+    <>
       <div
         className={`bg-white-pure h-full flex-shrink-0 shadow-xl transition-all duration-300 ease-in-out  ${isRightPanelOpen ? 'w-72 opacity-100' : 'pointer-events-none w-0 opacity-0'
           }`}
@@ -199,7 +207,7 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
                     type='checkbox'
                     id='personalization-toggle-settings'
                     className='peer sr-only'
-                    checked={isPersonalizationEnabled} // This will reflect the actual store state
+                    checked={isPersonalizationEnabled}
                     onChange={handlePersonalizationToggle}
                     disabled={!isLoggedIn}
                   />
@@ -208,6 +216,28 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
                 {!isLoggedIn && (
                   <p className="text-xs text-gray-500 mt-1">{t('Personalization_Login_Required_Message')}</p>
                 )}
+              </div>
+            )}
+
+            {/* Google Search Toggle */}
+            {chatMode === 'regular' && (
+              <div className='space-y-2'>
+                <div className="flex items-center justify-between">
+                  <label htmlFor='google-search-toggle-settings' className='block text-sm font-medium'>
+                    {t('Enable_Google_Search_Toggle_Label')}
+                  </label>
+                </div>
+                <label htmlFor='google-search-toggle-settings' className='inline-flex cursor-pointer items-center'>
+                  <input
+                    type='checkbox'
+                    id='google-search-toggle-settings'
+                    className='peer sr-only'
+                    checked={isGoogleSearchEnabled}
+                    onChange={handleGoogleSearchToggle}
+                    // Không bị disable khi chưa login
+                  />
+                  <div className="peer relative h-6 w-10 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:peer-checked:bg-blue-600 dark:peer-focus:ring-blue-800 rtl:peer-checked:after:-translate-x-full"></div>
+                </label>
               </div>
             )}
 
@@ -240,9 +270,8 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
         isOpen={isMissingInfoModalOpen}
         onClose={() => setIsMissingInfoModalOpen(false)}
         onConfirm={() => {
-          // User chose "Enable Anyway"
-          setIsMissingInfoModalOpen(false); // Close this modal
-          setIsBenefitModalOpen(true);     // Open the benefit modal
+          setIsMissingInfoModalOpen(false);
+          setIsBenefitModalOpen(true);     
         }}
         type="missingInfo"
         missingFieldsText={missingInfoFieldsText}
@@ -252,11 +281,19 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
         isOpen={isBenefitModalOpen}
         onClose={() => setIsBenefitModalOpen(false)}
         onConfirm={() => {
-          // User confirmed to enable personalization
           proceedToEnablePersonalization();
           setIsBenefitModalOpen(false);
         }}
         type="enableBenefit"
+      />
+
+      <GoogleSearchConfirmationModal
+        isOpen={isGoogleSearchModalOpen}
+        onClose={() => setIsGoogleSearchModalOpen(false)}
+        onConfirm={() => {
+          setIsGoogleSearchEnabled(true);
+          setIsGoogleSearchModalOpen(false);
+        }}
       />
     </>
   );
