@@ -123,42 +123,43 @@ const MessageContentRenderer: React.FC<MessageContentRendererProps> = ({
       </div>
     );
   }
-
-  // --- Multimodal and General Content Rendering ---
   // --- Multimodal and General Content Rendering ---
   const fileElements: React.ReactNode[] = [];
   const textElements: React.ReactNode[] = [];
-  let hasRenderedTextFromParts = false; // Giữ nguyên biến này
+  let hasRenderedTextFromParts = false;
 
-  // 1. Render User Files (từ prop `files`)
-  if (files && files.length > 0) {
+  // 1. Render User Files (from prop `files`) - ONLY if it's a user message
+  if (isUserMessage && files && files.length > 0) {
     files.forEach((file, index) => {
-      // FilePartDisplay sẽ tự xử lý việc render UserFileDisplayItem
       fileElements.push(
         <FilePartDisplay key={`user-file-${index}`} item={file} isUserMessage={isUserMessage} />
       );
     });
   }
 
-  // 2. Render files từ `parts` và gom text từ `parts`
-  let textFromPartsAccumulator = ""; // Đổi tên để tránh nhầm với prop `text`
+  // 2. Process `parts`
+  let textFromPartsAccumulator = "";
 
   if (parts && parts.length > 0) {
     parts.forEach((part, index) => {
       if (part.text) {
-        if (!text) { // Chỉ gom text từ parts nếu prop `text` không được cung cấp
+        if (!text) {
           textFromPartsAccumulator += (textFromPartsAccumulator ? "\n" : "") + part.text;
         }
       } else if (part.fileData || part.inlineData) {
-        // FilePartDisplay sẽ tự xử lý việc render GeminiPartSDK (fileData/inlineData)
-        // và trả về null cho các part không phải file (text, functionCall, functionResponse)
-        const fileDisplayElement = <FilePartDisplay key={`part-sdk-file-${index}`} item={part} isUserMessage={isUserMessage} />;
-        // Chỉ thêm vào fileElements nếu FilePartDisplay thực sự render ra gì đó (không phải null)
-        // Tuy nhiên, FilePartDisplay đã tự trả về null, nên ta cứ push, React sẽ bỏ qua null elements.
-        fileElements.push(fileDisplayElement);
+        // For BOT messages, render files from parts.
+        // For USER messages, files from parts (like GCS URIs) should NOT be rendered here,
+        // as they are already handled by the `files` prop (UserFileDisplayItem).
+        if (!isUserMessage) { // <<< KEY CHANGE HERE
+          const fileDisplayElement = <FilePartDisplay key={`part-sdk-file-${index}`} item={part} isUserMessage={isUserMessage} />;
+          fileElements.push(fileDisplayElement);
+        }
+        // If it IS a user message, we still want to acknowledge that the part had fileData/inlineData
+        // for the `hasDisplayableContentInParts` check, but we don't render it again.
+        // The `hasDisplayableContentInParts` check at the top already uses `parts.some(...)`
+        // so no extra logic needed here for that.
       }
-      // Các part chỉ có functionCall hoặc functionResponse sẽ được FilePartDisplay xử lý trả về null
-      // và không được thêm vào fileElements ở đây.
+      // functionCall/functionResponse parts are handled by FilePartDisplay returning null
     });
 
     if (!text && textFromPartsAccumulator) {
@@ -174,23 +175,17 @@ const MessageContentRenderer: React.FC<MessageContentRendererProps> = ({
     }
   }
 
-  // 3. Render Bot Files (từ prop `botFiles`)
-  if (botFiles && botFiles.length > 0 && !isUserMessage) {
-    // Logic kiểm tra trùng lặp có thể cần xem xét lại nếu FilePartDisplay đã xử lý tốt
-    // Hiện tại, FilePartDisplay được gọi cho cả `parts` và `botFiles`.
-    // Nếu `botFiles` là một cách khác để truyền cùng một file đã có trong `parts`,
-    // thì logic chống trùng lặp là cần thiết.
-    // Nếu `botFiles` là nguồn file riêng biệt, thì không cần chống trùng lặp.
-    // Giả sử `botFiles` có thể chứa file đã có trong `parts.fileData` hoặc `parts.inlineData`
+  // 3. Render Bot Files (from prop `botFiles`) - ONLY if it's a bot message
+  //    And ensure no duplicates if bot files might also appear in `parts`
+  if (!isUserMessage && botFiles && botFiles.length > 0) {
     const renderedFileKeys = new Set<string>();
+    // Populate renderedFileKeys from files already added from `parts` (for bot messages)
     fileElements.forEach(el => {
-      if (React.isValidElement(el)) {
-        const item = el.props.item;
-        if (item?.fileData?.fileUri) renderedFileKeys.add(item.fileData.fileUri);
-        else if (item?.inlineData?.data && item?.inlineData?.mimeType) {
+      if (React.isValidElement(el) && el.props.item) {
+        const item = el.props.item as GeminiPartFromSDK; // Assume items from parts are GeminiPartSDK
+        if (item.fileData?.fileUri) renderedFileKeys.add(item.fileData.fileUri);
+        else if (item.inlineData?.data && item.inlineData?.mimeType) {
           renderedFileKeys.add(`data:${item.inlineData.mimeType};base64,${item.inlineData.data}`);
-        } else if (item?.uri) { // For BotFileDisplayItem
-          renderedFileKeys.add(item.uri);
         }
       }
     });
@@ -198,15 +193,15 @@ const MessageContentRenderer: React.FC<MessageContentRendererProps> = ({
     botFiles.forEach((botFile, index) => {
       const key = botFile.uri || (botFile.inlineData ? `data:${botFile.inlineData.mimeType};base64,${botFile.inlineData.data}` : `prop-bot-file-unique-${index}`);
       if (!renderedFileKeys.has(key)) {
-        // FilePartDisplay sẽ tự xử lý việc render BotFileDisplayItem
         fileElements.push(
           <FilePartDisplay key={`prop-bot-file-${index}`} item={botFile} isUserMessage={isUserMessage} />
         );
+        renderedFileKeys.add(key); // Add to set after pushing
       }
     });
   }
 
-  // 4. Render primary `text` (prop `text`) nếu nó chưa được render từ `parts`
+  // 4. Render primary `text` (prop `text`) if it wasn't already rendered from `parts`
   if (text && !hasRenderedTextFromParts) {
     const markdownOutput = renderMarkdown(text);
     if (markdownOutput) {
