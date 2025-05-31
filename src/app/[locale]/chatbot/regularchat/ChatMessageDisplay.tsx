@@ -129,7 +129,6 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
         />
       ) : (
         <MessageContentRenderer
-          // Pass all necessary props for rendering multimodal content
           text={text}
           parts={parts}
           files={files}
@@ -137,7 +136,7 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
           type={type}
           location={location}
           action={action}
-          // Consider passing isUser if rendering differs for user vs bot images/files
+          isUserMessage={isUser} // <<< TRUYỀN isUser XUỐNG
         />
       )}
 

@@ -20,7 +20,7 @@ import {
   useConversationListState,
 } from '@/src/app/[locale]/chatbot/stores/storeHooks';
 import { useSettingsStore } from '@/src/app/[locale]/chatbot/stores';
-import { useMessageStore } from '@/src/app/[locale]/chatbot/stores/messageStore'; // Import trực tiếp để lấy editingMessageId
+import { useMessageStore } from '@/src/app/[locale]/chatbot/stores/messageStore/messageStore'; // Import trực tiếp để lấy editingMessageId
 
 interface RegularChatProps {
   isSmallContext?: boolean;

@@ -7,8 +7,8 @@ import { AuthResponse, UserResponse } from '@/src/models/response/user.response'
 import { appConfig } from '@/src/middleware';
 
 // Import các store cần thiết
-import { useMessageStore } from '../app/[locale]/chatbot/stores/messageStore';
-import { useConversationStore } from '../app/[locale]/chatbot/stores/conversationStore';
+import { useMessageStore } from '../app/[locale]/chatbot/stores/messageStore/messageStore';
+import { useConversationStore } from '../app/[locale]/chatbot/stores/conversationStore/conversationStore';
 import { useSocketStore } from '../app/[locale]/chatbot/stores/socketStore';
 import { useUiStore } from '../app/[locale]/chatbot/stores/uiStore';
 // import { useSettingsStore } from '../app/[locale]/chatbot/stores/setttingsStore';

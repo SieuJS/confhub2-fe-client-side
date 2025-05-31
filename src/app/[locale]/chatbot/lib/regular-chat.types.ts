@@ -1,45 +1,200 @@
-
 // src/app/[locale]/chatbot/lib/regular-chat.types.ts
-import { FunctionCall, Part } from "@google/genai"; // Import necessary types
+import { FunctionCall, Part as GooglePart } from "@google/genai"; // Đổi tên Part thành GooglePart để tránh nhầm lẫn
 
-// Ensure HistoryItem part can hold various types
-export interface HistoryItem {
-    /** The role of the entity that produced this part of the conversation. */
-    role: "user" | "model" | "function"; // 'function' role represents the *result* returned to the model
-    /** The content parts, directly using the Google AI SDK's Part type. */
-    parts: Part[];
-    /** Optional ISO timestamp indicating when the item was added. */
-    timestamp?: string | Date;
-    uuid?: string;
-}
+// --- Core Data Structures ---
 
-// ChatResponse might just return the final outcome
-export interface ChatResponse {
-    type: "text" | "error";
-    message: string;
-    thought?: string; // Optional field for internal reasoning/steps
+/**
+ * Represents a file uploaded by the user, primarily for UI display and initial sending.
+ */
+export interface UserFile {
+  name: string;
+  type: string;
+  size: number;
+  dataUrl?: string; // For client-side preview (blob or base64 URL)
+  // googleFileUri?: string; // Có thể thêm nếu muốn giữ tham chiếu đến URI sau khi upload thành công ở client
 }
 
 /**
- * Represents a chunk of text sent from the backend to the frontend during streaming responses.
- * This allows for live display of AI-generated text.
+ * Represents a file sent by the bot, for UI display.
  */
-export interface ChatUpdate {
-    /** Always 'partial_result' for discrimination. */
-    type: 'partial_result';
-    /** The piece of text generated in this chunk. */
-    textChunk: string;
-    /** Optional: For streaming structured parts (more complex) */
-    parts?: Part[];
-
+export interface BotFile {
+  uri?: string; // URI if it's a file from Google File API or external link
+  inlineData?: { mimeType: string; data: string }; // Base64 data for inline content
+  mimeType: string; // Always present
+  name?: string; // Optional: A display name for the bot's file
 }
 
-// You might want an intermediate response type if handleUserInput needs more info
-export interface GeminiInteractionResult {
-    status: "requires_function_call" | "final_text" | "error";
-    functionCall?: FunctionCall; // Present if status is 'requires_function_call'
-    text?: string; // Present if status is 'final_text'
-    errorMessage?: string; // Present if status is 'error'
+/**
+ * Stores original information about a user-uploaded file, sent to backend for persistence.
+ */
+export interface OriginalUserFileInfo {
+  name: string;        // Original file name
+  size: number;        // Original file size in bytes
+  type: string;        // Original MIME type
+  googleFileUri: string; // The URI returned by Google File API after upload
+}
+
+/**
+ * Represents a single part of a message, aligned with Google's SDK Part,
+ * but potentially extended if absolutely necessary (though generally avoided).
+ * Hiện tại, chúng ta sẽ sử dụng trực tiếp GooglePart.
+ */
+export type AppPart = GooglePart; // Sử dụng trực tiếp type từ SDK
+
+/**
+ * Structure for an item in the conversation history (stored in backend, sent to frontend).
+ */
+export interface HistoryItem {
+  role: "user" | "model" | "function";
+  parts: AppPart[]; // Parts theo định nghĩa của Google SDK
+  timestamp?: string | Date;
+  uuid: string; // Unique ID for the message (frontend generated for user, backend for model)
+  thoughts?: ThoughtStep[]; // Optional: Model's thought process
+  action?: FrontendAction;  // Optional: Action requested by the model
+  // Thông tin file gốc của người dùng, chỉ có ý nghĩa với role: 'user'
+  userFileInfo?: OriginalUserFileInfo[];
+}
+
+
+/**
+ * Structure for a message displayed in the chat UI (Frontend).
+ */
+export interface ChatMessageType {
+  id: string; // uuid từ HistoryItem
+  role: "user" | "model" | "function";
+  parts: AppPart[]; // Parts gốc từ HistoryItem, dùng cho MessageContentRenderer
+  text?: string;    // Text chính của tin nhắn, có thể được trích xuất từ parts
+  isUser: boolean; // Suy ra từ role
+  type: MessageType; // Loại tin nhắn để render UI (text, multimodal, map, error, etc.)
+  timestamp?: string | Date;
+  thoughts?: ThoughtStep[];
+  action?: FrontendAction;
+  location?: string; // Dùng cho 'map' type
+  errorCode?: string; // Dùng cho 'error'/'warning' type
+
+  // Files cụ thể cho hiển thị, được map từ HistoryItem
+  files?: UserFile[]; // Files do người dùng gửi (map từ userFileInfo hoặc parts nếu là user)
+  botFiles?: BotFile[]; // Files do bot gửi (map từ parts nếu là model)
+}
+
+
+
+// --- Socket Payloads ---
+
+/**
+ * Payload for sending a new message from frontend to backend.
+ */
+export interface SendMessageData {
+  parts: AppPart[]; // Nội dung chính của tin nhắn
+  isStreaming?: boolean;
+  language: LanguageCode; // Sử dụng LanguageCode đã định nghĩa
+  conversationId?: string | null;
+  frontendMessageId: string; // ID do frontend tạo cho tin nhắn user
+  personalizationData?: PersonalizationPayload | null;
+  originalUserFiles?: OriginalUserFileInfo[]; // Thông tin file gốc của user
+}
+
+
+/**
+ * Payload for the 'initial_history' event from backend to frontend.
+ */
+export interface InitialHistoryPayload {
+  conversationId: string;
+  messages: HistoryItem[]; // Backend gửi HistoryItem[], frontend store sẽ map sang ChatMessageType[]
+}
+
+/**
+ * Payload for editing a user message, sent from frontend to backend.
+ */
+export interface EditUserMessagePayload {
+  conversationId: string;
+  messageIdToEdit: string; // UUID của tin nhắn user cần sửa
+  newText: string;
+  language: LanguageCode;
+  personalizationData?: PersonalizationPayload | null;
+}
+
+
+/**
+ * Payload sent from backend to frontend after a user message is edited and AI responds.
+ */
+export interface BackendConversationUpdatedAfterEditPayload {
+  editedUserMessage: HistoryItem; // Tin nhắn user đã được cập nhật (từ DB)
+  newBotMessage: HistoryItem;     // Phản hồi mới từ bot (từ DB)
+  conversationId: string;
+}
+
+
+/**
+ * Represents a chunk of text/data sent from backend during streaming.
+ */
+export interface ChatUpdate {
+  type: 'partial_result';
+  textChunk?: string; // Ưu tiên textChunk cho streaming text
+  parts?: AppPart[];  // Dùng cho streaming non-text parts (ít phổ biến hơn)
+  thoughts?: ThoughtStep[]; // Có thể stream cả thoughts
+}
+
+/**
+ * Represents the final result of a bot's turn.
+ */
+export interface ResultUpdate {
+  type: 'result';
+  id?: string; // ID cuối cùng của tin nhắn bot từ backend (quan trọng)
+  message?: string; // Text tổng hợp cuối cùng (có thể không có nếu chỉ có parts phức tạp)
+  parts?: AppPart[]; // Parts đầy đủ cuối cùng từ model
+  thoughts?: ThoughtStep[];
+  action?: FrontendAction;
+}
+
+
+
+/**
+ * Represents an error or warning from the backend.
+ */
+export interface ErrorUpdate {
+  type: 'error' | 'warning';
+  message: string;
+  step?: string;
+  code?: string;
+  details?: any;
+  thoughts?: ThoughtStep[];
+}
+
+/**
+ * Represents a status update from the backend during processing.
+ */
+export interface StatusUpdate {
+  type: 'status';
+  step: string; // Bước xử lý hiện tại ở backend
+  message: string; // Mô tả cho bước đó
+  details?: any;
+  thoughts?: ThoughtStep[];
+  agentId?: AgentId;
+}
+
+
+
+// --- UI & Helper Types ---
+
+export type MessageType = 'text' | 'error' | 'warning' | 'map' | 'follow_update' | 'multimodal';
+
+export interface ThoughtStep {
+  step: string;
+  message: string;
+  timestamp: string;
+  details?: any;
+  agentId?: AgentId;
+}
+
+
+export type AgentId = 'HostAgent' | 'ConferenceAgent' | 'JournalAgent' | 'AdminContactAgent' | 'NavigationAgent' | 'WebsiteInfoAgent' | string;
+
+export interface LoadingState {
+  isLoading: boolean;
+  step: string;
+  message: string;
+  agentId?: AgentId; // Đổi string thành AgentId
 }
 
 // Define the structure for a single step in the thought process
@@ -53,18 +208,6 @@ export interface ThoughtStep {
 }
 
 
-export type AgentId = 'HostAgent' | 'ConferenceAgent' | 'JournalAgent' | 'AdminContactAgent' | 'NavigationAgent' | 'WebsiteInfoAgent' | string; // Allow string for flexibility if needed
-
-
-export interface StatusUpdate {
-    type: 'status';
-    step: string;
-    message: string;
-    details?: any; // Optional details relevant to the step (e.g., function name/args)
-    thoughts?: ThoughtStep[]; // Add the thought process history
-    agentId?: AgentId; // <<< THÊM DÒNG NÀY
-}
-
 // --- Define Action Types ---
 export interface NavigationAction {
     type: 'navigate';
@@ -76,72 +219,6 @@ export interface OpenMapAction {
     type: 'openMap';
     location: string; // The location string to search on Google Maps
 }
-
-// --- ResultUpdate (No change needed here, already has optional 'action') ---
-export interface ResultUpdate {
-    type: 'result';
-    message: string; // The text message to display
-    /** Optional: Full structured parts from the model */
-    parts?: Part[];
-    thoughts?: ThoughtStep[];
-    action?: FrontendAction; // Now includes NavigationAction or OpenMapAction
-}
-
-
-export interface ErrorUpdate {
-    type: 'error' | 'warning'; // Có thể là 'error' hoặc 'warning'
-    message: string;
-    step?: string;          // Bước trong quy trình server gây ra lỗi
-    code?: string;          // Mã lỗi cụ thể từ server (ví dụ: 'AUTH_REQUIRED', 'CONVERSATION_NOT_FOUND')
-    details?: any;          // Thông tin chi tiết thêm về lỗi (ví dụ: { conversationId: 'xyz' })
-    thoughts?: ThoughtStep[]; // Lịch sử "suy nghĩ" dẫn đến lỗi
-    // `thought?: string;` có thể được loại bỏ nếu `thoughts?: ThoughtStep[]` đã bao hàm ý nghĩa của nó
-}
-
-
-
-
-export type MessageType = 'text' | 'error' | 'warning' | 'map' | 'follow_update' | 'multimodal';
-/** Defines the possible types for a message displayed in the chat UI. */
-
-// ChatMessageType ở frontend cần có cấu trúc tương đồng với ChatHistoryItem ở backend
-// để có thể nhận và xử lý trực tiếp.
-export interface ChatMessageType {
-    id: string; // uuid từ ChatHistoryItem
-    role: "user" | "model" | "function"; // role từ ChatHistoryItem
-    parts: Part[]; // parts từ ChatHistoryItem
-    text?: string; // Có thể được tạo ra ở frontend từ parts để hiển thị nhanh
-    isUser: boolean; // Được suy ra từ role
-    type: MessageType;
-    timestamp?: string | Date;
-    thoughts?: ThoughtStep[];
-    action?: FrontendAction;
-    location?: string;
-    errorCode?: string;
-    files?: Array<{ name: string; type: string; size: number; dataUrl?: string }>; // Cho file người dùng gửi
-    botFiles?: Array<{ uri?: string; inlineData?: { mimeType: string; data: string }; mimeType: string }>; // Cho file bot gửi
-    // uuid không cần nữa nếu id đã là uuid
-}
-
-
-export interface InitialHistoryPayload {
-    conversationId: string;
-    messages: ChatMessageType[]; // <<< Sẽ nhận mảng ChatMessageType (đã được map ở frontend store)
-                                 // HOẶC, nếu backend gửi ChatHistoryItem[], thì frontend store sẽ map nó.
-                                 // Để đơn giản nhất, backend gửi ChatHistoryItem[], frontend store map.
-}
-export interface EditingMessageState {
-    id: string;           // ID của tin nhắn đang được chỉnh sửa
-    originalText: string; // Nội dung gốc của tin nhắn trước khi chỉnh sửa
-}
-
-export interface LoadingState {
-    isLoading: boolean;
-    step: string;
-    message: string;
-    agentId?: string;
-}
-
 
 /**
  * Payload for the 'displayList' frontend action.
@@ -283,21 +360,6 @@ export interface EmailConfirmationResult {
     message: string; // Message from backend explaining the outcome
 }
 
-// Update ResultUpdate if action is part of it
-export interface ResultUpdate {
-    type: 'result';
-    id?: string; // <<< ADD THIS OPTIONAL FIELD (it's the final backend ID of the bot message)
-
-    message: string; // Can be null if only action is present
-    thoughts?: ThoughtStep[];
-    action?: FrontendAction; // Ensure this includes the new type
-}
-
-
-export interface InitialHistoryPayload {
-    conversationId: string;
-    messages: ChatMessageType[]; // Nhận luôn định dạng frontend
-}
 
 
 // Định nghĩa payload cho action hiển thị nguồn hội nghị
@@ -401,31 +463,16 @@ export interface PersonalizationPayload {
 }
 
 
-export interface EditUserMessagePayload {
-    conversationId: string;
-    messageIdToEdit: string;
-    newText: string;
-    language: string; // Or LanguageCode
-    personalizationData?: PersonalizationPayload | null; // <<< ADDED
-}
-
 
 
 export interface SendMessagePayload { // This is for socketStore, might need adjustment
     // userInput: string; // OLD
-    parts: Part[]; // <<< NEW: The actual content to send to the model
+    parts: GooglePart[]; // <<< NEW: The actual content to send to the model
     isStreaming: boolean;
     language: string;
     conversationId: string | null;
     frontendMessageId: string; // ID of the user's message in the UI
     personalizationData?: PersonalizationPayload | null;
-}
-
-
-export interface ConversationUpdatedAfterEditPayload {
-    editedUserMessage: ChatMessageType; // The user message with its original ID but updated content
-    newBotMessage: ChatMessageType;     // The new bot response
-    conversationId: string;             // To ensure update is for the active conversation
 }
 
 // Add to your backend shared types as well (e.g., src/chatbot/shared/types.ts)
@@ -435,10 +482,4 @@ export interface BackendEditUserMessagePayload {
     messageIdToEdit: string;
     newText: string;
     language: string;
-}
-
-export interface BackendConversationUpdatedAfterEditPayload {
-    editedUserMessage: HistoryItem; // Or your backend's message type
-    newBotMessage: HistoryItem;     // Or your backend's message type
-    conversationId: string;
 }

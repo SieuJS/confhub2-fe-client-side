@@ -30,7 +30,6 @@ import {
     LanguageOption,
     StatusUpdate,
     FrontendAction,
-    EditingMessageState, // <<< THÊM TYPE MỚI CHO EDITING MESSAGE
 } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
 import { StreamingTextAnimationControls } from '@/src/hooks/regularchat/useStreamingTextAnimation';
 
@@ -147,12 +146,16 @@ export const useMessageActions = () => {
             addChatMessage: state.addChatMessage,
             updateMessageById: state.updateMessageById,
             setLoadingState: state.setLoadingState,
+            setAnimationControls: state.setAnimationControls,
+            resetAwaitFlag: state.resetAwaitFlag,
             setPendingBotMessageId: state.setPendingBotMessageId,
             sendMessage: state.sendMessage,
             resetChatUIForNewConversation: state.resetChatUIForNewConversation,
+            submitEditedMessage: state.submitEditedMessage,
+            setEditingMessageId: state.setEditingMessageId,
             clearAuthErrorMessages: state.clearAuthErrorMessages,
-            // setEditingMessage: state.setEditingMessage, // <<< BỎ
-            submitEditedMessage: state.submitEditedMessage, // Signature đã được cập nhật trong store
+            loadHistoryMessages: state.loadHistoryMessages,
+
         }))
     );
 };

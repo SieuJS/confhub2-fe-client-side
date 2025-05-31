@@ -1,6 +1,6 @@
 // src/hooks/chatbot/useMessageEditing.ts
 import { useState, useEffect, useRef } from 'react';
-import { useMessageStore } from '@/src/app/[locale]/chatbot/stores/messageStore'; // << IMPORT STORE
+import { useMessageStore } from '@/src/app/[locale]/chatbot/stores/messageStore/messageStore'; // << IMPORT STORE
 
 interface UseMessageEditingProps {
   messageId: string;

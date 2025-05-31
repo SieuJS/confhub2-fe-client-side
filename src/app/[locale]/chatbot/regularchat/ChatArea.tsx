@@ -4,7 +4,7 @@ import ChatHistory from './ChatHistory';
 import ChatIntroductionDisplay from './ChatIntroduction';
 import { ChatMessageType } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
 import { LanguageCode } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
-import { useMessageStore } from '@/src/app/[locale]/chatbot/stores/messageStore'; // <<< THÊM LẠI
+import { useMessageStore } from '@/src/app/[locale]/chatbot/stores/messageStore/messageStore'; // <<< THÊM LẠI
 
 interface ChatAreaProps {
     messages: ChatMessageType[];

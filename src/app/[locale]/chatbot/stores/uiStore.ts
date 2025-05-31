@@ -3,11 +3,11 @@ import { create } from 'zustand';
 import { persist, createJSONStorage, devtools } from 'zustand/middleware';
 import { ConfirmSendEmailAction, ErrorUpdate, ThoughtStep } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Adjust path
 import { generateMessageId } from '@/src/app/[locale]/chatbot/utils/chatUtils';
-import { useMessageStore } from './messageStore';
+import { useMessageStore } from './messageStore/messageStore';
 import { useSocketStore } from './socketStore';
 import { ChatMessageType } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
+import { Part } from '@google/genai'; // Import Part from Google GenAI SDK
 
-// --- Types for UI Store State ---
 // --- Types for UI Store State ---
 export interface UiStoreState {
     hasFatalError: boolean;
@@ -86,7 +86,6 @@ export const useUiStore = create<UiStoreState & UiStoreActions>()(
 
                     if (errorInput instanceof Error) {
                         finalError.message = errorInput.message;
-                        // Cố gắng lấy code nếu có, ví dụ từ custom error
                         if ('code' in errorInput && typeof (errorInput as any).code === 'string') {
                             finalError.code = (errorInput as any).code;
                         }
@@ -110,30 +109,31 @@ export const useUiStore = create<UiStoreState & UiStoreActions>()(
                         }
                     }
 
-
                     if (stopLoadingInMessageStore) {
                         setLoadingState({ isLoading: false, step: 'error', message: finalError.errorType === 'error' ? 'Error' : 'Warning' });
                     }
 
+                    // --- CHỈNH SỬA TỪ ĐÂY ---
                     const botMessage: ChatMessageType = {
                         id: generateMessageId(),
-                        message: finalError.message,
-                        isUser: false,
-                        type: finalError.errorType,
+                        role: 'model', // Đây là tin nhắn do hệ thống tạo ra, coi như từ model
+                        parts: [{ text: finalError.message }], // Tạo một Part chứa văn bản lỗi
+                        text: finalError.message, // Tùy chọn: Giữ lại để tiện hiển thị nếu UI component vẫn dùng `text`
+                        isUser: false, // Vẫn giữ isUser để tiện cho việc render UI (ví dụ, căn trái/phải)
+                        type: finalError.errorType, // 'error' or 'warning'
                         thoughts: finalError.thoughts,
                         timestamp: new Date().toISOString(),
-                        errorCode: finalError.code, // <<<< THÊM errorCode VÀO ĐÂY
-
+                        errorCode: finalError.code,
                     };
                     addChatMessage(botMessage);
+                    // --- KẾT THÚC CHỈNH SỬA ---
 
-                    const isAuthError = finalError.code === 'AUTH_REQUIRED' || finalError.code === 'ACCESS_DENIED' || finalError.code === 'TOKEN_EXPIRED'; // Thêm TOKEN_EXPIRED nếu có
+                    const isAuthError = finalError.code === 'AUTH_REQUIRED' || finalError.code === 'ACCESS_DENIED' || finalError.code === 'TOKEN_EXPIRED';
                     const isGenericFatal = finalError.code === 'FATAL_SERVER_ERROR';
 
                     if (isFatal || isAuthError || isGenericFatal) {
                         const errorCodeToSet = finalError.code || 'UNKNOWN_FATAL_ERROR';
                         console.warn(`[UiStore] Fatal error detected (${finalError.message}, code: ${errorCodeToSet}). Setting fatal error flag.`);
-                        // Sử dụng action setHasFatalError đã được cập nhật
                         get().setHasFatalError(true, errorCodeToSet);
 
                         if (isAuthError) {

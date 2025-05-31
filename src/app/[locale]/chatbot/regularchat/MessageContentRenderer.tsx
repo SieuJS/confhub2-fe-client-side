@@ -25,13 +25,13 @@ type MarkdownComponentProps<T extends keyof ReactHTML> = PropsWithChildren<
 interface MessageContentRendererProps {
   text?: string;
   parts?: GeminiPartFromSDK[];
-  files?: ChatMessageType['files'];
-  botFiles?: ChatMessageType['botFiles'];
+  files?: ChatMessageType['files']; // User uploaded files for this message
+  botFiles?: ChatMessageType['botFiles']; // Bot sent files for this message
   type: MessageType;
   location?: string;
   action?: FrontendAction;
+  isUserMessage?: boolean; // <<< THÊM PROP NÀY
 }
-
 
 const MessageContentRenderer: React.FC<MessageContentRendererProps> = ({
   text,
@@ -41,9 +41,28 @@ const MessageContentRenderer: React.FC<MessageContentRendererProps> = ({
   type,
   location,
   action,
+  isUserMessage,
 }) => {
+
+  // --- KIỂM TRA SỚM ĐỂ BỎ QUA CÁC PART KHÔNG HIỂN THỊ ---
+  // Nếu không có text, không có files, và parts chỉ chứa functionCall/functionResponse
+  // thì không render gì cả.
+  const hasDisplayableContentInParts = parts && parts.some(p => p.text || p.fileData || p.inlineData);
+
+  if (
+    !text &&
+    (!files || files.length === 0) &&
+    (!botFiles || botFiles.length === 0) &&
+    (!parts || parts.length === 0 || !hasDisplayableContentInParts) &&
+    type !== 'map' && // map và follow_update có thể không có text/parts nhưng vẫn render
+    type !== 'follow_update' &&
+    action?.type !== 'displayConferenceSources'
+  ) {
+    // console.log("[MessageContentRenderer] No displayable content found, returning null. Type:", type, "Text:", text, "Parts:", parts);
+    return null; // Không render gì cả cho các message chỉ chứa function call/response
+  }
+
   const renderMarkdown = (content: string | undefined) => {
-    // (Giữ nguyên hàm renderMarkdown của bạn)
     if (!content) return null;
     return (
       <ReactMarkdown
@@ -105,106 +124,129 @@ const MessageContentRenderer: React.FC<MessageContentRendererProps> = ({
     );
   }
 
-  // --- Multimodal and General Text Rendering ---
+  // --- Multimodal and General Content Rendering ---
+  // --- Multimodal and General Content Rendering ---
+  const fileElements: React.ReactNode[] = [];
+  const textElements: React.ReactNode[] = [];
+  let hasRenderedTextFromParts = false; // Giữ nguyên biến này
 
-  const isPurelySystemPartMessage = parts && parts.length > 0 &&
-                                 parts.every(p => p.functionCall || p.functionResponse) &&
-                                 !parts.some(p => p.text || p.inlineData || p.fileData) &&
-                                 !text && (!files || files.length === 0) && (!botFiles || botFiles.length === 0);
-
-  if (isPurelySystemPartMessage) {
-    return null;
+  // 1. Render User Files (từ prop `files`)
+  if (files && files.length > 0) {
+    files.forEach((file, index) => {
+      // FilePartDisplay sẽ tự xử lý việc render UserFileDisplayItem
+      fileElements.push(
+        <FilePartDisplay key={`user-file-${index}`} item={file} isUserMessage={isUserMessage} />
+      );
+    });
   }
 
-  const contentToRender: React.ReactNode[] = [];
+  // 2. Render files từ `parts` và gom text từ `parts`
+  let textFromPartsAccumulator = ""; // Đổi tên để tránh nhầm với prop `text`
 
-  if (text) {
+  if (parts && parts.length > 0) {
+    parts.forEach((part, index) => {
+      if (part.text) {
+        if (!text) { // Chỉ gom text từ parts nếu prop `text` không được cung cấp
+          textFromPartsAccumulator += (textFromPartsAccumulator ? "\n" : "") + part.text;
+        }
+      } else if (part.fileData || part.inlineData) {
+        // FilePartDisplay sẽ tự xử lý việc render GeminiPartSDK (fileData/inlineData)
+        // và trả về null cho các part không phải file (text, functionCall, functionResponse)
+        const fileDisplayElement = <FilePartDisplay key={`part-sdk-file-${index}`} item={part} isUserMessage={isUserMessage} />;
+        // Chỉ thêm vào fileElements nếu FilePartDisplay thực sự render ra gì đó (không phải null)
+        // Tuy nhiên, FilePartDisplay đã tự trả về null, nên ta cứ push, React sẽ bỏ qua null elements.
+        fileElements.push(fileDisplayElement);
+      }
+      // Các part chỉ có functionCall hoặc functionResponse sẽ được FilePartDisplay xử lý trả về null
+      // và không được thêm vào fileElements ở đây.
+    });
+
+    if (!text && textFromPartsAccumulator) {
+      const markdownOutput = renderMarkdown(textFromPartsAccumulator);
+      if (markdownOutput) {
+        textElements.push(
+          <div key="text-from-parts" className="message-content break-words">
+            {markdownOutput}
+          </div>
+        );
+        hasRenderedTextFromParts = true;
+      }
+    }
+  }
+
+  // 3. Render Bot Files (từ prop `botFiles`)
+  if (botFiles && botFiles.length > 0 && !isUserMessage) {
+    // Logic kiểm tra trùng lặp có thể cần xem xét lại nếu FilePartDisplay đã xử lý tốt
+    // Hiện tại, FilePartDisplay được gọi cho cả `parts` và `botFiles`.
+    // Nếu `botFiles` là một cách khác để truyền cùng một file đã có trong `parts`,
+    // thì logic chống trùng lặp là cần thiết.
+    // Nếu `botFiles` là nguồn file riêng biệt, thì không cần chống trùng lặp.
+    // Giả sử `botFiles` có thể chứa file đã có trong `parts.fileData` hoặc `parts.inlineData`
+    const renderedFileKeys = new Set<string>();
+    fileElements.forEach(el => {
+      if (React.isValidElement(el)) {
+        const item = el.props.item;
+        if (item?.fileData?.fileUri) renderedFileKeys.add(item.fileData.fileUri);
+        else if (item?.inlineData?.data && item?.inlineData?.mimeType) {
+          renderedFileKeys.add(`data:${item.inlineData.mimeType};base64,${item.inlineData.data}`);
+        } else if (item?.uri) { // For BotFileDisplayItem
+          renderedFileKeys.add(item.uri);
+        }
+      }
+    });
+
+    botFiles.forEach((botFile, index) => {
+      const key = botFile.uri || (botFile.inlineData ? `data:${botFile.inlineData.mimeType};base64,${botFile.inlineData.data}` : `prop-bot-file-unique-${index}`);
+      if (!renderedFileKeys.has(key)) {
+        // FilePartDisplay sẽ tự xử lý việc render BotFileDisplayItem
+        fileElements.push(
+          <FilePartDisplay key={`prop-bot-file-${index}`} item={botFile} isUserMessage={isUserMessage} />
+        );
+      }
+    });
+  }
+
+  // 4. Render primary `text` (prop `text`) nếu nó chưa được render từ `parts`
+  if (text && !hasRenderedTextFromParts) {
     const markdownOutput = renderMarkdown(text);
     if (markdownOutput) {
-      contentToRender.push(
-        <div key="primary-text" className={`message-content break-words`}>
+      textElements.push(
+        <div key="primary-text-prop" className="message-content break-words">
           {markdownOutput}
         </div>
       );
     }
   }
 
-  if (parts && parts.length > 0) {
-    parts.forEach((part, index) => {
-      if (part.text) {
-        const primaryTextAlreadyRendered = contentToRender.some(el => (el as JSX.Element)?.key === "primary-text");
-        if (!text || (part.text !== text && !primaryTextAlreadyRendered)) {
-          const markdownOutput = renderMarkdown(part.text);
-          if (markdownOutput) {
-            contentToRender.push(
-              <div key={`part-sdk-text-${index}`} className={`message-content break-words ${primaryTextAlreadyRendered || text ? 'mt-1' : ''}`}>
-                {markdownOutput}
-              </div>
-            );
-          }
-        }
-      } else if (part.inlineData || part.fileData) {
-        contentToRender.push(
-          <FilePartDisplay key={`part-sdk-file-${index}`} item={part} />
-        );
-      }
-    });
+  // --- Xây dựng finalContent ---
+  const finalContent: React.ReactNode[] = [];
+  if (textElements.length > 0) { // Ưu tiên text lên trước file nếu cả hai đều có
+    finalContent.push(
+      <div key="texts-container" className={`${fileElements.length > 0 ? 'mb-2' : ''}`}> {/* Thêm margin bottom nếu có file */}
+        {textElements}
+      </div>
+    );
   }
-
-  if (files && files.length > 0) {
-    contentToRender.push(
-      <div key="user-files-container" className="mt-2 space-y-2">
-        {files.map((file, index) => (
-          <FilePartDisplay key={`user-file-${index}`} item={file} />
-        ))}
+  if (fileElements.filter(el => el !== null).length > 0) { // Chỉ thêm container nếu có file thực sự
+    finalContent.push(
+      <div key="files-container" className={`space-y-2 ${isUserMessage ? 'flex flex-col items-end' : ''}`}>
+        {fileElements}
       </div>
     );
   }
 
-  if (botFiles && botFiles.length > 0) {
-    const partFileKeys = new Set(
-        (parts || [])
-        .filter(p => p.fileData || p.inlineData)
-        .map(p => {
-            if (p.fileData?.fileUri) return p.fileData.fileUri;
-            // Sửa lỗi ở đây:
-            if (p.inlineData?.data) return p.inlineData.data.substring(0,50);
-            return Math.random().toString();
-        })
-    );
 
-    const uniqueBotFilesToRender = botFiles.filter(bf => {
-        let key: string;
-        if (bf.uri) {
-            key = bf.uri;
-        } else if (bf.inlineData?.data) { // Sửa lỗi ở đây
-            key = bf.inlineData.data.substring(0,50);
-        } else {
-            key = Math.random().toString();
-        }
-        return !partFileKeys.has(key);
-    });
-
-    if (uniqueBotFilesToRender.length > 0) {
-        contentToRender.push(
-          <div key="bot-files-container" className="mt-2 space-y-2">
-            {uniqueBotFilesToRender.map((botFile, index) => (
-              <FilePartDisplay key={`bot-file-${index}`} item={botFile} />
-            ))}
-          </div>
-        );
-    }
+  // Nếu sau tất cả các bước, finalContent vẫn rỗng, thì mới trả về null hoặc fallback.
+  // Điều này đã được xử lý bởi kiểm tra sớm ở đầu component.
+  // Nếu kiểm tra sớm không bắt được, và finalContent vẫn rỗng, đó là một trường hợp cần xem xét.
+  if (finalContent.length === 0) {
+    // console.log(`[MessageContentRenderer] FINAL CONTENT IS EMPTY (after all processing). Type: ${type}, Text Prop: "${text}", Files Prop: ${files?.length}, BotFiles Prop: ${botFiles?.length}, Parts Prop: ${parts?.length}`);
+    // Có thể trả về một div rỗng có kích thước tối thiểu để giữ bubble chat nếu cần
+    // return <div className="message-content min-h-[1.2em]"></div>;
+    return null; // Hoặc đơn giản là không render gì cả
   }
 
-  if (contentToRender.length === 0) {
-    if ((type === 'text' && text === "") ||
-        (type === 'multimodal' && !text && (!parts || parts.length === 0) && (!files || files.length === 0) && (!botFiles || botFiles.length === 0))) {
-      return <div className="message-content min-h-[1.2em]"></div>;
-    }
-    return <div className="message-content break-words italic text-gray-500">No displayable content.</div>;
-  }
-
-  return <>{contentToRender}</>;
+  return <>{finalContent}</>;
 };
 
 export default MessageContentRenderer;

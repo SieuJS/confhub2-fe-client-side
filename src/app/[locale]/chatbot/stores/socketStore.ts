@@ -2,9 +2,9 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware'; // Loại bỏ persist và createJSONStorage nếu không persist gì
 import { Socket } from 'socket.io-client';
-import { useMessageStore } from './messageStore';
+import { useMessageStore } from './messageStore/messageStore';
 import { useUiStore } from './uiStore';
-import { EditUserMessagePayload, PersonalizationPayload } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // <<< NEW
+import { EditUserMessagePayload, PersonalizationPayload, SendMessageData } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // <<< NEW
 import { Part } from "@google/genai"; // <<< IMPORT Part
 
 // --- Types for Socket Store State ---
@@ -18,15 +18,6 @@ export interface SocketStoreState {
     hasFatalConnectionError: boolean;
 }
 
-export interface SendMessagePayload { // This is the type for emitSendMessage
-    // userInput: string; // OLD
-    parts: Part[]; // <<< NEW: The actual content to send to the model
-    isStreaming: boolean;
-    language: string;
-    conversationId: string | null;
-    frontendMessageId: string; // ID of the user's message in the UI
-    personalizationData?: PersonalizationPayload | null;
-}
 
 export interface SocketStoreActions {
     // setAuthToken được giữ lại để useChatSocketManager có thể set token cho kết nối hiện tại
@@ -55,7 +46,7 @@ export interface SocketStoreActions {
     emitClearConversation: (conversationId: string) => void;
     emitRenameConversation: (conversationId: string, newTitle: string) => void;
     emitPinConversation: (conversationId: string, isPinned: boolean) => void;
-    emitSendMessage: (payload: SendMessagePayload) => void;
+    emitSendMessage: (payload: SendMessageData) => void;
     emitEditUserMessage: (payload: EditUserMessagePayload) => void; // <<< NEW
 }
 
