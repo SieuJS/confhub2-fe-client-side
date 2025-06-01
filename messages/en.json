@@ -1375,5 +1375,7 @@
   "ChatInput_Error_FileSize": "File \"{name}\" is too large. Maximum size is {maxSize}MB.",
   "ChatInput_Remove_File": "Remove file {fileName}",
   "ChatInput_Attach_File_Button_Label": "Attach file",
-  "Type_message_or_attach_files": "Type message or attach files..."
+  "Type_message_or_attach_files": "Type message or attach files...",
+  "User_data_not_available": "User data not available",
+  "dob_must_be_18_or_older": "Date of birth must indicate you are 18 years or older."
 }
