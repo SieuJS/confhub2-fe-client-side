@@ -15,11 +15,11 @@ type MicButtonProps = {
 const MicButton: React.FC<MicButtonProps> = ({
   muted,
   setMuted,
-  userMicVolume,     // Sử dụng tên mới
+  userMicVolume, // Sử dụng tên mới
   modelOutputVolume, // Sử dụng tên mới
   connected
 }) => {
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
   // Cập nhật CSS variable --user-mic-volume cho hiệu ứng vòng tròn đỏ
   useEffect(() => {
@@ -27,17 +27,20 @@ const MicButton: React.FC<MicButtonProps> = ({
       // Chuyển đổi userMicVolume (0-1) thành một giá trị phù hợp cho style
       // Ví dụ: nếu userMicVolume là 0-1, bạn có thể nhân với một hệ số
       // để hiệu ứng rõ ràng hơn. Giả sử bạn muốn scale từ 0px đến 20px chẳng hạn.
-      const effectScale = userMicVolume * 150; // Điều chỉnh 20 theo ý muốn
-      buttonRef.current.style.setProperty('--user-mic-volume-effect', `${effectScale}px`);
+      const effectScale = userMicVolume * 150 // Điều chỉnh 20 theo ý muốn
+      buttonRef.current.style.setProperty(
+        '--user-mic-volume-effect',
+        `${effectScale}px`
+      )
     }
-  }, [userMicVolume, muted]); // Cập nhật khi userMicVolume hoặc muted thay đổi
+  }, [userMicVolume, muted]) // Cập nhật khi userMicVolume hoặc muted thay đổi
 
   return (
-    <div className='flex items-center gap-2'>
+    <div className='flex items-center gap-0 lg:gap-2'>
       <button
         ref={buttonRef} // Gán ref cho button
         className={cn(
-          'relative z-10 flex h-10 w-10 select-none items-center justify-center rounded-full text-xl transition-all duration-200 ease-in',
+          'relative z-10 flex h-8 w-8 select-none items-center justify-center rounded-full text-xl transition-all duration-200 ease-in lg:h-10 lg:w-10',
           {
             'bg-red-600 text-black hover:bg-red-400 focus:border-gray-800 focus:outline-2 focus:outline-red-500':
               !muted,
@@ -48,7 +51,11 @@ const MicButton: React.FC<MicButtonProps> = ({
         onClick={() => setMuted(!muted)}
       >
         <span className='material-symbols-outlined filled'>
-          {muted ? <MicOff /> : <Mic />}
+          {muted ? (
+            <MicOff className='h-4 w-4 lg:h-5 lg:w-5' />
+          ) : (
+            <Mic className='h-4 w-4 lg:h-5 lg:w-5' />
+          )}
         </span>
         {!muted && (
           <div
@@ -65,10 +72,14 @@ const MicButton: React.FC<MicButtonProps> = ({
       </button>
       <div className='flex h-12 w-12 items-center justify-center'>
         {/* AudioPulse này giờ sẽ dùng modelOutputVolume */}
-        <AudioPulse volume={modelOutputVolume} active={connected /* Hoặc một cờ isModelSpeaking */} hover={false} />
+        <AudioPulse
+          volume={modelOutputVolume}
+          active={connected /* Hoặc một cờ isModelSpeaking */}
+          hover={false}
+        />
       </div>
     </div>
-  );
+  )
 }
 
-export default MicButton;
+export default MicButton

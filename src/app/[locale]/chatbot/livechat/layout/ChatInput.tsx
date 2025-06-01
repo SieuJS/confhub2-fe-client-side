@@ -126,7 +126,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
     `}
     >
       <TextareaAutosize
-        className='flex-grow resize-none bg-transparent px-4 py-2 text-sm  outline-none disabled:cursor-not-allowed' // Bỏ disabled:bg-gray-100 vì đã xử lý ở div cha
+        className='flex-grow resize-none bg-transparent px-0 py-2 text-xs outline-none disabled:cursor-not-allowed  lg:px-4 lg:text-sm' // Bỏ disabled:bg-gray-100 vì đã xử lý ở div cha
         placeholder={t('Enter_message_Ctrl_Enter_to_send')}
         value={message}
         onChange={handleInputChange}
@@ -148,7 +148,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
         disabled={isEffectivelyDisabled}
         aria-label={isLoading ? t('Sending') : t('Send_message')}
         className={`
-         h-10 w-10                                
+         h-8 w-8 lg:h-10 lg:w-10                              
         `}
         // style={{ minWidth: '32px', minHeight: '32px' }}
       >
@@ -158,7 +158,10 @@ const ChatInput: React.FC<ChatInputProps> = ({
         ) : (
           // --- Hoặc dùng thư viện react-spinners ---
           // <ClipLoader size={18} color={"#2563EB"} loading={true} /> // Điều chỉnh size/color phù hợp
-          <GrSend className='h-5 w-5 text-center text-button' size={20} /> // Điều chỉnh kích thước icon nếu cần
+          <GrSend
+            className='h-4 w-4 text-center text-button lg:h-5 lg:w-5'
+            size={20}
+          /> // Điều chỉnh kích thước icon nếu cần
         )}
       </Button>
     </div>
