@@ -15,6 +15,7 @@ import LoadingIndicator from './header/LoadingIndicator'; // Bạn có thể dù
 import { MenuIcon, CloseIcon } from './header/Icon';
 import Button from './Button';
 import { useAuth } from '@/src/contexts/AuthContext'; // <<<< THAY ĐỔI QUAN TRỌNG
+import LogoIcon from '../../icons/logo';
 
 interface Props {
   locale: string;
@@ -95,7 +96,7 @@ export const Header: FC<Props> = ({ locale }) => {
       <Link href='/' locale={locale}>
         <div className='flex flex-row items-center '>
           <div className='mb-2 h-8 w-8'>
-            <GlobeIcon />
+            <LogoIcon />
           </div>
           <strong className='mx-2 hidden select-none md:block'>
             Global Conference Hub
