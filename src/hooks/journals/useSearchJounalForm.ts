@@ -1,4 +1,5 @@
-// src/hooks/useSearchJournalForm.ts
+// src/hooks/
+// .ts
 import { useState, useEffect, useRef, ChangeEvent, KeyboardEvent } from 'react';
 
 interface SearchJournalParams {
