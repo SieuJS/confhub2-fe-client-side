@@ -1,10 +1,11 @@
 // src/app/[locale]/chatbot/regularchat/ChatMessageDisplay.tsx
 import React from 'react';
 import {
-  MessageType, // This should be ChatMessageType['type']
+  MessageType,
   ThoughtStep,
   FrontendAction,
-  ChatMessageType // <<< IMPORT ChatMessageType for files/botFiles
+  ChatMessageType, // Đã import
+  SourceItem,    // <<< THÊM IMPORT SourceItem
 } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
 import { TriangleAlert } from 'lucide-react';
 import ThoughtProcess from './ThoughtProcess';
@@ -16,22 +17,24 @@ import { useMessageCopy } from '@/src/hooks/regularchat/useMessageCopy';
 import { useMessageBubbleLogic } from '@/src/hooks/regularchat/useMessageBubbleLogic';
 
 import EditMessageForm from './EditMessageForm';
-import MessageContentRenderer from './MessageContentRenderer'; // This will need significant updates
+import MessageContentRenderer from './MessageContentRenderer';
 import MessageActionsBar from './MessageActionsBar';
+import MessageSourcesDisplay from './MessageSourcesDisplay'; // <<< THÊM IMPORT
 import { Part } from '@google/genai';
+
 interface ChatMessageDisplayProps {
   id: string;
-  // message: string; // <<< OLD: Remove this
-  text?: string; // <<< NEW: Primary textual content
-  parts?: Part[]; // <<< NEW: For multimodal content
-  files?: ChatMessageType['files']; // <<< NEW: User uploaded files
-  botFiles?: ChatMessageType['botFiles']; // <<< NEW: Bot sent files
+  text?: string;
+  parts?: Part[];
+  files?: ChatMessageType['files'];
+  botFiles?: ChatMessageType['botFiles'];
   isUser: boolean;
-  type: MessageType; // This is ChatMessageType['type']
+  type: MessageType;
   thoughts?: ThoughtStep[];
   location?: string;
   action?: FrontendAction;
-  timestamp?: string | Date; // <<< NEW: Add timestamp
+  timestamp?: string | Date;
+  sources?: SourceItem[]; // <<< THÊM PROP sources
   isInsideSmallContainer?: boolean;
   isLatestUserMessage: boolean;
   onConfirmEdit: (messageId: string, newText: string) => void;
@@ -39,16 +42,17 @@ interface ChatMessageDisplayProps {
 
 const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
   id,
-  text, // <<< USE text
-  parts, // <<< USE parts
-  files, // <<< USE files
-  botFiles, // <<< USE botFiles
+  text,
+  parts,
+  files,
+  botFiles,
   isUser,
-  type = 'text', // Default type
+  type = 'text',
   thoughts,
   location,
   action,
-  timestamp, // <<< USE timestamp
+  timestamp,
+  sources, // <<< NHẬN PROP sources
   isInsideSmallContainer = false,
   isLatestUserMessage,
   onConfirmEdit,
@@ -59,8 +63,6 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
     }))
   );
 
-  // The primary text content for editing and copying should come from `text` prop.
-  // If `text` is undefined (e.g., a message with only an image), provide a fallback.
   const primaryTextContent = text || (parts?.find(p => p.text)?.text) || "";
 
   const {
@@ -74,17 +76,17 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
     handleKeyDown,
   } = useMessageEditing({
     messageId: id,
-    initialMessage: primaryTextContent, // <<< USE primaryTextContent
+    initialMessage: primaryTextContent,
     isUser,
     isLatestUserMessage,
     onConfirmEdit,
   });
 
-  const { isCopied, handleCopy } = useMessageCopy(primaryTextContent); // <<< USE primaryTextContent
+  const { isCopied, handleCopy } = useMessageCopy(primaryTextContent);
 
   const { bubbleRef, bubbleClasses } = useMessageBubbleLogic({
     id,
-    initialMessage: primaryTextContent, // <<< USE primaryTextContent (or consider full parts for logic if needed)
+    initialMessage: primaryTextContent,
     isUser,
     type,
     isInsideSmallContainer,
@@ -109,16 +111,16 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
     cancelEdit();
   };
 
-  // TODO: Add rendering for timestamp, e.g., below the message content or on hover
-
   return (
     <div ref={bubbleRef} className={bubbleClasses}>
+      {/* ... (Error/Warning icons) ... */}
       {type === 'error' && (
         <TriangleAlert className='absolute -left-1.5 -top-1.5 mr-1.5 inline-block h-4 w-4 rounded-full bg-white p-0.5 text-red-600 shadow dark:bg-gray-800 dark:text-red-400' />
       )}
       {type === 'warning' && (
         <TriangleAlert className='absolute -left-1.5 -top-1.5 mr-1.5 inline-block h-4 w-4 rounded-full bg-white p-0.5 text-yellow-600 shadow dark:bg-gray-800 dark:text-yellow-400' />
       )}
+
 
       {isEditing ? (
         <EditMessageForm
@@ -136,22 +138,25 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
           type={type}
           location={location}
           action={action}
-          isUserMessage={isUser} // <<< TRUYỀN isUser XUỐNG
+          isUserMessage={isUser}
         />
+      )}
+
+      {/* --- HIỂN THỊ SOURCES (CHỈ CHO TIN NHẮN CỦA MODEL) --- */}
+      {!isUser && sources && sources.length > 0 && (
+        <MessageSourcesDisplay sources={sources} />
       )}
 
       <MessageActionsBar
         isUser={isUser}
         isLatestUserMessage={isLatestUserMessage}
-        messageType={type} // Pass the message type
+        messageType={type}
         isEditing={isEditing}
         isCopied={isCopied}
         onCopy={handleCopy}
         onStartEdit={handleEditButtonClick}
         onConfirmEdit={handleConfirmEditClick}
         onCancelEdit={handleCancelEditClick}
-        // Disable editing for non-text messages or messages with files for now
-        // Or allow editing only the text part if `text` is present.
         canEditText={type === 'text' || (type === 'multimodal' && !!text)}
       />
 
@@ -160,7 +165,6 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
           <ThoughtProcess thoughts={thoughts} />
         </div>
       )}
-       {/* Optional: Display timestamp */}
        {timestamp && (
         <div className={`text-xs mt-1 ${isUser ? 'text-gray-500 dark:text-gray-400' : 'text-gray-600 dark:text-gray-700'} ${isUser ? 'text-right' : 'text-left'}`}>
           {new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}

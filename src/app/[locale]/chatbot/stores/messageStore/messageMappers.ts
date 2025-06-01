@@ -1,67 +1,70 @@
 // src/app/[locale]/chatbot/stores/messageStore/messageMappers.ts
 import {
-    HistoryItem,
+    HistoryItem, // Từ backend, có thể có sources, thoughts, action
     ChatMessageType,
     ThoughtStep,
-    ResultUpdate,
+    ResultUpdate, // Từ backend, có thể có sources, thoughts, action
     FrontendAction,
     ItemFollowStatusUpdatePayload,
     UserFile,
-} from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; 
+    BotFile, // Thêm BotFile
+    SourceItem, 
+    MessageType, // Thêm MessageType
+    AppPart, // Thêm AppPart
+} from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Sử dụng type từ lib
 import { generateMessageId } from '@/src/app/[locale]/chatbot/utils/chatUtils';
+import { Part as GooglePart } from '@google/genai'; // Đảm bảo import đúng
 
-export function mapBackendHistoryItemToFrontendChatMessage(backendItem: HistoryItem): ChatMessageType | null { // << MODIFIED: Can return null
-    console.log("[MAPPER DEBUG] Processing backendItem:", JSON.parse(JSON.stringify(backendItem)));
+// Helper function to map backend SourceItem to frontend SourceItem
+// Giả sử SourceItem từ backend và SourceItem từ frontend có cấu trúc tương tự
+function mapBackendSourceToFrontendSource(backendSources?: HistoryItem['sources']): SourceItem[] | undefined {
+    if (!backendSources || backendSources.length === 0) {
+        return undefined;
+    }
+    return backendSources.map(bs => ({
+        name: bs.name,
+        url: bs.url,
+        type: bs.type,
+    }));
+}
+
+export function mapBackendHistoryItemToFrontendChatMessage(backendItem: HistoryItem): ChatMessageType | null {
+    // console.log("[MAPPER DEBUG] Processing backendItem:", JSON.parse(JSON.stringify(backendItem)));
 
     let textContent = "";
-    let primaryTextFromParts = "";
     const userFilesForDisplay: UserFile[] = [];
-    const botFilesForDisplay: ChatMessageType['botFiles'] = [];
-    let messageType: ChatMessageType['type'] = 'text'; // Default
-    let hasDisplayablePartContent = false; // New flag
+    const botFilesForDisplay: BotFile[] = []; // Sử dụng BotFile type
+    let messageType: MessageType = 'text';
+    let hasDisplayablePartContent = false;
 
     if (backendItem.parts && backendItem.parts.length > 0) {
         backendItem.parts.forEach(part => {
-            if (part.text) {
-                primaryTextFromParts += (primaryTextFromParts ? "\n" : "") + part.text;
+            if ('text' in part && typeof part.text === 'string') {
+                textContent += (textContent ? "\n" : "") + part.text;
                 hasDisplayablePartContent = true;
             } else if (backendItem.role === 'model') {
-                if (part.fileData) {
+                if ('fileData' in part && part.fileData) {
                     const mimeType = part.fileData.mimeType || 'application/octet-stream';
                     if (part.fileData.fileUri) {
-                        botFilesForDisplay.push({ uri: part.fileData.fileUri, mimeType: mimeType });
+                        botFilesForDisplay.push({ uri: part.fileData.fileUri, mimeType: mimeType, name: part.fileData.fileUri.split('/').pop() || 'file' });
                         hasDisplayablePartContent = true;
-                    } else {
-                        console.warn(`[mapBackendHistoryItemToFrontendChatMessage] Bot message part has fileData but no fileUri. Part:`, part);
                     }
-                } else if (part.inlineData && part.inlineData.data && part.inlineData.mimeType) {
+                } else if ('inlineData' in part && part.inlineData?.data && part.inlineData.mimeType) {
                     botFilesForDisplay.push({
                         mimeType: part.inlineData.mimeType,
-                        inlineData: { data: part.inlineData.data, mimeType: part.inlineData.mimeType }
+                        inlineData: { data: part.inlineData.data, mimeType: part.inlineData.mimeType },
+                        name: `inline_data.${part.inlineData.mimeType.split('/')[1] || 'bin'}`
                     });
                     hasDisplayablePartContent = true;
                 }
-                // IMPORTANT: Do not set hasDisplayablePartContent = true for functionCall or functionResponse
-            } else if (backendItem.role === 'user') { // User parts can also have files
-                 if (part.fileData) {
-                    const uri = part.fileData.fileUri;
-                    const type = part.fileData.mimeType || 'application/octet-stream';
-                    if (uri) {
-                        // userFilesForDisplay.push(...) // This logic is handled below with userFileInfo
-                        hasDisplayablePartContent = true;
-                    }
-                } else if (part.inlineData) {
-                    const type = part.inlineData.mimeType;
-                    const data = part.inlineData.data;
-                    if (type && data) {
-                        // userFilesForDisplay.push(...) // This logic is handled below with userFileInfo
-                        hasDisplayablePartContent = true;
-                    }
+            } else if (backendItem.role === 'user') {
+                // userFileInfo sẽ được ưu tiên hơn
+                if (('fileData' in part && part.fileData?.fileUri) || ('inlineData' in part && part.inlineData?.data)) {
+                    hasDisplayablePartContent = true; // Đánh dấu có nội dung file từ parts
                 }
             }
         });
     }
-    textContent = primaryTextFromParts;
 
     let hasUserFiles = false;
     if (backendItem.role === 'user' && backendItem.userFileInfo && backendItem.userFileInfo.length > 0) {
@@ -70,41 +73,30 @@ export function mapBackendHistoryItemToFrontendChatMessage(backendItem: HistoryI
                 name: info.name,
                 type: info.type,
                 size: info.size,
+                // dataUrl không có từ backend history
             });
         });
         if (userFilesForDisplay.length > 0) {
             hasUserFiles = true;
         }
     }
-    // Fallback for user files from parts if userFileInfo is not present
-    else if (backendItem.role === 'user' && backendItem.parts?.some(p => p.fileData || p.inlineData)) {
+    // Fallback nếu userFileInfo không có nhưng parts có file (ít xảy ra nếu backend chuẩn)
+    else if (backendItem.role === 'user' && !hasUserFiles && backendItem.parts?.some(p => ('fileData' in p && p.fileData?.fileUri) || ('inlineData' in p && p.inlineData?.data))) {
         backendItem.parts.forEach(part => {
-            if (part.fileData) {
-                const uri = part.fileData.fileUri;
-                const type = part.fileData.mimeType || 'application/octet-stream';
-                if (uri) {
-                    userFilesForDisplay.push({
-                        name: uri.split('/').pop() || 'file_from_part_user',
-                        type: type,
-                        size: 0, // Size might not be available from part.fileData
-                    });
-                    hasUserFiles = true;
-                } else {
-                    console.warn(`[mapBackendHistoryItemToFrontendChatMessage] User message part has fileData but no fileUri. Part:`, part);
-                }
-            } else if (part.inlineData) {
-                const type = part.inlineData.mimeType;
-                const data = part.inlineData.data;
-                if (type && data) {
-                    userFilesForDisplay.push({
-                        name: `inline_from_part_user.${type.split('/')[1] || 'bin'}`,
-                        type: type,
-                        size: Math.round((data.length * 3) / 4), // Approximate size
-                    });
-                    hasUserFiles = true;
-                } else {
-                    console.warn(`[mapBackendHistoryItemToFrontendChatMessage] User message part has inlineData but missing mimeType or data. Part:`, part);
-                }
+            if ('fileData' in part && part.fileData?.fileUri) {
+                userFilesForDisplay.push({
+                    name: part.fileData.fileUri.split('/').pop() || 'file_from_part_user',
+                    type: part.fileData.mimeType || 'application/octet-stream',
+                    size: 0, // Không có size từ part.fileData
+                });
+                hasUserFiles = true;
+            } else if ('inlineData' in part && part.inlineData?.data && part.inlineData.mimeType) {
+                 userFilesForDisplay.push({
+                    name: `inline_from_part_user.${part.inlineData.mimeType.split('/')[1] || 'bin'}`,
+                    type: part.inlineData.mimeType,
+                    size: Math.round((part.inlineData.data.length * 3) / 4),
+                });
+                hasUserFiles = true;
             }
         });
     }
@@ -112,59 +104,41 @@ export function mapBackendHistoryItemToFrontendChatMessage(backendItem: HistoryI
 
     const hasAnyFileContent = botFilesForDisplay.length > 0 || hasUserFiles;
 
-    // Determine messageType
     if (hasAnyFileContent) {
         messageType = 'multimodal';
     } else if (textContent) {
         messageType = 'text';
-    } else {
-        // If no text and no files, it might be a function call/response or an empty message.
-        // The `hasDisplayablePartContent` helps differentiate.
-        // If it only had functionCall/Response, hasDisplayablePartContent would be false.
-        messageType = 'text'; // Keep as text, MessageContentRenderer will handle emptiness
     }
+    // Nếu không có text và không có file, messageType vẫn là 'text' (sẽ hiển thị rỗng hoặc theo action)
 
-    // Override messageType for specific actions
     let isActionDisplayable = false;
-    if (backendItem.action?.type === 'openMap') {
-        messageType = 'map';
-        isActionDisplayable = true;
-    } else if (backendItem.action?.type === 'itemFollowStatusUpdated') {
-        messageType = 'follow_update';
-        isActionDisplayable = true;
-    } else if (backendItem.action?.type === 'displayConferenceSources') {
-        // This action itself makes the message displayable, even if text/files are empty
-        isActionDisplayable = true;
-        // messageType might remain 'text' or 'multimodal' if other content exists
+    if (backendItem.action) {
+        switch (backendItem.action.type) {
+            case 'openMap':
+                messageType = 'map';
+                isActionDisplayable = true;
+                break;
+            case 'itemFollowStatusUpdated':
+                messageType = 'follow_update';
+                isActionDisplayable = true;
+                break;
+            case 'displayConferenceSources': // Và các action khác có thể tự hiển thị
+                isActionDisplayable = true;
+                break;
+        }
     }
 
-    // --- CRITICAL CHECK ---
-    // If there's no text content, no file content from any source,
-    // no displayable content derived from parts (e.g. text, fileData, inlineData),
-    // AND no specific displayable action, then this message should not be rendered.
     if (!textContent && !hasAnyFileContent && !hasDisplayablePartContent && !isActionDisplayable) {
-        // This primarily targets messages that *only* contain functionCall or functionResponse parts.
-        // Also, if a 'model' role message has parts but none are text/fileData/inlineData.
-        console.log(`[mapBackendHistoryItemToFrontendChatMessage] ID: ${backendItem.uuid}, Role: ${backendItem.role}. No displayable content (text, files, or displayable parts/actions). Returning null.`);
-        return null; // << DO NOT CREATE A CHAT MESSAGE OBJECT
+        // console.log(`[mapBackendHistoryItemToFrontendChatMessage] ID: ${backendItem.uuid}, Role: ${backendItem.role}. No displayable content. Returning null.`);
+        return null;
     }
 
-
-    console.log(`[mapBackendHistoryItemToFrontendChatMessage] ID: ${backendItem.uuid}, Role: ${backendItem.role}`);
-    console.log(`  Parts received:`, backendItem.parts);
-    console.log(`  UserFileInfo received:`, backendItem.userFileInfo);
-    console.log(`  TextContent derived: "${textContent}"`);
-    console.log(`  UserFilesForDisplay:`, userFilesForDisplay);
-    console.log(`  BotFilesForDisplay:`, botFilesForDisplay);
-    console.log(`  HasDisplayablePartContent: ${hasDisplayablePartContent}`);
-    console.log(`  HasAnyFileContent: ${hasAnyFileContent}`);
-    console.log(`  IsActionDisplayable: ${isActionDisplayable}`);
-    console.log(`  Final MessageType: ${messageType}`);
+    // console.log(`[mapBackendHistoryItemToFrontendChatMessage] ID: ${backendItem.uuid}, Role: ${backendItem.role}, Type: ${messageType}`);
 
     return {
-        id: backendItem.uuid || generateMessageId(),
+        id: backendItem.uuid || generateMessageId(), // Nên luôn có uuid từ backend
         role: backendItem.role,
-        parts: backendItem.parts, // Keep original parts for MessageContentRenderer if it needs to inspect them
+        parts: backendItem.parts, // Giữ parts gốc
         text: textContent,
         isUser: backendItem.role === 'user',
         type: messageType,
@@ -173,87 +147,100 @@ export function mapBackendHistoryItemToFrontendChatMessage(backendItem: HistoryI
         files: userFilesForDisplay.length > 0 ? userFilesForDisplay : undefined,
         botFiles: botFilesForDisplay.length > 0 ? botFilesForDisplay : undefined,
         action: backendItem.action,
+        sources: mapBackendSourceToFrontendSource(backendItem.sources), // <<< MAP SOURCES
+        // errorCode: backendItem.errorCode, // Nếu có
+        location: backendItem.action?.type === 'openMap' ? backendItem.action.location : undefined,
     };
 }
 
 
-// Extracted from _onSocketChatResult
 export const createMessagePayloadFromResult = (
     result: ResultUpdate,
     currentThoughts?: ThoughtStep[]
-): Omit<ChatMessageType, 'id' | 'isUser' | 'role'> => {
+): Omit<ChatMessageType, 'id' | 'isUser' | 'role' | 'timestamp'> => { // Bỏ timestamp vì sẽ được thêm khi tạo ChatMessageType
     let messageTextContent = "";
-    let messageParts = result.parts || [];
-    let messageType: ChatMessageType['type'] = 'text';
-    let botFilesForDisplay: ChatMessageType['botFiles'] = [];
+    let messageParts: AppPart[] = result.parts || []; // Sử dụng AppPart
+    let messageType: MessageType = 'text';
+    const botFilesForDisplay: BotFile[] = [];
     let locationData: string | undefined = undefined;
     const actionData: FrontendAction | undefined = result.action;
 
     if (result.message) {
         messageTextContent = result.message;
-        if (messageParts.length === 0) messageParts = [{ text: result.message }];
+        // Nếu có result.message, ưu tiên nó làm text chính, parts có thể chứa nội dung phức tạp hơn
+        if (messageParts.length === 0 || !messageParts.some(p => 'text' in p && p.text === result.message)) {
+             // Nếu parts rỗng hoặc không chứa chính xác result.message, tạo text part từ result.message
+            messageParts = [{ text: result.message } as GooglePart, ...messageParts.filter(p => !('text' in p))];
+        }
     } else if (messageParts.length > 0) {
-        messageTextContent = messageParts.filter(p => p.text).map(p => p.text).join('\n');
-    } else {
-        messageTextContent = "Result received."; // Fallback
-        messageParts = [{ text: messageTextContent }];
+        messageTextContent = messageParts
+            .filter(p => 'text' in p && typeof p.text === 'string')
+            .map(p => (p as GooglePart).text)
+            .join('\n');
     }
 
-    let hasNonTextPart = false;
+    let hasNonTextPartContent = false;
     messageParts.forEach(part => {
-        if (part.fileData) {
-            const mimeType = part.fileData.mimeType || 'application/octet-stream';
-            if (part.fileData.fileUri) { // Ensure fileUri exists
-                botFilesForDisplay.push({ uri: part.fileData.fileUri, mimeType: mimeType });
-                hasNonTextPart = true;
-            } else {
-                 console.warn("[MessageStore createMessagePayloadFromResult] Received fileData part missing fileUri:", part.fileData);
-            }
-        } else if (part.inlineData) {
-            if (part.inlineData.data && part.inlineData.mimeType) {
-                botFilesForDisplay.push({
-                    mimeType: part.inlineData.mimeType,
-                    inlineData: { data: part.inlineData.data, mimeType: part.inlineData.mimeType }
-                });
-                hasNonTextPart = true;
-            } else { console.warn("[MessageStore createMessagePayloadFromResult] Received inlineData part missing essential data or mimeType:", part.inlineData); }
+        if ('fileData' in part && part.fileData?.fileUri) {
+            botFilesForDisplay.push({
+                uri: part.fileData.fileUri,
+                mimeType: part.fileData.mimeType || 'application/octet-stream',
+                name: part.fileData.fileUri.split('/').pop() || 'file'
+            });
+            hasNonTextPartContent = true;
+        } else if ('inlineData' in part && part.inlineData?.data && part.inlineData.mimeType) {
+            botFilesForDisplay.push({
+                mimeType: part.inlineData.mimeType,
+                inlineData: { data: part.inlineData.data, mimeType: part.inlineData.mimeType },
+                name: `inline_data.${part.inlineData.mimeType.split('/')[1] || 'bin'}`
+            });
+            hasNonTextPartContent = true;
         }
     });
 
-    if (hasNonTextPart) messageType = 'multimodal';
-    else if (messageParts.every(p => p.text) && messageParts.length > 0) messageType = 'text';
+    if (hasNonTextPartContent) {
+        messageType = 'multimodal';
+    } else if (messageTextContent) { // Chỉ cần có text là 'text'
+        messageType = 'text';
+    }
+    // Nếu không có text và không có file, messageType vẫn là 'text' (sẽ hiển thị rỗng hoặc theo action)
 
 
-    if (actionData?.type === 'openMap' && actionData.location) {
-        messageType = 'map';
-        locationData = actionData.location;
-        if (!result.message && !messageParts.some(p => p.text)) {
-            messageTextContent = `Showing map for: ${actionData.location}`;
-            messageParts = [{ text: messageTextContent }];
+    if (actionData) {
+        switch (actionData.type) {
+            case 'openMap':
+                messageType = 'map';
+                locationData = actionData.location;
+                if (!messageTextContent) { // Chỉ thêm text mặc định nếu chưa có
+                    messageTextContent = `Hiển thị bản đồ cho: ${actionData.location}`;
+                    if (!messageParts.some(p => 'text' in p)) messageParts.push({ text: messageTextContent } as GooglePart);
+                }
+                break;
+            case 'itemFollowStatusUpdated':
+                messageType = 'follow_update';
+                if (!messageTextContent && actionData.payload) {
+                    const followPayload = actionData.payload as ItemFollowStatusUpdatePayload;
+                    messageTextContent = followPayload.followed ? "Đã theo dõi mục." : "Đã bỏ theo dõi mục.";
+                    if (!messageParts.some(p => 'text' in p)) messageParts.push({ text: messageTextContent } as GooglePart);
+                }
+                break;
+            // Các action khác có thể không cần thay đổi text mặc định
+            case 'confirmEmailSend':
+            case 'navigate':
+                if (!messageTextContent && !hasNonTextPartContent) {
+                     messageTextContent = actionData.type === 'confirmEmailSend' ? 'Vui lòng xác nhận hành động.' : 'Đang điều hướng...';
+                     if (!messageParts.some(p => 'text' in p)) messageParts.push({ text: messageTextContent } as GooglePart);
+                }
+                break;
         }
-    } else if (actionData?.type === 'itemFollowStatusUpdated') {
-        messageType = 'follow_update';
-        if (!result.message && !messageParts.some(p => p.text) && actionData.payload) {
-            const followPayload = actionData.payload as ItemFollowStatusUpdatePayload;
-            messageTextContent = followPayload.followed ? "Item followed." : "Item unfollowed.";
-            messageParts = [{ text: messageTextContent }];
-        }
-    } else if (actionData?.type === 'confirmEmailSend') {
-        if (!result.message && !messageParts.some(p => p.text)) {
-            messageTextContent = 'Please confirm the action.';
-            messageParts = [{ text: messageTextContent }];
-        }
-    } else if (actionData?.type === 'navigate' && (!result.message && !messageParts.some(p => p.text))) {
-        messageTextContent = `Okay, navigating...`;
-        messageParts = [{ text: messageTextContent }];
     }
 
-    if (!messageTextContent && messageParts.length === 0 && botFilesForDisplay.length > 0) {
-        messageTextContent = `${botFilesForDisplay.length} file(s) received.`;
-    } else if (!messageTextContent && messageParts.length === 0 && !actionData && botFilesForDisplay.length === 0) {
-        messageTextContent = "Result received.";
-        messageParts = [{ text: messageTextContent }];
+    // Fallback text nếu mọi thứ đều rỗng
+    if (!messageTextContent && messageParts.length === 0 && botFilesForDisplay.length === 0 && !actionData) {
+        messageTextContent = "Đã nhận kết quả."; // Hoặc một tin nhắn chung chung hơn
+        messageParts = [{ text: messageTextContent } as GooglePart];
     }
+
 
     const finalThoughts = (result.thoughts && result.thoughts.length > 0)
         ? result.thoughts
@@ -261,12 +248,13 @@ export const createMessagePayloadFromResult = (
 
     return {
         text: messageTextContent,
-        parts: messageParts,
+        parts: messageParts, // Luôn trả về parts, có thể rỗng nếu không có gì
         thoughts: finalThoughts,
         type: messageType,
         location: locationData,
         action: actionData,
-        timestamp: new Date().toISOString(),
         botFiles: botFilesForDisplay.length > 0 ? botFilesForDisplay : undefined,
+        sources: mapBackendSourceToFrontendSource(result.sources), // <<< MAP SOURCES
+        // errorCode sẽ được xử lý riêng nếu là tin nhắn lỗi
     };
 };

@@ -3,12 +3,13 @@ import { create } from 'zustand';
 
 interface PageContextState {
   currentPageText: string | null;
-  isCurrentPageFeatureEnabled: boolean; // True if not on main chatbot page and floating bot is open
-  isContextAttachedNextSend: boolean; // Flag to indicate context should be sent with the next message
+  currentPageUrl: string | null; // <<< THÊM MỚI
+  isCurrentPageFeatureEnabled: boolean;
+  isContextAttachedNextSend: boolean;
 }
 
 interface PageContextActions {
-  setPageContext: (text: string | null, isEnabled: boolean) => void;
+  setPageContext: (text: string | null, url: string | null, isEnabled: boolean) => void; // <<< CẬP NHẬT
   clearPageContext: () => void;
   toggleContextAttachedNextSend: (attach: boolean) => void;
   resetContextAttachedNextSend: () => void;
@@ -16,6 +17,7 @@ interface PageContextActions {
 
 const initialState: PageContextState = {
   currentPageText: null,
+  currentPageUrl: null, // <<< THÊM MỚI
   isCurrentPageFeatureEnabled: false,
   isContextAttachedNextSend: false,
 };
@@ -23,10 +25,19 @@ const initialState: PageContextState = {
 export const usePageContextStore = create<PageContextState & PageContextActions>()(
   (set) => ({
     ...initialState,
-    setPageContext: (text, isEnabled) => set({ currentPageText: text, isCurrentPageFeatureEnabled: isEnabled }),
-    clearPageContext: () => set({ currentPageText: null, isCurrentPageFeatureEnabled: false, isContextAttachedNextSend: false }),
+    setPageContext: (text, url, isEnabled) => set({ 
+      
+      currentPageText: text, 
+      currentPageUrl: url, // <<< LƯU URL
+      isCurrentPageFeatureEnabled: isEnabled 
+    }),
+    clearPageContext: () => set({ 
+      currentPageText: null, 
+      currentPageUrl: null, // <<< XÓA URL
+      isCurrentPageFeatureEnabled: false, 
+      isContextAttachedNextSend: false 
+    }),
     toggleContextAttachedNextSend: (attach) => set(state => {
-      // Only allow attaching if the feature is enabled and context exists
       if (attach && state.isCurrentPageFeatureEnabled && state.currentPageText) {
         return { isContextAttachedNextSend: true };
       }

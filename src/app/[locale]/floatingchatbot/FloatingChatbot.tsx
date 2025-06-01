@@ -4,8 +4,8 @@
 import React, {
   useState,
   useEffect,
-  useCallback,
-  useRef
+  useCallback
+  // useRef // No longer needed directly here for draggableWrapperRef
 } from 'react'
 import { X, Settings, Minus } from 'lucide-react';
 import RegularChat from '../chatbot/regularchat/RegularChat'
@@ -24,9 +24,10 @@ import ChatbotErrorDisplay from '../chatbot/ChatbotErrorDisplay'
 import { usePathname } from '@/src/navigation'
 import { MAIN_CHATBOT_PAGE_PATH } from '@/src/app/[locale]/chatbot/lib/constants'
 
-import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
-import { Resizable, ResizeDirection } from 're-resizable'
-import type { NumberSize } from 're-resizable'
+import Draggable from 'react-draggable'; // Keep for Draggable component
+import { Resizable } from 're-resizable'; // Keep for Resizable component
+// Import the new hook (adjust path as needed)
+import { useFloatingWindowControls } from '@/src/hooks/floatingChatbot/useFloatingWindowControls'; 
 
 const DynamicAnimatedIcon = dynamic(() => import('../utils/AnimatedIcon'), {
   ssr: false,
@@ -36,7 +37,7 @@ const DynamicAnimatedIcon = dynamic(() => import('../utils/AnimatedIcon'), {
 })
 
 const getCurrentPageTextContent = (
-  maxLength: number = 20000
+  maxLength: number = 50000
 ): string | null => {
   if (typeof window !== 'undefined' && document?.body?.innerText) {
     const text = document.body.innerText
@@ -47,6 +48,14 @@ const getCurrentPageTextContent = (
   return null
 }
 
+const getCurrentPageUrl = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return window.location.href;
+  }
+  return null;
+}
+
+// These constants will be passed to the hook
 const MIN_WIDTH = 320
 const MIN_HEIGHT = 400
 const DEFAULT_WIDTH = 384
@@ -73,178 +82,122 @@ const FloatingChatbot: React.FC = () => {
   )
   const hasFatalError = useUiStore(state => state.hasFatalError)
 
-  const { setPageContext, clearPageContext } = usePageContextStore.getState()
+  const { setPageContext, clearPageContext } = usePageContextStore();
   const pathname = usePathname()
 
   useAppInitialization()
 
-  const [position, setPosition] = useState({ x: 0, y: 0 })
-  const [size, setSize] = useState({
-    width: DEFAULT_WIDTH,
-    height: DEFAULT_HEIGHT
-  })
-  const [isDraggingOrResizing, setIsDraggingOrResizing] = useState(false)
-  const [bounds, setBounds] = useState<
-    { left: number; top: number; right: number; bottom: number }
-  >({ left: 0, top: 0, right: 0, bottom: 0 })
-
-  const draggableWrapperRef = useRef<HTMLDivElement>(null);
-  // previousIsDraggingOrResizing không còn cần thiết nếu bỏ useEffect lưu trữ cũ
   const [runOpenAnimation, setRunOpenAnimation] = useState(false);
 
+  // Use the custom hook
+  const {
+    position,
+    size,
+    bounds,
+    draggableWrapperRef,
+    dragHandlers,
+    resizeHandlers,
+    currentMaxWidth,
+    currentMaxHeight,
+    adjustPositionToFitScreen,
+    // isInteracting, // Hook manages this, parent doesn't directly use it for now
+    setPosition: setHookPosition, // Renamed to avoid conflict if any local 'setPosition' existed
+    setSize: setHookSize,       // Renamed to avoid conflict if any local 'setSize' existed
+  } = useFloatingWindowControls({
+    initialWidth: DEFAULT_WIDTH,
+    initialHeight: DEFAULT_HEIGHT,
+    minConstraints: { width: MIN_WIDTH, height: MIN_HEIGHT },
+    maxConstraintsPercentage: { width: MAX_WIDTH_PERCENTAGE, height: MAX_HEIGHT_PERCENTAGE },
+    localStorageKeys: { position: 'chatbotPosition', size: 'chatbotSize' },
+    isEnabled: isChatOpen,
+  });
 
-  const adjustPositionToFitScreen = useCallback(() => {
-    if (typeof window === 'undefined') return;
-    setPosition(prevPos => {
-      const currentWidth = size.width;
-      const currentHeight = size.height;
-      const maxX = window.innerWidth - currentWidth;
-      const maxY = window.innerHeight - currentHeight;
-      const safeMaxX = Math.max(0, maxX);
-      const safeMaxY = Math.max(0, maxY);
-      const newX = Math.min(Math.max(0, prevPos.x), safeMaxX);
-      const newY = Math.min(Math.max(0, prevPos.y), safeMaxY);
-      if (newX !== prevPos.x || newY !== prevPos.y) {
-        return { x: newX, y: newY };
-      }
-      return prevPos;
-    });
-  }, [size.width, size.height]);
-
-  // Khôi phục trạng thái từ localStorage khi component mount
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const savedPositionJSON = localStorage.getItem('chatbotPosition');
-    const savedSizeJSON = localStorage.getItem('chatbotSize');
-    let newSize = { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT };
-    if (savedSizeJSON) {
-      try {
-        const parsedSize = JSON.parse(savedSizeJSON);
-        newSize.width = Math.min(
-          Math.max(parsedSize.width, MIN_WIDTH),
-          window.innerWidth * MAX_WIDTH_PERCENTAGE
-        );
-        newSize.height = Math.min(
-          Math.max(parsedSize.height, MIN_HEIGHT),
-          window.innerHeight * MAX_HEIGHT_PERCENTAGE
-        );
-      } catch (e) {
-        console.error('Failed to parse saved chatbot size:', e);
-      }
-    }
-    setSize(newSize); // Cập nhật state size trước
-
-    // Sau đó tính toán và cập nhật position dựa trên newSize
-    let newPosition = { x: 0, y: 0 };
-    if (savedPositionJSON) {
-      try {
-        const parsedPosition = JSON.parse(savedPositionJSON);
-        newPosition.x = Math.min(
-          Math.max(0, parsedPosition.x),
-          Math.max(0, window.innerWidth - newSize.width) // Dùng newSize
-        );
-        newPosition.y = Math.min(
-          Math.max(0, parsedPosition.y),
-          Math.max(0, window.innerHeight - newSize.height) // Dùng newSize
-        );
-      } catch (e) {
-        console.error('Failed to parse saved chatbot position:', e);
-        newPosition.x = Math.max(0, window.innerWidth - newSize.width - 32);
-        newPosition.y = Math.max(0, window.innerHeight - newSize.height - 32);
-      }
-    } else {
-      newPosition.x = Math.max(0, window.innerWidth - newSize.width - 32);
-      newPosition.y = Math.max(0, window.innerHeight - newSize.height - 32);
-    }
-    setPosition(newPosition);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Chỉ chạy một lần khi mount
-
-  // Cập nhật bounds và điều chỉnh vị trí khi kích thước component hoặc cửa sổ thay đổi
-  useEffect(() => {
-    const handleResizeOrSizeChange = () => {
-      if (typeof window !== 'undefined') {
-        setBounds({
-          left: 0,
-          top: 0,
-          right: Math.max(0, window.innerWidth - size.width),
-          bottom: Math.max(0, window.innerHeight - size.height)
-        });
-        // Quan trọng: Gọi adjustPositionToFitScreen sau khi size đã được cập nhật
-        // và bounds cũng đã được tính toán dựa trên size mới (nếu size thay đổi).
-        adjustPositionToFitScreen();
-      }
-    }
-    if (typeof window !== 'undefined') {
-        handleResizeOrSizeChange();
-        window.addEventListener('resize', handleResizeOrSizeChange);
-        return () => window.removeEventListener('resize', handleResizeOrSizeChange);
-    }
-  }, [size.width, size.height, adjustPositionToFitScreen]);
-
-
+  // The original logic for loading from localStorage on toggleChatbot (when opening)
+  // is preserved here to ensure the exact same behavior of eagerly loading/overriding.
+  // The hook also loads when `isEnabled` becomes true, but this explicit load
+  // in toggleChatbot ensures values are set before the hook's effect might run.
   const toggleChatbot = useCallback(() => {
     setIsChatOpen(prevIsChatOpen => {
       const newIsChatOpen = !prevIsChatOpen;
-      if (newIsChatOpen) { // Mở chat
-        // Đọc lại từ localStorage để đảm bảo có position/size mới nhất nếu có thay đổi ngầm
-        // Tuy nhiên, useEffect mount đã làm việc này. Nếu component không unmount, state hiện tại là đúng.
-        // Chỉ cần đảm bảo adjustPositionToFitScreen được gọi.
+      if (newIsChatOpen) {
+        // Eagerly load from localStorage and apply, similar to original logic
         if (typeof window !== 'undefined') {
-            const savedPositionJSON = localStorage.getItem('chatbotPosition');
-            const savedSizeJSON = localStorage.getItem('chatbotSize');
-            let currentSize = size;
-            if (savedSizeJSON) {
-                try {
-                    const parsedSize = JSON.parse(savedSizeJSON);
-                    currentSize = {
-                        width: Math.min(Math.max(parsedSize.width, MIN_WIDTH), window.innerWidth * MAX_WIDTH_PERCENTAGE),
-                        height: Math.min(Math.max(parsedSize.height, MIN_HEIGHT), window.innerHeight * MAX_HEIGHT_PERCENTAGE)
-                    };
-                    if(currentSize.width !== size.width || currentSize.height !== size.height) setSize(currentSize);
-                } catch (e) { /* ignore */ }
-            }
-            if (savedPositionJSON) {
-                try {
-                    const parsedPosition = JSON.parse(savedPositionJSON);
-                    const newPos = {
-                        x: Math.min(Math.max(0, parsedPosition.x), Math.max(0, window.innerWidth - currentSize.width)),
-                        y: Math.min(Math.max(0, parsedPosition.y), Math.max(0, window.innerHeight - currentSize.height))
-                    };
-                    if(newPos.x !== position.x || newPos.y !== position.y) setPosition(newPos);
-                } catch (e) { /* ignore */ }
-            }
+          const savedPositionJSON = localStorage.getItem('chatbotPosition');
+          const savedSizeJSON = localStorage.getItem('chatbotSize');
+          
+          let tempSize = { width: size.width, height: size.height }; // Start with current hook size
+          if (savedSizeJSON) {
+            try {
+              const parsedSize = JSON.parse(savedSizeJSON);
+              tempSize.width = Math.min(
+                Math.max(parsedSize.width, MIN_WIDTH),
+                window.innerWidth * MAX_WIDTH_PERCENTAGE
+              );
+              tempSize.height = Math.min(
+                Math.max(parsedSize.height, MIN_HEIGHT),
+                window.innerHeight * MAX_HEIGHT_PERCENTAGE
+              );
+              // Only update if different from hook's current size to avoid unnecessary re-renders
+              if (tempSize.width !== size.width || tempSize.height !== size.height) {
+                setHookSize(tempSize);
+              }
+            } catch (e) { console.error('Failed to parse saved chatbot size on toggle:', e); }
+          }
+
+          if (savedPositionJSON) {
+            try {
+              const parsedPosition = JSON.parse(savedPositionJSON);
+              const newX = Math.min(
+                Math.max(0, parsedPosition.x),
+                Math.max(0, window.innerWidth - tempSize.width) // Use potentially updated tempSize
+              );
+              const newY = Math.min(
+                Math.max(0, parsedPosition.y),
+                Math.max(0, window.innerHeight - tempSize.height) // Use potentially updated tempSize
+              );
+              if (newX !== position.x || newY !== position.y) {
+                 setHookPosition({ x: newX, y: newY });
+              }
+            } catch (e) { console.error('Failed to parse saved chatbot position on toggle:', e); }
+          }
         }
 
-
         setRunOpenAnimation(true);
-        if (activeConversationId === null) { // Mở mới
+        if (activeConversationId === null) {
           const isMainChatPage = pathname === MAIN_CHATBOT_PAGE_PATH;
           if (!isMainChatPage) {
             const pageText = getCurrentPageTextContent();
-            setPageContext(pageText, true);
+            
+            const pageUrl = getCurrentPageUrl();
+            console.log('[FloatingChatbot] Setting page context. URL:', pageUrl, 'Text length:', pageText?.length);
+
+            setPageContext(pageText, pageUrl, true);
           } else {
-            setPageContext(null, false);
+            setPageContext(null, null, false);
           }
           if (currentStoreChatMode !== 'regular') {
             setChatMode('regular');
           }
           resetChatUIForNewConversation(true);
-        } else { // Mở lại từ minimize
+        } else {
           const isMainChatPage = pathname === MAIN_CHATBOT_PAGE_PATH;
-            if (!isMainChatPage) {
-                const pageText = getCurrentPageTextContent();
-                setPageContext(pageText, true); // Cập nhật context
-            } else {
-                setPageContext(null, false);
-            }
+          if (!isMainChatPage) {
+            const pageText = getCurrentPageTextContent();
+            const pageUrl = getCurrentPageUrl();
+            setPageContext(pageText, pageUrl, true);
+          } else {
+            setPageContext(null, null, false);
+          }
         }
         setIsSettingsOpen(false);
-        adjustPositionToFitScreen(); // Đảm bảo vừa màn hình
-      } else { // Đóng chat từ icon chính (nên coi như Close hoàn toàn)
+        // Ensure position is correct after potential size/pos changes from localStorage
+        // and after the component is definitely going to be open.
+        // adjustPositionToFitScreen will use the latest size from the hook's state.
+        adjustPositionToFitScreen();
+      } else { // Closing chat
         if (typeof window !== 'undefined') {
-          localStorage.setItem('chatbotPosition', JSON.stringify(position));
-          localStorage.setItem('chatbotSize', JSON.stringify(size));
+          localStorage.setItem('chatbotPosition', JSON.stringify(position)); // Use position from hook
+          localStorage.setItem('chatbotSize', JSON.stringify(size));       // Use size from hook
         }
         setIsSettingsOpen(false);
         clearPageContext();
@@ -257,29 +210,30 @@ const FloatingChatbot: React.FC = () => {
     activeConversationId, pathname, setPageContext, clearPageContext,
     currentStoreChatMode, setChatMode, setActiveConversationId,
     resetChatUIForNewConversation, adjustPositionToFitScreen,
-    position, size // Thêm position, size vì dùng trong logic đọc lại localStorage
+    position, size, // Current position and size from hook (for saving on close and comparing on open)
+    setHookPosition, setHookSize // Setters from hook for eager load
   ]);
 
   const handleMinimizeChat = useCallback(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('chatbotPosition', JSON.stringify(position));
-      localStorage.setItem('chatbotSize', JSON.stringify(size));
+      localStorage.setItem('chatbotPosition', JSON.stringify(position)); // Use position from hook
+      localStorage.setItem('chatbotSize', JSON.stringify(size));       // Use size from hook
     }
     setIsChatOpen(false);
     if (isSettingsOpen) setIsSettingsOpen(false);
-  }, [position, size, isSettingsOpen]);
+  }, [position, size, isSettingsOpen]); // position and size from hook
 
   const handleCloseChat = useCallback(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('chatbotPosition', JSON.stringify(position)); // Lưu trạng thái cuối
-      localStorage.setItem('chatbotSize', JSON.stringify(size));
+      localStorage.setItem('chatbotPosition', JSON.stringify(position)); // Use position from hook
+      localStorage.setItem('chatbotSize', JSON.stringify(size));       // Use size from hook
     }
     setIsChatOpen(false);
     setIsSettingsOpen(false);
     clearPageContext();
     setActiveConversationId(null);
     resetChatUIForNewConversation(true);
-  }, [position, size, clearPageContext, setActiveConversationId, resetChatUIForNewConversation, isSettingsOpen]);
+  }, [position, size, clearPageContext, setActiveConversationId, resetChatUIForNewConversation]);
 
 
   useEffect(() => {
@@ -309,7 +263,7 @@ const FloatingChatbot: React.FC = () => {
         if (isSettingsOpen) {
           setIsSettingsOpen(false);
         } else if (isChatOpen) {
-          handleMinimizeChat();
+          handleMinimizeChat(); // This already uses hook's position/size for saving
         }
       }
     };
@@ -319,64 +273,13 @@ const FloatingChatbot: React.FC = () => {
     };
   }, [isChatOpen, isSettingsOpen, handleMinimizeChat]);
 
-  const handleDrag = (e: DraggableEvent, ui: DraggableData) => {
-    setPosition({ x: ui.x, y: ui.y })
-  }
-
-  const handleResize = useCallback((
-    event: MouseEvent | TouchEvent,
-    direction: ResizeDirection,
-    elementRef: HTMLElement,
-    delta: NumberSize
-  ) => {
-    setSize(prevSize => ({
-      width: prevSize.width + delta.width,
-      height: prevSize.height + delta.height
-    }));
-  }, []);
-
-  const onResizeStartHandler = useCallback((
-    e: React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement>,
-    dir: ResizeDirection,
-    elementRef: HTMLElement
-  ) => {
-    setIsDraggingOrResizing(true);
-  }, []);
-
-  const onResizeStopHandler = useCallback((
-    event: MouseEvent | TouchEvent,
-    direction: ResizeDirection,
-    elementRef: HTMLElement,
-    delta: NumberSize
-  ) => {
-    setIsDraggingOrResizing(false);
-    if (typeof window !== 'undefined') {
-      // size đã được cập nhật từ handleResize
-      localStorage.setItem('chatbotSize', JSON.stringify(size));
-      // position có thể cần điều chỉnh và lưu lại
-      adjustPositionToFitScreen(); // Điều chỉnh trước
-      // Sau khi adjustPositionToFitScreen, state position có thể thay đổi, nhưng nó bất đồng bộ
-      // Để lưu position chính xác sau khi adjust, cần một effect hoặc callback
-      // Tạm thời lưu position hiện tại, adjustPositionToFitScreen sẽ cập nhật nó cho hiển thị
-      localStorage.setItem('chatbotPosition', JSON.stringify(position));
-    }
-  }, [adjustPositionToFitScreen, size, position]); // Thêm size, position
-
-
-  const onDragStartInteraction = () => setIsDraggingOrResizing(true)
-  const onDragStopInteraction = () => {
-    setIsDraggingOrResizing(false);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('chatbotPosition', JSON.stringify(position));
-    }
-  };
+  // Drag and resize state and handlers (handleDrag, handleResize, onResizeStart, onResizeStop, etc.)
+  // are now managed by useFloatingWindowControls hook.
 
   const shouldShowErrorDisplayInFloatingChat = isChatOpen && hasFatalError
   const currentAnimationClass = runOpenAnimation ? 'animate-slide-up-fade' : '';
 
-  const currentMaxWidth = typeof window !== 'undefined' ? window.innerWidth * MAX_WIDTH_PERCENTAGE : DEFAULT_WIDTH * 1.5;
-  const currentMaxHeight = typeof window !== 'undefined' ? window.innerHeight * MAX_HEIGHT_PERCENTAGE : DEFAULT_HEIGHT * 1.5;
-
+  // currentMaxWidth, currentMaxHeight are now provided by the hook.
 
   return (
     <>
@@ -393,35 +296,35 @@ const FloatingChatbot: React.FC = () => {
 
       {isChatOpen && (
         <Draggable
-          nodeRef={draggableWrapperRef}
+          nodeRef={draggableWrapperRef} // From hook
           handle='.chatbot-drag-handle'
-          position={position}
-          onDrag={handleDrag}
-          onStart={onDragStartInteraction}
-          onStop={onDragStopInteraction}
-          bounds={bounds}
+          position={position} // From hook
+          onDrag={dragHandlers.onDrag} // From hook
+          onStart={dragHandlers.onStart} // From hook
+          onStop={dragHandlers.onStop} // From hook
+          bounds={bounds} // From hook
           disabled={isSettingsOpen}
         >
           <div
-            ref={draggableWrapperRef}
+            ref={draggableWrapperRef} // From hook
             className={`${currentAnimationClass} fixed z-50`}
             style={{
-              width: size.width,
-              height: size.height,
+              width: size.width, // From hook
+              height: size.height, // From hook
             }}
           >
             <Resizable
-              size={{ width: size.width, height: size.height }}
-              minWidth={MIN_WIDTH}
-              minHeight={MIN_HEIGHT}
-              maxWidth={currentMaxWidth}
-              maxHeight={currentMaxHeight}
-              onResize={handleResize}
-              onResizeStart={onResizeStartHandler}
-              onResizeStop={onResizeStopHandler}
+              size={{ width: size.width, height: size.height }} // From hook
+              minWidth={MIN_WIDTH} // Constant
+              minHeight={MIN_HEIGHT} // Constant
+              maxWidth={currentMaxWidth} // From hook
+              maxHeight={currentMaxHeight} // From hook
+              onResize={resizeHandlers.onResize} // From hook
+              onResizeStart={resizeHandlers.onResizeStart} // From hook
+              onResizeStop={resizeHandlers.onResizeStop} // From hook
               enable={{
-                  top: false, right: true, bottom: true, left: false,
-                  topRight: false, bottomRight: true, bottomLeft: false, topLeft: false,
+                top: false, right: true, bottom: true, left: false,
+                topRight: false, bottomRight: true, bottomLeft: false, topLeft: false,
               }}
               className="flex h-full w-full flex-col rounded-xl bg-white-pure shadow-2xl dark:border dark:border-gray-700"
             >
@@ -465,9 +368,8 @@ const FloatingChatbot: React.FC = () => {
 
               <div className={`relative flex-1 overflow-hidden`}>
                 <div
-                  className={`h-full w-full transition-opacity duration-200 ${
-                    isSettingsOpen ? 'pointer-events-none opacity-30' : 'opacity-100'
-                  }`}
+                  className={`h-full w-full transition-opacity duration-200 ${isSettingsOpen ? 'pointer-events-none opacity-30' : 'opacity-100'
+                    }`}
                 >
                   <RegularChat isSmallContext={true} />
                 </div>

@@ -9,6 +9,8 @@ import {
     EmailConfirmationResult,
     BackendConversationUpdatedAfterEditPayload,
     ChatMessageType,
+    SourceItem
+
 } from './messageState'; // Import from the new state file
 import { useSettingsStore } from '../setttingsStore';
 import { useUiStore } from '../uiStore';
@@ -135,7 +137,7 @@ export const handleSocketChatUpdate = (
 export const handleSocketChatResult = (
     get: StoreGet,
     set: StoreSet, // Added set for storeSetPendingBotMessageId
-    result: ResultUpdate
+    result: ResultUpdate // ResultUpdate đã có sources?: SourceItem[] (từ backend)
 ) => {
     const {
         animationControls, setLoadingState, updateMessageById, addChatMessage,
@@ -152,16 +154,20 @@ export const handleSocketChatResult = (
     const targetMessageId = pendingBotMessageId || result.id || `result-${generateMessageId()}`;
     const existingMessageForThoughts = chatMessages.find(msg => msg.id === targetMessageId);
 
-    // createMessagePayloadFromResult is now imported
+    // createMessagePayloadFromResult cần được cập nhật để xử lý `result.sources`
+    // và trả về một payload có trường `sources` cho ChatMessageType
     const payloadFromFn = createMessagePayloadFromResult(result, existingMessageForThoughts?.thoughts);
+    // payloadFromFn bây giờ sẽ có dạng:
+    // { text?: string, parts?: Part[], thoughts?: ThoughtStep[], action?: FrontendAction, sources?: SourceLink[], type: MessageType }
 
     if (existingMessageForThoughts) {
         updateMessageById(targetMessageId, (prevMsg) => {
             const updatedPayload = {
-                ...payloadFromFn,
+                ...payloadFromFn, // payloadFromFn đã chứa sources
                 role: 'model' as const,
                 isUser: false
             };
+            // Nếu backend gửi ID mới cho tin nhắn này (ví dụ, sau khi lưu DB), cập nhật ID
             if (result.id && result.id !== targetMessageId) {
                 return { ...updatedPayload, id: result.id };
             }
@@ -169,9 +175,21 @@ export const handleSocketChatResult = (
         });
     } else {
         const finalId = result.id || targetMessageId;
-        addChatMessage({ id: finalId, role: 'model', isUser: false, ...payloadFromFn } as ChatMessageType);
+        // Đảm bảo ChatMessageType được tạo đúng với các trường từ payloadFromFn
+        const newBotMessage: ChatMessageType = {
+            id: finalId,
+            role: 'model',
+            isUser: false,
+            timestamp: new Date().toISOString(), // Thêm timestamp nếu payloadFromFn không có
+            text: payloadFromFn.text,
+            parts: payloadFromFn.parts || (payloadFromFn.text ? [{ text: payloadFromFn.text }] : []),
+            type: payloadFromFn.type,
+            thoughts: payloadFromFn.thoughts,
+            action: payloadFromFn.action,
+            sources: payloadFromFn.sources, // <<< GÁN SOURCES
+        };
+        addChatMessage(newBotMessage);
     }
-
     resetAwaitFlag();
     setLoadingState({ isLoading: false, step: 'result_received', message: '', agentId: undefined });
     // storeSetPendingBotMessageId(null); // Replaced
@@ -266,9 +284,10 @@ export const handleSocketConversationUpdatedAfterEdit = (
     const originalEditingId = get().editingMessageId;
     const currentPendingBotId = get().pendingBotMessageId;
 
-    // mapBackendHistoryItemToFrontendChatMessage can return null
     const mappedEditedUserMessage = mapBackendHistoryItemToFrontendChatMessage(backendUserMessage);
+    // mapBackendHistoryItemToFrontendChatMessage cần được cập nhật để map cả sources
     const mappedNewBotMessageDataOnly = backendBotMessage ? mapBackendHistoryItemToFrontendChatMessage(backendBotMessage) : undefined;
+    // mappedNewBotMessageDataOnly bây giờ sẽ có dạng ChatMessageType (có thể có sources)
 
     // If the edited user message itself becomes non-displayable (highly unlikely for user edits, but for completeness)
     if (!mappedEditedUserMessage) {
@@ -283,26 +302,22 @@ export const handleSocketConversationUpdatedAfterEdit = (
 
     set(state => {
         let chatMessages = [...state.chatMessages];
-        
+
         if (mappedEditedUserMessage) { // Only proceed if user message is displayable
             const userMessageIndex = chatMessages.findIndex(msg => msg.id === originalEditingId);
 
-            if (userMessageIndex === -1) {
-                console.warn(`[MessageStore _onSocketConvUpdatedAfterEdit] User message (ID: ${originalEditingId}) not found for definitive update.`);
-                // If original not found, but we have a mapped one, maybe insert it? Or just log.
-                // This path suggests an inconsistency. For now, let's assume it's found if mappedEditedUserMessage exists.
+            if (userMessageIndex !== -1) {
+                chatMessages[userMessageIndex] = mappedEditedUserMessage; // mappedEditedUserMessage là ChatMessageType đầy đủ
             } else {
-                 chatMessages[userMessageIndex] = mappedEditedUserMessage;
+                console.warn(`[MessageStore _onSocketConvUpdatedAfterEdit] User message (ID: ${originalEditingId}) not found for definitive update.`);
             }
         } else {
-            // If mappedEditedUserMessage is null, we might want to remove the originalEditingId from chatMessages
             const userMessageIndex = chatMessages.findIndex(msg => msg.id === originalEditingId);
             if (userMessageIndex !== -1) {
                 console.log(`[MessageStore _onSocketConvUpdatedAfterEdit] Original user message (ID: ${originalEditingId}) became non-displayable. Removing it.`);
                 chatMessages.splice(userMessageIndex, 1);
             }
         }
-
 
         const botPlaceholderBeingFinalized = currentPendingBotId ? chatMessages.find(msg => msg.id === currentPendingBotId) : undefined;
 
@@ -314,32 +329,38 @@ export const handleSocketConversationUpdatedAfterEdit = (
                 targetBotMsgForUpdate = botPlaceholderBeingFinalized;
                 targetBotMsgIndex = chatMessages.findIndex(msg => msg.id === targetBotMsgForUpdate!.id);
             } else {
+                // Nếu không có placeholder, thử tìm bằng ID từ backend (trường hợp không streaming edit)
                 targetBotMsgIndex = chatMessages.findIndex(msg => msg.id === mappedNewBotMessageDataOnly.id);
                 if (targetBotMsgIndex !== -1) {
                     targetBotMsgForUpdate = chatMessages[targetBotMsgIndex];
                 }
             }
-
             if (targetBotMsgForUpdate && targetBotMsgIndex !== -1) {
+                // Cập nhật tin nhắn bot hiện có, giữ lại text/thoughts nếu đang stream, nhưng ghi đè sources
                 chatMessages[targetBotMsgIndex] = {
-                    ...mappedNewBotMessageDataOnly,
-                    text: targetBotMsgForUpdate.text,
-                    parts: mappedNewBotMessageDataOnly.parts && mappedNewBotMessageDataOnly.parts.length > 0 ? mappedNewBotMessageDataOnly.parts : targetBotMsgForUpdate.parts,
-                    thoughts: targetBotMsgForUpdate.thoughts,
+                    ...mappedNewBotMessageDataOnly, // Chứa parts, type, sources từ backend
+                    id: mappedNewBotMessageDataOnly.id || targetBotMsgForUpdate.id, // Ưu tiên ID từ backend
+                    text: targetBotMsgForUpdate.text, // Giữ lại text đang stream nếu có
+                    thoughts: targetBotMsgForUpdate.thoughts, // Giữ lại thoughts đang stream nếu có
+                    // sources đã có trong mappedNewBotMessageDataOnly
                 };
                 console.log(`[MessageStore _onSocketConvUpdatedAfterEdit] Updated/Finalized bot message (ID: ${chatMessages[targetBotMsgIndex].id}) preserving thoughts.`);
             } else {
                 console.warn(`[MessageStore _onSocketConvUpdatedAfterEdit] Bot message (Placeholder ID: ${currentPendingBotId}, Backend ID: ${mappedNewBotMessageDataOnly.id}) not found. Inserting new.`);
                 // Find the index of the (potentially updated or removed) user message
                 const finalUserMsgIdx = mappedEditedUserMessage ? chatMessages.findIndex(m => m.id === mappedEditedUserMessage.id) : -1;
+                 const newBotMsgWithDefaults: ChatMessageType = {
+                    ...mappedNewBotMessageDataOnly, // Chứa parts, type, sources từ backend
+                    thoughts: undefined, // Không có thoughts khi chèn mới
+                    timestamp: mappedNewBotMessageDataOnly.timestamp || new Date().toISOString(), // Đảm bảo có timestamp
+                };
                 if (finalUserMsgIdx !== -1) {
-                    chatMessages.splice(finalUserMsgIdx + 1, 0, { ...mappedNewBotMessageDataOnly, thoughts: undefined });
+                    chatMessages.splice(finalUserMsgIdx + 1, 0, newBotMsgWithDefaults);
                 } else {
-                    // If user message was removed or not found, append to end or handle differently
-                    chatMessages.push({ ...mappedNewBotMessageDataOnly, thoughts: undefined });
+                    chatMessages.push(newBotMsgWithDefaults);
                 }
             }
-        } else { // No new bot message from backend OR it was non-displayable
+         } else { 
             if (botPlaceholderBeingFinalized) {
                 const idxToRemove = chatMessages.findIndex(msg => msg.id === botPlaceholderBeingFinalized.id);
                 if (idxToRemove !== -1) {
@@ -350,7 +371,7 @@ export const handleSocketConversationUpdatedAfterEdit = (
         }
 
         // Final cleanup: ensure only the edited user message (if displayable) and its subsequent bot message (if displayable) remain after the original edit point.
-        if (mappedEditedUserMessage) {
+         if (mappedEditedUserMessage) {
             const finalUserMsgIdx = chatMessages.findIndex(m => m.id === mappedEditedUserMessage.id);
             if (finalUserMsgIdx !== -1) {
                 let cleanedMessages = chatMessages.slice(0, finalUserMsgIdx + 1);
@@ -362,14 +383,7 @@ export const handleSocketConversationUpdatedAfterEdit = (
                 }
                 chatMessages = cleanedMessages;
             }
-        } else {
-            // If the user message itself was removed because it became non-displayable,
-            // we need to ensure no orphaned bot messages from the edit flow are left.
-            // The logic above for removing the placeholder should handle this.
-            // If there was no placeholder but a bot message was expected, this state might be tricky.
-            // For now, the existing logic should remove the placeholder if the bot message is null.
         }
-
 
         return {
             chatMessages,

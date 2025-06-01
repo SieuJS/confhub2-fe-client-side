@@ -25,8 +25,8 @@ type StoreGet = () => MessageStoreState & MessageStoreActions;
 interface DevtoolsAction {
     type: string;
     [key: string]: any;
-    [key: number]: any; 
-    [key: symbol]: any; 
+    [key: number]: any;
+    [key: symbol]: any;
 }
 type StoreSet = (
     partial: MessageStoreState | Partial<MessageStoreState> | ((state: MessageStoreState) => MessageStoreState | Partial<MessageStoreState>),
@@ -41,7 +41,9 @@ export const handleSendMessage = (
     partsForBackend: Part[], // <<< THAM SỐ MỚI
     partsForDisplay: Part[], // <<< THAM SỐ MỚI
     userFilesForDisplayOptimistic?: UserFile[],
-    originalUserFilesInfo?: OriginalUserFileInfo[]
+    originalUserFilesInfo?: OriginalUserFileInfo[],
+    pageContextUrl?: string // <<< THÊM MỚI
+
 ) => {
     const { addChatMessage, setLoadingState, animationControls, resetAwaitFlag, setPendingBotMessageId } = get();
     const { isStreamingEnabled, currentLanguage } = useSettingsStore.getState();
@@ -81,6 +83,8 @@ export const handleSendMessage = (
         type: filesToDisplay.length > 0 ? 'multimodal' : 'text',
         timestamp: new Date().toISOString(),
         files: filesToDisplay.length > 0 ? filesToDisplay : undefined,
+        // sources sẽ được thêm vào tin nhắn của model từ backend
+
     };
     addChatMessage(newUserMessage);
     const botPlaceholderId = `bot-pending-${generateMessageId()}`;
@@ -96,8 +100,13 @@ export const handleSendMessage = (
         frontendMessageId: newUserMessage.id, // ID của tin nhắn hiển thị trên UI
         personalizationData: personalizationInfo,
         originalUserFiles: originalUserFilesInfo,
+        pageContextUrl: pageContextUrl, // <<< TRUYỀN URL
+
     };
+       // Thêm log ở đây để kiểm tra payloadForSocket trước khi emit
+    console.log('[MessageActionHandlers handleSendMessage] Payload for socket:', JSON.stringify(payloadForSocket, null, 2));
     useSocketStore.getState().emitSendMessage(payloadForSocket);
+    
 };
 
 // ... (handleLoadHistoryMessages, handleSubmitEditedMessage, etc. giữ nguyên) ...
@@ -107,7 +116,7 @@ export const handleLoadHistoryMessages = (
 ) => {
     const frontendMessages = historyItems
         .map(mapBackendHistoryItemToFrontendChatMessage)
-        .filter(msg => msg !== null) as ChatMessageType[]; 
+        .filter(msg => msg !== null) as ChatMessageType[];
 
     set({
         chatMessages: frontendMessages,
@@ -123,7 +132,7 @@ export const handleSubmitEditedMessage = (
     messageIdToEdit: string,
     newText: string
 ) => {
-    const { setChatMessages, setLoadingState, animationControls, resetAwaitFlag, setPendingBotMessageId } = get(); 
+    const { setChatMessages, setLoadingState, animationControls, resetAwaitFlag, setPendingBotMessageId } = get();
     const { currentLanguage } = useSettingsStore.getState();
     const { activeConversationId } = useConversationStore.getState();
 

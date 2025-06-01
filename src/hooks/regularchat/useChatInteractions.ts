@@ -45,18 +45,26 @@ export function useChatInteractions({ onChatStart, startTimer }: UseChatInteract
 
       const partsForBackend: Part[] = [];
       const partsForDisplay: Part[] = []; // Parts chỉ chứa query của user
+      let pageContextUrlForBackend: string | undefined = undefined; // <<< BIẾN MỚI
 
       const freshPageContextState = usePageContextStore.getState();
+      console.log('[useChatInteractions] Fresh page context state:', freshPageContextState);
+
       if (shouldUsePageContext && freshPageContextState.isCurrentPageFeatureEnabled && freshPageContextState.currentPageText) {
         const contextText = freshPageContextState.currentPageText.length > 50000
-            ? freshPageContextState.currentPageText.substring(0, 50000) + "\n[...content truncated]"
-            : freshPageContextState.currentPageText;
+          ? freshPageContextState.currentPageText.substring(0, 50000) + "\n[...content truncated]"
+          : freshPageContextState.currentPageText;
 
         const contextPartForBackend: Part = {
           text: `[START CURRENT PAGE CONTEXT]\n${contextText}\n[END CURRENT PAGE CONTEXT]\n\nUser query:`
         };
         partsForBackend.push(contextPartForBackend);
-        // KHÔNG thêm contextPart vào partsForDisplay
+        if (freshPageContextState.currentPageUrl) {
+          pageContextUrlForBackend = freshPageContextState.currentPageUrl;
+          console.log('[useChatInteractions] Page context URL for backend:', pageContextUrlForBackend);
+        } else {
+          console.warn('[useChatInteractions] Page context is being used, but currentPageUrl is null/undefined in store. URL will not be sent.');
+        }
       }
 
       const userFilesForDisplayOptimistic: UserFile[] = filesFromInput.map(file => ({
@@ -121,7 +129,7 @@ export function useChatInteractions({ onChatStart, startTimer }: UseChatInteract
               const indexToRemove = userFilesForDisplayOptimistic.findIndex(f => f.name === uploadedFile.name);
               if (indexToRemove > -1) {
                 if (userFilesForDisplayOptimistic[indexToRemove].dataUrl) {
-                    URL.revokeObjectURL(userFilesForDisplayOptimistic[indexToRemove].dataUrl!);
+                  URL.revokeObjectURL(userFilesForDisplayOptimistic[indexToRemove].dataUrl!);
                 }
                 userFilesForDisplayOptimistic.splice(indexToRemove, 1);
               }
@@ -151,17 +159,20 @@ export function useChatInteractions({ onChatStart, startTimer }: UseChatInteract
         console.warn("No message content (text, files, or context) to send to backend.");
         setLoadingState({ isLoading: false, step: 'idle', message: '' });
         if (userFilesForDisplayOptimistic.length > 0 && filesFromInput.length > 0) {
-             userFilesForDisplayOptimistic.forEach(f => { if (f.dataUrl) URL.revokeObjectURL(f.dataUrl); });
+          userFilesForDisplayOptimistic.forEach(f => { if (f.dataUrl) URL.revokeObjectURL(f.dataUrl); });
         }
         return;
       }
-      
-      // Gọi sendMessage với cả hai bộ parts
+
+      console.log('[useChatInteractions] Calling sendMessage with pageContextUrlForBackend:', pageContextUrlForBackend);
+
+      // Cần cập nhật signature của sendMessage trong messageStore và messageActionHandlers
       sendMessage(
         partsForBackend,
-        partsForDisplay, // <<< TRUYỀN PARTS CHO HIỂN THỊ
+        partsForDisplay,
         userFilesForDisplayOptimistic,
-        originalUserFilesInfoForBackend.length > 0 ? originalUserFilesInfoForBackend : undefined
+        originalUserFilesInfoForBackend.length > 0 ? originalUserFilesInfoForBackend : undefined,
+        pageContextUrlForBackend // <<< TRUYỀN URL
       );
 
     },

@@ -61,9 +61,11 @@ export const useMessageStore = create<MessageStoreState & MessageStoreActions>()
                 partsForBackend: Part[],
                 partsForDisplay: Part[], // <<< THÊM THAM SỐ
                 userFilesForDisplayOptimistic?: UserFile[],
-                originalUserFilesInfo?: OriginalUserFileInfo[]
+                originalUserFilesInfo?: OriginalUserFileInfo[],
+                pageContextUrl?: string // <<< THÊM MỚI
+
             ) => {
-                handleSendMessage(get, set, partsForBackend, partsForDisplay, userFilesForDisplayOptimistic, originalUserFilesInfo);
+                handleSendMessage(get, set, partsForBackend, partsForDisplay, userFilesForDisplayOptimistic, originalUserFilesInfo, pageContextUrl);
             },
             loadHistoryMessages: (historyItems: HistoryItem[]) => {
                 handleLoadHistoryMessages(set, historyItems);

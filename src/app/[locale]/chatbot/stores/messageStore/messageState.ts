@@ -18,7 +18,8 @@ import {
     UserFile,
     OriginalUserFileInfo,
     SendMessageData,
-    LanguageCode
+    LanguageCode,
+    SourceItem
 } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
 import { StreamingTextAnimationControls } from '@/src/hooks/regularchat/useStreamingTextAnimation';
 import { Part } from "@google/genai";
@@ -49,7 +50,9 @@ export interface MessageStoreActions {
         partsForBackend: Part[], // Parts để gửi lên backend (có thể chứa context)
         partsForDisplay: Part[], // Parts chỉ để hiển thị trên UI (chỉ query user)
         userFilesForDisplayOptimistic?: UserFile[],
-        originalUserFilesInfo?: OriginalUserFileInfo[]
+        originalUserFilesInfo?: OriginalUserFileInfo[],
+                pageContextUrl?: string // <<< THÊM MỚI
+
     ) => void;
 
     resetChatUIForNewConversation: (clearActiveIdInOtherStores?: boolean) => void;
@@ -96,6 +99,7 @@ export type {
     OriginalUserFileInfo,
     SendMessageData,
     LanguageCode,
-    Part
+    Part,
+    SourceItem
 };
 export type { StreamingTextAnimationControls };
