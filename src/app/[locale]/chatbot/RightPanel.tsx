@@ -1,23 +1,23 @@
 // src/app/[locale]/chatbot/RightPanel.tsx
-import React, { useEffect, useState } from 'react';
-import { X, Settings } from 'lucide-react';
-import LanguageDropdown from './LanguageDropdown';
-import LiveChatSpecificSettings from './livechat/LiveChatSpecificSettings';
-import { useTranslations } from 'next-intl';
-import { useUiStore, useSettingsStore } from './stores';
-import { useShallow } from 'zustand/react/shallow';
-import { useLiveChatSettings } from './livechat/contexts/LiveChatSettingsContext';
-import { LanguageOption } from './stores';
-import { UserResponse } from '@/src/models/response/user.response';
-import { useAuth } from '@/src/contexts/AuthContext';
-import PersonalizationConfirmationModal from './PersonalizationConfirmationModal'; // <<< IMPORT MODAL
+import React, { useEffect, useState } from 'react'
+import { X, Settings } from 'lucide-react'
+import LanguageDropdown from './LanguageDropdown'
+import LiveChatSpecificSettings from './livechat/LiveChatSpecificSettings'
+import { useTranslations } from 'next-intl'
+import { useUiStore, useSettingsStore } from './stores'
+import { useShallow } from 'zustand/react/shallow'
+import { useLiveChatSettings } from './livechat/contexts/LiveChatSettingsContext'
+import { LanguageOption } from './stores'
+import { UserResponse } from '@/src/models/response/user.response'
+import { useAuth } from '@/src/contexts/AuthContext'
+import PersonalizationConfirmationModal from './PersonalizationConfirmationModal'
 
 const LiveAwareLanguageDropdown: React.FC<{
-  currentLanguage: LanguageOption;
-  availableLanguages: LanguageOption[];
-  setCurrentLanguage: (language: LanguageOption) => void;
+  currentLanguage: LanguageOption
+  availableLanguages: LanguageOption[]
+  setCurrentLanguage: (language: LanguageOption) => void
 }> = ({ currentLanguage, availableLanguages, setCurrentLanguage }) => {
-  const { isLiveChatConnected } = useLiveChatSettings();
+  const { isLiveChatConnected } = useLiveChatSettings()
 
   return (
     <LanguageDropdown
@@ -26,26 +26,25 @@ const LiveAwareLanguageDropdown: React.FC<{
       onLanguageChange={setCurrentLanguage}
       disabled={isLiveChatConnected}
     />
-  );
-};
-
+  )
+}
 
 interface RightSettingsPanelProps {
-  isLiveChatContextActive?: boolean;
+  isLiveChatContextActive?: boolean
 }
 
 const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
   isLiveChatContextActive
 }) => {
-  const t = useTranslations();
-  const { user, isLoggedIn } = useAuth();
+  const t = useTranslations()
+  const { user, isLoggedIn } = useAuth()
 
   const { isRightPanelOpen, setRightPanelOpen } = useUiStore(
     useShallow(state => ({
       isRightPanelOpen: state.isRightPanelOpen,
-      setRightPanelOpen: state.setRightPanelOpen,
+      setRightPanelOpen: state.setRightPanelOpen
     }))
-  );
+  )
 
   const {
     chatMode,
@@ -55,7 +54,7 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
     isPersonalizationEnabled,
     setCurrentLanguage,
     setIsStreamingEnabled,
-    setIsPersonalizationEnabled,
+    setIsPersonalizationEnabled
   } = useSettingsStore(
     useShallow(state => ({
       chatMode: state.chatMode,
@@ -65,115 +64,146 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
       isPersonalizationEnabled: state.isPersonalizationEnabled,
       setCurrentLanguage: state.setCurrentLanguage,
       setIsStreamingEnabled: state.setIsStreamingEnabled,
-      setIsPersonalizationEnabled: state.setIsPersonalizationEnabled,
+      setIsPersonalizationEnabled: state.setIsPersonalizationEnabled
     }))
-  );
+  )
 
   // State for managing modals
-  const [isBenefitModalOpen, setIsBenefitModalOpen] = useState(false);
-  const [isMissingInfoModalOpen, setIsMissingInfoModalOpen] = useState(false);
-  const [missingInfoFieldsText, setMissingInfoFieldsText] = useState('');
-
-  // Removed benefitPopupShownThisSession, as modal logic will handle display
+  const [isBenefitModalOpen, setIsBenefitModalOpen] = useState(false)
+  const [isMissingInfoModalOpen, setIsMissingInfoModalOpen] = useState(false)
+  const [missingInfoFieldsText, setMissingInfoFieldsText] = useState('')
 
   const handleStreamingToggle = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setIsStreamingEnabled(event.target.checked);
-  };
+    setIsStreamingEnabled(event.target.checked)
+  }
 
   const proceedToEnablePersonalization = () => {
-    setIsPersonalizationEnabled(true);
-    // setBenefitPopupShownThisSession(true); // No longer needed if modal is shown each time
-  };
+    setIsPersonalizationEnabled(true)
+  }
 
   const handlePersonalizationToggle = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const enable = event.target.checked;
+    const enable = event.target.checked
 
     if (enable) {
       if (!user) {
-        // This case should ideally be prevented by disabling the toggle,
-        // but as a fallback, an alert can be used or a more styled notification.
-        alert(t('Error_Login_Required_Generic'));
-        return;
+        alert(t('Error_Login_Required_Generic'))
+        // Revert the toggle visually if login is required.
+        event.target.checked = false // Revert optimistic UI change of the toggle
+        return
       }
 
-      const currentUserData = JSON.parse(localStorage.getItem('user') || '{}') as UserResponse;
-      const missingFields: string[] = [];
+      const currentUserData = JSON.parse(
+        localStorage.getItem('user') || '{}'
+      ) as UserResponse
+      const missingFields: string[] = []
       if (!currentUserData.aboutMe) {
-        missingFields.push(t('Profile_AboutMe_Label'));
+        missingFields.push(t('Profile_AboutMe_Label'))
       }
-      if (!currentUserData.interestedTopics || currentUserData.interestedTopics.length === 0) {
-        missingFields.push(t('Profile_InterestedTopics_Label'));
+      if (
+        !currentUserData.interestedTopics ||
+        currentUserData.interestedTopics.length === 0
+      ) {
+        missingFields.push(t('Profile_InterestedTopics_Label'))
       }
 
       if (missingFields.length > 0) {
-        setMissingInfoFieldsText(missingFields.join(', '));
-        setIsMissingInfoModalOpen(true);
-        // We don't change the toggle state here. It will be changed if user confirms in modal.
-        // To prevent the toggle from visually changing before confirmation,
-        // we can revert it if the modals are cancelled.
-        event.target.checked = false; // Revert optimistic UI change of the toggle
+        setMissingInfoFieldsText(missingFields.join(', '))
+        setIsMissingInfoModalOpen(true)
+        // Revert the toggle visually, it will be enabled if user confirms in modal.
+        event.target.checked = false
       } else {
-        // No missing info, directly show benefit modal
-        setIsBenefitModalOpen(true);
-        event.target.checked = false; // Revert optimistic UI change
+        setIsBenefitModalOpen(true)
+        // Revert the toggle visually, it will be enabled if user confirms in modal.
+        event.target.checked = false
       }
     } else {
       // User is disabling
-      setIsPersonalizationEnabled(false);
+      setIsPersonalizationEnabled(false)
     }
-  };
+  }
 
   useEffect(() => {
     if (!isLoggedIn) {
-      // setBenefitPopupShownThisSession(false); // No longer needed
-      // Optionally turn off personalization if user logs out
       if (isPersonalizationEnabled) {
-         setIsPersonalizationEnabled(false);
+        setIsPersonalizationEnabled(false)
       }
     }
-  }, [isLoggedIn, isPersonalizationEnabled, setIsPersonalizationEnabled]);
+  }, [isLoggedIn, isPersonalizationEnabled, setIsPersonalizationEnabled])
 
-
-  if (!isRightPanelOpen) {
-    return null;
-  }
+  // Handle keyboard escape for closing the panel
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isRightPanelOpen) {
+        setRightPanelOpen(false)
+      }
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [isRightPanelOpen, setRightPanelOpen])
 
   return (
-    <> {/* Use Fragment to return multiple root elements (Panel + Modals) */}
+    <>
+      {/* Backdrop (Lớp phủ nền mờ) */}
       <div
-        className={`bg-white-pure h-full flex-shrink-0 shadow-xl transition-all duration-300 ease-in-out  ${isRightPanelOpen ? 'w-72 opacity-100' : 'pointer-events-none w-0 opacity-0'
-          }`}
+        className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ease-in-out
+          ${isRightPanelOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}
+        onClick={() => setRightPanelOpen(false)}
         aria-hidden={!isRightPanelOpen}
+        aria-label={t('Close_settings')} // Thêm aria-label cho khả năng truy cập
+      />
+
+      {/* Right Panel */}
+      <div
+        // Đặt panel cố định ở góc phải màn hình
+        className={`fixed right-0 top-0 z-50 h-full w-72 transform bg-white-pure shadow-xl transition-transform duration-300 ease-in-out
+          ${isRightPanelOpen ? 'pointer-events-auto translate-x-0' : 'pointer-events-none translate-x-full'}`}
+        aria-modal='true' // Cho trình đọc màn hình biết đây là một cửa sổ modal
+        role='dialog' // Xác định vai trò là hộp thoại
+        aria-labelledby='right-panel-title' // Liên kết với tiêu đề panel
       >
         <div className='flex h-full w-full flex-col overflow-y-auto px-4'>
-          <div className='border-gray-200 flex flex-shrink-0 items-center justify-between border-b pb-4 pt-4'>
+          <div className='flex flex-shrink-0 items-center justify-between border-b border-gray-200 pb-4 pt-4'>
             <div className='flex items-center space-x-2'>
-                <Settings size={20} className='' />
-                <h2 id='right-panel-title' className='text-lg font-semibold '>
+              <Settings size={20} className='' />
+              <h2 id='right-panel-title' className='text-lg font-semibold '>
                 {t('Settings')}
-                </h2>
+              </h2>
             </div>
             <button
-                onClick={() => setRightPanelOpen(false)}
-                className='flex h-8 w-8 items-center justify-center rounded-full  hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:hover:bg-black dark:hover:text-gray-300'
-                title={t('Close_settings')}
-                aria-label={t('Close_settings')}
+              onClick={() => setRightPanelOpen(false)}
+              className='flex h-8 w-8 items-center justify-center rounded-full  hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:hover:bg-black dark:hover:text-gray-300'
+              title={t('Close_settings')}
+              aria-label={t('Close_settings')}
             >
-                <X size={20} strokeWidth={1.5} className='h-5 w-5' aria-hidden='true' />
+              <X
+                size={20}
+                strokeWidth={1.5}
+                className='h-5 w-5'
+                aria-hidden='true'
+              />
             </button>
-            </div>
-
+          </div>
 
           <div className='flex-grow space-y-6  pt-4'>
             {/* Streaming Toggle */}
             {chatMode === 'regular' && (
               <div className='space-y-2 '>
-                <label htmlFor='streaming-toggle-settings' className='block text-sm font-medium '>{t('Stream_Response')}</label>
-                <label htmlFor='streaming-toggle-settings' className='inline-flex cursor-pointer items-center'>
+                <label
+                  htmlFor='streaming-toggle-settings'
+                  className='block text-sm font-medium '
+                >
+                  {t('Stream_Response')}
+                </label>
+                <label
+                  htmlFor='streaming-toggle-settings'
+                  className='inline-flex cursor-pointer items-center'
+                >
                   <input
                     type='checkbox'
                     id='streaming-toggle-settings'
@@ -189,47 +219,53 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
             {/* Personalization Toggle */}
             {chatMode === 'regular' && (
               <div className='space-y-2'>
-                <div className="flex items-center justify-between">
-                  <label htmlFor='personalization-toggle-settings' className='block text-sm font-medium'>
+                <div className='flex items-center justify-between'>
+                  <label
+                    htmlFor='personalization-toggle-settings'
+                    className='block text-sm font-medium'
+                  >
                     {t('Personalize_Responses_Toggle_Label')}
                   </label>
                 </div>
-                <label htmlFor='personalization-toggle-settings' className={`inline-flex items-center ${!isLoggedIn ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                <label
+                  htmlFor='personalization-toggle-settings'
+                  className={`inline-flex items-center ${!isLoggedIn ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                >
                   <input
                     type='checkbox'
                     id='personalization-toggle-settings'
                     className='peer sr-only'
-                    checked={isPersonalizationEnabled} // This will reflect the actual store state
+                    checked={isPersonalizationEnabled}
                     onChange={handlePersonalizationToggle}
                     disabled={!isLoggedIn}
                   />
                   <div className="peer relative h-6 w-10 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:peer-checked:bg-blue-600 dark:peer-focus:ring-blue-800 rtl:peer-checked:after:-translate-x-full"></div>
                 </label>
                 {!isLoggedIn && (
-                  <p className="text-xs text-gray-500 mt-1">{t('Personalization_Login_Required_Message')}</p>
+                  <p className='mt-1 text-xs text-gray-500'>
+                    {t('Personalization_Login_Required_Message')}
+                  </p>
                 )}
               </div>
             )}
 
             {isLiveChatContextActive && chatMode === 'live' ? (
-                <LiveAwareLanguageDropdown
+              <LiveAwareLanguageDropdown
                 currentLanguage={currentLanguage}
                 availableLanguages={availableLanguages}
                 setCurrentLanguage={setCurrentLanguage}
-                />
+              />
             ) : (
-                <LanguageDropdown
+              <LanguageDropdown
                 currentLanguage={currentLanguage}
                 availableLanguages={availableLanguages}
                 onLanguageChange={setCurrentLanguage}
                 disabled={false}
-                />
+              />
             )}
 
             {isLiveChatContextActive && chatMode === 'live' && (
-                <LiveChatSpecificSettings
-                currentChatMode={chatMode}
-                />
+              <LiveChatSpecificSettings currentChatMode={chatMode} />
             )}
           </div>
         </div>
@@ -240,11 +276,10 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
         isOpen={isMissingInfoModalOpen}
         onClose={() => setIsMissingInfoModalOpen(false)}
         onConfirm={() => {
-          // User chose "Enable Anyway"
-          setIsMissingInfoModalOpen(false); // Close this modal
-          setIsBenefitModalOpen(true);     // Open the benefit modal
+          setIsMissingInfoModalOpen(false)
+          setIsBenefitModalOpen(true)
         }}
-        type="missingInfo"
+        type='missingInfo'
         missingFieldsText={missingInfoFieldsText}
       />
 
@@ -252,14 +287,13 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
         isOpen={isBenefitModalOpen}
         onClose={() => setIsBenefitModalOpen(false)}
         onConfirm={() => {
-          // User confirmed to enable personalization
-          proceedToEnablePersonalization();
-          setIsBenefitModalOpen(false);
+          proceedToEnablePersonalization()
+          setIsBenefitModalOpen(false)
         }}
-        type="enableBenefit"
+        type='enableBenefit'
       />
     </>
-  );
-};
+  )
+}
 
-export default RightSettingsPanel;
+export default RightSettingsPanel

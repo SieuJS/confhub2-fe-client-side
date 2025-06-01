@@ -24,13 +24,13 @@ export default function ChatInputBar({
   disconnect,
   muted,
   setMuted,
-  micVolume,    // userMicVolume
-  modelVolume,  // modelOutputVolume
+  micVolume, // userMicVolume
+  modelVolume, // modelOutputVolume
   onSendMessage,
   isSendingMessage
 }: ChatInputBarProps) {
   return (
-    <div className='m-4 flex items-center gap-2 rounded-full border border-gray-20 bg-gray-10 p-1'>
+    <div className='m-0 flex items-center gap-1 rounded-full border border-gray-20 bg-gray-10 p-1 text-xs lg:m-4 lg:gap-2'>
       <ConnectionButton
         connected={connected}
         connect={connect}
@@ -40,11 +40,11 @@ export default function ChatInputBar({
       <MicButton
         muted={muted}
         setMuted={setMuted}
-        userMicVolume={micVolume}       // Truyền userMicVolume
+        userMicVolume={micVolume} // Truyền userMicVolume
         modelOutputVolume={modelVolume} // Truyền modelOutputVolume
         connected={connected}
       />
-      <div className='flex-grow'>
+      <div className='min-w-0 flex-grow'>
         <ChatInput
           onSendMessage={onSendMessage}
           disabled={!connected || isSendingMessage}

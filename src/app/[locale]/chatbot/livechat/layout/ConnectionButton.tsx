@@ -32,7 +32,7 @@ const ConnectionButton: React.FC<ConnectionButtonProps> = ({
   return (
     <button
       className={cn(
-        'flex min-h-10 min-w-10 select-none items-center justify-center rounded-full border border-transparent text-xl transition-all duration-200 ease-in-out focus:outline-2 focus:outline-offset-2',
+        'flex min-h-8 min-w-8 select-none items-center  justify-center rounded-full border border-transparent text-xl transition-all duration-200 ease-in-out focus:outline-2 focus:outline-offset-2 lg:min-h-10 lg:min-w-10',
         {
           // Red when connected (shows pause icon for disconnect action)
           'bg-red-500 text-white hover:bg-red-600': connected,
@@ -53,7 +53,13 @@ const ConnectionButton: React.FC<ConnectionButtonProps> = ({
     >
       <span className='material-symbols-outlined filled'>
         {/* Icon depends on connection and connecting states */}
-        {connected ? <Pause /> : isConnecting ? <Hourglass /> : <Play />}
+        {connected ? (
+          <Pause className='h-4 w-4 lg:h-5 lg:w-5' />
+        ) : isConnecting ? (
+          <Hourglass className='h-4 w-4 lg:h-5 lg:w-5' />
+        ) : (
+          <Play className='h-4 w-4 lg:h-5 lg:w-5' />
+        )}
       </span>
     </button>
   )
