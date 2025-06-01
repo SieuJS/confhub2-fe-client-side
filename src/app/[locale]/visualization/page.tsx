@@ -16,9 +16,7 @@ import useVisualizationData from '@/src/hooks/visualization/useVisualizationData
 import useChartBuilder from '@/src/hooks/visualization/useChartBuilder'
 import { FieldType } from '@/src/models/visualization/visualization'
 import { downloadChartAsSvg } from '@/src/app/[locale]/visualization/utils/chartActions'
-// --- CHANGE/ADD THIS LINE ---
-import { EChartsType } from 'echarts/core' // Ensure this specific import is used
-// --- End Change ---
+import { EChartsType } from 'echarts/core'
 import {
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon
@@ -54,8 +52,7 @@ const VisualizationPage: React.FC = () => {
     setChartConfig
   } = useChartBuilder({ rawData })
 
-  // --- Ensure the ref uses the correctly imported EChartsType ---
-  const chartInstanceRef = useRef<EChartsType | null | undefined>(null) // This should now match chartActions.ts
+  const chartInstanceRef = useRef<EChartsType | null | undefined>(null)
 
   const toggleFieldsPanel = useCallback(
     () => setIsFieldsPanelCollapsed(prev => !prev),
@@ -66,17 +63,9 @@ const VisualizationPage: React.FC = () => {
     []
   )
 
-  useEffect(() => {
-    const resizeTimer = setTimeout(() => {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.resize()
-      }
-    }, 350)
-    return () => clearTimeout(resizeTimer)
-  }, [isFieldsPanelCollapsed, isConfigPanelCollapsed])
-  // --- End Effect ---
+  // REMOVED: useEffect for manual resize on panel collapse/expand
+  // The ResizeObserver in ChartDisplay.tsx handles this more effectively.
 
-  // --- Drag and Drop Handlers (Keep existing logic) ---
   const handleDragStart = useCallback((start: DragStart) => {
     // console.log("Drag started:", start);
   }, [])
@@ -117,7 +106,11 @@ const VisualizationPage: React.FC = () => {
           `Invalid drop: ${field.type} field into ${zoneLabel} zone (requires ${acceptedType})`
         )
         alert(
-          `Cannot drop a ${field.type} field into the ${zoneLabel} zone (requires ${acceptedType}).`
+          t('Cannot_drop_field_into_zone', {
+            fieldType: field.type,
+            zoneLabel: zoneLabel,
+            acceptedType: acceptedType
+          }) // Example of using t for dynamic alert
         )
         return
       }
@@ -127,7 +120,7 @@ const VisualizationPage: React.FC = () => {
         [targetZoneId]: { ...prevConfig[targetZoneId], fieldId: draggableId }
       }))
     },
-    [availableFields, setChartConfig, chartConfig.chartType]
+    [availableFields, setChartConfig, chartConfig.chartType, t] // Added t
   )
 
   const handleRemoveField = useCallback(
@@ -143,7 +136,6 @@ const VisualizationPage: React.FC = () => {
 
   const handleGetChartInstance = useCallback(
     (instance: EChartsType | null | undefined) => {
-      // No change needed here as the type should now be consistent
       if (instance !== chartInstanceRef.current) {
         chartInstanceRef.current = instance ?? null
       }
@@ -154,13 +146,11 @@ const VisualizationPage: React.FC = () => {
   const handleDownload = useCallback(() => {
     if (chartInstanceRef.current) {
       try {
-        // --- NO CHANGE NEEDED HERE ---
-        // The type of chartInstanceRef now matches the expected parameter type
         downloadChartAsSvg(chartInstanceRef, chartOptions.title || 'chart')
       } catch (error) {
         console.error(`Error during SVG download:`, error)
         alert(
-          `Failed to download chart: ${error instanceof Error ? error.message : String(error)}`
+          `${t('Failed_to_download_chart')}: ${error instanceof Error ? error.message : String(error)}`
         )
       }
     } else {
@@ -168,9 +158,8 @@ const VisualizationPage: React.FC = () => {
         `Download failed: Chart instance ref not available or chart not ready.`
       )
     }
-  }, [chartOptions.title]) // chartInstanceRef is stable, no need to include in deps
+  }, [chartOptions.title, t]) // Added t
 
-  // --- Render Logic (No changes needed) ---
   if (dataLoading)
     return (
       <div className='flex h-screen w-screen items-center justify-center bg-gray-10'>
@@ -203,13 +192,14 @@ const VisualizationPage: React.FC = () => {
           isCollapsed={isFieldsPanelCollapsed}
           onToggle={toggleFieldsPanel}
         />
-        <div className='relative flex flex-grow flex-col p-2'>
+        {/* This is the main chart area container */}
+        <div className='relative flex flex-grow flex-col p-2 min-w-0'> {/* ADDED: min-w-0 */}
           {isFieldsPanelCollapsed && (
             <button
               onClick={toggleFieldsPanel}
-              className='absolute left-0 top-1/2 z-20 -translate-y-1/2 transform rounded-r-md bg-gray-20 p-1  shadow-md hover:bg-gray-30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1'
-              title='Expand Fields Panel'
-              aria-label='Expand Fields Panel'
+              className='absolute left-0 top-1/2 z-20 -translate-y-1/2 transform rounded-r-md bg-gray-20 p-1 shadow-md hover:bg-gray-30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1'
+              title={t('Expand_Fields_Panel')}
+              aria-label={t('Expand_Fields_Panel')}
             >
               <ChevronDoubleRightIcon className='h-5 w-5' />
             </button>
@@ -226,9 +216,9 @@ const VisualizationPage: React.FC = () => {
           {isConfigPanelCollapsed && (
             <button
               onClick={toggleConfigPanel}
-              className='absolute right-0 top-1/2 z-20 -translate-y-1/2 transform rounded-l-md bg-gray-20 p-1  shadow-md hover:bg-gray-30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1'
-              title='Expand Configuration Panel'
-              aria-label='Expand Configuration Panel'
+              className='absolute right-0 top-1/2 z-20 -translate-y-1/2 transform rounded-l-md bg-gray-20 p-1 shadow-md hover:bg-gray-30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1'
+              title={t('Expand_Configuration_Panel')}
+              aria-label={t('Expand_Configuration_Panel')}
             >
               <ChevronDoubleLeftIcon className='h-5 w-5' />
             </button>

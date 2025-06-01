@@ -23,7 +23,7 @@ import Loading from '../utils/Loading'
 import { debounce } from 'lodash'
 import { useTranslations } from 'next-intl'
 
-// --- Register ECharts components (No changes) ---
+// --- Register ECharts components ---
 echarts.use([
   TitleComponent,
   TooltipComponent,
@@ -40,7 +40,7 @@ echarts.use([
 ])
 
 interface ChartDisplayProps {
-  option: EChartsOption | null // Corrected type name
+  option: EChartsOption | null
   isLoading: boolean
   isReady: boolean
   config: ChartConfig
@@ -52,7 +52,7 @@ interface ChartDisplayProps {
 const logPrefixCD = '[ChartDisplay]'
 
 const ChartDisplay: React.FC<ChartDisplayProps> = ({
-  option, // This prop now uses the EChartsCoreOption type
+  option,
   isLoading,
   isReady,
   config,
@@ -67,14 +67,14 @@ const ChartDisplay: React.FC<ChartDisplayProps> = ({
 
   const debouncedChartResize = useCallback(
     debounce(() => {
-      // --- Type Assertion (Still likely needed) ---
       const instance = chartRef.current?.getEchartsInstance() as
         | EChartsType
         | undefined
       if (instance) {
+        // console.log(`${logPrefixCD} Resizing chart instance.`);
         instance.resize()
       }
-    }, 150),
+    }, 150), // Debounce time can be adjusted
     []
   )
 
@@ -83,24 +83,25 @@ const ChartDisplay: React.FC<ChartDisplayProps> = ({
     let observer: ResizeObserver | null = null
 
     if (containerElement) {
+      // console.log(`${logPrefixCD} Observing chart container for resize.`);
       observer = new ResizeObserver(() => {
+        // console.log(`${logPrefixCD} Chart container resized, debouncing chart resize.`);
         debouncedChartResize()
       })
       observer.observe(containerElement)
     }
 
-    // --- Pass Instance Up ---
-    // --- Type Assertion (Still likely needed) ---
     const instance = chartRef.current?.getEchartsInstance() as
       | EChartsType
       | undefined
     if (getChartInstance) {
       getChartInstance(instance)
     }
-    // --- End Pass Instance ---
 
     return () => {
-      if (observer) {
+      if (observer && containerElement) {
+        // console.log(`${logPrefixCD} Disconnecting ResizeObserver.`);
+        observer.unobserve(containerElement) // More specific cleanup
         observer.disconnect()
       }
       debouncedChartResize.cancel()
@@ -108,8 +109,7 @@ const ChartDisplay: React.FC<ChartDisplayProps> = ({
   }, [debouncedChartResize, getChartInstance])
 
   const getPlaceholderMessage = useCallback((): string => {
-    // ... (no changes needed in this function)
-    const { chartType, xAxis, yAxis, color, size } = config
+    const { chartType, xAxis, yAxis, color } = config
     switch (chartType) {
       case 'pie':
         if (!color?.fieldId)
@@ -117,10 +117,6 @@ const ChartDisplay: React.FC<ChartDisplayProps> = ({
         if (!yAxis?.fieldId)
           return t('Please_select_a_field_for_Value_Slice_Size_Measure')
         break
-      // case 'scatter':
-      //   if (!xAxis?.fieldId) return t('Please_select_a_field_for_the_XAxis')
-      //   if (!yAxis?.fieldId) return t('Please_select_a_field_for_the_YAxis')
-      //   break
       case 'bar':
       case 'line':
       default:
@@ -131,43 +127,35 @@ const ChartDisplay: React.FC<ChartDisplayProps> = ({
         break
     }
     return t('Configure_the_chart_using_the_panels_or_check_data_processing')
-  }, [config])
+  }, [config, t]) // Added t to dependency array
 
-  // --- Render Logic (No changes) ---
   return (
     <div
       ref={chartContainerRef}
-      className='relative h-full flex-grow overflow-hidden rounded-lg bg-gray-5 p-4 pt-10 shadow-inner'
+      className='relative h-full flex-1 min-w-0 overflow-hidden rounded-lg bg-gray-5 p-4 pt-10 shadow-inner' // CHANGED: flex-grow to flex-1 and added min-w-0
     >
-      {/* Action Buttons */}
-      {/* <div className='absolute right-3 top-2.5 z-10 flex space-x-1.5'>
-        <button
-          onClick={onDownloadSvg}
-          className='rounded p-1.5  transition-colors duration-150 hover:bg-gray-20 hover:text-gray-80 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent'
-          title='Download as SVG'
-          disabled={isLoading || !isReady || !option}
-          aria-label='Download chart as SVG'
-        >
-          <ArrowDownTrayIcon className='h-5 w-5' />
-        </button>
-      </div> */}
+      {/* Action Buttons - Kept commented as in original */}
+      {/* <div className='absolute right-3 top-2.5 z-10 flex space-x-1.5'> ... </div> */}
+
       {/* Loading Overlay */}
       {isLoading && (
         <div className='absolute inset-0 z-20 flex items-center justify-center bg-white-pure backdrop-blur-sm'>
           <Loading />
         </div>
       )}
+
       {/* Placeholder/Instructions */}
       {!isLoading && !isReady && (
-        <div className='flex h-full flex-col items-center justify-center text-center  '>
+        <div className='flex h-full flex-col items-center justify-center text-center'>
           <p className='mb-2'>{getPlaceholderMessage()}</p>
-          <p className='text-sm '>
+          <p className='text-sm'>
             {t(
               'Drag_fields_from_the_left_panel_to_the_configuration_zones_on_the_right'
             )}
           </p>
         </div>
       )}
+
       {/* ECharts Component */}
       {!isLoading && isReady && option && (
         <ReactECharts
@@ -176,7 +164,7 @@ const ChartDisplay: React.FC<ChartDisplayProps> = ({
           option={option}
           notMerge={true}
           lazyUpdate={true}
-          style={{ height: chartHeight, width: '100%' }}
+          style={{ height: chartHeight, width: '100%' }} // width: '100%' is correct, it will fill the parent
         />
       )}
     </div>
