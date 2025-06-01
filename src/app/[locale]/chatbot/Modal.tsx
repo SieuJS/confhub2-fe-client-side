@@ -5,7 +5,7 @@ import { X } from 'lucide-react';
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
   children: ReactNode;
   footer?: ReactNode; // Optional footer for buttons
   size?: 'sm' | 'md' | 'lg'; // Optional size

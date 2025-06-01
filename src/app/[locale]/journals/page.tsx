@@ -8,7 +8,6 @@ import { Header } from '../utils/Header';
 import Footer from '../utils/Footer';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
-import FloatingChatbot from '@/src/app/[locale]/floatingchatbot/FloatingChatbot'; // <-- IMPORT MỚI
 
 
 export default function Journals({ params: { locale } }: { params: { locale: string } }) {
@@ -77,7 +76,6 @@ export default function Journals({ params: { locale } }: { params: { locale: str
             </div>
             <Footer />
         
-            <FloatingChatbot /> {/* <-- THÊM CHATBOT NỔI Ở ĐÂY */}
 
         </>
     );

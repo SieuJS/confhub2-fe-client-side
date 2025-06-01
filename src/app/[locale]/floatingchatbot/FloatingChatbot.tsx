@@ -5,9 +5,8 @@ import React, {
   useState,
   useEffect,
   useCallback
-  // useRef // No longer needed directly here for draggableWrapperRef
 } from 'react'
-import { X, Settings, Minus } from 'lucide-react';
+import { X, Settings, Minus, MessageSquare } from 'lucide-react';
 import RegularChat from '../chatbot/regularchat/RegularChat'
 import FloatingChatbotSettings from './FloatingChatbotSettings'
 import {
@@ -19,33 +18,40 @@ import {
 import { usePageContextStore } from '@/src/app/[locale]/chatbot/stores/pageContextStore'
 import { useTranslations } from 'next-intl'
 import { useAppInitialization } from '@/src/hooks/regularchat/useAppInitialization'
-import dynamic from 'next/dynamic'
 import ChatbotErrorDisplay from '../chatbot/ChatbotErrorDisplay'
-import { usePathname } from '@/src/navigation'
+import { usePathname, pathnames as appPathnames } from '@/src/navigation' // Giữ nguyên cách import usePathname
 import { MAIN_CHATBOT_PAGE_PATH } from '@/src/app/[locale]/chatbot/lib/constants'
 
-import Draggable from 'react-draggable'; // Keep for Draggable component
-import { Resizable } from 're-resizable'; // Keep for Resizable component
-// Import the new hook (adjust path as needed)
-import { useFloatingWindowControls } from '@/src/hooks/floatingChatbot/useFloatingWindowControls'; 
+import Draggable from 'react-draggable';
+import { Resizable } from 're-resizable';
+import { useFloatingWindowControls } from '@/src/hooks/floatingChatbot/useFloatingWindowControls';
 
-const DynamicAnimatedIcon = dynamic(() => import('../utils/AnimatedIcon'), {
-  ssr: false,
-  loading: () => (
-    <div className='flex h-14 w-14 items-center justify-center rounded-full bg-blue-400'></div>
-  )
-})
+const FLOATING_CHATBOT_WRAPPER_ID = 'floating-chatbot-wrapper-for-text-extraction';
+
 
 const getCurrentPageTextContent = (
   maxLength: number = 50000
 ): string | null => {
   if (typeof window !== 'undefined' && document?.body?.innerText) {
-    const text = document.body.innerText
+    const chatbotWrapper = document.getElementById(FLOATING_CHATBOT_WRAPPER_ID);
+    let originalDisplay = '';
+
+    if (chatbotWrapper) {
+      originalDisplay = chatbotWrapper.style.display;
+      chatbotWrapper.style.display = 'none';
+    }
+
+    let text = document.body.innerText;
+
+    if (chatbotWrapper) {
+      chatbotWrapper.style.display = originalDisplay;
+    }
+    text = text.replace(/\s\s+/g, ' ').replace(/\n\n+/g, '\n').trim();
     return text.length > maxLength
       ? text.substring(0, maxLength) + '\n[...content truncated]'
-      : text
+      : text;
   }
-  return null
+  return null;
 }
 
 const getCurrentPageUrl = (): string | null => {
@@ -55,7 +61,6 @@ const getCurrentPageUrl = (): string | null => {
   return null;
 }
 
-// These constants will be passed to the hook
 const MIN_WIDTH = 320
 const MIN_HEIGHT = 400
 const DEFAULT_WIDTH = 384
@@ -64,10 +69,27 @@ const MAX_WIDTH_PERCENTAGE = 0.9
 const MAX_HEIGHT_PERCENTAGE = 0.85
 const OPEN_ANIMATION_DURATION = 300;
 
+const FLOATING_ICON_Z_INDEX = 2147483640;
+const CHATBOT_WINDOW_Z_INDEX = 2147483645;
+
+const CHATBOT_FULL_PAGE_PATHS_TO_HIDE_FLOATING: (keyof typeof appPathnames)[] = [
+  '/chatbot/regularchat',
+  '/chatbot/livechat',
+  '/chatbot/history',
+];
+
+
 const FloatingChatbot: React.FC = () => {
   const t = useTranslations('')
-  const [isChatOpen, setIsChatOpen] = useState(false)
+  const currentPathnameFromHook = usePathname(); // Lấy pathname ở cấp cao nhất của component
+
+  const shouldRenderFloatingChatbot = !CHATBOT_FULL_PAGE_PATHS_TO_HIDE_FLOATING.includes(currentPathnameFromHook as keyof typeof appPathnames);
+
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [runOpenAnimation, setRunOpenAnimation] = useState(false);
+
+  const isChatOpen = useUiStore(state => state.isFloatingChatOpen);
+  const setIsChatOpen = useUiStore(state => state.setIsFloatingChatOpen);
 
   const setChatMode = useSettingsStore(state => state.setChatMode)
   const currentStoreChatMode = useSettingsStore(state => state.chatMode)
@@ -80,16 +102,12 @@ const FloatingChatbot: React.FC = () => {
   const activeConversationId = useConversationStore(
     state => state.activeConversationId
   )
-  const hasFatalError = useUiStore(state => state.hasFatalError)
+  const hasFatalErrorGlobal = useUiStore(state => state.hasFatalError)
 
   const { setPageContext, clearPageContext } = usePageContextStore();
-  const pathname = usePathname()
 
   useAppInitialization()
 
-  const [runOpenAnimation, setRunOpenAnimation] = useState(false);
-
-  // Use the custom hook
   const {
     position,
     size,
@@ -100,151 +118,191 @@ const FloatingChatbot: React.FC = () => {
     currentMaxWidth,
     currentMaxHeight,
     adjustPositionToFitScreen,
-    // isInteracting, // Hook manages this, parent doesn't directly use it for now
-    setPosition: setHookPosition, // Renamed to avoid conflict if any local 'setPosition' existed
-    setSize: setHookSize,       // Renamed to avoid conflict if any local 'setSize' existed
+    setPosition: setHookPosition,
+    setSize: setHookSize,
   } = useFloatingWindowControls({
     initialWidth: DEFAULT_WIDTH,
     initialHeight: DEFAULT_HEIGHT,
     minConstraints: { width: MIN_WIDTH, height: MIN_HEIGHT },
     maxConstraintsPercentage: { width: MAX_WIDTH_PERCENTAGE, height: MAX_HEIGHT_PERCENTAGE },
     localStorageKeys: { position: 'chatbotPosition', size: 'chatbotSize' },
-    isEnabled: isChatOpen,
+    isEnabled: isChatOpen && shouldRenderFloatingChatbot,
   });
 
-  // The original logic for loading from localStorage on toggleChatbot (when opening)
-  // is preserved here to ensure the exact same behavior of eagerly loading/overriding.
-  // The hook also loads when `isEnabled` becomes true, but this explicit load
-  // in toggleChatbot ensures values are set before the hook's effect might run.
-  const toggleChatbot = useCallback(() => {
-    setIsChatOpen(prevIsChatOpen => {
-      const newIsChatOpen = !prevIsChatOpen;
-      if (newIsChatOpen) {
-        // Eagerly load from localStorage and apply, similar to original logic
-        if (typeof window !== 'undefined') {
-          const savedPositionJSON = localStorage.getItem('chatbotPosition');
-          const savedSizeJSON = localStorage.getItem('chatbotSize');
-          
-          let tempSize = { width: size.width, height: size.height }; // Start with current hook size
-          if (savedSizeJSON) {
-            try {
-              const parsedSize = JSON.parse(savedSizeJSON);
-              tempSize.width = Math.min(
-                Math.max(parsedSize.width, MIN_WIDTH),
-                window.innerWidth * MAX_WIDTH_PERCENTAGE
-              );
-              tempSize.height = Math.min(
-                Math.max(parsedSize.height, MIN_HEIGHT),
-                window.innerHeight * MAX_HEIGHT_PERCENTAGE
-              );
-              // Only update if different from hook's current size to avoid unnecessary re-renders
-              if (tempSize.width !== size.width || tempSize.height !== size.height) {
-                setHookSize(tempSize);
-              }
-            } catch (e) { console.error('Failed to parse saved chatbot size on toggle:', e); }
-          }
+  useEffect(() => {
+    if (!shouldRenderFloatingChatbot && isChatOpen) {
+      setIsChatOpen(false);
+    }
+  }, [shouldRenderFloatingChatbot, isChatOpen, setIsChatOpen]);
 
-          if (savedPositionJSON) {
-            try {
-              const parsedPosition = JSON.parse(savedPositionJSON);
-              const newX = Math.min(
-                Math.max(0, parsedPosition.x),
-                Math.max(0, window.innerWidth - tempSize.width) // Use potentially updated tempSize
-              );
-              const newY = Math.min(
-                Math.max(0, parsedPosition.y),
-                Math.max(0, window.innerHeight - tempSize.height) // Use potentially updated tempSize
-              );
-              if (newX !== position.x || newY !== position.y) {
-                 setHookPosition({ x: newX, y: newY });
-              }
-            } catch (e) { console.error('Failed to parse saved chatbot position on toggle:', e); }
-          }
-        }
 
-        setRunOpenAnimation(true);
-        if (activeConversationId === null) {
-          const isMainChatPage = pathname === MAIN_CHATBOT_PAGE_PATH;
-          if (!isMainChatPage) {
-            const pageText = getCurrentPageTextContent();
-            
-            const pageUrl = getCurrentPageUrl();
-            console.log('[FloatingChatbot] Setting page context. URL:', pageUrl, 'Text length:', pageText?.length);
+  const MIN_REASONABLE_TEXT_LENGTH = 500;
+  const MAX_CONTEXT_FETCH_ATTEMPTS = 10;
+  const CONTEXT_FETCH_RETRY_DELAY = 500;
 
-            setPageContext(pageText, pageUrl, true);
-          } else {
-            setPageContext(null, null, false);
-          }
-          if (currentStoreChatMode !== 'regular') {
-            setChatMode('regular');
-          }
-          resetChatUIForNewConversation(true);
-        } else {
-          const isMainChatPage = pathname === MAIN_CHATBOT_PAGE_PATH;
-          if (!isMainChatPage) {
+  useEffect(() => {
+    console.log(
+      '[FloatingChatbot] Page context useEffect triggered. Pathname from hook:', currentPathnameFromHook,
+      'isChatOpen:', isChatOpen,
+      'shouldRender:', shouldRenderFloatingChatbot
+    );
+
+    let attemptCount = 0;
+    let animationFrameId: number | null = null;
+    let retryTimerId: NodeJS.Timeout | null = null;
+
+    const fetchPageContext = (currentPath: string) => { // << Nhận currentPath làm tham số
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      if (retryTimerId) clearTimeout(retryTimerId);
+
+      animationFrameId = requestAnimationFrame(() => {
+        const currentFloatingChatOpenState = useUiStore.getState().isFloatingChatOpen;
+        // currentPath đã được truyền vào, không cần gọi lại usePathname()
+        const currentShouldRender = !CHATBOT_FULL_PAGE_PATHS_TO_HIDE_FLOATING.includes(currentPath as keyof typeof appPathnames);
+
+        if (currentFloatingChatOpenState && currentShouldRender) {
+          const isAnyChatbotFullPage =
+            CHATBOT_FULL_PAGE_PATHS_TO_HIDE_FLOATING.includes(currentPath as keyof typeof appPathnames) ||
+            currentPath === appPathnames['/chatbot/landingchatbot'];
+
+          if (!isAnyChatbotFullPage) {
             const pageText = getCurrentPageTextContent();
             const pageUrl = getCurrentPageUrl();
-            setPageContext(pageText, pageUrl, true);
+
+            if (pageText && !pageText.toLowerCase().includes("loading...") && pageText.length > MIN_REASONABLE_TEXT_LENGTH) {
+              console.log(`[FloatingChatbot] Updating page context (Attempt ${attemptCount + 1}) for: ${currentPath}. Text length: ${pageText.length}`);
+              setPageContext(pageText, pageUrl, true);
+              attemptCount = 0;
+            } else {
+              attemptCount++;
+              console.warn(`[FloatingChatbot] Page content might be loading or too short (Attempt ${attemptCount}) for: ${currentPath}. Text: "${pageText ? pageText.substring(0, 100) + '...' : 'null'}"`);
+              if (attemptCount < MAX_CONTEXT_FETCH_ATTEMPTS) {
+                // Truyền currentPath vào lệnh gọi đệ quy
+                retryTimerId = setTimeout(() => fetchPageContext(currentPath), CONTEXT_FETCH_RETRY_DELAY);
+              } else {
+                console.error(`[FloatingChatbot] Max attempts reached for fetching context for: ${currentPath}. Setting context to null.`);
+                setPageContext(null, null, false);
+                attemptCount = 0;
+              }
+            }
           } else {
+            console.log(`[FloatingChatbot] Clearing page context (rAF) for chatbot page: ${currentPath}`);
             setPageContext(null, null, false);
+            attemptCount = 0;
           }
         }
-        setIsSettingsOpen(false);
-        // Ensure position is correct after potential size/pos changes from localStorage
-        // and after the component is definitely going to be open.
-        // adjustPositionToFitScreen will use the latest size from the hook's state.
-        adjustPositionToFitScreen();
-      } else { // Closing chat
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('chatbotPosition', JSON.stringify(position)); // Use position from hook
-          localStorage.setItem('chatbotSize', JSON.stringify(size));       // Use size from hook
-        }
-        setIsSettingsOpen(false);
-        clearPageContext();
-        setActiveConversationId(null);
-        resetChatUIForNewConversation(true);
+      });
+    };
+
+    if (isChatOpen && shouldRenderFloatingChatbot) {
+      fetchPageContext(currentPathnameFromHook); // << Truyền currentPathnameFromHook vào đây
+    }
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        console.log('[FloatingChatbot] Cleaning up page context rAF.');
       }
-      return newIsChatOpen;
-    });
+      if (retryTimerId) {
+        clearTimeout(retryTimerId);
+        console.log('[FloatingChatbot] Cleaning up page context retry timer.');
+      }
+      attemptCount = 0;
+    };
+  }, [isChatOpen, currentPathnameFromHook, setPageContext, shouldRenderFloatingChatbot]);
+
+  const openChatbot = useCallback(() => {
+    if (!shouldRenderFloatingChatbot) return;
+
+    setIsChatOpen(true);
+    if (typeof window !== 'undefined') {
+      const savedPositionJSON = localStorage.getItem('chatbotPosition');
+      const savedSizeJSON = localStorage.getItem('chatbotSize');
+      let tempSize = { width: size.width, height: size.height };
+      if (savedSizeJSON) {
+        try {
+          const parsedSize = JSON.parse(savedSizeJSON);
+          tempSize.width = Math.min(Math.max(parsedSize.width, MIN_WIDTH), window.innerWidth * MAX_WIDTH_PERCENTAGE);
+          tempSize.height = Math.min(Math.max(parsedSize.height, MIN_HEIGHT), window.innerHeight * MAX_HEIGHT_PERCENTAGE);
+          if (tempSize.width !== size.width || tempSize.height !== size.height) {
+            setHookSize(tempSize);
+          }
+        } catch (e) { console.error('Failed to parse saved chatbot size on open:', e); }
+      }
+      if (savedPositionJSON) {
+        try {
+          const parsedPosition = JSON.parse(savedPositionJSON);
+          const newX = Math.min(Math.max(0, parsedPosition.x), Math.max(0, window.innerWidth - tempSize.width));
+          const newY = Math.min(Math.max(0, parsedPosition.y), Math.max(0, window.innerHeight - tempSize.height));
+          if (newX !== position.x || newY !== position.y) {
+            setHookPosition({ x: newX, y: newY });
+          }
+        } catch (e) { console.error('Failed to parse saved chatbot position on open:', e); }
+      }
+    }
+    setRunOpenAnimation(true);
+
+    const isAnyChatbotFullPageImmediate =
+      CHATBOT_FULL_PAGE_PATHS_TO_HIDE_FLOATING.includes(currentPathnameFromHook as keyof typeof appPathnames) ||
+      currentPathnameFromHook === appPathnames['/chatbot/landingchatbot'];
+
+    if (!isAnyChatbotFullPageImmediate) {
+      // Cân nhắc: Có thể không cần lấy context ngay ở đây nữa nếu useEffect đã xử lý tốt.
+      // Hoặc, nếu muốn lấy ngay, đảm bảo DOM đã sẵn sàng.
+      // Tạm thời, để useEffect xử lý việc lấy context khi mở.
+      // const pageText = getCurrentPageTextContent();
+      // const pageUrl = getCurrentPageUrl();
+      // setPageContext(pageText, pageUrl, true);
+      console.log("[FloatingChatbot openChatbot] Deferring context fetch to useEffect for path:", currentPathnameFromHook);
+    } else {
+      setPageContext(null, null, false);
+    }
+
+    if (activeConversationId === null) {
+      if (currentStoreChatMode !== 'regular') {
+        setChatMode('regular');
+      }
+      resetChatUIForNewConversation(true);
+    }
+    setIsSettingsOpen(false);
+    adjustPositionToFitScreen();
   }, [
-    activeConversationId, pathname, setPageContext, clearPageContext,
-    currentStoreChatMode, setChatMode, setActiveConversationId,
-    resetChatUIForNewConversation, adjustPositionToFitScreen,
-    position, size, // Current position and size from hook (for saving on close and comparing on open)
-    setHookPosition, setHookSize // Setters from hook for eager load
+    shouldRenderFloatingChatbot,
+    setIsChatOpen, activeConversationId, currentPathnameFromHook, setPageContext,
+    currentStoreChatMode, setChatMode, resetChatUIForNewConversation,
+    adjustPositionToFitScreen, position, size, setHookPosition, setHookSize
   ]);
 
   const handleMinimizeChat = useCallback(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('chatbotPosition', JSON.stringify(position)); // Use position from hook
-      localStorage.setItem('chatbotSize', JSON.stringify(size));       // Use size from hook
+      localStorage.setItem('chatbotPosition', JSON.stringify(position));
+      localStorage.setItem('chatbotSize', JSON.stringify(size));
     }
     setIsChatOpen(false);
     if (isSettingsOpen) setIsSettingsOpen(false);
-  }, [position, size, isSettingsOpen]); // position and size from hook
+  }, [position, size, isSettingsOpen, setIsChatOpen]);
 
   const handleCloseChat = useCallback(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('chatbotPosition', JSON.stringify(position)); // Use position from hook
-      localStorage.setItem('chatbotSize', JSON.stringify(size));       // Use size from hook
+      localStorage.setItem('chatbotPosition', JSON.stringify(position));
+      localStorage.setItem('chatbotSize', JSON.stringify(size));
     }
     setIsChatOpen(false);
     setIsSettingsOpen(false);
     clearPageContext();
     setActiveConversationId(null);
     resetChatUIForNewConversation(true);
-  }, [position, size, clearPageContext, setActiveConversationId, resetChatUIForNewConversation]);
-
+  }, [
+    position, size, clearPageContext, setActiveConversationId,
+    resetChatUIForNewConversation, setIsChatOpen
+  ]);
 
   useEffect(() => {
     if (runOpenAnimation) {
-      const timer = setTimeout(() => {
-        setRunOpenAnimation(false);
-      }, OPEN_ANIMATION_DURATION);
+      const timer = setTimeout(() => setRunOpenAnimation(false), OPEN_ANIMATION_DURATION);
       return () => clearTimeout(timer);
     }
   }, [runOpenAnimation]);
-
 
   const toggleSettingsPanel = useCallback((e?: React.MouseEvent) => {
     e?.stopPropagation()
@@ -252,76 +310,68 @@ const FloatingChatbot: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    if (isChatOpen && currentStoreChatMode !== 'regular') {
-      setChatMode('regular')
-    }
-  }, [isChatOpen, currentStoreChatMode, setChatMode])
-
-  useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
+      if (!shouldRenderFloatingChatbot) return;
       if (event.key === 'Escape') {
-        if (isSettingsOpen) {
-          setIsSettingsOpen(false);
-        } else if (isChatOpen) {
-          handleMinimizeChat(); // This already uses hook's position/size for saving
-        }
+        if (isSettingsOpen) setIsSettingsOpen(false);
+        else if (isChatOpen) handleMinimizeChat();
       }
     };
     document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [isChatOpen, isSettingsOpen, handleMinimizeChat]);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isChatOpen, isSettingsOpen, handleMinimizeChat, shouldRenderFloatingChatbot]);
 
-  // Drag and resize state and handlers (handleDrag, handleResize, onResizeStart, onResizeStop, etc.)
-  // are now managed by useFloatingWindowControls hook.
+  if (!shouldRenderFloatingChatbot) {
+    return null;
+  }
 
-  const shouldShowErrorDisplayInFloatingChat = isChatOpen && hasFatalError
+  const shouldShowErrorDisplayInFloatingChat = isChatOpen && hasFatalErrorGlobal;
   const currentAnimationClass = runOpenAnimation ? 'animate-slide-up-fade' : '';
-
-  // currentMaxWidth, currentMaxHeight are now provided by the hook.
 
   return (
     <>
       {!isChatOpen && (
         <button
-          onClick={toggleChatbot}
-          className='fixed bottom-5 right-5 z-[60] flex h-14 w-14 items-center justify-center rounded-full bg-blue-400 text-white shadow-lg transition-transform duration-150 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75'
+          onClick={openChatbot}
+          className='fixed bottom-5 right-5 flex h-14 w-14 items-center justify-center rounded-full bg-blue-400 text-white shadow-lg transition-transform duration-150 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75'
+          style={{ zIndex: FLOATING_ICON_Z_INDEX }}
           aria-label={t('Open_Chat')}
           title={t('Open_Chat')}
         >
-          <DynamicAnimatedIcon className='h-24 w-24' loopOnHover={true} />
+          <MessageSquare size={28} />
         </button>
       )}
 
       {isChatOpen && (
         <Draggable
-          nodeRef={draggableWrapperRef} // From hook
+          nodeRef={draggableWrapperRef}
           handle='.chatbot-drag-handle'
-          position={position} // From hook
-          onDrag={dragHandlers.onDrag} // From hook
-          onStart={dragHandlers.onStart} // From hook
-          onStop={dragHandlers.onStop} // From hook
-          bounds={bounds} // From hook
+          position={position}
+          onDrag={dragHandlers.onDrag}
+          onStart={dragHandlers.onStart}
+          onStop={dragHandlers.onStop}
+          bounds={bounds}
           disabled={isSettingsOpen}
         >
           <div
-            ref={draggableWrapperRef} // From hook
-            className={`${currentAnimationClass} fixed z-50`}
+            id={FLOATING_CHATBOT_WRAPPER_ID}
+            ref={draggableWrapperRef}
+            className={`${currentAnimationClass} fixed`}
             style={{
-              width: size.width, // From hook
-              height: size.height, // From hook
+              width: size.width,
+              height: size.height,
+              zIndex: CHATBOT_WINDOW_Z_INDEX,
             }}
           >
             <Resizable
-              size={{ width: size.width, height: size.height }} // From hook
-              minWidth={MIN_WIDTH} // Constant
-              minHeight={MIN_HEIGHT} // Constant
-              maxWidth={currentMaxWidth} // From hook
-              maxHeight={currentMaxHeight} // From hook
-              onResize={resizeHandlers.onResize} // From hook
-              onResizeStart={resizeHandlers.onResizeStart} // From hook
-              onResizeStop={resizeHandlers.onResizeStop} // From hook
+              size={{ width: size.width, height: size.height }}
+              minWidth={MIN_WIDTH}
+              minHeight={MIN_HEIGHT}
+              maxWidth={currentMaxWidth}
+              maxHeight={currentMaxHeight}
+              onResize={resizeHandlers.onResize}
+              onResizeStart={resizeHandlers.onResizeStart}
+              onResizeStop={resizeHandlers.onResizeStop}
               enable={{
                 top: false, right: true, bottom: true, left: false,
                 topRight: false, bottomRight: true, bottomLeft: false, topLeft: false,

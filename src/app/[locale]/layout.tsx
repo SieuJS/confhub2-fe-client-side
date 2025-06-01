@@ -3,22 +3,23 @@
 import React from 'react'
 import { ThemeProvider } from '@/src/app/[locale]/utils/ThemeProvider'
 import type { Metadata } from 'next'
-import type { Viewport } from 'next' // Import Viewport type nếu cần
+import type { Viewport } from 'next'
 
 import {
   AbstractIntlMessages,
   NextIntlClientProvider,
-  useMessages // useMessages chỉ hoạt động trong Server Components hoặc Client Components được gọi từ Server Components
+  useMessages
 } from 'next-intl'
 import localFont from 'next/font/local'
 import NextTopLoader from 'nextjs-toploader'
-import { ToastContainer } from 'react-toastify'
+import { ToastContainer } from 'react-toastify' // ToastContainer thường có z-index cao
 import 'react-toastify/dist/ReactToastify.css'
 import './globals.css'
-import ChatbotGlobalInitializer from './chatbot/ChatbotGlobalInitializer' // <-- IMPORT MỚI
-import { AuthProvider } from '@/src/contexts/AuthContext'; // Điều chỉnh path nếu cần
+import ChatbotGlobalInitializer from './chatbot/ChatbotGlobalInitializer'
+import { AuthProvider } from '@/src/contexts/AuthContext';
+import FloatingChatbot from './floatingchatbot/FloatingChatbot';
 
-// ... (Phần định nghĩa fonts: spaceGrotesk, inter, rubik)
+// ... (phần fonts và metadata giữ nguyên như trước)
 const spaceGrotesk = localFont({
   src: [
     {
@@ -68,27 +69,6 @@ const rubik = localFont({
   display: 'swap'
 })
 
-// // Định nghĩa font Material Symbols Outlined cục bộ
-// const materialSymbolsOutlined = localFont({
-//   src: [
-//     // Thay đổi đường dẫn và tên file font cho phù hợp với font bạn đã tải về
-//     {
-//       path: '../../../public/fonts/Material-Symbols-Outlined-Regular.woff2', // Ví dụ với định dạng woff2
-//       weight: '400', // Hoặc trọng lượng font bạn đã tải về
-//       style: 'normal'
-//     },
-//     // Nếu có các biến thể khác (bold, fill, v.v.), bạn có thể thêm vào đây
-//     // {
-//     //   path: '../../../public/fonts/Material-Symbols-Outlined-Filled.woff2',
-//     //   weight: '400',
-//     //   style: 'normal'
-//     // },
-//   ],
-//   variable: '--font-material-symbols-outlined', // Đặt một biến CSS cho font này
-//   display: 'block', // Hoặc 'swap' tùy theo cách bạn muốn hiển thị font
-// })
-
-
 export const metadata: Metadata = {
   title: 'Global Conference Hub',
   description:
@@ -103,12 +83,6 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: 'default',
     title: 'ConFHub',
-  },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
   },
   icons: {
     icon: '/icons/icon-192x192.png',
@@ -141,12 +115,12 @@ export const metadata: Metadata = {
     ],
   },
 }
+
 export const viewport: Viewport = {
-  // Sử dụng type Viewport
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  userScalable: false
+  userScalable: false,
 }
 
 export default function RootLayout({
@@ -157,25 +131,18 @@ export default function RootLayout({
   params: { locale: string }
 }) {
   const messages = useMessages()
+
   return (
     <html
       lang={locale}
       dir={locale === 'ar' || locale == 'fa' ? 'rtl' : 'ltr'}
-      // Thêm biến font Material Symbols Outlined vào className
-      className={`${spaceGrotesk.variable} ${rubik.variable}  scroll-smooth scrollbar scrollbar-track-background scrollbar-thumb-background-secondary  `}
-      // ${materialSymbolsOutlined.variable}
+      className={`${spaceGrotesk.variable} ${inter.variable} ${rubik.variable} scroll-smooth scrollbar scrollbar-track-background scrollbar-thumb-background-secondary`}
       suppressHydrationWarning
     >
       <head>
-        {/* XÓA DÒNG NÀY ĐỂ LOẠI BỎ VIỆC FETCH FONT TỪ GOOGLE */}
-        {/* <link
-          href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block'
-          rel='stylesheet'
-        /> */}
       </head>
       <body>
-        <AuthProvider> {/* Bọc toàn bộ ứng dụng hoặc phần cần xác thực */}
-          {/* --- ThemeProvider bao bọc mọi thứ để ToastContainer có thể nhận theme --- */}
+        <AuthProvider>
           <ThemeProvider
             enableSystem
             attribute='class'
@@ -191,45 +158,53 @@ export default function RootLayout({
               'reddit'
             ]}
           >
-            {/* --- ToastContainer đặt ở đây --- */}
-            {/* Có thể thêm props để tùy chỉnh, ví dụ: position, autoClose, theme */}
+            {/* ToastContainer thường có z-index rất cao (ví dụ: 9999) */}
             <ToastContainer
-              position='top-right' // Vị trí hiển thị (phổ biến)
-              autoClose={3000} // Tự động đóng sau 3 giây
+              position='top-right'
+              autoClose={3000}
               hideProgressBar={false}
               newestOnTop={false}
               closeOnClick
-              rtl={locale === 'ar' || locale === 'fa'} // Hỗ trợ RTL nếu cần
+              rtl={locale === 'ar' || locale === 'fa'}
               pauseOnFocusLoss
               draggable
               pauseOnHover
-              theme='colored' // Sử dụng theme màu ('light', 'dark', 'colored') - 'colored' sẽ có màu theo type (success, error,...)
+              theme='colored'
             />
 
-            {/* --- NextIntlClientProvider --- */}
             <NextIntlClientProvider
               locale={locale}
               messages={messages as AbstractIntlMessages}
             >
-              <ChatbotGlobalInitializer /> {/* <-- SỬ DỤNG Ở ĐÂY */}
-              {/* --- NextTopLoader --- */}
+              <ChatbotGlobalInitializer />
+
+              {/* NextTopLoader cũng có thể có z-index cao */}
               <NextTopLoader
+                color="var(--primary)"
                 initialPosition={0.08}
                 crawlSpeed={200}
                 height={3}
                 crawl={true}
-                easing='ease'
-                speed={200}
-                shadow='0 0 10px #2299DD,0 0 5px #2299DD'
-                color='var(--primary)'
                 showSpinner={false}
+                easing="ease"
+                speed={200}
+                shadow="0 0 10px var(--primary), 0 0 5px var(--primary-dark)"
               />
-              {/* --- Nội dung chính của trang --- */}
-              <main className='mx-auto max-w-screen-2xl'>{children}</main>
+              
+              {/* FloatingChatbot được render sau main và các overlay khác như Toast, NextTopLoader */}
+              {/* Điều này, kết hợp với z-index cao trong chính FloatingChatbot, giúp nó nổi lên trên */}
+              <FloatingChatbot /> 
+
+
+              {/* Nội dung chính của các trang */}
+              <main className='mx-auto max-w-screen-2xl'>
+                {children}
+              </main>
+
+              
             </NextIntlClientProvider>
           </ThemeProvider>
         </AuthProvider>
-
       </body>
     </html>
   )

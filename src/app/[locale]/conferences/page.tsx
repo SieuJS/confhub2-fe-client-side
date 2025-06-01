@@ -8,7 +8,6 @@ import { Header } from '../utils/Header' // Adjust path if necessary
 import Footer from '../utils/Footer' // Adjust path if necessary
 import { useRouter, usePathname } from 'next/navigation' // Added usePathname
 import { useCallback } from 'react'
-import FloatingChatbot from '@/src/app/[locale]/floatingchatbot/FloatingChatbot'
 import useUserBlacklist from '@/src/hooks/auth/useUserBlacklist'
 
 // It's good practice to import the type from the hook if it's exported.
@@ -135,7 +134,6 @@ export default function Conferences({
       </div>
       <Footer />
 
-      <FloatingChatbot />
     </>
   )
 }

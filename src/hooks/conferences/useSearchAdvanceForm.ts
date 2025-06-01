@@ -56,7 +56,7 @@ const useSearchAdvanceForm = ({
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data: string[] = await response.json();
-        console.log(data);
+        // console.log(data);
         setAvailableTopics(data);
       } catch (error) {
         console.error("Could not fetch topics:", error);

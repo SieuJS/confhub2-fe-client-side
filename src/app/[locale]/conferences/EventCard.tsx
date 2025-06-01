@@ -46,7 +46,7 @@ const EventCard: React.FC<EventCardProps> = ({
   const [showWebsiteTooltip, setShowWebsiteTooltip] = useState(false);
   const [showFavoriteTooltip, setShowFavoriteTooltip] = useState(false);
   const [showAddCalendarTooltip, setShowAddCalendarTooltip] = useState(false);
-  console.log("isAddToCalendar",conferenceDataForHook?.title,isAddToCalendar);
+  // console.log("isAddToCalendar",conferenceDataForHook?.title,isAddToCalendar);
 
   const checkLoginAndRedirect = useCallback(
     (callback: () => void) => {

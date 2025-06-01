@@ -2,11 +2,12 @@ import React from 'react'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode
-  variant?: 'primary' | 'secondary' | 'danger'
-  size?: 'small' | 'medium' | 'large' | 'mini'
-  rounded?: boolean
-  advanced?: boolean
-  advancedDivColor?: string
+  variant?: 'primary' | 'secondary' | 'danger' | 'link'; // <<< THÊM 'link'
+  size?: 'small' | 'medium' | 'large' | 'mini';
+  rounded?: boolean;
+  advanced?: boolean;
+  advancedDivColor?: string;
+  // className có thể được truyền từ ngoài vào để tùy chỉnh thêm
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -15,51 +16,71 @@ const Button: React.FC<ButtonProps> = ({
   size = 'medium',
   rounded = false,
   advanced = false,
-  className,
+  className, // className được truyền từ props
   advancedDivColor = '',
   ...props
 }) => {
+  // --- Base Styles ---
+  // Bỏ rounded ở đây, sẽ áp dụng theo rounded prop hoặc variant
+  const baseStyles = `focus:outline-none transition-colors duration-150 ease-in-out`;
+
+  // --- Size Styles ---
   const sizeStyles = {
-    mini: 'px-3 py-1 text-sm',
+    // Điều chỉnh padding cho 'link' variant nếu cần
+    mini: 'px-2 py-0.5 text-xs', // Giảm padding cho mini
     small: 'px-2 py-1 text-sm',
     medium: 'px-4 py-2 text-base font-semibold',
     large: 'px-6 py-3 text-lg font-semibold'
-  }
+  };
 
-  const baseStyles = `rounded focus:outline-none  ${rounded ? 'rounded-full' : ''}`
-
+  // --- Variant Styles ---
+  // Thêm style cho 'link'
   const variantStyles = {
-    primary: 'bg-button text-button-text ring-secondary ring-2',
-    secondary: 'bg-button-secondary text-secondary ring-secondary ring-2',
-    danger: 'bg-red-400 text-button-text ring-red-500 ring-2'
-  }
+    primary: `bg-button text-button-text ${!rounded ? 'rounded-md' : ''} ring-secondary ring-1 hover:bg-button-hover disabled:bg-button-disabled disabled:text-button-text-disabled disabled:ring-gray-300`,
+    secondary: `bg-button-secondary text-secondary ${!rounded ? 'rounded-md' : ''} ring-secondary ring-1 hover:bg-button-secondary-hover disabled:bg-gray-100 disabled:text-gray-400 disabled:ring-gray-300`,
+    danger: `bg-red-500 text-white ${!rounded ? 'rounded-md' : ''} ring-red-600 ring-1 hover:bg-red-600 disabled:bg-red-300 disabled:text-gray-100 disabled:ring-red-400`,
+    link: `bg-transparent text-current hover:underline disabled:text-gray-400 disabled:no-underline p-0` // p-0 để loại bỏ padding mặc định của size nếu không muốn
+  };
 
-  const advancedStyles = advanced
-    ? 'relative hover:shadow-lg transition-shadow duration-300 group'
-    : '' // group class still needed for button hover effect if you keep it
+  // --- Rounded Styles ---
+  // Áp dụng rounded-full nếu prop rounded là true, trừ khi là link (link không nên có bo tròn kiểu này)
+  const roundedStyles = rounded && variant !== 'link' ? 'rounded-full' : (variant !== 'link' ? 'rounded-md' : '');
 
-  const buttonStyles = `${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className} ${advancedStyles}`
+
+  // --- Advanced Styles (cho hiệu ứng ripple/glow) ---
+  const advancedEffectStyles = advanced
+    ? 'relative group' // group cần cho hiệu ứng con
+    : '';
+
+  // Kết hợp các style
+  // Chú ý: className từ props nên được đặt cuối để có thể ghi đè
+  const buttonStyles = `
+    ${baseStyles}
+    ${sizeStyles[size]}
+    ${variantStyles[variant]}
+    ${roundedStyles}
+    ${advancedEffectStyles}
+    ${className || ''}
+  `;
 
   const renderButton = () => (
-    <button className={buttonStyles} {...props}>
+    <button className={buttonStyles.trim().replace(/\s\s+/g, ' ')} {...props}>
       {children}
     </button>
-  )
+  );
 
-  if (advanced) {
+  if (advanced && variant !== 'link') { // Hiệu ứng advanced không áp dụng cho link
     return (
       <div
-        className={`${advancedDivColor} relative overflow-hidden rounded-full`}
+        className={`${advancedDivColor || ''} relative overflow-hidden ${roundedStyles}`} // Sử dụng roundedStyles ở đây
       >
-        {' '}
-        {/* Div wrapper with ripple effect and overflow-hidden */}
         <span className='pointer-events-none absolute inset-0 before:absolute before:-inset-1 before:origin-center before:scale-0 before:animate-pulse-ripple before:rounded-full before:bg-button before:opacity-10'></span>
         {renderButton()}
       </div>
-    )
+    );
   } else {
-    return renderButton()
+    return renderButton();
   }
-}
+};
 
-export default Button
+export default Button;

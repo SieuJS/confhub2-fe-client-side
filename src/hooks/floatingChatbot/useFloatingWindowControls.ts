@@ -1,3 +1,6 @@
+
+
+
 // src/hooks/useFloatingWindowControls.ts
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { DraggableData, DraggableEvent } from 'react-draggable';
@@ -262,3 +265,5 @@ export const useFloatingWindowControls = ({
     setSize,     // Exposing for toggleChatbot's explicit load
   };
 };
+
+

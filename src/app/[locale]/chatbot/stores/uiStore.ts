@@ -1,34 +1,35 @@
-// src/app/[locale]/cahtbot/stores/uiStore.ts
+// src/app/[locale]/chatbot/stores/uiStore.ts
 import { create } from 'zustand';
 import { persist, createJSONStorage, devtools } from 'zustand/middleware';
 import { ConfirmSendEmailAction, ErrorUpdate, ThoughtStep } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'; // Adjust path
 import { generateMessageId } from '@/src/app/[locale]/chatbot/utils/chatUtils';
-import { useMessageStore } from './messageStore/messageStore';
-import { useSocketStore } from './socketStore';
+import { useMessageStore } from './messageStore/messageStore'; // Ensure this path is correct
+import { useSocketStore } from './socketStore'; // Ensure this path is correct
 import { ChatMessageType } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
-import { Part } from '@google/genai'; // Import Part from Google GenAI SDK
+// import { Part } from '@google/genai'; // Part is not directly used here, ChatMessageType.parts handles it
 
 // --- Types for UI Store State ---
 export interface UiStoreState {
     hasFatalError: boolean;
-    fatalErrorCode: string | null; // NEW: Để lưu mã lỗi cụ thể khi hasFatalError là true
+    fatalErrorCode: string | null;
     showConfirmationDialog: boolean;
     confirmationData: ConfirmSendEmailAction | null;
     isLeftPanelOpen: boolean;
     isRightPanelOpen: boolean;
-    // currentView: 'chat' | 'history';
+    // currentView: 'chat' | 'history'; // Commented out as per original
+    isFloatingChatOpen: boolean; // <<< NEW: For floating chatbot visibility
 }
 
 // --- Types for UI Store Actions ---
 export interface UiStoreActions {
-    setHasFatalError: (hasError: boolean, errorCode?: string | null) => void; // MODIFIED
+    setHasFatalError: (hasError: boolean, errorCode?: string | null) => void;
     setShowConfirmationDialog: (show: boolean, data?: ConfirmSendEmailAction | null) => void;
     toggleLeftPanel: () => void;
-    setLeftPanelOpen: (isOpen: boolean) => void; // Added for explicit control
+    setLeftPanelOpen: (isOpen: boolean) => void;
     setRightPanelOpen: (isOpen: boolean) => void;
-    // setCurrentView: (view: 'chat' | 'history') => void;
-    clearFatalError: () => void; // NEW: Để xóa lỗi nghiêm trọng
-
+    // setCurrentView: (view: 'chat' | 'history') => void; // Commented out as per original
+    clearFatalError: () => void;
+    setIsFloatingChatOpen: (isOpen: boolean) => void; // <<< NEW: Setter for floating chat
 
     // Complex Actions
     handleError: (
@@ -36,18 +37,19 @@ export interface UiStoreActions {
         stopLoadingInMessageStore?: boolean,
         isFatal?: boolean
     ) => void;
-    handleConfirmSend: (confirmationId: string) => void; // User confirms email
-    handleCancelSend: (confirmationId: string) => void;  // User cancels email
+    handleConfirmSend: (confirmationId: string) => void;
+    handleCancelSend: (confirmationId: string) => void;
 }
 
 const initialUiStoreState: UiStoreState = {
     hasFatalError: false,
-    fatalErrorCode: null, // NEW
+    fatalErrorCode: null,
     showConfirmationDialog: false,
     confirmationData: null,
-    isLeftPanelOpen: true,
-    isRightPanelOpen: false,
-    // currentView: 'chat',
+    isLeftPanelOpen: true, // Default for main chatbot page
+    isRightPanelOpen: false, // Default for main chatbot page
+    // currentView: 'chat', // Commented out
+    isFloatingChatOpen: false, // <<< NEW: Initial state for floating chat (closed by default)
 };
 
 export const useUiStore = create<UiStoreState & UiStoreActions>()(
@@ -60,7 +62,6 @@ export const useUiStore = create<UiStoreState & UiStoreActions>()(
                 setHasFatalError: (hasError, errorCode = null) => {
                     set({
                         hasFatalError: hasError,
-                        // Chỉ set errorCode nếu hasError là true, ngược lại thì null
                         fatalErrorCode: hasError ? (errorCode || get().fatalErrorCode || 'UNKNOWN_FATAL_ERROR') : null
                     }, false, 'setHasFatalError');
                 },
@@ -71,13 +72,18 @@ export const useUiStore = create<UiStoreState & UiStoreActions>()(
                 setRightPanelOpen: (isOpen) => set({ isRightPanelOpen: isOpen }, false, 'setRightPanelOpen'),
                 // setCurrentView: (view) => set({ currentView: view }, false, `setCurrentView/${view}`),
 
+                setIsFloatingChatOpen: (isOpen) => set({ isFloatingChatOpen: isOpen }, false, 'setIsFloatingChatOpen'), // <<< NEW: Setter implementation
+
                 // --- Complex Actions ---
                 handleError: (errorInput, stopLoadingInMessageStore = true, isFatal = false) => {
                     console.error("Chat Error/Warning (UI Store):", errorInput);
-                    const { animationControls, resetAwaitFlag, setLoadingState, addChatMessage } = useMessageStore.getState();
+                    // It's generally better to avoid calling getState() from other stores directly inside a store action
+                    // if it can be avoided or passed as a parameter. However, for existing logic, we'll keep it.
+                    const messageStore = useMessageStore.getState();
+                    const socketStore = useSocketStore.getState();
 
-                    animationControls?.stopStreaming();
-                    resetAwaitFlag();
+                    messageStore.animationControls?.stopStreaming();
+                    messageStore.resetAwaitFlag();
 
                     let finalError: Pick<ErrorUpdate, 'message' | 'thoughts' | 'step' | 'code' | 'details'> & { errorType: 'error' | 'warning' } = {
                         message: 'An unknown error occurred.',
@@ -110,23 +116,21 @@ export const useUiStore = create<UiStoreState & UiStoreActions>()(
                     }
 
                     if (stopLoadingInMessageStore) {
-                        setLoadingState({ isLoading: false, step: 'error', message: finalError.errorType === 'error' ? 'Error' : 'Warning' });
+                        messageStore.setLoadingState({ isLoading: false, step: 'error', message: finalError.errorType === 'error' ? 'Error' : 'Warning' });
                     }
 
-                    // --- CHỈNH SỬA TỪ ĐÂY ---
                     const botMessage: ChatMessageType = {
                         id: generateMessageId(),
-                        role: 'model', // Đây là tin nhắn do hệ thống tạo ra, coi như từ model
-                        parts: [{ text: finalError.message }], // Tạo một Part chứa văn bản lỗi
-                        text: finalError.message, // Tùy chọn: Giữ lại để tiện hiển thị nếu UI component vẫn dùng `text`
-                        isUser: false, // Vẫn giữ isUser để tiện cho việc render UI (ví dụ, căn trái/phải)
-                        type: finalError.errorType, // 'error' or 'warning'
+                        role: 'model',
+                        parts: [{ text: finalError.message }],
+                        text: finalError.message,
+                        isUser: false,
+                        type: finalError.errorType,
                         thoughts: finalError.thoughts,
                         timestamp: new Date().toISOString(),
                         errorCode: finalError.code,
                     };
-                    addChatMessage(botMessage);
-                    // --- KẾT THÚC CHỈNH SỬA ---
+                    messageStore.addChatMessage(botMessage);
 
                     const isAuthError = finalError.code === 'AUTH_REQUIRED' || finalError.code === 'ACCESS_DENIED' || finalError.code === 'TOKEN_EXPIRED';
                     const isGenericFatal = finalError.code === 'FATAL_SERVER_ERROR';
@@ -134,50 +138,64 @@ export const useUiStore = create<UiStoreState & UiStoreActions>()(
                     if (isFatal || isAuthError || isGenericFatal) {
                         const errorCodeToSet = finalError.code || 'UNKNOWN_FATAL_ERROR';
                         console.warn(`[UiStore] Fatal error detected (${finalError.message}, code: ${errorCodeToSet}). Setting fatal error flag.`);
-                        get().setHasFatalError(true, errorCodeToSet);
+                        get().setHasFatalError(true, errorCodeToSet); // Use get() for self-reference
 
                         if (isAuthError) {
-                            useSocketStore.getState().setHasFatalConnectionError(true);
-                            useSocketStore.getState().setIsConnected(false, null);
-                            useSocketStore.getState().setIsServerReadyForCommands(false);
+                            socketStore.setHasFatalConnectionError(true);
+                            socketStore.setIsConnected(false, null);
+                            socketStore.setIsServerReadyForCommands(false);
                         }
                     }
                 },
                 handleConfirmSend: (confirmationId) => {
-                    const { isConnected } = useSocketStore.getState();
-                    const { setLoadingState } = useMessageStore.getState();
-                    const { setShowConfirmationDialog } = get();
+                    const socketStore = useSocketStore.getState();
+                    const messageStore = useMessageStore.getState();
+                    // const { setShowConfirmationDialog } = get(); // No, use set() directly or call other actions
 
-                    if (isConnected) {
-                        useSocketStore.getState().emitUserConfirmEmail(confirmationId);
-                        setLoadingState({ isLoading: true, step: 'confirming_email', message: 'Sending email...' });
+                    if (socketStore.isConnected) {
+                        socketStore.emitUserConfirmEmail(confirmationId);
+                        messageStore.setLoadingState({ isLoading: true, step: 'confirming_email', message: 'Sending email...' });
+                        // Dialog should be closed by the component initiating this, or after success/failure
+                        // set({ showConfirmationDialog: false, confirmationData: null }); // Optionally close here
                     } else {
                         get().handleError({ message: 'Cannot confirm: Not connected.', type: 'error' }, false, false);
-                        setShowConfirmationDialog(false);
+                        set({ showConfirmationDialog: false, confirmationData: null }); // Ensure dialog closes on error
                     }
                 },
                 handleCancelSend: (confirmationId) => {
-                    const { isConnected } = useSocketStore.getState();
-                    const { setShowConfirmationDialog } = get();
-                    if (isConnected) {
-                        useSocketStore.getState().emitUserCancelEmail(confirmationId);
+                    const socketStore = useSocketStore.getState();
+                    // const { setShowConfirmationDialog } = get(); // No, use set()
+
+                    if (socketStore.isConnected) {
+                        socketStore.emitUserCancelEmail(confirmationId);
                     } else {
                         console.warn('[UiStore] Cannot cancel: Not connected.');
                     }
-                    setShowConfirmationDialog(false);
+                    set({ showConfirmationDialog: false, confirmationData: null }); // Always close dialog on cancel
                 },
             }),
             {
-                name: 'chatbot-ui-storage-v1',
+                name: 'chatbot-ui-storage-v2', // Consider versioning if schema changes significantly
                 storage: createJSONStorage(() => localStorage),
                 partialize: (state) => ({
+                    // Persist only what's necessary and safe to persist
                     isLeftPanelOpen: state.isLeftPanelOpen,
                     isRightPanelOpen: state.isRightPanelOpen,
-                    // hasFatalError, showConfirmationDialog, confirmationData are transient
+                    isFloatingChatOpen: state.isFloatingChatOpen, // <<< NEW: Persist floating chat open state
+                    // hasFatalError, fatalErrorCode, showConfirmationDialog, confirmationData are typically transient
+                    // and should not be persisted, or reset on rehydration if they are.
                 }),
-                onRehydrateStorage: () => (state) => {
+                onRehydrateStorage: () => (state, error) => {
+                    if (error) {
+                        console.error('[UiStore] Failed to rehydrate from storage:', error);
+                    }
                     if (state) {
                         console.log('[UiStore] Rehydrated from storage.');
+                        // Optionally reset transient states that might have been persisted by mistake or due to older versions
+                        // state.hasFatalError = false;
+                        // state.fatalErrorCode = null;
+                        // state.showConfirmationDialog = false;
+                        // state.confirmationData = null;
                     }
                 }
             }

@@ -1375,5 +1375,14 @@
   "ChatInput_Error_FileSize": "File \"{name}\" is too large. Maximum size is {maxSize}MB.",
   "ChatInput_Remove_File": "Remove file {fileName}",
   "ChatInput_Attach_File_Button_Label": "Attach file",
-  "Type_message_or_attach_files": "Type message or attach files..."
+  "Type_message_or_attach_files": "Type message or attach files...",
+  "Minimize_Chat": "Minimize Chat",
+  "FloatingChatbot_ContextOutOfDate": "Page context might be outdated.",
+  "FloatingChatbot_UpdateContextButton": "Update context",
+  "FloatingChatbot_UpdatingContext": "Updating...",
+  "FloatingChatbot_ContextFetchFailed": "Failed to get page context.",
+  "FloatingChatbot_RetryContextButton": "Retry",
+ 
+  "FloatingChat_Personalize_Title": "Enable Personalization",
+  "FloatingChat_Personalize_Description": "Allow the chatbot to remember your preferences and provide more personalized responses."
 }

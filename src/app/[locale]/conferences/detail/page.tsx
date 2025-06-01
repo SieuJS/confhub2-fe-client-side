@@ -12,7 +12,6 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { Header } from '../../utils/Header'
 import Footer from '../../utils/Footer'
 import { useAuth } from '@/src/contexts/AuthContext' // <<<< THAY ĐỔI QUAN TRỌNG
-import FloatingChatbot from '@/src/app/[locale]/floatingchatbot/FloatingChatbot'
 
 // Import the custom hooks
 import useSequentialConferenceData from '@/src/hooks/conferenceDetails/useSequentialConferenceData'
@@ -97,14 +96,14 @@ const DetailContent: React.FC<DetailContentProps> = ({
     (callback: () => void) => {
       if (isAuthInitializing) {
         // Đợi auth khởi tạo xong
-        console.log('[Detail Page] Auth still initializing, action deferred.')
+        // console.log('[Detail Page] Auth still initializing, action deferred.')
         // Có thể hiển thị thông báo hoặc không làm gì cả
         return
       }
       if (!isLoggedIn) {
-        console.log(
-          '[Detail Page] Not logged in, redirecting to login for action.'
-        )
+        // console.log(
+        //   '[Detail Page] Not logged in, redirecting to login for action.'
+        // )
         const currentPath =
           pathname + (conferenceId ? `?id=${conferenceId}` : '')
         localStorage.setItem('returnUrl', currentPath)
@@ -218,7 +217,6 @@ const DetailContent: React.FC<DetailContentProps> = ({
         </div>
       </main>
       <Footer />
-      <FloatingChatbot />
     </div>
   )
 }
