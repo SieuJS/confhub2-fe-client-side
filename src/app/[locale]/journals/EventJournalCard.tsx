@@ -1,20 +1,56 @@
 // EventJournalCard.tsx
 'use client' // This is required for useTranslations in Client Components
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image' // Keep Image if you use next/image for optimization
-import { JournalResponse } from '../../../models/response/journal.response' // Import your JournalResponse type
+import { JournalResponseData } from '../../../models/response/journal.response' // Import your JournalResponse type
 import Button from '../utils/Button'
 import { Link } from '@/src/navigation' // Use next-intl's Link for locale-aware navigation
 import { useTranslations } from 'next-intl' // Import the hook
+import { journalFollowService } from '@/src/services/journal-follow.service'
+import { toast } from 'react-toastify'
 
 interface EventJournalCardProps {
-  journal: JournalResponse // Sử dụng JournalResponse type
+  journal: JournalResponseData // Sử dụng JournalResponse type
 }
 
 const EventJournalCard: React.FC<EventJournalCardProps> = ({ journal }) => {
   // Initialize the translation function with a namespace
   const t = useTranslations('JournalCard')
+  const [isFollowing, setIsFollowing] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    const checkFollowStatus = async () => {
+      try {
+        const followedJournals = await journalFollowService.getFollowedJournals()
+        setIsFollowing(followedJournals.some(fj => fj.journalId === journal.id))
+      } catch (error) {
+        console.error('Error checking follow status:', error)
+      }
+    }
+    checkFollowStatus()
+  }, [journal.id])
+
+  const handleFollowToggle = async () => {
+    if (isLoading) return
+    setIsLoading(true)
+    try {
+      if (isFollowing) {
+        await journalFollowService.unfollowJournal(journal.id)
+        toast.success('Successfully unfollowed journal')
+      } else {
+        await journalFollowService.followJournal(journal.id)
+        toast.success('Successfully followed journal')
+      }
+      setIsFollowing(!isFollowing)
+    } catch (error) {
+      console.error('Error toggling follow status:', error)
+      toast.error('Failed to update follow status')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className='relative flex flex-row-reverse overflow-hidden rounded-lg bg-gradient-to-r from-background to-background-secondary shadow-md'>
@@ -72,14 +108,14 @@ const EventJournalCard: React.FC<EventJournalCardProps> = ({ journal }) => {
           </Link>
         </Button>
         <Button
-          variant='primary'
+          variant={isFollowing ? 'secondary' : 'primary'}
           size='small'
           rounded
           className='px-3 py-1'
-          // Add onClick handler if this button performs an action
-          // onClick={() => handleSubmission(journal.id)}
+          onClick={handleFollowToggle}
+          disabled={isLoading}
         >
-          {t('submitButton')} {/* Use translation key */}
+          {isLoading ? 'Loading...' : isFollowing ? 'Unfollow' : 'Follow'}
         </Button>
       </div>
     </div>

@@ -29,7 +29,8 @@ type SupplementaryTableItem = {
 };
 
 // Định nghĩa type chính cho toàn bộ đối tượng JSON
-export type JournalResponse = {
+export type JournalResponseData = {
+  id: string;
   scimagoLink: string;
   bioxbio: BioxbioItem[] | null; // Giá trị trong JSON là null
   Image: string;
@@ -66,4 +67,14 @@ export type JournalResponse = {
   "Additional Info"?: string;
   SupplementaryTable: SupplementaryTableItem[]; // Sử dụng type đã định nghĩa
   Thumbnail: string;
+};
+
+export type JournalResponse = {
+  data: JournalResponseData;
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 };
