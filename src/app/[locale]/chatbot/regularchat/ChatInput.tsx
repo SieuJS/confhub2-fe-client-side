@@ -352,7 +352,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           aria-label={buttonAriaLabel}
           className='mb-0.5 ml-1.5 mr-0.25 flex-shrink-0 '
         >
-          <GrSend size={12} className='h-4 w-4' />
+          <GrSend size={16} className='h-4 w-4' />
         </Button>
       </div>
     </div>

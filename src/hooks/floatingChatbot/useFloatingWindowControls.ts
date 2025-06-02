@@ -1,7 +1,3 @@
-
-
-
-// src/hooks/useFloatingWindowControls.ts
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { DraggableData, DraggableEvent } from 'react-draggable';
 import type { ResizeDirection, NumberSize } from 're-resizable';
@@ -12,7 +8,7 @@ interface FloatingWindowControlsProps {
   minConstraints: { width: number; height: number };
   maxConstraintsPercentage: { width: number; height: number };
   localStorageKeys: { position: string; size: string };
-  isEnabled: boolean; // To control when the hook is active (e.g., when chat is open)
+  isEnabled: boolean;
 }
 
 interface FloatingWindowControlsReturn {
@@ -48,11 +44,84 @@ interface FloatingWindowControlsReturn {
   currentMaxHeight: number;
   adjustPositionToFitScreen: () => void;
   isInteracting: boolean;
-  // Expose setters if the parent component needs to programmatically change them
-  // (e.g., on initial load from a different source or specific reset)
   setPosition: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
   setSize: React.Dispatch<React.SetStateAction<{ width: number; height: number }>>;
+  isInitialized: boolean;
 }
+
+// Helper function to get initial size from localStorage or defaults
+const getInitialSizeValue = (
+  lsKey: string,
+  initialW: number,
+  initialH: number,
+  minW: number,
+  minH: number,
+  maxWPercent: number,
+  maxHPercent: number
+): { width: number; height: number } => {
+  if (typeof window === 'undefined') {
+    // console.log('[FWC InitSize] Window undefined, returning defaults for SSR/pre-mount');
+    return { width: initialW, height: initialH };
+  }
+  const savedSizeJSON = localStorage.getItem(lsKey);
+  if (savedSizeJSON) {
+    try {
+      const parsedSize = JSON.parse(savedSizeJSON);
+      return {
+        width: Math.min(
+          Math.max(parsedSize.width, minW),
+          window.innerWidth * maxWPercent
+        ),
+        height: Math.min(
+          Math.max(parsedSize.height, minH),
+          window.innerHeight * maxHPercent
+        ),
+      };
+    } catch (e) {
+      console.error(`[FWC InitSize] Failed to parse saved size ${lsKey}:`, e);
+      // Fall through to default if parsing fails
+    }
+  }
+  // console.log('[FWC InitSize] No saved size or error, returning defaults');
+  return { width: initialW, height: initialH };
+};
+
+// Helper function to get initial position from localStorage or defaults
+const getInitialPositionValue = (
+  lsKey: string,
+  currentSize: { width: number; height: number } // Relies on the actual initial size
+): { x: number; y: number } => {
+  if (typeof window === 'undefined') {
+    // console.log('[FWC InitPos] Window undefined, returning 0,0 for SSR/pre-mount');
+    return { x: 0, y: 0 }; // Default if no window (SSR or pre-mount)
+  }
+  const savedPositionJSON = localStorage.getItem(lsKey);
+  // Default position calculation (e.g., bottom-right with padding)
+  const defaultX = Math.max(0, window.innerWidth - currentSize.width - 32);
+  const defaultY = Math.max(0, window.innerHeight - currentSize.height - 32);
+
+  if (savedPositionJSON) {
+    try {
+      const parsedPosition = JSON.parse(savedPositionJSON);
+      return {
+        x: Math.min(
+          Math.max(0, parsedPosition.x),
+          Math.max(0, window.innerWidth - currentSize.width) // Ensure within bounds
+        ),
+        y: Math.min(
+          Math.max(0, parsedPosition.y),
+          Math.max(0, window.innerHeight - currentSize.height) // Ensure within bounds
+        ),
+      };
+    } catch (e) {
+      console.error(`[FWC InitPos] Failed to parse saved position ${lsKey}:`, e);
+      // Fall through to default if parsing fails
+    }
+  }
+  // console.log('[FWC InitPos] No saved position or error, returning calculated defaults');
+  return { x: defaultX, y: defaultY };
+};
+
 
 export const useFloatingWindowControls = ({
   initialWidth,
@@ -62,25 +131,85 @@ export const useFloatingWindowControls = ({
   localStorageKeys,
   isEnabled,
 }: FloatingWindowControlsProps): FloatingWindowControlsReturn => {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [size, setSize] = useState({
-    width: initialWidth,
-    height: initialHeight,
-  });
-  const [isInteracting, setIsInteracting] = useState(false);
-  const [bounds, setBounds] = useState<{
-    left: number;
-    top: number;
-    right: number;
-    bottom: number;
-  }>({ left: 0, top: 0, right: 0, bottom: 0 });
+  const [isInitialized, setIsInitialized] = useState(false);
 
+  const [size, setSize] = useState(() =>
+    getInitialSizeValue(
+      localStorageKeys.size, initialWidth, initialHeight,
+      minConstraints.width, minConstraints.height,
+      maxConstraintsPercentage.width, maxConstraintsPercentage.height
+    )
+  );
+
+  const [position, setPosition] = useState(() => {
+    const actualInitialSize = getInitialSizeValue(
+        localStorageKeys.size, initialWidth, initialHeight,
+        minConstraints.width, minConstraints.height,
+        maxConstraintsPercentage.width, maxConstraintsPercentage.height
+    );
+    return getInitialPositionValue(localStorageKeys.position, actualInitialSize);
+  });
+
+  const [isInteracting, setIsInteracting] = useState(false);
+  const [bounds, setBounds] = useState({ left: 0, top: 0, right: 0, bottom: 0 });
   const draggableWrapperRef = useRef<HTMLDivElement>(null);
 
+  // --- 1. EFFECT FOR INITIALIZATION AND SYNCHRONIZATION ---
+  useEffect(() => {
+    if (!isEnabled) {
+      setIsInitialized(false);
+      // console.log('[FWC SyncEffect] Disabled. isInitialized set to false.');
+      return;
+    }
+
+    if (typeof window !== 'undefined') {
+      // console.log('[FWC SyncEffect] Enabled and window defined. Reading from localStorage.');
+      const lsSize = getInitialSizeValue(
+        localStorageKeys.size, initialWidth, initialHeight,
+        minConstraints.width, minConstraints.height,
+        maxConstraintsPercentage.width, maxConstraintsPercentage.height
+      );
+
+      setSize(currentSize => {
+        if (currentSize.width !== lsSize.width || currentSize.height !== lsSize.height) {
+          // console.log('[FWC SyncEffect] Updating size from', currentSize, 'to', lsSize);
+          return lsSize;
+        }
+        return currentSize;
+      });
+
+      const lsPosition = getInitialPositionValue(localStorageKeys.position, lsSize);
+      setPosition(currentPosition => {
+        if (currentPosition.x !== lsPosition.x || currentPosition.y !== lsPosition.y) {
+          // console.log('[FWC SyncEffect] Updating position from', currentPosition, 'to', lsPosition);
+          return lsPosition;
+        }
+        return currentPosition;
+      });
+
+      setIsInitialized(true);
+      // console.log('[FWC SyncEffect] Initialization complete. Size:', lsSize, 'Position:', lsPosition);
+    } else {
+      // console.log('[FWC SyncEffect] Enabled but window NOT defined. isInitialized remains false.');
+      setIsInitialized(false);
+    }
+  }, [
+    isEnabled,
+    localStorageKeys.position,
+    localStorageKeys.size,
+    initialWidth,
+    initialHeight,
+    minConstraints.width,
+    minConstraints.height,
+    maxConstraintsPercentage.width,
+    maxConstraintsPercentage.height,
+    // setSize and setPosition are stable and not needed in deps
+  ]);
+
+  // --- 2. ADJUSTING position to fit screen (helper) ---
   const adjustPositionToFitScreen = useCallback(() => {
-    if (typeof window === 'undefined' || !isEnabled) return;
-    
-    // Use current size from state for calculations
+    if (typeof window === 'undefined' || !isEnabled || !isInitialized) return;
+
     const currentWidth = size.width;
     const currentHeight = size.height;
 
@@ -89,105 +218,77 @@ export const useFloatingWindowControls = ({
       const maxY = window.innerHeight - currentHeight;
       const safeMaxX = Math.max(0, maxX);
       const safeMaxY = Math.max(0, maxY);
-
-      const newX = Math.min(Math.max(0, prevPos.x), safeMaxX);
-      const newY = Math.min(Math.max(0, prevPos.y), safeMaxY);
-
-      if (newX !== prevPos.x || newY !== prevPos.y) {
+      let newX = prevPos.x, newY = prevPos.y, changed = false;
+      if (newX < 0) { newX = 0; changed = true; }
+      if (newY < 0) { newY = 0; changed = true; }
+      if (newX > safeMaxX) { newX = safeMaxX; changed = true; }
+      if (newY > safeMaxY) { newY = safeMaxY; changed = true; }
+      if (changed) {
+        // console.log('[FWC] adjustPositionToFitScreen: Adjusting to', { x: newX, y: newY });
         return { x: newX, y: newY };
       }
       return prevPos;
     });
-  }, [isEnabled, size.width, size.height, setPosition]); // Ensure it re-runs if size changes
+  }, [isEnabled, size.width, size.height, isInitialized, setPosition]); // Added setPosition
 
-  // Load from localStorage on mount or when enabled
+  // --- 3. UPDATING bounds and auto-adjusting position on window/internal size changes ---
   useEffect(() => {
-    if (typeof window === 'undefined' || !isEnabled) return;
+    if (typeof window === 'undefined' || !isEnabled || !isInitialized) return;
 
-    const savedPositionJSON = localStorage.getItem(localStorageKeys.position);
-    const savedSizeJSON = localStorage.getItem(localStorageKeys.size);
-
-    let newSizeState = { width: initialWidth, height: initialHeight };
-    if (savedSizeJSON) {
-      try {
-        const parsedSize = JSON.parse(savedSizeJSON);
-        newSizeState.width = Math.min(
-          Math.max(parsedSize.width, minConstraints.width),
-          window.innerWidth * maxConstraintsPercentage.width
-        );
-        newSizeState.height = Math.min(
-          Math.max(parsedSize.height, minConstraints.height),
-          window.innerHeight * maxConstraintsPercentage.height
-        );
-      } catch (e) {
-        console.error(`Failed to parse saved ${localStorageKeys.size}:`, e);
-      }
-    }
-    setSize(newSizeState);
-
-    let newPositionState = { x: 0, y: 0 };
-    if (savedPositionJSON) {
-      try {
-        const parsedPosition = JSON.parse(savedPositionJSON);
-        newPositionState.x = Math.min(
-          Math.max(0, parsedPosition.x),
-          Math.max(0, window.innerWidth - newSizeState.width) // Use newSizeState
-        );
-        newPositionState.y = Math.min(
-          Math.max(0, parsedPosition.y),
-          Math.max(0, window.innerHeight - newSizeState.height) // Use newSizeState
-        );
-      } catch (e) {
-        console.error(`Failed to parse saved ${localStorageKeys.position}:`, e);
-        newPositionState.x = Math.max(0, window.innerWidth - newSizeState.width - 32);
-        newPositionState.y = Math.max(0, window.innerHeight - newSizeState.height - 32);
-      }
-    } else {
-      newPositionState.x = Math.max(0, window.innerWidth - newSizeState.width - 32);
-      newPositionState.y = Math.max(0, window.innerHeight - newSizeState.height - 32);
-    }
-    setPosition(newPositionState);
-    // This effect should primarily run when `isEnabled` becomes true,
-    // or if the configuration props change (which is less likely for keys/initial values).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    isEnabled, 
-    localStorageKeys.position, 
-    localStorageKeys.size, 
-    initialWidth, 
-    initialHeight, 
-    minConstraints.width, 
-    minConstraints.height, 
-    maxConstraintsPercentage.width, 
-    maxConstraintsPercentage.height
-    // setSize and setPosition are stable, no need to list them here
-  ]);
-
-  // Update bounds and adjust position on window resize or internal size change
-  useEffect(() => {
-    if (typeof window === 'undefined' || !isEnabled) return;
-
-    const handleResizeOrSizeChange = () => {
+    const handleExternalOrInternalResize = () => {
+      // console.log('[FWC BoundsEffect] Resizing. Current size:', size);
       setBounds({
         left: 0,
         top: 0,
         right: Math.max(0, window.innerWidth - size.width),
         bottom: Math.max(0, window.innerHeight - size.height),
       });
-      // Important: Call adjustPositionToFitScreen AFTER bounds might have changed
-      // and after size state is confirmed.
       adjustPositionToFitScreen();
     };
 
-    handleResizeOrSizeChange();
-    window.addEventListener('resize', handleResizeOrSizeChange);
-    return () => window.removeEventListener('resize', handleResizeOrSizeChange);
-  }, [size.width, size.height, adjustPositionToFitScreen, isEnabled]);
+    handleExternalOrInternalResize();
+    window.addEventListener('resize', handleExternalOrInternalResize);
+    return () => window.removeEventListener('resize', handleExternalOrInternalResize);
+  }, [size.width, size.height, adjustPositionToFitScreen, isEnabled, isInitialized]);
 
 
-  const handleDrag = (e: DraggableEvent, ui: DraggableData) => {
+  // --- 4. SAVING to localStorage ---
+  useEffect(() => {
+    if (isEnabled && isInitialized && !isInteracting && typeof window !== 'undefined') {
+      // console.log('[FWC SaveSizeEffect] Saving size:', size);
+      localStorage.setItem(localStorageKeys.size, JSON.stringify(size));
+    }
+  }, [size, isEnabled, isInitialized, isInteracting, localStorageKeys.size]);
+
+  useEffect(() => {
+    if (isEnabled && isInitialized && !isInteracting && typeof window !== 'undefined') {
+      // console.log('[FWC SavePosEffect] Saving position:', position);
+      localStorage.setItem(localStorageKeys.position, JSON.stringify(position));
+    }
+  }, [position, isEnabled, isInitialized, isInteracting, localStorageKeys.position]);
+
+
+  // --- 5. DRAG Handlers ---
+  const onDragStart = useCallback(() => {
+    // console.log('[FWC] DragStart');
+    setIsInteracting(true);
+  }, []);
+
+  const handleDrag = useCallback((e: DraggableEvent, ui: DraggableData) => {
     setPosition({ x: ui.x, y: ui.y });
-  };
+  }, [setPosition]); // Added setPosition
+
+  const onDragStop = useCallback(() => {
+    // console.log('[FWC] DragStop');
+    setIsInteracting(false);
+  }, []);
+
+
+  // --- 6. RESIZE Handlers ---
+  const onResizeStart = useCallback(() => {
+    // console.log('[FWC] ResizeStart');
+    setIsInteracting(true);
+  }, []);
 
   const handleResize = useCallback(
     (
@@ -201,20 +302,8 @@ export const useFloatingWindowControls = ({
         height: prevSize.height + delta.height,
       }));
     },
-    [setSize] // setSize is stable
+    [setSize] // Added setSize
   );
-
-  const onDragStart = () => setIsInteracting(true);
-  const onDragStop = () => {
-    setIsInteracting(false);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(localStorageKeys.position, JSON.stringify(position));
-    }
-  };
-
-  const onResizeStart = useCallback(() => {
-    setIsInteracting(true);
-  }, []);
 
   const onResizeStop = useCallback(
     (
@@ -223,20 +312,15 @@ export const useFloatingWindowControls = ({
       elementRef: HTMLElement,
       delta: NumberSize
     ) => {
+      // console.log('[FWC] ResizeStop');
+      const finalSize = {
+        width: elementRef.offsetWidth,
+        height: elementRef.offsetHeight,
+      };
+      setSize(finalSize);
       setIsInteracting(false);
-      if (typeof window !== 'undefined') {
-        // `size` state is already updated by `handleResize` via `setSize`.
-        localStorage.setItem(localStorageKeys.size, JSON.stringify(size));
-        
-        // Position might need adjustment after resize.
-        // The original logic called adjustPositionToFitScreen and then saved the *current* position state.
-        // This means it saved the position *before* adjustPositionToFitScreen's setPosition might have taken effect in the next render.
-        // We replicate this to maintain original logic.
-        adjustPositionToFitScreen(); 
-        localStorage.setItem(localStorageKeys.position, JSON.stringify(position));
-      }
     },
-    [size, position, adjustPositionToFitScreen, localStorageKeys.size, localStorageKeys.position]
+    [setSize] // Added setSize
   );
 
   const currentMaxWidth = typeof window !== 'undefined' ? window.innerWidth * maxConstraintsPercentage.width : initialWidth * 1.5;
@@ -261,9 +345,8 @@ export const useFloatingWindowControls = ({
     currentMaxHeight,
     adjustPositionToFitScreen,
     isInteracting,
-    setPosition, // Exposing for toggleChatbot's explicit load
-    setSize,     // Exposing for toggleChatbot's explicit load
+    setPosition,
+    setSize,
+    isInitialized,
   };
 };
-
-

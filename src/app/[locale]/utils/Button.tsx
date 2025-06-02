@@ -27,7 +27,7 @@ const Button: React.FC<ButtonProps> = ({
   // --- Size Styles ---
   const sizeStyles = {
     // Điều chỉnh padding cho 'link' variant nếu cần
-    mini: 'px-2 py-0.5 text-xs', // Giảm padding cho mini
+    mini: 'px-2 py-1 text-sm', // Giảm padding cho mini
     small: 'px-2 py-1 text-sm',
     medium: 'px-4 py-2 text-base font-semibold',
     large: 'px-6 py-3 text-lg font-semibold'
