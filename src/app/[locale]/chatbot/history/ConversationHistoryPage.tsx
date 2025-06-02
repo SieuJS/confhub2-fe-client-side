@@ -111,7 +111,7 @@ const ConversationHistoryPage: React.FC = () => {
   const showInitialLoading = isLoadingHistory && displayedConversations.length === 0 && searchTerm.trim() === '';
 
   return (
-    <div className='bg-gray-5 flex h-full flex-col p-4 md:p-6 dark:bg-gray-900'>
+    <div className='bg-gray-10 flex h-full flex-col p-4 md:p-6 dark:bg-gray-900'>
       <div className='mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row'>
         <h1 className='text-2xl font-semibold text-gray-800 dark:text-gray-100'>{t('Chat_History_Full')}</h1>
         <button

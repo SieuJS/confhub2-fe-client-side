@@ -199,6 +199,7 @@ export default function RootLayout({
               {/* Nội dung chính của các trang */}
               <main className='mx-auto max-w-screen-2xl'>
                 {children}
+                
               </main>
 
               

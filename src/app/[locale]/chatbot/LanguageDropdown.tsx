@@ -75,7 +75,7 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
           type='button'
           disabled={disabled}
           onClick={() => setIsOpen(!isOpen)}
-          className='bg-white-pure disabled:bg-gray-5 relative w-full cursor-default rounded-md border border-gray-300 py-2 pl-3 pr-10 text-left text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-70 '
+          className='bg-white-pure disabled:bg-gray-10 relative w-full cursor-default rounded-md border border-gray-300 py-2 pl-3 pr-10 text-left text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-70 '
           aria-haspopup='listbox'
           aria-expanded={isOpen}
           aria-labelledby='language-select-label'

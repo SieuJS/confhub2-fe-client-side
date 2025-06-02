@@ -336,7 +336,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
               </thead>
               <tbody>
                 {groupedDates.map(groupInfo => (
-                  <tr key={groupInfo.name} className='hover:bg-gray-5'>
+                  <tr key={groupInfo.name} className='hover:bg-gray-10'>
                     {/* --- MODIFIED TD --- */}
                     <td className='border-b border-gray-300 px-2 py-4 font-medium md:px-4'>
                       {groupInfo.name}

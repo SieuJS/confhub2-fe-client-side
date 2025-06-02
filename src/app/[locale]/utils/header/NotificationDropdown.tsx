@@ -104,7 +104,7 @@ const NotificationDropdown: FC<Props> = ({
           // onClick={closeAllMenus}
         >
           <div
-            className={`flex items-start border-b border-gray-20 p-4 hover:bg-gray-5 ${notification.seenAt ? '' : 'bg-gray-10'}`}
+            className={`flex items-start border-b border-gray-20 p-4 hover:bg-gray-10 ${notification.seenAt ? '' : 'bg-gray-10'}`}
           >
             <div className='mr-3 flex-shrink-0'>
               <div className='relative flex h-10 w-10 items-center justify-center rounded-full bg-gray-20'>

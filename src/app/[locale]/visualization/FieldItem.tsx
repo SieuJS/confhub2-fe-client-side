@@ -35,7 +35,7 @@ const FieldItem: React.FC<FieldItemProps> = React.memo(
     // Determine dynamic classes based on dragging state
     const draggingClasses = isDragging
       ? 'bg-blue-100 shadow-lg border-blue-300 ring-2 ring-blue-300' // Styles when dragging
-      : 'bg-white-pure hover:shadow-md hover:bg-gray-5' // Styles when static or hovered
+      : 'bg-white-pure hover:shadow-md hover:bg-gray-10' // Styles when static or hovered
 
     return (
       // Main container div: Apply dnd refs and props

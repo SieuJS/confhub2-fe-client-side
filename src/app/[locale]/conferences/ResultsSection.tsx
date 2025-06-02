@@ -60,7 +60,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
             </label>
             <select
               id='sort-by'
-              className='rounded border bg-gray-5 px-2 py-1 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 '
+              className='rounded border bg-gray-10 px-2 py-1 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 '
               value={sortBy}
               onChange={handleSortByChange}
               title='Select field to sort by'
@@ -77,7 +77,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
             </label>
             <select
               id='event-per-page'
-              className='rounded border bg-gray-5 px-2 py-1 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 '
+              className='rounded border bg-gray-10 px-2 py-1 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 '
               value={eventsPerPage}
               onChange={handleEventPerPageChange}
               title='Select number of event per page'

@@ -53,6 +53,7 @@ export default function ChatbotRootLayout({
                     <LiveChatSettingsProvider>
                         <MainLayoutComponent isLiveChatContextActive={true}>
                             {children}
+
                         </MainLayoutComponent>
                     </LiveChatSettingsProvider>
                 </LiveAPIProvider>
@@ -63,6 +64,8 @@ export default function ChatbotRootLayout({
                     {children}
                 </MainLayoutComponent>
             )}
+            <div id="tooltip-portal-root"></div> {/* <<< ĐẶT PORTAL ROOT Ở ĐÂY */}
+
         </>
     );
 }

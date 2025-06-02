@@ -40,7 +40,7 @@ const DropZone: React.FC<DropZoneProps> = ({
   const isDraggingOver = snapshot.isDraggingOver
 
   // Determine background and border colors based on drag state
-  const bgColor = isDraggingOver ? 'bg-blue-50' : 'bg-gray-5' // Lighter shades
+  const bgColor = isDraggingOver ? 'bg-blue-50' : 'bg-gray-10' // Lighter shades
   const borderColor = isDraggingOver ? 'border-blue-400' : 'border-gray-30'
 
   // Determine the placeholder text based on accepted type

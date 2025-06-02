@@ -272,7 +272,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
       {/* Selected files preview */}
       {selectedFiles.length > 0 && (
-        <div className="mb-2 p-3 border bg-gray-50 dark:bg-gray-700 rounded-t-lg max-h-48 overflow-y-auto">
+        <div className="mb-2 p-3 border bg-gray-10 dark:bg-gray-700 rounded-t-lg max-h-48 overflow-y-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {selectedFiles.map(file => (
               <div

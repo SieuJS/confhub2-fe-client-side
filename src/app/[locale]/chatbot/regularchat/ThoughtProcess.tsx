@@ -114,7 +114,7 @@ const ThoughtProcess: React.FC<ThoughtProcessProps> = ({ thoughts }) => {
     );
   };
   return (
-    <div className='bg-gray-5 rounded border border-gray-200 text-sm shadow-sm  dark:border-gray-700'>
+    <div className='bg-gray-10 rounded border border-gray-200 text-sm shadow-sm  dark:border-gray-700'>
       <button
         onClick={toggleOpen}
         className='flex w-full items-center justify-between rounded-t px-3 py-1.5 text-left font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500'

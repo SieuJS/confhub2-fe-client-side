@@ -29,7 +29,7 @@ export default function SettingsToggleButton({ isProcessingDeletion }: SettingsT
         setRightPanelOpen(true);
       }}
       disabled={isProcessingDeletion}
-      className='bg-white-pure hover:bg-gray-5 fixed right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'
+      className='bg-white-pure hover:bg-gray-10 fixed right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'
       title={t('Open_settings')}
       aria-label={t('Open_settings')}
     >

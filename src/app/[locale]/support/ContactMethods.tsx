@@ -15,7 +15,7 @@ const ContactMethods: React.FC = () => {
     'M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z'
 
   return (
-    <section className='bg-gray-5 py-8  lg:py-16'>
+    <section className='bg-gray-10 py-8  lg:py-16'>
       <div className='mx-auto max-w-screen-xl px-4'>
         <div className='grid grid-cols-1 gap-8 text-center md:grid-cols-3'>
           {/* Email Us */}

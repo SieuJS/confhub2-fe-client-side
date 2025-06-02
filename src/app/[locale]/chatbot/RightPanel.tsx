@@ -2,16 +2,19 @@
 import React, { useEffect, useState } from 'react'
 import { X, Settings } from 'lucide-react'
 import LanguageDropdown from './LanguageDropdown'
+import ModelSelectionDropdown from './ModelSelectionDropdown' // <<< THÊM IMPORT
 import LiveChatSpecificSettings from './livechat/LiveChatSpecificSettings'
 import { useTranslations } from 'next-intl'
 import { useUiStore, useSettingsStore } from './stores'
 import { useShallow } from 'zustand/react/shallow'
 import { useLiveChatSettings } from './livechat/contexts/LiveChatSettingsContext'
-import { LanguageOption } from './stores'
+import { LanguageOption, ModelOption } from './stores' // <<< CẬP NHẬT IMPORT (ModelOption từ settingsStore)
+import { AVAILABLE_MODELS } from './lib/models' // <<< THÊM IMPORT
 import { UserResponse } from '@/src/models/response/user.response'
 import { useAuth } from '@/src/contexts/AuthContext'
 import PersonalizationConfirmationModal from './PersonalizationConfirmationModal'
 
+// ... (LiveAwareLanguageDropdown giữ nguyên)
 const LiveAwareLanguageDropdown: React.FC<{
   currentLanguage: LanguageOption
   availableLanguages: LanguageOption[]
@@ -52,9 +55,11 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
     availableLanguages,
     isStreamingEnabled,
     isPersonalizationEnabled,
+    selectedModel, // <<< LẤY STATE MODEL
     setCurrentLanguage,
     setIsStreamingEnabled,
-    setIsPersonalizationEnabled
+    setIsPersonalizationEnabled,
+    setSelectedModel // <<< LẤY ACTION MODEL
   } = useSettingsStore(
     useShallow(state => ({
       chatMode: state.chatMode,
@@ -62,13 +67,15 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
       availableLanguages: state.availableLanguages,
       isStreamingEnabled: state.isStreamingEnabled,
       isPersonalizationEnabled: state.isPersonalizationEnabled,
+      selectedModel: state.selectedModel, // <<< LẤY STATE MODEL
       setCurrentLanguage: state.setCurrentLanguage,
       setIsStreamingEnabled: state.setIsStreamingEnabled,
-      setIsPersonalizationEnabled: state.setIsPersonalizationEnabled
+      setIsPersonalizationEnabled: state.setIsPersonalizationEnabled,
+      setSelectedModel: state.setSelectedModel // <<< LẤY ACTION MODEL
     }))
   )
 
-  // State for managing modals
+  // ... (state for modals, handlers giữ nguyên) ...
   const [isBenefitModalOpen, setIsBenefitModalOpen] = useState(false)
   const [isMissingInfoModalOpen, setIsMissingInfoModalOpen] = useState(false)
   const [missingInfoFieldsText, setMissingInfoFieldsText] = useState('')
@@ -91,8 +98,7 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
     if (enable) {
       if (!user) {
         alert(t('Error_Login_Required_Generic'))
-        // Revert the toggle visually if login is required.
-        event.target.checked = false // Revert optimistic UI change of the toggle
+        event.target.checked = false 
         return
       }
 
@@ -113,15 +119,12 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
       if (missingFields.length > 0) {
         setMissingInfoFieldsText(missingFields.join(', '))
         setIsMissingInfoModalOpen(true)
-        // Revert the toggle visually, it will be enabled if user confirms in modal.
         event.target.checked = false
       } else {
         setIsBenefitModalOpen(true)
-        // Revert the toggle visually, it will be enabled if user confirms in modal.
         event.target.checked = false
       }
     } else {
-      // User is disabling
       setIsPersonalizationEnabled(false)
     }
   }
@@ -134,7 +137,6 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
     }
   }, [isLoggedIn, isPersonalizationEnabled, setIsPersonalizationEnabled])
 
-  // Handle keyboard escape for closing the panel
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isRightPanelOpen) {
@@ -149,23 +151,22 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
 
   return (
     <>
-      {/* Backdrop (Lớp phủ nền mờ) */}
+      {/* Backdrop */}
       <div
         className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ease-in-out
           ${isRightPanelOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}
         onClick={() => setRightPanelOpen(false)}
         aria-hidden={!isRightPanelOpen}
-        aria-label={t('Close_settings')} // Thêm aria-label cho khả năng truy cập
+        aria-label={t('Close_settings')}
       />
 
       {/* Right Panel */}
       <div
-        // Đặt panel cố định ở góc phải màn hình
         className={`fixed right-0 top-0 z-50 h-full w-72 transform bg-white-pure shadow-xl transition-transform duration-300 ease-in-out
           ${isRightPanelOpen ? 'pointer-events-auto translate-x-0' : 'pointer-events-none translate-x-full'}`}
-        aria-modal='true' // Cho trình đọc màn hình biết đây là một cửa sổ modal
-        role='dialog' // Xác định vai trò là hộp thoại
-        aria-labelledby='right-panel-title' // Liên kết với tiêu đề panel
+        aria-modal='true'
+        role='dialog'
+        aria-labelledby='right-panel-title'
       >
         <div className='flex h-full w-full flex-col overflow-y-auto px-4'>
           <div className='flex flex-shrink-0 items-center justify-between border-b border-gray-200 pb-4 pt-4'>
@@ -248,7 +249,19 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
                 )}
               </div>
             )}
+            
+            {/* Model Selection Dropdown - Added Here */}
+            {chatMode === 'regular' && (
+                 <ModelSelectionDropdown
+                    currentModel={selectedModel}
+                    availableModels={AVAILABLE_MODELS}
+                    onModelChange={setSelectedModel}
+                    // disabled={isLiveChatConnected} // Hoặc logic disable khác nếu cần
+                 />
+            )}
 
+
+            {/* Language Dropdown */}
             {isLiveChatContextActive && chatMode === 'live' ? (
               <LiveAwareLanguageDropdown
                 currentLanguage={currentLanguage}
@@ -260,7 +273,7 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
                 currentLanguage={currentLanguage}
                 availableLanguages={availableLanguages}
                 onLanguageChange={setCurrentLanguage}
-                disabled={false}
+                disabled={false} // Có thể disable nếu đang kết nối live chat hoặc tùy logic
               />
             )}
 

@@ -38,27 +38,24 @@ type StoreSet = (
 export const handleSendMessage = (
     get: StoreGet,
     set: StoreSet,
-    partsForBackend: Part[], // <<< THAM SỐ MỚI
-    partsForDisplay: Part[], // <<< THAM SỐ MỚI
+    partsForBackend: Part[], 
+    partsForDisplay: Part[], 
     userFilesForDisplayOptimistic?: UserFile[],
     originalUserFilesInfo?: OriginalUserFileInfo[],
-    pageContextUrl?: string // <<< THÊM MỚI
-
+    pageContextUrl?: string 
 ) => {
     const { addChatMessage, setLoadingState, animationControls, resetAwaitFlag, setPendingBotMessageId } = get();
-    const { isStreamingEnabled, currentLanguage } = useSettingsStore.getState();
+    // <<< LẤY THÊM selectedModel TỪ SETTINGS STORE >>>
+    const { isStreamingEnabled, currentLanguage, selectedModel } = useSettingsStore.getState(); 
     const { hasFatalConnectionError } = useSocketStore.getState();
     const { handleError, hasFatalError: uiHasFatalError } = useUiStore.getState();
     const { activeConversationId } = useConversationStore.getState();
 
-    // partsForBackend được dùng để kiểm tra có gì để gửi không
     if (partsForBackend.length === 0) {
         console.warn("[MessageStore] sendMessage called with empty partsForBackend.");
         setLoadingState({ isLoading: false, step: 'idle', message: '' });
         return;
     }
-    // partsForDisplay có thể rỗng nếu user chỉ gửi @currentpage (không có query text)
-    // nhưng vẫn phải có partsForBackend (chứa context)
 
     if (hasFatalConnectionError || uiHasFatalError) {
         handleError({ message: "Cannot send message: A critical error occurred.", type: 'error', step: 'send_message_fail_fatal' } as any, false, false);
@@ -70,21 +67,18 @@ export const handleSendMessage = (
     resetAwaitFlag();
     setLoadingState({ isLoading: true, step: 'sending_to_bot', message: 'Sending...', agentId: undefined });
 
-    // Sử dụng partsForDisplay để tạo text hiển thị trên UI
     const textContentFromDisplayParts = partsForDisplay.find(part => 'text' in part)?.text || '';
     const filesToDisplay = userFilesForDisplayOptimistic || [];
 
     const newUserMessage: ChatMessageType = {
         id: generateMessageId(),
         role: 'user',
-        parts: partsForDisplay, // <<< SỬ DỤNG partsForDisplay CHO UI
-        text: textContentFromDisplayParts, // Text từ partsForDisplay
+        parts: partsForDisplay, 
+        text: textContentFromDisplayParts,
         isUser: true,
         type: filesToDisplay.length > 0 ? 'multimodal' : 'text',
         timestamp: new Date().toISOString(),
         files: filesToDisplay.length > 0 ? filesToDisplay : undefined,
-        // sources sẽ được thêm vào tin nhắn của model từ backend
-
     };
     addChatMessage(newUserMessage);
     const botPlaceholderId = `bot-pending-${generateMessageId()}`;
@@ -93,23 +87,21 @@ export const handleSendMessage = (
     const personalizationInfo = getPersonalizationData();
 
     const payloadForSocket: SendMessageData = {
-        parts: partsForBackend, // <<< SỬ DỤNG partsForBackend CHO SOCKET
+        parts: partsForBackend, 
         isStreaming: isStreamingEnabled,
         language: currentLanguage.code as LanguageCode,
         conversationId: activeConversationId,
-        frontendMessageId: newUserMessage.id, // ID của tin nhắn hiển thị trên UI
+        frontendMessageId: newUserMessage.id,
         personalizationData: personalizationInfo,
         originalUserFiles: originalUserFilesInfo,
-        pageContextUrl: pageContextUrl, // <<< TRUYỀN URL
-
+        pageContextUrl: pageContextUrl,
+        model: selectedModel.value, // <<< GỬI GIÁ TRỊ CỦA MODEL ĐÃ CHỌN
     };
-       // Thêm log ở đây để kiểm tra payloadForSocket trước khi emit
+    
     console.log('[MessageActionHandlers handleSendMessage] Payload for socket:', JSON.stringify(payloadForSocket, null, 2));
     useSocketStore.getState().emitSendMessage(payloadForSocket);
-    
 };
 
-// ... (handleLoadHistoryMessages, handleSubmitEditedMessage, etc. giữ nguyên) ...
 export const handleLoadHistoryMessages = (
     set: StoreSet,
     historyItems: HistoryItem[]

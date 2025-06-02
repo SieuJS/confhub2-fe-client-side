@@ -41,7 +41,7 @@ const LoginForm: React.FC<LoginFormProps> = (/* props: LoginFormProps */) => {
   // The backend will handle the Google OAuth flow and redirect to the /auth/callback page.
 
   return (
-    <div className='flex min-h-screen flex-col items-center justify-center bg-gray-5 px-4 py-12  sm:px-6 lg:px-8'>
+    <div className='flex min-h-screen flex-col items-center justify-center bg-gray-10 px-4 py-12  sm:px-6 lg:px-8'>
       <div className='w-full max-w-xl'>
         <div className='bg-white-pure px-8 py-10 shadow-xl  sm:rounded-lg sm:px-16'>
           <div className='space-y-8'>
@@ -57,7 +57,7 @@ const LoginForm: React.FC<LoginFormProps> = (/* props: LoginFormProps */) => {
                 type='button'
                 onClick={handleGoogleLogin} // Use the handler from useLoginForm
                 disabled={isLoading}
-                className='flex w-full items-center justify-center space-x-2 rounded-md border border-gray-300 bg-white-pure px-4 py-2.5 text-sm font-medium shadow-sm  hover:bg-gray-5 focus:outline-none focus:ring-2 focus:ring-gray-50 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                className='flex w-full items-center justify-center space-x-2 rounded-md border border-gray-300 bg-white-pure px-4 py-2.5 text-sm font-medium shadow-sm  hover:bg-gray-10 focus:outline-none focus:ring-2 focus:ring-gray-50 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
               >
                 <svg className='h-5 w-5' viewBox='0 0 24 24'>
                   <path

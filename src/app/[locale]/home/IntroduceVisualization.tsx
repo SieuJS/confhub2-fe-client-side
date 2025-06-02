@@ -415,7 +415,7 @@ const IntroduceVisualization: React.FC = () => {
   return (
     <section
       aria-labelledby='visualization-intro-heading'
-      className='m-0 rounded-xl border border-gray-20 bg-gray-5 p-6 shadow-lg  md:m-12 md:p-4'
+      className='m-0 rounded-xl border border-gray-20 bg-gray-10 p-6 shadow-lg  md:m-12 md:p-4'
     >
       {/* --- CSS Keyframes cho fade (Giữ nguyên) --- */}
       <style>{`

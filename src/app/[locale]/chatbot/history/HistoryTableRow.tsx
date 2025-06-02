@@ -70,7 +70,7 @@ const HistoryTableRow: React.FC<HistoryTableRowProps> = ({
 
 
   return (
-    <tr className='hover:bg-gray-5 transition-colors dark:hover:bg-gray-800/50'>
+    <tr className='hover:bg-gray-10 transition-colors dark:hover:bg-gray-800/50'>
       <td className='whitespace-nowrap px-6 py-4'>
         <div className='flex items-center'>
           <div className='min-w-0 flex-1'>

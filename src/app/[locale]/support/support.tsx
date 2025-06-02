@@ -893,7 +893,7 @@ const Support = () => {
                       className='overflow-hidden rounded-lg border border-gray-20   '
                     >
                       <div
-                        className='flex cursor-pointer items-center justify-between px-4 py-3 transition-colors duration-150 hover:bg-gray-5 '
+                        className='flex cursor-pointer items-center justify-between px-4 py-3 transition-colors duration-150 hover:bg-gray-10 '
                         onClick={() => toggleAccordion(index)}
                         aria-expanded={expandedIndex === index}
                         aria-controls={`faq-content-${index}`}

@@ -25,7 +25,7 @@ const DataFieldPanel: React.FC<DataFieldPanelProps> = React.memo(
       <div
         className={`
                 duration-400 relative flex-shrink-0 border-r border-gray-20
-                bg-gray-5 transition-all
+                bg-gray-10 transition-all
                 duration-300 ease-in-out ease-out
                 ${
                   isCollapsed

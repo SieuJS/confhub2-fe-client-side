@@ -132,7 +132,7 @@ const ChartDisplay: React.FC<ChartDisplayProps> = ({
   return (
     <div
       ref={chartContainerRef}
-      className='relative h-full flex-1 min-w-0 overflow-hidden rounded-lg bg-gray-5 p-4 pt-10 shadow-inner' // CHANGED: flex-grow to flex-1 and added min-w-0
+      className='relative h-full flex-1 min-w-0 overflow-hidden rounded-lg bg-gray-10 p-4 pt-10 shadow-inner' // CHANGED: flex-grow to flex-1 and added min-w-0
     >
       {/* Action Buttons - Kept commented as in original */}
       {/* <div className='absolute right-3 top-2.5 z-10 flex space-x-1.5'> ... </div> */}

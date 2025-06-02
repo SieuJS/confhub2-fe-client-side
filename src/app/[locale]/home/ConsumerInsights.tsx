@@ -35,7 +35,7 @@ const ConsumerInsights: React.FC<ConsumerInsightsProps> = ({}) => {
       id='consumer-insights'
       // Loại bỏ ref vì không còn IntersectionObserver
       // ref={componentRef}
-      className='mx-0 my-12 overflow-hidden rounded-lg bg-gray-5 py-8 shadow-lg  md:mx-12 md:py-16'
+      className='mx-0 my-12 overflow-hidden rounded-lg bg-gray-10 py-8 shadow-lg  md:mx-12 md:py-16'
     >
       <div className='container mx-auto px-4 md:px-6'>
         {/* Content Wrapper */}

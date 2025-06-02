@@ -97,6 +97,8 @@ export interface SendMessageData {
   personalizationData?: PersonalizationPayload | null;
   originalUserFiles?: OriginalUserFileInfo[]; // Thông tin file gốc của user
   pageContextUrl?: string; // <<< THÊM MỚI
+  model?: string; // <<< THÊM TRƯỜNG MODEL (string là giá trị value của model)
+
 
 }
 

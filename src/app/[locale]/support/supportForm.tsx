@@ -56,7 +56,7 @@ const SupportForm: React.FC = () => {
       </section>
 
       {/* Phần Form */}
-      <div className='bg-gray-5 pb-8  lg:pb-16'>
+      <div className='bg-gray-10 pb-8  lg:pb-16'>
         <div className='relative z-20 mx-auto -mt-24 max-w-screen-md rounded-lg bg-white-pure p-6 px-4 shadow-xl  sm:p-8 md:-mt-56 lg:p-10'>
           <form onSubmit={handleSubmit} className='space-y-6'>
             {/* Trường Chủ đề */}
@@ -72,7 +72,7 @@ const SupportForm: React.FC = () => {
                 type='text'
                 id='subject'
                 name='subject'
-                className='dark:shadow-sm-light block w-full rounded-lg border border-gray-30 bg-gray-5 p-2.5 text-sm  placeholder-primary shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500'
+                className='dark:shadow-sm-light block w-full rounded-lg border border-gray-30 bg-gray-10 p-2.5 text-sm  placeholder-primary shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500'
                 // Sử dụng key từ file dịch
                 placeholder={t('subjectPlaceholder')}
                 required
@@ -91,7 +91,7 @@ const SupportForm: React.FC = () => {
               <select
                 id='type'
                 name='type'
-                className='dark:shadow-sm-light block w-full rounded-lg border border-gray-30 bg-gray-5 p-2.5 text-sm  placeholder-primary shadow-sm focus:border-blue-500    focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500'
+                className='dark:shadow-sm-light block w-full rounded-lg border border-gray-30 bg-gray-10 p-2.5 text-sm  placeholder-primary shadow-sm focus:border-blue-500    focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500'
                 required
                 defaultValue=''
               >
@@ -119,7 +119,7 @@ const SupportForm: React.FC = () => {
                 id='message'
                 name='message'
                 rows={6}
-                className='block w-full rounded-lg border border-gray-30 bg-gray-5 p-2.5 text-sm  placeholder-primary shadow-sm focus:border-blue-500   focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500'
+                className='block w-full rounded-lg border border-gray-30 bg-gray-10 p-2.5 text-sm  placeholder-primary shadow-sm focus:border-blue-500   focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500'
                 // Sử dụng key từ file dịch
                 placeholder={t('messagePlaceholder')}
                 required
@@ -137,7 +137,7 @@ const SupportForm: React.FC = () => {
                   checked={agreedToTerms}
                   onChange={e => setAgreedToTerms(e.target.checked)}
                   required
-                  className='focus:ring-3 h-4 w-4 rounded border border-gray-30 bg-gray-5 focus:ring-blue-300   dark:ring-offset-gray-800 dark:focus:ring-blue-600'
+                  className='focus:ring-3 h-4 w-4 rounded border border-gray-30 bg-gray-10 focus:ring-blue-300   dark:ring-offset-gray-800 dark:focus:ring-blue-600'
                 />
               </div>
               <div className='ml-3 text-sm'>
