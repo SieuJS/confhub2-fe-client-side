@@ -1,27 +1,43 @@
-// hooks/useAddFeedback.ts
-import { useState, useCallback } from 'react';
+// hooks/useGetFeedback.ts
+import { useState, useEffect, useCallback } from 'react';
 import { getFeedBack } from '../../app/apis/conference/getFeedBack'; // Path to your API function
 import { FeedbackResponse } from '../../models/response/feedback.list.response';
+import { Feedback } from '@/src/models/send/feedback.send';
 
-interface UseGetFeedbackProps {
-  initialData?: FeedbackResponse;
-}
 
-const useGetFeedBack = (conferenceId: string, { initialData }: UseGetFeedbackProps = {}) => {
-    const [feedbacks, setFeedbacks] = useState<FeedbackResponse | undefined>(initialData);
+const useGetFeedBack = (
+  conferenceId?: string, 
+  newFeedback?: Feedback | null
+) => {
+    const [feedbackResponse, setFeedbackResponse] = useState<FeedbackResponse[] | undefined>();
     const [error, setError] = useState<string | null>(null)
-    const fetchFeedback = (async () => {
+    const [isLoading, setIsLoading] = useState(true);
+    const fetchFeedback = useCallback(async () => {
+      if (!conferenceId) {
+      // Nếu không có conferenceId, không fetch và reset state
+        setFeedbackResponse([]);
+        setIsLoading(false);
+      return;
+      }
         try {
             const data = await getFeedBack(conferenceId); // Gọi API.
-            setFeedbacks(data);
+            setFeedbackResponse(data);
         } catch (error: any) {
         console.error("Failed to fetch conferences:", error);
             setError(error.message); // Lấy message từ error object.
-        }
-  });
+            setFeedbackResponse([]);
+        } finally {
+          setIsLoading(false);
+      }
+  }, [conferenceId]);
+
+  useEffect(() => {
+    fetchFeedback();
+  }, [fetchFeedback, newFeedback]);
 
   return {
-    feedbacks,
+    feedbackResponse,
+    isLoading,
     error
   }
 }

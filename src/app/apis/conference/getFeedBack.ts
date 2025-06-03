@@ -5,7 +5,7 @@ import { FeedbackResponse } from "../../../models/response/feedback.list.respons
 
 export const getFeedBack = async (
     conferenceId: string // Change to conferenceId
-): Promise<FeedbackResponse> => {
+): Promise<FeedbackResponse[]> => {
     // const userJSON = localStorage.getItem('user');
     // if (!userJSON) {
     //     throw new Error("User not logged in"); // Or handle differently
@@ -25,7 +25,7 @@ export const getFeedBack = async (
         throw new Error(errorData.message || 'Failed to get feedback');
     }
 
-    const allFeedback: FeedbackResponse = await response.json();
+    const allFeedback: FeedbackResponse[] = await response.json();
     return allFeedback;
 };
 
