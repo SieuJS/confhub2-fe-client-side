@@ -189,14 +189,12 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
           {/* Hiển thị FeedbackSummary */}
           {loadingFeedbacks && !allFeedbacks.length ? (
             <div className="text-center py-4">{t('loading_summary')}</div>
-          ) : !loadingFeedbacks && !fetchFeedbacksError && allFeedbacks.length > 0 ? (
+          ) : !loadingFeedbacks && !fetchFeedbacksError ? (
             <FeedbackSummary
               overallRating={overallRating}
               ratingDistribution={ratingDistribution}
               totalReviews={allFeedbacks.length}
             />
-          ) : !loadingFeedbacks && !fetchFeedbacksError && allFeedbacks.length === 0 ? (
-            <div className="text-center py-4">{t('no_feedback_summary')}</div>
           ) : null}
           <div className='mt-6'>
             {/*
