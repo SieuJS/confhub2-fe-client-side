@@ -1378,14 +1378,13 @@
   "Type_message_or_attach_files": "Type message or attach files...",
   "User_data_not_available": "User data not available",
   "dob_must_be_18_or_older": "Date of birth must indicate you are 18 years or older.",
-
   "Minimize_Chat": "Minimize Chat",
   "FloatingChatbot_ContextOutOfDate": "Page context might be outdated.",
   "FloatingChatbot_UpdateContextButton": "Update context",
   "FloatingChatbot_UpdatingContext": "Updating...",
   "FloatingChatbot_ContextFetchFailed": "Failed to get page context.",
   "FloatingChatbot_RetryContextButton": "Retry",
- 
   "FloatingChat_Personalize_Title": "Enable Personalization",
-  "FloatingChat_Personalize_Description": "Allow the chatbot to remember your preferences and provide more personalized responses."
+  "FloatingChat_Personalize_Description": "Allow the chatbot to remember your preferences and provide more personalized responses.",
+  "Location_not_available": "Location not available"
 }

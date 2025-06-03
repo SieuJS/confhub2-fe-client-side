@@ -1,7 +1,7 @@
 // FollowedTab.tsx
 import React, { useState, useEffect, useCallback } from 'react'
 import { Link } from '@/src/navigation'
-import Button from '../../utils/Button' // Kiểm tra lại đường dẫn
+import Button from '../../utils/Button'
 import ConferenceItem from '../../conferences/ConferenceItem'
 import { ConferenceInfo } from '../../../../models/response/conference.list.response'
 import { timeAgo, formatDateFull } from '../timeFormat'
@@ -11,10 +11,12 @@ import { appConfig } from '@/src/middleware'
 
 interface FollowedTabProps {}
 
-// Nên đặt type cho dữ liệu fetch về để dễ quản lý
-interface FollowedConferenceResponse extends ConferenceInfo {
-  followedAt: string // Thêm trường followedAt từ API response
-  // Các trường khác nếu có từ API response
+// Kế thừa ConferenceInfo (ngoại trừ 'dates') và thêm trường 'followedAt'
+interface FollowedConferenceResponse extends Omit<ConferenceInfo, 'dates'> {
+  id: string // Đảm bảo ID có mặt và là string
+  followedAt: string // Trường này sẽ chứa timestamp khi người dùng follow
+  // Định nghĩa lại kiểu cho 'dates' để phản ánh nó là một MẢNG
+  dates?: { fromDate?: string; toDate?: string }[]
 }
 
 const API_GET_USER_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1`
@@ -23,127 +25,96 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
   const t = useTranslations('')
   const language = t('language')
 
-  // Cập nhật kiểu dữ liệu cho state để bao gồm followedAt
   const [followedConferences, setFollowedConferences] = useState<
-    FollowedConferenceResponse[] // Sử dụng kiểu dữ liệu đã định nghĩa
+    FollowedConferenceResponse[]
   >([])
   const [loading, setLoading] = useState(true)
-  const [loggedIn, setLoggedIn] = useState(false) // Bạn có thể dùng trạng thái này nếu kiểm tra token ở đây
-  const [initialLoad, setInitialLoad] = useState(true)
+  const [loggedIn, setLoggedIn] = useState(false)
+  const [initialLoad, setInitialLoad] = useState(true) // Dùng để kiểm soát trạng thái loading ban đầu
 
   const fetchData = useCallback(async () => {
-    // Kiểm tra token trước khi fetch
+    setLoading(true) // Bắt đầu loading khi fetchData được gọi
     const token = localStorage.getItem('token')
+
     if (!token) {
       console.warn('No token found, cannot fetch followed conferences.')
       setLoggedIn(false)
-      setLoading(false) // Đảm bảo loading tắt nếu không có token
-      setFollowedConferences([]) // Xóa dữ liệu cũ nếu có
+      setFollowedConferences([]) // Xóa dữ liệu cũ nếu không có token
+      setLoading(false)
+      setInitialLoad(false)
       return
     }
+
     setLoggedIn(true) // Đặt trạng thái loggedIn nếu có token
-    setLoading(true) // Bắt đầu loading khi fetch
 
     try {
-      const featchFollow = await fetch(
+      const response = await fetch(
         `${API_GET_USER_ENDPOINT}/follow-conference/followed`,
         {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}` // Sử dụng biến token
+            Authorization: `Bearer ${token}`
           }
         }
       )
 
-      if (!featchFollow.ok) {
-        // Xử lý lỗi, ví dụ token hết hạn hoặc user không login (backend trả lỗi 401/403)
-        if (featchFollow.status === 401 || featchFollow.status === 403) {
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
           console.error('Authentication error. Please log in.')
-          // Optional: clear token and redirect to login
-          localStorage.removeItem('token')
+          localStorage.removeItem('token') // Xóa token không hợp lệ/hết hạn
           setLoggedIn(false)
-          setFollowedConferences([])
         } else {
-          throw new Error(`HTTP error! status: ${featchFollow.status}`)
+          throw new Error(`HTTP error! status: ${response.status}`)
         }
-        // Dừng xử lý nếu có lỗi HTTP
-        setLoading(false)
-        setInitialLoad(false)
-        return // Kết thúc hàm fetchData
+        setFollowedConferences([]) // Xóa dữ liệu nếu có lỗi
+        return // Dừng thực thi nếu có lỗi
       }
 
-      let followed: FollowedConferenceResponse[] = await featchFollow.json()
+      let followed: FollowedConferenceResponse[] = await response.json()
 
       // Sắp xếp danh sách theo followedAt giảm dần (mới nhất lên trên)
       followed.sort((a, b) => {
-        // Chuyển đổi chuỗi ngày thành đối tượng Date hoặc timestamp để so sánh chính xác
         const dateA = new Date(a.followedAt).getTime()
         const dateB = new Date(b.followedAt).getTime()
-
-        // So sánh b với a để có thứ tự giảm dần (mới nhất trước)
-        // Nếu dateB > dateA, kết quả dương -> b đứng trước a
         return dateB - dateA
       })
 
-      setFollowedConferences(followed) // Set mảng đã được sắp xếp
+      setFollowedConferences(followed)
     } catch (error) {
-      console.error('Failed to fetch data:', error)
+      console.error('Failed to fetch followed conferences:', error)
       setFollowedConferences([]) // Xóa dữ liệu nếu fetch thất bại
-      setLoggedIn(false) // Giả định lỗi fetch có thể do auth
+      setLoggedIn(false) // Giả định lỗi fetch có thể do xác thực
     } finally {
-      // Dừng loading sau khi fetch xong hoặc gặp lỗi
-      setLoading(false)
-      setInitialLoad(false) // initialLoad chỉ set false sau lần fetch đầu tiên
+      setLoading(false) // Dừng loading
+      setInitialLoad(false) // Đã hoàn thành lần tải đầu tiên
     }
-  }, []) // initialLoad không cần ở đây vì logic set nó đã trong finally
+  }, [])
 
   useEffect(() => {
-    fetchData() // Gọi fetchData khi component mount
-  }, [fetchData]) // Dependency array chỉ cần fetchData
+    fetchData()
+  }, [fetchData])
 
-  // Không cần useEffect này nữa, logic loading đã được handle trong fetchData và finally
-  // useEffect(() => {
-  //   if (!initialLoad) {
-  //     setLoading(false)
-  //   }
-  // }, [followedConferences, initialLoad])
-
-  // Hiển thị UI dựa trên trạng thái loading và loggedIn
-  if (loading) {
+  // --- Hiển thị UI dựa trên trạng thái ---
+  // Chỉ hiển thị "Loading" ở lần tải đầu tiên
+  if (loading && initialLoad) {
     return <div className='container mx-auto p-4'>{t('Loading')}</div>
   }
 
-  // Hiển thị thông báo nếu không logged in hoặc token không hợp lệ
+  // Hiển thị thông báo yêu cầu đăng nhập nếu chưa đăng nhập
   if (!loggedIn) {
     return (
       <div className='container mx-auto p-4'>
-        <p className='mb-4'>{t('Please_log_in_to_view_followed_conferences')}</p>
+        <p className='mb-4'>
+          {t('Please_log_in_to_view_followed_conferences')}
+        </p>
         <Link href='/auth/login'>
           <Button variant='primary'>{t('Sign_In')}</Button>
         </Link>
       </div>
     )
   }
-
-  // transformedConferences vẫn làm việc với dữ liệu đã được sắp xếp
-  const transformedConferences = followedConferences.map(conf => {
-    const conferenceDates = conf.dates
-
-    return {
-      id: conf.id!,
-      title: conf.title,
-      acronym: conf.acronym,
-      location: conf.location
-        ? `${conf.location.cityStateProvince || ''}, ${conf.location.country || ''}`
-        : '',
-      fromDate: conferenceDates?.fromDate || undefined,
-      toDate: conferenceDates?.toDate || undefined,
-      followedAt: conf.followedAt, // Giữ lại followedAt để hiển thị hoặc dùng ở đây nếu cần
-      status: conf.status
-    }
-  })
-  // console.log('transformedConferences:', transformedConferences) // Bỏ console.log không cần thiết
+  // --- Kết thúc hiển thị UI dựa trên trạng thái ---
 
   return (
     <div className='container mx-auto p-2 md:p-4'>
@@ -152,11 +123,12 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
           {t('Followed_Conferences')}
         </h1>
         <button
-          onClick={fetchData} // Gọi lại fetchData để refresh
+          onClick={fetchData} // Tải lại dữ liệu khi click
           className='rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400'
-          aria-label='Refresh'
-          disabled={loading} // Disable nút khi đang loading
+          aria-label='Refresh followed conferences'
+          disabled={loading} // Tắt nút khi đang tải
         >
+          {/* Refresh Icon */}
           <svg
             xmlns='http://www.w3.org/2000/svg'
             width='20'
@@ -167,7 +139,7 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
             strokeWidth='2'
             strokeLinecap='round'
             strokeLinejoin='round'
-            className={`lucide lucide-refresh-cw ${loading ? 'animate-spin' : ''}`} // Thêm hiệu ứng spin khi loading
+            className={`lucide lucide-refresh-cw ${loading ? 'animate-spin' : ''}`} // Thêm hiệu ứng spin khi tải
           >
             <path d='M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.67 2.62' />
             <path d='M22 4v4h-4' />
@@ -175,17 +147,29 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
         </button>
       </div>
 
-      {/* Sử dụng followedConferences trực tiếp sau khi đã sắp xếp */}
       {followedConferences.length === 0 ? (
-        // Hiển thị thông báo phù hợp nếu không có conference nào
-        <p>
-          {loggedIn
-            ? t('You_are_not_following_any_conferences_yet')
-            : t('Please_log_in_to_view_followed_conferences')}
-        </p>
+        <p>{t('You_are_not_following_any_conferences_yet')}</p>
       ) : (
         followedConferences.map(conference => {
-          // console.log('Rendering ConferenceItem with conference:', conference) // Bỏ console.log không cần thiết
+          // Xây dựng chuỗi địa điểm theo yêu cầu người dùng
+          const locationString = (() => {
+            if (!conference.location) {
+              return t('Location_not_available') || 'Location not available'
+            }
+            const parts: string[] = []
+            if (conference.location.cityStateProvince) {
+              parts.push(conference.location.cityStateProvince)
+            }
+            if (conference.location.country) {
+              parts.push(conference.location.country)
+            }
+            // Nếu mảng parts rỗng (đối tượng location có nhưng các trường con rỗng/null)
+            if (parts.length === 0) {
+              return t('Location_not_available') || 'Location not available'
+            }
+            return parts.join(', ')
+          })()
+
           return (
             <div
               className='mb-4 rounded-xl md:border-2 md:px-4 md:py-2 md:shadow-xl'
@@ -205,17 +189,14 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
 
               {/* Truyền dữ liệu conference đến ConferenceItem */}
               <ConferenceItem
-                key={conference.id} // Key nên ở div bọc ngoài hoặc ở đây
                 conference={{
-                  id: conference.id!,
+                  id: conference.id,
                   title: conference.title,
                   acronym: conference.acronym,
-                  location: conference.location
-                    ? `${conference.location.cityStateProvince || ''}, ${conference.location.country || ''}`
-                    : '',
-                  fromDate: conference.dates?.fromDate, // Truy cập lại từ conference.dates
-                  toDate: conference.dates?.toDate // Truy cập lại từ conference.dates
-                  // Không cần truyền followedAt vào ConferenceItem nếu nó chỉ hiển thị trong div này
+                  location: locationString, // Sử dụng chuỗi địa điểm đã được xử lý
+                  // ************** Sửa lỗi Dates not available ở đây **************
+                  fromDate: conference.dates?.[0]?.fromDate, // Lấy phần tử đầu tiên của mảng dates
+                  toDate: conference.dates?.[0]?.toDate // Lấy phần tử đầu tiên của mảng dates
                 }}
               />
             </div>
