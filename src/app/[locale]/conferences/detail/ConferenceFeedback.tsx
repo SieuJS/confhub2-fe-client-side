@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { ConferenceResponse } from '../../../../models/response/conference.response';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import useAddFeedback from '../../../../hooks/conferenceDetails/useAddFeedBack';
+import useGetFeedBack from '@/src/hooks/conferenceDetails/useGetFeedBack';
 import { useAuth } from '@/src/contexts/AuthContext'; // <<<< THAY ĐỔI QUAN TRỌNG
 import { Feedback, SortOption } from '../../../../models/send/feedback.send';
 import GeneralPagination from '../../utils/GeneralPagination';
@@ -16,7 +17,7 @@ import FeedbackControls from './feedback/FeedbackControls';
 import FeedbackSummary from './feedback/FeedbackSummary';
 import FeedbackItem from './feedback/FeedbackItem';
 import FeedbackForm from './feedback/FeedbackForm';
-import SignInPrompt from './feedback/SignInPrompt';
+import SignInPrompt from './feedback/SignInPrompt'; 
 import { useTranslations } from 'next-intl';
 
 interface ConferenceFeedbackProps {
@@ -55,15 +56,25 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
 
   // --- Data Preparation ---
   const conferenceId = conferenceData?.id;
-  const baseFeedbacks = conferenceData?.feedbacks ?? [];
 
-  const allFeedbacks = useMemo(() => {
-    const combined: Feedback[] = [...baseFeedbacks];
-    if (newFeedback && !combined.some(f => f.id === newFeedback.id)) {
-      combined.unshift(newFeedback);
-    }
-    return combined;
-  }, [baseFeedbacks, newFeedback]);
+  const {feedbackResponse, error: fetchFeedbacksError, isLoading: loadingFeedbacks} = useGetFeedBack(conferenceId, newFeedback);
+  const rawFeedbacks = feedbackResponse ?? [];
+
+  const allFeedbacks: Feedback[] = useMemo(() => {
+    if (!rawFeedbacks) return []; // Nếu rawFeedbacks là undefined, trả về mảng rỗng
+    return rawFeedbacks.map((fbResponse): Feedback => ({
+      id: fbResponse.id,
+      organizedId: fbResponse.conferenceId, // Giả định: organizedId là conferenceId
+      creatorId: fbResponse.creatorId,
+      firstName: fbResponse.firstName,
+      lastName: fbResponse.lastName,
+      avatar: fbResponse.avatar ?? 'avatar1.png', // Cung cấp giá trị mặc định
+      description: fbResponse.description,
+      star: fbResponse.star,
+      createdAt: fbResponse.createdAt,
+      updatedAt: fbResponse.updatedAt,
+    }));
+  }, [rawFeedbacks]);
 
   const displayedFeedbacks = useProcessedFeedbacks(
     allFeedbacks,
@@ -86,9 +97,8 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [filterStar, sortOption]);
+  }, [filterStar, sortOption, allFeedbacks.length]);
 
-  const totalReviews = displayedFeedbacks.length;
 
   // --- Calculations ---
   const { overallRating, ratingDistribution } = useMemo(() => {
@@ -136,8 +146,12 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
   };
 
   let message;
-  if (paginatedFeedbacks.length > 0) {
-    message = ''; // No message needed if there are feedbacks on the current page
+  if (loadingFeedbacks) {
+    message = t('loading_feedbacks');
+  } else if (fetchFeedbacksError) {
+    message = t('error_fetching_feedbacks', { error: fetchFeedbacksError });
+  } else if (paginatedFeedbacks.length > 0) {
+    message = '';
   } else if (displayedFeedbacks.length === 0) {
     if (filterStar !== null) {
       message = t('no_feedback_matching_filter', { starCount: filterStar });
@@ -172,11 +186,18 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
 
       <div className='mt-6 flex flex-col gap-8 md:flex-row md:gap-8'>
         <div className='w-full md:w-1/2'>
-          <FeedbackSummary
-            overallRating={overallRating}
-            ratingDistribution={ratingDistribution}
-            totalReviews={allFeedbacks.length}
-          />
+          {/* Hiển thị FeedbackSummary */}
+          {loadingFeedbacks && !allFeedbacks.length ? (
+            <div className="text-center py-4">{t('loading_summary')}</div>
+          ) : !loadingFeedbacks && !fetchFeedbacksError && allFeedbacks.length > 0 ? (
+            <FeedbackSummary
+              overallRating={overallRating}
+              ratingDistribution={ratingDistribution}
+              totalReviews={allFeedbacks.length}
+            />
+          ) : !loadingFeedbacks && !fetchFeedbacksError && allFeedbacks.length === 0 ? (
+            <div className="text-center py-4">{t('no_feedback_summary')}</div>
+          ) : null}
           <div className='mt-6'>
             {/*
               Render dựa trên isLoggedIn thực tế sau khi AuthProvider đã khởi tạo.
@@ -200,15 +221,15 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
 
         <div className='w-full md:w-1/2 '>
           <div className='space-y-4'>
-            {message && paginatedFeedbacks.length === 0 && ( // Chỉ hiển thị message nếu trang hiện tại rỗng
+            {message && (loadingFeedbacks || fetchFeedbacksError || paginatedFeedbacks.length === 0) && ( // Chỉ hiển thị message nếu trang hiện tại rỗng
               <div className='pt-4 text-center '>{message}</div>
             )}
-            {paginatedFeedbacks.map(feedback => (
+            {!loadingFeedbacks && !fetchFeedbacksError && paginatedFeedbacks.map(feedback => (
               <FeedbackItem key={feedback.id} feedback={feedback} />
             ))}
           </div>
 
-          {totalPages > 1 && (
+          {!loadingFeedbacks && !fetchFeedbacksError && totalPages > 1 && (
             <div className='mt-6 flex justify-center'>
               <GeneralPagination
                 currentPage={currentPage}

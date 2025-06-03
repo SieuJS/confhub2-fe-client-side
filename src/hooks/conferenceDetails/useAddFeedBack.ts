@@ -15,7 +15,7 @@ const useAddFeedback = () => {
         try {
             const feedback = await addFeedback({ conferenceId, description, star }); // Pass conferenceId
             setNewFeedback(feedback); // Store the new feedback
-            window.location.reload();
+            //window.location.reload();
             return feedback
         } catch (err: any) {
             setError(err.message || 'An error occurred while submitting feedback.');
