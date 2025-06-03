@@ -23,12 +23,13 @@ const ProfileTab: React.FC = () => {
   const {
     isEditing,
     editedData,
+    dobError,
     setEditedData,
     handleEditClick,
-    handleSaveClick, // GIỮ NGUYÊN hook's handleSaveClick
     handleCancelClick,
     handleInputChange,
-    handleInterestedTopicsChange
+    handleInterestedTopicsChange,
+    handleProfileSave
   } = useEditProfile(authUser)
 
   const {
@@ -56,7 +57,7 @@ const ProfileTab: React.FC = () => {
   const [showChangePasswordForm, setShowChangePasswordForm] = useState(false)
   const [formattedDob, setFormattedDob] = useState<string | null>(null)
   // THÊM state mới để quản lý lỗi ngày sinh
-  const [dobError, setDobError] = useState<string | null>(null)
+  //const [dobError, setDobError] = useState<string | null>(null)
 
   useEffect(() => {
     console.log(authUser?.dob)
@@ -82,26 +83,26 @@ const ProfileTab: React.FC = () => {
     }
   }, [authUser?.dob, t])
 
-  // Hàm xử lý lưu thông tin, bao gồm kiểm tra ngày sinh
-  const handleProfileSave = async () => {
-    setDobError(null) // Xóa lỗi cũ trước khi kiểm tra lại
+  // // Hàm xử lý lưu thông tin, bao gồm kiểm tra ngày sinh
+  // const handleProfileSave = async () => {
+  //   setDobError(null) // Xóa lỗi cũ trước khi kiểm tra lại
 
-    // Kiểm tra tuổi nếu có ngày sinh được nhập
-    if (editedData.dob) {
-      const dobDate = new Date(editedData.dob)
-      const eighteenYearsAgo = new Date()
-      eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 18)
+  //   // Kiểm tra tuổi nếu có ngày sinh được nhập
+  //   if (editedData.dob) {
+  //     const dobDate = new Date(editedData.dob)
+  //     const eighteenYearsAgo = new Date()
+  //     eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 18)
 
-      // Nếu ngày sinh sau ngày 18 năm trước (nghĩa là chưa đủ 18 tuổi)
-      if (dobDate > eighteenYearsAgo) {
-        setDobError(t('dob_must_be_18_or_older')) // Sử dụng key dịch mới
-        return // Dừng quá trình lưu
-      }
-    }
+  //     // Nếu ngày sinh sau ngày 18 năm trước (nghĩa là chưa đủ 18 tuổi)
+  //     if (dobDate > eighteenYearsAgo) {
+  //       setDobError(t('dob_must_be_18_or_older')) // Sử dụng key dịch mới
+  //       return // Dừng quá trình lưu
+  //     }
+  //   }
 
-    // Nếu không có lỗi ngày sinh, tiến hành lưu
-    await handleSaveClick()
-  }
+  //   // Nếu không có lỗi ngày sinh, tiến hành lưu
+  //   await handleSaveClick()
+  // }
 
   if (isAuthInitializing) {
     return (
@@ -368,7 +369,7 @@ const ProfileTab: React.FC = () => {
                 />
                 {/* HIỂN THỊ THÔNG BÁO LỖI NGÀY SINH */}
                 {dobError && (
-                  <p className='mt-1 text-sm text-red-500'>{dobError}</p>
+                  <p className='mt-1 text-sm text-red-500'>{t(`${dobError}`)}</p>
                 )}
               </div>
             </div>

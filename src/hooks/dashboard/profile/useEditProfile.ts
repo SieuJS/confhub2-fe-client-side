@@ -9,6 +9,7 @@ export const useEditProfile = (
 ) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState<Partial<UserResponse>>({});
+  const [dobError, setDobError] = useState<string | null>(null)
 
   // <<<< THAY ĐỔI QUAN TRỌNG: Sử dụng useAuth từ Context
   // user từ context là nguồn thông tin user hiện tại
@@ -111,6 +112,7 @@ export const useEditProfile = (
     // Reset editedData về initialUserData (hoặc user từ context nếu initialUserData là null)
     const dataToReset = initialUserData || user;
     setEditedData(dataToReset || {});
+    if (dobError) setDobError(null);
   };
 
   const handleInputChange = (
@@ -141,14 +143,36 @@ export const useEditProfile = (
     });
   };
 
+  // Hàm xử lý lưu thông tin, bao gồm kiểm tra ngày sinh
+  const handleProfileSave = async () => {
+    setDobError(null) // Xóa lỗi cũ trước khi kiểm tra lại
+
+    // Kiểm tra tuổi nếu có ngày sinh được nhập
+    if (editedData.dob) {
+      const dobDate = new Date(editedData.dob)
+      const eighteenYearsAgo = new Date()
+      eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 18)
+
+      // Nếu ngày sinh sau ngày 18 năm trước (nghĩa là chưa đủ 18 tuổi)
+      if (dobDate > eighteenYearsAgo) {
+        setDobError('dob_must_be_18_or_older') // Sử dụng key dịch mới
+        return // Dừng quá trình lưu
+      }
+    }
+
+    // Nếu không có lỗi ngày sinh, tiến hành lưu
+    await handleSaveClick()
+  }
   return {
     isEditing,
     editedData,
+    dobError,
     setEditedData,
     handleEditClick,
     handleSaveClick,
     handleCancelClick,
     handleInputChange,
     handleInterestedTopicsChange,
+    handleProfileSave
   };
 };
