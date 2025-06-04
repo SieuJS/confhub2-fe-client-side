@@ -1391,5 +1391,6 @@
   "Conference_date_must_be_7_days_from_now": "Hội nghị phải bắt đầu ít nhất 7 ngày kể từ hôm nay.",
   "Important_dates_must_end_before_conference_start": "{dateName} phải kết thúc trước ngày bắt đầu của Hội nghị.",
   "Please_select_a_type_for_date_entry_or_invalid_type": "Vui lòng chọn loại ngày cho mục nhập ngày {name} hoặc loại không hợp lệ đã được chọn.",
-  "Duplicate_conference_error_message": "Một hội nghị với tên và/hoặc tên viết tắt này đã tồn tại. Vui lòng điều chỉnh hoặc chọn tên khác."
+  "Duplicate_conference_error_message": "Một hội nghị với tên và/hoặc tên viết tắt này đã tồn tại. Vui lòng điều chỉnh hoặc chọn tên khác.",
+  "No_source_rank_information_available": "Không có thông tin xếp hạng nguồn nào có sẵn cho hội nghị này."
 }
