@@ -1386,5 +1386,10 @@
   "FloatingChatbot_RetryContextButton": "Thử lại",
   "FloatingChat_Personalize_Title": "Bật Cá nhân hóa",
   "FloatingChat_Personalize_Description": "Cho phép chatbot ghi nhớ sở thích của bạn và cung cấp các phản hồi được cá nhân hóa hơn.",
-  "Location_not_available": "Địa điểm không có sẵn"
+  "Location_not_available": "Địa điểm không có sẵn",
+  "Conference_Date_Start_Validation": "Ngày bắt đầu hội nghị phải cách hôm nay ít nhất 7 ngày.",
+  "Conference_date_must_be_7_days_from_now": "Hội nghị phải bắt đầu ít nhất 7 ngày kể từ hôm nay.",
+  "Important_dates_must_end_before_conference_start": "{dateName} phải kết thúc trước ngày bắt đầu của Hội nghị.",
+  "Please_select_a_type_for_date_entry_or_invalid_type": "Vui lòng chọn loại ngày cho mục nhập ngày {name} hoặc loại không hợp lệ đã được chọn.",
+  "Duplicate_conference_error_message": "Một hội nghị với tên và/hoặc tên viết tắt này đã tồn tại. Vui lòng điều chỉnh hoặc chọn tên khác."
 }

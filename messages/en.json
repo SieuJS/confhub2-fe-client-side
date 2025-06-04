@@ -1386,5 +1386,10 @@
   "FloatingChatbot_RetryContextButton": "Retry",
   "FloatingChat_Personalize_Title": "Enable Personalization",
   "FloatingChat_Personalize_Description": "Allow the chatbot to remember your preferences and provide more personalized responses.",
-  "Location_not_available": "Location not available"
+  "Location_not_available": "Location not available",
+  "Conference_Date_Start_Validation": "Conference start date must be at least 7 days from today.",
+  "Conference_date_must_be_7_days_from_now": "The conference must start at least 7 days from today.",
+  "Important_dates_must_end_before_conference_start": "{dateName} must end before the Conference Date begins.",
+  "Please_select_a_type_for_date_entry_or_invalid_type": "Please select a type for date entry {name} or an invalid type was chosen.",
+  "Duplicate_conference_error_message": "A conference with this title and/or acronym already exists. Please adjust or choose another name."
 }
