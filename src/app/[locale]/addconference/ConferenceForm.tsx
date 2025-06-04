@@ -57,8 +57,10 @@ const ConferenceForm: React.FC = () => {
 
   const [conferenceDateStartError, setConferenceDateStartError] = useState('')
 
+  // Date options, ADDING 'conferenceDates' back in
   const dateTypeOptions = [
     { value: 'submissionDate', name: t('Submission_Date') },
+    { value: 'conferenceDates', name: t('Conference_Dates') }, // Re-added this
     { value: 'registrationDate', name: t('Registration_Date') },
     { value: 'notificationDate', name: t('Notification_Date') },
     { value: 'cameraReadyDate', name: t('Camera_Ready_Date') }
@@ -178,10 +180,13 @@ const ConferenceForm: React.FC = () => {
         const dateIdentifier = date.name || `${t('Date_entry')} ${i + 1}`
 
         if (i > 0) {
+          // For user-added dates
           if (!date.name.trim()) {
             alert(t('Please_provide_a_name_for_date_entry', { number: i + 1 }))
             return
           }
+          // The selected type MUST NOT be 'conferenceDates' for user-added entries
+          // This check is now also enforced by filtering options in ImportantDatesInput
           if (!date.type || date.type === 'conferenceDates') {
             alert(
               t('Please_select_a_type_for_date_entry_or_invalid_type', {
@@ -240,26 +245,6 @@ const ConferenceForm: React.FC = () => {
           }
         }
       }
-
-      // --- NEW: Format Location Address before proceeding ---
-      if (type === 'Offline' || type === 'Hybrid') {
-        const originalAddress = location.address.trim()
-        const cityStateProvince = location.cityStateProvince.trim()
-        const country = location.country.trim()
-
-        let combinedAddressParts = []
-        if (originalAddress) combinedAddressParts.push(originalAddress)
-        if (cityStateProvince) combinedAddressParts.push(cityStateProvince)
-        if (country) combinedAddressParts.push(country)
-
-        const newFormattedAddress = combinedAddressParts.join(', ')
-
-        // Update the address in the state
-        setLocation(prevLocation => ({
-          ...prevLocation,
-          address: newFormattedAddress
-        }))
-      }
     }
 
     // If all validations pass for the current step
@@ -282,9 +267,25 @@ const ConferenceForm: React.FC = () => {
       return
     }
 
+    // Run step 1 validation if somehow submit is clicked before nexting on step 1
     if (currentStep === 1) {
-      goToNextStep()
-      return
+      goToNextStep() // This will re-validate and potentially block submission
+      return // Prevent submission if still on step 1
+    }
+
+    // --- NEW: Format Location Address ONLY on submit ---
+    const locationForSubmission = { ...location } // Create a mutable copy of the location state
+    if (type === 'Offline' || type === 'Hybrid') {
+      const originalAddress = locationForSubmission.address.trim()
+      const cityStateProvince = locationForSubmission.cityStateProvince.trim()
+      const country = locationForSubmission.country.trim()
+
+      let combinedAddressParts = []
+      if (originalAddress) combinedAddressParts.push(originalAddress)
+      if (cityStateProvince) combinedAddressParts.push(cityStateProvince)
+      if (country) combinedAddressParts.push(country)
+
+      locationForSubmission.address = combinedAddressParts.join(', ')
     }
 
     const conferenceData: ConferenceFormData = {
@@ -293,7 +294,7 @@ const ConferenceForm: React.FC = () => {
       link,
       topics,
       type,
-      location, // This location object now contains the formatted address
+      location: locationForSubmission, // Use the formatted location for submission
       dates,
       imageUrl,
       description
@@ -372,7 +373,7 @@ const ConferenceForm: React.FC = () => {
             setImageUrl={setImageUrl}
             description={description}
             setDescription={setDescription}
-            dateTypeOptions={dateTypeOptions}
+            dateTypeOptions={dateTypeOptions} // Pass all options
             t={t}
             cscApiKey={CSC_API_KEY || ''}
             setStatesForReview={setStatesForReview}
@@ -386,7 +387,7 @@ const ConferenceForm: React.FC = () => {
             acronym={acronym}
             link={link}
             type={type}
-            location={location} // This will display the formatted address
+            location={location} // This location still holds the original address for review
             dates={dates}
             topics={topics}
             imageUrl={imageUrl}

@@ -18,8 +18,8 @@ interface ConferenceReviewStepProps {
   imageUrl: string
   description: string
   t: (key: string) => string
-  statesForReview: State[] // Thêm prop này để xác định City/State Province
-  citiesForReview: City[] // Thêm prop này để xác định City/State Province
+  statesForReview: State[]
+  citiesForReview: City[]
 }
 
 const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
@@ -36,6 +36,24 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
   statesForReview,
   citiesForReview
 }) => {
+  // Helper function to format the address for display in review
+  const getFormattedAddressForDisplay = () => {
+    if (type === 'Online') {
+      return t('Not_applicable_for_online')
+    }
+
+    const originalAddress = location.address.trim()
+    const cityStateProvince = location.cityStateProvince.trim()
+    const country = location.country.trim()
+
+    let combinedAddressParts = []
+    if (originalAddress) combinedAddressParts.push(originalAddress)
+    if (cityStateProvince) combinedAddressParts.push(cityStateProvince)
+    if (country) combinedAddressParts.push(country)
+
+    return combinedAddressParts.join(', ') || t('Not_provided')
+  }
+
   return (
     <div className='space-y-3 sm:col-span-2'>
       <h2 className='mb-4 text-lg font-semibold sm:text-xl'>
@@ -61,12 +79,9 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
       <p>
         <strong>{t('Type')}:</strong> {t(type)}
       </p>
+      {/* Updated to use the helper function for address display */}
       <p>
-        <strong>{t('Address')}:</strong>{' '}
-        {location.address ||
-          (type === 'Online'
-            ? t('Not_applicable_for_online')
-            : t('Not_provided'))}
+        <strong>{t('Address')}:</strong> {getFormattedAddressForDisplay()}
       </p>
       <p>
         <strong>{t('Continent')}:</strong>{' '}

@@ -11,9 +11,9 @@ interface ImportantDatesInputProps {
   ) => void
   addDate: () => void
   removeDate: (index: number) => void
-  dateTypeOptions: { value: string; name: string }[]
+  dateTypeOptions: { value: string; name: string }[] // Now this includes 'conferenceDates'
   t: (key: string) => string
-  conferenceDateStartError: string // New prop for specific error message
+  conferenceDateStartError: string
 }
 
 const ImportantDatesInput: React.FC<ImportantDatesInputProps> = ({
@@ -23,7 +23,7 @@ const ImportantDatesInput: React.FC<ImportantDatesInputProps> = ({
   removeDate,
   dateTypeOptions,
   t,
-  conferenceDateStartError // Destructure new prop
+  conferenceDateStartError
 }) => {
   return (
     <div className='sm:col-span-2'>
@@ -63,11 +63,14 @@ const ImportantDatesInput: React.FC<ImportantDatesInputProps> = ({
               disabled={index === 0}
             >
               <option value=''>{t('Select_Type')}</option>
-              {dateTypeOptions.map(opt => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.name}
-                </option>
-              ))}
+              {/* Filter dateTypeOptions: Only show conferenceDates for the first entry */}
+              {dateTypeOptions
+                .filter(opt => index === 0 || opt.value !== 'conferenceDates')
+                .map(opt => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.name}
+                  </option>
+                ))}
             </select>
           </div>
           <div>
