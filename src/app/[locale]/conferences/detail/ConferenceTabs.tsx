@@ -1,3 +1,5 @@
+// src/app/[locale]/conferences/detail/ConferenceTabs.tsx
+
 'use client'
 
 import React, { useMemo, useRef } from 'react'
