@@ -28,6 +28,7 @@ const useUpdateConference = () => {
         method: 'POST', // Changed to PUT for updates (more standard RESTful practice), can also be PATCH
         headers: {
           'Content-Type': 'application/json',
+          'Authorization' : `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
         },
       });
 
