@@ -1392,5 +1392,6 @@
   "Important_dates_must_end_before_conference_start": "{dateName} must end before the Conference Date begins.",
   "Please_select_a_type_for_date_entry_or_invalid_type": "Please select a type for date entry {name} or an invalid type was chosen.",
   "Duplicate_conference_error_message": "A conference with this title and/or acronym already exists. Please adjust or choose another name.",
-  "No_source_rank_information_available": "No source rank information available"
+  "No_source_rank_information_available": "No source rank information available",
+  "Reset_Code": "Reset Code"
 }
