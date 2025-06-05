@@ -88,10 +88,17 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
         });
   
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(
-            `HTTP error! status: ${response.status}, message: ${errorData.message}`
-          );
+          if (response.status === 403)
+          {
+            throw new Error('User is banned');
+          }
+          else
+          {
+            const errorData = await response.json();
+            throw new Error(
+              `HTTP error! status: ${response.status}, message: ${errorData.message}`
+            );
+          }
         }
   
         const updatedUser: Calendar[] = await response.json();

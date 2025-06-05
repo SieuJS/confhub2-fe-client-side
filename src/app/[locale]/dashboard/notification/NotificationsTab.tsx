@@ -7,6 +7,7 @@ import NotificationDetails from './NotificationDetails'
 import useNotifications from '../../../../hooks/dashboard/notification/useNotifications' // Đảm bảo đúng đường dẫn
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import { useAuth } from '@/src/contexts/AuthContext' // <<<< THAY ĐỔI QUAN TRỌNG
 
 const NotificationsTab: React.FC = () => {
   const t = useTranslations('')

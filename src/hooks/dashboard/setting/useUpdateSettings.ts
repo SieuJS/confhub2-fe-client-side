@@ -11,6 +11,11 @@ interface UpdateUserResult {
   error: string | null;
 }
 
+interface GetUserSettingResult {
+  getUserSettings: () => Promise<Setting | null>;
+  error: string | null;
+}
+
 export const useUpdateUser = (): UpdateUserResult => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,7 +64,10 @@ export const useUpdateUser = (): UpdateUserResult => {
   return { updateUserSetting, updateUserProfile, loading, error };
 };
 
-export const getUserSettings = async (): Promise<Setting | null> => {
+export const useGetUserSetting = (): GetUserSettingResult => {
+  const [error, setError] = useState<string | null>(null);
+
+  const getUserSettings = async (): Promise<Setting | null> => {
   try {
     const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/user/setting`, {
       headers: {
@@ -72,7 +80,9 @@ export const getUserSettings = async (): Promise<Setting | null> => {
     }
     return await response.json();
   } catch (error) {
-    console.error('Error fetching user settings:', error);
+    setError('Error fetching user settings:' + error);
     return null;
   }
+  }
+  return { getUserSettings, error };
 }

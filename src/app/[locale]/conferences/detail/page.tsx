@@ -45,7 +45,7 @@ const DetailContent: React.FC<DetailContentProps> = ({
   const pathname = usePathname()
 
   // <<<< THAY ĐỔI QUAN TRỌNG: Sử dụng useAuth từ Context
-  const { isLoggedIn, isInitializing: isAuthInitializing, user } = useAuth() // Lấy thêm user nếu cần
+  const { isLoggedIn, isInitializing: isAuthInitializing, user, logout } = useAuth() // Lấy thêm user nếu cần
 
   const {
     conferenceDataFromDB,
@@ -128,6 +128,30 @@ const DetailContent: React.FC<DetailContentProps> = ({
       }
     }
   }, [updateResult]) // Bỏ t nếu không dùng
+
+
+  useEffect(() => {
+    if (calendarError === 'User is banned')
+    {
+        alert(calendarError)
+    }
+  }, [calendarError])
+
+  useEffect(() => {
+    if (blacklistError === 'User is banned')
+    {
+        alert(blacklistError)
+    }
+  }, [blacklistError])
+
+  useEffect(() => {
+    if (followError === 'User is banned')
+    {
+        alert(followError)
+    }
+  }, [followError])
+
+
 
   // --- Loading & Error States ---
   if (isAuthInitializing || (sequentialLoading && !conferenceDataFromDB)) {

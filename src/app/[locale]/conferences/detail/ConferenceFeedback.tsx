@@ -47,7 +47,7 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
 
   // <<<< THAY ĐỔI QUAN TRỌNG: Sử dụng useAuth từ Context
   // isInitializing cho biết AuthProvider có đang trong quá trình kiểm tra auth ban đầu hay không
-  const { isLoggedIn, isInitializing: isAuthInitializing, user } = useAuth();
+  const { isLoggedIn, isInitializing: isAuthInitializing, user, logout } = useAuth();
 
   // --- Effects ---
   // useEffect(() => {
@@ -161,6 +161,13 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
   } else {
     message = t('no_feedback_on_page');
   }
+
+  // if (feedbackError === 'User is banned')
+  // {
+  //   return <div className='flex h-screen items-center justify-center'>
+  //     Your account is banned, you'll automatically logout
+  //   </div>
+  // }
 
   // --- Render ---
   // Hiển thị loading cho đến khi AuthProvider khởi tạo xong
