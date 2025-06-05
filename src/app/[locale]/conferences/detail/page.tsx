@@ -53,10 +53,13 @@ const DetailContent: React.FC<DetailContentProps> = ({
     loading: sequentialLoading
   } = useSequentialConferenceData(conferenceId) // Sử dụng conferenceId từ props
 
-  const lastOrganization =
-    conferenceDataFromDB?.organizations?.[
-      conferenceDataFromDB.organizations.length - 1
-    ]
+  // const lastOrganization =
+  //   conferenceDataFromDB?.organizations?.[
+  //     conferenceDataFromDB.organizations.length - 1
+  //   ]
+
+  const lastOrganization = conferenceDataFromDB?.organizations?.[0]
+
   const firstRankData = conferenceDataFromDB?.ranks?.[0]
   const transformedDatesData = transformDates(lastOrganization?.conferenceDates)
 
