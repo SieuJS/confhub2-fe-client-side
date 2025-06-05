@@ -1,6 +1,7 @@
-// src/hooks/useChangePassword.ts (Đã cập nhật)
+// src/hooks/dashboard/profile/useChangePassword.ts (đổi đường dẫn nếu cần)
 import { appConfig } from '@/src/middleware';
 import { useState, useCallback } from 'react';
+import { toast } from 'react-toastify'; // Import toast library (cần cài đặt: npm install react-toastify)
 
 const API_CHANGE_PASSWORD_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/change-password`;
 
@@ -14,18 +15,20 @@ export const useChangePassword = (userId: string, onClose: () => void) => {
 
   const handleOldPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOldPassword(e.target.value);
-    setError(null);
+    setError(null);    // Clear error when typing
+    setMessage(null); // Clear success message when typing
   };
 
   const handleNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewPassword(e.target.value);
     setError(null);
+    setMessage(null);
   };
 
-  
   const handleConfirmNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setConfirmNewPassword(e.target.value);
     setError(null);
+    setMessage(null);
   };
 
   const handleChangePassword = useCallback(async () => {
@@ -33,49 +36,71 @@ export const useChangePassword = (userId: string, onClose: () => void) => {
     setMessage(null);
     setIsLoading(true);
 
-    if (newPassword !== confirmNewPassword) {
-      setError('New passwords do not match.');
+    // --- Thêm validation cho các trường bắt buộc ---
+    if (!oldPassword || !newPassword || !confirmNewPassword) {
+      setError('All fields are required.');
+      toast.error('All fields are required.'); // Toast for user feedback
       setIsLoading(false);
       return;
     }
 
+    if (newPassword !== confirmNewPassword) {
+      setError('New passwords do not match.');
+      toast.error('New passwords do not match.');
+      setIsLoading(false);
+      return;
+    }
+
+    // --- Kiểm tra định dạng mật khẩu mới ---
+    // Cân nhắc thêm kiểm tra độ dài tối thiểu, có chữ hoa/thường/số/ký tự đặc biệt
     const allowRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]*$/;
 
     if (!allowRegex.test(newPassword)) {
-      setError('New passwords is invalid format.');
+      setError('New password contains invalid characters.'); // Cập nhật thông báo cho rõ ràng
+      toast.error('New password contains invalid characters.');
       setIsLoading(false);
       return;
     }
 
+    // --- Thực hiện gọi API ---
     try {
-      const response = await fetch(API_CHANGE_PASSWORD_ENDPOINT, { // Gọi API change-password
+      const response = await fetch(API_CHANGE_PASSWORD_ENDPOINT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify({ oldPassword, newPassword }), // Gửi id, newPassword, confirmNewPassword
+        body: JSON.stringify({ oldPassword, newPassword }),
       });
 
-      const data = await response.json();
+      const data = await response.json(); // Luôn đọc response.json() để có data.message
 
       if (response.ok) {
-        setMessage(data.message);
+        setMessage(data.message || 'Password changed successfully!'); // Fallback message
+        toast.success(data.message || 'Password changed successfully!'); // Toast success
         setOldPassword('');
         setNewPassword('');
         setConfirmNewPassword('');
+        // Không dùng setTimeout nếu bạn muốn đóng ngay hoặc có thể đợi một chút
+        // Cân nhắc cách đóng form: onClose() ngay lập tức hoặc sau khi toast biến mất
         setTimeout(() => {
-          onClose(); // Đóng form
-        }, 3000);
+            onClose(); // Đóng form sau khi hiển thị message
+        }, 1500); // Đợi 1.5 giây để người dùng thấy thông báo
       } else {
-        setError(data.message || 'Failed to change password.');
+        // Xử lý lỗi từ backend
+        const errorMessage = data.message || 'Failed to change password.';
+        setError(errorMessage);
+        toast.error(errorMessage); // Toast error
       }
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred.');
+      console.error('Change password API error:', err); // Log lỗi chi tiết
+      const unexpectedErrorMessage = err.message || 'An unexpected error occurred. Please try again.';
+      setError(unexpectedErrorMessage);
+      toast.error(unexpectedErrorMessage); // Toast error
     } finally {
       setIsLoading(false);
     }
-  }, [userId, newPassword, confirmNewPassword, onClose]);
+  }, [oldPassword, newPassword, confirmNewPassword, onClose]); // Thêm oldPassword vào dependencies
 
   return {
     oldPassword,
