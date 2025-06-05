@@ -1393,5 +1393,13 @@
   "Please_select_a_type_for_date_entry_or_invalid_type": "Please select a type for date entry {name} or an invalid type was chosen.",
   "Duplicate_conference_error_message": "A conference with this title and/or acronym already exists. Please adjust or choose another name.",
   "No_source_rank_information_available": "No source rank information available",
-  "Reset_Code": "Reset Code"
+  "Reset_Code": "Reset Code",
+  "Confirm_Account_Deletion": "Confirm Account Deletion",
+  "Are_you_sure_you_want_to_delete_your_account": "Are you sure you want to delete your account? All your data will be permanently removed.",
+  "This_action_cannot_be_undone": "This action cannot be undone",
+  "Deleting...": "Deleting...",
+  "Delete_my_Account": "Delete my Account",
+  "Failed_to_delete_account_unknown_error": "Failed to delete account. An unknown error occurred.",
+  "Failed_to_delete_account_network_error": "Failed to delete account. Please check your network connection.",
+  "User_not_authenticated": "User not authenticated. Please log in again."
 }

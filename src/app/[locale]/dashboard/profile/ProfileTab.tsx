@@ -8,7 +8,7 @@ import { useEditProfile } from '@/src/hooks/dashboard/profile/useEditProfile'
 import { useImageSelection } from '@/src/hooks/dashboard/profile/useImageSelection'
 import { Link } from '@/src/navigation'
 import ChangePasswordForm from './ChangePasswordForm'
-import { useAuth } from '@/src/contexts/AuthContext'
+import { useAuth } from '@/src/contexts/AuthContext' // Import useAuth
 
 const ProfileTab: React.FC = () => {
   const t = useTranslations('')
@@ -17,7 +17,8 @@ const ProfileTab: React.FC = () => {
     user: authUser,
     isInitializing: isAuthInitializing,
     error: authError,
-    isLoggedIn
+    isLoggedIn,
+    deleteAccount // THÊM DÒNG NÀY: Destructure deleteAccount từ useAuth
   } = useAuth()
 
   const {
@@ -56,8 +57,13 @@ const ProfileTab: React.FC = () => {
 
   const [showChangePasswordForm, setShowChangePasswordForm] = useState(false)
   const [formattedDob, setFormattedDob] = useState<string | null>(null)
-  // THÊM state mới để quản lý lỗi ngày sinh
-  //const [dobError, setDobError] = useState<string | null>(null)
+
+  // THÊM CÁC STATE MỚI CHO CHỨC NĂNG XÓA TÀI KHOẢN
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false)
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false)
+  const [deleteAccountError, setDeleteAccountError] = useState<string | null>(
+    null
+  )
 
   useEffect(() => {
     console.log(authUser?.dob)
@@ -83,26 +89,38 @@ const ProfileTab: React.FC = () => {
     }
   }, [authUser?.dob, t])
 
-  // // Hàm xử lý lưu thông tin, bao gồm kiểm tra ngày sinh
-  // const handleProfileSave = async () => {
-  //   setDobError(null) // Xóa lỗi cũ trước khi kiểm tra lại
+  const handleChangePasswordClick = () => {
+    setShowChangePasswordForm(true)
+  }
 
-  //   // Kiểm tra tuổi nếu có ngày sinh được nhập
-  //   if (editedData.dob) {
-  //     const dobDate = new Date(editedData.dob)
-  //     const eighteenYearsAgo = new Date()
-  //     eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 18)
+  // HÀM XỬ LÝ KHI NGƯỜI DÙNG NHẤN NÚT "XÓA TÀI KHOẢN" (MỞ MODAL)
+  const handleDeleteAccountClick = () => {
+    setShowDeleteConfirmModal(true)
+    setDeleteAccountError(null) // Clear any previous errors
+  }
 
-  //     // Nếu ngày sinh sau ngày 18 năm trước (nghĩa là chưa đủ 18 tuổi)
-  //     if (dobDate > eighteenYearsAgo) {
-  //       setDobError(t('dob_must_be_18_or_older')) // Sử dụng key dịch mới
-  //       return // Dừng quá trình lưu
-  //     }
-  //   }
-
-  //   // Nếu không có lỗi ngày sinh, tiến hành lưu
-  //   await handleSaveClick()
-  // }
+  // HÀM XỬ LÝ KHI NGƯỜI DÙNG XÁC NHẬN XÓA TÀI KHOẢN TRONG MODAL
+  const handleConfirmDeleteAccount = async () => {
+    setIsDeletingAccount(true)
+    setDeleteAccountError(null)
+    try {
+      const result = await deleteAccount()
+      if (result.success) {
+        // Tài khoản đã được xóa thành công và người dùng đã được đăng xuất/chuyển hướng
+        // Không cần làm gì thêm ở đây, AuthContext đã lo phần này
+      } else {
+        setDeleteAccountError(
+          result.error || t('Failed_to_delete_account_unknown_error')
+        )
+      }
+    } catch (error) {
+      console.error('Error during account deletion:', error)
+      setDeleteAccountError(t('Failed_to_delete_account_network_error'))
+    } finally {
+      setIsDeletingAccount(false)
+      setShowDeleteConfirmModal(false) // Đóng modal dù thành công hay thất bại
+    }
+  }
 
   if (isAuthInitializing) {
     return (
@@ -139,10 +157,6 @@ const ProfileTab: React.FC = () => {
     displayUser.avatar || authUser.avatar || '/avatar1.jpg'
   const displayBackgroundUrl =
     displayUser.background || authUser.background || '/bg-2.jpg'
-
-  const handleChangePasswordClick = () => {
-    setShowChangePasswordForm(true)
-  }
 
   return (
     <div className='w-full overflow-hidden rounded-lg bg-background shadow-xl md:px-10 md:py-6'>
@@ -201,6 +215,14 @@ const ProfileTab: React.FC = () => {
               className='w-full md:w-auto'
             >
               {t('Change_Password')}
+            </Button>
+            {/* THÊM NÚT XÓA TÀI KHOẢN TẠI ĐÂY */}
+            <Button
+              variant='danger' // Dùng variant danger vì đây là hành động nguy hiểm
+              onClick={handleDeleteAccountClick}
+              className='w-full md:w-auto'
+            >
+              {t('Delete_Account')}
             </Button>
           </div>
         )}
@@ -369,7 +391,9 @@ const ProfileTab: React.FC = () => {
                 />
                 {/* HIỂN THỊ THÔNG BÁO LỖI NGÀY SINH */}
                 {dobError && (
-                  <p className='mt-1 text-sm text-red-500'>{t(`${dobError}`)}</p>
+                  <p className='mt-1 text-sm text-red-500'>
+                    {t(`${dobError}`)}
+                  </p>
                 )}
               </div>
             </div>
@@ -510,6 +534,41 @@ const ProfileTab: React.FC = () => {
           userId={authUser.id}
           onClose={() => setShowChangePasswordForm(false)}
         />
+      )}
+
+      {/* MODAL XÁC NHẬN XÓA TÀI KHOẢN */}
+      {showDeleteConfirmModal && (
+        <div className='animate-fadeIn fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4'>
+          <div className='w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800'>
+            <h2 className='mb-4 text-xl font-semibold text-gray-800 dark:text-white'>
+              {t('Confirm_Account_Deletion')}
+            </h2>
+            <p className='mb-6 text-gray-600 dark:text-gray-300'>
+              {t('Are_you_sure_you_want_to_delete_your_account')}
+              <br />
+              <strong>{t('This_action_cannot_be_undone')}</strong>.
+            </p>
+            {deleteAccountError && (
+              <p className='mb-4 text-sm text-red-500'>{deleteAccountError}</p>
+            )}
+            <div className='flex justify-end space-x-3'>
+              <Button
+                variant='secondary'
+                onClick={() => setShowDeleteConfirmModal(false)}
+                disabled={isDeletingAccount}
+              >
+                {t('Cancel')}
+              </Button>
+              <Button
+                variant='danger'
+                onClick={handleConfirmDeleteAccount}
+                disabled={isDeletingAccount}
+              >
+                {isDeletingAccount ? t('Deleting...') : t('Delete_my_Account')}
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

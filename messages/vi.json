@@ -1393,5 +1393,13 @@
   "Please_select_a_type_for_date_entry_or_invalid_type": "Vui lòng chọn loại ngày cho mục nhập ngày {name} hoặc loại không hợp lệ đã được chọn.",
   "Duplicate_conference_error_message": "Một hội nghị với tên và/hoặc tên viết tắt này đã tồn tại. Vui lòng điều chỉnh hoặc chọn tên khác.",
   "No_source_rank_information_available": "Không có thông tin xếp hạng nguồn nào có sẵn cho hội nghị này.",
-  "Reset_Code": "Mã đặt lại"
+  "Reset_Code": "Mã đặt lại",
+  "Confirm_Account_Deletion": "Xác nhận xóa tài khoản",
+  "Are_you_sure_you_want_to_delete_your_account": "Bạn có chắc chắn muốn xóa tài khoản của mình không? Tất cả dữ liệu của bạn sẽ bị xóa vĩnh viễn.",
+  "This_action_cannot_be_undone": "Hành động này không thể hoàn tác",
+  "Deleting...": "Đang xóa...",
+  "Delete_my_Account": "Xóa tài khoản của tôi",
+  "Failed_to_delete_account_unknown_error": "Không thể xóa tài khoản. Đã xảy ra lỗi không xác định.",
+  "Failed_to_delete_account_network_error": "Không thể xóa tài khoản. Vui lòng kiểm tra kết nối mạng của bạn.",
+  "User_not_authenticated": "Người dùng chưa được xác thực. Vui lòng đăng nhập lại."
 }
