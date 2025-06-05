@@ -160,7 +160,7 @@ const DetailContent: React.FC<DetailContentProps> = ({
     return <Loading />
   }
 
-  if (dbError === 'Conference not found' || !conferenceId) {
+  if (dbError === 'Conference not found' || dbError?.includes('404') || !conferenceId) {
     // Nếu không có conferenceId từ đầu (do URL sai) hoặc API trả về không tìm thấy
     return <NotFoundPage />
   }
