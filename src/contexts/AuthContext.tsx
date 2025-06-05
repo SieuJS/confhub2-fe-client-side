@@ -365,7 +365,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     try {
       const response = await fetch(
-        `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/users/${user.id}`,
+        `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/user/delete`,
         {
           method: 'DELETE',
           headers: {
