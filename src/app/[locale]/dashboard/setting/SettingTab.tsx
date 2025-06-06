@@ -7,13 +7,14 @@ import { useLocalStorage } from 'usehooks-ts'
 import { useRouter, usePathname } from 'next/navigation'
 import deleteUser from '../../../apis/user/deleteUser' // Adjust path if needed
 import {
-  getUserSettings,
+  useGetUserSetting,
   useUpdateUser
 } from '../../../../hooks/dashboard/setting/useUpdateSettings' // Adjust path if needed
 import { useGetUser } from '../../../../hooks/dashboard/setting/useGetUser' // Adjust path if needed
 import { Setting } from '@/src/models/response/user.response' // Adjust path if needed
 import { get } from 'lodash'
 import { updateNotifications } from '@/src/app/apis/user/updateNotifications'
+import { useAuth } from '@/src/contexts/AuthContext' // <<<< THAY ĐỔI QUAN TRỌNG
 
 // Helper type for setting keys used in toggles
 type ToggleSettingKey = keyof Pick<
@@ -35,7 +36,7 @@ const SettingTab: React.FC = () => {
     'user',
     null
   )
-
+  const {logout} = useAuth()
   const [setting, setSetting] = useState<Setting | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
@@ -47,6 +48,10 @@ const SettingTab: React.FC = () => {
     loading: updateLoading,
     error: updateError
   } = useUpdateUser()
+  const {
+    getUserSettings,
+    error: getSettingError
+  } = useGetUserSetting()
   async function fetchUserSettings() {
     setLoading(true)
     const userSetting = await getUserSettings()
@@ -76,6 +81,8 @@ const SettingTab: React.FC = () => {
         await updateUserSetting({
           [settingKey]: !currentValue
         })
+        if (updateError)
+          throw new Error(updateError)
         await fetchUserSettings() // Refetch settings after update
       } catch (error) {
         // Revert optimistic update on error
@@ -84,6 +91,7 @@ const SettingTab: React.FC = () => {
         )
         // Optional: Show error to user based on updateError from the hook
         console.error(`Failed to update setting ${settingKey}:`, error)
+        alert(`Error:, ${error}`)
       }
     }
   }
@@ -147,6 +155,9 @@ const SettingTab: React.FC = () => {
   // }
 
   if (!setting) {
+    console.log('err '+getSettingError)
+    if (getSettingError?.includes('403'))
+      logout({callApi: true, preventRedirect: true});
     return <div data-testid='no-data-state'>
       <p className='mb-4'>{t('No_user_data_available')}</p>
         <Link href='/auth/login'>

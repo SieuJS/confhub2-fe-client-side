@@ -8,7 +8,7 @@ import { timeAgo, formatDateFull } from '../timeFormat'
 import Tooltip from '../../utils/Tooltip'
 import { useTranslations } from 'next-intl'
 import { appConfig } from '@/src/middleware'
-
+import { useAuth } from '@/src/contexts/AuthContext' // <<<< THAY ĐỔI QUAN TRỌNG
 interface FollowedTabProps {}
 
 // Kế thừa ConferenceInfo (ngoại trừ 'dates') và thêm trường 'followedAt'
@@ -31,6 +31,8 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
   const [loading, setLoading] = useState(true)
   const [loggedIn, setLoggedIn] = useState(false)
   const [initialLoad, setInitialLoad] = useState(true) // Dùng để kiểm soát trạng thái loading ban đầu
+  const [isBanned, setIsBanned] = useState(false)
+  const {logout} = useAuth();
 
   const fetchData = useCallback(async () => {
     setLoading(true) // Bắt đầu loading khi fetchData được gọi
@@ -60,11 +62,14 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
       )
 
       if (!response.ok) {
-        if (response.status === 401 || response.status === 403) {
+        if (response.status === 401) {
           console.error('Authentication error. Please log in.')
-          localStorage.removeItem('token') // Xóa token không hợp lệ/hết hạn
           setLoggedIn(false)
-        } else {
+        } else if (response.status === 403) {
+          console.error('User is banned.')
+          setLoggedIn(false)
+          setIsBanned(true);
+        } else{
           throw new Error(`HTTP error! status: ${response.status}`)
         }
         setFollowedConferences([]) // Xóa dữ liệu nếu có lỗi
@@ -103,6 +108,20 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
 
   // Hiển thị thông báo yêu cầu đăng nhập nếu chưa đăng nhập
   if (!loggedIn) {
+    if (isBanned) {
+    logout({callApi: true, preventRedirect: true});
+    return (
+      <div className='container mx-auto p-4'>
+        <p className='mb-4'>
+          {t(`User_is_banned!_You'll_automatically_logout!`)}
+        </p>
+        <p className='mb-4'>{t('Please_use_another_account_to_view_blacklisted_conferences')}</p>
+          <Link href='/auth/login'>
+            <Button variant='primary'>{t('Sign_In')}</Button>
+          </Link>
+      </div>
+  )
+  } else
     return (
       <div className='container mx-auto p-4'>
         <p className='mb-4'>
@@ -114,6 +133,7 @@ const FollowedTab: React.FC<FollowedTabProps> = () => {
       </div>
     )
   }
+
   // --- Kết thúc hiển thị UI dựa trên trạng thái ---
 
   return (

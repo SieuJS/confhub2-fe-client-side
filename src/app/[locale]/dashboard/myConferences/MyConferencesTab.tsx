@@ -34,7 +34,8 @@ const MyConferencesTab: React.FC = () => {
     user,
     isLoggedIn,
     isInitializing: isAuthInitializing,
-    getToken
+    getToken,
+    logout
   } = useAuth()
 
   // Hook useMyConferences giờ sẽ lấy token từ getToken() của useAuth
@@ -56,7 +57,7 @@ const MyConferencesTab: React.FC = () => {
       // Hoặc bạn có thể để useMyConferences tự xử lý dựa trên sự thay đổi của user?.id
       // refetch(); // Cân nhắc có cần thiết không nếu useMyConferences đã handle
     }
-  }, [isAuthInitializing, user?.id, refetch])
+  }, [isAuthInitializing, user?.id])
 
   const transformedConferences = useMemo(() => {
     if (!conferences) {
@@ -123,6 +124,39 @@ const MyConferencesTab: React.FC = () => {
     )
   }
 
+    if (conferencesError) {
+    if (conferencesError === 'User is banned')
+    {
+      if (isLoggedIn) { // Chỉ gọi logout nếu user thực sự đang logged in
+          logout({ callApi: true, preventRedirect: true });
+      }
+      return (
+        <div className='container mx-auto p-4'>
+          <p className='mb-4'>
+            {t(`User_is_banned!_You'll_automatically_logout!`)}
+          </p>
+          <p className='mb-4'>{t('Please_use_another_account_to_view_blacklisted_conferences')}</p>
+            <Link href='/auth/login'>
+              <Button variant='primary'>{t('Sign_In')}</Button>
+            </Link>
+        </div>
+    )
+    }
+    else
+    {
+      return (
+      <div className='flex h-60 flex-col items-center justify-center'>
+        <p className='mb-2 text-red-500'>
+          {t('Error_loading_conferences')}: {conferencesError}
+        </p>
+        <Button onClick={refetch} variant='secondary'>
+          {t('Try_Again')}
+        </Button>
+      </div>
+    )
+    }
+  }
+  
   // Nếu chưa đăng nhập sau khi AuthProvider đã khởi tạo
   if (!isLoggedIn) {
     return (
@@ -144,18 +178,6 @@ const MyConferencesTab: React.FC = () => {
     )
   }
 
-  if (conferencesError) {
-    return (
-      <div className='flex h-60 flex-col items-center justify-center'>
-        <p className='mb-2 text-red-500'>
-          {t('Error_loading_conferences')}: {conferencesError}
-        </p>
-        <Button onClick={refetch} variant='secondary'>
-          {t('Try_Again')}
-        </Button>
-      </div>
-    )
-  }
 
   // User đã đăng nhập và không có lỗi, dữ liệu đã tải (hoặc rỗng)
   const getStatusTitle = (status: ConferenceStatus | 'All') => {

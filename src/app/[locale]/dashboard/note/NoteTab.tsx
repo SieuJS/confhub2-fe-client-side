@@ -11,6 +11,7 @@ import Button from '../../utils/Button'
 import { useTranslations } from 'next-intl'
 import { getConferenceFromDB } from '@/src/app/apis/conference/getConferenceDetails'
 import { appConfig } from '@/src/middleware'
+import { useAuth } from '@/src/contexts/AuthContext' // <<<< THAY ĐỔI QUAN TRỌNG
 
 interface NoteTabProps {}
 
@@ -18,6 +19,7 @@ const API_GET_USER_CALENDAR_ENDPOINT = `${process.env.NEXT_PUBLIC_DATABASE_URL}`
 
 const NoteTab: React.FC<NoteTabProps> = () => {
   const t = useTranslations('')
+  const {logout} = useAuth();
 
   const [upcomingNotes, setUpcomingNotes] = useState<any[]>([])
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([])
@@ -167,7 +169,10 @@ const NoteTab: React.FC<NoteTabProps> = () => {
           const errorMessage =
             calendarResponse.status === 404
               ? 'Calendar not found for this user.'
-              : `HTTP error! status: ${calendarResponse.status}`
+              : (calendarResponse.status === 403
+                ? 'User is banned'
+                :`HTTP error! status: ${calendarResponse.status}`
+              )
           setError(errorMessage)
           throw new Error(errorMessage)
         }
@@ -418,7 +423,22 @@ const NoteTab: React.FC<NoteTabProps> = () => {
   }
 
   if (error) {
-    return <div className='container mx-auto p-4 text-red-500'>{error}</div>
+    if (error === 'User is banned')
+    {
+      logout({callApi: true, preventRedirect: true});
+      return (
+        <div className='container mx-auto p-4'>
+          <p className='mb-4'>
+            {t(`User_is_banned!_You'll_automatically_logout!`)}
+          </p>
+          <p className='mb-4'>{t('Please_use_another_account_to_view_blacklisted_conferences')}</p>
+            <Link href='/auth/login'>
+              <Button variant='primary'>{t('Sign_In')}</Button>
+            </Link>
+        </div>
+    )
+    }
+    else return <div className='container mx-auto p-4 text-red-500'>{error}</div>
   }
 
   const getNoteWidth = () => {

@@ -8,6 +8,7 @@ import { timeAgo, formatDateFull } from '../timeFormat'
 import Tooltip from '../../utils/Tooltip'
 import { useTranslations } from 'next-intl'
 import { appConfig } from '@/src/middleware'
+import { useAuth } from '@/src/contexts/AuthContext' // <<<< THAY ĐỔI QUAN TRỌNG
 
 interface BlacklistTabProps {}
 
@@ -24,6 +25,8 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
   const [loading, setLoading] = useState(true)
   const [loggedIn, setLoggedIn] = useState(false)
   const [initialLoad, setInitialLoad] = useState(true)
+  const {logout} = useAuth();
+  const [isBanned, setIsBanned] = useState(false)
 
   const fetchData = useCallback(async () => {
     try {
@@ -50,15 +53,20 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
       })
 
       if (!userBlacklist.ok) {
-        throw new Error(`HTTP error! status: ${userBlacklist.status}`)
+        if (userBlacklist.status === 403) {
+          console.error('User is banned.')
+          setLoggedIn(false)
+          setIsBanned(true);
+        }
+        else throw new Error(`HTTP error! status: ${userBlacklist.status}`)
       }
 
-      const followed: any[] = await userBlacklist.json()
+      const blacklist: any[] = await userBlacklist.json()
       // Assuming the API response structure for a blacklisted item looks something like:
       // { conferenceId: '...', title: '...', ..., createdAt: 'ISO_DATE_STRING' }
       // We need to ensure the received data has a 'createdAt' or similar timestamp.
       // Let's assume it's 'createdAt' as used later in the map.
-      setBlacklistedConferences(followed)
+      setBlacklistedConferences(blacklist)
     } catch (error) {
       console.error('Failed to fetch blacklist data:', error) // Updated error message
     } finally {
@@ -83,6 +91,20 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
   if (!loggedIn) {
     if (loading) {
       return <div className='container mx-auto p-4'>{t('Loading')}</div>
+    }
+    if (isBanned) {
+      logout({callApi: true, preventRedirect: true});
+      return (
+        <div className='container mx-auto p-4'>
+          <p className='mb-4'>
+            {t(`User_is_banned!_You'll_automatically_logout!`)}
+          </p>
+          <p className='mb-4'>{t('Please_use_another_account_to_view_blacklisted_conferences')}</p>
+            <Link href='/auth/login'>
+              <Button variant='primary'>{t('Sign_In')}</Button>
+            </Link>
+        </div>
+    )
     }
     return (
       <div className='container mx-auto p-4'>

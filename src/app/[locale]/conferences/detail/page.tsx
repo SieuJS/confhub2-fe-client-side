@@ -45,7 +45,7 @@ const DetailContent: React.FC<DetailContentProps> = ({
   const pathname = usePathname()
 
   // <<<< THAY ĐỔI QUAN TRỌNG: Sử dụng useAuth từ Context
-  const { isLoggedIn, isInitializing: isAuthInitializing, user } = useAuth() // Lấy thêm user nếu cần
+  const { isLoggedIn, isInitializing: isAuthInitializing, user, logout } = useAuth() // Lấy thêm user nếu cần
 
   const {
     conferenceDataFromDB,
@@ -129,6 +129,30 @@ const DetailContent: React.FC<DetailContentProps> = ({
     }
   }, [updateResult]) // Bỏ t nếu không dùng
 
+
+  useEffect(() => {
+    if (calendarError === 'User is banned')
+    {
+        alert(calendarError)
+    }
+  }, [calendarError])
+
+  useEffect(() => {
+    if (blacklistError === 'User is banned')
+    {
+        alert(blacklistError)
+    }
+  }, [blacklistError])
+
+  useEffect(() => {
+    if (followError === 'User is banned')
+    {
+        alert(followError)
+    }
+  }, [followError])
+
+
+
   // --- Loading & Error States ---
   if (isAuthInitializing || (sequentialLoading && !conferenceDataFromDB)) {
     // Ưu tiên hiển thị loading auth nếu nó đang chạy
@@ -136,7 +160,7 @@ const DetailContent: React.FC<DetailContentProps> = ({
     return <Loading />
   }
 
-  if (dbError === 'Conference not found' || !conferenceId) {
+  if (dbError === 'Conference not found' || dbError?.includes('404') || !conferenceId) {
     // Nếu không có conferenceId từ đầu (do URL sai) hoặc API trả về không tìm thấy
     return <NotFoundPage />
   }

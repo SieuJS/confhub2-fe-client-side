@@ -13,6 +13,7 @@ import {
 } from '@/src/models/send/addConference.send'
 import { appConfig } from '@/src/middleware'
 
+import { useAuth } from '@/src/contexts/AuthContext'
 // Import các component con
 import ConferenceProgressIndicator from './ConferenceProgressIndicator'
 import ConferenceDetailsStep from './steps/ConferenceDetailsStep'
@@ -27,6 +28,7 @@ const ConferenceForm: React.FC = () => {
   const router = useRouter()
   const pathname = usePathname()
 
+  const {logout} = useAuth();
   const [currentStep, setCurrentStep] = useState(1)
   const [title, setTitle] = useState('')
   const [acronym, setAcronym] = useState('')
@@ -321,11 +323,19 @@ const ConferenceForm: React.FC = () => {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(
-          `HTTP error! status: ${response.status}, message: ${
-            errorData.message || 'Unknown error'
-          }`
-        )
+        if (response.status === 403)
+        {
+          window.location.reload();
+          throw new Error(errorData.message + `, you'll automatically logout`);
+        }
+        else
+        {
+          throw new Error(
+            `HTTP error! status: ${response.status}, message: ${
+              errorData.message || 'Unknown error'
+            }`
+          )
+        }
       }
 
       const addedConference = await response.json()
