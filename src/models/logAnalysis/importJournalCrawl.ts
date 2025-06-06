@@ -11,7 +11,7 @@ export interface Journal {
     SJR: string; // Keep as string due to potential comma as decimal separator
     'SJR Best Quartile': string; // Use quotes for keys with spaces/special chars
     'H index': string;
-    'Total Docs. (2023)': string;
+    'Total Docs. (2024)': string;
     'Total Docs. (3years)': string;
     'Total Refs.': string;
     'Total Cites (3years)': string;
