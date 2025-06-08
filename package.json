@@ -6,6 +6,7 @@
     "dev": "next dev --port 8386",
     "build": "next build",
     "start": "next start --port 8386",
+    "start:prod": "npm run build && npm run start",
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch"
