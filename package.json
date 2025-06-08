@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --port 8386",
     "build": "next build",
-    "start": "next start",
+    "start": "next start --port 8386",
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch"
