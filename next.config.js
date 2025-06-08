@@ -13,6 +13,14 @@ const nextConfig = {
     images: {
         domains: ['lh3.googleusercontent.com'],
     },
+    async rewrites() {
+        return [
+            {
+                source: '/apis/auth/google-callback',
+                destination: '/apis/auth/google-callback',
+            },
+        ]
+    },
 }
 
 module.exports = withPWA(withNextIntl(nextConfig))

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { useAuth } from '@/src/contexts/AuthContext'; // <<<< THAY ĐỔI QUAN TRỌNG
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function GET(request: Request) {
   try {
@@ -14,7 +16,8 @@ export async function GET(request: Request) {
         <html>
           <body>
             <script>
-              window.location.href = 'localStorage.getItem('returnUrl')';
+              const returnUrl = localStorage.getItem('returnUrl') || '/';
+              window.location.href = returnUrl;
             </script>
           </body>
         </html>
@@ -24,7 +27,7 @@ export async function GET(request: Request) {
             'Content-Type': 'text/html',
           },
         }
-    );
+      );
     }
 
     cookies().set('auth_token', token, {
@@ -41,9 +44,15 @@ export async function GET(request: Request) {
       <html>
         <body>
           <script>
-            localStorage.setItem('token', '${token}');
-            localStorage.setItem('loginStatus', 'true');
-            window.location.href = localStorage.getItem('returnUrl');
+            try {
+              localStorage.setItem('token', '${token}');
+              localStorage.setItem('loginStatus', 'true');
+              const returnUrl = localStorage.getItem('returnUrl') || '/';
+              window.location.href = returnUrl;
+            } catch (e) {
+              console.error('Error setting localStorage:', e);
+              window.location.href = '/';
+            }
           </script>
         </body>
       </html>
@@ -57,20 +66,20 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('Error in backend callback:', error);
     return new NextResponse(
-        `
-        <html>
-          <body>
-            <script>
-              window.location.href = '/';
-            </script>
-          </body>
-        </html>
-        `,
-        {
-          headers: {
-            'Content-Type': 'text/html',
-          },
-        }
+      `
+      <html>
+        <body>
+          <script>
+            window.location.href = '/';
+          </script>
+        </body>
+      </html>
+      `,
+      {
+        headers: {
+          'Content-Type': 'text/html',
+        },
+      }
     );
   }
 }
