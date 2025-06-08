@@ -63,48 +63,53 @@ const MyConferencesTab: React.FC = () => {
     if (!conferences) {
       return []
     }
-    return conferences
-      .map(conf => {
-        // Bỏ qua các mục không có status hoặc status không phải là string hợp lệ
-        if (typeof conf.status !== 'string') {
-          // console.warn(`Conference ID ${conf.id} has invalid status:`, conf.status);
-          return null // Trả về null để loại bỏ mục này sau
-        }
-        const normalizedStatus = conf.status.toUpperCase()
-        const statusEnum = Object.values(ConferenceStatus).includes(
-          normalizedStatus as ConferenceStatus
-        )
-          ? (normalizedStatus as ConferenceStatus)
-          : ConferenceStatus.Pending // Hoặc một giá trị mặc định khác, hoặc loại bỏ nó
-        return {
-          id: conf.id,
-          title: conf.title,
-          acronym: conf.acronym,
-          // Cẩn thận với optional chaining và truy cập mảng
-          location: conf.organizations?.[0]?.locations?.[0]
-            ? `${conf.organizations[0].locations[0].cityStateProvince || t('N/A')}, ${conf.organizations[0].locations[0].country || t('N/A')}`
-            : t('Location_Not_Available'),
-          year: conf.organizations?.[0]?.year?.toString() || t('N/A'), // Đảm bảo là string
-          summerize: conf.organizations?.[0]?.summary || '', // Summary có thể là string rỗng
-          fromDate: conf.organizations?.[0]?.conferenceDates?.find(
-            d => d.type === 'conferenceDates'
-          )?.fromDate,
-          toDate: conf.organizations?.[0]?.conferenceDates?.find(
-            d => d.type === 'conferenceDates'
-          )?.toDate,
-          websiteUrl: conf.organizations?.[0]?.link || '#', // Cung cấp fallback cho link
-          status: statusEnum, // Ép kiểu nếu bạn chắc chắn giá trị status từ backend khớp với enum
-          createdAt: conf.createdAt
-          // Thêm các trường cần thiết khác từ conf
-        }
-      })
-      .filter(conf => conf !== null)
+
+    // Bước 1: Map và có thể trả về null
+    const mappedConferences = conferences.map(conf => {
+      if (typeof conf.status !== 'string') {
+        return null
+      }
+      const normalizedStatus = conf.status.toUpperCase()
+      const statusEnum = Object.values(ConferenceStatus).includes(
+        normalizedStatus as ConferenceStatus
+      )
+        ? (normalizedStatus as ConferenceStatus)
+        : ConferenceStatus.Pending
+      return {
+        id: conf.id,
+        title: conf.title,
+        acronym: conf.acronym,
+        location: conf.organizations?.[0]?.locations?.[0]
+          ? `${conf.organizations[0].locations[0].cityStateProvince || t('N/A')}, ${conf.organizations[0].locations[0].country || t('N/A')}`
+          : t('Location_Not_Available'),
+        year: conf.organizations?.[0]?.year?.toString() || t('N/A'),
+        summerize: conf.organizations?.[0]?.summary || '',
+        fromDate: conf.organizations?.[0]?.conferenceDates?.find(
+          d => d.type === 'conferenceDates'
+        )?.fromDate,
+        toDate: conf.organizations?.[0]?.conferenceDates?.find(
+          d => d.type === 'conferenceDates'
+        )?.toDate,
+        websiteUrl: conf.organizations?.[0]?.link || '#',
+        status: statusEnum,
+        createdAt: conf.createdAt,
+      }
+    });
+
+    // Lấy kiểu của một phần tử trong mảng (loại trừ `null`)
+    type TransformedConference = NonNullable<typeof mappedConferences[0]>;
+
+    // Bước 2: Dùng Type Predicate để "dạy" cho TypeScript
+    return mappedConferences
+      .filter((conf): conf is TransformedConference => conf !== null)
       .sort((a, b) => {
-        if (!a.createdAt) return 1 // Đẩy các item không có createdAt về cuối
+        // Giờ TypeScript đã bị "ép" phải hiểu a và b không phải là null
+        if (!a.createdAt) return 1
         if (!b.createdAt) return -1
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       })
-  }, [conferences, t]) // Thêm t vào dependencies nếu các giá trị fallback dùng t
+  }, [conferences, t])
+
 
   const filteredConferences = useMemo(() => {
     if (displayStatus === 'All') {
@@ -124,11 +129,10 @@ const MyConferencesTab: React.FC = () => {
     )
   }
 
-    if (conferencesError) {
-    if (conferencesError === 'User is banned')
-    {
+  if (conferencesError) {
+    if (conferencesError === 'User is banned') {
       if (isLoggedIn) { // Chỉ gọi logout nếu user thực sự đang logged in
-          logout({ callApi: true, preventRedirect: true });
+        logout({ callApi: true, preventRedirect: true });
       }
       return (
         <div className='container mx-auto p-4'>
@@ -136,27 +140,26 @@ const MyConferencesTab: React.FC = () => {
             {t(`User_is_banned!_You'll_automatically_logout!`)}
           </p>
           <p className='mb-4'>{t('Please_use_another_account_to_view_blacklisted_conferences')}</p>
-            <Link href='/auth/login'>
-              <Button variant='primary'>{t('Sign_In')}</Button>
-            </Link>
+          <Link href='/auth/login'>
+            <Button variant='primary'>{t('Sign_In')}</Button>
+          </Link>
         </div>
-    )
+      )
     }
-    else
-    {
+    else {
       return (
-      <div className='flex h-60 flex-col items-center justify-center'>
-        <p className='mb-2 text-red-500'>
-          {t('Error_loading_conferences')}: {conferencesError}
-        </p>
-        <Button onClick={refetch} variant='secondary'>
-          {t('Try_Again')}
-        </Button>
-      </div>
-    )
+        <div className='flex h-60 flex-col items-center justify-center'>
+          <p className='mb-2 text-red-500'>
+            {t('Error_loading_conferences')}: {conferencesError}
+          </p>
+          <Button onClick={refetch} variant='secondary'>
+            {t('Try_Again')}
+          </Button>
+        </div>
+      )
     }
   }
-  
+
   // Nếu chưa đăng nhập sau khi AuthProvider đã khởi tạo
   if (!isLoggedIn) {
     return (

@@ -22,65 +22,43 @@ export const generateChartOption = (
 ): EChartsOption => {
     console.log(`${logPrefixOptions} generateChartOption: Start. Type: ${config.chartType}, Title: "${options.title}"`);
 
-    // 1. Process Data
+    // 1. Xử lý Dữ liệu
     console.log(`${logPrefixOptions} generateChartOption: Calling processDataForChart...`);
     const { categories, series, legendData } = processDataForChart(rawData, config, availableFields);
     console.log(`${logPrefixOptions} generateChartOption: Data processed. Series: ${series.length}, Categories: ${categories?.length}, Legend: ${legendData?.length}`);
 
-    // Find fields for axis names etc.
+    // Tìm các trường để lấy tên trục, v.v.
     const xAxisField = availableFields.find(f => f.id === config.xAxis?.fieldId);
     const yAxisField = availableFields.find(f => f.id === config.yAxis?.fieldId);
-    const sizeField = availableFields.find(f => f.id === config.size?.fieldId);
+    // REMOVED: sizeField không còn cần thiết
 
-    // 2. Determine Axis Types
-    let xAxisType: 'category' | 'value' = 'category';
-    if (config.chartType === 'scatter') {
-        xAxisType = (xAxisField && xAxisField.type === 'measure') ? 'value' : 'category';
-    } else if (config.chartType === 'bar' || config.chartType === 'line') {
-        xAxisType = 'category';
-    }
+    // 2. Xác định Loại Trục
+    // Vì scatter đã bị loại bỏ, trục X cho các biểu đồ thanh/đường luôn là 'category'.
+    const xAxisType: 'category' = 'category';
     console.log(`${logPrefixOptions} generateChartOption: X-Axis type: ${xAxisType}`);
 
-    // 3. Build Axis Options
-    // --- FIX: Define xAxisOption using indexed access type ---
+    // 3. Xây dựng Tùy chọn Trục
     let xAxisOption: EChartsOption['xAxis'] = undefined;
     if (config.chartType !== 'pie') {
-        if (xAxisType === 'category') {
-            xAxisOption = {
-                type: 'category',
-                name: xAxisField?.name,
-                nameLocation: 'middle',
-                nameGap: (categories && categories.length > 10) ? 40 : 25,
-                nameTextStyle: { fontSize: 12 },
-                data: categories,
-                axisTick: { alignWithLabel: true },
-                axisLabel: {
-                    fontSize: 10,
-                    rotate: (categories && categories.length > 10) ? 30 : 0,
-                    interval: (categories && categories.length > 20) ? 'auto' : 0,
-                },
-                boundaryGap: true, // <-- Boolean là đúng cho category
-            };
-        } else { // Includes 'value', 'time', 'log'
-            xAxisOption = {
-                type: 'value', // Hoặc 'time', 'log'
-                name: xAxisField?.name,
-                nameLocation: 'middle',
-                nameGap: 25,
-                nameTextStyle: { fontSize: 12 },
-                axisTick: undefined, // Thường không cần tick đặc biệt cho value axis
-                axisLabel: {
-                    fontSize: 10,
-                },
-                // boundaryGap: false, // <-- XÓA DÒNG NÀY
-                // Mặc định cho type 'value' là không có khoảng đệm thêm (boundaryGap = [0,0])
-            };
-        }
+        // Logic chỉ còn lại cho xAxisType là 'category'
+        xAxisOption = {
+            type: 'category',
+            name: xAxisField?.name,
+            nameLocation: 'middle',
+            nameGap: (categories && categories.length > 10) ? 40 : 25,
+            nameTextStyle: { fontSize: 12 },
+            data: categories,
+            axisTick: { alignWithLabel: true },
+            axisLabel: {
+                fontSize: 10,
+                rotate: (categories && categories.length > 10) ? 30 : 0,
+                interval: (categories && categories.length > 20) ? 'auto' : 0,
+            },
+            boundaryGap: true,
+        };
     }
-    // --- FIX END ---
 
-
-    // 4. Build Base Option Structure
+    // 4. Xây dựng Cấu trúc Tùy chọn Cơ bản
     const finalOption: EChartsOption = {
         title: {
             text: options.title || 'Chart',
@@ -89,18 +67,17 @@ export const generateChartOption = (
         },
         tooltip: {
             trigger: config.chartType === 'pie' ? 'item' : 'axis',
-            axisPointer: { type: 'cross' }, // Crosshair for axis tooltips
-            // formatter: // Add custom formatter later if needed based on chart type/data
+            axisPointer: { type: 'cross' }, // Crosshair cho tooltip trục
         },
         legend: {
-            show: options.showLegend && legendData && legendData.length > 0, // Show if enabled and items exist
-            type: 'scroll', // Allow scrolling if many items
+            show: options.showLegend && legendData && legendData.length > 0,
+            type: 'scroll',
             orient: 'horizontal',
             left: 'center',
-            bottom: 5, // Position at bottom
+            bottom: 5,
             data: legendData,
-            textStyle: { fontSize: 10 }, // Smaller legend text
-            itemWidth: 15, // Adjust legend item symbol size
+            textStyle: { fontSize: 10 },
+            itemWidth: 15,
             itemHeight: 10,
         },
         toolbox: {
@@ -108,153 +85,61 @@ export const generateChartOption = (
             orient: 'vertical',
             left: 'right',
             top: 'center',
-            itemSize: 14, // Smaller toolbox icons
+            itemSize: 14,
             feature: {
-                // dataZoom: { yAxisIndex: 'none', title: { zoom: 'Zoom', back: 'Reset' } },
                 magicType: {
-                    type: ['line', 'bar', 'stack'], // Allow switching (contextually useful)
+                    type: ['line', 'bar', 'stack'],
                     title: { line: 'Line', bar: 'Bar', stack: 'Stack', tiled: 'Tiled' }
                 },
                 restore: { title: 'Restore' },
                 saveAsImage: {
-                    name: options.title?.replace(/[^a-z0-9]/gi, '_') || 'chart', // Sanitize filename
+                    name: options.title?.replace(/[^a-z0-9]/gi, '_') || 'chart',
                     type: 'png',
-                    pixelRatio: 2, // Higher resolution save
+                    pixelRatio: 2,
                     title: 'Save PNG'
                 },
-                dataView: { readOnly: true, title: 'Data View', lang: ['Data View', 'Close', 'Refresh'] }, // Allow viewing data
+                dataView: { readOnly: true, title: 'Data View', lang: ['Data View', 'Close', 'Refresh'] },
             },
         },
-        grid: { // Padding around the chart area
+        grid: {
             left: '3%',
-            right: '8%', // Increased right padding for toolbox
-            bottom: options.showLegend && legendData && legendData.length > 0 ? '10%' : '5%', // Adjust based on legend
-            top: '15%', // Padding for title
-            containLabel: true // Ensure axis labels fit
+            right: '8%',
+            bottom: options.showLegend && legendData && legendData.length > 0 ? '10%' : '5%',
+            top: '15%',
+            containLabel: true
         },
-        xAxis: xAxisOption, // <-- Assign the conditionally created option object
-        yAxis: config.chartType !== 'pie' ? { // yAxis is usually 'value' in these examples
+        xAxis: xAxisOption,
+        yAxis: config.chartType !== 'pie' ? {
             type: 'value',
             name: yAxisField?.name,
             nameLocation: 'middle',
-            nameGap: 45, // Adjust based on expected label length
+            nameGap: 45,
             nameTextStyle: { fontSize: 12 },
             axisLabel: {
                 fontSize: 10,
-                // formatter: '{value} units' // Custom formatting if needed
             },
-        } : undefined, // No yAxis for Pie
+        } : undefined, // Không có yAxis cho Pie
         series: series,
-        // visualMap: [], // Placeholder for continuous color/size mapping
-        // dataZoom: [], // Placeholder for zoom/scroll
-        // backgroundColor: '#fff', // Optional background
     };
 
+    // 5. Áp dụng các Ghi đè & Cải tiến Cụ thể cho Từng Biểu đồ
 
-
-    // 4. Apply Chart-Specific Overrides & Enhancements
-
-    // Pie Chart: Remove axis/grid explicitly (already handled by xAxisOption being undefined)
+    // Biểu đồ Tròn:
     if (config.chartType === 'pie') {
-        // delete finalOption.xAxis; // No longer needed
         delete finalOption.yAxis;
         delete finalOption.grid;
-        // Adjust tooltip formatter for Pie
+        // Điều chỉnh trình định dạng tooltip cho Pie
         finalOption.tooltip = {
             ...finalOption.tooltip,
             trigger: 'item',
-            formatter: '{a} <br/>{b} : {c} ({d}%)' // Standard pie tooltip: Series Name, Item Name, Value, Percentage
+            formatter: '{a} <br/>{b} : {c} ({d}%)' // Tooltip chuẩn cho pie: Tên Series, Tên Mục, Giá trị, Phần trăm
         };
     }
 
-    // Scatter Chart: Ensure value axis types are correct (already handled by xAxisOption logic)
-    if (config.chartType === 'scatter') {
+    // REMOVED: Toàn bộ khối logic cho biểu đồ phân tán (scatter) đã được xóa.
 
-        // Add visualMap if size field is used
-        if (sizeField && finalOption.series && Array.isArray(finalOption.series) && finalOption.series.length > 0) {
-            let minSize = Infinity, maxSize = -Infinity;
-            let sizeDataExists = false;
-
-            finalOption.series.forEach(s => {
-                // Check if series is scatter and data exists and has length
-                // (length check is important for ArrayLike)
-                if (s.type === 'scatter' && s.data && typeof (s.data as any).length === 'number') {
-
-                    // --- FIX START: Use standard for loop for ArrayLike compatibility ---
-                    const dataLength = (s.data as any).length; // Get length safely
-                    for (let i = 0; i < dataLength; i++) {
-                        // Truy cập phần tử bằng chỉ mục
-                        const item = (s.data as any)[i];
-
-                        // Giữ nguyên type guard bên trong cho từng 'item'
-                        if (Array.isArray(item) && item.length > 2) {
-                            const sizeVal = item[2];
-                            if (typeof sizeVal === 'number' && !isNaN(sizeVal)) {
-                                sizeDataExists = true;
-                                minSize = Math.min(minSize, sizeVal);
-                                maxSize = Math.max(maxSize, sizeVal);
-                            }
-                        }
-                        // Bạn có thể thêm else if để xử lý trường hợp item là object
-                        // else if (typeof item === 'object' && item !== null && Array.isArray((item as any).value)) {
-                        //    // Xử lý item.value[2] nếu cần
-                        // }
-                        // else {
-                        //    console.warn("Unexpected scatter data item format:", item);
-                        // }
-                    }
-                    // --- FIX END ---
-                }
-            });
-
-            // Logic thêm visualMap không đổi
-            if (sizeDataExists && isFinite(minSize) && isFinite(maxSize) && minSize !== maxSize) {
-                console.log(`Adding visualMap for size. Range: ${minSize}-${maxSize}`, 'color: purple;');
-                finalOption.visualMap = [{
-                    type: 'continuous',
-                    dimension: 2,
-                    min: minSize,
-                    max: maxSize,
-                    itemWidth: 15,
-                    itemHeight: 80,
-                    text: [`Max: ${maxSize.toFixed(1)}`, `Min: ${minSize.toFixed(1)}`],
-                    textGap: 5,
-                    textStyle: { fontSize: 10 },
-                    calculable: true,
-                    realtime: true,
-                    inRange: { symbolSize: [5, 30] },
-                    orient: 'vertical',
-                    left: 10,
-                    bottom: '15%'
-                }];
-            } else if (sizeDataExists) {
-                console.log(`Size field selected, but min/max range invalid or constant (${minSize}-${maxSize}). Skipping visualMap.`, 'color: orange;');
-            }
-        }
-        // Adjust scatter tooltip formatter
-        finalOption.tooltip = {
-            ...finalOption.tooltip,
-            trigger: 'item', // Tooltip per point
-            formatter: (params: any) => {
-                const seriesName = params.seriesName;
-                const data = params.data || [];
-                // Use axis field names if available, otherwise default
-                const xName = xAxisField?.name ?? 'X';
-                const yName = yAxisField?.name ?? 'Y';
-                let tooltip = `${seriesName}<br/>`;
-                // Access data array elements, checking length
-                if (data.length > 0) tooltip += `${xName}: ${data[0]}<br/>`;
-                if (data.length > 1) tooltip += `${yName}: ${data[1]}<br/>`;
-                if (sizeField && data.length > 2) {
-                    tooltip += `${sizeField.name}: ${data[2]}<br/>`;
-                }
-                return tooltip;
-            }
-        };
-    }
-
-    // Add DataZoom for charts with many categories or value-based X-axis
-    const addDataZoom = (xAxisType === 'value') || (xAxisType === 'category' && categories && categories.length > 20);
+    // Thêm DataZoom cho các biểu đồ có nhiều danh mục
+    const addDataZoom = categories && categories.length > 20;
     if (config.chartType !== 'pie' && addDataZoom) {
         console.log(`Adding dataZoom for X-axis.`, 'color: purple;');
         finalOption.dataZoom = [
@@ -274,34 +159,20 @@ export const generateChartOption = (
             }
         ];
 
-        // --- FIX START: Adjust grid bottom padding more safely ---
-        // Kiểm tra grid tồn tại VÀ không phải là mảng (vì chúng ta khởi tạo nó là object)
+        // Điều chỉnh padding dưới của grid một cách an toàn
         if (finalOption.grid && !Array.isArray(finalOption.grid)) {
-            // Bên trong khối này, TypeScript biết finalOption.grid là một object đơn lẻ (GridComponentOption)
             if (options.showLegend && legendData && legendData.length > 0) {
-                // Tăng padding nếu cả legend và zoom đều hiển thị
-                finalOption.grid.bottom = '15%'; // Truy cập trực tiếp, không cần 'as'
+                // Tăng padding nếu cả chú giải và zoom đều hiển thị
+                finalOption.grid.bottom = '15%';
             } else {
                 // Padding ít hơn nếu chỉ có zoom
-                finalOption.grid.bottom = '10%'; // Truy cập trực tiếp
+                finalOption.grid.bottom = '10%';
             }
         }
-        // Optional: Nếu có khả năng grid là mảng ở đâu đó khác, bạn cần xử lý trường hợp đó:
-        // else if (Array.isArray(finalOption.grid) && finalOption.grid.length > 0) {
-        //     // Quyết định grid nào cần sửa, ví dụ: grid đầu tiên
-        //     const gridToModify = finalOption.grid[0];
-        //     if (options.showLegend && legendData && legendData.length > 0) {
-        //         gridToModify.bottom = '15%';
-        //     } else {
-        //         gridToModify.bottom = '10%';
-        //     }
-        // }
-        // --- FIX END ---
     }
 
-
     console.log(`Final ECharts option constructed.`, 'color: purple; font-weight: bold;');
-    // console.log(JSON.stringify(finalOption, null, 2)); // Deep log final option if needed
+    // console.log(JSON.stringify(finalOption, null, 2)); // Ghi log sâu tùy chọn cuối cùng nếu cần
 
     return finalOption;
 };

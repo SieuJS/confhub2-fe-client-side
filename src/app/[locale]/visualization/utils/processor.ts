@@ -96,16 +96,15 @@ export const processDataForChart = (
         return { categories: [], series: [], legendData: [] };
     }
 
-    // Find selected fields (validation ensures required ones exist later)
+    // Tìm các trường đã chọn
     const xAxisField = availableFields.find(f => f.id === config.xAxis?.fieldId);
     const yAxisField = availableFields.find(f => f.id === config.yAxis?.fieldId);
     const colorField = availableFields.find(f => f.id === config.color?.fieldId);
-    const sizeField = availableFields.find(f => f.id === config.size?.fieldId);
+    // REMOVED: sizeField không còn cần thiết
 
-    console.log(`${logPrefixProcessor} processDataForChart: Fields - X:${xAxisField?.id || 'N/A'} Y:${yAxisField?.id || 'N/A'} Color:${colorField?.id || 'N/A'} Size:${sizeField?.id || 'N/A'}`);
+    console.log(`${logPrefixProcessor} processDataForChart: Fields - X:${xAxisField?.id || 'N/A'} Y:${yAxisField?.id || 'N/A'} Color:${colorField?.id || 'N/A'}`);
 
-    // --- Input Validation ---
-    // Added more specific error logging
+    // --- Xác thực đầu vào ---
     if (!yAxisField) {
         const errorMsg = `Chart requires a Measure field for Y-Axis/Value (Selected: ${config.yAxis?.fieldId || 'none'}).`;
         throw new Error(errorMsg);
@@ -114,8 +113,9 @@ export const processDataForChart = (
         const errorMsg = `Field '${yAxisField.name}' (ID: ${yAxisField.id}) selected for Y-Axis/Value is not a Measure (Type: ${yAxisField.type}).`;
         throw new Error(errorMsg);
     }
-    if (!yAxisField.aggregation && !yAxisField.accessor && chartType !== 'scatter') {
-        const errorMsg = `Measure field '${yAxisField.name}' (ID: ${yAxisField.id}) requires an 'aggregation' type (or an accessor for scatter Y) but has none.`;
+    // Tất cả các loại biểu đồ còn lại đều yêu cầu một phương thức tổng hợp
+    if (!yAxisField.aggregation) {
+        const errorMsg = `Measure field '${yAxisField.name}' (ID: ${yAxisField.id}) requires an 'aggregation' type but has none.`;
         throw new Error(errorMsg);
     }
 
@@ -125,51 +125,21 @@ export const processDataForChart = (
 
     console.log(`${logPrefixProcessor} processDataForChart: Processing logic for ${chartType}...`);
 
-    // --- Bar/Line Chart Logic ---
+    // --- Logic Biểu đồ Cột/Đường ---
     if (chartType === 'bar' || chartType === 'line') {
-
-
         if (!xAxisField?.accessor || !yAxisField?.aggregation) throw new Error("Bar/Line chart requires valid X (Dimension w/ accessor) and Y (Measure w/ aggregation) fields.");
-
-
 
         const groupKeyAccessor = (item: ConferenceResponse): string => xAxisField.accessor!(item)?.toString() ?? UNKNOWN_CATEGORY;
 
-
-        console.log(`${logPrefixProcessor} processDataForChart: Calculating group keys...`);
-        const keysGenerated: Record<string, number> = {};
-        rawData.forEach((item, index) => {
-            const key = groupKeyAccessor(item);
-            keysGenerated[key] = (keysGenerated[key] || 0) + 1;
-            // Optional: Log problematic items
-            // if (key === "Record Count") {
-            //    console.log(`Item at index ${index} generated key "Record Count":`, JSON.stringify(item));
-            // }
-        });
-
-        console.log(`${logPrefixProcessor} processDataForChart: Keys generated counts:`, keysGenerated);
-        // Explicitly check for empty string count
-        if (keysGenerated.hasOwnProperty('')) {
-            console.log(`>>> Count for empty string key ('') : ${keysGenerated['']}`); // Log dễ nhận biết
-        } else {
-            console.log(`>>> No empty string key ('') found.`);
-        }
-
         const groupedByX = groupBy(rawData, groupKeyAccessor);
-        console.log(`${logPrefixProcessor} processDataForChart: Grouped data keys:`, Object.keys(groupedByX));
         categories = Object.keys(groupedByX).sort();
-        console.log(`${logPrefixProcessor} processDataForChart: Final categories:`, categories);
 
-
-        // const groupedByX = groupBy(rawData, groupKeyAccessor);
-        // categories = Object.keys(groupedByX).sort();
-
-        if (!colorField?.accessor) { // Single series
+        if (!colorField?.accessor) { // Một chuỗi duy nhất
             const aggregatedValues = aggregateData(groupedByX, yAxisField);
             const data = categories.map(cat => aggregatedValues[cat] ?? 0);
             series.push({ name: yAxisField.name, type: chartType, data, emphasis: { focus: 'series' }, smooth: chartType === 'line' });
             legendData.push(yAxisField.name);
-        } else { // Multi series by color
+        } else { // Nhiều chuỗi theo màu sắc
             const colorKeyAccessor = (item: ConferenceResponse): string => colorField.accessor!(item)?.toString() ?? UNKNOWN_CATEGORY;
             const groupedByColor = groupBy(rawData, colorKeyAccessor);
             legendData = Object.keys(groupedByColor).sort();
@@ -182,7 +152,7 @@ export const processDataForChart = (
             });
         }
     }
-    // --- Pie Chart Logic ---
+    // --- Logic Biểu đồ Tròn ---
     else if (chartType === 'pie') {
         if (!colorField?.accessor || !yAxisField?.aggregation) throw new Error("Pie chart requires valid Color (Dimension w/ accessor) and Value (Measure w/ aggregation) fields.");
         const groupKeyAccessor = (item: ConferenceResponse): string => colorField.accessor!(item)?.toString() ?? UNKNOWN_CATEGORY;
@@ -203,47 +173,7 @@ export const processDataForChart = (
         });
         categories = [];
     }
-    // --- Scatter Plot Logic ---
-    else if (chartType === 'scatter') {
-        if (!xAxisField?.accessor || !yAxisField?.accessor) throw new Error("Scatter chart requires valid X and Y fields with accessors.");
-        const sizeAccessor = sizeField?.accessor; // Optional
-        const defaultSize = 8;
-
-        const mapItemToPoint = (item: ConferenceResponse): (number | string | null)[] | null => {
-            const xValRaw = xAxisField.accessor!(item);
-            const yValRaw = yAxisField.accessor!(item);
-            const finalXVal = xAxisField.type === 'dimension' ? String(xValRaw ?? UNKNOWN_CATEGORY) : parseNumericValue(xValRaw);
-            const numY = parseNumericValue(yValRaw);
-            const sizeVal = sizeAccessor ? parseNumericValue(sizeAccessor(item)) : defaultSize;
-            const isXInvalid = xAxisField.type === 'measure' && isNaN(Number(finalXVal));
-            const isYInvalid = isNaN(numY);
-            if (isXInvalid || isYInvalid) return null; // Skip invalid
-            const pointData: (number | string | null)[] = [finalXVal, numY];
-            if (sizeAccessor) pointData.push(sizeVal > 0 ? sizeVal : 1);
-            return pointData;
-        };
-
-        if (!colorField?.accessor) { // Single series scatter
-            const data = rawData.map(mapItemToPoint).filter((p): p is (number | string | null)[] => p !== null);
-            series.push({ name: yAxisField.name, type: 'scatter', symbolSize: sizeAccessor ? undefined : defaultSize, data, emphasis: { focus: 'series', scale: 1.1 } });
-            legendData.push(yAxisField.name);
-        } else { // Multi series scatter by color
-            const colorKeyAccessor = (item: ConferenceResponse): string => colorField.accessor!(item)?.toString() ?? UNKNOWN_CATEGORY;
-            const groupedByColor = groupBy(rawData, colorKeyAccessor);
-            legendData = Object.keys(groupedByColor).sort();
-            series = legendData.map(colorValue => {
-                const colorGroupData = groupedByColor[colorValue];
-                const data = colorGroupData.map(mapItemToPoint).filter((p): p is (number | string | null)[] => p !== null);
-                return { name: colorValue, type: 'scatter', symbolSize: sizeAccessor ? undefined : defaultSize, data, emphasis: { focus: 'series', scale: 1.1 } };
-            });
-        }
-        // Generate categories if X is dimension
-        if (xAxisField.type === 'dimension') {
-            categories = [...new Set(rawData.map(item => String(xAxisField.accessor!(item) ?? UNKNOWN_CATEGORY)))].sort();
-        } else {
-            categories = [];
-        }
-    }
+    // --- Logic Biểu đồ Phân tán đã được loại bỏ ---
 
     console.log(`${logPrefixProcessor} processDataForChart: Finished. Series: ${series.length}, Categories: ${categories.length}, Legend: ${legendData.length}`);
     return { categories, series, legendData };

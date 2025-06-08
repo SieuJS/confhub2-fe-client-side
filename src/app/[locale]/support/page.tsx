@@ -10,7 +10,7 @@ import Support from './support'
 import SupportForm from './supportForm'
 import ContactMethods from './ContactMethods'
 
-const FAQ = ({ locale }: { locale: string }) => {
+const FAQ = ({ params: { locale } }: { params: { locale: string } }) => {
   return (
     <>
       <Header locale={locale} />

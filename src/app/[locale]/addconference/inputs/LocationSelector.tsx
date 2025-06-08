@@ -13,7 +13,10 @@ import {
 interface LocationSelectorProps {
   type: 'Offline' | 'Online' | 'Hybrid'
   location: LocationInput
-  setLocation: (value: LocationInput) => void
+
+  // FIX: Change the type of setLocation to be more accurate
+  setLocation: React.Dispatch<React.SetStateAction<LocationInput>>
+
   t: (key: string) => string
   cscApiKey: string
   setStatesForReview: React.Dispatch<React.SetStateAction<State[]>>
@@ -357,15 +360,15 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
             </option>
             {states.length > 0
               ? states.map(state => (
-                  <option key={state.iso2} value={state.iso2}>
-                    {state.name}
-                  </option>
-                ))
+                <option key={state.iso2} value={state.iso2}>
+                  {state.name}
+                </option>
+              ))
               : cities.map(city => (
-                  <option key={city.name} value={city.name}>
-                    {city.name}
-                  </option>
-                ))}
+                <option key={city.name} value={city.name}>
+                  {city.name}
+                </option>
+              ))}
           </select>
         </div>
       </div>

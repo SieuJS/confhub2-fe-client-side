@@ -6,7 +6,7 @@ import { appConfig } from '@/src/middleware';
 
 interface UpdateUserResult {
   updateUserSetting: (updatedSetting: Partial<Setting>) => Promise<void>;
-  updateUserProfile:(userId: string, updatedProfile: Partial<UserResponse>) => Promise<void>
+  updateUserProfile: (userId: string, updatedProfile: Partial<UserResponse>) => Promise<void>
   loading: boolean;
   error: string | null;
 }
@@ -50,14 +50,18 @@ export const useUpdateUser = (): UpdateUserResult => {
   const updateUserProfile = async (userId: string, updatedProfile: Partial<UserResponse>) => {
     setLoading(true);
     setError(null);
-    try{
-        await updateUser(userId, updatedProfile);
+    try {
+      // Lấy token từ localStorage, giống như cách làm trong updateUserSetting
+      const token = localStorage.getItem('token');
+
+      // Truyền cả 2 tham số vào hàm updateUser
+      await updateUser(updatedProfile, token); // <<< SỬA LỖI Ở ĐÂY
     }
-    catch(err: any){
-        setError(err.message || 'Failed to update user profile');
+    catch (err: any) {
+      setError(err.message || 'Failed to update user profile');
     }
-    finally{
-        setLoading(false);
+    finally {
+      setLoading(false);
     }
   }
 
@@ -68,21 +72,21 @@ export const useGetUserSetting = (): GetUserSettingResult => {
   const [error, setError] = useState<string | null>(null);
 
   const getUserSettings = async (): Promise<Setting | null> => {
-  try {
-    const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/user/setting`, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
-      },
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to fetch user settings. Status: ${response.status}`);
+    try {
+      const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/user/setting`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch user settings. Status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      setError('Error fetching user settings:' + error);
+      return null;
     }
-    return await response.json();
-  } catch (error) {
-    setError('Error fetching user settings:' + error);
-    return null;
-  }
   }
   return { getUserSettings, error };
 }

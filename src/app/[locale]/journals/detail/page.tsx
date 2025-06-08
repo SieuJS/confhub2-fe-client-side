@@ -13,7 +13,8 @@ import { RecentlyAddedJournals } from './RecentlyAddedJournals'
 import SubjectAreasJournals from '../../home/SubjectAreasJournals'
 import { useTranslations } from 'next-intl'
 
-const JournalDetails = ({ locale }: { locale: string }) => {
+const JournalDetails = ({ params: { locale } }: { params: { locale: string } }) => {
+  
   const t = useTranslations()
 
   const searchParams = useSearchParams()
@@ -55,10 +56,10 @@ const JournalDetails = ({ locale }: { locale: string }) => {
         )
 
         // Tìm kiếm journal trong danh sách trả về từ API
-        const foundJournal = allJournals.find(j => j.Sourceid === idFromQuery)
+        const foundJournal = allJournals.find(j => j.data.Sourceid === idFromQuery)
 
         if (foundJournal) {
-          console.log(`Journal found:`, foundJournal.Title)
+          console.log(`Journal found:`, foundJournal.data.title)
           setJournal(foundJournal)
         } else {
           console.log(

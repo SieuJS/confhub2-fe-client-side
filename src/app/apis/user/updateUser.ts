@@ -3,7 +3,6 @@ import { appConfig } from '@/src/middleware';
 import { UserResponse } from '@/src/models/response/user.response';
 
 export const updateUser = async (
-  userId: string, // userId này có thể không cần thiết nếu backend lấy userId từ token
   updatedData: Partial<UserResponse>,
   token: string | null // <<<< THÊM THAM SỐ TOKEN >>>>
 ): Promise<UserResponse> => {

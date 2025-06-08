@@ -28,19 +28,19 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
 
   // Safely access bioxbio array and its elements
   const latestImpactFactor =
-    journal.bioxbio && journal.bioxbio.length > 0
-      ? journal.bioxbio[0].Impact_factor
+    journal.data.bioxbio && journal.data.bioxbio.length > 0
+      ? journal.data.bioxbio[0].Impact_factor
       : 'N/A'
-  const overalRanking = journal['Rank']
-  const hIndex = journal['H index']
-  const sjr = journal.SJR
+  const overalRanking = journal.data['Rank']
+  const hIndex = journal.data['H index']
+  const sjr = journal.data.SJR
 
   return (
     <div className='container mx-auto rounded-lg px-4  py-2'>
       <div className='flex flex-col gap-6 md:flex-row'>
         {/* Left section */}
         <div className='md:w-3/5'>
-          <h2 className='mb-2 text-4xl font-bold'>{journal.title}</h2>
+          <h2 className='mb-2 text-4xl font-bold'>{journal.data.title}</h2>
           <p className='mb-4'>
             Comprehensive information about the Journal, including Impact
             factor, H-index, subject Area, Category, Scope, ISSN.
@@ -53,8 +53,8 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
                 {' '}
                 {/* Make sure the container has w-full and h-full */}
                 <img
-                  src={journal.Image || '/bg-2.jpg'}
-                  alt={journal.Title}
+                  src={journal.data.Image || '/bg-2.jpg'}
+                  alt={journal.data.Title}
                   className='h-full w-full object-cover'
                 />
               </div>
@@ -122,7 +122,7 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
 
               <div className='mt-8 flex justify-center'>
                 <Button variant='primary' rounded>
-                  <a href={journal.Information?.Homepage || '#'}>
+                  <a href={journal.data.Information?.Homepage || '#'}>
                     Journal Website
                   </a>
                 </Button>
@@ -140,15 +140,15 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
                 {/* CHANGE: Reduced py-2 to py-2 in all td elements */}
                 <tr className='border-b  '>
                   <td className='px-3 py-2 font-semibold'>Title</td>
-                  <td className='px-3 py-2'>{journal.Title}</td>
+                  <td className='px-3 py-2'>{journal.data.Title}</td>
                 </tr>
                 <tr className='border-b  '>
                   <td className='px-3 py-2 font-semibold'>Areas</td>
                   <td className='px-3 py-2'>
-                    {journal['Subject Area and Category'] ? (
+                    {journal.data['Subject Area and Category'] ? (
                       <>
                         {
-                          journal['Subject Area and Category'][
+                          journal.data['Subject Area and Category'][
                             'Field of Research'
                           ]
                         }
@@ -165,18 +165,18 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
                 </tr>
                 <tr className='border-b  '>
                   <td className='px-3 py-2 font-semibold'>Publisher</td>
-                  <td className='px-3 py-2'>{journal.Publisher}</td>{' '}
-                  {/* Use journal.Publisher */}
+                  <td className='px-3 py-2'>{journal.data.Publisher}</td>{' '}
+                  {/* Use journal.data.Publisher */}
                 </tr>
                 <tr className='border-b  '>
                   <td className='px-3 py-2 font-semibold'>Country</td>
-                  <td className='px-3 py-2'>{journal.Country}</td>{' '}
-                  {/* Use journal.Country */}
+                  <td className='px-3 py-2'>{journal.data.Country}</td>{' '}
+                  {/* Use journal.data.Country */}
                 </tr>
                 <tr className='border-b  '>
                   <td className='px-3 py-2 font-semibold'>ISSN</td>
-                  <td className='px-3 py-2'>{journal.ISSN}</td>{' '}
-                  {/* Use journal.ISSN */}
+                  <td className='px-3 py-2'>{journal.data.ISSN}</td>{' '}
+                  {/* Use journal.data.ISSN */}
                 </tr>
                 <tr className='border-b  '>
                   <td className='px-3 py-2 font-semibold'>Best Quartile</td>

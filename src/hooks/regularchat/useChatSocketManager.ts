@@ -50,34 +50,6 @@ export function useChatSocketManager() {
         }))
     );
 
-    const socketStoreActions = useSocketStore(useShallow(state => ({
-        _onSocketConnect: state._onSocketConnect,
-        _onSocketDisconnect: state._onSocketDisconnect,
-        _onSocketConnectError: state._onSocketConnectError,
-        _onSocketAuthError: state._onSocketAuthError,
-        _onSocketConnectionReady: state._onSocketConnectionReady,
-    })));
-
-    const conversationStoreActions = useConversationStore(useShallow(state => ({
-        _onSocketConversationList: state._onSocketConversationList,
-        _onSocketInitialHistory: state._onSocketInitialHistory,
-        _onSocketNewConversationStarted: state._onSocketNewConversationStarted,
-        _onSocketConversationDeleted: state._onSocketConversationDeleted,
-        _onSocketConversationCleared: state._onSocketConversationCleared,
-        _onSocketConversationRenamed: state._onSocketConversationRenamed,
-        _onSocketConversationPinStatusChanged: state._onSocketConversationPinStatusChanged,
-    })));
-
-    const messageStoreActions = useMessageStore(useShallow(state => ({
-        _onSocketStatusUpdate: state._onSocketStatusUpdate,
-        _onSocketChatUpdate: state._onSocketChatUpdate,
-        _onSocketChatResult: state._onSocketChatResult,
-        _onSocketChatError: state._onSocketChatError,
-        _onSocketEmailConfirmationResult: state._onSocketEmailConfirmationResult,
-        _onSocketConversationUpdatedAfterEdit: state._onSocketConversationUpdatedAfterEdit, // <<< ADD THIS LINE
-        setAnimationControls: state.setAnimationControls,
-    })));
-
     const updateCallbackForAnimation = useUpdateChatMessageCallbackForAnimation();
     const animationControls = useStreamingTextAnimation(updateCallbackForAnimation);
 
@@ -85,11 +57,14 @@ export function useChatSocketManager() {
     const isMountedRef = useRef(true);
     const socketInstanceRef = useRef<Socket | null>(null); // Ref để giữ instance socket hiện tại
 
+    //useEffect thứ nhất (của animation) cũng cần sửa
     useEffect(() => {
         if (isMountedRef.current) {
-            messageStoreActions.setAnimationControls(animationControls);
+            // SỬA Ở ĐÂY
+            useMessageStore.getState().setAnimationControls(animationControls);
         }
-    }, [animationControls, messageStoreActions.setAnimationControls]);
+    }, [animationControls]); // Giờ đây chỉ cần dependency là animationControls
+
 
 
     useEffect(() => {
@@ -140,7 +115,7 @@ export function useChatSocketManager() {
         if (!socketInstanceRef.current) {
             console.log(`[SocketManager Connect Effect] Attempting to create socket instance. Token for auth: ${currentAuthToken ? 'VALID' : 'NULL'}`);
 
-    
+
 
             const newSocket = io(socketIoBaseUrl, {
                 // ... (options của socket giữ nguyên)
@@ -153,58 +128,60 @@ export function useChatSocketManager() {
                 ...(socketIoPathOption && socketIoPathOption !== '/socket.io/' && { path: socketIoPathOption }),
             });
 
+
             socketInstanceRef.current = newSocket;
             if (isMountedRef.current) {
                 setSocketInstance(newSocket);
             }
 
-            // --- Register Event Handlers (Logic giữ nguyên) ---
             const createMountedAwareHandler = <Args extends any[]>(handler: (...args: Args) => void) => {
                 return (...args: Args) => {
-                    if (isMountedRef.current && socketInstanceRef.current === newSocket) { // Kiểm tra instance hiện tại
+                    if (isMountedRef.current && socketInstanceRef.current === newSocket) {
                         handler(...args);
                     }
                 };
             };
+
+            // --- Register Event Handlers (ĐÃ SỬA HOÀN CHỈNH) ---
+
+            // Basic events
             newSocket.on('connect', createMountedAwareHandler(() => {
-                if (newSocket.id) socketStoreActions._onSocketConnect(newSocket.id);
+                if (newSocket.id) useSocketStore.getState()._onSocketConnect(newSocket.id);
             }));
-            newSocket.on('disconnect', createMountedAwareHandler(socketStoreActions._onSocketDisconnect));
-            newSocket.on('connect_error', createMountedAwareHandler(socketStoreActions._onSocketConnectError));
-            newSocket.on('auth_error', createMountedAwareHandler(socketStoreActions._onSocketAuthError));
+            newSocket.on('disconnect', createMountedAwareHandler(useSocketStore.getState()._onSocketDisconnect));
+            newSocket.on('connect_error', createMountedAwareHandler(useSocketStore.getState()._onSocketConnectError));
+            newSocket.on('auth_error', createMountedAwareHandler(useSocketStore.getState()._onSocketAuthError));
             newSocket.on('error', createMountedAwareHandler((error) => { console.error(`[SocketManager] Generic Socket Error: ${error.message}`, error); }));
 
-
             // Custom events
-            newSocket.on('connection_ready', createMountedAwareHandler(socketStoreActions._onSocketConnectionReady));
+            newSocket.on('connection_ready', createMountedAwareHandler(useSocketStore.getState()._onSocketConnectionReady));
 
             // Conversation events
-            newSocket.on('conversation_list', createMountedAwareHandler(conversationStoreActions._onSocketConversationList));
-            newSocket.on('initial_history', createMountedAwareHandler(conversationStoreActions._onSocketInitialHistory));
-            newSocket.on('new_conversation_started', createMountedAwareHandler(conversationStoreActions._onSocketNewConversationStarted));
-            newSocket.on('conversation_deleted', createMountedAwareHandler(conversationStoreActions._onSocketConversationDeleted));
-            newSocket.on('conversation_cleared', createMountedAwareHandler(conversationStoreActions._onSocketConversationCleared));
-            newSocket.on('conversation_renamed', createMountedAwareHandler(conversationStoreActions._onSocketConversationRenamed));
-            newSocket.on('conversation_pin_status_changed', createMountedAwareHandler(conversationStoreActions._onSocketConversationPinStatusChanged));
+            newSocket.on('conversation_list', createMountedAwareHandler(useConversationStore.getState()._onSocketConversationList));
+            newSocket.on('initial_history', createMountedAwareHandler(useConversationStore.getState()._onSocketInitialHistory));
+            newSocket.on('new_conversation_started', createMountedAwareHandler(useConversationStore.getState()._onSocketNewConversationStarted));
+            newSocket.on('conversation_deleted', createMountedAwareHandler(useConversationStore.getState()._onSocketConversationDeleted));
+            newSocket.on('conversation_cleared', createMountedAwareHandler(useConversationStore.getState()._onSocketConversationCleared));
+            newSocket.on('conversation_renamed', createMountedAwareHandler(useConversationStore.getState()._onSocketConversationRenamed));
+            newSocket.on('conversation_pin_status_changed', createMountedAwareHandler(useConversationStore.getState()._onSocketConversationPinStatusChanged));
 
             // Message events
-            newSocket.on('status_update', createMountedAwareHandler(messageStoreActions._onSocketStatusUpdate));
-            newSocket.on('chat_update', createMountedAwareHandler(messageStoreActions._onSocketChatUpdate));
-            newSocket.on('chat_result', createMountedAwareHandler(messageStoreActions._onSocketChatResult));
-            newSocket.on('chat_error', createMountedAwareHandler(messageStoreActions._onSocketChatError));
-            newSocket.on('email_confirmation_result', createMountedAwareHandler(messageStoreActions._onSocketEmailConfirmationResult));
-            newSocket.on('conversation_updated_after_edit', createMountedAwareHandler(messageStoreActions._onSocketConversationUpdatedAfterEdit));
+            newSocket.on('status_update', createMountedAwareHandler(useMessageStore.getState()._onSocketStatusUpdate));
+            newSocket.on('chat_update', createMountedAwareHandler(useMessageStore.getState()._onSocketChatUpdate));
+            newSocket.on('chat_result', createMountedAwareHandler(useMessageStore.getState()._onSocketChatResult));
+            newSocket.on('chat_error', createMountedAwareHandler(useMessageStore.getState()._onSocketChatError));
+            newSocket.on('email_confirmation_result', createMountedAwareHandler(useMessageStore.getState()._onSocketEmailConfirmationResult));
+            newSocket.on('conversation_updated_after_edit', createMountedAwareHandler(useMessageStore.getState()._onSocketConversationUpdatedAfterEdit));
 
-
-            // Listener cho các sự kiện của Manager (quản lý reconnect)
+            // Manager (reconnect) events
             newSocket.io.on('reconnect_attempt', createMountedAwareHandler((attempt) => console.log(`[SocketManager] Reconnect attempt ${attempt}`)));
             newSocket.io.on('reconnect_error', createMountedAwareHandler((error) => {
                 console.error(`[SocketManager] Reconnect error (Manager): ${error.message}`, error);
-                socketStoreActions._onSocketConnectError(error);
+                useSocketStore.getState()._onSocketConnectError(error); // SỬA Ở ĐÂY
             }));
             newSocket.io.on('reconnect_failed', createMountedAwareHandler(() => {
                 console.error("[SocketManager] Reconnect failed (Manager).");
-                socketStoreActions._onSocketConnectError(new Error("Failed to reconnect to server after multiple attempts."));
+                useSocketStore.getState()._onSocketConnectError(new Error("Failed to reconnect to server after multiple attempts.")); // SỬA Ở ĐÂY
             }));
             newSocket.io.on('reconnect', createMountedAwareHandler((attemptNumber) => {
                 console.log(`[SocketManager] Reconnected successfully after ${attemptNumber} attempts.`);
@@ -230,9 +207,6 @@ export function useChatSocketManager() {
         isAuthInitializing,
         setSocketInstance,
         setCurrentAuthTokenForSocket,
-        socketStoreActions,
-        conversationStoreActions,
-        messageStoreActions,
     ]);
 
     return null;

@@ -80,7 +80,7 @@ export const useEditProfile = (
       }
 
       // Gọi API updateUser với user.id và payload, truyền token
-      const updatedUserResponse = await updateUser(user.id, updatePayload, currentToken);
+      const updatedUserResponse = await updateUser(updatePayload, currentToken);
 
       // Sau khi cập nhật thành công từ API:
       // 1. Cập nhật UserResponse trong AuthProvider

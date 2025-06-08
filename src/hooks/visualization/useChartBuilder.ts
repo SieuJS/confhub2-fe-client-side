@@ -48,7 +48,7 @@ const useChartBuilder = ({ rawData }: UseChartBuilderProps): UseChartBuilderRetu
         // console.log(`Recalculating availableFields memo (dataExists: ${dataExists})...`);
         if (!dataExists || !rawData) {
             //  console.log(`... no data, returning [].`);
-             return [];
+            return [];
         }
         // getAvailableFields now returns a STABLE reference if data exists
         const fields = getAvailableFields(rawData.payload[0]);
@@ -62,7 +62,7 @@ const useChartBuilder = ({ rawData }: UseChartBuilderProps): UseChartBuilderRetu
         // console.log(`Recalculating echartsOption memo...`);
         if (!dataExists || availableFields.length === 0 || !rawData) {
             //  console.log(`... no data or fields, returning null.`);
-             return null;
+            return null;
         }
 
         try {
@@ -81,16 +81,17 @@ const useChartBuilder = ({ rawData }: UseChartBuilderProps): UseChartBuilderRetu
     }, [dataExists, rawData, chartConfig, chartOptions, availableFields]); // availableFields reference is now stable
 
 
-    // --- isChartReady (memoized - Add optional chaining) ---
-     const isChartReady = useMemo(() => {
+    // --- isChartReady (memoized) ---
+    const isChartReady = useMemo(() => {
         // console.log(`Recalculating isChartReady memo...`);
-        // Check if option exists and required fields are selected
-        if (!echartsOption || !rawData || !dataExists) {
-            //  console.log(`... isChartReady: false (no option/data).`);
-             return false;
+
+        // FIX: The check for `!rawData` is redundant. 
+        // If `rawData` is null, `dataExists` will be false and `echartsOption` will be null,
+        // so the following line already covers that case.
+        if (!echartsOption || !dataExists) {
+            // console.log(`... isChartReady: false (no option/data).`);
+            return false;
         }
-        // Check if option generation failed (if returning null on error)
-        // This check is now implicitly handled by !echartsOption above.
 
         const { chartType, xAxis, yAxis, color } = chartConfig;
         let ready = false;
@@ -99,10 +100,10 @@ const useChartBuilder = ({ rawData }: UseChartBuilderProps): UseChartBuilderRetu
         } else { // Covers bar, line, scatter etc.
             ready = !!(xAxis?.fieldId && yAxis?.fieldId);
         }
-        //  console.log(`... isChartReady result: ${ready} (Type: ${chartType}, X: ${xAxis?.fieldId}, Y: ${yAxis?.fieldId}, Color: ${color?.fieldId})`);
+        // console.log(`... isChartReady result: ${ready} (Type: ${chartType}, X: ${xAxis?.fieldId}, Y: ${yAxis?.fieldId}, Color: ${color?.fieldId})`);
         return ready;
-    // }, [echartsOption, chartConfig, rawData, dataExists]); // Add dataExists dependency
-     }, [echartsOption, chartConfig, dataExists]); // rawData is implicitly covered by echartsOption and dataExists
+        // The dependency array is now correct because `rawData` is no longer used inside.
+    }, [echartsOption, chartConfig, dataExists]);
 
     // --- Callbacks (Keep as before) ---
     const updateChartConfig = useCallback((newConfig: Partial<ChartConfig>) => {

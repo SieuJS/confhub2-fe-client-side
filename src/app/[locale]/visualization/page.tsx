@@ -85,8 +85,7 @@ const VisualizationPage: React.FC = () => {
       let acceptedType: FieldType | 'any' = 'any'
       switch (targetZoneId) {
         case 'xAxis':
-          acceptedType =
-            chartConfig.chartType === 'scatter' ? 'any' : 'dimension'
+          acceptedType = 'dimension'
           break
         case 'yAxis':
           acceptedType = 'measure'
@@ -99,7 +98,7 @@ const VisualizationPage: React.FC = () => {
           break
       }
 
-      if (acceptedType !== 'any' && field.type !== acceptedType) {
+      if (field.type !== acceptedType) {
         const zoneLabel =
           targetZoneId.charAt(0).toUpperCase() + targetZoneId.slice(1)
         console.warn(

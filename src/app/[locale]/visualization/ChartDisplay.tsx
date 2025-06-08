@@ -1,5 +1,5 @@
 // src/app/[locale]/visualization/ChartDisplay.tsx
-import React, { useRef, useEffect, useCallback } from 'react'
+import React, { useRef, useEffect, useCallback, useMemo } from 'react'
 import ReactECharts from 'echarts-for-react/lib/core'
 import * as echarts from 'echarts/core'
 import { BarChart, LineChart, PieChart, ScatterChart } from 'echarts/charts'
@@ -65,17 +65,20 @@ const ChartDisplay: React.FC<ChartDisplayProps> = ({
   const chartRef = useRef<ReactECharts | null>(null)
   const chartContainerRef = useRef<HTMLDivElement | null>(null)
 
-  const debouncedChartResize = useCallback(
-    debounce(() => {
-      const instance = chartRef.current?.getEchartsInstance() as
-        | EChartsType
-        | undefined
-      if (instance) {
-        // console.log(`${logPrefixCD} Resizing chart instance.`);
-        instance.resize()
-      }
-    }, 150), // Debounce time can be adjusted
-    []
+  // FIX: Use `useMemo` to create the debounced function only once.
+  // `useMemo` will call `debounce` on the initial render and then return
+  // the same function instance on all subsequent renders.
+  const debouncedChartResize = useMemo(
+    () =>
+      debounce(() => {
+        const instance = chartRef.current?.getEchartsInstance() as
+          | EChartsType
+          | undefined
+        if (instance) {
+          instance.resize()
+        }
+      }, 150), // Debounce time can be adjusted
+    [] // The empty dependency array ensures this is created only once.
   )
 
   useEffect(() => {

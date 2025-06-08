@@ -1,3 +1,4 @@
+// src/app/[locale]/dashboard/page.tsx
 'use client'
 
 import React, { useState, useEffect } from 'react'
@@ -15,7 +16,7 @@ import NoteTab from './note/NoteTab'
 import MyConferencesTab from './myConferences/MyConferencesTab'
 import { Header } from '../utils/Header' // Assuming Header component handles its own width/centering
 
-export default function Dashboard({ locale }: { locale: string }) {
+export default function Dashboard({ params: { locale } }: { params: { locale: string } }) {
   const t = useTranslations('')
   const searchParams = useSearchParams()
   const [activePage, setActivePage] = useState<string>('')
@@ -32,9 +33,6 @@ export default function Dashboard({ locale }: { locale: string }) {
     else if (tab === 'notifications') initialPage = 'Notifications'
     else if (tab === 'blacklisted') initialPage = 'Blacklisted'
     else if (tab === 'setting') initialPage = 'Setting'
-    // else if (tab === 'moderation') initialPage = 'Moderation'
-    // else if (tab === 'requestadmintab') initialPage = 'RequestAdminTab'
-    // else if (tab === 'analysis') initialPage = 'Analysis' // Ensure 'analysis' param works
 
     setActivePage(initialPage)
 

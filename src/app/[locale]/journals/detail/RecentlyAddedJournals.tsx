@@ -30,8 +30,8 @@ const JournalCard: React.FC<JournalCardProps> = ({
   journal,
 }) => {
   // Extract category from Subject Area and Category -> Topics, default to "General" if not available
-  const category = journal["Subject Area and Category"]?.Topics && journal["Subject Area and Category"].Topics.length > 0
-    ? journal["Subject Area and Category"].Topics[0]
+  const category = journal.data["Subject Area and Category"]?.Topics && journal.data["Subject Area and Category"].Topics.length > 0
+    ? journal.data["Subject Area and Category"].Topics[0]
     : 'General';
 
   return (
@@ -41,14 +41,14 @@ const JournalCard: React.FC<JournalCardProps> = ({
           {category}
         </div>
         <img
-          src={journal.Image || "https://via.placeholder.com/150/34495e/fff?text=No+Image"}
-          alt={journal.Title}
+          src={journal.data.Image || "https://via.placeholder.com/150/34495e/fff?text=No+Image"}
+          alt={journal.data.Title}
           className="w-full h-full object-cover"
         />
       </div>
       <div className="p-4">
-        <h3 className="text-sm font-semibold mb-1 truncate">{journal.Title}</h3>
-        <p className="text-xs truncate">{journal.Publisher}</p>
+        <h3 className="text-sm font-semibold mb-1 truncate">{journal.data.Title}</h3>
+        <p className="text-xs truncate">{journal.data.Publisher}</p>
       </div>
 
     </div>

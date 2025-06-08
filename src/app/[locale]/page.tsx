@@ -31,7 +31,7 @@ const DynamicFloatingChatbot = dynamic(
 )
 // --- End Dynamic Import ---
 
-export default function HomePage({ locale }: { locale: string }) {
+export default function HomePage({ params: { locale } }: { params: { locale: string } }) {
   return (
     <div className=''>
       <Header locale={locale} />

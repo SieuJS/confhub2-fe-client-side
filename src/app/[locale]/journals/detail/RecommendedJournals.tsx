@@ -2,7 +2,7 @@
 import React from 'react';
 import Image from 'next/image'; // Import Image component
 import journalData from '../../../../models/data/journals-list.json'; // Import journalData from the specified path
-import { JournalResponse } from '../../../../models/response/journal.response'; // Import JournalResponse
+import { JournalResponse } from '@/src/models/response/journal.response';
 
 export const RecommendedJournals: React.FC = () => {
   // Get the first 5 journals from journalData (assuming they are "recently added" in the order of the JSON file)
@@ -30,8 +30,8 @@ const JournalCard: React.FC<JournalCardProps> = ({
   journal,
 }) => {
   // Extract category from Subject Area and Category -> Topics, default to "General" if not available
-  const category = journal["Subject Area and Category"]?.Topics && journal["Subject Area and Category"].Topics.length > 0
-    ? journal["Subject Area and Category"].Topics[0]
+  const category = journal.data["Subject Area and Category"]?.Topics && journal.data["Subject Area and Category"].Topics.length > 0
+    ? journal.data["Subject Area and Category"].Topics[0]
     : 'General';
 
   return (
@@ -42,15 +42,15 @@ const JournalCard: React.FC<JournalCardProps> = ({
         </div>
         <div className="relative w-full h-full">
           <img
-            src={journal.Image || "https://via.placeholder.com/150/FFFFFF/808080?text=No+Image"}
-            alt={journal.Title}
+            src={journal.data.Image || "https://via.placeholder.com/150/FFFFFF/808080?text=No+Image"}
+            alt={journal.data.Title}
             className="w-full h-full object-cover"
           />
         </div>
       </div>
       <div className="p-4">
-        <h3 className="text-sm font-semibold mb-1 truncate">{journal.Title}</h3>
-        <p className="text-xs truncate">{journal.Publisher}</p>
+        <h3 className="text-sm font-semibold mb-1 truncate">{journal.data.Title}</h3>
+        <p className="text-xs truncate">{journal.data.Publisher}</p>
       </div>
 
     </div>

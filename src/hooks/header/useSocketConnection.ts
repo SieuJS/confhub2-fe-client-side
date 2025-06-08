@@ -5,17 +5,17 @@ import { Notification } from '../../models/response/user.response'; // Adjust pa
 import { UserResponse } from '../../models/response/user.response';
 interface UseSocketConnectionProps {
   loginStatus: string | null;
-  user: UserResponse  | null;
+  user: UserResponse | null;
 }
 const NEXT_PUBLIC_DATABASE_URL = process.env.NEXT_PUBLIC_DATABASE_URL || 'http://localhost:3000';
 const socketInitializer = () => {
   console.log(`Initializing socket connection to: ${NEXT_PUBLIC_DATABASE_URL}`);
-  
+
   return io(`${NEXT_PUBLIC_DATABASE_URL}`, {
     reconnectionAttempts: 5,
     reconnectionDelay: 1000,
     transports: ['websocket', 'polling'],
-  }); 
+  });
 };
 
 export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionProps) => {
@@ -33,8 +33,8 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
       try {
         const response = await fetch(`${NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/user`, {
           method: 'GET',
-          headers : {
-            "Authorization" : `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
             'Content-Type': 'application/json',
           }
         });
@@ -84,11 +84,10 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
     }
   }, [user?.id]); // Add fetchNotifications if you choose to refetch
 
-  // Setup socket event listeners - this should only be called once after socket initialization
+  // Setup socket event listeners
   const setupSocketListeners = useCallback((socket: Socket) => {
     console.log('Setting up socket listeners for user:', user?.id);
-    
-    // Setup new listeners - don't remove existing listeners to avoid reconnection issues
+
     socket.on('connect', () => {
       console.log('Socket connected successfully, registering user:', user?.id);
       setSocketConnected(true);
@@ -107,6 +106,7 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
       setSocketConnected(false);
     });
 
+
     socket.on('notification', (newNotification: Notification) => {
       console.log("Received new notification:", newNotification);
       setNotifications(prevNotifications => {
@@ -118,25 +118,27 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
       setNotificationEffect(true);
       setTimeout(() => setNotificationEffect(false), 1000);
     });
-  }, []); // Remove user?.id from dependency array to prevent reconnection on user changes
+    // FIX: Add user.id as a dependency.
+    // This ensures that if the user logs in/out, a new function with the correct user.id is created.
+  }, [user?.id]);
 
   // Single initialization effect - runs only once when component mounts and user is logged in
   useEffect(() => {
     if (!loginStatus || !user || isInitializedRef.current) return;
-    
+
     console.log('Initial socket setup for user:', user?.id);
     isInitializedRef.current = true;
-    
+
     // Initial fetch of notifications
     fetchNotifications();
-    
+
     // Initialize socket connection
     const newSocket = socketInitializer();
     socketRef.current = newSocket;
-    
+
     // Setup event listeners
     setupSocketListeners(newSocket);
-    
+
     // Cleanup function
     return () => {
       console.log('Cleaning up socket on unmount');
@@ -152,7 +154,7 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
   // Handle user changes - only reconnect if user ID actually changed
   useEffect(() => {
     const currentSocket = socketRef.current;
-    
+
     // If socket exists but user changed, update the registration
     if (currentSocket && currentSocket.connected && user?.id) {
       console.log('User changed, re-registering with socket:', user.id);

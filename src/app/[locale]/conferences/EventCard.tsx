@@ -94,7 +94,7 @@ const EventCard: React.FC<EventCardProps> = ({
   );
 
   const locationString =
-    [event.location?.cityStateProvince, event.location?.country]
+    [event.location?.address]
       .filter(Boolean)
       .join(', ') || t('Location_Not_Available');
 

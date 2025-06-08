@@ -1,5 +1,5 @@
 // src/hooks/chatbot/layout/useLeftPanelNavigation.ts
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { usePathname, useRouter, AppPathname, Link } from '@/src/navigation';
 import type { ComponentProps } from 'react';
@@ -54,7 +54,8 @@ export function useLeftPanelNavigation({
 
   const disableChatModeSelection = !!isLiveServiceConnected;
 
-  const handleNavItemClick = (itemMode: 'live' | 'regular', targetPath: AppPathname) => {
+  // Bọc bằng useCallback để ổn định hàm này
+  const handleNavItemClick = useCallback((itemMode: 'live' | 'regular', targetPath: AppPathname) => {
     if (disableChatModeSelection && chatMode !== itemMode) {
       console.warn('Cannot switch chat mode while live service is connected.');
       return;
@@ -63,7 +64,13 @@ export function useLeftPanelNavigation({
       setChatMode(itemMode);
     }
     router.push(targetPath);
-  };
+  }, [disableChatModeSelection, chatMode, router, setChatMode]); // ESLint sẽ tự động yêu cầu bạn thêm các dependency cần thiết
+
+  // Wrap a separate handler for the history action for clarity
+  const handleHistoryClick = useCallback(() => {
+    router.push('/chatbot/history');
+  }, [router]);
+
 
   const navItems: NavItem[] = useMemo(() => [
     {
@@ -79,10 +86,7 @@ export function useLeftPanelNavigation({
       label: t('Regular_Chat'),
       icon: Bot,
       href: '/chatbot/regularchat',
-      isActive:
-        currentView === 'chat' &&
-        chatMode === 'regular' &&
-        currentPathname === '/chatbot/regularchat',
+      isActive: currentView === 'chat' && chatMode === 'regular' && currentPathname === '/chatbot/regularchat',
       disabled: disableChatModeSelection,
       type: 'link',
       action: () => handleNavItemClick('regular', '/chatbot/regularchat'),
@@ -92,10 +96,7 @@ export function useLeftPanelNavigation({
       label: t('Live_Stream'),
       icon: Radio,
       href: '/chatbot/livechat',
-      isActive:
-        currentView === 'chat' &&
-        chatMode === 'live' &&
-        currentPathname === '/chatbot/livechat',
+      isActive: currentView === 'chat' && chatMode === 'live' && currentPathname === '/chatbot/livechat',
       disabled: disableChatModeSelection,
       type: 'link',
       action: () => handleNavItemClick('live', '/chatbot/livechat'),
@@ -107,19 +108,9 @@ export function useLeftPanelNavigation({
       href: '/chatbot/history',
       isActive: currentView === 'history',
       type: 'link',
-      action: () => {
-        // Nếu vào trang history, có thể muốn đảm bảo chatMode là 'regular'
-        // hoặc để nó giữ nguyên mode hiện tại.
-        // Ví dụ: nếu muốn set về regular khi vào history:
-        // if (chatMode !== 'regular') {
-        //   setChatMode('regular');
-        // }
-        router.push('/chatbot/history');
-      }
+      action: handleHistoryClick, // Dùng hàm đã được useCallback bọc
     },
-  ], [t, currentPathname, currentView, chatMode, disableChatModeSelection, handleNavItemClick, router, setChatMode]);
-  // Thêm router, setChatMode vào dependencies của useMemo nếu handleNavItemClick không được memoized đúng cách
-  // Hoặc wrap handleNavItemClick bằng useCallback
+  ], [t, currentPathname, currentView, chatMode, disableChatModeSelection, handleNavItemClick, handleHistoryClick]);
 
-  return { navItems }; // handleNavItemClick không cần trả về vì nó được dùng trong action của navItems
+  return { navItems };
 }

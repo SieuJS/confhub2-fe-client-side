@@ -56,31 +56,29 @@ const ChartConfigPanel: React.FC<ChartConfigPanelProps> = ({
     AVAILABLE_CHART_TYPES[0]
 
   const showXAxis = chartType !== 'pie'
-  const showYAxis = true // Keep Y-axis dropzone for Pie (Value)
+  const showYAxis = true // Giữ vùng thả Y-axis cho Pie (Value)
   const showColor = true
-  const showSize = chartType === 'scatter'
 
   return (
     <div
       className={`
-                - + relative flex-shrink-0 border-l border-gray-20
-bg-white-pure                shadow-sm transition-all
-duration-300               duration-500 ease-in-out ease-out
-                ${
-                  isCollapsed
-                    ? 'pointer-events-none w-0 overflow-hidden border-none p-0 opacity-0'
-                    : 'w-72 overflow-y-auto p-4 opacity-100'
-                }
+                relative flex-shrink-0 border-l border-gray-20
+                bg-white-pure shadow-sm transition-all
+                duration-300 ease-in-out
+                ${isCollapsed
+          ? 'pointer-events-none w-0 overflow-hidden border-none p-0 opacity-0'
+          : 'w-72 overflow-y-auto p-4 opacity-100'
+        }
             `}
       aria-hidden={isCollapsed}
     >
-      {/* --- Content is ALWAYS rendered, but hidden by parent CSS when collapsed --- */}
-      {/* Panel Title and Collapse Button */}
+      {/* --- Nội dung luôn được render, nhưng bị ẩn bởi CSS của cha khi thu gọn --- */}
+      {/* Tiêu đề Panel và Nút Thu gọn */}
       <div className='mb-4 flex items-center justify-between'>
         <h3 className='whitespace-nowrap text-lg  font-semibold'>
           {t('Configuration')}
         </h3>{' '}
-        {/* Added whitespace-nowrap */}
+        {/* Đã thêm whitespace-nowrap */}
         <button
           onClick={onToggle}
           className='rounded p-1  hover:bg-gray-20 hover:text-gray-60 focus:outline-none focus:ring-1 focus:ring-gray-40'
@@ -91,7 +89,7 @@ duration-300               duration-500 ease-in-out ease-out
         </button>
       </div>
 
-      {/* Chart Type Selector */}
+      {/* Bộ chọn Loại Biểu đồ */}
       <div className='mb-6'>
         <Listbox
           value={chartType}
@@ -144,19 +142,15 @@ duration-300               duration-500 ease-in-out ease-out
         </Listbox>
       </div>
 
-      {/* Drop Zones Section */}
+      {/* Phần Vùng Thả */}
       <div className='space-y-3'>
         {showXAxis && (
           <Droppable droppableId='xAxis'>
             {(provided, snapshot) => (
               <DropZone
                 id='xAxis'
-                label={
-                  chartType === 'scatter'
-                    ? t('XAxis_Measure_Dimension')
-                    : t('XAxis_Category_Dimension')
-                }
-                acceptedType={chartType === 'scatter' ? 'any' : 'dimension'}
+                label={t('XAxis_Category_Dimension')}
+                acceptedType='dimension'
                 field={getFieldById(config.xAxis?.fieldId)}
                 onRemoveField={onRemoveField}
                 provided={provided}
@@ -166,7 +160,7 @@ duration-300               duration-500 ease-in-out ease-out
             )}
           </Droppable>
         )}
-        {showYAxis && ( // Always show Y-axis conceptually, label changes for Pie
+        {showYAxis && ( // Luôn hiển thị Y-axis về mặt khái niệm, nhãn thay đổi cho Pie
           <Droppable droppableId='yAxis'>
             {(provided, snapshot) => (
               <DropZone
@@ -186,7 +180,7 @@ duration-300               duration-500 ease-in-out ease-out
             )}
           </Droppable>
         )}
-        {showColor && ( // Always show Color conceptually, label changes for Pie
+        {showColor && ( // Luôn hiển thị Color về mặt khái niệm, nhãn thay đổi cho Pie
           <Droppable droppableId='color'>
             {(provided, snapshot) => (
               <DropZone
@@ -206,25 +200,9 @@ duration-300               duration-500 ease-in-out ease-out
             )}
           </Droppable>
         )}
-        {showSize && (
-          <Droppable droppableId='size'>
-            {(provided, snapshot) => (
-              <DropZone
-                id='size'
-                label='Size (Bubble/Measure)'
-                acceptedType='measure'
-                field={getFieldById(config.size?.fieldId)}
-                onRemoveField={onRemoveField}
-                provided={provided}
-                snapshot={snapshot}
-                required={false}
-              />
-            )}
-          </Droppable>
-        )}
       </div>
 
-      {/* Chart Options Section */}
+      {/* Phần Tùy chọn Biểu đồ */}
       <div className='mt-6 border-t border-gray-20 pt-4'>
         <button
           onClick={() => setIsOptionsOpen(!isOptionsOpen)}
@@ -233,12 +211,12 @@ duration-300               duration-500 ease-in-out ease-out
           aria-controls='chart-options-panel'
         >
           <span className='whitespace-nowrap'>{t('Chart_Options')}</span>{' '}
-          {/* Added whitespace-nowrap */}
+          {/* Đã thêm whitespace-nowrap */}
           <Cog6ToothIcon
             className={`h-5 w-5 transition-transform duration-200 ${isOptionsOpen ? 'rotate-90' : ''}`}
           />
         </button>
-        {/* Headless UI Transition should work fine here as it handles display properties */}
+        {/* Headless UI Transition sẽ hoạt động tốt ở đây vì nó xử lý các thuộc tính hiển thị */}
         <Transition
           show={isOptionsOpen}
           enter='transition ease-out duration-100'
@@ -249,7 +227,7 @@ duration-300               duration-500 ease-in-out ease-out
           leaveTo='transform opacity-0 scale-95'
         >
           <div id='chart-options-panel' className='mt-3 space-y-4'>
-            {/* Title Input */}
+            {/* Input Tiêu đề */}
             <div>
               <label
                 htmlFor='chartTitle'
@@ -267,7 +245,7 @@ duration-300               duration-500 ease-in-out ease-out
                 className='w-full rounded border border-gray-30 bg-white-pure px-2 py-1.5 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500'
               />
             </div>
-            {/* Legend Toggle */}
+            {/* Nút bật/tắt Chú giải */}
             <div className='flex items-center justify-between'>
               <span className='text-sm '>{t('Show_Legend')}</span>
               <button
@@ -284,7 +262,7 @@ duration-300               duration-500 ease-in-out ease-out
                 )}
               </button>
             </div>
-            {/* Toolbox Toggle */}
+            {/* Nút bật/tắt Hộp công cụ */}
             <div className='flex items-center justify-between'>
               <span className='text-sm '>{t('Show_Toolbox')}</span>
               <button
@@ -304,7 +282,6 @@ duration-300               duration-500 ease-in-out ease-out
           </div>
         </Transition>
       </div>
-      {/* --- REMOVED: Conditional rendering wrapper --- */}
     </div>
   )
 }

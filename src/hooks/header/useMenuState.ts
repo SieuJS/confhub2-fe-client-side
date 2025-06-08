@@ -5,32 +5,8 @@ export const useMenuState = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
 
-
-  const closeAllMenus = useCallback(() => { // Function to close all including mobile
-      setIsNotificationOpen(false);
-      setIsMobileMenuOpen(false);
-      setIsUserDropdownOpen(false);
-  }, []);
-
-
-  const openNotification = useCallback(() => {
-    toggleNotification();
-    setIsMobileMenuOpen(false); // Close mobile menu
-    setIsUserDropdownOpen(false); // Close user dropdown
-  }, []);
-
-  const openMobileMenu = useCallback(() => {
-    toggleMobileMenu();
-    setIsNotificationOpen(false); // Close mobile menu
-    setIsUserDropdownOpen(false); // Close user dropdown
-  }, []);
-
-  const openUserDropdown = useCallback(() => {
-    toggleUserDropdown();
-    setIsNotificationOpen(false);
-    setIsMobileMenuOpen(false)
-  }, []);
-
+  // These togglers are stable because they use the functional update form of useState
+  // and have no other dependencies.
   const toggleNotification = useCallback(() => {
     setIsNotificationOpen((isOpen) => !isOpen);
   }, []);
@@ -43,11 +19,41 @@ export const useMenuState = () => {
     setIsUserDropdownOpen((isOpen) => !isOpen);
   }, []);
 
+
+  const closeAllMenus = useCallback(() => {
+      setIsNotificationOpen(false);
+      setIsMobileMenuOpen(false);
+      setIsUserDropdownOpen(false);
+  }, []);
+
+
+  // FIX: Add `toggleNotification` to the dependency array.
+  const openNotification = useCallback(() => {
+    toggleNotification();
+    setIsMobileMenuOpen(false);
+    setIsUserDropdownOpen(false);
+  }, [toggleNotification]);
+
+  // FIX: Add `toggleMobileMenu` to the dependency array.
+  const openMobileMenu = useCallback(() => {
+    toggleMobileMenu();
+    setIsNotificationOpen(false);
+    setIsUserDropdownOpen(false);
+  }, [toggleMobileMenu]);
+
+  // FIX: Add `toggleUserDropdown` to the dependency array.
+  const openUserDropdown = useCallback(() => {
+    toggleUserDropdown();
+    setIsNotificationOpen(false);
+    setIsMobileMenuOpen(false)
+  }, [toggleUserDropdown]);
+
+
   return {
     isNotificationOpen,
     isMobileMenuOpen,
     isUserDropdownOpen,
-    closeAllMenus, // Added for closing all
+    closeAllMenus,
     toggleNotification,
     toggleMobileMenu,
     toggleUserDropdown,

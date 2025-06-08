@@ -15,13 +15,14 @@ const useNotificationState = (initialNotifications: Notification[], userId: stri
 
     const updateUserNotifications = useCallback(
         async (updatedNotifications: Notification[]) => {
-            // console.log('useNotificationState: updateUserNotifications called with:', updatedNotifications); // Log before update
+            // console.log('useNotificationState: updateUserNotifications called with:', updatedNotifications);
             const updatedData = { notifications: updatedNotifications };
-            await updateNotifications( updatedData);
+            // The API call uses the auth token, not the userId prop.
+            await updateNotifications(updatedData);
             setNotifications(updatedNotifications);
-            // console.log('useNotificationState: updateUserNotifications - State updated.'); // Log after update
+            // console.log('useNotificationState: updateUserNotifications - State updated.');
         },
-        [userId]
+        [] // FIX: Remove `userId`. The function has no real dependencies.
     );
 
     const handleUpdateSeenAt = useCallback(
