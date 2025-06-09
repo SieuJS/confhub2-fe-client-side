@@ -1,4 +1,4 @@
-// src/app/[locale]/chatbot/landingchatbot/page.tsx
+// src/app/[locale]/chatbot/landing/page.tsx
 'use client'
 
 import AIAbilities from './AIAbilities'

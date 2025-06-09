@@ -1,10 +1,8 @@
 // src/hooks/useSearchAdvanceForm.ts
 
-import { appConfig } from '@/src/middleware';
-import { useState, ChangeEvent, KeyboardEvent, useEffect } from 'react';
+import { useState, ChangeEvent, KeyboardEvent } from 'react';
 
 interface UseSearchAdvanceFormProps {
-  // Remove submissionDate and onSubmissionDateChange props
   onRankChange: (rank: string | null) => void;
   selectedRank: string | null;
   onSourceChange: (source: string | null) => void;
@@ -17,11 +15,11 @@ interface UseSearchAdvanceFormProps {
   selectedFieldsOfResearch: string[];
   onPublisherChange: (publisher: string | null) => void;
   selectedPublisher: string | null;
+  // --- THÊM PROP MỚI ---
+  availableTopics: string[]; // Nhận danh sách topics từ component cha
 }
 
 const useSearchAdvanceForm = ({
-  // submissionDate, // Removed
-  // onSubmissionDateChange, // Removed
   onRankChange,
   selectedRank,
   onSourceChange,
@@ -34,45 +32,31 @@ const useSearchAdvanceForm = ({
   selectedFieldsOfResearch,
   onPublisherChange,
   selectedPublisher,
+  // --- NHẬN PROP MỚI ---
+  availableTopics,
 }: UseSearchAdvanceFormProps) => {
   const [topicsInput, setTopicsInput] = useState('');
   const [topicSuggestions, setTopicSuggestions] = useState<string[]>([]);
   const [fieldOfResearchInput, setFieldOfResearchInput] = useState('');
   const [fieldOfResearchSuggestions, setFieldOfResearchSuggestions] = useState<string[]>([]);
-  const [availableTopics, setAvailableTopics] = useState<string[]>([]); // State for fetched topics
+  
+  // --- KHÔNG CẦN FETCH Ở ĐÂY NỮA ---
+  // const [availableTopics, setAvailableTopics] = useState<string[]>([]);
+  // useEffect(() => { ... }, []);
 
   // This availableFieldsOfResearch should likely be fetched or come from config
   const availableFieldsOfResearch = [
     "Computer Science", "Information Technology", "Software Engineering", "Data Analytics", "Artificial Intelligence",
     "Cybersecurity", "Information Systems", "Human-Computer Interaction", "Bioinformatics", "Computational Linguistics"
-    ];
+  ];
 
-  // Fetch topics from the backend when the component mounts
-  useEffect(() => {
-    const fetchTopics = async () => {
-      try {
-        const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/conference-organization/topics`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data: string[] = await response.json();
-        // console.log(data);
-        setAvailableTopics(data);
-      } catch (error) {
-        console.error("Could not fetch topics:", error);
-      }
-    };
-
-    fetchTopics();
-  }, []);
-
-
-  // ... (Keep all topic and field of research handlers: handleTopicInputChange, handleTopicSuggestionClick, etc.) ...
-   const handleTopicInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  // Logic của các hàm handler không đổi, chúng sẽ sử dụng `availableTopics` từ props
+  const handleTopicInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     setTopicsInput(inputValue);
     const trimmedInput = inputValue.trim();
     if (trimmedInput) {
+      // Sử dụng availableTopics từ props
       const suggestions = availableTopics.filter(topic =>
         topic.toLowerCase().includes(trimmedInput.toLowerCase()) && !selectedTopics.includes(topic)
       );
@@ -93,6 +77,7 @@ const useSearchAdvanceForm = ({
       e.preventDefault();
       const trimmedInput = topicsInput.trim();
       if (trimmedInput) {
+        // Sử dụng availableTopics từ props
         if (!selectedTopics.includes(trimmedInput) && availableTopics.includes(trimmedInput)) {
             onTopicsChange([...selectedTopics, trimmedInput]);
         } else if (topicSuggestions.length > 0 ) {
@@ -104,6 +89,7 @@ const useSearchAdvanceForm = ({
     }
   };
 
+  // ... các hàm handler khác không thay đổi ...
   const handleRemoveTopic = (topicToRemove: string) => {
     onTopicsChange(selectedTopics.filter(topic => topic !== topicToRemove));
   };
@@ -146,14 +132,6 @@ const useSearchAdvanceForm = ({
     onFieldOfResearchChange(selectedFieldsOfResearch.filter(field => field !== fieldToRemove));
   };
 
-
-  // --- Remove submission date handler ---
-  // const handleSubmissionDateInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-  //   const date = event.target.value ? new Date(event.target.value) : null;
-  //   onSubmissionDateChange(date);
-  // };
-  // --- End Remove ---
-
   const handleRankChangeInput = (event: ChangeEvent<HTMLSelectElement>) => {
     onRankChange(event.target.value === "" ? null : event.target.value);
   };
@@ -185,15 +163,14 @@ const useSearchAdvanceForm = ({
     handleTopicSuggestionClick,
     handleTopicInputKeyDown,
     handleRemoveTopic,
-      handleFieldOfResearchInputChange,
+    handleFieldOfResearchInputChange,
     handleFieldOfResearchSuggestionClick,
     handleFieldOfResearchInputKeyDown,
     handleRemoveFieldOfResearch,
-    // handleSubmissionDateInputChange, // Removed
     handleRankChangeInput,
     handleSourceChangeInput,
     handleAverageScoreChangeInput,
-      handlePublisherInputChange,
+    handlePublisherInputChange,
     handlePublisherEnter
   };
 };

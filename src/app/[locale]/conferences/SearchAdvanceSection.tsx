@@ -2,20 +2,19 @@
 
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import useSearchAdvanceForm from '../../../hooks/conferences/useSearchAdvanceForm'
 import { useTranslations } from 'next-intl'
-import DatePicker from 'react-datepicker' // Import DatePicker
-import 'react-datepicker/dist/react-datepicker.css' // Import CSS
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+import { appConfig } from '@/src/middleware' // Import appConfig
 
 interface SearchAdvanceSectionProps {
   isAdvancedOptionsVisible: boolean
   toggleAdvancedOptionsVisibility: () => void
-  // --- Updated Date Props ---
   onSubmissionDateRangeChange: (dates: [Date | null, Date | null]) => void
   subFromDate: Date | null
   subToDate: Date | null
-  // --- End Updated Date Props ---
   onRankChange: (rank: string | null) => void
   selectedRank: string | null
   onSourceChange: (source: string | null) => void
@@ -33,11 +32,9 @@ interface SearchAdvanceSectionProps {
 const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
   isAdvancedOptionsVisible,
   toggleAdvancedOptionsVisibility,
-  // --- Use Updated Date Props ---
   onSubmissionDateRangeChange,
   subFromDate,
   subToDate,
-  // --- End Use Updated Date Props ---
   onRankChange,
   selectedRank,
   onSourceChange,
@@ -51,6 +48,37 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
   onPublisherChange,
   selectedPublisher
 }) => {
+  const t = useTranslations('')
+  
+  // --- LOGIC MỚI: FETCH TOPICS KHI CẦN ---
+  const [availableTopics, setAvailableTopics] = useState<string[]>([])
+  const [topicsLoading, setTopicsLoading] = useState(false)
+
+  useEffect(() => {
+    // Chỉ fetch khi:
+    // 1. Panel được mở
+    // 2. Dữ liệu chưa được fetch (availableTopics rỗng)
+    // 3. Không đang trong quá trình fetch
+    if (isAdvancedOptionsVisible && availableTopics.length === 0 && !topicsLoading) {
+      const fetchTopics = async () => {
+        setTopicsLoading(true)
+        try {
+          const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/conference-organization/topics`)
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+          }
+          const data: string[] = await response.json()
+          setAvailableTopics(data)
+        } catch (error) {
+          console.error("Could not fetch topics:", error)
+        } finally {
+          setTopicsLoading(false)
+        }
+      }
+      fetchTopics()
+    }
+  }, [isAdvancedOptionsVisible, availableTopics.length, topicsLoading]) // Dependencies
+
   const {
     topicsInput,
     topicSuggestions,
@@ -64,16 +92,12 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
     handleFieldOfResearchSuggestionClick,
     handleFieldOfResearchInputKeyDown,
     handleRemoveFieldOfResearch,
-    // Remove handleSubmissionDateInputChange from here if it's not used elsewhere
     handleRankChangeInput,
     handleSourceChangeInput,
     handleAverageScoreChangeInput,
     handlePublisherInputChange,
     handlePublisherEnter
   } = useSearchAdvanceForm({
-    // Remove date props from the hook if they are no longer managed there
-    // submissionDate: null, // Or however you structure the hook now
-    // onSubmissionDateChange: () => {},
     onRankChange,
     selectedRank,
     onSourceChange,
@@ -85,9 +109,10 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
     onFieldOfResearchChange,
     selectedFieldsOfResearch,
     onPublisherChange,
-    selectedPublisher
+    selectedPublisher,
+    // --- TRUYỀN DỮ LIỆU TOPICS XUỐNG HOOK ---
+    availableTopics: availableTopics
   })
-  const t = useTranslations('')
 
   return (
     <div>
@@ -104,13 +129,13 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
 
       {isAdvancedOptionsVisible && (
         <div className='mt-2 rounded border p-4 shadow-md'>
-          {/* Responsive grid layout */}
+          {/* ... JSX không đổi ... */}
           <div className='mb-2 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5'>
             {/* --- Date Picker Section --- */}
             <div className='col-span-1'>
               <label
                 className='mb-1 block text-sm font-bold '
-                htmlFor='submissionDateRange' // Changed ID for clarity
+                htmlFor='submissionDateRange'
               >
                 {t('Submission_Date')}:
               </label>
@@ -119,35 +144,15 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 startDate={subFromDate}
                 endDate={subToDate}
                 onChange={onSubmissionDateRangeChange}
-                isClearable={true} // Allows clearing the date range
-                placeholderText={t('Select_Date_Range') ?? 'Select Date Range'} // Use translation
-                dateFormat='yyyy/MM/dd' // Adjust date format as needed
-                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow placeholder:text-primary focus:outline-none' // Apply same styling
-                wrapperClassName='w-full' // Ensure wrapper takes full width if needed
+                isClearable={true}
+                placeholderText={t('Select_Date_Range') ?? 'Select Date Range'}
+                dateFormat='yyyy/MM/dd'
+                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow placeholder:text-primary focus:outline-none'
+                wrapperClassName='w-full'
                 id='submissionDateRange'
               />
             </div>
-            {/* --- End Date Picker Section --- */}
-
-            {/* Other fields remain the same */}
-            {/* <div className='col-span-1'>
-              <label
-                className='mb-1 block text-sm font-bold'
-                htmlFor='publisher'
-              >
-                {t('Publisher')}:
-              </label>
-              <input
-                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow placeholder:text-primary focus:outline-none'
-                id='publisher'
-                type='text'
-                placeholder={t('Publisher')}
-                value={selectedPublisher || ''}
-                onChange={handlePublisherInputChange}
-                onKeyDown={handlePublisherEnter}
-              />
-            </div> */}
-
+            
             <div className='col-span-1'>
               <label className='mb-1 block text-sm font-bold' htmlFor='rank'>
                 {t('Rank')}:
@@ -159,13 +164,10 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 onChange={handleRankChangeInput}
               >
                 <option value=''>{t('Rank')}</option>
-                {/* ... options */}
                 <option value='A*'>A*</option>
                 <option value='A'>A</option>
                 <option value='B'>B</option>
-                {/* <option value='AustralasianB'>Australasian B</option> */}
                 <option value='C'>C</option>
-                {/* <option value='AustralasianC'>Australasian C</option> */}
                 <option value='Unranked'>Unranked</option>
               </select>
             </div>
@@ -181,7 +183,6 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 onChange={handleSourceChangeInput}
               >
                 <option value=''>{t('Source')}</option>
-                {/* ... options */}
                 <option value='CORE2023'>CORE2023</option>
                 <option value='CORE2021'>CORE2021</option>
                 <option value='CORE2020'>CORE2020</option>
@@ -193,32 +194,8 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
               </select>
             </div>
 
-            {/* <div className='col-span-1'>
-              <label
-                className='mb-1 block text-sm font-bold'
-                htmlFor='averageScore'
-              >
-                {t('Average_Score')}:
-              </label>
-              <select
-                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none'
-                id='averageScore'
-                value={selectedAverageScore || ''}
-                onChange={handleAverageScoreChangeInput}
-              >
-                <option value=''>{t('Score')}</option>
-                <option value='1'>1</option>
-                <option value='2'>2</option>
-                <option value='3'>3</option>
-                <option value='4'>4</option>
-                <option value='5'>5</option>
-              </select>
-            </div> */}
-
             <div className='relative col-span-2'>
               <label className='mb-1 block text-sm font-bold' htmlFor='topics'>
-                {' '}
-                {/* Reduced mb */}
                 {t('Topics')}:
               </label>
               <input
@@ -227,15 +204,16 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 value={topicsInput}
                 onChange={handleTopicInputChange}
                 onKeyDown={handleTopicInputKeyDown}
-                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow placeholder:text-primary focus:outline-none' // Reduced py and px
-                placeholder={t('Enter_topics')}
+                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow placeholder:text-primary focus:outline-none'
+                placeholder={topicsLoading ? t('Loading_topics') : t('Enter_topics')}
+                disabled={topicsLoading} // Vô hiệu hóa input khi đang tải
               />
               {topicSuggestions.length > 0 && (
                 <ul className='absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded border border-gray-300 bg-white-pure shadow-md '>
                   {topicSuggestions.map((suggestion, index) => (
                     <li
                       key={index}
-                      className='cursor-pointer px-3 py-1 text-sm hover:bg-gray-10 ' // Reduced py and px
+                      className='cursor-pointer px-3 py-1 text-sm hover:bg-gray-10 '
                       onClick={() => handleTopicSuggestionClick(suggestion)}
                     >
                       {suggestion}
@@ -244,15 +222,11 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 </ul>
               )}
               <div className='mt-2 flex flex-wrap gap-1'>
-                {' '}
-                {/* Reduced gap */}
                 {selectedTopics.map((topic, index) => (
                   <div
                     key={index}
                     className='flex items-center gap-1 rounded-full bg-gray-20 px-2 py-0.5 text-sm '
                   >
-                    {' '}
-                    {/* Reduced px and py */}
                     <span>{topic}</span>
                     <button
                       type='button'
@@ -265,8 +239,6 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                         viewBox='0 0 20 20'
                         fill='currentColor'
                       >
-                        {' '}
-                        {/* Smaller icon */}
                         <path
                           fillRule='evenodd'
                           d='M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z'
@@ -278,135 +250,6 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 ))}
               </div>
             </div>
-          </div>
-
-          {/* Topics and Field of Research sections remain the same */}
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-            {/* <div className='relative col-span-1'>
-              <label className='mb-1 block text-sm font-bold' htmlFor='topics'>
-                {' '}
-                {t('Topics')}:
-              </label>
-              <input
-                type='text'
-                id='topics'
-                value={topicsInput}
-                onChange={handleTopicInputChange}
-                onKeyDown={handleTopicInputKeyDown}
-                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow placeholder:text-primary focus:outline-none' 
-                placeholder={t('Enter_topics')}
-              />
-              {topicSuggestions.length > 0 && (
-                <ul className='absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded border border-gray-300 bg-white-pure shadow-md '>
-                  {topicSuggestions.map((suggestion, index) => (
-                    <li
-                      key={index}
-                      className='cursor-pointer px-3 py-1 text-sm hover:bg-gray-10 ' 
-                      onClick={() => handleTopicSuggestionClick(suggestion)}
-                    >
-                      {suggestion}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <div className='mt-2 flex flex-wrap gap-1'>
-                {' '}
-                {selectedTopics.map((topic, index) => (
-                  <div
-                    key={index}
-                    className='flex items-center gap-1 rounded-full bg-gray-20 px-2 py-0.5 text-sm '
-                  >
-                    {' '}
-                    <span>{topic}</span>
-                    <button
-                      type='button'
-                      className='hover:text-gray-700 focus:outline-none'
-                      onClick={() => handleRemoveTopic(topic)}
-                    >
-                      <svg
-                        xmlns='http://www.w3.org/2000/svg'
-                        className='h-3 w-3'
-                        viewBox='0 0 20 20'
-                        fill='currentColor'
-                      >
-                        {' '}
-                        <path
-                          fillRule='evenodd'
-                          d='M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z'
-                          clipRule='evenodd'
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div> */}
-            {/* ... Field of Research Input ... */}
-            {/* <div className='relative col-span-1'>
-              <label
-                className='mb-1 block text-sm font-bold'
-                htmlFor='fieldOfResearch'
-              >
-                {' '}
-                {t('Field_of_Research')}:
-              </label>
-              <input
-                type='text'
-                id='fieldOfResearch'
-                value={fieldOfResearchInput}
-                onChange={handleFieldOfResearchInputChange}
-                onKeyDown={handleFieldOfResearchInputKeyDown}
-                className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow placeholder:text-primary focus:outline-none' 
-                placeholder={t('Enter_field_of_research')}
-              />
-              {fieldOfResearchSuggestions.length > 0 && (
-                <ul className='absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded border border-gray-300 bg-white-pure shadow-md '>
-                  {fieldOfResearchSuggestions.map((suggestion, index) => (
-                    <li
-                      key={index}
-                      className='cursor-pointer px-3 py-1 text-sm hover:bg-gray-10 ' 
-                      onClick={() =>
-                        handleFieldOfResearchSuggestionClick(suggestion)
-                      }
-                    >
-                      {suggestion}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <div className='mt-2 flex flex-wrap gap-1'>
-                {' '}
-                {selectedFieldsOfResearch.map((field, index) => (
-                  <div
-                    key={index}
-                    className='flex items-center gap-1 rounded-full bg-gray-20 px-2 py-0.5 text-sm '
-                  >
-                    {' '}
-                    <span>{field}</span>
-                    <button
-                      type='button'
-                      className='hover:text-gray-700 focus:outline-none'
-                      onClick={() => handleRemoveFieldOfResearch(field)}
-                    >
-                      <svg
-                        xmlns='http://www.w3.org/2000/svg'
-                        className='h-3 w-3'
-                        viewBox='0 0 20 20'
-                        fill='currentColor'
-                      >
-                        {' '}
-                        
-                        <path
-                          fillRule='evenodd'
-                          d='M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z'
-                          clipRule='evenodd'
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div> */}
           </div>
         </div>
       )}

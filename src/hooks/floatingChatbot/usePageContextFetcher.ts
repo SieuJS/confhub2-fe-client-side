@@ -50,7 +50,7 @@ export const usePageContextFetcher = ({
         if (currentFloatingChatOpenState && currentShouldRenderState) {
           const isAnyChatbotFullPage =
             CHATBOT_FULL_PAGE_PATHS_TO_HIDE_FLOATING.includes(path as keyof typeof appPathnames) ||
-            path === appPathnames['/chatbot/landingchatbot'];
+            path === appPathnames['/chatbot/landing'];
 
           if (!isAnyChatbotFullPage) {
             const pageText = getCurrentPageTextContent();

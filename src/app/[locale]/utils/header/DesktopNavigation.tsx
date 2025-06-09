@@ -69,7 +69,7 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
 
       <Link
         lang={locale}
-        href={`/chatbot/landingchatbot`}
+        href={`/chatbot/landing`}
         className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-button md:mx-4 ${isActive(`/${locale}/chatbot`) ? 'text-button' : ''} inline-flex items-center`}
       >
         {t('Chatbot')}

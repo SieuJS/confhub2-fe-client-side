@@ -22,7 +22,7 @@ export default function ChatbotRootLayout({
     const currentStoreChatMode = useSettingsStore(state => state.chatMode);
 
     const isLiveChatPage = unlocalizedPathname.includes('/chatbot/livechat');
-    const isLandingChatbotPage = unlocalizedPathname === '/chatbot/landingchatbot';
+    const islandingPage = unlocalizedPathname === '/chatbot/landing';
 
     useEffect(() => {
         const newMode = isLiveChatPage ? 'live' : 'regular';
@@ -41,7 +41,7 @@ export default function ChatbotRootLayout({
         );
     }
 
-    const shouldShowChatbotErrorDisplay = !isLandingChatbotPage;
+    const shouldShowChatbotErrorDisplay = !islandingPage;
 
     return (
         <>
@@ -57,7 +57,7 @@ export default function ChatbotRootLayout({
                         </MainLayoutComponent>
                     </LiveChatSettingsProvider>
                 </LiveAPIProvider>
-            ) : isLandingChatbotPage ? (
+            ) : islandingPage ? (
                 <>{children}</>
             ) : (
                 <MainLayoutComponent isLiveChatContextActive={false}>

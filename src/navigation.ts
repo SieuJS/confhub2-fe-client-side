@@ -13,7 +13,7 @@ export const pathnames = {
   '/dashboard': '/dashboard',
   '/journals': '/journals',
 
-  '/chatbot/landingchatbot': '/chatbot/landingchatbot',
+  '/chatbot/landing': '/chatbot/landing',
   '/chatbot/regularchat': '/chatbot/regularchat',
   '/chatbot/livechat': '/chatbot/livechat',
   '/chatbot/history': '/chatbot/history',

@@ -432,7 +432,7 @@ const internalPaths = [
     '/conferences',
     '/dashboard',
     '/journals',
-    '/chatbot/landingchatbot',
+    '/chatbot/landing',
     '/chatbot/regularchat',
     '/chatbot/livechat',
     '/chatbot/history',

@@ -71,7 +71,7 @@ export const useFloatingChatbotActions = ({
 
     const isAnyChatbotFullPageImmediate =
       CHATBOT_FULL_PAGE_PATHS_TO_HIDE_FLOATING.includes(currentPathname as keyof typeof appPathnames) ||
-      currentPathname === appPathnames['/chatbot/landingchatbot'];
+      currentPathname === appPathnames['/chatbot/landing'];
 
     if (!isAnyChatbotFullPageImmediate) {
       // Context fetching is handled by usePageContextFetcher
