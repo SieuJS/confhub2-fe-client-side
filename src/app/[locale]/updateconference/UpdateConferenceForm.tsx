@@ -48,7 +48,7 @@ const ConferenceForm: React.FC<ConferenceFormProps> = ({
   const [dates, setDates] = useState<ImportantDateInput[]>([
     {
       type: 'conferenceDates',
-      name: 'Conference Date',
+      name: 'Conference Dates',
       fromDate: '',
       toDate: ''
     }

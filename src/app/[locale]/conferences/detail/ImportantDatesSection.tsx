@@ -104,7 +104,7 @@ export const ImportantDatesSection: React.FC<ImportantDatesSectionProps> = ({
     },
     otherDate: {
       icon: <Info className='h-6 w-6 text-gray-500' />,
-      title: t('Other_Dates')
+      title: t('Other')
     }
   }
 

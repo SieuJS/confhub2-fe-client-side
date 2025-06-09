@@ -191,9 +191,9 @@ const ConferenceHeader: React.FC<ConferenceHeaderProps> = ({
         </div>
 
         {/* Followers Display */}
-        {/* <div className='mt-3'>
+        <div className='mt-3'>
           <FollowerAvatars followBy={conferenceData?.followBy} />
-        </div> */}
+        </div>
       </div>
     </div>
   )

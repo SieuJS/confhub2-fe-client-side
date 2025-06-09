@@ -77,7 +77,7 @@ const AddConferencePage = ({
     return (
       <>
         <Header locale={locale} />
-        <main className='container mx-auto min-h-screen px-4 py-8 md:px-16'>
+        <main className='container mx-auto min-h-screen py-8'>
           {' '}
           <div className='w-full bg-background pt-14'></div>{' '}
           <h1 className='mb-6 text-3xl font-bold'>{t('Add_New_Conference')}</h1>
