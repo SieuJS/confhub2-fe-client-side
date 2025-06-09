@@ -6,15 +6,6 @@ import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import { Link } from '@/src/navigation'
 
-// --- ECharts Core Imports (ĐÃ BỎ) ---
-// import * as echarts from 'echarts/core';
-// import { CanvasRenderer } from 'echarts/renderers';
-// import { GraphicComponent } from 'echarts/components';
-// type EChartsType = any; // Loại bỏ type EChartsType
-
-// --- Register ECharts components and renderer (ĐÃ BỎ) ---
-// echarts.use([GraphicComponent, CanvasRenderer]);
-
 // --- Framer Motion Animation Variants (Cho các phần tử nội dung chính) ---
 const containerVariants = {
   hidden: { opacity: 0 },
