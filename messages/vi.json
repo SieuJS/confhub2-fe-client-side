@@ -1505,12 +1505,13 @@
   "Go_To_My_Conferences": "Đến hội nghị của tôi",
   "Remove_date": "Xóa ngày",
   "MyConferences": {
+    "Loading_your_profile": "Đang tải thông tin của bạn...",
     "Loading_your_calendar": "Đang tải lịch của bạn...",
     "Loading_your_conferences": "Đang tải các hội nghị của bạn...",
     "Account_Banned_Title": "Tài khoản bị cấm",
     "Account_Banned_Message": "Tài khoản của bạn đã bị cấm. Vui lòng liên hệ hỗ trợ để biết thêm thông tin.",
     "Login_Required_Title": "Yêu cầu đăng nhập",
-    "Login_Required_Message": "Vui lòng đăng nhập để xem các hội nghị của bạn.",
+    "Login_Required_Message": "Vui lòng đăng nhập để xem thông tin.",
     "Title_All": "Tất cả hội nghị (<b>{count}</b>)",
     "Title_PENDING": "Hội nghị đang chờ duyệt (<b>{count}</b>)",
     "Title_APPROVED": "Hội nghị đã được duyệt (<b>{count}</b>)",
@@ -1586,5 +1587,13 @@
   "Initializing_session": "Đang khởi tạo phiên...",
   "Please_log_in_to_view_settings": "Vui lòng đăng nhập để xem cài đặt của bạn.",
   "Could_not_load_user_settings": "Không thể tải cài đặt của bạn. Vui lòng thử lại sau.",
-  "Retry": "Thử lại"
+  "Retry": "Thử lại",
+  "Search_followed_conferences": "Tìm hội nghị đã theo dõi...",
+  "Search_blacklisted_conferences": "Tìm hội nghị đã đưa vào danh sách đen...",
+  "No_conferences_match_your_search": "Không có hội nghị nào khớp với tìm kiếm của bạn.",
+  "Search_my_conferences": "Tìm hội nghị của tôi...",
+  "Search_settings": "Tìm kiếm cài đặt...",
+  "No_settings_match_your_search": "Không có cài đặt nào khớp với tìm kiếm của bạn.",
+  "View_all_settings": "Xem tất cả cài đặt",
+  "Could_not_load_user_settings_title": "Không thể tải cài đặt người dùng"
 }

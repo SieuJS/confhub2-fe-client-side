@@ -13,6 +13,7 @@ import ProfileDisplayInfo from './ProfileDisplayInfo'
 import ProfileEditForm from './ProfileEditForm'
 import ImageSelectionModal from './ImageSelectionModal'
 import DeleteAccountModal from './DeleteAccountModal'
+import { Loader2 } from 'lucide-react' // Import Loader2
 
 const ProfileTab: React.FC = () => {
   const t = useTranslations('')
@@ -58,6 +59,14 @@ const ProfileTab: React.FC = () => {
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false)
   const [isDeletingAccount, setIsDeletingAccount] = useState(false)
   const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null)
+  const [initialLoad, setInitialLoad] = useState(true) // State cho initialLoad
+
+  // Set initialLoad to false once authentication initialization is complete
+  useEffect(() => {
+    if (!isAuthInitializing) {
+      setInitialLoad(false)
+    }
+  }, [isAuthInitializing])
 
   useEffect(() => {
     if (authUser?.dob) {
@@ -106,18 +115,28 @@ const ProfileTab: React.FC = () => {
     }
   }
 
-  if (isAuthInitializing) {
+  // Hàm render loading tương tự như FollowedTab
+  const renderLoading = () => (
+    <div className='flex flex-col items-center justify-center h-80 text-gray-500'>
+      <Loader2 className='w-10 h-10 animate-spin text-primary' /> {/* Kích thước và màu */}
+      <p className='mt-4 text-lg'>{t('MyConferences.Loading_your_profile')}</p> {/* Dòng chữ */}
+    </div>
+  )
+
+  // --- Render Loading with Loader2 ---
+  if (isAuthInitializing && initialLoad) {
     return (
       <div className='flex h-screen items-center justify-center'>
-        <div className='h-20 w-20 animate-spin rounded-full border-b-2 border-t-2 border-primary'></div>
+        {renderLoading()} {/* Gọi hàm renderLoading */}
       </div>
     )
   }
 
+  // --- Render Error/Login Required after initial load ---
   if (authError && !isLoggedIn) {
     return (
-      <div className='flex h-screen items-center justify-center'>
-        <div className='rounded-lg bg-background p-8 text-center shadow-lg'>
+      <div className='container mx-auto p-4 text-center'> {/* Thêm class container mx-auto p-4 text-center */}
+        <div className='rounded-lg bg-background p-8 text-center shadow-lg'> {/* Giữ lại div này để có background và shadow */}
           <p className='mb-4 text-red-500'>{authError}</p>
         </div>
       </div>
@@ -126,23 +145,26 @@ const ProfileTab: React.FC = () => {
 
   if (!isLoggedIn) {
     return (
-      <div className='flex h-screen items-center justify-center'>
-        <div className='rounded-lg bg-background p-8 text-center shadow-lg'>
-          <p className='mb-4'>{t('Please_log_in_to_view_profile')}</p>
-          <Link href='/auth/login'>
-            <Button variant='primary'>{t('Sign_In')}</Button>
-          </Link>
-        </div>
+      <div className='container mx-auto p-4 text-center'> {/* <-- THAY ĐỔI Ở ĐÂY */}
+        {/*
+          Theo FollowedTab, không có rounded-lg bg-background p-8 text-center shadow-lg ở đây.
+          Nó chỉ có h2 và p trực tiếp.
+          Để đồng bộ, chúng ta bỏ div bọc và giữ nguyên h2, p, button.
+        */}
+        <h2 className='text-xl font-semibold mb-2'>{t('MyConferences.Login_Required_Title')}</h2> {/* Sử dụng h2 và key dịch tương tự */}
+        <p className='mb-4'>{t('MyConferences.Login_Required_Message')}</p> {/* Sử dụng key dịch tương tự */}
+        <Link href='/auth/login'>
+          <Button variant='primary'>{t('Sign_In')}</Button>
+        </Link>
       </div>
     )
   }
 
   if (!authUser) {
     return (
-      <div className='flex h-screen items-center justify-center'>
-        <div className='rounded-lg bg-background p-8 text-center shadow-lg'>
-          <p>{t('User_data_not_available')}</p>
-        </div>
+      <div className='container mx-auto p-4 text-center'> {/* Đồng bộ với cấu trúc trên */}
+        <h2 className='text-xl font-semibold mb-2'>{t('User_data_not_available_title')}</h2> {/* Thêm title nếu cần */}
+        <p className='mb-4'>{t('User_data_not_available')}</p>
       </div>
     )
   }
@@ -218,4 +240,4 @@ const ProfileTab: React.FC = () => {
   )
 }
 
-export default ProfileTab
+export default ProfileTab;

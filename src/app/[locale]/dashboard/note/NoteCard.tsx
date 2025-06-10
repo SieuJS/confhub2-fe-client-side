@@ -1,0 +1,48 @@
+// src/app/[locale]/dashboard/note/NoteCard.tsx
+import React from 'react';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/src/navigation';
+import Button from '../../utils/Button';
+import { ProcessedNote } from '@/src/hooks/dashboard/note/useNoteData';
+import { getEventTypeColor, NoteType } from './utils/noteUtils';
+
+interface NoteCardProps {
+  note: ProcessedNote;
+  style: React.CSSProperties;
+}
+
+const NoteCard: React.FC<NoteCardProps> = ({ note, style }) => {
+  const t = useTranslations('');
+
+  return (
+    <div
+      style={style}
+      className={`rounded-md border p-4 shadow-md ${getEventTypeColor(note.type as NoteType)}`}
+    >
+      <div className="flex h-full flex-col text-gray-700">
+        <div className="h-3/4">
+          <h3 className="text-lg font-semibold">{note.conference}</h3>
+          <div className="mt-1 flex items-center">
+            <span className="text-sm">{note.location}</span>
+          </div>
+          <p className="mt-1 text-sm font-semibold">
+            {note.name ? `${note.name}: ` : ''} {note.date}
+          </p>
+          <p className="mt-1 text-xs">({note.typeText})</p>
+        </div>
+        <div className="flex h-1/4 items-end">
+          <div className="mt-2 flex w-full items-center justify-between">
+            <div className="rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-700">
+              {note.countdown}
+            </div>
+            <Link href={{ pathname: '/conferences/detail', query: { id: note.id } }}>
+              <Button className="hover: text-xs text-button">{t('More_details')}</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default NoteCard;

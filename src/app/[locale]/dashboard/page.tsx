@@ -3,6 +3,10 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
+import { useAuth } from '@/src/contexts/AuthContext' // BƯỚC 1: IMPORT useAuth
+import { Loader2 } from 'lucide-react' // BƯỚC 1: IMPORT Loader2
+
+// Import các component Tab của bạn
 import SettingTab from './setting/SettingTab'
 import NotificationsTab from './notification/NotificationsTab'
 import FollowedTab from './follow/FollowedTab'
@@ -11,13 +15,22 @@ import ProfileTab from './profile/ProfileTab'
 import NoteTab from './note/NoteTab'
 import MyConferencesTab from './myConferences/MyConferencesTab'
 
-// Không cần import Header hay Sidebar ở đây nữa
+// BƯỚC 2: TẠO COMPONENT LOADING DÙNG CHUNG
+const LoadingSpinner = ({ message }: { message: string }) => (
+  <div className="flex flex-col items-center justify-center h-80 text-gray-500">
+    <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
+    <p className="mt-4 text-lg">{message}</p>
+  </div>
+);
 
-export default function DashboardPage() { // Không cần nhận props locale nữa vì layout đã xử lý
+export default function DashboardPage() {
   const searchParams = useSearchParams()
+  const t = useTranslations('') // Khởi tạo t để dùng trong loading
   const [activePage, setActivePage] = useState<string>('Profile')
 
-  // Logic cập nhật activePage dựa trên searchParams (giữ nguyên)
+  // BƯỚC 3: LẤY TRẠNG THÁI isInitializing TỪ AUTH CONTEXT
+  const { isInitializing } = useAuth();
+
   useEffect(() => {
     const tab = searchParams.get('tab');
     let initialPage = 'Profile'; // Default
@@ -32,6 +45,16 @@ export default function DashboardPage() { // Không cần nhận props locale n�
     setActivePage(initialPage);
   }, [searchParams]);
 
+  // BƯỚC 4: THÊM LOGIC HIỂN THỊ LOADING KHI isInitializing LÀ TRUE
+  if (isInitializing) {
+    return (
+      // Đặt spinner vào một container để nó căn giữa trong khu vực nội dung
+      <div className='container mx-auto p-4'>
+        <LoadingSpinner message={t('MyConferences.Loading_your_profile')} />
+      </div>
+    );
+  }
+
   const renderPage = () => {
     switch (activePage) {
       case 'Setting':
@@ -39,7 +62,7 @@ export default function DashboardPage() { // Không cần nhận props locale n�
       case 'Notifications':
         return <NotificationsTab />;
       case 'Followed':
-        return <FollowedTab />;
+        return <FollowedTab />; // FollowedTab giờ sẽ được render sau khi isInitializing là false
       case 'Blacklisted':
         return <BlacklistTab />;
       case 'Note':
@@ -48,11 +71,11 @@ export default function DashboardPage() { // Không cần nhận props locale n�
         return <MyConferencesTab />;
       case 'Profile':
       default:
-        return <ProfileTab />; // Fallback
+        return <ProfileTab />;
     }
   };
 
-  // Component này giờ chỉ trả về nội dung của trang
+  // Khi isInitializing là false, render nội dung trang như bình thường
   return (
     <>
       {renderPage()}

@@ -1,8 +1,7 @@
 // src/app/[locale]/dashboard/setting/SettingTab.tsx
-
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react' // <-- Thêm useMemo
 import Button from '../../utils/Button'
 import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
@@ -24,6 +23,9 @@ import {
   Ban,
   Loader2
 } from 'lucide-react'
+
+// BƯỚC 1: IMPORT COMPONENT SEARCHINPUT MỚI
+import SearchInput from '../../utils/SearchInput'; // <-- Đảm bảo đường dẫn chính xác
 
 // --- Helper Type ---
 type ToggleSettingKey = keyof Pick<
@@ -96,6 +98,10 @@ const SettingTab: React.FC = () => {
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const [isFetchingSettings, setIsFetchingSettings] = useState(true)
+  const [initialLoad, setInitialLoad] = useState(true);
+
+  // BƯỚC 2: THÊM STATE CHO TÌM KIẾM
+  const [searchTerm, setSearchTerm] = useState('');
 
   const {
     updateUserSetting,
@@ -107,6 +113,8 @@ const SettingTab: React.FC = () => {
   const fetchUserSettings = useCallback(async () => {
     if (!isLoggedIn) {
       console.warn('[SettingTab] Skipping fetch: User not logged in.')
+      setIsFetchingSettings(false)
+      setInitialLoad(false);
       return
     }
     setIsFetchingSettings(true)
@@ -124,6 +132,7 @@ const SettingTab: React.FC = () => {
       }
     } finally {
       setIsFetchingSettings(false)
+      setInitialLoad(false);
     }
   }, [isLoggedIn, getUserSettings, getSettingError, logout])
 
@@ -132,21 +141,24 @@ const SettingTab: React.FC = () => {
       fetchUserSettings()
     } else if (!isInitializing && !isLoggedIn) {
         setIsFetchingSettings(false)
+        setInitialLoad(false)
     }
   }, [isInitializing, isLoggedIn, fetchUserSettings])
 
   const handleToggle = useCallback(async (settingKey: ToggleSettingKey) => {
-    if (setting) {
-      const currentValue = setting[settingKey] ?? false
-      setSetting(prev => (prev ? { ...prev, [settingKey]: !currentValue } : null))
-      try {
-        await updateUserSetting({ [settingKey]: !currentValue })
-        if (updateError) throw new Error(updateError)
-      } catch (error: any) {
-        setSetting(prev => (prev ? { ...prev, [settingKey]: currentValue } : null))
-        console.error(`Failed to update setting ${settingKey}:`, error)
-        alert(`${t('Error_Updating_Setting')}: ${error.message || error.toString()}`)
-      }
+    if (!setting) {
+      console.error("Attempted to toggle setting when setting object is null.");
+      return;
+    }
+    const currentValue = setting[settingKey] ?? false
+    setSetting(prev => (prev ? { ...prev, [settingKey]: !currentValue } : null))
+    try {
+      await updateUserSetting({ [settingKey]: !currentValue })
+      if (updateError) throw new Error(updateError)
+    } catch (error: any) {
+      setSetting(prev => (prev ? { ...prev, [settingKey]: currentValue } : null))
+      console.error(`Failed to update setting ${settingKey}:`, error)
+      alert(`${t('Error_Updating_Setting')}: ${error.message || error.toString()}`)
     }
   }, [setting, updateUserSetting, updateError, t])
 
@@ -162,12 +174,113 @@ const SettingTab: React.FC = () => {
     }
   }
 
-  // --- Render Logic ---
-  if (isInitializing) {
+  // BƯỚC 3: ĐỊNH NGHĨA TẤT CẢ CÁC TÙY CHỌN CÀI ĐẶT CÓ THỂ TÌM KIẾM
+  const allSettingItems = useMemo(() => [
+    // General Settings
+    {
+      key: 'receiveNotifications',
+      label: t('Receive_Notifications'),
+      description: t('Receive_Notifications_Description'),
+      icon: Bell,
+      section: 'general'
+    },
+    {
+      key: 'autoAddFollowToCalendar',
+      label: t('Auto_add_events_to_schedule'),
+      description: t('Auto_add_events_to_schedule_describe'),
+      icon: CalendarCheck,
+      section: 'general'
+    },
+    {
+      key: 'notificationThroughEmail',
+      label: t('Send_notification_through_email'),
+      description: t('Send_notification_through_email_describe'),
+      icon: Mail,
+      section: 'general'
+    },
+    // Notification Preferences
+    {
+      key: 'notificationWhenConferencesChanges',
+      label: t('Notification_when_conferences_changes'),
+      description: t('Change_and_Update_describe'),
+      icon: ChevronRight,
+      section: 'notifications'
+    },
+    {
+      key: 'upComingEvent',
+      label: t('Your_upcoming_event'),
+      description: t('Your_upcoming_event_describe'),
+      icon: CalendarPlus,
+      section: 'notifications'
+    },
+    {
+      key: 'notificationWhenUpdateProfile',
+      label: t('Notification_when_update_profile'),
+      description: t('Notification_when_update_profile_description'),
+      icon: UserCheck,
+      section: 'notifications'
+    },
+    {
+      key: 'notificationWhenFollow',
+      label: t('Notification_when_follow'),
+      description: t('Notification_when_follow_description'),
+      icon: Bell, // Hoặc một icon khác nếu có
+      section: 'notifications'
+    },
+    {
+      key: 'notificationWhenAddTocalendar',
+      label: t('Notification_when_add_to_calendar'),
+      description: t('Notification_when_add_to_calendar_description'),
+      icon: CalendarPlus,
+      section: 'notifications'
+    },
+    {
+      key: 'notificationWhenAddToBlacklist',
+      label: t('Notification_when_add_to_blacklist'),
+      description: t('Notification_when_add_to_blacklist_description'),
+      icon: Ban,
+      section: 'notifications'
+    },
+  ], [t]); // Dependency t để đảm bảo label và description được cập nhật khi ngôn ngữ thay đổi
+
+  // BƯỚC 4: LỌC CÁC TÙY CHỌN CÀI ĐẶT DỰA TRÊN SEARCH TERM
+  const filteredSettingItems = useMemo(() => {
+    if (!searchTerm) {
+      return allSettingItems;
+    }
+    const lowercasedSearchTerm = searchTerm.toLowerCase();
+    return allSettingItems.filter(item =>
+      item.label.toLowerCase().includes(lowercasedSearchTerm) ||
+      item.description.toLowerCase().includes(lowercasedSearchTerm)
+    );
+  }, [searchTerm, allSettingItems]);
+
+  // Nhóm các cài đặt đã lọc theo section
+  const groupedFilteredSettings = useMemo(() => {
+    return filteredSettingItems.reduce((acc, item) => {
+      if (!acc[item.section]) {
+        acc[item.section] = [];
+      }
+      acc[item.section].push(item);
+      return acc;
+    }, {} as Record<string, typeof allSettingItems>);
+  }, [filteredSettingItems]);
+
+
+  // --- Hàm render loading tương tự như FollowedTab/ProfileTab ---
+  const renderLoading = (messageKey: string) => (
+    <div className='flex flex-col items-center justify-center h-80 text-gray-500'>
+      <Loader2 className='w-10 h-10 animate-spin text-primary' />
+      <p className='mt-4 text-lg'>{t(messageKey)}</p>
+    </div>
+  )
+
+  // --- Render Logic (Thứ tự kiểm tra rất quan trọng!) ---
+
+  if ((isInitializing || isFetchingSettings) && initialLoad) {
     return (
-      <div className='flex items-center justify-center h-64 text-gray-500'>
-        <Loader2 className='animate-spin h-8 w-8 mr-2' />
-        <span>{t('Initializing_session')}</span>
+      <div className='flex h-screen items-center justify-center'>
+        {renderLoading('Loading_settings')}
       </div>
     )
   }
@@ -175,7 +288,8 @@ const SettingTab: React.FC = () => {
   if (!isLoggedIn) {
     return (
       <div className='container mx-auto p-4 text-center'>
-        <p className='mb-4'>{t('Please_log_in_to_view_settings')}</p>
+        <h2 className='text-xl font-semibold mb-2'>{t('MyConferences.Login_Required_Title')}</h2>
+        <p className='mb-4'>{t('MyConferences.Login_Required_Message')}</p>
         <Link href='/auth/login'>
           <Button variant='primary'>{t('Sign_In')}</Button>
         </Link>
@@ -185,9 +299,8 @@ const SettingTab: React.FC = () => {
 
   if (isFetchingSettings) {
     return (
-      <div className='flex items-center justify-center h-64 text-gray-500'>
-        <Loader2 className='animate-spin h-8 w-8 mr-2' />
-        <span>{t('Loading_settings')}</span>
+      <div className='flex h-screen items-center justify-center'>
+        {renderLoading('Loading_settings')}
       </div>
     )
   }
@@ -195,6 +308,7 @@ const SettingTab: React.FC = () => {
   if (!setting) {
     return (
       <div className='container mx-auto p-4 text-center'>
+        <h2 className='text-xl font-semibold mb-2 text-red-600'>{t('Could_not_load_user_settings_title')}</h2>
         <p className='mb-4 text-red-500'>
           {t('Could_not_load_user_settings')}
         </p>
@@ -216,95 +330,70 @@ const SettingTab: React.FC = () => {
           <p className='text-gray-600 mt-2'>{t('Manage_your_account_preferences_and_notifications')}</p>
         </header>
 
-        {/* General Settings Section */}
-        <section className='mb-8 p-6 bg-white rounded-lg shadow-sm'>
-          <h3 className='text-xl font-semibold text-gray-800 mb-4 flex items-center'>
-            <Cog className='h-6 w-6 mr-2 text-gray-500' />
-            {t('General_Settings')}
-          </h3>
-          <SettingToggle
-            label={t('Receive_Notifications')}
-            description={t('Receive_Notifications_Description')}
-            checked={setting.receiveNotifications ?? false}
-            onToggle={() => handleToggle('receiveNotifications')}
-            disabled={updateLoading}
-            icon={Bell}
+        {/* BƯỚC 5: THÊM SEARCHINPUT */}
+        <div className='mb-6'>
+          <SearchInput
+            initialValue={searchTerm}
+            onSearchChange={setSearchTerm}
+            placeholder={t('Search_settings') || 'Search settings...'}
           />
-          <SettingToggle
-            label={t('Auto_add_events_to_schedule')}
-            description={t('Auto_add_events_to_schedule_describe')}
-            checked={setting.autoAddFollowToCalendar ?? false}
-            onToggle={() => handleToggle('autoAddFollowToCalendar')}
-            disabled={updateLoading}
-            icon={CalendarCheck}
-          />
-          <SettingToggle
-            label={t('Send_notification_through_email')}
-            description={t('Send_notification_through_email_describe')}
-            checked={setting.notificationThroughEmail ?? false}
-            onToggle={() => handleToggle('notificationThroughEmail')}
-            disabled={updateLoading}
-            icon={Mail}
-          />
-        </section>
+        </div>
 
-        {/* Notification Preferences Section */}
-        <section className='mb-8 p-6 bg-white rounded-lg shadow-sm'>
-          <h3 className='text-xl font-semibold text-gray-800 mb-4 flex items-center'>
-            <Bell className='h-6 w-6 mr-2 text-gray-500' />
-            {t('Notification_Preferences')}
-          </h3>
-          <SettingToggle
-            label={t('Notification_when_conferences_changes')}
-            description={t('Change_and_Update_describe')}
-            checked={setting.notificationWhenConferencesChanges ?? false}
-            onToggle={() => handleToggle('notificationWhenConferencesChanges')}
-            disabled={updateLoading}
-            icon={ChevronRight}
-          />
-          <SettingToggle
-            label={t('Your_upcoming_event')}
-            description={t('Your_upcoming_event_describe')}
-            checked={setting.upComingEvent ?? false}
-            onToggle={() => handleToggle('upComingEvent')}
-            disabled={updateLoading}
-            icon={CalendarPlus}
-          />
-          <SettingToggle
-            label={t('Notification_when_update_profile')}
-            description={t('Notification_when_update_profile_description')}
-            checked={setting.notificationWhenUpdateProfile ?? false}
-            onToggle={() => handleToggle('notificationWhenUpdateProfile')}
-            disabled={updateLoading}
-            icon={UserCheck}
-          />
-          <SettingToggle
-            label={t('Notification_when_follow')}
-            description={t('Notification_when_follow_description')}
-            checked={setting.notificationWhenFollow ?? false}
-            onToggle={() => handleToggle('notificationWhenFollow')}
-            disabled={updateLoading}
-            icon={Bell}
-          />
-          <SettingToggle
-            label={t('Notification_when_add_to_calendar')}
-            description={t('Notification_when_add_to_calendar_description')}
-            checked={setting.notificationWhenAddTocalendar ?? false}
-            onToggle={() => handleToggle('notificationWhenAddTocalendar')}
-            disabled={updateLoading}
-            icon={CalendarPlus}
-          />
-          <SettingToggle
-            label={t('Notification_when_add_to_blacklist')}
-            description={t('Notification_when_add_to_blacklist_description')}
-            checked={setting.notificationWhenAddToBlacklist ?? false}
-            onToggle={() => handleToggle('notificationWhenAddToBlacklist')}
-            disabled={updateLoading}
-            icon={Ban}
-          />
-        </section>
+        {filteredSettingItems.length === 0 && (
+          <div className="my-10 text-center text-gray-500 bg-white p-10 rounded-lg shadow-sm">
+            <p className="text-lg">{t('No_settings_match_your_search')}</p>
+            <Button
+              variant="link"
+              onClick={() => setSearchTerm('')}
+              className="mt-2 text-sm text-indigo-600 hover:text-indigo-800"
+            >
+              {t('View_all_settings')}
+            </Button>
+          </div>
+        )}
 
-        {/* Account Management Section */}
+        {/* BƯỚC 6: SỬ DỤNG filteredSettingItems để render các phần cài đặt */}
+        {groupedFilteredSettings.general && groupedFilteredSettings.general.length > 0 && (
+          <section className='mb-8 p-6 bg-white rounded-lg shadow-sm'>
+            <h3 className='text-xl font-semibold text-gray-800 mb-4 flex items-center'>
+              <Cog className='h-6 w-6 mr-2 text-gray-500' />
+              {t('General_Settings')}
+            </h3>
+            {groupedFilteredSettings.general.map(item => (
+              <SettingToggle
+                key={item.key}
+                label={item.label}
+                description={item.description}
+                checked={setting[item.key as ToggleSettingKey] ?? false}
+                onToggle={() => handleToggle(item.key as ToggleSettingKey)}
+                disabled={updateLoading}
+                icon={item.icon}
+              />
+            ))}
+          </section>
+        )}
+
+        {groupedFilteredSettings.notifications && groupedFilteredSettings.notifications.length > 0 && (
+          <section className='mb-8 p-6 bg-white rounded-lg shadow-sm'>
+            <h3 className='text-xl font-semibold text-gray-800 mb-4 flex items-center'>
+              <Bell className='h-6 w-6 mr-2 text-gray-500' />
+              {t('Notification_Preferences')}
+            </h3>
+            {groupedFilteredSettings.notifications.map(item => (
+              <SettingToggle
+                key={item.key}
+                label={item.label}
+                description={item.description}
+                checked={setting[item.key as ToggleSettingKey] ?? false}
+                onToggle={() => handleToggle(item.key as ToggleSettingKey)}
+                disabled={updateLoading}
+                icon={item.icon}
+              />
+            ))}
+          </section>
+        )}
+
+        {/* Account Management Section (Không bị ảnh hưởng bởi tìm kiếm) */}
         <section className='mb-8 p-6 bg-white rounded-lg shadow-sm'>
           <h3 className='text-xl font-semibold text-gray-800 mb-4 flex items-center'>
             <UserX className='h-6 w-6 mr-2 text-gray-500' />
@@ -321,7 +410,7 @@ const SettingTab: React.FC = () => {
               data-testid='delete-account-button'
               onClick={handleDeleteAccount}
               disabled={isDeleting || updateLoading}
-              className={`mt-4 sm:mt-0 flex items-center justify-center px-6 py-2 rounded-md font-semibold text-white transition-colors duration-200 
+              className={`mt-4 sm:mt-0 flex items-center justify-center px-6 py-2 rounded-md font-semibold text-white transition-colors duration-200
                 ${isDeleting || updateLoading
                   ? 'cursor-not-allowed bg-red-400'
                   : 'bg-red-600 hover:bg-red-700 focus:ring-red-500'

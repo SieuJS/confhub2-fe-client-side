@@ -1517,12 +1517,13 @@
   "Modal_Title_Reason": "Reason from Administrator",
   "Modal_Title_Review": "Review Submitted Information",
   "MyConferences": {
+    "Loading_your_profile": "Loading your profile...",
     "Loading_your_calendar": "Loading your calendar...",
     "Loading_your_conferences": "Loading your conferences...",
     "Account_Banned_Title": "Account Banned",
     "Account_Banned_Message": "Your account has been banned. Please contact support for more information.",
     "Login_Required_Title": "Login Required",
-    "Login_Required_Message": "Please log in to view your conferences.",
+    "Login_Required_Message": "Please log in to view information.",
     "Title_All": "All My Conferences (<b>{count}</b>)",
     "Title_PENDING": "Pending Conferences (<b>{count}</b>)",
     "Title_APPROVED": "Approved Conferences (<b>{count}</b>)",
@@ -1598,5 +1599,13 @@
   "Initializing_session": "Initializing session...",
   "Please_log_in_to_view_settings": "Please log in to view your settings.",
   "Could_not_load_user_settings": "Could not load your settings. Please try again later.",
-  "Retry": "Retry"
+  "Retry": "Retry",
+  "Search_followed_conferences": "Search followed conferences...",
+  "Search_blacklisted_conferences": "Search blacklisted conferences...",
+  "No_conferences_match_your_search": "No conferences match your search.",
+  "Search_my_conferences": "Search my conferences...",
+  "Search_settings": "Search settings...",
+  "No_settings_match_your_search": "No settings match your search.",
+  "View_all_settings": "View all settings",
+  "Could_not_load_user_settings_title": "Could not load user settings"
 }

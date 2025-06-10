@@ -1,31 +1,43 @@
-// AddNoteDialog.tsx
-import React, { useState, useEffect, useRef } from 'react'
-import { CalendarEvent } from './Calendar' // Import
-import Image from 'next/image'
+// src/app/[locale]/note/AddNoteDialog.tsx
+
+import React from 'react'
+import { CalendarEvent } from './types/calendar'
+import { ConferenceResponse } from '@/src/models/response/conference.response'
+import { Link } from '@/src/navigation' // *** 1. Import Link từ Next.js ***
+
+// Import các icon Lucide cần dùng
+import {
+  X,
+  MapPin,
+  Link as LinkIcon, // Đổi tên để tránh trùng với component Link
+  Calendar as CalendarIcon,
+  Tag,
+  Info,
+  Loader2,
+  ExternalLink, // Icon cho link ra ngoài
+  ArrowRight, // Icon cho link nội bộ
+} from 'lucide-react'
 
 interface AddNoteDialogProps {
   date: Date
   onClose: () => void
-  onSave: (note: string, eventType: 'Event' | 'Task' | 'Appointment') => void
-  event?: CalendarEvent | null // Optional event prop
-  eventDetails?: any | null // Optional event details
+  event?: CalendarEvent | null
+  eventDetails?: ConferenceResponse | null
   loadingDetails?: boolean
 }
 
 const AddNoteDialog: React.FC<AddNoteDialogProps> = ({
-  date,
   onClose,
-  onSave,
   event,
   eventDetails,
-  loadingDetails
+  loadingDetails,
 }) => {
+  /*
+  // --- START: Tạm thời comment out logic Add/Edit Note ---
+  const t = useTranslations('')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [eventType, setEventType] = useState<'Event' | 'Task' | 'Appointment'>(
-    'Event'
-  )
-
+  const [eventType, setEventType] = useState<'Event' | 'Task' | 'Appointment'>('Event')
   const [showLocationInput, setShowLocationInput] = useState(false)
   const [location, setLocation] = useState('')
   const [showGuestsInput, setShowGuestsInput] = useState(false)
@@ -37,11 +49,10 @@ const AddNoteDialog: React.FC<AddNoteDialogProps> = ({
   const [allDay, setAllDay] = useState(false)
   const [showStartTimeDropdown, setShowStartTimeDropdown] = useState(false)
   const [showEndTimeDropdown, setShowEndTimeDropdown] = useState(false)
-  const startTimeRef = useRef(null)
-  const endTimeRef = useRef(null)
+  const startTimeRef = useRef<HTMLInputElement>(null)
+  const endTimeRef = useRef<HTMLInputElement>(null)
   const formattedDate = date.toISOString().split('T')[0]
 
-  // Generate time options (e.g., every 15 minutes)
   const generateTimeOptions = () => {
     const options = []
     for (let hour = 0; hour < 24; hour++) {
@@ -56,339 +67,175 @@ const AddNoteDialog: React.FC<AddNoteDialogProps> = ({
   const timeOptions = generateTimeOptions()
 
   const handleSaveWithTimes = () => {
-    if (allDay) {
-      // handleSave({ title, description, location, guests, meetLink, date: formattedDate, startTime: '00:00', endTime: '23:59' });
-    } else {
-      if (!startTime || !endTime) {
-        alert('Please select both start and end times.')
-        return
-      }
-      // handleSave({ title, description, location, guests, meetLink, date: formattedDate, startTime, endTime });
-    }
+    const noteContent = `${title}\n${description}\nLocation: ${location}\nGuests: ${guests}\nMeet: ${meetLink}\nStart: ${startTime}\nEnd: ${endTime}\nAll Day: ${allDay}`
+    // onSave(noteContent, eventType) // onSave không còn tồn tại
+    onClose()
   }
 
-  // Update state when the event prop changes (for editing)
   useEffect(() => {
-    if (event) {
-      setTitle(event.title || '') // Use title if available
+    if (event && !event.conferenceId) {
+      setTitle(event.title || '')
       setEventType(event.type as 'Event' | 'Task' | 'Appointment')
-      // You might set other fields here, like description, based on your event data
-    } else {
-      // Reset to defaults when adding a new note
+    } else if (!event) {
       setTitle('')
       setDescription('')
       setEventType('Event')
+      setLocation('')
+      setGuests('')
+      setMeetLink('')
+      setStartTime('')
+      setEndTime('')
+      setAllDay(false)
     }
   }, [event])
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        startTimeRef.current &&
+        !startTimeRef.current.contains(e.target as Node) &&
+        showStartTimeDropdown
+      ) {
+        setShowStartTimeDropdown(false)
+      }
+      if (
+        endTimeRef.current &&
+        !endTimeRef.current.contains(e.target as Node) &&
+        showEndTimeDropdown
+      ) {
+        setShowEndTimeDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showStartTimeDropdown, showEndTimeDropdown])
+
   const handleDelete = () => {
-    // Implement your delete logic here.  You'll likely need a way
-    // to identify the event to delete (e.g., using a unique ID).
-    // You might need an `onDelete` prop similar to `onSave`.
     console.log('Delete event:', event)
     onClose()
   }
 
   const renderAddEditView = () => {
+    // JSX for Add/Edit view
+  }
+  // --- END: Tạm thời comment out logic Add/Edit Note ---
+  */
+
+   const renderEventDetailView = () => {
+    if (loadingDetails) {
+      return (
+        <div className='flex h-48 items-center justify-center'>
+          <Loader2 className='h-8 w-8 animate-spin text-button' />
+          <span className='ml-2'>Loading details...</span>
+        </div>
+      )
+    }
+    if (!event || !eventDetails) {
+      return (
+        <div className='flex h-48 items-center justify-center'>
+          <p>Could not load event details.</p>
+        </div>
+      )
+    }
+
+    const orgDetails = eventDetails.organizations?.[0]
+    const location = orgDetails?.locations?.[0]
+
     return (
-      <>
-        <h2 className='mb-4 text-lg font-semibold'>
-          {event ? 'Edit Event' : ''}
-          {/* Added "Add Event" for clarity */}
-        </h2>
+      <div className='space-y-4'>
+        {/* Title */}
+        <h3 className='text-xl font-bold text-text-primary'>
+          {eventDetails.title}
+        </h3>
 
-        <div className='relative mb-4 font-bold'>
-          <input
-            type='text'
-            placeholder='Add title'
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            className='w-full bg-background py-2 placeholder-secondary focus:border-b-2 focus:border-background-secondary focus:outline-none'
-          />
-        </div>
-
-        <div className='mb-4 flex items-center text-sm'>
-          <div className='mr-4 '>{formattedDate}</div>
-          {/* <div className='flex items-center'> */}
-          <div className='relative' ref={startTimeRef}>
-            <input
-              type='text'
-              placeholder='Start Time'
-              value={startTime}
-              onClick={() => setShowStartTimeDropdown(!showStartTimeDropdown)}
-              readOnly // Important: Prevent keyboard input
-              className='mr-1 w-16 cursor-pointer bg-background py-2 text-center text-sm  placeholder-text-secondary focus:border-b focus:outline-none focus:ring-2 focus:ring-button'
-              disabled={allDay}
-            />
-
-            {showStartTimeDropdown && (
-              <div className='absolute z-10 max-h-40 w-20 overflow-y-auto rounded border bg-background text-sm shadow-md scrollbar-none'>
-                {timeOptions.map(time => (
-                  <div
-                    key={time}
-                    className='cursor-pointer px-3 py-1 hover:bg-gray-100'
-                    onClick={() => {
-                      setStartTime(time)
-                      setShowStartTimeDropdown(false)
-                    }}
-                  >
-                    {time}
-                  </div>
-                ))}
-              </div>
-            )}
+        {/* Acronym */}
+        {eventDetails.acronym && (
+          <div className='flex items-center text-sm text-text-secondary'>
+            <Info className='mr-3 h-4 w-4 flex-shrink-0' />
+            <span>{eventDetails.acronym}</span>
           </div>
-          <span>-</span>
-          <div className='relative ml-2' ref={endTimeRef}>
-            <input
-              type='text'
-              placeholder='End Time'
-              value={endTime}
-              onClick={() => setShowEndTimeDropdown(!showEndTimeDropdown)}
-              readOnly // Prevent keyboard input
-              className='ml-1 w-16 cursor-pointer bg-background py-2 text-center text-sm placeholder-text-secondary focus:border-b focus:outline-none focus:ring-2 focus:ring-button'
-              disabled={allDay}
-            />
-
-            {showEndTimeDropdown && (
-              <div className='absolute z-10 max-h-40 w-20 overflow-y-auto rounded border bg-background shadow-md scrollbar-none'>
-                {timeOptions.map(time => (
-                  <div
-                    key={time}
-                    className=' cursor-pointer px-3 py-1 '
-                    onClick={() => {
-                      setEndTime(time)
-                      setShowEndTimeDropdown(false)
-                    }}
-                  >
-                    {time}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          <label className='ml-4 flex items-center'>
-            <input
-              type='checkbox'
-              checked={allDay}
-              onChange={e => setAllDay(e.target.checked)}
-              className='mr-2 h-4 w-4  bg-background' // Added h-4 w-4 for better checkbox size
-            />
-            All Day
-          </label>
-        </div>
-        {/* </div> */}
-
-        {/* Guests */}
-        <div className='relative mb-4 flex items-center text-sm'>
-          {/* Guests Icon */}
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            fill='none'
-            viewBox='0 0 24 24'
-            strokeWidth={1.5}
-            stroke='currentColor'
-            className='mr-2 h-5 w-5 '
-          >
-            <path
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              d='M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z'
-            />
-          </svg>
-          {showGuestsInput ? (
-            <input
-              type='text'
-              placeholder='Add guests'
-              value={guests}
-              onChange={e => setGuests(e.target.value)}
-              className='w-full bg-background py-2 placeholder-text-secondary focus:border-b-2 focus:border-background-secondary focus:outline-none'
-              onBlur={() => setShowGuestsInput(false)}
-              autoFocus
-            />
-          ) : (
-            <div
-              className='flex cursor-pointer items-center py-2'
-              onClick={() => setShowGuestsInput(true)}
-            >
-              Add guests
-            </div>
-          )}
-        </div>
-
-        {/* Google Meet */}
-        <div className='relative mb-4 flex items-center text-sm'>
-          {/* Google Meet Icon */}
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            viewBox='0 0 24 24'
-            fill='currentColor'
-            className='mr-2 h-5 w-5 '
-          >
-            <path
-              fillRule='evenodd'
-              d='M1.5 7.125c0-1.036.84-1.875 1.875-1.875h6c1.036 0 1.875.84 1.875 1.875V9h-9.75V7.125ZM4.125 11.25h17.25c1.035 0 1.875.84 1.875 1.875v6c0 1.036-.84 1.875-1.875 1.875h-17.25A1.875 1.875 0 0 1 2.25 19.125v-6c0-1.035.84-1.875 1.875-1.875Zm6 3.75a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75Zm3-.75a.75.75 0 0 0-1.5 0v1.5a.75.75 0 0 0 1.5 0v-1.5Zm4.5.75a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75Zm-9-3a.75.75 0 0 0-1.5 0v1.5a.75.75 0 0 0 1.5 0v-1.5Zm3-.75a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75Zm4.5.75a.75.75 0 0 0-1.5 0v1.5a.75.75 0 0 0 1.5 0v-1.5Z'
-              clipRule='evenodd'
-            />
-          </svg>
-          {showMeetInput ? (
-            <input
-              type='text'
-              placeholder='Add Google Meet '
-              value={meetLink}
-              onChange={e => setMeetLink(e.target.value)}
-              className='w-full bg-background py-2 placeholder-text-secondary focus:border-b-2 focus:border-background-secondary focus:outline-none'
-              onBlur={() => setShowMeetInput(false)}
-              autoFocus
-            />
-          ) : (
-            <div
-              className='flex cursor-pointer items-center py-2'
-              onClick={() => setShowMeetInput(true)}
-            >
-              Add Google Meet
-            </div>
-          )}
-        </div>
+        )}
 
         {/* Location */}
-        <div className='relative mb-4 flex items-center text-sm'>
-          {/* Location Icon */}
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            fill='none'
-            viewBox='0 0 24 24'
-            strokeWidth={1.5}
-            stroke='currentColor'
-            className='mr-2 h-5 w-5 '
-          >
-            <path
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              d='M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'
-            />
-            <path
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              d='M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z'
-            />
-          </svg>
-          {showLocationInput ? (
-            <input
-              type='text'
-              placeholder='Add location'
-              value={location}
-              onChange={e => setLocation(e.target.value)}
-              className='w-full bg-background py-2 placeholder-text-secondary focus:border-b-2 focus:border-background-secondary focus:outline-none'
-              onBlur={() => setShowLocationInput(false)}
-              autoFocus
-            />
-          ) : (
-            <div
-              className='flex cursor-pointer items-center py-2'
-              onClick={() => setShowLocationInput(true)}
-            >
-              Add location
+        {location && (
+          <div className='flex items-center text-sm text-text-secondary'>
+            <MapPin className='mr-3 h-4 w-4 flex-shrink-0' />
+            <span>
+              {location.cityStateProvince}, {location.country}
+            </span>
+          </div>
+        )}
+
+        {/* Important Dates */}
+        {orgDetails?.conferenceDates && orgDetails.conferenceDates.length > 0 && (
+          <div className='text-sm'>
+            <div className='mb-2 flex items-center font-medium text-text-primary'>
+              <CalendarIcon className='mr-3 h-4 w-4 flex-shrink-0' />
+              <span>Important Dates</span>
             </div>
-          )}
-        </div>
-
-        {/* Description */}
-        <div className='relative mb-4 text-sm'>
-          <textarea
-            placeholder='Add description'
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            className='w-full bg-background py-2  placeholder-text-secondary focus:border-b-2 focus:border-background-secondary focus:outline-none'
-          />
-        </div>
-
-        <div className='flex justify-end'>
-          {event && (
-            <button
-              className='mr-2 px-4 py-2  hover:underline'
-              onClick={handleDelete}
-            >
-              Delete
-            </button>
-          )}
-
-          <button
-            className='ml-2 rounded-md bg-button px-4 py-2 text-button-text '
-            onClick={handleSaveWithTimes} // Use the new save function
-            disabled={!title}
-          >
-            Save
-          </button>
-        </div>
-      </>
-    )
-  }
-
-  const renderEventDetailView = () => {
-    if (loadingDetails) {
-      return <div>Loading conference details...</div>
-    }
-    if (!event || !eventDetails) return null
-
-    return (
-      <div>
-        <h3 className='mb-2 text-lg font-semibold text-teal-700'>
-          {eventDetails.conference.title}
-        </h3>
-        <p className='mb-2 text-gray-700'>
-          Acronym: {eventDetails.conference.acronym}
-        </p>
-        <p className='mb-2 text-gray-700'>
-          Location: {eventDetails.location.cityStateProvince},{' '}
-          {eventDetails.location.country}
-        </p>
-        {/* Display important dates */}
-        {eventDetails.dates && eventDetails.dates.length > 0 && (
-          <div className='mb-2'>
-            <h4 className='font-medium'>Important Dates:</h4>
-            <ul>
-              {eventDetails.dates.map((date: any, index: any) => (
-                <li key={index} className='text-gray-700'>
-                  {date.name}: {new Date(date.fromDate).toLocaleDateString()} -{' '}
-                  {new Date(date.toDate).toLocaleDateString()}
+            <ul className='ml-7 list-disc space-y-1 text-text-secondary'>
+              {orgDetails.conferenceDates.map((d, index) => (
+                <li key={index}>
+                  <span className='font-semibold'>{d.name || d.type}:</span>{' '}
+                  {new Date(d.fromDate).toLocaleDateString()}
+                  {d.toDate &&
+                    d.toDate !== d.fromDate &&
+                    ` - ${new Date(d.toDate).toLocaleDateString()}`}
                 </li>
               ))}
             </ul>
           </div>
         )}
 
-        <div className='mb-2'>
-          <h4 className='font-medium'>Topics:</h4>
-          <p className='mb-2 text-gray-700'>
-            {eventDetails.organization.topics.join(', ')}
-          </p>
-        </div>
+        {/* Topics */}
+        {orgDetails?.topics && orgDetails.topics.length > 0 && (
+          <div className='text-sm'>
+            <div className='mb-2 flex items-center font-medium text-text-primary'>
+              <Tag className='mr-3 h-4 w-4 flex-shrink-0' />
+              <span>Topics</span>
+            </div>
+            <div className='ml-7 flex flex-wrap gap-2'>
+              {orgDetails.topics.map((topic, index) => (
+                <span
+                  key={index}
+                  className='rounded-full bg-background-secondary px-2 py-1 text-xs'
+                >
+                  {topic}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
-        <div className='mb-4'>
-          <a
-            href={eventDetails.organization.link}
-            target='_blank'
-            rel='noopener noreferrer'
-            className='flex items-center text-blue-500 hover:text-blue-700'
+        {/* --- 2. SỬA PHẦN HIỂN THỊ CÁC NÚT LINK --- */}
+        <div className='flex flex-wrap items-center gap-4 pt-2'>
+          {/* Nút đi tới trang chi tiết trong hệ thống */}
+          <Link
+            href={{
+              pathname: '/conferences/detail',
+              query: { id: eventDetails.id }, // Sử dụng id từ eventDetails
+            }}
+            className='inline-flex items-center rounded-md bg-button px-4 py-2 text-sm font-medium text-button-text shadow-sm hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
           >
-            <Image
-              src='/images/link-icon.svg'
-              alt='More Details'
-              width={14}
-              height={14}
-              className='mr-1'
-            />
-            More details
-          </a>
-        </div>
-        <div className='flex justify-between'>
-          <button
-            onClick={handleDelete}
-            className='focus:shadow-outline rounded bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700 focus:outline-none'
-          >
-            Delete
-          </button>
+            View Details
+            <ArrowRight className='ml-2 h-4 w-4' />
+          </Link>
+
+          {/* Nút đi tới trang web của hội nghị */}
+          {orgDetails?.link && (
+            <a
+              href={orgDetails.link}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='inline-flex items-center rounded-md border border-gray-300 bg-background px-4 py-2 text-sm font-medium text-text-primary shadow-sm hover:bg-background-secondary focus:outline-none focus:ring-2 focus:ring-button focus:ring-offset-2'
+            >
+              Visit Website
+              <ExternalLink className='ml-2 h-4 w-4' />
+            </a>
+          )}
         </div>
       </div>
     )
@@ -396,27 +243,13 @@ const AddNoteDialog: React.FC<AddNoteDialogProps> = ({
 
   return (
     <div className='relative w-full max-w-md rounded-lg bg-background p-6 shadow-xl'>
-      <button className='absolute right-2 top-2' onClick={onClose}>
-        <svg
-          className='h-6 w-6'
-          fill='none'
-          viewBox='0 0 24 24'
-          stroke='currentColor'
-        >
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            strokeWidth='2'
-            d='M6 18L18 6M6 6l12 12'
-          />
-        </svg>
+      <button
+        className='absolute right-4 top-4 text-text-secondary hover:text-text-primary'
+        onClick={onClose}
+      >
+        <X className='h-6 w-6' />
       </button>
-
-      {event
-        ? event.conferenceId
-          ? renderEventDetailView()
-          : renderAddEditView()
-        : renderAddEditView()}
+      {renderEventDetailView()}
     </div>
   )
 }

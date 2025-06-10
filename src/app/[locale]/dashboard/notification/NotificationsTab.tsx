@@ -1,4 +1,5 @@
 // NotificationsTab.tsx
+
 import React, { useEffect, useCallback, useState, useMemo } from 'react';
 import Button from '../../utils/Button';
 import { Link } from '@/src/navigation';
@@ -13,12 +14,15 @@ import {
   MailOpen,
   Star,
   Trash2,
-  Loader2 // THÊM DÒNG NÀY
+  Loader2
 } from 'lucide-react';
+
+// BƯỚC 1: IMPORT COMPONENT TÌM KIẾM MỚI
+import SearchInput from '../../utils/SearchInput'; // <-- Đảm bảo đường dẫn này chính xác
 
 const NotificationsTab: React.FC = () => {
   const t = useTranslations('');
-  const { logout } = useAuth(); // Import logout từ useAuth
+  const { logout } = useAuth();
 
   const {
     notifications,
@@ -42,9 +46,9 @@ const NotificationsTab: React.FC = () => {
     handleMarkSelectedAsUnimportant,
     allSelectedAreImportant,
     setSearchTerm,
-    isBanned, // GIẢ ĐỊNH useNotifications TRẢ VỀ isBanned
-    initialLoad // GIẢ ĐỊNH useNotifications TRẢ VỀ initialLoad
-  } = useNotifications(); // Đảm bảo useNotifications trả về isBanned và initialLoad
+    isBanned,
+    initialLoad
+  } = useNotifications();
 
   const pathname = usePathname();
   const router = useRouter();
@@ -91,23 +95,17 @@ const NotificationsTab: React.FC = () => {
     return filteredNotifications;
   }, [filteredNotifications, filter]);
 
-  // Hàm render loading (tương tự các tab khác)
   const renderLoading = () => (
     <div className="flex flex-col items-center justify-center h-80 text-gray-500">
       <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
-      <p className="mt-4 text-lg">{t('MyConferences.Loading_your_conferences')}</p> {/* Sử dụng cùng một key dịch */}
+      <p className="mt-4 text-lg">{t('MyConferences.Loading_your_conferences')}</p>
     </div>
   );
 
-  // LOGIC ĐIỀU CHỈNH CHÍNH:
-  // 1. Nếu đang tải VÀ là lần tải ban đầu, hiển thị loading spinner.
   if (loading && initialLoad) {
     return <div className='container mx-auto p-4'>{renderLoading()}</div>;
   }
 
-  // 2. Sau khi initialLoad đã hoàn tất, kiểm tra các trạng thái khác.
-  // Đảm bảo tab là 'notifications' trước khi kiểm tra loggedIn để tránh lỗi render
-  // nếu tab không đúng hoặc đang chuyển tab.
   if (tab !== 'notifications') {
     return null;
   }
@@ -136,7 +134,6 @@ const NotificationsTab: React.FC = () => {
     );
   }
 
-  // Nếu có một thông báo được chọn, hiển thị chi tiết
   if (selectedNotificationId) {
     const notification = notifications.find(
       n => n.id === selectedNotificationId
@@ -168,17 +165,15 @@ const NotificationsTab: React.FC = () => {
     }
   }
 
-  // Nếu không có thông báo được chọn và đã tải xong, hiển thị danh sách
   return (
     <div className='container mx-auto p-2 md:p-6'>
-      {/* Thanh tìm kiếm */}
-      <div className='mb-4 '>
-        <input
-          type='text'
+      {/* BƯỚC 2: SỬ DỤNG COMPONENT SEARCHINPUT ĐÃ TÁCH */}
+      <div className='mb-4'>
+        <SearchInput
+          initialValue={searchTerm}
+          onSearchChange={setSearchTerm}
           placeholder={t('Search_notifications') || 'Search notifications...'}
-          className='w-full rounded-full border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-button'
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
+          debounceDelay={300} // Giảm delay một chút để phản hồi nhanh hơn
         />
       </div>
 
@@ -228,7 +223,6 @@ const NotificationsTab: React.FC = () => {
         </div>
         {checkedIndices.length > 0 && (
           <>
-            {/* Nút Mark Read/Unread */}
             <button
               onClick={
                 allSelectedAreRead
@@ -254,7 +248,6 @@ const NotificationsTab: React.FC = () => {
                 </>
               )}
             </button>
-            {/* Nút Mark Important/Unimportant */}
             <button
               onClick={
                 allSelectedAreImportant
@@ -280,7 +273,6 @@ const NotificationsTab: React.FC = () => {
                 </>
               )}
             </button>
-            {/* Nút Delete Selected */}
             <button
               onClick={handleDeleteSelected}
               className='flex min-w-[110px] items-center justify-center rounded bg-red-500 px-2 py-1 text-sm font-bold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 md:min-w-[140px] md:px-3 md:text-base'
@@ -295,7 +287,6 @@ const NotificationsTab: React.FC = () => {
 
       {/* Danh sách thông báo */}
       <div className='overflow-hidden rounded border bg-white-pure shadow'>
-        {/* Hiển thị loading nếu không phải lần tải ban đầu nhưng vẫn đang tải */}
         {loading && !initialLoad && renderLoading()}
 
         {!loading && displayedNotifications.length === 0 ? (
@@ -304,7 +295,7 @@ const NotificationsTab: React.FC = () => {
               'No notifications match your current filters.'}
           </p>
         ) : (
-          !loading && displayedNotifications.map(notification => ( // Chỉ render khi không loading
+          !loading && displayedNotifications.map(notification => (
             <NotificationItem
               key={notification.id}
               notification={notification}

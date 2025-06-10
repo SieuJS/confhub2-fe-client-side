@@ -15,6 +15,7 @@ import MyConferenceCard from './MyConferenceCard';
 import ConferenceReviewStep from '../../addconference/steps/ConferenceReviewStep';
 import Modal from '../../chatbot/Modal';
 import Button from '../../utils/Button';
+import SearchInput from '../../utils/SearchInput'; 
 
 // Types
 import { ConferenceResponse } from '@/src/models/response/conference.response';
@@ -25,7 +26,7 @@ const ConferenceStatus = {
   Approve: 'APPROVED',
   Pending: 'PENDING',
   Rejected: 'REJECTED',
-} as const; // Sử dụng 'as const' để có kiểu chặt chẽ hơn
+} as const;
 
 type StatusFilter = typeof ConferenceStatus[keyof typeof ConferenceStatus] | 'All';
 
@@ -38,6 +39,8 @@ const MyConferencesTab: React.FC = () => {
   const [displayStatus, setDisplayStatus] = useState<StatusFilter>('PENDING');
   const [modalContent, setModalContent] = useState<{ type: 'reason' | 'review'; data: any } | null>(null);
 
+  const [searchTerm, setSearchTerm] = useState('');
+
   const setConferenceToEdit = useConferenceEditStore((state) => state.setConferenceToEdit);
 
   // --- Action Handlers ---
@@ -49,13 +52,12 @@ const MyConferencesTab: React.FC = () => {
     const organization = conferenceData.organizations?.[0];
     const location = organization?.locations?.[0];
 
-    // Helper để ép kiểu an toàn
     const toConferenceType = (accessType: string | undefined): ConferenceType => {
       const upperType = (accessType || '').toUpperCase();
       if (upperType === 'ONLINE' || upperType === 'OFFLINE' || upperType === 'HYBRID') {
         return accessType as ConferenceType;
       }
-      return 'Offline'; // Default
+      return 'Offline';
     };
 
     const reviewProps = {
@@ -86,11 +88,25 @@ const MyConferencesTab: React.FC = () => {
   const filteredConferences = useMemo(() => {
     if (!conferences) return [];
     const sorted = [...conferences].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    if (displayStatus === 'All') {
-      return sorted;
+
+    let tempFiltered = sorted;
+
+    // Lọc theo trạng thái
+    if (displayStatus !== 'All') {
+      tempFiltered = tempFiltered.filter(conf => conf.status.toUpperCase() === displayStatus);
     }
-    return sorted.filter(conf => conf.status.toUpperCase() === displayStatus);
-  }, [conferences, displayStatus]);
+
+    // LỌC THEO SEARCH TERM
+    if (searchTerm) {
+      const lowercasedSearchTerm = searchTerm.toLowerCase();
+      tempFiltered = tempFiltered.filter(conf =>
+        conf.title.toLowerCase().includes(lowercasedSearchTerm) ||
+        conf.acronym.toLowerCase().includes(lowercasedSearchTerm)
+      );
+    }
+
+    return tempFiltered;
+  }, [conferences, displayStatus, searchTerm]);
 
   // --- Render Logic ---
 
@@ -138,9 +154,10 @@ const MyConferencesTab: React.FC = () => {
   if (isLoading) return renderLoading();
 
   const getStatusTitle = (status: StatusFilter) => {
+    const count = filteredConferences.length;
     const key = `MyConferences.Title_${status}`;
     return t.rich(key, {
-      count: filteredConferences.length,
+      count: count,
       b: (chunks) => <strong>{chunks}</strong>
     });
   };
@@ -154,24 +171,38 @@ const MyConferencesTab: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4 md:p-6 bg-gray-10 min-h-screen">
-      <div className="flex justify-end mb-6">
-        <Link href="/addconference">
-          <Button variant="primary" size="medium" rounded>{t('Add_Conference')}</Button>
-        </Link>
-      </div>
+      {/* Thanh Search trên đầu */}
+      {conferences && conferences.length > 0 && (
+        <div className="mb-6">
+          <SearchInput
+            initialValue={searchTerm}
+            onSearchChange={setSearchTerm}
+            placeholder={t('Search_my_conferences') || 'Search by title or acronym...'}
+          />
+        </div>
+      )}
 
+      {/* Các nút actions: filter bên trái, Add Conference bên phải */}
       <div className="bg-white p-3 rounded-lg shadow-sm mb-6">
-        <div className="flex flex-wrap items-center justify-center gap-2 md:justify-start">
-          {filterButtons.map(btn => (
-            <Button
-              key={btn.status}
-              variant={displayStatus === btn.status ? 'primary' : 'secondary'}
-              size="small"
-              onClick={() => setDisplayStatus(btn.status)}
-            >
-              {btn.label}
-            </Button>
-          ))}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4"> {/* Đặt flex-col cho mobile, flex-row cho desktop */}
+          {/* Các nút filter ở bên trái */}
+          <div className="flex flex-wrap gap-2 order-2 md:order-1 w-full md:w-auto justify-center md:justify-start"> {/* Điều chỉnh thứ tự và căn chỉnh */}
+            {filterButtons.map(btn => (
+              <Button
+                key={btn.status}
+                variant={displayStatus === btn.status ? 'primary' : 'secondary'}
+                size="small"
+                onClick={() => setDisplayStatus(btn.status)}
+              >
+                {btn.label}
+              </Button>
+            ))}
+          </div>
+
+          {/* Nút Add Conference ở bên phải */}
+          <Link href="/addconference" className="order-1 md:order-2"> {/* Điều chỉnh thứ tự */}
+            <Button variant="primary" size="medium" rounded>{t('Add_Conference')}</Button>
+          </Link>
         </div>
       </div>
 
@@ -181,11 +212,18 @@ const MyConferencesTab: React.FC = () => {
 
       {filteredConferences.length === 0 ? (
         <div className="my-10 text-center text-gray-500 bg-white p-10 rounded-lg shadow-sm">
-          <p className="text-lg">{t('MyConferences.You_have_no_conference_in_this_category')}</p>
-          {displayStatus !== 'All' && (
+          <p className="text-lg">
+            {searchTerm && conferences && conferences.length > 0
+              ? t('No_conferences_match_your_search')
+              : t('MyConferences.You_have_no_conference_in_this_category')}
+          </p>
+          {(displayStatus !== 'All' || (searchTerm && conferences && conferences.length > 0)) && (
             <Button
               variant="link"
-              onClick={() => setDisplayStatus('All')}
+              onClick={() => {
+                setDisplayStatus('All');
+                setSearchTerm('');
+              }}
               className="mt-2 text-sm text-indigo-600 hover:text-indigo-800"
             >
               {t('MyConferences.View_all_conferences')}
