@@ -1,314 +1,237 @@
-// frontend/MyConferencesTab.tsx
-'use client' // Đảm bảo component này là Client Component
+'use client';
 
-import React, { useState, useMemo, useEffect } from 'react' // Thêm useEffect
-import ConferenceItem from '../../conferences/ConferenceItem'
-import Button from '../../utils/Button'
-import { Link } from '@/src/navigation'
-import useMyConferences from '@/src/hooks/dashboard/myConferences/useMyConferences'
-import { formatDateFull, timeAgo } from '../timeFormat' // Đường dẫn này cần kiểm tra lại nếu có lỗi
-import Tooltip from '../../utils/Tooltip'
-import { useTranslations } from 'next-intl'
-import { useAuth } from '@/src/contexts/AuthContext' // <<<< THAY ĐỔI QUAN TRỌNG
+import React, { useState, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
+import { useRouter, Link } from '@/src/navigation';
+import { Loader2 } from 'lucide-react';
+
+// Hooks & Stores
+import { useAuth } from '@/src/contexts/AuthContext';
+import useMyConferences from '@/src/hooks/dashboard/myConferences/useMyConferences';
+import { useConferenceEditStore } from '@/src/stores/conferenceEditStore';
+
+// Components
+import MyConferenceCard from './MyConferenceCard';
+import ConferenceReviewStep from '../../addconference/steps/ConferenceReviewStep';
+import Modal from '../../chatbot/Modal';
+import Button from '../../utils/Button';
+
+// Types
+import { ConferenceResponse } from '@/src/models/response/conference.response';
+import { ConferenceType } from '@/src/hooks/addConference/useConferenceForm';
 
 // Enum for conference status
-enum ConferenceStatus {
-  Approve = 'APPROVED', // Giữ nguyên giá trị từ backend nếu nó là string
-  Pending = 'PENDING',
-  Rejected = 'REJECTED'
-  // Thêm các status khác nếu có từ backend, ví dụ: 'Draft', 'Cancelled'
-}
+const ConferenceStatus = {
+  Approve: 'APPROVED',
+  Pending: 'PENDING',
+  Rejected: 'REJECTED',
+} as const; // Sử dụng 'as const' để có kiểu chặt chẽ hơn
+
+type StatusFilter = typeof ConferenceStatus[keyof typeof ConferenceStatus] | 'All';
 
 const MyConferencesTab: React.FC = () => {
-  const t = useTranslations('')
-  const language = t('language')
+  const t = useTranslations('');
+  const router = useRouter();
+  const { user, getToken, isInitializing: isAuthInitializing, isLoggedIn, logout } = useAuth();
+  const { conferences, isLoading, error, refetch } = useMyConferences(user?.id || null, getToken);
 
-  const [displayStatus, setDisplayStatus] = useState<ConferenceStatus | 'All'>( // Thêm 'All' để hiển thị tất cả
-    ConferenceStatus.Pending
-  )
+  const [displayStatus, setDisplayStatus] = useState<StatusFilter>('PENDING');
+  const [modalContent, setModalContent] = useState<{ type: 'reason' | 'review'; data: any } | null>(null);
 
-  // <<<< THAY ĐỔI QUAN TRỌNG: Sử dụng useAuth từ Context
-  // isInitializing là trạng thái khởi tạo của AuthProvider
-  // isLoading (đổi tên thành isAuthLoading) là khi có action bất đồng bộ từ useAuth (ít dùng ở đây)
-  const {
-    user,
-    isLoggedIn,
-    isInitializing: isAuthInitializing,
-    getToken,
-    logout
-  } = useAuth()
+  const setConferenceToEdit = useConferenceEditStore((state) => state.setConferenceToEdit);
 
-  // Hook useMyConferences giờ sẽ lấy token từ getToken() của useAuth
-  // và chỉ fetch khi user đã được xác thực và isAuthInitializing là false
-  const {
-    conferences,
-    isLoading: isLoadingConferences, // Đổi tên để phân biệt
-    error: conferencesError,
-    refetch
-  } = useMyConferences(user?.id || null, getToken) // Truyền userId (hoặc null) và hàm getToken
+  // --- Action Handlers ---
+  const handleViewReason = (message: string) => {
+    setModalContent({ type: 'reason', data: message });
+  };
 
-  // useEffect để tự động fetch lại khi user thay đổi (ví dụ: login/logout)
-  // Hoặc khi isAuthInitializing thay đổi từ true sang false và user đã có
-  useEffect(() => {
-    if (!isAuthInitializing && user?.id) {
-      // console.log('[MyConferencesTab] Auth initialized and user available, ensuring conferences are fetched.');
-      // useMyConferences đã có logic fetch khi userId thay đổi,
-      // nhưng gọi refetch ở đây có thể hữu ích nếu bạn muốn đảm bảo nó chạy sau khi auth sẵn sàng.
-      // Hoặc bạn có thể để useMyConferences tự xử lý dựa trên sự thay đổi của user?.id
-      // refetch(); // Cân nhắc có cần thiết không nếu useMyConferences đã handle
-    }
-  }, [isAuthInitializing, user?.id])
+  const handleViewSubmitted = (conferenceData: ConferenceResponse) => {
+    const organization = conferenceData.organizations?.[0];
+    const location = organization?.locations?.[0];
 
-  const transformedConferences = useMemo(() => {
-    if (!conferences) {
-      return []
-    }
-
-    // Bước 1: Map và có thể trả về null
-    const mappedConferences = conferences.map(conf => {
-      if (typeof conf.status !== 'string') {
-        return null
+    // Helper để ép kiểu an toàn
+    const toConferenceType = (accessType: string | undefined): ConferenceType => {
+      const upperType = (accessType || '').toUpperCase();
+      if (upperType === 'ONLINE' || upperType === 'OFFLINE' || upperType === 'HYBRID') {
+        return accessType as ConferenceType;
       }
-      const normalizedStatus = conf.status.toUpperCase()
-      const statusEnum = Object.values(ConferenceStatus).includes(
-        normalizedStatus as ConferenceStatus
-      )
-        ? (normalizedStatus as ConferenceStatus)
-        : ConferenceStatus.Pending
-      return {
-        id: conf.id,
-        title: conf.title,
-        acronym: conf.acronym,
-        location: conf.organizations?.[0]?.locations?.[0]
-          ? `${conf.organizations[0].locations[0].cityStateProvince || t('N/A')}, ${conf.organizations[0].locations[0].country || t('N/A')}`
-          : t('Location_Not_Available'),
-        year: conf.organizations?.[0]?.year?.toString() || t('N/A'),
-        summerize: conf.organizations?.[0]?.summary || '',
-        fromDate: conf.organizations?.[0]?.conferenceDates?.find(
-          d => d.type === 'conferenceDates'
-        )?.fromDate,
-        toDate: conf.organizations?.[0]?.conferenceDates?.find(
-          d => d.type === 'conferenceDates'
-        )?.toDate,
-        websiteUrl: conf.organizations?.[0]?.link || '#',
-        status: statusEnum,
-        createdAt: conf.createdAt,
-      }
-    });
+      return 'Offline'; // Default
+    };
 
-    // Lấy kiểu của một phần tử trong mảng (loại trừ `null`)
-    type TransformedConference = NonNullable<typeof mappedConferences[0]>;
+    const reviewProps = {
+      title: conferenceData.title,
+      acronym: conferenceData.acronym,
+      link: organization?.link || '',
+      type: toConferenceType(organization?.accessType),
+      location: location || { address: '', cityStateProvince: '', country: '', continent: '' },
+      dates: organization?.conferenceDates || [],
+      topics: organization?.topics || [],
+      // imageUrl: organization?.imageUrl || '',
+      description: organization?.summary || '',
+      t: (key: string) => t(`AddConference.${key}`),
+      statesForReview: [],
+      citiesForReview: [],
+    };
+    setModalContent({ type: 'review', data: reviewProps });
+  };
 
-    // Bước 2: Dùng Type Predicate để "dạy" cho TypeScript
-    return mappedConferences
-      .filter((conf): conf is TransformedConference => conf !== null)
-      .sort((a, b) => {
-        // Giờ TypeScript đã bị "ép" phải hiểu a và b không phải là null
-        if (!a.createdAt) return 1
-        if (!b.createdAt) return -1
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      })
-  }, [conferences, t])
+  const handleEdit = (conferenceData: ConferenceResponse) => {
+    setConferenceToEdit(conferenceData);
+    router.push('/addconference');
+  };
 
+  const closeModal = () => setModalContent(null);
 
+  // --- Data Filtering ---
   const filteredConferences = useMemo(() => {
+    if (!conferences) return [];
+    const sorted = [...conferences].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     if (displayStatus === 'All') {
-      return transformedConferences
+      return sorted;
     }
-    return transformedConferences.filter(conf => conf.status === displayStatus)
-  }, [transformedConferences, displayStatus])
+    return sorted.filter(conf => conf.status.toUpperCase() === displayStatus);
+  }, [conferences, displayStatus]);
 
-  console.log('[MyConferencesTab] filteredConferences:', filteredConferences)
+  // --- Render Logic ---
 
-  // Chờ AuthProvider khởi tạo xong
-  if (isAuthInitializing) {
-    return (
-      <div className='flex h-60 items-center justify-center'>
-        <div>{t('Loading_authentication')}</div>
-      </div>
-    )
-  }
+  const renderLoading = () => (
+    <div className="flex flex-col items-center justify-center h-80 text-gray-500">
+      <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
+      <p className="mt-4 text-lg">{t('MyConferences.Loading_your_conferences')}</p>
+    </div>
+  );
 
-  if (conferencesError) {
-    if (conferencesError === 'User is banned') {
-      if (isLoggedIn) { // Chỉ gọi logout nếu user thực sự đang logged in
-        logout({ callApi: true, preventRedirect: true });
-      }
+  const renderError = () => {
+    if (error === 'User is banned') {
+      if (isLoggedIn) logout({ callApi: true, preventRedirect: true });
       return (
-        <div className='container mx-auto p-4'>
-          <p className='mb-4'>
-            {t(`User_is_banned!_You'll_automatically_logout!`)}
-          </p>
-          <p className='mb-4'>{t('Please_use_another_account_to_view_blacklisted_conferences')}</p>
-          <Link href='/auth/login'>
-            <Button variant='primary'>{t('Sign_In')}</Button>
+        <div className="container mx-auto p-4 text-center">
+          <h2 className="text-xl font-bold text-red-600 mb-2">{t('MyConferences.Account_Banned_Title')}</h2>
+          <p className="mb-4">{t('MyConferences.Account_Banned_Message')}</p>
+          <Link href="/auth/login">
+            <Button variant="primary">{t('Sign_In')}</Button>
           </Link>
         </div>
-      )
+      );
     }
-    else {
-      return (
-        <div className='flex h-60 flex-col items-center justify-center'>
-          <p className='mb-2 text-red-500'>
-            {t('Error_loading_conferences')}: {conferencesError}
-          </p>
-          <Button onClick={refetch} variant='secondary'>
-            {t('Try_Again')}
-          </Button>
-        </div>
-      )
-    }
-  }
-
-  // Nếu chưa đăng nhập sau khi AuthProvider đã khởi tạo
-  if (!isLoggedIn) {
     return (
-      <div className='container mx-auto p-4'>
-        <p className='mb-4'>{t('Please_log_in_to_view_your_conferences')}</p>
-        <Link href='/auth/login'>
-          <Button variant='primary'>{t('Sign_In')}</Button>
-        </Link>
+      <div className="flex flex-col items-center justify-center h-80 text-red-500">
+        <p className="mb-4 text-lg">{t('Error_loading_conferences')}: {error}</p>
+        <Button onClick={refetch} variant="secondary">{t('Try_Again')}</Button>
       </div>
-    )
-  }
+    );
+  };
 
-  // User đã đăng nhập, giờ kiểm tra trạng thái tải conferences
-  if (isLoadingConferences) {
-    return (
-      <div className='flex h-60 items-center justify-center'>
-        <div>{t('Loading_your_conferences')}</div>
-      </div>
-    )
-  }
+  const renderNotLoggedIn = () => (
+    <div className="container mx-auto p-4 text-center">
+      <h2 className="text-xl font-semibold mb-2">{t('MyConferences.Login_Required_Title')}</h2>
+      <p className="mb-4">{t('MyConferences.Login_Required_Message')}</p>
+      <Link href="/auth/login">
+        <Button variant="primary">{t('Sign_In')}</Button>
+      </Link>
+    </div>
+  );
 
+  if (isAuthInitializing) return renderLoading();
+  if (!isLoggedIn) return renderNotLoggedIn();
+  if (error) return renderError();
+  if (isLoading) return renderLoading();
 
-  // User đã đăng nhập và không có lỗi, dữ liệu đã tải (hoặc rỗng)
-  const getStatusTitle = (status: ConferenceStatus | 'All') => {
-    if (status === 'All') return t('All_My_Conferences')
-    switch (status) {
-      case ConferenceStatus.Approve:
-        return t('My_conferences_are_approved')
-      case ConferenceStatus.Pending:
-        return t('My_conferences_are_pending')
-      case ConferenceStatus.Rejected:
-        return t('My_conferences_are_rejected')
-      default:
-        return t('My_conferences') // Fallback title
-    }
-  }
+  const getStatusTitle = (status: StatusFilter) => {
+    const key = `MyConferences.Title_${status}`;
+    return t.rich(key, {
+      count: filteredConferences.length,
+      b: (chunks) => <strong>{chunks}</strong>
+    });
+  };
+
+  const filterButtons = [
+    { label: t('All'), status: 'All' as StatusFilter },
+    { label: t('Pending'), status: ConferenceStatus.Pending as StatusFilter },
+    { label: t('Approved'), status: ConferenceStatus.Approve as StatusFilter },
+    { label: t('Rejected'), status: ConferenceStatus.Rejected as StatusFilter },
+  ];
 
   return (
-    <div className='container mx-auto p-4'>
-      <div className='mb-6 text-right'>
-        <Link href={`/addconference`}>
-          <Button variant='primary' size='medium' rounded>
-            {t('Add_Conference')}
-          </Button>
+    <div className="container mx-auto p-4 md:p-6 bg-gray-10 min-h-screen">
+      <div className="flex justify-end mb-6">
+        <Link href="/addconference">
+          <Button variant="primary" size="medium" rounded>{t('Add_Conference')}</Button>
         </Link>
       </div>
 
-      <div className='my-6 flex flex-wrap items-center justify-center gap-2 border-b pb-4 md:justify-start md:space-x-4'>
-        <Button
-          variant={displayStatus === 'All' ? 'primary' : 'secondary'} // Cần định nghĩa variant 'primary' và 'secondary'
-          size='small'
-          onClick={() => setDisplayStatus('All')}
-        >
-          {t('All')}
-        </Button>
-        <Button
-          variant={
-            displayStatus === ConferenceStatus.Pending ? 'primary' : 'secondary'
-          }
-          size='small'
-          onClick={() => setDisplayStatus(ConferenceStatus.Pending)}
-        >
-          {t('Pending')}
-        </Button>
-        <Button
-          variant={
-            displayStatus === ConferenceStatus.Approve ? 'primary' : 'secondary'
-          }
-          size='small'
-          onClick={() => setDisplayStatus(ConferenceStatus.Approve)}
-        >
-          {t('Approved')}
-        </Button>
-        <Button
-          variant={
-            displayStatus === ConferenceStatus.Rejected
-              ? 'primary'
-              : 'secondary'
-          }
-          size='small'
-          onClick={() => setDisplayStatus(ConferenceStatus.Rejected)}
-        >
-          {t('Rejected')}
-        </Button>
+      <div className="bg-white p-3 rounded-lg shadow-sm mb-6">
+        <div className="flex flex-wrap items-center justify-center gap-2 md:justify-start">
+          {filterButtons.map(btn => (
+            <Button
+              key={btn.status}
+              variant={displayStatus === btn.status ? 'primary' : 'secondary'}
+              size="small"
+              onClick={() => setDisplayStatus(btn.status)}
+            >
+              {btn.label}
+            </Button>
+          ))}
+        </div>
       </div>
 
-      <h1 className='my-4 text-xl font-semibold md:text-2xl'>
+      <h1 className="my-4 text-xl font-semibold text-gray-800 md:text-2xl">
         {getStatusTitle(displayStatus)}
-        {` (${filteredConferences.length})`}
       </h1>
 
       {filteredConferences.length === 0 ? (
-        <div className='my-10 text-center '>
-          <p className='text-lg'>
-            {t('You_have_no_conference_in_this_category')}
-          </p>
+        <div className="my-10 text-center text-gray-500 bg-white p-10 rounded-lg shadow-sm">
+          <p className="text-lg">{t('MyConferences.You_have_no_conference_in_this_category')}</p>
           {displayStatus !== 'All' && (
             <Button
-              variant='primary'
+              variant="link"
               onClick={() => setDisplayStatus('All')}
-              className='mt-2 text-sm'
+              className="mt-2 text-sm text-indigo-600 hover:text-indigo-800"
             >
-              {t('View_all_conferences')}
+              {t('MyConferences.View_all_conferences')}
             </Button>
           )}
         </div>
       ) : (
-        <div className='space-y-6'>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {filteredConferences.map(conference => (
-            <div
-              className='rounded-lg border p-2 shadow-md transition-shadow hover:shadow-lg' // Cải thiện styling
+            <MyConferenceCard
               key={conference.id}
-            >
-              <div className='mb-2 flex items-center text-base '>
-                <span className='mr-1'>{t('Created_Time')}: </span>
-                <Tooltip text={formatDateFull(conference.createdAt, language)}>
-                  <span>{timeAgo(conference.createdAt, language)}</span>
-                </Tooltip>
-              </div>
-              <ConferenceItem
-                conference={{
-                  // Chỉ truyền những gì ConferenceItem cần
-                  id: conference.id,
-                  title: conference.title,
-                  acronym: conference.acronym,
-                  location: conference.location,
-                  fromDate: conference.fromDate,
-                  toDate: conference.toDate,
-                  status: conference.status
-                  // websiteUrl: conference.websiteUrl, // Ví dụ nếu ConferenceItem cần
-                }}
-              />
-              {/* Thêm các action button nếu cần, ví dụ: Edit, View Details */}
-              {/* <div className="mt-3 flex justify-end space-x-2">
-                <Link href={`/UpdateConference?id=${conference.id}`}>
-                    <Button variant="outline" size="small">{t('Edit')}</Button>
-                </Link>
-                <Button variant="dangerOutline" size="small">{t('Delete')}</Button>
-              </div> */}
-            </div>
+              conference={conference}
+              onViewReason={handleViewReason}
+              onViewSubmitted={handleViewSubmitted}
+              onEdit={handleEdit}
+            />
           ))}
         </div>
       )}
-      {/* Nút refetch có thể không cần thiết nếu data tự động cập nhật hoặc có cơ chế khác */}
-      {/* <button onClick={refetch} className="mt-6 rounded bg-gray-200 px-3 py-1 text-sm hover:bg-gray-300">
-        {t('Refetch_Data')}
-      </button> */}
-    </div>
-  )
-}
 
-export default MyConferencesTab
+      <Modal
+        isOpen={!!modalContent}
+        onClose={closeModal}
+        title={
+          modalContent?.type === 'reason'
+            ? t('MyConferences.Modal_Title_Reason')
+            : t('MyConferences.Modal_Title_Review')
+        }
+        size={modalContent?.type === 'review' ? '4xl' : 'lg'}
+        footer={
+          <Button onClick={closeModal} variant="secondary">{t('Close')}</Button>
+        }
+      >
+        {modalContent?.type === 'reason' && (
+          <div className="p-4 text-gray-700 whitespace-pre-wrap bg-gray-10 rounded-md">
+            {modalContent.data}
+          </div>
+        )}
+        {modalContent?.type === 'review' && (
+          <div className="p-1 max-h-[70vh] overflow-y-auto">
+            <ConferenceReviewStep {...modalContent.data} />
+          </div>
+        )}
+      </Modal>
+    </div>
+  );
+};
+
+export default MyConferencesTab;

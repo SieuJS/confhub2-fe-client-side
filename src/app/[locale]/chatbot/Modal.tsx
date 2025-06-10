@@ -8,7 +8,7 @@ interface ModalProps {
   title?: string;
   children: ReactNode;
   footer?: ReactNode; // Optional footer for buttons
-  size?: 'sm' | 'md' | 'lg'; // Optional size
+  size?: 'sm' | 'md' | 'lg' | '4xl'; // Optional size
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -25,6 +25,7 @@ const Modal: React.FC<ModalProps> = ({
     sm: 'max-w-sm',
     md: 'max-w-md',
     lg: 'max-w-lg',
+    "4xl": 'max-w-4xl',
   };
 
   return (

@@ -1,232 +1,187 @@
 // BlacklistTab.tsx
-import React, { useState, useEffect, useCallback } from 'react'
-import { Link } from '@/src/navigation'
-import Button from '../../utils/Button' // Kiểm tra lại đường dẫn
-import ConferenceItem from '../../conferences/ConferenceItem'
-import { ConferenceInfo } from '../../../../models/response/conference.list.response'
-import { timeAgo, formatDateFull } from '../timeFormat'
-import Tooltip from '../../utils/Tooltip'
-import { useTranslations } from 'next-intl'
-import { appConfig } from '@/src/middleware'
-import { useAuth } from '@/src/contexts/AuthContext' // <<<< THAY ĐỔI QUAN TRỌNG
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from '@/src/navigation';
+import Button from '../../utils/Button';
+import BlacklistConferenceCard from './BlacklistConferenceCard';
+import { ConferenceInfo, Location } from '../../../../models/response/conference.list.response';
+import { timeAgo, formatDateFull } from '../timeFormat'; // Giữ lại nếu vẫn dùng ở đâu đó khác
+import Tooltip from '../../utils/Tooltip'; // Giữ lại nếu vẫn dùng ở đâu đó khác
+import { useTranslations } from 'next-intl';
+import { appConfig } from '@/src/middleware';
+import { useAuth } from '@/src/contexts/AuthContext';
+import { Loader2 } from 'lucide-react'; // THÊM DÒNG NÀY
 
 interface BlacklistTabProps {}
 
-const API_GET_BLACKLIST_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/blacklist-conference`
+const API_GET_BLACKLIST_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/blacklist-conference`;
+
+// Định nghĩa lại kiểu dữ liệu cho BlacklistedConferences
+interface BlacklistedConferenceResponse extends Omit<ConferenceInfo, 'dates' | 'location'> {
+  conferenceId: string; // API trả về conferenceId
+  title: string; // Đảm bảo các trường này có mặt
+  acronym: string;
+  location: Location | null; // Sử dụng Location từ models
+  dates?: { fromDate?: string; toDate?: string }[]; // API của bạn có vẻ không có type, nên bỏ nó đi
+  createdAt: string; // Thời gian blacklisted
+  // Các trường khác từ ConferenceInfo nếu API blacklist trả về
+}
 
 const BlacklistTab: React.FC<BlacklistTabProps> = () => {
-  const t = useTranslations('')
-  const language = t('language')
+  const t = useTranslations('');
+  const language = t('language');
 
-  // State for blacklisted conferences
   const [blacklistedConferences, setBlacklistedConferences] = useState<
-    (ConferenceInfo & { created_at?: string; conferenceId: string })[] // Assuming API returns created_at, adjusted type hint
-  >([])
-  const [loading, setLoading] = useState(true)
-  const [loggedIn, setLoggedIn] = useState(false)
-  const [initialLoad, setInitialLoad] = useState(true)
-  const {logout} = useAuth();
-  const [isBanned, setIsBanned] = useState(false)
+    BlacklistedConferenceResponse[]
+  >([]);
+  const [loading, setLoading] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(true);
+  const { logout } = useAuth();
+  const [isBanned, setIsBanned] = useState(false);
 
   const fetchData = useCallback(async () => {
+    setLoading(true); // Bắt đầu loading khi fetchData được gọi
     try {
-      const userData = localStorage.getItem('user')
+      const token = localStorage.getItem('token');
 
-      if (!userData) {
-        setLoggedIn(false)
-        if (initialLoad) {
-          setLoading(false)
-          setInitialLoad(false)
-        }
-        return
+      if (!token) {
+        setLoggedIn(false);
+        setBlacklistedConferences([]); // Đảm bảo làm sạch dữ liệu cũ
+        return;
       }
 
-      setLoggedIn(true)
+      setLoggedIn(true); // Giả sử đã đăng nhập, sẽ được cập nhật lại nếu 401
 
-      const userBlacklist = await fetch(`${API_GET_BLACKLIST_ENDPOINT}`, {
-        // Use conferenceId in URL
+      const response = await fetch(`${API_GET_BLACKLIST_ENDPOINT}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}` // Add userId to the headers
+          Authorization: `Bearer ${token}`
         }
-      })
+      });
 
-      if (!userBlacklist.ok) {
-        if (userBlacklist.status === 403) {
-          console.error('User is banned.')
-          setLoggedIn(false)
+      if (!response.ok) {
+        if (response.status === 403) {
+          console.error('User is banned.');
+          setLoggedIn(false);
           setIsBanned(true);
+        } else if (response.status === 401) {
+          console.error('Authentication error. Please log in.');
+          setLoggedIn(false);
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-        else throw new Error(`HTTP error! status: ${userBlacklist.status}`)
+        setBlacklistedConferences([]);
+        return;
       }
 
-      const blacklist: any[] = await userBlacklist.json()
-      // Assuming the API response structure for a blacklisted item looks something like:
-      // { conferenceId: '...', title: '...', ..., createdAt: 'ISO_DATE_STRING' }
-      // We need to ensure the received data has a 'createdAt' or similar timestamp.
-      // Let's assume it's 'createdAt' as used later in the map.
-      setBlacklistedConferences(blacklist)
+      let blacklist: BlacklistedConferenceResponse[] = await response.json();
+      
+      // Sắp xếp danh sách theo createdAt giảm dần (mới nhất lên trên)
+      blacklist.sort((a, b) => {
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+        return dateB - dateA;
+      });
+
+      setBlacklistedConferences(blacklist);
     } catch (error) {
-      console.error('Failed to fetch blacklist data:', error) // Updated error message
+      console.error('Failed to fetch blacklist data:', error);
+      setBlacklistedConferences([]);
+      setLoggedIn(false);
     } finally {
-      if (initialLoad) {
-        setLoading(false)
-        setInitialLoad(false)
-      }
+      setLoading(false);
+      setInitialLoad(false);
     }
-  }, [initialLoad])
+  }, []);
 
   useEffect(() => {
-    fetchData()
-  }, [fetchData])
+    fetchData();
+  }, [fetchData]);
 
-  // Update loading state based on blacklistedConferences after initial load
-  useEffect(() => {
-    if (!initialLoad) {
-      setLoading(false)
-    }
-  }, [blacklistedConferences, initialLoad])
+  // Hàm render loading
+  const renderLoading = () => (
+    <div className="flex flex-col items-center justify-center h-80 text-gray-500">
+      <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
+      <p className="mt-4 text-lg">{t('MyConferences.Loading_your_conferences')}</p> {/* Sử dụng cùng một key dịch */}
+    </div>
+  );
 
+  // LOGIC ĐIỀU CHỈNH CHÍNH:
+  // 1. Nếu đang tải VÀ là lần tải ban đầu, hiển thị loading spinner.
+  if (loading && initialLoad) {
+    return <div className='container mx-auto p-4'>{renderLoading()}</div>;
+  }
+
+  // 2. Sau khi initialLoad đã hoàn tất, nếu không đăng nhập (hoặc bị cấm), hiển thị thông báo tương ứng.
   if (!loggedIn) {
-    if (loading) {
-      return <div className='container mx-auto p-4'>{t('Loading')}</div>
-    }
     if (isBanned) {
-      logout({callApi: true, preventRedirect: true});
+      logout({ callApi: true, preventRedirect: true });
       return (
-        <div className='container mx-auto p-4'>
-          <p className='mb-4'>
-            {t(`User_is_banned!_You'll_automatically_logout!`)}
-          </p>
-          <p className='mb-4'>{t('Please_use_another_account_to_view_blacklisted_conferences')}</p>
-            <Link href='/auth/login'>
-              <Button variant='primary'>{t('Sign_In')}</Button>
-            </Link>
+        <div className='container mx-auto p-4 text-center'>
+          <h2 className='text-xl font-bold text-red-600 mb-2'>{t('MyConferences.Account_Banned_Title')}</h2>
+          <p className='mb-4'>{t('MyConferences.Account_Banned_Message')}</p>
+          <Link href='/auth/login'>
+            <Button variant='primary'>{t('Sign_In')}</Button>
+          </Link>
         </div>
-    )
+      );
     }
     return (
-      <div className='container mx-auto p-4'>
-        <p className='mb-4'>{t('Please_log_in_to_view_blacklisted_conferences')}</p>
+      <div className='container mx-auto p-4 text-center'>
+        <h2 className='text-xl font-semibold mb-2'>{t('MyConferences.Login_Required_Title')}</h2>
+        <p className='mb-4'>{t('MyConferences.Login_Required_Message')}</p>
         <Link href='/auth/login'>
           <Button variant='primary'>{t('Sign_In')}</Button>
         </Link>
-        {/* Updated message */}
       </div>
-    )
+    );
   }
 
-  if (loading) {
-    return <div className='container mx-auto p-4'>{t('Loading')}</div>
-  }
-
-  // Transform blacklisted conferences data for rendering
-  const transformedConferences = blacklistedConferences.map(conf => {
-    const conferenceDates = conf.dates
-    return {
-      id: conf.conferenceId!,
-      title: conf.title,
-      acronym: conf.acronym,
-      location: conf.location
-        ? `${conf.location.cityStateProvince || ''}, ${conf.location.country || ''}`
-        : '',
-      fromDate: conferenceDates?.fromDate || undefined,
-      toDate: conferenceDates?.toDate || undefined,
-      // Use conf.createdAt directly if available, otherwise use conf.created_at
-      // Ensure your API response structure matches this assumption
-      createdAt: conf.createdAt || (conf as any).created_at, // Use the correct timestamp field from API
-      status: conf.status // Keep status if needed
-    }
-  })
-
-  // --- ADD SORTING HERE ---
-  // Sort by createdAt timestamp, earliest first
-  transformedConferences.sort((a, b) => {
-    const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0 // Treat missing date as epoch or handle appropriately
-    const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0 // Treat missing date as epoch or handle appropriately
-
-    // Sort ascending (earliest first)
-    return dateB - dateA
-  })
-  // --- END SORTING ---
-
-  // console.log('transformed Blacklisted Conferences:', transformedConferences); // Optional logging
-
+  // 3. Nếu đã đăng nhập và không bị cấm, hiển thị nội dung chính.
   return (
-    <div className='container mx-auto p-4'>
-      <div className='mb-2 flex items-center justify-between'>
-        {/* Updated Title */}
-        <h1 className='text-2xl font-semibold'>
-          {t('Blacklisted_Conferences')}
-        </h1>
-        <button
-          onClick={() => {
-            console.log('Refresh button clicked for Blacklist') // Updated log
-            setLoading(true) // Optionally show loading spinner on refresh
-            fetchData()
-          }}
-          className='rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400'
-          aria-label='Refresh Blacklist' // Updated aria-label
-        >
-          {/* Refresh Icon */}
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='20'
-            height='20'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='2'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            className='lucide lucide-refresh-cw'
-          >
-            <path d='M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.67 2.62' />
-            <path d='M22 4v4h-4' />
-          </svg>
-        </button>
+    <div className='container mx-auto p-4 md:p-6 bg-gray-10 min-h-screen'>
+      <div className='flex justify-end mb-6'>
+        <Link href="/conferences">
+          <Button variant="primary" size="medium" rounded>{t('Explore_All_Conferences')}</Button>
+        </Link>
       </div>
 
-      {/* Check blacklistedConferences length */}
-      {blacklistedConferences.length === 0 ? (
-        // Updated empty state message
-        <p>{t('You_have_not_blacklisted_any_conferences_yet')}</p>
-      ) : (
-        // Map over the SORTED transformedConferences
-        transformedConferences.map(conference => {
-          // console.log('Rendering Blacklisted ConferenceItem:', conference); // Optional logging
-          return (
-            <div
-              className='mb-4 rounded-xl border-2 px-4 py-2 shadow-xl'
-              key={conference.id}
+      <h1 className='my-4 text-xl font-semibold text-gray-800 md:text-2xl'>
+        {t('Blacklisted_Conferences')} ({blacklistedConferences.length})
+      </h1>
+
+      {/* Hiển thị loading nếu không phải lần tải ban đầu nhưng vẫn đang tải */}
+      {loading && !initialLoad && renderLoading()}
+
+      {/* Hiển thị nội dung nếu không còn loading HOẶC nếu không có loading ban đầu và danh sách trống */}
+      {!loading && blacklistedConferences.length === 0 ? (
+        <div className="my-10 text-center text-gray-500 bg-white p-10 rounded-lg shadow-sm">
+          <p className="text-lg">{t('You_have_not_blacklisted_any_conferences_yet')}</p>
+          <Link href="/conferences">
+            <Button
+              variant="link"
+              className="mt-2 text-sm text-indigo-600 hover:text-indigo-800"
             >
-              <div className='flex'>
-                {/* Updated Label */}
-                <span className='mr-1'>{t('Blacklisted_Time')}: </span>
-                {/* Use createdAt timestamp */}
-                <Tooltip text={formatDateFull(conference.createdAt, language)}>
-                  <span>{timeAgo(conference.createdAt, language)}</span>
-                </Tooltip>
-              </div>
-              <ConferenceItem
-                key={conference.id} // Key moved to wrapper div is better practice, but keeping consistent with original
-                conference={{
-                  id: conference.id,
-                  title: conference.title,
-                  acronym: conference.acronym,
-                  location: conference.location,
-                  fromDate: conference.fromDate,
-                  toDate: conference.toDate
-                  // No need to pass createdAt to ConferenceItem unless it uses it
-                }}
+              {t('Explore_All_Conferences')}
+            </Button>
+          </Link>
+        </div>
+      ) : (
+        // Chỉ hiển thị danh sách khi không còn loading HOẶC khi đã có dữ liệu
+        !loading && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {blacklistedConferences.map(conference => (
+              <BlacklistConferenceCard
+                key={conference.conferenceId}
+                conference={conference}
               />
-            </div>
-          )
-        })
+            ))}
+          </div>
+        )
       )}
     </div>
-  )
-}
+  );
+};
 
-export default BlacklistTab
+export default BlacklistTab;

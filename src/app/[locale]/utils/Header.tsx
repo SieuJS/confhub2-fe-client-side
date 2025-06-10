@@ -1,8 +1,7 @@
 // src/app/[locale]/utils/Header.tsx
-
 import { FC, useRef, useState, useEffect } from 'react';
 import { Link } from '@/src/navigation';
-import GlobeIcon from '../../icons/globe'; // Giả sử bạn đã có icon này, hoặc LogoIcon
+import GlobeIcon from '../../icons/globe';
 import { useSocketConnection } from '../../../hooks/header/useSocketConnection';
 import { useClickOutside } from '../../../hooks/header/useClickOutsideHeader';
 import { useMenuState } from '../../../hooks/header/useMenuState';
@@ -11,27 +10,32 @@ import UserDropdown from './header/UserDropdown';
 import MobileNavigation from './header/MobileNavigation';
 import AuthButtons from './header/AuthButtons';
 import DesktopNavigation from './header/DesktopNavigation';
-import LoadingIndicator from './header/LoadingIndicator'; // Bạn có thể dùng isInitializing từ useAuth
+import LoadingIndicator from './header/LoadingIndicator';
 import { MenuIcon, CloseIcon } from './header/Icon';
 import Button from './Button';
-import { useAuth } from '@/src/contexts/AuthContext'; // <<<< THAY ĐỔI QUAN TRỌNG
+import { useAuth } from '@/src/contexts/AuthContext';
 import LogoIcon from '../../icons/logo';
+import { FaBars, FaTimes } from 'react-icons/fa'; // Sử dụng react-icons cho nút toggle
 
-interface Props {
+// --- BỔ SUNG PROPS MỚI ---
+interface HeaderProps {
   locale: string;
+  // Props tùy chọn cho layout có sidebar
+  toggleSidebar?: () => void;
+  isSidebarOpen?: boolean;
+  headerHeight?: number;
+  sidebarWidth?: number;
 }
 
-export const Header: FC<Props> = ({ locale }) => {
+export const Header: FC<HeaderProps> = ({
+  locale,
+  toggleSidebar,
+  isSidebarOpen,
+  headerHeight = 60, // Giá trị mặc định
+  sidebarWidth = 0,   // Giá trị mặc định
+}) => {
   const headerRef = useRef<HTMLDivElement>(null);
-
-  // <<<< THAY ĐỔI QUAN TRỌNG: Sử dụng useAuth từ Context
   const { user, isLoggedIn, logout, isInitializing } = useAuth();
-  // Bạn không cần state isLoading cục bộ nữa, isInitializing từ useAuth sẽ đảm nhiệm việc này
-  // const [isLoading, setIsLoading] = useState(true);
-
-  // useEffect(() => {
-  //   setIsLoading(false); // Không cần nữa
-  // }, []);
 
   const {
     notifications,
@@ -40,14 +44,13 @@ export const Header: FC<Props> = ({ locale }) => {
     fetchNotifications,
     isLoadingNotifications,
     socketRef
-  } = useSocketConnection({ loginStatus: isLoggedIn ? 'true' : null, user }); // isLoggedIn đã có sẵn
+  } = useSocketConnection({ loginStatus: isLoggedIn ? 'true' : null, user });
 
   const {
     isNotificationOpen,
     isMobileMenuOpen,
     isUserDropdownOpen,
     closeAllMenus,
-    // toggleMobileMenu, // Sẽ dùng openMobileMenu từ useMenuState
     openNotification,
     openUserDropdown,
     openMobileMenu
@@ -64,25 +67,38 @@ export const Header: FC<Props> = ({ locale }) => {
 
   const displayedNotifications = notifications.slice(0, 20);
 
-  // Nếu isInitializing là true, nghĩa là AuthProvider đang kiểm tra trạng thái đăng nhập ban đầu.
-  // Bạn có thể hiển thị một spinner hoặc một phiên bản đơn giản của header.
+  // --- LOGIC STYLE ĐỘNG CHO HEADER ---
+  const headerStyles: React.CSSProperties = {
+    height: `${headerHeight}px`,
+    // Nếu có sidebar, header sẽ bị đẩy sang phải
+    left: toggleSidebar && isSidebarOpen ? `${sidebarWidth}px` : '0px',
+    // Chiều rộng của header sẽ co lại khi sidebar mở
+    width: toggleSidebar && isSidebarOpen ? `calc(100% - ${sidebarWidth}px)` : '100%',
+    transition: 'left 300ms ease-in-out, width 300ms ease-in-out',
+  };
+
   if (isInitializing) {
     return (
       <div
-        className={`fixed left-0 right-0 top-0 z-40 mx-auto flex h-[60px] max-w-screen-2xl flex-row items-center justify-between bg-gradient-to-r from-background to-background-secondary p-3 text-sm shadow-md`}
+        className={`fixed right-0 top-0 z-40 mx-auto flex flex-row items-center justify-between bg-gradient-to-r from-background to-background-secondary p-3 text-sm shadow-md`}
+        style={{ height: `${headerHeight}px`, left: '0px', width: '100%' }}
       >
-        <Link href='/' locale={locale}>
-          <div className='flex flex-row items-center '>
-            <div className='mb-2 h-8 w-8'>
-              <GlobeIcon />
+        <div className='flex flex-row items-center'>
+          {/* Nút Toggle Sidebar (hiển thị ở trạng thái loading) */}
+          {toggleSidebar && (
+            <button onClick={toggleSidebar} className="mr-4 p-2 text-foreground hover:text-primary">
+              <FaBars className="h-5 w-5" />
+            </button>
+          )}
+          <Link href='/' locale={locale}>
+            <div className='flex flex-row items-center'>
+              <div className='mb-2 h-8 w-8'><GlobeIcon /></div>
+              <strong className='mx-2 hidden select-none md:block'>Global Conference Hub</strong>
             </div>
-            <strong className='mx-2 hidden select-none md:block'>
-              Global Conference Hub
-            </strong>
-          </div>
-        </Link>
+          </Link>
+        </div>
         <div className='relative flex flex-row items-center gap-2 md:gap-4'>
-          <LoadingIndicator /> {/* Hoặc một spinner/skeleton UI khác */}
+          <LoadingIndicator />
         </div>
       </div>
     );
@@ -91,23 +107,30 @@ export const Header: FC<Props> = ({ locale }) => {
   return (
     <div
       ref={headerRef}
-      className={`fixed left-0 right-0 top-0 z-40 mx-auto flex h-[60px] max-w-screen-2xl flex-row items-center justify-between bg-gradient-to-r from-background to-background-secondary p-3 text-sm shadow-md transition-all duration-300 ease-in-out`}
+      className={`fixed top-0 z-40 flex flex-row items-center justify-between bg-gradient-to-r from-background to-background-secondary p-3 text-sm shadow-md`}
+      style={headerStyles} // Áp dụng style động
     >
-      <Link href='/' locale={locale}>
-        <div className='flex flex-row items-center '>
-          <div className='mb-2 h-8 w-8'>
-            <LogoIcon />
+      <div className="flex items-center">
+        {/* --- NÚT TOGGLE SIDEBAR --- */}
+        {/* Chỉ hiển thị nút này nếu hàm toggleSidebar được truyền vào */}
+        {toggleSidebar && (
+          <button onClick={toggleSidebar} className="mr-4 p-2 text-foreground hover:text-primary">
+            {/* Thay đổi icon dựa trên trạng thái sidebar */}
+            {isSidebarOpen ? <FaTimes className="h-5 w-5" /> : <FaBars className="h-5 w-5" />}
+          </button>
+        )}
+
+        <Link href='/' locale={locale}>
+          <div className='flex flex-row items-center'>
+            <div className='mb-2 h-8 w-8'><LogoIcon /></div>
+            <strong className='mx-2 hidden select-none md:block'>Global Conference Hub</strong>
           </div>
-          <strong className='mx-2 hidden select-none md:block'>
-            Global Conference Hub
-          </strong>
-        </div>
-      </Link>
+        </Link>
+      </div>
 
       <div className='relative flex flex-row items-center gap-2 md:gap-4'>
         <DesktopNavigation locale={locale} />
 
-        {/* Sử dụng isLoggedIn trực tiếp từ useAuth */}
         <AuthButtons
           isLogin={isLoggedIn}
           locale={locale}
@@ -117,21 +140,25 @@ export const Header: FC<Props> = ({ locale }) => {
           unreadCount={unreadCount()}
         />
 
-        <Button
-          className='block lg:hidden'
-          onClick={e => {
-            e.stopPropagation();
-            openMobileMenu(); // Sử dụng hàm đã có từ useMenuState
-          }}
-        >
-          {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
-        </Button>
+        {/* Nút menu mobile có thể được ẩn đi nếu nút toggle sidebar đã tồn tại */}
+        {/* Hoặc bạn có thể giữ cả hai và xử lý logic hiển thị riêng */}
+        {!toggleSidebar && (
+          <Button
+            className='block lg:hidden'
+            onClick={e => {
+              e.stopPropagation();
+              openMobileMenu();
+            }}
+          >
+            {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
+          </Button>
+        )}
 
         <MobileNavigation
           isMobileMenuOpen={isMobileMenuOpen}
           closeAllMenus={closeAllMenus}
           locale={locale}
-          isLogin={isLoggedIn} // Truyền isLoggedIn từ useAuth
+          isLogin={isLoggedIn}
         />
         <NotificationDropdown
           notifications={displayedNotifications}
@@ -146,14 +173,10 @@ export const Header: FC<Props> = ({ locale }) => {
           isUserDropdownOpen={isUserDropdownOpen}
           closeAllMenus={closeAllMenus}
           locale={locale}
-          logout={logout} // logout từ useAuth
+          logout={logout}
           socketRef={socketRef}
-          // user={user} // Truyền user nếu UserDropdown cần thông tin user
         />
       </div>
     </div>
   );
 };
-
-// Không cần export default Header ở đây nếu nó được export tên là Header
-// export default Header;

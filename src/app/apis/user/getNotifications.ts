@@ -1,32 +1,43 @@
 // src/api/user/getNotifications.ts
 import { appConfig } from '@/src/middleware';
-import { Notification } from '@/src/models/response/user.response'; // Import Notification
+import { Notification } from '@/src/models/response/user.response';
 
-export const getNotifications = async (userId: string): Promise<Notification[] | null> => {
+// Bỏ userId nếu nó không được sử dụng để tạo request
+export const getNotifications = async (): Promise<Notification[]> => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    const error = new Error('Unauthorized: No authentication token found.');
+    (error as any).status = 401;
+    throw error;
+  }
+
   try {
     const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/user`,
       {
-        headers : {
+        headers: {
           'Content-Type': 'application/json',
-          'Authorization' : `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
+          'Authorization': `Bearer ${token}`,
         }
       }
-    ); // Adjust the API endpoint as needed
+    );
 
     if (!response.ok) {
-      // Handle non-2xx responses (e.g., 404, 500)
-      console.error(`Error fetching notifications: ${response.status} ${response.statusText}`);
-
-        if(response.status === 404) {
-            return []; // Return empty array if 404.
-        }
-      return null; // Or throw an error, depending on your error handling strategy
+      const errorBody = await response.text();
+      const errorMessage = errorBody || response.statusText;
+      
+      const error = new Error(`${response.status}: ${errorMessage}`);
+      (error as any).status = response.status;
+      throw error;
     }
 
     const data: Notification[] = await response.json();
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching notifications:', error);
-    return null; // Or throw an error
+    if (!error.status) {
+        (error as any).status = 0;
+    }
+    throw error;
   }
 };

@@ -135,11 +135,11 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
   const getTypeIconAndColor = () => {
     switch (type) {
       case 'Online':
-        return { icon: <Monitor className='w-5 h-5 mr-1.5' />, color: 'text-sky-600', chipColor: 'bg-sky-100 text-sky-700' }
+        return { icon: <Monitor className='w-5 h-5 mr-1.5' />, color: 'text-green-600', chipColor: 'bg-green-100 text-green-700' }
       case 'Offline':
-        return { icon: <Users className='w-5 h-5 mr-1.5' />, color: 'text-green-600', chipColor: 'bg-green-100 text-green-700' }
+        return { icon: <Users className='w-5 h-5 mr-1.5' />, color: 'text-red-600', chipColor: 'bg-red-100 text-red-700' }
       case 'Hybrid':
-        return { icon: <GitFork className='w-5 h-5 mr-1.5' />, color: 'text-purple-600', chipColor: 'bg-purple-100 text-purple-700' }
+        return { icon: <GitFork className='w-5 h-5 mr-1.5' />, color: 'text-blue-600', chipColor: 'bg-blue-100 text-blue-700' }
       default:
         return { icon: <ShieldAlert className='w-5 h-5 mr-1.5' />, color: 'text-slate-600', chipColor: 'bg-slate-100 text-slate-700' }
     }
@@ -148,6 +148,45 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
 
   // Lấy các options loại ngày một lần
   const dateTypeOptions = getDateTypeOptions(t);
+
+  // Helper function to format dates
+  const formatDateRange = (fromDateStr?: string, toDateStr?: string): React.ReactNode => {
+    const options: Intl.DateTimeFormatOptions = {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    };
+
+    try {
+      const fromDate = fromDateStr ? new Date(fromDateStr) : null;
+      const toDate = toDateStr ? new Date(toDateStr) : null;
+
+      if (!fromDate && !toDate) {
+        return <span className='italic text-slate-500'>{t('N_A')}</span>;
+      }
+
+      if (fromDate && toDate && fromDate.toDateString() === toDate.toDateString()) {
+        // Same date, format as "Month Day, Year"
+        return fromDate.toLocaleDateString(undefined, options);
+      } else if (fromDate && toDate) {
+        // Different dates, format as "Month Day, Year - Month Day, Year"
+        const fromPart = fromDate.toLocaleDateString(undefined, options);
+        const toPart = toDate.toLocaleDateString(undefined, options);
+        return `${fromPart} - ${toPart}`;
+      } else if (fromDate) {
+        // Only fromDate available
+        return fromDate.toLocaleDateString(undefined, options);
+      } else if (toDate) {
+        // Only toDate available
+        return toDate.toLocaleDateString(undefined, options);
+      }
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return <span className='italic text-slate-500'>{t('Invalid_Date')}</span>;
+    }
+    return <span className='italic text-slate-500'>{t('N_A')}</span>;
+  };
+
 
   return (
     <div className='bg-slate-50 p-3 sm:p-6 rounded-lg min-h-screen'>
@@ -185,7 +224,7 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
             )}
           </InfoDisplay>
           <InfoDisplay label={t('Type')} icon={React.cloneElement(typeStyle.icon, { className: `${typeStyle.icon.props.className} ${typeStyle.color}`})}>
-            <span className={`px-2 py-0.5 text-xs font-semibold rounded-full inline-flex items-center ${typeStyle.chipColor}`}>
+            <span className={`p-2 text-xs font-semibold rounded-full inline-flex items-center ${typeStyle.chipColor}`}>
               {React.cloneElement(typeStyle.icon, {size: 14, className: 'mr-1'})}
               {t(type)}
             </span>
@@ -232,7 +271,8 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
                       </span>
                     </div>
                     <div className='text-sm text-slate-600 mt-1'>
-                      {date.fromDate || t('N_A')} - {date.toDate || t('N_A')}
+                      {/* Sử dụng hàm formatDateRange mới */}
+                      {formatDateRange(date.fromDate, date.toDate)}
                     </div>
                   </li>
                 );

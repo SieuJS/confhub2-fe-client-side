@@ -1,22 +1,31 @@
-// SettingTab.tsx
-import React, { useState, useEffect } from 'react'
+// src/app/[locale]/dashboard/setting/SettingTab.tsx
+
+'use client'
+
+import React, { useState, useEffect, useCallback } from 'react'
 import Button from '../../utils/Button'
 import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
-import { useLocalStorage } from 'usehooks-ts'
-import { useRouter, usePathname } from 'next/navigation'
-import deleteUser from '../../../apis/user/deleteUser' // Adjust path if needed
 import {
   useGetUserSetting,
   useUpdateUser
-} from '../../../../hooks/dashboard/setting/useUpdateSettings' // Adjust path if needed
-import { useGetUser } from '../../../../hooks/dashboard/setting/useGetUser' // Adjust path if needed
-import { Setting } from '@/src/models/response/user.response' // Adjust path if needed
-import { get } from 'lodash'
-import { updateNotifications } from '@/src/app/apis/user/updateNotifications'
-import { useAuth } from '@/src/contexts/AuthContext' // <<<< THAY ĐỔI QUAN TRỌNG
+} from '../../../../hooks/dashboard/setting/useUpdateSettings'
+import { Setting } from '@/src/models/response/user.response'
+import { useAuth } from '@/src/contexts/AuthContext'
+import {
+  Bell,
+  CalendarCheck,
+  Mail,
+  UserX,
+  Cog,
+  ChevronRight,
+  UserCheck,
+  CalendarPlus,
+  Ban,
+  Loader2
+} from 'lucide-react'
 
-// Helper type for setting keys used in toggles
+// --- Helper Type ---
 type ToggleSettingKey = keyof Pick<
   Setting,
   | 'receiveNotifications'
@@ -30,439 +39,323 @@ type ToggleSettingKey = keyof Pick<
   | 'notificationThroughEmail'
 >
 
+// --- Reusable Toggle Component ---
+interface SettingToggleProps {
+  label: string
+  description: string
+  checked: boolean
+  onToggle: () => void
+  disabled: boolean
+  icon: React.ElementType
+}
+
+const SettingToggle: React.FC<SettingToggleProps> = ({
+  label,
+  description,
+  checked,
+  onToggle,
+  disabled,
+  icon: Icon
+}) => (
+  <div className='flex items-center justify-between py-4 border-b border-gray-100 last:border-b-0'>
+    <div className='flex items-start'>
+      <div className='p-2 rounded-full bg-blue-100 text-blue-600 mr-4'>
+        <Icon className='h-5 w-5' />
+      </div>
+      <div>
+        <h4 className='font-semibold text-gray-800'>{label}</h4>
+        <p className='text-sm text-gray-500 mt-0.5'>{description}</p>
+      </div>
+    </div>
+    <button
+      className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+        checked ? 'bg-blue-600' : 'bg-gray-200'
+      } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+      onClick={onToggle}
+      disabled={disabled}
+      role='switch'
+      aria-checked={checked}
+    >
+      <span className='sr-only'>{label}</span>
+      <span
+        aria-hidden='true'
+        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+          checked ? 'translate-x-5' : 'translate-x-0'
+        }`}
+      />
+    </button>
+  </div>
+)
+
+// --- Main SettingTab Component ---
 const SettingTab: React.FC = () => {
   const t = useTranslations('')
-  const [localUser, setLocalUser] = useLocalStorage<{ id: string } | null>(
-    'user',
-    null
-  )
-  const {logout} = useAuth()
+  const { isLoggedIn, isInitializing, logout, deleteAccount } = useAuth()
+
   const [setting, setSetting] = useState<Setting | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const pathname = usePathname()
+  const [isFetchingSettings, setIsFetchingSettings] = useState(true)
+
   const {
     updateUserSetting,
     loading: updateLoading,
     error: updateError
   } = useUpdateUser()
-  const {
-    getUserSettings,
-    error: getSettingError
-  } = useGetUserSetting()
-  async function fetchUserSettings() {
-    setLoading(true)
-    const userSetting = await getUserSettings()
-    if (userSetting) {
-      setSetting(userSetting)
+  const { getUserSettings, error: getSettingError } = useGetUserSetting()
+
+  const fetchUserSettings = useCallback(async () => {
+    if (!isLoggedIn) {
+      console.warn('[SettingTab] Skipping fetch: User not logged in.')
+      return
     }
-    setLoading(false)
-  }
+    setIsFetchingSettings(true)
+    try {
+      const userSetting = await getUserSettings()
+      if (userSetting) {
+        setSetting(userSetting)
+      } else {
+        console.error('Failed to get user settings:', getSettingError)
+      }
+    } catch (err) {
+      console.error('[SettingTab] Critical error fetching user settings:', err)
+      if (getSettingError?.includes('403')) {
+        logout({ callApi: true, preventRedirect: true })
+      }
+    } finally {
+      setIsFetchingSettings(false)
+    }
+  }, [isLoggedIn, getUserSettings, getSettingError, logout])
+
   useEffect(() => {
-    fetchUserSettings()
-  }, [])
+    if (!isInitializing && isLoggedIn) {
+      fetchUserSettings()
+    } else if (!isInitializing && !isLoggedIn) {
+        setIsFetchingSettings(false)
+    }
+  }, [isInitializing, isLoggedIn, fetchUserSettings])
 
-  // Centralized toggle handler
-  const handleToggle = async (settingKey: ToggleSettingKey) => {
+  const handleToggle = useCallback(async (settingKey: ToggleSettingKey) => {
     if (setting) {
-      const currentValue = setting[settingKey]
-
-      const newSetting = {
-        ...setting,
-        [settingKey]: !currentValue
-      }
-      // Optimistic update locally first
-      setSetting(prev =>
-        prev ? { ...prev, [settingKey]: !currentValue } : null
-      )
+      const currentValue = setting[settingKey] ?? false
+      setSetting(prev => (prev ? { ...prev, [settingKey]: !currentValue } : null))
       try {
-        await updateUserSetting({
-          [settingKey]: !currentValue
-        })
-        if (updateError)
-          throw new Error(updateError)
-        await fetchUserSettings() // Refetch settings after update
-      } catch (error) {
-        // Revert optimistic update on error
-        setSetting(prev =>
-          prev ? { ...prev, [settingKey]: currentValue } : null
-        )
-        // Optional: Show error to user based on updateError from the hook
+        await updateUserSetting({ [settingKey]: !currentValue })
+        if (updateError) throw new Error(updateError)
+      } catch (error: any) {
+        setSetting(prev => (prev ? { ...prev, [settingKey]: currentValue } : null))
         console.error(`Failed to update setting ${settingKey}:`, error)
-        alert(`Error:, ${error}`)
+        alert(`${t('Error_Updating_Setting')}: ${error.message || error.toString()}`)
       }
     }
-  }
+  }, [setting, updateUserSetting, updateError, t])
 
   const handleDeleteAccount = async () => {
-    // Use window.confirm for simple confirmation
-    if (
-      window.confirm(
-        t('Delete_Account_Confirmation') || // Use translation key
-          'Are you sure you want to delete your account? This action cannot be undone.'
-      )
-    ) {
+    if (window.confirm(t('Delete_Account_Confirmation'))) {
       setIsDeleting(true)
       setDeleteError(null)
-
-      try {
-        if (!localUser?.id) {
-          // Check for id specifically
-          setDeleteError(t('Error_UserNotLoggedIn') || 'User not logged in.')
-          setIsDeleting(false) // Reset deleting state
-          return
-        }
-        await deleteUser(localUser.id)
-        setLocalUser(null) // Clear user from local storage
-
-        // Redirect logic (as before)
-        let pathWithLocale = '/auth/login'
-        if (pathname) {
-          const pathParts = pathname.split('/')
-          if (pathParts.length > 1 && pathParts[1].length === 2) {
-            // Basic locale check
-            const localePrefix = pathParts[1]
-            pathWithLocale = `/${localePrefix}/auth/login`
-          }
-        }
-        router.push(pathWithLocale)
-      } catch (error: any) {
-        const errorMessage =
-          error.message ||
-          t('Error_DeleteAccountFailed') ||
-          'Failed to delete account.'
-        setDeleteError(errorMessage)
-        console.error('Failed to delete account:', error)
-      } finally {
-        setIsDeleting(false)
+      const result = await deleteAccount()
+      if (!result.success) {
+        setDeleteError(result.error || t('Error_DeleteAccountFailed'))
       }
+      setIsDeleting(false)
     }
   }
 
   // --- Render Logic ---
-  if (loading) {
-    return <div data-testid='loading-state'>{t('Loading_settings')}</div>
+  if (isInitializing) {
+    return (
+      <div className='flex items-center justify-center h-64 text-gray-500'>
+        <Loader2 className='animate-spin h-8 w-8 mr-2' />
+        <span>{t('Initializing_session')}</span>
+      </div>
+    )
   }
 
-  // if (userError) {
-  //   return (
-  //     <div data-testid='error-state'>
-  //       {t('Error')}: {userError}
-  //     </div>
-  //   )
-  // }
-
-  if (!setting) {
-    console.log('err '+getSettingError)
-    if (getSettingError?.includes('403'))
-      logout({callApi: true, preventRedirect: true});
-    return <div data-testid='no-data-state'>
-      <p className='mb-4'>{t('No_user_data_available')}</p>
+  if (!isLoggedIn) {
+    return (
+      <div className='container mx-auto p-4 text-center'>
+        <p className='mb-4'>{t('Please_log_in_to_view_settings')}</p>
         <Link href='/auth/login'>
           <Button variant='primary'>{t('Sign_In')}</Button>
         </Link>
       </div>
+    )
   }
 
-  // --- Main Component Render ---
+  if (isFetchingSettings) {
+    return (
+      <div className='flex items-center justify-center h-64 text-gray-500'>
+        <Loader2 className='animate-spin h-8 w-8 mr-2' />
+        <span>{t('Loading_settings')}</span>
+      </div>
+    )
+  }
+
+  if (!setting) {
+    return (
+      <div className='container mx-auto p-4 text-center'>
+        <p className='mb-4 text-red-500'>
+          {t('Could_not_load_user_settings')}
+        </p>
+        <Button variant='secondary' onClick={fetchUserSettings}>
+          {t('Retry')}
+        </Button>
+      </div>
+    )
+  }
+
   return (
-    <div className='flex w-full'>
-      <main className='flex-1 p-8'>
-        <header className='mb-4 flex items-center justify-between'>
-          <h2 className='text-xl font-semibold md:text-2xl'>{t('Setting')}</h2>
+    <div className='flex w-full min-h-screen bg-gray-10'>
+      <main className='flex-1 p-4 md:p-8 max-w-4xl mx-auto'>
+        <header className='mb-8 pb-4 border-b border-gray-200'>
+          <h2 className='text-3xl font-bold text-gray-900 flex items-center'>
+            <Cog className='h-8 w-8 mr-3 text-gray-600' />
+            {t('Setting')}
+          </h2>
+          <p className='text-gray-600 mt-2'>{t('Manage_your_account_preferences_and_notifications')}</p>
         </header>
 
-        <section className='mb-8'>
-          {/* Option 1: Receive Notifications */}
-          {/* <div className='mb-4 flex items-center justify-between'>
-            <div>
-              <h4 className='font-semibold'>{t('Receive_Notifications')}</h4>
-              <p className=' text-sm'>
-                {t('Receive_Notifications_Description')}.
-              </p>
-            </div>
-            <button
-              data-testid='toggle-receiveNotifications'
-              className={`h-6 w-12 min-w-[3rem] rounded-full transition-colors duration-200 focus:outline-none ${
-                setting.receiveNotifications
-                  ? 'bg-button'
-                  : 'bg-background-secondary'
-              }`}
-              onClick={() => handleToggle('receiveNotifications')}
-              disabled={updateLoading}
-              aria-pressed={setting.receiveNotifications} 
-            >
-              <div
-                className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
-                  setting.receiveNotifications
-                    ? 'translate-x-7' // Adjusted for fixed width
-                    : 'translate-x-1'
-                }`}
-              ></div>
-            </button>
-          </div> */}
-
-          {/* Option 2: Auto add events to schedule */}
-          {/* <div className='mb-4 flex items-center justify-between'>
-            <div>
-              <h4 className='font-semibold'>
-                {t('Auto_add_events_to_schedule')}
-              </h4>
-              <p className=' text-sm'>
-                {t('Auto_add_events_to_schedule_describe')}.
-              </p>
-            </div>
-            <button
-              data-testid='toggle-autoAddFollowToCalendar'
-              className={`h-6 w-12 min-w-[3rem] rounded-full transition-colors duration-200 focus:outline-none ${
-                setting.autoAddFollowToCalendar
-                  ? 'bg-button'
-                  : 'bg-background-secondary'
-              }`}
-              onClick={() => handleToggle('autoAddFollowToCalendar')}
-              disabled={updateLoading}
-              aria-pressed={setting.autoAddFollowToCalendar}
-            >
-              <div
-                className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
-                  setting.autoAddFollowToCalendar
-                    ? 'translate-x-7'
-                    : 'translate-x-1'
-                }`}
-              ></div>
-            </button>
-          </div> */}
-
-          {/* Option 3: Change and Update */}
-          <div className='mb-4 flex items-center justify-between'>
-            <div>
-              <h4 className='font-semibold'>{t('Change_and_Update')}</h4>
-              <p className=' text-sm'>{t('Change_and_Update_describe')}</p>
-            </div>
-            <button
-              data-testid='toggle-notificationWhenConferencesChanges'
-              className={`h-6 w-12 min-w-[3rem] rounded-full transition-colors duration-200 focus:outline-none ${
-                setting.notificationWhenConferencesChanges
-                  ? 'bg-button'
-                  : 'bg-background-secondary'
-              }`}
-              onClick={() => handleToggle('notificationWhenConferencesChanges')}
-              disabled={updateLoading}
-              aria-pressed={setting.notificationWhenConferencesChanges}
-            >
-              <div
-                className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
-                  setting.notificationWhenConferencesChanges
-                    ? 'translate-x-7'
-                    : 'translate-x-1'
-                }`}
-              ></div>
-            </button>
-          </div>
-
-          {/* Option 4: Your upcoming event */}
-          <div className='mb-4 flex items-center justify-between'>
-            <div>
-              <h4 className='font-semibold'>{t('Your_upcoming_event')}</h4>
-              <p className=' text-sm'>{t('Your_upcoming_event_describe')}</p>
-            </div>
-            <button
-              data-testid='toggle-upComingEvent'
-              className={`h-6 w-12 min-w-[3rem] rounded-full transition-colors duration-200 focus:outline-none ${
-                setting.upComingEvent ? 'bg-button' : 'bg-background-secondary'
-              }`}
-              onClick={() => handleToggle('upComingEvent')}
-              disabled={updateLoading}
-              aria-pressed={setting.upComingEvent}
-            >
-              <div
-                className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
-                  setting.upComingEvent ? 'translate-x-7' : 'translate-x-1'
-                }`}
-              ></div>
-            </button>
-          </div>
-
-          {/* Option 5: Send notification through email  */}
-          <div className='mb-4 items-center justify-between md:flex'>
-            <div>
-              <h4 className='font-semibold'>
-                {t('Send_notification_through_email')}
-              </h4>
-              <p className=' text-sm'>
-                {t('Send_notification_through_email_describe')}
-              </p>
-            </div>
-            <button
-              data-testid='toggle-notificationWhenUpdateProfile'
-              className={`h-6 w-12 min-w-[3rem] rounded-full transition-colors duration-200 focus:outline-none ${
-                setting.notificationThroughEmail
-                  ? 'bg-button'
-                  : 'bg-background-secondary'
-              }`}
-              onClick={() => handleToggle('notificationThroughEmail')}
-              disabled={updateLoading}
-              aria-pressed={setting.notificationThroughEmail}
-            >
-              <div
-                className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
-                  setting.notificationThroughEmail
-                    ? 'translate-x-7'
-                    : 'translate-x-1'
-                }`}
-              ></div>
-            </button>
-          </div>
-
-          {/* Option 6: Notification when update profile */}
-          {/* <div className='mb-4 flex items-center justify-between'>
-            <div>
-              <h4 className='font-semibold'>
-                {t('Notification_when_update_profile')}
-              </h4>
-              <p className=' text-sm'>
-                {t('Notification_when_update_profile_description')}
-              </p>
-            </div>
-            <button
-              data-testid='toggle-notificationWhenUpdateProfile'
-              className={`h-6 w-12 min-w-[3rem] rounded-full transition-colors duration-200 focus:outline-none ${
-                setting.notificationWhenUpdateProfile
-                  ? 'bg-button'
-                  : 'bg-background-secondary'
-              }`}
-              onClick={() => handleToggle('notificationWhenUpdateProfile')}
-              disabled={updateLoading}
-              aria-pressed={setting.notificationWhenUpdateProfile}
-            >
-              <div
-                className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
-                  setting.notificationWhenUpdateProfile
-                    ? 'translate-x-7'
-                    : 'translate-x-1'
-                }`}
-              ></div>
-            </button>
-          </div> */}
-
-          {/* Option 7: Notification when follow */}
-          <div className='mb-4 flex items-center justify-between'>
-            <div>
-              <h4 className='font-semibold'>{t('Notification_when_follow')}</h4>
-              <p className=' text-sm'>
-                {t('Notification_when_follow_description')}
-              </p>
-            </div>
-            <button
-              data-testid='toggle-notificationWhenFollow'
-              className={`h-6 w-12 min-w-[3rem] rounded-full transition-colors duration-200 focus:outline-none ${
-                setting.notificationWhenFollow
-                  ? 'bg-button'
-                  : 'bg-background-secondary'
-              }`}
-              onClick={() => handleToggle('notificationWhenFollow')}
-              disabled={updateLoading}
-              aria-pressed={setting.notificationWhenFollow}
-            >
-              <div
-                className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
-                  setting.notificationWhenFollow
-                    ? 'translate-x-7'
-                    : 'translate-x-1'
-                }`}
-              ></div>
-            </button>
-          </div>
-
-          {/* Option 8: Notification when add to calendar */}
-          <div className='mb-4 flex items-center justify-between'>
-            <div>
-              <h4 className='font-semibold'>
-                {t('Notification_when_add_to_calendar')}
-              </h4>
-              <p className=' text-sm'>
-                {t('Notification_when_add_to_calendar_description')}
-              </p>
-            </div>
-            <button
-              data-testid='toggle-notificationWhenAddTocalendar'
-              className={`h-6 w-12 min-w-[3rem] rounded-full transition-colors duration-200 focus:outline-none ${
-                setting.notificationWhenAddTocalendar
-                  ? 'bg-button'
-                  : 'bg-background-secondary'
-              }`}
-              onClick={() => handleToggle('notificationWhenAddTocalendar')}
-              disabled={updateLoading}
-              aria-pressed={setting.notificationWhenAddTocalendar}
-            >
-              <div
-                className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
-                  setting.notificationWhenAddTocalendar
-                    ? 'translate-x-7'
-                    : 'translate-x-1'
-                }`}
-              ></div>
-            </button>
-          </div>
-
-          {/* Option 9: Notification when add to blacklist */}
-          <div className='mb-4 flex items-center justify-between'>
-            <div>
-              <h4 className='font-semibold'>
-                {t('Notification_when_add_to_blacklist')}
-              </h4>
-              <p className=' text-sm'>
-                {t('Notification_when_add_to_blacklist_description')}
-              </p>
-            </div>
-            <button
-              data-testid='toggle-notificationWhenAddToBlacklist'
-              className={`h-6 w-12 min-w-[3rem] rounded-full transition-colors duration-200 focus:outline-none ${
-                setting.notificationWhenAddToBlacklist
-                  ? 'bg-button'
-                  : 'bg-background-secondary'
-              }`}
-              onClick={() => handleToggle('notificationWhenAddToBlacklist')}
-              disabled={updateLoading}
-              aria-pressed={setting.notificationWhenAddToBlacklist}
-            >
-              <div
-                className={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
-                  setting.notificationWhenAddToBlacklist
-                    ? 'translate-x-7'
-                    : 'translate-x-1'
-                }`}
-              ></div>
-            </button>
-          </div>
+        {/* General Settings Section */}
+        <section className='mb-8 p-6 bg-white rounded-lg shadow-sm'>
+          <h3 className='text-xl font-semibold text-gray-800 mb-4 flex items-center'>
+            <Cog className='h-6 w-6 mr-2 text-gray-500' />
+            {t('General_Settings')}
+          </h3>
+          <SettingToggle
+            label={t('Receive_Notifications')}
+            description={t('Receive_Notifications_Description')}
+            checked={setting.receiveNotifications ?? false}
+            onToggle={() => handleToggle('receiveNotifications')}
+            disabled={updateLoading}
+            icon={Bell}
+          />
+          <SettingToggle
+            label={t('Auto_add_events_to_schedule')}
+            description={t('Auto_add_events_to_schedule_describe')}
+            checked={setting.autoAddFollowToCalendar ?? false}
+            onToggle={() => handleToggle('autoAddFollowToCalendar')}
+            disabled={updateLoading}
+            icon={CalendarCheck}
+          />
+          <SettingToggle
+            label={t('Send_notification_through_email')}
+            description={t('Send_notification_through_email_describe')}
+            checked={setting.notificationThroughEmail ?? false}
+            onToggle={() => handleToggle('notificationThroughEmail')}
+            disabled={updateLoading}
+            icon={Mail}
+          />
         </section>
 
-        {/* Delete Account */}
-        {/* <section>
-          <button
-            data-testid='delete-account-button'
-            onClick={handleDeleteAccount}
-            disabled={isDeleting || updateLoading} // Also disable if settings are updating
-            className={`focus:shadow-outline rounded px-4 py-2 font-semibold text-white transition-colors duration-200 ${
-              isDeleting || updateLoading
-                ? 'cursor-not-allowed bg-red-400'
-                : 'bg-red-500 hover:bg-red-600'
-            } focus:outline-none`}
-          >
-            {isDeleting ? t('Deleting') : t('Delete_Account')}
-          </button>
+        {/* Notification Preferences Section */}
+        <section className='mb-8 p-6 bg-white rounded-lg shadow-sm'>
+          <h3 className='text-xl font-semibold text-gray-800 mb-4 flex items-center'>
+            <Bell className='h-6 w-6 mr-2 text-gray-500' />
+            {t('Notification_Preferences')}
+          </h3>
+          <SettingToggle
+            label={t('Notification_when_conferences_changes')}
+            description={t('Change_and_Update_describe')}
+            checked={setting.notificationWhenConferencesChanges ?? false}
+            onToggle={() => handleToggle('notificationWhenConferencesChanges')}
+            disabled={updateLoading}
+            icon={ChevronRight}
+          />
+          <SettingToggle
+            label={t('Your_upcoming_event')}
+            description={t('Your_upcoming_event_describe')}
+            checked={setting.upComingEvent ?? false}
+            onToggle={() => handleToggle('upComingEvent')}
+            disabled={updateLoading}
+            icon={CalendarPlus}
+          />
+          <SettingToggle
+            label={t('Notification_when_update_profile')}
+            description={t('Notification_when_update_profile_description')}
+            checked={setting.notificationWhenUpdateProfile ?? false}
+            onToggle={() => handleToggle('notificationWhenUpdateProfile')}
+            disabled={updateLoading}
+            icon={UserCheck}
+          />
+          <SettingToggle
+            label={t('Notification_when_follow')}
+            description={t('Notification_when_follow_description')}
+            checked={setting.notificationWhenFollow ?? false}
+            onToggle={() => handleToggle('notificationWhenFollow')}
+            disabled={updateLoading}
+            icon={Bell}
+          />
+          <SettingToggle
+            label={t('Notification_when_add_to_calendar')}
+            description={t('Notification_when_add_to_calendar_description')}
+            checked={setting.notificationWhenAddTocalendar ?? false}
+            onToggle={() => handleToggle('notificationWhenAddTocalendar')}
+            disabled={updateLoading}
+            icon={CalendarPlus}
+          />
+          <SettingToggle
+            label={t('Notification_when_add_to_blacklist')}
+            description={t('Notification_when_add_to_blacklist_description')}
+            checked={setting.notificationWhenAddToBlacklist ?? false}
+            onToggle={() => handleToggle('notificationWhenAddToBlacklist')}
+            disabled={updateLoading}
+            icon={Ban}
+          />
+        </section>
+
+        {/* Account Management Section */}
+        <section className='mb-8 p-6 bg-white rounded-lg shadow-sm'>
+          <h3 className='text-xl font-semibold text-gray-800 mb-4 flex items-center'>
+            <UserX className='h-6 w-6 mr-2 text-gray-500' />
+            {t('Account_Management')}
+          </h3>
+          <div className='flex flex-col sm:flex-row sm:items-center justify-between py-4'>
+            <div>
+              <h4 className='font-semibold text-red-700'>{t('Delete_Account')}</h4>
+              <p className='text-sm text-red-500 mt-0.5'>
+                {t('Delete_Account_describe')}
+              </p>
+            </div>
+            <button
+              data-testid='delete-account-button'
+              onClick={handleDeleteAccount}
+              disabled={isDeleting || updateLoading}
+              className={`mt-4 sm:mt-0 flex items-center justify-center px-6 py-2 rounded-md font-semibold text-white transition-colors duration-200 
+                ${isDeleting || updateLoading
+                  ? 'cursor-not-allowed bg-red-400'
+                  : 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
+                } focus:outline-none focus:ring-2 focus:ring-offset-2
+              `}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className='animate-spin h-5 w-5 mr-2' />
+                  {t('Deleting')}
+                </>
+              ) : (
+                <>
+                  <UserX className='h-5 w-5 mr-2' />
+                  {t('Delete_Account')}
+                </>
+              )}
+            </button>
+          </div>
           {deleteError && (
             <p data-testid='delete-error' className='mt-2 text-sm text-red-500'>
               {deleteError}
             </p>
           )}
-          <p className='mt-2 text-sm text-red-600'>
-            {t('Delete_Account_describe')}
-          </p>
         </section>
-         */}
+
+        {updateLoading && (
+          <div className='fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50'>
+            <div className='bg-white p-4 rounded-lg shadow-lg flex items-center'>
+              <Loader2 className='animate-spin h-6 w-6 mr-2 text-blue-500' />
+              <p className='text-gray-700'>{t('Saving_changes')}</p>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )

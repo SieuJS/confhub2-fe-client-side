@@ -24,8 +24,8 @@ import {
   isBasicInfoComplete,
   isLogisticsComplete,
   isContentComplete,
-} from '@/src/utils/addConferenceValidation'; // Đảm bảo import các hàm validator
-import { DateError } from '@/src/utils/conferenceValidationSchema';
+} from '@/src/utils/validation/addConferenceValidation'; // Đảm bảo import các hàm validator
+import { DateError } from '@/src/utils/validation';
 
 // --- CÁC COMPONENT UI CHUNG (Giữ nguyên) ---
 export const FormSectionCard: React.FC<{ title: string; description: string; children: React.ReactNode }> = ({ title, description, children }) => (

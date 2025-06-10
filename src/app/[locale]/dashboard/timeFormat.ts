@@ -224,3 +224,62 @@ export function formatDateFull(
     hour12: false,
   }).format(date);
 }
+
+
+
+
+// Thêm hàm này vào cuối file timeFormat.ts
+
+/**
+ * Formats a date range for display.
+ * @param fromDate The start date.
+ * @param toDate The end date.
+ * @param locale The locale to use for formatting.
+ * @returns A formatted string representing the date range.
+ */
+export function formatDateRange(
+  fromDate: string | Date | undefined,
+  toDate: string | Date | undefined,
+  locale: string = "en"
+): string {
+  if (!fromDate) {
+    return getLocalizedMessage("unknownDate", locale);
+  }
+
+  // Chỉ format ngày, không cần giờ
+  const formatDateOnly = (dateParam: string | Date | undefined): string => {
+    if (!dateParam) return '';
+    const date = typeof dateParam === 'string' ? new Date(dateParam) : dateParam;
+    if (isNaN(date.getTime())) return '';
+    
+    // Sử dụng lại logic locale từ formatDateFull
+    let useLocale = locale;
+    if (locale === "vi") useLocale = "vi-VN";
+    else if (locale === "zh-CN" || locale === 'zh') useLocale = "zh-CN";
+    else if (locale === "zh-TW") useLocale = "zh-TW";
+    else if (locale === "ja") useLocale = "ja-JP";
+    else if (locale === "ru") useLocale = "ru-RU";
+    else if (locale === "fr") useLocale = "fr-FR";
+    else if (locale === "de") useLocale = "de-DE";
+    else if (locale === "ar") useLocale = "ar";
+    else if (locale === "es") useLocale = "es";
+    else if (locale === "fa") useLocale = "fa-IR";
+
+    return new Intl.DateTimeFormat(useLocale, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }).format(date);
+  };
+
+  const fromFormatted = formatDateOnly(fromDate);
+  const toFormatted = formatDateOnly(toDate);
+
+  // Nếu không có ngày kết thúc hoặc ngày kết thúc giống ngày bắt đầu
+  if (!toFormatted || fromFormatted === toFormatted) {
+    return fromFormatted;
+  }
+
+  // Nếu có cả hai và chúng khác nhau
+  return `${fromFormatted} - ${toFormatted}`;
+}

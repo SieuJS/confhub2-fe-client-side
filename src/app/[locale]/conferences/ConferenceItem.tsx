@@ -58,18 +58,6 @@ const ConferenceItem: React.FC<ConferenceItemProps> = ({ conference }) => {
         </Link>
       )}
 
-      {/* {showEditButton && (
-        <Link
-          href={{
-            pathname: '/updateconference',
-            query: { id: conference.id }
-          }}
-        >
-          <Button variant='secondary' size={sizeButton} rounded>
-            {t('Edit')}
-          </Button>
-        </Link>
-      )} */}
     </>
   )
 

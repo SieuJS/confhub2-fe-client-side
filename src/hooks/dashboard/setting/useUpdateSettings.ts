@@ -1,12 +1,12 @@
-// src/hooks/useUpdateUser.ts
-import { useState } from 'react';
-import { UserResponse, Setting } from '@/src/models/response/user.response';  // Import your UserResponse and Setting type
-import { updateUser } from '../../../app/apis/user/updateUser'; // Adjust path if needed.
+// src/hooks/useUpdateUser.ts (Đã sửa lỗi)
+import { useState, useCallback } from 'react'; // <<<< THÊM useCallback
+import { UserResponse, Setting } from '@/src/models/response/user.response';
+import { updateUser } from '../../../app/apis/user/updateUser';
 import { appConfig } from '@/src/middleware';
 
 interface UpdateUserResult {
   updateUserSetting: (updatedSetting: Partial<Setting>) => Promise<void>;
-  updateUserProfile: (userId: string, updatedProfile: Partial<UserResponse>) => Promise<void>
+  updateUserProfile: (userId: string, updatedProfile: Partial<UserResponse>) => Promise<void>;
   loading: boolean;
   error: string | null;
 }
@@ -20,50 +20,49 @@ export const useUpdateUser = (): UpdateUserResult => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const updateUserSetting = async (updatedSetting: Partial<Setting>) => {
+  // Bọc hàm trong useCallback để nó không bị tạo lại mỗi lần render
+  const updateUserSetting = useCallback(async (updatedSetting: Partial<Setting>) => {
     setLoading(true);
     setError(null);
-    console.log('Updated Setting:', updatedSetting);
     try {
       const updateResponse = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/user/setting`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({
           settings: updatedSetting,
         }),
       });
       if (!updateResponse.ok) {
-        throw new Error(`Failed to update user setting. Status: ${updateResponse.status}`);
+        // Cung cấp thông tin lỗi chi tiết hơn nếu có thể
+        const errorBody = await updateResponse.text();
+        throw new Error(`Failed to update user setting. Status: ${updateResponse.status}. Body: ${errorBody}`);
       }
-
-
     } catch (err: any) {
       setError(err.message || 'Failed to update user setting.');
+      // Re-throw lỗi để component gọi nó có thể bắt và xử lý nếu cần
+      throw err;
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // Mảng dependency rỗng vì hàm này không phụ thuộc vào props hay state nào từ bên ngoài
 
-  const updateUserProfile = async (userId: string, updatedProfile: Partial<UserResponse>) => {
+  // Tương tự, bọc hàm này trong useCallback
+  const updateUserProfile = useCallback(async (userId: string, updatedProfile: Partial<UserResponse>) => {
     setLoading(true);
     setError(null);
     try {
-      // Lấy token từ localStorage, giống như cách làm trong updateUserSetting
       const token = localStorage.getItem('token');
-
-      // Truyền cả 2 tham số vào hàm updateUser
-      await updateUser(updatedProfile, token); // <<< SỬA LỖI Ở ĐÂY
-    }
-    catch (err: any) {
+      await updateUser(updatedProfile, token);
+    } catch (err: any) {
       setError(err.message || 'Failed to update user profile');
-    }
-    finally {
+      throw err;
+    } finally {
       setLoading(false);
     }
-  }
+  }, []); // Mảng dependency rỗng
 
   return { updateUserSetting, updateUserProfile, loading, error };
 };
@@ -71,22 +70,31 @@ export const useUpdateUser = (): UpdateUserResult => {
 export const useGetUserSetting = (): GetUserSettingResult => {
   const [error, setError] = useState<string | null>(null);
 
-  const getUserSettings = async (): Promise<Setting | null> => {
+  const getUserSettings = useCallback(async (): Promise<Setting | null> => {
+    setError(null);
     try {
       const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/user/setting`, {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
       });
+
       if (!response.ok) {
-        throw new Error(`Failed to fetch user settings. Status: ${response.status}`);
+        const errorBody = await response.text();
+        throw new Error(`Failed to fetch user settings. Status: ${response.status}. Body: ${errorBody}`);
       }
-      return await response.json();
-    } catch (error) {
-      setError('Error fetching user settings:' + error);
+      
+      // SỬA LỖI Ở ĐÂY: Trả về trực tiếp object data
+      // vì API không gói dữ liệu trong một key 'data'
+      const data = await response.json();
+      return data; // <<<< THAY ĐỔI TỪ `data.data` THÀNH `data`
+
+    } catch (error: any) {
+      setError(error.message || 'Error fetching user settings');
       return null;
     }
-  }
+  }, []); 
+
   return { getUserSettings, error };
 }

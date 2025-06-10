@@ -23,6 +23,7 @@ const AddressInput: React.FC<AddressInputProps> = ({
       <label htmlFor="address" className="block text-sm font-medium text-gray-700">
         <div className="flex items-center"> {/* Flex container cho icon và label text */}
           <MapPin className="h-4 w-4 mr-2 text-gray-500" /> {/* Icon */}
+          {required && <span className="text-red-500">* </span>}
           {t('Address')}:
         </div>
       </label>
