@@ -12,7 +12,7 @@ export type ConferenceResponse = {
   createdAt: string;
   updatedAt: string;
   status: string;
-  message: string;
+  message? : string;
   ranks: {
     year: number;
     rank: string;
