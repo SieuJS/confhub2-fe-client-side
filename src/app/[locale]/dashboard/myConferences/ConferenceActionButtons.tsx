@@ -33,7 +33,7 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
                             <Button variant="primary" size="small">{t('Action_View_Details')}</Button>
                         </Link>
                         {conference.message && (
-                            <Button variant="secondary" size="small" onClick={() => onViewReason(conference.message)}>
+                            <Button variant="secondary" size="small" onClick={() => onViewReason(conference.message!)}>
                                 {t('Action_View_Approval_Reason')}
                             </Button>
                         )}
@@ -46,7 +46,7 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
                             {t('Action_Edit')}
                         </Button>
                         {conference.message && (
-                            <Button variant="danger" size="small" onClick={() => onViewReason(conference.message)}>
+                            <Button variant="danger" size="small" onClick={() => onViewReason(conference.message!)}>
                                 {t('Action_View_Rejection_Reason')}
                             </Button>
                         )}
