@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
-import { useAuth } from '@/src/contexts/AuthContext' // BƯỚC 1: IMPORT useAuth
-import { Loader2 } from 'lucide-react' // BƯỚC 1: IMPORT Loader2
+import { useAuth } from '@/src/contexts/AuthContext'
+import { Loader2 } from 'lucide-react'
 
-// Import các component Tab của bạn
+// Import các component Tab
 import SettingTab from './setting/SettingTab'
 import NotificationsTab from './notification/NotificationsTab'
 import FollowedTab from './follow/FollowedTab'
@@ -15,7 +15,6 @@ import ProfileTab from './profile/ProfileTab'
 import NoteTab from './note/NoteTab'
 import MyConferencesTab from './myConferences/MyConferencesTab'
 
-// BƯỚC 2: TẠO COMPONENT LOADING DÙNG CHUNG
 const LoadingSpinner = ({ message }: { message: string }) => (
   <div className="flex flex-col items-center justify-center h-80 text-gray-500">
     <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
@@ -23,12 +22,21 @@ const LoadingSpinner = ({ message }: { message: string }) => (
   </div>
 );
 
+// *** BƯỚC 1: ĐỊNH NGHĨA CẤU HÌNH CÁC TAB ***
+const TABS = [
+  { name: 'Profile', component: <ProfileTab /> },
+  { name: 'Followed', component: <FollowedTab /> },
+  { name: 'My Conferences', component: <MyConferencesTab /> },
+  { name: 'Note', component: <NoteTab /> },
+  { name: 'Notifications', component: <NotificationsTab /> },
+  { name: 'Blacklisted', component: <BlacklistTab /> },
+  { name: 'Setting', component: <SettingTab /> },
+];
+
 export default function DashboardPage() {
   const searchParams = useSearchParams()
-  const t = useTranslations('') // Khởi tạo t để dùng trong loading
+  const t = useTranslations('')
   const [activePage, setActivePage] = useState<string>('Profile')
-
-  // BƯỚC 3: LẤY TRẠNG THÁI isInitializing TỪ AUTH CONTEXT
   const { isInitializing } = useAuth();
 
   useEffect(() => {
@@ -45,40 +53,22 @@ export default function DashboardPage() {
     setActivePage(initialPage);
   }, [searchParams]);
 
-  // BƯỚC 4: THÊM LOGIC HIỂN THỊ LOADING KHI isInitializing LÀ TRUE
   if (isInitializing) {
     return (
-      // Đặt spinner vào một container để nó căn giữa trong khu vực nội dung
       <div className='container mx-auto p-4'>
         <LoadingSpinner message={t('MyConferences.Loading_your_profile')} />
       </div>
     );
   }
 
-  const renderPage = () => {
-    switch (activePage) {
-      case 'Setting':
-        return <SettingTab />;
-      case 'Notifications':
-        return <NotificationsTab />;
-      case 'Followed':
-        return <FollowedTab />; // FollowedTab giờ sẽ được render sau khi isInitializing là false
-      case 'Blacklisted':
-        return <BlacklistTab />;
-      case 'Note':
-        return <NoteTab />;
-      case 'My Conferences':
-        return <MyConferencesTab />;
-      case 'Profile':
-      default:
-        return <ProfileTab />;
-    }
-  };
-
-  // Khi isInitializing là false, render nội dung trang như bình thường
+  // *** BƯỚC 2: RENDER TẤT CẢ CÁC TAB VÀ DÙNG CSS ĐỂ ẨN/HIỆN ***
   return (
     <>
-      {renderPage()}
+      {TABS.map(tab => (
+        <div key={tab.name} className={activePage === tab.name ? 'block' : 'hidden'}>
+          {tab.component}
+        </div>
+      ))}
     </>
   );
 }
