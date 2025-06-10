@@ -1,46 +1,48 @@
 // ResultsJournalSection.tsx
-'use client' // This is required for useTranslations in Client Components
+'use client'
 
 import React from 'react'
 import EventJournalCard from './EventJournalCard'
-import Pagination from '../utils/Pagination' // Ensure this Pagination component is also internationalized if it contains text
-import useJournalResult from '@/src/hooks/journals/useJournalResult'
-import { useTranslations } from 'next-intl' // Import the hook
+import Pagination from '../utils/Pagination'
+import useJournalResults from '@/src/hooks/journals/useJournalResults'
+import { useTranslations } from 'next-intl'
 
 interface ResultsJournalSectionProps {}
 
 const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = () => {
-  // Initialize the translation function with a namespace
   const t = useTranslations('JournalResults')
 
   const {
-    journals,
-    currentPage,
-    journalsPerPage,
+    journals, // Bây giờ là dữ liệu của trang hiện tại
+    totalJournals, // Tổng số tạp chí từ meta.total
+    currentPage,   // Trang hiện tại từ meta.page
+    journalsPerPage, // Số tạp chí trên mỗi trang từ meta.limit
+    totalPages,    // Tổng số trang từ meta.totalPages
     sortBy,
     loading,
     error,
-    currentJournals,
     paginate,
     handleSortByChange
-  } = useJournalResult()
+  } = useJournalResults()
 
   if (loading) {
-    // Use translation key for loading message
     return <p>{t('loading')}</p>
   }
 
+  // journals có thể là undefined hoặc mảng rỗng
   if (!journals || journals.length === 0) {
-    // Use translation key for no results message
+    if (error) {
+        return <p className="text-red-500">{t('errorFetchingResults', { error: error })}</p>
+    }
     return <p>{t('noResults')}</p>
   }
 
   return (
-    <div className='w-full pl-8'>
+    <div className='w-full'>
       <div className='mb-4 flex items-center justify-between'>
         <h2 className='text-2xl font-semibold'>
-          {/* Use translation key with interpolation for count */}
-          {t('resultsCount', { count: journals.length })}
+          {/* Sử dụng totalJournals từ hook để hiển thị tổng số kết quả */}
+          {t('resultsCount', { count: totalJournals })}
         </h2>
         <div className='flex items-center rounded-md px-2 py-1'>
           <svg
@@ -55,44 +57,36 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = () => {
               clipRule='evenodd'
             />
           </svg>
-          {/* Use translation key for sort label */}
           <span className='mr-1 text-sm'>{t('sortByLabel')}:</span>
           <select
             className='rounded border bg-transparent px-2 py-1 text-sm focus:outline-none'
             value={sortBy}
             onChange={handleSortByChange}
           >
-            {/* Use translation keys for sort options */}
             <option value='title'>{t('sortByTitle')}</option>
-            <option value='issn'>{t('sortByISSN')}</option>{' '}
-            {/* ISSN is often not translated */}
+            <option value='issn'>{t('sortByISSN')}</option>
             <option value='publisher'>{t('sortByPublisher')}</option>
-            {/* Language and other metrics might not be directly filterable/sortable based on provided JournalResponse */}
-            {/* <option value="language">{t('sortByLanguage')}</option> */}
             <option value='impactFactor'>{t('sortByImpactFactor')}</option>
-            {/* <option value="citeScore">{t('sortByCiteScore')}</option> */}
             <option value='sjr'>{t('sortBySJR')}</option>
-            {/* <option value="overallRank">{t('sortByOverallRank')}</option> */}
             <option value='hIndex'>{t('sortByHIndex')}</option>
           </select>
         </div>
       </div>
 
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
-        {/* EventJournalCard already internationalized in previous step */}
-        {currentJournals?.map(journal => (
-          <EventJournalCard key={journal.Title} journal={journal} />
+        {/* currentJournals (hoặc journals) là mảng JournalData[] */}
+        {journals?.map(journal => ( // Đảm bảo map qua journals hoặc currentJournals
+          <EventJournalCard key={journal.id} journal={journal} />
         ))}
       </div>
 
-      {journals.length > 0 && (
+      {/* Điều kiện hiển thị phân trang dựa trên totalPages */}
+      {totalPages > 1 && ( // Chỉ hiển thị phân trang nếu có nhiều hơn 1 trang
         <Pagination
-          eventsPerPage={journalsPerPage}
-          totalEvents={journals.length}
+          eventsPerPage={journalsPerPage} // Đây là limit từ meta
+          totalEvents={totalJournals} // Đây là tổng số record từ meta
           paginate={paginate}
-          currentPage={currentPage}
-          // If Pagination component has text, you might need to pass t down or internationalize it internally
-          // t={t} // Example if needed
+          currentPage={currentPage} // Trang hiện tại từ meta
         />
       )}
     </div>

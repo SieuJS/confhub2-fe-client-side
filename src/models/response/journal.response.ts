@@ -1,8 +1,6 @@
-// Định nghĩa kiểu cho các đối tượng lồng nhau trước
+// src/models/response/journal.response.ts (Đề xuất tạo một file riêng cho types)
 
-// Kiểu cho các mục trong mảng bioxbio (dựa trên type bạn cung cấp, vì JSON là null)
-// Lưu ý: Vì giá trị trong JSON là null, nên nó có thể là null hoặc một mảng trống
-// hoặc một mảng các đối tượng này. Chúng ta sẽ dùng kiểu `BioxbioItem[] | null`.
+// Kiểu cho các mục trong mảng bioxbio
 type BioxbioItem = {
   Year: string;
   Impact_factor: string;
@@ -10,67 +8,70 @@ type BioxbioItem = {
 
 // Kiểu cho đối tượng "Subject Area and Category"
 type SubjectAreaAndCategory = {
-  "Field of Research": string; // Cần dấu ngoặc kép vì có khoảng trắng
-  Topics: string[]; // Mảng các chuỗi
+  "Field of Research": string;
+  Topics: string[];
 };
 
 // Kiểu cho đối tượng "Information"
 type Information = {
   Homepage: string;
-  "How to publish in this journal": string; // Cần dấu ngoặc kép vì có khoảng trắng
+  "How to publish in this journal": string;
   Mail: string;
 };
 
 // Kiểu cho các mục trong mảng "SupplementaryTable"
 type SupplementaryTableItem = {
   Category: string;
-  Year: string;
+  Year: string; // Trong JSON là chuỗi, ví dụ "2022"
   Quartile: string;
 };
 
-// Định nghĩa type chính cho toàn bộ đối tượng JSON
-export type JournalResponseData = {
+// Định nghĩa type cho từng đối tượng Journal trong mảng 'data'
+export type JournalData = { // Đổi tên từ JournalResponseData thành JournalData để rõ ràng hơn
   id: string;
   scimagoLink: string;
-  bioxbio: BioxbioItem[] | null; // Giá trị trong JSON là null
+  bioxbio: BioxbioItem[]; // API trả về mảng rỗng [], không phải null
   Image: string;
   Image_Context: string;
-  Rank: string; // Thêm trường bị thiếu
-  Sourceid: string; // Thêm trường bị thiếu
-  Title: string; // Giữ lại Title viết hoa
-  Type: string;
-  Issn: string; // Thêm trường Issn viết thường (có trong JSON)
-  SJR: string;
-  "SJR Best Quartile": string; // Thêm trường bị thiếu
-  "H index": string; // Cần dấu ngoặc kép
-  "Total Docs. (2024)": string; // Cần dấu ngoặc kép
-  "Total Docs. (3years)": string; // Cần dấu ngoặc kép
-  "Total Refs.": string; // Sửa tên key (xóa (2024)) và cần dấu ngoặc kép
-  "Total Cites (3years)": string; // Cần dấu ngoặc kép
-  "Citable Docs. (3years)": string; // Cần dấu ngoặc kép
-  "Cites / Doc. (2years)": string; // Cần dấu ngoặc kép
-  "Ref. / Doc.": string; // Sửa tên key (xóa (2024)) và cần dấu ngoặc kép
-  "%Female": string; // Sửa tên key (xóa (2024)) và cần dấu ngoặc kép
-  Overton: string; // Thêm trường bị thiếu
-  SDG: string; // Thêm trường bị thiếu
+  Rank: string;
+  Sourceid: string;
+  Title: string; // "Health Education Journal"
+  Type: string; // "journal"
+  Issn: string; // "00178969, 17488176"
+  SJR: number; // Trong JSON là số (461)
+  "SJR Best Quartile": string;
+  "H index": string; // Trong JSON là chuỗi, ví dụ "40"
+  "Total Docs. (2023)": string; // Trong JSON là chuỗi, ví dụ "75"
+  "Total Docs. (3years)": string; // Trong JSON là chuỗi, ví dụ "228"
+  "Total Refs.": string; // Trong JSON là chuỗi, ví dụ "2966"
+  "Total Cites (3years)": string; // Trong JSON là chuỗi, ví dụ "337"
+  "Citable Docs. (3years)": string; // Trong JSON là chuỗi, ví dụ "226"
+  "Cites / Doc. (2years)": string; // Trong JSON là chuỗi, ví dụ "139"
+  "Ref. / Doc.": string; // Trong JSON là chuỗi, ví dụ "3955"
+  "%Female": string; // Trong JSON là chuỗi, ví dụ "6469"
+  Overton: number; // Trong JSON là số (0)
+  SDG: number; // Trong JSON là số (0)
   Country: string;
-  Region: string; // Thêm trường bị thiếu
+  Region: string;
   Publisher: string;
-  Coverage: string; // Thêm trường bị thiếu
-  Categories: string; // Thêm trường bị thiếu
-  Areas: string; // Thêm trường bị thiếu
-  title: string; // Giữ lại title viết thường
-  "Subject Area and Category": SubjectAreaAndCategory; // Sử dụng type đã định nghĩa
-  ISSN: string; // Giữ lại ISSN viết hoa (có trong JSON)
-  Information: Information; // Sử dụng type đã định nghĩa
-  Scope?: string;
-  "Additional Info"?: string;
-  SupplementaryTable: SupplementaryTableItem[]; // Sử dụng type đã định nghĩa
+  Coverage: string;
+  Categories: string;
+  Areas: string;
+  title: string; // Đôi khi có thể trùng lặp với Title nhưng vẫn nên giữ cả hai nếu API cung cấp
+  "Subject Area and Category": SubjectAreaAndCategory;
+  ISSN: string; // Trùng với Issn nhưng vẫn nên giữ cả hai nếu API cung cấp
+  Information: Information;
+  Scope?: string; // Tùy chọn
+  "Additional Info"?: string; // Tùy chọn
+  SupplementaryTable: SupplementaryTableItem[];
   Thumbnail: string;
+  createdAt: string; // Thêm nếu cần dùng
+  updatedAt: string; // Thêm nếu cần dùng
 };
 
-export type JournalResponse = {
-  data: JournalResponseData;
+// Định nghĩa type cho toàn bộ phản hồi từ API
+export type JournalApiResponse = { // Đổi tên thành JournalApiResponse để rõ ràng
+  data: JournalData[]; // Đây là MẢNG các đối tượng Journal
   meta: {
     total: number;
     page: number;

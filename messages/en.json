@@ -621,7 +621,8 @@
   "Common": {
     "loading": "Loading...",
     "or": "or",
-    "new": "NEW"
+    "new": "NEW",
+    "welcomeMessage": "Welcome to our platform!"
   },
   "Publish": "Publish",
   "No_summary_available": "No summary available.",
@@ -793,25 +794,37 @@
     "overallRankPlaceholder": "e.g., <1000"
   },
   "JournalCard": {
-    "issnLabel": "ISSN",
-    "detailsButton": "Details",
     "submitButton": "Submit",
-    "defaultJournalAltText": "Default Journal Cover Image"
+    "defaultJournalAltText": "Journal cover image",
+    "issnLabel": "ISSN",
+    "publisherLabel": "Publisher",
+    "countryLabel": "Country",
+    "sjrLabel": "SJR",
+    "hIndexLabel": "H-Index",
+    "latestQuartileLabel": "Latest Quartile",
+    "detailsButton": "Details",
+    "followButton": "Follow",
+    "unfollowButton": "Unfollow",
+    "loadingButton": "Loading...",
+    "unfollowSuccess": "Successfully unfollowed journal!",
+    "followSuccess": "Successfully followed journal!",
+    "followError": "Failed to update follow status."
   },
   "JournalResults": {
-    "loading": "Loading journals...",
-    "noResults": "No journals found.",
-    "resultsCount": "Results ({count})",
-    "sortByLabel": "Sort by",
-    "sortByTitle": "Title",
-    "sortByISSN": "ISSN",
     "sortByPublisher": "Publisher",
     "sortByLanguage": "Language",
     "sortByImpactFactor": "Impact Factor",
     "sortByCiteScore": "CiteScore",
     "sortBySJR": "SJR",
     "sortByOverallRank": "Overall Rank",
-    "sortByHIndex": "H-index"
+    "sortByHIndex": "H-index",
+    "loading": "Loading journals...",
+    "noResults": "No journals found matching your criteria. Try adjusting your filters.",
+    "errorFetchingResults": "Error fetching journals: {error}",
+    "resultsCount": "{count, plural, one {# result} other {# results}}",
+    "sortByLabel": "Sort by",
+    "sortByTitle": "Title",
+    "sortByISSN": "ISSN"
   },
   "Your_login_session_has_expired": "Your login session has expired.",
   "Redirecting_to_homepage_in_seconds": "Redirecting to homepage in {seconds} seconds...",

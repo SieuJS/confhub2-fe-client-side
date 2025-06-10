@@ -621,7 +621,8 @@
   "Common": {
     "loading": "Đang tải...",
     "or": "hoặc",
-    "new": "MỚI"
+    "new": "MỚI",
+    "welcomeMessage": "Chào mừng đến với nền tảng của chúng tôi!"
   },
   "Publish": "Đăng bài",
   "No_summary_available": "Không có tóm tắt nào.",
@@ -793,25 +794,37 @@
     "overallRankPlaceholder": "ví dụ: <1000"
   },
   "JournalCard": {
-    "issnLabel": "ISSN",
-    "detailsButton": "Chi tiết",
     "submitButton": "Nộp bài",
-    "defaultJournalAltText": "Ảnh bìa tạp chí mặc định"
+    "defaultJournalAltText": "Ảnh bìa tạp chí",
+    "issnLabel": "ISSN",
+    "publisherLabel": "Nhà xuất bản",
+    "countryLabel": "Quốc gia",
+    "sjrLabel": "SJR",
+    "hIndexLabel": "Chỉ số H",
+    "latestQuartileLabel": "Quartile gần nhất",
+    "detailsButton": "Chi tiết",
+    "followButton": "Theo dõi",
+    "unfollowButton": "Bỏ theo dõi",
+    "loadingButton": "Đang tải...",
+    "unfollowSuccess": "Đã bỏ theo dõi tạp chí thành công!",
+    "followSuccess": "Đã theo dõi tạp chí thành công!",
+    "followError": "Cập nhật trạng thái theo dõi thất bại."
   },
   "JournalResults": {
+    "sortByLanguage": "Ngôn ngữ",
+    "sortByCiteScore": "CiteScore",
+    "sortByOverallRank": "Xếp hạng tổng thể",
     "loading": "Đang tải tạp chí...",
-    "noResults": "Không tìm thấy tạp chí nào.",
-    "resultsCount": "Kết quả ({count})",
+    "noResults": "Không tìm thấy tạp chí nào phù hợp với tiêu chí của bạn. Hãy thử điều chỉnh các bộ lọc.",
+    "errorFetchingResults": "Lỗi khi tải tạp chí: {error}",
+    "resultsCount": "{count, plural, one {# kết quả} other {# kết quả}}",
     "sortByLabel": "Sắp xếp theo",
     "sortByTitle": "Tiêu đề",
     "sortByISSN": "ISSN",
     "sortByPublisher": "Nhà xuất bản",
-    "sortByLanguage": "Ngôn ngữ",
-    "sortByImpactFactor": "Hệ số ảnh hưởng",
-    "sortByCiteScore": "CiteScore",
+    "sortByImpactFactor": "Chỉ số ảnh hưởng",
     "sortBySJR": "SJR",
-    "sortByOverallRank": "Xếp hạng tổng thể",
-    "sortByHIndex": "Chỉ số H-index"
+    "sortByHIndex": "Chỉ số H"
   },
   "Your_login_session_has_expired": "Phiên đăng nhập của bạn đã hết hạn.",
   "Redirecting_to_homepage_in_seconds": "Đang chuyển hướng đến trang chủ trong {seconds} giây...",

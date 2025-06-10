@@ -1,12 +1,15 @@
-// src/components/journals/details/JournalDetails.tsx (Ví dụ đường dẫn mới)
+// src/app/[locale]/journals/detail/page.tsx
+
 'use client'
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { JournalResponse } from '../../../../models/response/journal.response'
+// Giả sử JournalData đã được cập nhật để khớp với cấu trúc API mới
+// Nếu chưa, bạn cần định nghĩa lại nó. Dựa trên JSON bạn cung cấp, nó là một object phẳng.
+import { JournalData } from '../../../../models/response/journal.response' 
 import { Header } from '../../utils/Header'
 import Footer from '../../utils/Footer'
 import NotFoundPage from '../../utils/NotFoundPage'
-import JournalReport from './JournalReport' // Giả sử các component con nằm cùng thư mục
+import JournalReport from './JournalReport'
 import { JournalTabs } from './JournalTabs'
 import { RecommendedJournals } from './RecommendedJournals'
 import { RecentlyAddedJournals } from './RecentlyAddedJournals'
@@ -18,90 +21,88 @@ const JournalDetails = ({ params: { locale } }: { params: { locale: string } }) 
   const t = useTranslations()
 
   const searchParams = useSearchParams()
-  const idFromQuery = searchParams.get('id') // Lấy Sourceid từ query param 'id'
+  // API mới sử dụng 'id' (UUID) thay vì 'Sourceid'.
+  // Giả sử query param vẫn là 'id' và chứa UUID.
+  const journalId = searchParams.get('id') 
 
-  // State để lưu trữ journal tìm thấy, trạng thái loading và lỗi
-  const [journal, setJournal] = useState<JournalResponse | null | undefined>(
-    undefined
-  ) // undefined: chưa fetch, null: không tìm thấy, object: tìm thấy
+  const [journal, setJournal] = useState<JournalData | null | undefined>(undefined)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Hàm để fetch và tìm kiếm journal
-    const fetchAndFindJournal = async () => {
-      // Nếu không có id trong query param, không cần fetch
-      if (!idFromQuery) {
-        console.log("No 'id' (Sourceid) found in query parameters.")
-        setJournal(null) // Đánh dấu là không tìm thấy
+    const fetchJournalById = async () => {
+      if (!journalId) {
+        console.log("No 'id' found in query parameters.")
+        setJournal(null)
         setLoading(false)
         return
       }
 
       setLoading(true)
       setError(null)
-      setJournal(undefined) // Reset journal state trong khi fetch
+      setJournal(undefined)
 
       try {
-        console.log(`Fetching all journals to find Sourceid: ${idFromQuery}...`)
-        const response = await fetch('/api/journal') // Gọi API endpoint
+        // Lấy base URL từ biến môi trường
+        const baseUrl = process.env.NEXT_PUBLIC_DATABASE_URL;
+        if (!baseUrl) {
+            throw new Error("NEXT_PUBLIC_DATABASE_URL is not defined in environment variables.");
+        }
+
+        // Xây dựng URL API để lấy journal cụ thể
+        const apiUrl = `${baseUrl}/api/v1/journals/${journalId}`;
+        console.log(`Fetching journal from: ${apiUrl}`);
+
+        const response = await fetch(apiUrl);
+
+        // Xử lý trường hợp không tìm thấy (API trả về 404)
+        if (response.status === 404) {
+          console.log(`Journal with id ${journalId} not found (404).`);
+          setJournal(null);
+          throw new Error(`Journal not found.`);
+        }
 
         if (!response.ok) {
-          throw new Error(`API call failed with status: ${response.status}`)
+          throw new Error(`API call failed with status: ${response.status}`);
         }
 
-        const allJournals: JournalResponse[] = await response.json()
-        console.log(
-          `Received ${allJournals.length} journals from API. Searching for Sourceid: ${idFromQuery}`
-        )
+        // Dữ liệu trả về là một object journal duy nhất
+        const foundJournal: JournalData = await response.json();
+        console.log(`Journal found:`, foundJournal.Title); // Truy cập trực tiếp vào Title
+        setJournal(foundJournal);
 
-        // Tìm kiếm journal trong danh sách trả về từ API
-        const foundJournal = allJournals.find(j => j.data.Sourceid === idFromQuery)
-
-        if (foundJournal) {
-          console.log(`Journal found:`, foundJournal.data.title)
-          setJournal(foundJournal)
-        } else {
-          console.log(
-            `Journal with Sourceid ${idFromQuery} not found in the fetched data.`
-          )
-          setJournal(null) // Đánh dấu là không tìm thấy
-        }
       } catch (err: any) {
-        console.error('Failed to fetch or find journal:', err)
-        setError(err.message || 'An unknown error occurred')
-        setJournal(null) // Đặt là null khi có lỗi
+        console.error('Failed to fetch journal:', err);
+        setError(err.message || 'An unknown error occurred');
+        setJournal(null);
       } finally {
-        setLoading(false) // Kết thúc loading
+        setLoading(false);
       }
     }
 
-    fetchAndFindJournal()
-
-    // Chạy lại effect khi idFromQuery thay đổi
-  }, [idFromQuery])
+    fetchJournalById();
+  }, [journalId]);
 
   // --- Render Logic ---
 
-  // Trường hợp đang loading
   if (loading) {
     return (
       <>
         <Header locale={locale} />
         <div className='flex min-h-screen items-center justify-center'>
-          <p>{t('Loading_journal_details')}</p> {/* Hoặc component spinner */}
+          <p>{t('Loading_journal_details')}</p>
         </div>
         <Footer />
       </>
     )
   }
 
-  // Trường hợp có lỗi fetch hoặc không tìm thấy journal (bao gồm cả không có id)
   if (error || journal === null) {
     return (
       <>
         <Header locale={locale} />
-        {error && (
+        {/* Không hiển thị lỗi "Journal not found" cho người dùng, chỉ hiển thị trang 404 */}
+        {error && error !== 'Journal not found.' && (
           <div className='py-4 text-center text-red-500'>
             {t('Error')}: {error}
           </div>
@@ -112,8 +113,11 @@ const JournalDetails = ({ params: { locale } }: { params: { locale: string } }) 
     )
   }
 
-  // Trường hợp đã load xong và tìm thấy journal (journal không phải null/undefined)
   if (journal) {
+    // QUAN TRỌNG: Vì cấu trúc dữ liệu đã thay đổi (không còn `journal.data`),
+    // bạn cần đảm bảo các component con như JournalReport, JournalTabs
+    // cũng được cập nhật để nhận props là `journal` và truy cập trực tiếp
+    // các thuộc tính (ví dụ: `journal.Title` thay vì `journal.data.title`).
     return (
       <div className=''>
         <Header locale={locale} />
@@ -128,7 +132,6 @@ const JournalDetails = ({ params: { locale } }: { params: { locale: string } }) 
     )
   }
 
-  // Trường hợp mặc định (không nên xảy ra nếu logic trên đúng)
   return (
     <>
       <Header locale={locale} />

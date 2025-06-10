@@ -37,7 +37,7 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
         ></span>
       </Link>
 
-      {/* <Link
+      <Link
         lang={locale}
         href={`/journals`}
         className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-button md:mx-4 ${isActive(`/${locale}/journals`) ? 'text-button' : ''}`}
@@ -50,7 +50,7 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
               : 'scale-x-0 group-hover:scale-x-100'
           }`}
         ></span>
-      </Link> */}
+      </Link>
 
       <Link
         lang={locale}

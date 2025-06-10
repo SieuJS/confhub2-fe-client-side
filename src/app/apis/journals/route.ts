@@ -1,80 +1,47 @@
-// src/app/api/journals/route.ts
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import { JournalResponse } from '@/src/models/response/journal.response'; // Điều chỉnh đường dẫn nếu cần
 
-// Hàm đọc và parse một file JSONL
-async function readJsonlFile(filePath: string): Promise<JournalResponse[]> {
-    try {
-        const fileContent = await fs.promises.readFile(filePath, 'utf-8');
-        const lines = fileContent.trim().split('\n');
-        const journals: JournalResponse[] = lines
-            .map((line) => {
-                if (!line.trim()) return null; // Bỏ qua dòng trống
-                try {
-                    return JSON.parse(line) as JournalResponse;
-                } catch (parseError) {
-                    console.error(`Error parsing line in ${filePath}:`, line, parseError);
-                    return null; // Bỏ qua dòng lỗi
-                }
-            })
-            .filter((journal): journal is JournalResponse => journal !== null); // Loại bỏ các giá trị null
-        return journals;
-    } catch (readError) {
-        console.error(`Error reading file ${filePath}:`, readError);
-        return []; // Trả về mảng rỗng nếu lỗi đọc file
-    }
-}
+// Loại bỏ các import liên quan đến file system (fs, path)
+// import fs from 'fs';
+// import path from 'path';
+// import { JournalResponse } from '@/src/models/response/journal.response';
 
 export async function GET() {
     try {
-        const cwd = process.cwd();
-        console.log(`Current working directory: ${cwd}`); // Log CWD
-        const dataDir = path.join(cwd, 'src', 'models', 'journalData');
-        console.log(`Calculated data directory: ${dataDir}`); // Log dataDir
-
-        let allFiles: string[] = [];
-        try {
-            allFiles = await fs.promises.readdir(dataDir);
-            console.log(`Files found in ${dataDir}:`, allFiles); // Log found files
-        } catch (readDirError: any) {
-            console.error(`Error reading directory ${dataDir}:`, readDirError.message);
-            if (readDirError.code === 'ENOENT') {
-                console.error(`Directory not found! Path: ${dataDir}`); // Specific log for directory not found
-            }
-            throw readDirError; // Rethrow to catch in main catch block
+        const baseUrl = process.env.NEXT_PUBLIC_DATABASE_URL;
+        if (!baseUrl) {
+            // Lỗi này chỉ log ở server, không lộ ra cho client
+            console.error("NEXT_PUBLIC_DATABASE_URL is not defined in environment variables.");
+            throw new Error("Server configuration error.");
         }
 
+        // Giả sử endpoint để lấy tất cả journals là /api/v1/journals
+        const apiUrl = `${baseUrl}/api/v1/journals`;
+        console.log(`Proxying request to: ${apiUrl}`);
 
-        const jsonlFiles = allFiles.filter(file => file.endsWith('.jsonl'));
-        console.log(`Filtered .jsonl files:`, jsonlFiles); // Log filtered files
+        const apiResponse = await fetch(apiUrl, {
+            // Thêm header hoặc tùy chọn cache nếu cần
+            // Ví dụ: cache trong 1 giờ
+            next: { revalidate: 3600 } 
+        });
 
-        if (jsonlFiles.length === 0) {
-            console.warn("No .jsonl files found in", dataDir);
-            // Vẫn trả về 200 OK với mảng rỗng, vì API hoạt động nhưng không có data.
-            // Lỗi 404 ở client có thể do front-end xử lý khi nhận mảng rỗng.
-            // Nếu bạn muốn 404 khi không có file, thay dòng dưới bằng:
-            // return NextResponse.json({ message: 'No data files found' }, { status: 404 });
-            return NextResponse.json([]);
+        if (!apiResponse.ok) {
+            // Chuyển tiếp lỗi từ API gốc
+            return NextResponse.json(
+                { message: `Error from upstream API: ${apiResponse.statusText}` },
+                { status: apiResponse.status }
+            );
         }
 
-        let allJournals: JournalResponse[] = [];
+        const allJournals = await apiResponse.json();
 
-        // Đọc từng file và gộp kết quả
-        for (const file of jsonlFiles) {
-            const filePath = path.join(dataDir, file);
-            const journalsFromFile = await readJsonlFile(filePath);
-            allJournals = allJournals.concat(journalsFromFile);
-            console.log(`Read ${journalsFromFile.length} journals from ${file}. Total: ${allJournals.length}`);
-        }
-
-        console.log(`Successfully loaded a total of ${allJournals.length} journals from ${jsonlFiles.length} files.`);
+        console.log(`Successfully fetched ${allJournals.length} journals from the upstream API.`);
         return NextResponse.json(allJournals);
 
     } catch (error: any) {
-        console.error('Failed to load journals:', error.message, error); // Log đầy đủ lỗi
-        // Trả về lỗi 500 nếu có lỗi xảy ra trong quá trình xử lý (đọc thư mục, file, parse)
-        return NextResponse.json({ message: 'Internal Server Error: Failed to load journals', error: error.message }, { status: 500 });
+        console.error('Failed to proxy request for journals:', error.message, error);
+        return NextResponse.json(
+            { message: 'Internal Server Error: Failed to fetch journals', error: error.message },
+            { status: 500 }
+        );
     }
 }

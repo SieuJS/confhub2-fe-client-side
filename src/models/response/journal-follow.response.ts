@@ -1,4 +1,4 @@
-import { JournalResponse } from './journal.response';
+import { JournalData } from './journal.response';
 
 export type JournalFollowInput = {
   journalId: string;
@@ -24,7 +24,7 @@ export type JournalFollowedResponse = {
   id: string;
   userId: string;
   journalId: string;
-  belongsTo: JournalResponse;
+  belongsTo: JournalData;
   byUser: JournalFollower;
   createdAt: string;
   updatedAt: string;

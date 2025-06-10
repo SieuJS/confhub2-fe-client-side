@@ -3,10 +3,10 @@
 // components/JournalTabs.tsx
 import React, { useEffect, useRef } from 'react'; // Import useRef
 import Image from 'next/image'; // Import the Image component from next/image
-import { JournalResponse } from '@/src/models/response/journal.response';
+import {JournalData } from '@/src/models/response/journal.response';
 
 interface JournalTabsProps {
-    journal: JournalResponse; // Define the journal prop
+    journal:JournalData; // Define the journal prop
 }
 
 export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Update component signature to accept props
@@ -84,23 +84,23 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                 <h2 className="text-3xl font-bold text-secondary mb-4">Overview</h2>
                 <div className=" text-lg">
                     {/* Use journal data for overview, if available */}
-                    <div>{journal.data.Scope ?? journal.data['Additional Info']?.slice(5)}</div> {/* Using Scope from journal data */}
+                    <div>{journal.Scope ?? journal['Additional Info']?.slice(5)}</div> {/* Using Scope from journal data */}
                 </div>
             </section>
 
             <section id="impact-factor" className="p-6 bg-gradient-to-r from-background to-background-secondary shadow-md rounded-lg mt-6">
                 <h2 className="text-3xl font-bold text-secondary mb-4">Impact Factor</h2>
                 <div className=" text-lg">
-                    <strong>The Impact IF {journal.data.bioxbio ? journal.data.bioxbio[0]?.Year: new Date().getFullYear()}</strong> of <strong>{journal.data.Title}</strong> is 
-                    <strong>{journal.data.bioxbio ? ' ' + journal.data.bioxbio[0]?.Impact_factor : ' N/A'}</strong>
-                    {journal.data.bioxbio && <div className='inline'>, which is computed in <strong>{parseInt(journal.data.bioxbio[0]?.Year || '2023') + 1}</strong> as per its definition.</div>}  
+                    <strong>The Impact IF {journal.bioxbio ? journal.bioxbio[0]?.Year: new Date().getFullYear()}</strong> of <strong>{journal.Title}</strong> is 
+                    <strong>{journal.bioxbio ? ' ' + journal.bioxbio[0]?.Impact_factor : ' N/A'}</strong>
+                    {journal.bioxbio && <div className='inline'>, which is computed in <strong>{parseInt(journal.bioxbio[0]?.Year || '2023') + 1}</strong> as per its definition.</div>}  
                     {/* ... rest of the Impact Factor tab content, you can dynamically update journal name and IF value here */}
                 </div>
                 <p className=" text-lg mt-4 mb-4">
                     The impact IF, also denoted as <strong>Journal Impact Score (JIS)</strong>, of an academic journal is a
                     measure of the yearly average
-                    number of citations to recent articles published in that journal.data. It is based on <strong>Scopus </strong>
-                    data.
+                    number of citations to recent articles published in that journal. It is based on <strong>Scopus </strong>
+                    
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-background shadow-md rounded-lg">
@@ -114,14 +114,14 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                                 </tr>
                             </thead>
                             <tbody>
-                                {journal.data.bioxbio?.map((history, index) => ( // Use journal.data.bioxbio
+                                {journal.bioxbio?.map((history, index) => ( // Use journal.bioxbio
                                     <tr key={index} className="border-b  ">
                                         <td className="px-6 py-2">{history.Year}</td>
                                         <td className="px-6 py-2">{history.Impact_factor}</td>
                                     </tr>
                                 ))}
                                 {/* Fallback if no impact factor history */}
-                                {(journal.data.bioxbio == null || (journal.data.bioxbio && journal.data.bioxbio.length === 0)) && (
+                                {(journal.bioxbio == null || (journal.bioxbio && journal.bioxbio.length === 0)) && (
                                     <tr>
                                         <td className="px-6 py-2" colSpan={2}>No Impact Factor History Available</td>
                                     </tr>
@@ -135,7 +135,7 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                         <h2 className="text-2xl font-bold text-secondary mb-4">How Impact Factor is Calculated</h2>
                         <p className="text-lg mb-4">
                             The Impact Factor (IF) is a metric that reflects the yearly average number of citations to
-                            recent articles published in a journal.data.
+                            recent articles published in a journal.
                             It is calculated based on the following formula:
                         </p>
                         <p className="text-lg font-semibold  p-4 rounded-lg mb-4">
@@ -162,7 +162,7 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                     <div className="flex flex-col items-center">
                         <h2 className="text-3xl font-bold text-secondary mb-4">H-index</h2>
                         <p className=" text-lg mb-4">
-                            The H-index of this journal is <strong className="text-2xl">{journal.data["H index"] || 'N/A'}</strong>. {/* Use journal.data["H index"] */}
+                            The H-index of this journal is <strong className="text-2xl">{journal["H index"] || 'N/A'}</strong>. {/* Use journal["H index"] */}
                         </p>
                         <div className="w-full max-w-xs relative aspect-square"> {/* Container for Image with aspect ratio */}
                             <Image
@@ -178,7 +178,7 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                     <div className="">
                         <h2 className="text-2xl font-bold text-secondary mb-4">What is H-index?</h2>
                         <p className="text-lg mb-4">
-                            The <strong>H-index</strong> is a metric used to measure the productivity and citation impact of a researcher or journal.data.
+                            The <strong>H-index</strong> is a metric used to measure the productivity and citation impact of a researcher or journal.
                             It is defined as the maximum value of <em>h</em> such that the entity has published <em>h</em> papers that have each been cited at least <em>h</em> times.
                         </p>
                         <p className="text-lg font-semibold  p-4 rounded-lg mb-4">
@@ -201,7 +201,7 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                     <div className="flex flex-col items-center">
                         <h2 className="text-3xl font-bold text-secondary mb-4">SJR (Scimago Journal Ranking)</h2>
                         <p className=" text-lg mb-4">
-                            The SJR value of this journal is <strong className="text-2xl">{journal.data.SJR || 'N/A'}</strong>. {/* Use journal.data.SJR */}
+                            The SJR value of this journal is <strong className="text-2xl">{journal.SJR || 'N/A'}</strong>. {/* Use journal.SJR */}
                         </p>
                         <div className="w-full max-w-xs rounded-lg shadow-lg relative aspect-square"> {/* Container for Image with aspect ratio and styling */}
                             <Image
@@ -221,13 +221,13 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                             It is developed from the information in the Scopus database.
                         </p>
                         <p className="text-lg font-semibold  p-4 rounded-lg mb-4">
-                            <strong>Formula:</strong> SJR is calculated based on the weighted citations received in a given year. The weights are determined by the prestige of the citing journal.data.
+                            <strong>Formula:</strong> SJR is calculated based on the weighted citations received in a given year. The weights are determined by the prestige of the citing journal.
                         </p>
                         <p className="text-lg">
                             For example, a journal that receives citations from highly ranked journals will have a higher SJR compared to journals with similar citation counts from less influential sources.
                         </p>
                         <p className="text-lg">
-                            SJR takes into account both the number of citations and the importance of the citing journals, offering a balanced perspective on the scientific impact of a journal.data.
+                            SJR takes into account both the number of citations and the importance of the citing journals, offering a balanced perspective on the scientific impact of a journal.
                         </p>
                     </div>
                 </div>
@@ -237,13 +237,13 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => { // Upd
                 <h2 className="text-3xl font-bold text-secondary mb-4">Subject Area and Category</h2>
                 <div className=" text-lg">
                     {/* Display Subject Areas and Categories from journal data */}
-                    {journal.data["Subject Area and Category"] ? (
+                    {journal["Subject Area and Category"] ? (
                         <>
-                            <p className="mb-2"><strong>Field of Research: </strong> {journal.data["Subject Area and Category"]["Field of Research"]}</p>
+                            <p className="mb-2"><strong>Field of Research: </strong> {journal["Subject Area and Category"]["Field of Research"]}</p>
                             <p><strong>Categories: </strong>
-                            {journal.data["Subject Area and Category"].Topics.map((topic, index) => (
+                            {journal["Subject Area and Category"].Topics.map((topic, index) => (
                                 <span key={index}>
-                                    {topic}{index < journal.data["Subject Area and Category"].Topics.length - 1 ? ', ' : ''}
+                                    {topic}{index < journal["Subject Area and Category"].Topics.length - 1 ? ', ' : ''}
                                 </span>
                             ))}
                             </p>
