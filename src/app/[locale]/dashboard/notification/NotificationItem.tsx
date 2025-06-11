@@ -108,7 +108,8 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         setIsHovered(false)
       }}
     >
-      <input
+      {/* Nút chọn và đánh dấu quan trọng */}
+      {/* <input
         type='checkbox'
         className='mr-3 h-4 w-4 cursor-pointer rounded border-background text-button-text focus:ring-button'
         checked={isChecked}
@@ -133,7 +134,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         >
           ★
         </span>
-      </button>
+      </button> */}
 
       <div className='grid flex-1 grid-cols-[2fr_7fr_1fr] items-center gap-2'>
         {/* Column 1: Type (1fr) */}

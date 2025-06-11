@@ -1,28 +1,22 @@
 // NotificationsTab.tsx
 
-import React, { useEffect, useCallback, useState, useMemo } from 'react';
-import Button from '../../utils/Button';
-import { Link } from '@/src/navigation';
-import NotificationItem from './NotificationItem';
-import NotificationDetails from './NotificationDetails';
-import useNotifications from '../../../../hooks/dashboard/notification/useNotifications';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
-import { useAuth } from '@/src/contexts/AuthContext';
-import {
-  Mail,
-  MailOpen,
-  Star,
-  Trash2,
-  Loader2
-} from 'lucide-react';
+import React, { useEffect, useCallback, useState, useMemo } from 'react'
+import Button from '../../utils/Button'
+import { Link } from '@/src/navigation'
+import NotificationItem from './NotificationItem'
+import NotificationDetails from './NotificationDetails'
+import useNotifications from '../../../../hooks/dashboard/notification/useNotifications'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
+import { useAuth } from '@/src/contexts/AuthContext'
+import { Mail, MailOpen, Star, Trash2, Loader2 } from 'lucide-react'
 
 // BƯỚC 1: IMPORT COMPONENT TÌM KIẾM MỚI
-import SearchInput from '../../utils/SearchInput'; // <-- Đảm bảo đường dẫn này chính xác
+import SearchInput from '../../utils/SearchInput' // <-- Đảm bảo đường dẫn này chính xác
 
 const NotificationsTab: React.FC = () => {
-  const t = useTranslations('');
-  const { logout } = useAuth();
+  const t = useTranslations('')
+  const { logout } = useAuth()
 
   const {
     notifications,
@@ -48,96 +42,102 @@ const NotificationsTab: React.FC = () => {
     setSearchTerm,
     isBanned,
     initialLoad
-  } = useNotifications();
+  } = useNotifications()
 
-  const pathname = usePathname();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const selectedNotificationId = searchParams.get('id');
-  const tab = searchParams.get('tab');
+  const pathname = usePathname()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const selectedNotificationId = searchParams.get('id')
+  const tab = searchParams.get('tab')
 
   const [filter, setFilter] = useState<'all' | 'unread' | 'read' | 'important'>(
     'all'
-  );
+  )
 
   useEffect(() => {
     if (selectedNotificationId) {
       const notification = notifications.find(
         n => n.id === selectedNotificationId
-      );
+      )
       if (notification && !notification.seenAt) {
-        handleUpdateSeenAt(selectedNotificationId);
+        handleUpdateSeenAt(selectedNotificationId)
       }
     }
-  }, [selectedNotificationId, handleUpdateSeenAt, notifications]);
+  }, [selectedNotificationId, handleUpdateSeenAt, notifications])
 
   const handleBackToNotifications = () => {
-    const newSearchParams = new URLSearchParams(searchParams.toString());
-    newSearchParams.delete('id');
-    router.push(`${pathname}?${newSearchParams.toString()}`);
-  };
+    const newSearchParams = new URLSearchParams(searchParams.toString())
+    newSearchParams.delete('id')
+    router.push(`${pathname}?${newSearchParams.toString()}`)
+  }
 
   const handleCheckboxChange = useCallback(
     (notificationId: string, checked: boolean) => {
-      handleCheckboxChangeTab(notificationId, checked);
+      handleCheckboxChangeTab(notificationId, checked)
     },
     [handleCheckboxChangeTab]
-  );
+  )
 
   const displayedNotifications = useMemo(() => {
     if (filter === 'unread') {
-      return filteredNotifications.filter(n => !n.seenAt);
+      return filteredNotifications.filter(n => !n.seenAt)
     } else if (filter === 'read') {
-      return filteredNotifications.filter(n => n.seenAt);
+      return filteredNotifications.filter(n => n.seenAt)
     } else if (filter === 'important') {
-      return filteredNotifications.filter(n => n.isImportant);
+      return filteredNotifications.filter(n => n.isImportant)
     }
-    return filteredNotifications;
-  }, [filteredNotifications, filter]);
+    return filteredNotifications
+  }, [filteredNotifications, filter])
 
   const renderLoading = () => (
-    <div className="flex flex-col items-center justify-center h-80 text-gray-500">
-      <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
-      <p className="mt-4 text-lg">{t('MyConferences.Loading_your_conferences')}</p>
+    <div className='flex h-80 flex-col items-center justify-center text-gray-500'>
+      <Loader2 className='h-10 w-10 animate-spin text-indigo-600' />
+      <p className='mt-4 text-lg'>
+        {t('MyConferences.Loading_your_conferences')}
+      </p>
     </div>
-  );
+  )
 
   if (loading && initialLoad) {
-    return <div className='container mx-auto p-4'>{renderLoading()}</div>;
+    return <div className='container mx-auto p-4'>{renderLoading()}</div>
   }
 
   if (tab !== 'notifications') {
-    return null;
+    return null
   }
 
   if (!loggedIn) {
     if (isBanned) {
-      logout({ callApi: true, preventRedirect: true });
+      logout({ callApi: true, preventRedirect: true })
       return (
         <div className='container mx-auto p-4 text-center'>
-          <h2 className='text-xl font-bold text-red-600 mb-2'>{t('MyConferences.Account_Banned_Title')}</h2>
+          <h2 className='mb-2 text-xl font-bold text-red-600'>
+            {t('MyConferences.Account_Banned_Title')}
+          </h2>
           <p className='mb-4'>{t('MyConferences.Account_Banned_Message')}</p>
           <Link href='/auth/login'>
             <Button variant='primary'>{t('Sign_In')}</Button>
           </Link>
         </div>
-      );
+      )
     }
     return (
       <div className='container mx-auto p-4 text-center'>
-        <h2 className='text-xl font-semibold mb-2'>{t('MyConferences.Login_Required_Title')}</h2>
+        <h2 className='mb-2 text-xl font-semibold'>
+          {t('MyConferences.Login_Required_Title')}
+        </h2>
         <p className='mb-4'>{t('MyConferences.Login_Required_Message')}</p>
         <Link href='/auth/login'>
           <Button variant='primary'>{t('Sign_In')}</Button>
         </Link>
       </div>
-    );
+    )
   }
 
   if (selectedNotificationId) {
     const notification = notifications.find(
       n => n.id === selectedNotificationId
-    );
+    )
     if (notification) {
       return (
         <NotificationDetails
@@ -146,11 +146,11 @@ const NotificationsTab: React.FC = () => {
           onDelete={handleDeleteNotification}
           onToggleImportant={handleToggleImportant}
         />
-      );
+      )
     } else {
       console.warn(
         `Notification with id ${selectedNotificationId} not found in the list.`
-      );
+      )
       return (
         <div className='container mx-auto p-4'>
           {t('Notification_not_found')}{' '}
@@ -161,7 +161,7 @@ const NotificationsTab: React.FC = () => {
             {t('Back')}
           </button>
         </div>
-      );
+      )
     }
   }
 
@@ -178,7 +178,7 @@ const NotificationsTab: React.FC = () => {
       </div>
 
       {/* Các nút lọc UI */}
-      <div className='mb-4 flex flex-wrap gap-2'>
+      {/* <div className='mb-4 flex flex-wrap gap-2'>
         <button
           onClick={() => setFilter('all')}
           className={`rounded px-3 py-1 text-sm md:px-4 md:py-2 ${filter === 'all' ? 'bg-button text-white' : 'bg-gray-20 hover:bg-gray-30'}`}
@@ -203,10 +203,10 @@ const NotificationsTab: React.FC = () => {
         >
           {t('Important')}
         </button>
-      </div>
+      </div> */}
 
       {/* Thanh hành động hàng loạt */}
-      <div className='mb-4 flex flex-wrap items-center gap-2'>
+      {/* <div className='mb-4 flex flex-wrap items-center gap-2'>
         <div className='flex items-center'>
           <input
             type='checkbox'
@@ -283,7 +283,7 @@ const NotificationsTab: React.FC = () => {
             </button>
           </>
         )}
-      </div>
+      </div> */}
 
       {/* Danh sách thông báo */}
       <div className='overflow-hidden rounded border bg-white-pure shadow'>
@@ -295,7 +295,8 @@ const NotificationsTab: React.FC = () => {
               'No notifications match your current filters.'}
           </p>
         ) : (
-          !loading && displayedNotifications.map(notification => (
+          !loading &&
+          displayedNotifications.map(notification => (
             <NotificationItem
               key={notification.id}
               notification={notification}
@@ -312,7 +313,7 @@ const NotificationsTab: React.FC = () => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default NotificationsTab;
+export default NotificationsTab
