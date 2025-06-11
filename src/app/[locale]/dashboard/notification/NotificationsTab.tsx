@@ -178,7 +178,7 @@ const NotificationsTab: React.FC = () => {
       </div>
 
       {/* Các nút lọc UI */}
-      {/* <div className='mb-4 flex flex-wrap gap-2'>
+      <div className='mb-4 flex flex-wrap gap-2'>
         <button
           onClick={() => setFilter('all')}
           className={`rounded px-3 py-1 text-sm md:px-4 md:py-2 ${filter === 'all' ? 'bg-button text-white' : 'bg-gray-20 hover:bg-gray-30'}`}
@@ -203,10 +203,10 @@ const NotificationsTab: React.FC = () => {
         >
           {t('Important')}
         </button>
-      </div> */}
+      </div>
 
       {/* Thanh hành động hàng loạt */}
-      {/* <div className='mb-4 flex flex-wrap items-center gap-2'>
+      <div className='mb-4 flex flex-wrap items-center gap-2'>
         <div className='flex items-center'>
           <input
             type='checkbox'
@@ -238,12 +238,12 @@ const NotificationsTab: React.FC = () => {
             >
               {allSelectedAreRead ? (
                 <>
-                  <MailOpen className='mr-1 md:mr-2 h-4 w-4' />
+                  <MailOpen className='mr-1 h-4 w-4 md:mr-2' />
                   <span className='truncate'>{t('Mark_As_Unread')}</span>
                 </>
               ) : (
                 <>
-                  <Mail className='mr-1 md:mr-2 h-4 w-4' />
+                  <Mail className='mr-1 h-4 w-4 md:mr-2' />
                   <span className='truncate'>{t('Mark_As_Read')}</span>
                 </>
               )}
@@ -263,12 +263,16 @@ const NotificationsTab: React.FC = () => {
             >
               {allSelectedAreImportant ? (
                 <>
-                  <Star className='mr-1 md:mr-2 h-4 w-4' stroke='currentColor' fill='none' />
+                  <Star
+                    className='mr-1 h-4 w-4 md:mr-2'
+                    stroke='currentColor'
+                    fill='none'
+                  />
                   <span className='truncate'>{t('Mark_As_Unimportant')}</span>
                 </>
               ) : (
                 <>
-                  <Star className='mr-1 md:mr-2 h-4 w-4' fill='currentColor' />
+                  <Star className='mr-1 h-4 w-4 md:mr-2' fill='currentColor' />
                   <span className='truncate'>{t('Mark_As_Important')}</span>
                 </>
               )}
@@ -278,12 +282,12 @@ const NotificationsTab: React.FC = () => {
               className='flex min-w-[110px] items-center justify-center rounded bg-red-500 px-2 py-1 text-sm font-bold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 md:min-w-[140px] md:px-3 md:text-base'
               aria-label={t('Delete_Selected')}
             >
-              <Trash2 className='mr-1 md:mr-2 h-4 w-4' />
+              <Trash2 className='mr-1 h-4 w-4 md:mr-2' />
               <span className='truncate'>{t('Delete_Selected')}</span>
             </button>
           </>
         )}
-      </div> */}
+      </div>
 
       {/* Danh sách thông báo */}
       <div className='overflow-hidden rounded border bg-white-pure shadow'>

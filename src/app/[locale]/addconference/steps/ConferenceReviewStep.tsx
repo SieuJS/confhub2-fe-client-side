@@ -55,12 +55,17 @@ interface InfoDisplayProps {
 }
 
 const InfoDisplay: React.FC<InfoDisplayProps> = ({ label, icon, children }) => (
-  <div className='py-2.5 border-b border-slate-200 last:border-b-0'>
-    <div className='flex items-center text-sm font-medium text-slate-500 mb-1'>
-      {icon && React.cloneElement(icon as React.ReactElement, { className: 'w-4 h-4 mr-2 text-slate-400 flex-shrink-0' })}
+  <div className='border-b border-slate-200 py-2.5 last:border-b-0'>
+    <div className='mb-1 flex items-center text-sm font-medium text-slate-500'>
+      {icon &&
+        React.cloneElement(icon as React.ReactElement, {
+          className: 'w-4 h-4 mr-2 text-slate-400 flex-shrink-0'
+        })}
       <span>{label}</span>
     </div>
-    <div className='text-slate-800 break-words text-sm sm:text-base'>{children}</div>
+    <div className='break-words text-sm text-slate-800 sm:text-base'>
+      {children}
+    </div>
   </div>
 )
 
@@ -72,10 +77,17 @@ interface SectionProps {
   className?: string
 }
 
-const Section: React.FC<SectionProps> = ({ title, icon, children, className = '' }) => (
-  <div className={`bg-white shadow-lg rounded-xl p-5 sm:p-6 ${className}`}>
-    <div className='flex items-center text-lg sm:text-xl font-semibold text-indigo-700 mb-4 pb-3 border-b border-indigo-100'>
-      {React.cloneElement(icon as React.ReactElement, { className: 'w-6 h-6 mr-3 text-indigo-500 flex-shrink-0' })}
+const Section: React.FC<SectionProps> = ({
+  title,
+  icon,
+  children,
+  className = ''
+}) => (
+  <div className={`rounded-xl bg-white p-5 shadow-lg sm:p-6 ${className}`}>
+    <div className='mb-4 flex items-center border-b border-indigo-100 pb-3 text-lg font-semibold text-indigo-700 sm:text-xl'>
+      {React.cloneElement(icon as React.ReactElement, {
+        className: 'w-6 h-6 mr-3 text-indigo-500 flex-shrink-0'
+      })}
       {title}
     </div>
     <div className='space-y-1'>{children}</div>
@@ -103,7 +115,9 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
     onlineFallbackKey?: string
   ): React.ReactNode => {
     if (type === 'Online' && onlineFallbackKey) {
-      return <span className='italic text-slate-500'>{t(onlineFallbackKey)}</span>
+      return (
+        <span className='italic text-slate-500'>{t(onlineFallbackKey)}</span>
+      )
     }
     if (value && String(value).trim() !== '') {
       return String(value)
@@ -114,7 +128,11 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
   // Helper function to format the address for display in review
   const getFormattedAddressForDisplay = (): React.ReactNode => {
     if (type === 'Online') {
-      return <span className='italic text-slate-500'>{t('Not_applicable_for_online')}</span>
+      return (
+        <span className='italic text-slate-500'>
+          {t('Not_applicable_for_online')}
+        </span>
+      )
     }
 
     const originalAddress = location.address?.trim()
@@ -123,8 +141,8 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
 
     let combinedAddressParts = []
     if (originalAddress) combinedAddressParts.push(originalAddress)
-    if (cityStateProvince) combinedAddressParts.push(cityStateProvince)
-    if (country) combinedAddressParts.push(country)
+    // if (cityStateProvince) combinedAddressParts.push(cityStateProvince)
+    // if (country) combinedAddressParts.push(country)
 
     if (combinedAddressParts.length > 0) {
       return combinedAddressParts.join(', ')
@@ -135,72 +153,96 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
   const getTypeIconAndColor = () => {
     switch (type) {
       case 'Online':
-        return { icon: <Monitor className='w-5 h-5 mr-1.5' />, color: 'text-green-600', chipColor: 'bg-green-100 text-green-700' }
+        return {
+          icon: <Monitor className='mr-1.5 h-5 w-5' />,
+          color: 'text-green-600',
+          chipColor: 'bg-green-100 text-green-700'
+        }
       case 'Offline':
-        return { icon: <Users className='w-5 h-5 mr-1.5' />, color: 'text-red-600', chipColor: 'bg-red-100 text-red-700' }
+        return {
+          icon: <Users className='mr-1.5 h-5 w-5' />,
+          color: 'text-red-600',
+          chipColor: 'bg-red-100 text-red-700'
+        }
       case 'Hybrid':
-        return { icon: <GitFork className='w-5 h-5 mr-1.5' />, color: 'text-blue-600', chipColor: 'bg-blue-100 text-blue-700' }
+        return {
+          icon: <GitFork className='mr-1.5 h-5 w-5' />,
+          color: 'text-blue-600',
+          chipColor: 'bg-blue-100 text-blue-700'
+        }
       default:
-        return { icon: <ShieldAlert className='w-5 h-5 mr-1.5' />, color: 'text-slate-600', chipColor: 'bg-slate-100 text-slate-700' }
+        return {
+          icon: <ShieldAlert className='mr-1.5 h-5 w-5' />,
+          color: 'text-slate-600',
+          chipColor: 'bg-slate-100 text-slate-700'
+        }
     }
   }
-  const typeStyle = getTypeIconAndColor();
+  const typeStyle = getTypeIconAndColor()
 
   // Lấy các options loại ngày một lần
-  const dateTypeOptions = getDateTypeOptions(t);
+  const dateTypeOptions = getDateTypeOptions(t)
 
   // Helper function to format dates
-  const formatDateRange = (fromDateStr?: string, toDateStr?: string): React.ReactNode => {
+  const formatDateRange = (
+    fromDateStr?: string,
+    toDateStr?: string
+  ): React.ReactNode => {
     const options: Intl.DateTimeFormatOptions = {
       month: 'long',
       day: 'numeric',
-      year: 'numeric',
-    };
+      year: 'numeric'
+    }
 
     try {
-      const fromDate = fromDateStr ? new Date(fromDateStr) : null;
-      const toDate = toDateStr ? new Date(toDateStr) : null;
+      const fromDate = fromDateStr ? new Date(fromDateStr) : null
+      const toDate = toDateStr ? new Date(toDateStr) : null
 
       if (!fromDate && !toDate) {
-        return <span className='italic text-slate-500'>{t('N_A')}</span>;
+        return <span className='italic text-slate-500'>{t('N_A')}</span>
       }
 
-      if (fromDate && toDate && fromDate.toDateString() === toDate.toDateString()) {
+      if (
+        fromDate &&
+        toDate &&
+        fromDate.toDateString() === toDate.toDateString()
+      ) {
         // Same date, format as "Month Day, Year"
-        return fromDate.toLocaleDateString(undefined, options);
+        return fromDate.toLocaleDateString(undefined, options)
       } else if (fromDate && toDate) {
         // Different dates, format as "Month Day, Year - Month Day, Year"
-        const fromPart = fromDate.toLocaleDateString(undefined, options);
-        const toPart = toDate.toLocaleDateString(undefined, options);
-        return `${fromPart} - ${toPart}`;
+        const fromPart = fromDate.toLocaleDateString(undefined, options)
+        const toPart = toDate.toLocaleDateString(undefined, options)
+        return `${fromPart} - ${toPart}`
       } else if (fromDate) {
         // Only fromDate available
-        return fromDate.toLocaleDateString(undefined, options);
+        return fromDate.toLocaleDateString(undefined, options)
       } else if (toDate) {
         // Only toDate available
-        return toDate.toLocaleDateString(undefined, options);
+        return toDate.toLocaleDateString(undefined, options)
       }
     } catch (error) {
-      console.error("Error formatting date:", error);
-      return <span className='italic text-slate-500'>{t('Invalid_Date')}</span>;
+      console.error('Error formatting date:', error)
+      return <span className='italic text-slate-500'>{t('Invalid_Date')}</span>
     }
-    return <span className='italic text-slate-500'>{t('N_A')}</span>;
-  };
-
+    return <span className='italic text-slate-500'>{t('N_A')}</span>
+  }
 
   return (
-    <div className='bg-slate-50 p-3 sm:p-6 rounded-lg min-h-screen'>
-      <header className='mb-6 sm:mb-8 pb-4 border-b border-slate-300'>
-        <h2 className='text-2xl sm:text-3xl font-bold text-indigo-800 flex items-center'>
-          <PencilLine className='w-7 h-7 sm:w-8 sm:h-8 mr-3 text-indigo-600 flex-shrink-0' />
+    <div className='min-h-screen rounded-lg bg-slate-50 p-3 sm:p-6'>
+      <header className='mb-6 border-b border-slate-300 pb-4 sm:mb-8'>
+        <h2 className='flex items-center text-2xl font-bold text-indigo-800 sm:text-3xl'>
+          <PencilLine className='mr-3 h-7 w-7 flex-shrink-0 text-indigo-600 sm:h-8 sm:w-8' />
           {t('Review_Information')}
         </h2>
         <p className='mt-2 text-sm text-slate-600'>
-          {t('Please_review_all_conference_details_carefully_before_proceeding')}
+          {t(
+            'Please_review_all_conference_details_carefully_before_proceeding'
+          )}
         </p>
       </header>
 
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+      <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
         {/* General Information Section */}
         <Section title={t('General_Information')} icon={<Info />}>
           <InfoDisplay label={t('Conference_Name')} icon={<FileText />}>
@@ -215,17 +257,31 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
                 href={link}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='text-blue-600 hover:text-blue-800 hover:underline flex items-center group'
+                className='group flex items-center text-blue-600 hover:text-blue-800 hover:underline'
               >
-                {link} <ExternalLinkIcon size={14} className='ml-1.5 opacity-70 group-hover:opacity-100 transition-opacity' />
+                {link}{' '}
+                <ExternalLinkIcon
+                  size={14}
+                  className='ml-1.5 opacity-70 transition-opacity group-hover:opacity-100'
+                />
               </a>
             ) : (
               renderDetail(null, 'Link_not_provided')
             )}
           </InfoDisplay>
-          <InfoDisplay label={t('Type')} icon={React.cloneElement(typeStyle.icon, { className: `${typeStyle.icon.props.className} ${typeStyle.color}`})}>
-            <span className={`p-2 text-xs font-semibold rounded-full inline-flex items-center ${typeStyle.chipColor}`}>
-              {React.cloneElement(typeStyle.icon, {size: 14, className: 'mr-1'})}
+          <InfoDisplay
+            label={t('Type')}
+            icon={React.cloneElement(typeStyle.icon, {
+              className: `${typeStyle.icon.props.className} ${typeStyle.color}`
+            })}
+          >
+            <span
+              className={`inline-flex items-center rounded-full p-2 text-xs font-semibold ${typeStyle.chipColor}`}
+            >
+              {React.cloneElement(typeStyle.icon, {
+                size: 14,
+                className: 'mr-1'
+              })}
               {t(type)}
             </span>
           </InfoDisplay>
@@ -237,45 +293,70 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
             {getFormattedAddressForDisplay()}
           </InfoDisplay>
           <InfoDisplay label={t('Continent')} icon={<Globe />}>
-            {renderDetail(location.continent, 'Not_provided', 'Not_applicable_for_online')}
+            {renderDetail(
+              location.continent,
+              'Not_provided',
+              'Not_applicable_for_online'
+            )}
           </InfoDisplay>
           <InfoDisplay label={t('Country')} icon={<Map />}>
-            {renderDetail(location.country, 'Not_provided', 'Not_applicable_for_online')}
+            {renderDetail(
+              location.country,
+              'Not_provided',
+              'Not_applicable_for_online'
+            )}
           </InfoDisplay>
           <InfoDisplay
             label={
               statesForReview.length > 0 ||
-              (!statesForReview.length && !citiesForReview.length && location.cityStateProvince)
+              (!statesForReview.length &&
+                !citiesForReview.length &&
+                location.cityStateProvince)
                 ? t('State_Province')
                 : t('City')
             }
             icon={<Building />}
           >
-            {renderDetail(location.cityStateProvince, 'Not_provided', 'Not_applicable_for_online')}
+            {renderDetail(
+              location.cityStateProvince,
+              'Not_provided',
+              'Not_applicable_for_online'
+            )}
           </InfoDisplay>
         </Section>
 
         {/* Important Dates Section */}
-        <Section title={t('Important_Dates')} icon={<CalendarDays />} className="md:col-span-2">
+        <Section
+          title={t('Important_Dates')}
+          icon={<CalendarDays />}
+          className='md:col-span-2'
+        >
           {dates.length > 0 ? (
             <ul className='space-y-3'>
               {dates.map((date, index) => {
                 // Tìm tên hiển thị cho loại ngày từ dateTypeOptions
-                const displayTypeName = dateTypeOptions.find(option => option.value === date.type)?.name || t('N_A');
+                const displayTypeName =
+                  dateTypeOptions.find(option => option.value === date.type)
+                    ?.name || t('N_A')
                 return (
-                  <li key={index} className='p-3 bg-slate-100 rounded-lg shadow-sm'>
-                    <div className='flex justify-between items-center'>
-                      <strong className='text-indigo-700 text-base'>{date.name || t('Unnamed_Date')}</strong>
-                      <span className='text-xs px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full font-medium'>
+                  <li
+                    key={index}
+                    className='rounded-lg bg-slate-100 p-3 shadow-sm'
+                  >
+                    <div className='flex items-center justify-between'>
+                      <strong className='text-base text-indigo-700'>
+                        {date.name || t('Unnamed_Date')}
+                      </strong>
+                      <span className='rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700'>
                         {displayTypeName} {/* Sử dụng tên hiển thị đã dịch */}
                       </span>
                     </div>
-                    <div className='text-sm text-slate-600 mt-1'>
+                    <div className='mt-1 text-sm text-slate-600'>
                       {/* Sử dụng hàm formatDateRange mới */}
                       {formatDateRange(date.fromDate, date.toDate)}
                     </div>
                   </li>
-                );
+                )
               })}
             </ul>
           ) : (
@@ -284,13 +365,17 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
         </Section>
 
         {/* Topics Section */}
-        <Section title={t('Topics')} icon={<ListChecks />} className="md:col-span-2">
+        <Section
+          title={t('Topics')}
+          icon={<ListChecks />}
+          className='md:col-span-2'
+        >
           {topics.length > 0 ? (
             <div className='flex flex-wrap gap-2 pt-1'>
               {topics.map((topic, index) => (
                 <span
                   key={index}
-                  className='bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-full text-md font-medium shadow-sm'
+                  className='text-md rounded-full bg-emerald-100 px-3 py-1.5 font-medium text-emerald-800 shadow-sm'
                 >
                   {topic}
                 </span>
@@ -311,9 +396,13 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
                 href={imageUrl}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='text-blue-600 hover:text-blue-800 hover:underline flex items-center group'
+                className='group flex items-center text-blue-600 hover:text-blue-800 hover:underline'
               >
-                {imageUrl} <ExternalLinkIcon size={14} className='ml-1.5 opacity-70 group-hover:opacity-100 transition-opacity' />
+                {imageUrl}{' '}
+                <ExternalLinkIcon
+                  size={14}
+                  className='ml-1.5 opacity-70 transition-opacity group-hover:opacity-100'
+                />
               </a>
             </InfoDisplay>
           </Section>
@@ -324,12 +413,14 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
       <div className='mt-6'>
         <Section title={t('Call_for_Papers')} icon={<FileText />}>
           {description && description.trim() !== '' ? (
-            <div className='prose prose-base dark:prose-invert max-w-none'>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{description}</ReactMarkdown>
+            <div className='prose prose-base max-w-none dark:prose-invert'>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {description}
+              </ReactMarkdown>
             </div>
           ) : (
             <div className='py-2'>
-                {renderDetail(null, 'No_description_provided')}
+              {renderDetail(null, 'No_description_provided')}
             </div>
           )}
         </Section>

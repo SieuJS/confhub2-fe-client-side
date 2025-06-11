@@ -380,16 +380,16 @@ export const useConferenceForm = ({ t }: UseConferenceFormProps) => {
 
     // Tìm tên Country và thêm vào
     if (location.country) {
-      const selectedCountry = countriesData.find(c => c.iso2 === location.country);
-      if (selectedCountry) {
-        addressParts.push(selectedCountry.name);
-      }
+      // const selectedCountry = countriesData.find(c => c.iso2 === location.country);
+      // if (selectedCountry) {
+        addressParts.push(location.country);
+      // }
     }
 
     // Thêm Continent
-    if (location.continent) {
-      addressParts.push(location.continent);
-    }
+    // if (location.continent) {
+    //   addressParts.push(location.continent);
+    // }
 
     // 3. Ghép các phần lại và cập nhật vào payload
     if (addressParts.length > 0) {
