@@ -1,3 +1,5 @@
+// src/app/[locale]/addconference/ConferenceForm.tsx
+
 'use client';
 
 import React from 'react';
@@ -6,8 +8,8 @@ import { useTranslations } from 'next-intl';
 // Import hooks, constants and components
 import { useConferenceForm } from '@/src/hooks/addConference/useConferenceForm';
 import { getDateTypeOptions, CSC_API_KEY } from '@/src/hooks/addConference/constants';
-import { useRouter, usePathname } from 'next/navigation'; // Import thêm
-import { CheckCircle, AlertTriangle, Loader2 } from 'lucide-react'; // Import icons
+import { useRouter, usePathname } from 'next/navigation';
+import { CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 
 import ConferenceProgressIndicator from './ConferenceProgressIndicator';
 import ConferenceDetailsStep from './steps/ConferenceDetailsStep';
@@ -18,13 +20,9 @@ import Modal from '../chatbot/Modal';
 
 const ConferenceForm: React.FC = () => {
   const t = useTranslations('');
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const router = useRouter(); // Khởi tạo router
-  const pathname = usePathname(); // Lấy pathname
-
-
-  // Lấy toàn bộ state và logic từ custom hook.
-  // Component này không cần biết chi tiết về cách state được quản lý.
   const {
     currentStep,
     formData,
@@ -33,14 +31,16 @@ const ConferenceForm: React.FC = () => {
     errors,
     dateErrors,
     globalDateError,
-    topicError, // Lấy topicError để truyền xuống
+    topicError,
     isStep1Complete,
-    isSubmitting,   // Lấy state isSubmitting
-    modalState,     // Lấy state của modal
-    resetForm,      // Lấy hàm resetForm
-    closeModal,     // Lấy hàm closeModal
+    isSubmitting,
+    modalState,
+    resetForm,
+    closeModal,
     statesForReview,
     citiesForReview,
+    touchedFields,
+    existenceCheck, // *** THAY ĐỔI 1: LẤY STATE MỚI TỪ HOOK ***
     setNewTopic,
     setAgreedToTerms,
     setStatesForReview,
@@ -48,33 +48,30 @@ const ConferenceForm: React.FC = () => {
     handlers,
   } = useConferenceForm({ t });
 
-  // Component giờ đây rất gọn gàng, chỉ tập trung vào việc render.
   return (
     <div className="mx-auto max-w-10xl py-8">
       <ConferenceProgressIndicator currentStep={currentStep} t={t} />
 
-      {/* Thẻ form sẽ gọi handler.handleSubmit khi được submit */}
       <form onSubmit={handlers.handleSubmit} className="mt-8" noValidate>
-        {/* `noValidate` ngăn trình duyệt thực hiện validation mặc định */}
-
-        {/* --- STEP 1: CHI TIẾT HỘI NGHỊ --- */}
         {currentStep === 1 && (
           <ConferenceDetailsStep
-            // Truyền toàn bộ dữ liệu, lỗi và handlers cần thiết
+            // Các props dữ liệu và lỗi giữ nguyên
             formData={formData}
             errors={errors}
             dateErrors={dateErrors}
-            globalDateError={globalDateError} // Truyền xuống component con
-            topicError={topicError} // Truyền topicError xuống
+            globalDateError={globalDateError}
+            topicError={topicError}
             newTopic={newTopic}
+            touchedFields={touchedFields}
             setNewTopic={setNewTopic}
-            onFieldChange={handlers.handleFieldChange}
-            onLocationChange={handlers.handleLocationChange}
-            onDateChange={handlers.handleDateChange}
-            addDate={handlers.addDate}
-            removeDate={handlers.removeDate}
-            addTopic={handlers.handleAddTopic}
-            removeTopic={handlers.handleRemoveTopic}
+            
+            // Truyền toàn bộ object handlers
+            handlers={handlers} 
+            
+            // *** THAY ĐỔI 2: TRUYỀN STATE MỚI XUỐNG COMPONENT CON ***
+            existenceCheck={existenceCheck}
+            
+            // Các props còn lại giữ nguyên
             dateTypeOptions={getDateTypeOptions(t)}
             t={t}
             cscApiKey={CSC_API_KEY || ''}
@@ -83,10 +80,9 @@ const ConferenceForm: React.FC = () => {
           />
         )}
 
-        {/* --- STEP 2: XEM LẠI THÔNG TIN --- */}
+        {/* --- Các Step 2 và 3 không thay đổi --- */}
         {currentStep === 2 && (
           <ConferenceReviewStep
-            // Truyền dữ liệu từ formData để hiển thị
             title={formData.title}
             acronym={formData.acronym}
             link={formData.link}
@@ -102,7 +98,6 @@ const ConferenceForm: React.FC = () => {
           />
         )}
 
-        {/* --- STEP 3: ĐIỀU KHOẢN --- */}
         {currentStep === 3 && (
           <ConferenceTermsStep
             agreedToTerms={agreedToTerms}
@@ -111,7 +106,7 @@ const ConferenceForm: React.FC = () => {
           />
         )}
 
-        {/* --- CÁC NÚT ĐIỀU HƯỚNG (CẬP NHẬT NÚT NEXT) --- */}
+        {/* --- Các nút điều hướng không thay đổi --- */}
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-end">
           {currentStep > 1 && (
             <button
@@ -127,10 +122,9 @@ const ConferenceForm: React.FC = () => {
             <button
               type="button"
               onClick={handlers.goToNextStep}
-              disabled={!isStep1Complete} // VÔ HIỆU HÓA NÚT KHI STEP 1 CHƯA HOÀN THÀNH
+              disabled={!isStep1Complete}
               className={clsx(
                 'w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto',
-                // Thêm class cho trạng thái disabled
                 'disabled:cursor-not-allowed disabled:opacity-50'
               )}
             >
@@ -144,16 +138,14 @@ const ConferenceForm: React.FC = () => {
               className="relative w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto flex items-center justify-center"
               disabled={!agreedToTerms || isSubmitting}
             >
-              {isSubmitting && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isSubmitting ? t('Submitting') : t('Add_Conference_Submit')}
             </button>
           )}
         </div>
       </form>
 
-      {/* *** BƯỚC 5: RENDER MODAL *** */}
+      {/* --- Modal không thay đổi --- */}
       <Modal
         isOpen={modalState.isOpen}
         onClose={closeModal}
@@ -191,12 +183,8 @@ const ConferenceForm: React.FC = () => {
         }
       >
         <div className="flex flex-col items-center text-center">
-          {modalState.status === 'success' && (
-            <CheckCircle className="h-16 w-16 text-green-500 mb-4" />
-          )}
-          {modalState.status === 'error' && (
-            <AlertTriangle className="h-16 w-16 text-red-500 mb-4" />
-          )}
+          {modalState.status === 'success' && <CheckCircle className="h-16 w-16 text-green-500 mb-4" />}
+          {modalState.status === 'error' && <AlertTriangle className="h-16 w-16 text-red-500 mb-4" />}
           <p className="text-gray-600">{modalState.message}</p>
         </div>
       </Modal>

@@ -1608,5 +1608,10 @@
   "Search_settings": "Tìm kiếm cài đặt...",
   "No_settings_match_your_search": "Không có cài đặt nào khớp với tìm kiếm của bạn.",
   "View_all_settings": "Xem tất cả cài đặt",
-  "Could_not_load_user_settings_title": "Không thể tải cài đặt người dùng"
+  "Could_not_load_user_settings_title": "Không thể tải cài đặt người dùng",
+  "Please_enter_a_valid_link": "Vui lòng nhập đường dẫn hợp lệ!",
+  "This_combination_is_available": "Tên và tên viết tắt này có thể sử dụng.",
+  "Conference_with_this_Title_and_Acronym_already_exists": "Hội nghị với Tên và Tên viết tắt này đã tồn tại.",
+  "Failed_to_check_conference_existence": "Không thể kiểm tra sự tồn tại của hội nghị. Vui lòng kiểm tra kết nối và thử lại.",
+  "An_error_occurred": "Đã có lỗi xảy ra trong quá trình kiểm tra."
 }

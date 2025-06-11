@@ -1,11 +1,13 @@
 // src/app/[locale]/addconference/inputs/AddressInput.tsx
 import React from 'react';
 import clsx from 'clsx';
-import { MapPin } from 'lucide-react'; // Import icon
+import { MapPin } from 'lucide-react';
 
 interface AddressInputProps {
   address: string;
   onAddressChange: (value: string) => void;
+  onBlur: () => void; // Thêm
+  isTouched: boolean; // Thêm
   t: (key: string) => string;
   required: boolean;
   error?: string | null;
@@ -14,15 +16,19 @@ interface AddressInputProps {
 const AddressInput: React.FC<AddressInputProps> = ({
   address,
   onAddressChange,
+  onBlur,
+  isTouched,
   t,
   required,
   error,
 }) => {
+  const showError = !!error && isTouched;
+
   return (
     <div>
       <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-        <div className="flex items-center"> {/* Flex container cho icon và label text */}
-          <MapPin className="h-4 w-4 mr-2 text-gray-500" /> {/* Icon */}
+        <div className="flex items-center">
+          <MapPin className="h-4 w-4 mr-2 text-gray-500" />
           {required && <span className="text-red-500">* </span>}
           {t('Address')}:
         </div>
@@ -32,16 +38,17 @@ const AddressInput: React.FC<AddressInputProps> = ({
         id="address"
         className={clsx(
           'p-2 mt-1 block w-full rounded-md shadow-sm sm:text-sm focus:border-indigo-500 focus:ring-indigo-500',
-          error ? 'border-red-500' : 'border-gray-300'
+          showError ? 'border-red-500' : 'border-gray-300'
         )}
         value={address}
         onChange={e => onAddressChange(e.target.value)}
+        onBlur={onBlur} // Gắn onBlur
         title={t('Enter_the_address_of_the_conference')}
         required={required}
-        aria-invalid={!!error}
-        aria-describedby={error ? 'address-error' : undefined}
+        aria-invalid={showError}
+        aria-describedby={showError ? 'address-error' : undefined}
       />
-      {error && (
+      {showError && (
         <p id="address-error" className="mt-1 text-sm text-red-600">
           {error}
         </p>

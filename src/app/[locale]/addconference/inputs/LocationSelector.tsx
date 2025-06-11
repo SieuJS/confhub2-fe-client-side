@@ -2,8 +2,6 @@
 'use client';
 
 import React from 'react';
-// Bỏ State, City import nếu không dùng trực tiếp ở đây, chúng được dùng trong hook
-// import { State, City } from '@/src/models/send/addConference.send';
 import { useLocationData } from '@/src/hooks/addConference/useLocationData';
 import { ConferenceDetailsStepProps } from '../steps/ConferenceDetailsStep';
 import AddressInput from './AddressInput';
@@ -15,14 +13,14 @@ interface LocationSelectorProps extends ConferenceDetailsStepProps {
   isRequired: boolean;
 }
 
-// Đảm bảo các giá trị này khớp với 'region' trong countries.json
 const continentOptions = ['Americas', 'Europe', 'Asia', 'Africa', 'Oceania'];
 
 const LocationSelector: React.FC<LocationSelectorProps> = (props) => {
   const {
     formData,
     errors,
-    onLocationChange, // Handler này phải cập nhật formData.location ở component cha một cách chính xác
+    touchedFields, // Nhận touchedFields
+    handlers,      // Nhận handlers
     t,
     cscApiKey,
     setStatesForReview,
@@ -43,8 +41,8 @@ const LocationSelector: React.FC<LocationSelectorProps> = (props) => {
     handleStateChange,
     handleCityChange,
   } = useLocationData({
-    location: formData.location, // Truyền location hiện tại từ formData
-    onLocationChange,           // Truyền handler để hook có thể gọi cập nhật formData cha
+    location: formData.location,
+    onLocationChange: handlers.handleLocationChange, // Sử dụng handler từ object handlers
     cscApiKey,
     setStatesForReview,
     setCitiesForReview,
@@ -59,15 +57,19 @@ const LocationSelector: React.FC<LocationSelectorProps> = (props) => {
       <div className="mt-2 grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-2 lg:grid-cols-4">
         <AddressInput
           address={formData.location.address}
-          onAddressChange={value => onLocationChange('address', value)}
+          onAddressChange={value => handlers.handleLocationChange('address', value)}
+          onBlur={() => handlers.handleBlur('location.address')} // Truyền onBlur
+          isTouched={touchedFields.has('location.address')}   // Truyền isTouched
           t={t}
           required={isRequired}
           error={errors['location.address']}
         />
 
         <ContinentSelect
-          selectedContinent={internalSelectedContinent} // Sử dụng state nội bộ từ hook
+          selectedContinent={internalSelectedContinent}
           onContinentChange={handleContinentChange}
+          onBlur={() => handlers.handleBlur('location.continent')} // Truyền onBlur
+          isTouched={touchedFields.has('location.continent')}   // Truyền isTouched
           continentOptions={continentOptions}
           t={t}
           required={isRequired}
@@ -75,8 +77,10 @@ const LocationSelector: React.FC<LocationSelectorProps> = (props) => {
         />
 
         <CountrySelect
-          selectedCountry={internalSelectedCountry} // Sử dụng state nội bộ từ hook
+          selectedCountry={internalSelectedCountry}
           onCountryChange={handleCountryChange}
+          onBlur={() => handlers.handleBlur('location.country')} // Truyền onBlur
+          isTouched={touchedFields.has('location.country')}   // Truyền isTouched
           countries={filteredCountries}
           t={t}
           required={isRequired}
@@ -84,16 +88,19 @@ const LocationSelector: React.FC<LocationSelectorProps> = (props) => {
         />
 
         <StateCitySelect
-          selectedState={internalSelectedState} // Sử dụng state nội bộ từ hook
-          selectedCity={internalSelectedCity}   // Sử dụng state nội bộ từ hook
+          selectedState={internalSelectedState}
+          selectedCity={internalSelectedCity}
           onStateChange={handleStateChange}
           onCityChange={handleCityChange}
+          // Coi việc blur ở State hoặc City là blur của cả cụm
+          onStateBlur={() => handlers.handleBlur('location.cityStateProvince')}
+          onCityBlur={() => handlers.handleBlur('location.cityStateProvince')}
+          // isTouched cho cả cụm
+          isTouched={touchedFields.has('location.cityStateProvince')}
           states={states}
           cities={cities}
           t={t}
           required={isRequired}
-          // Lỗi cho cityStateProvince có thể áp dụng cho cả State và City tùy thuộc vào logic
-          // Nếu bạn muốn tách lỗi riêng cho state và city, bạn cần thêm trường lỗi riêng.
           error={errors['location.cityStateProvince']}
         />
       </div>

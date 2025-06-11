@@ -24,10 +24,11 @@ import {
   isBasicInfoComplete,
   isLogisticsComplete,
   isContentComplete,
-} from '@/src/utils/validation/addConferenceValidation'; // Đảm bảo import các hàm validator
+} from '@/src/utils/validation/addConferenceValidation';
 import { DateError } from '@/src/utils/validation';
 
-// --- CÁC COMPONENT UI CHUNG (Giữ nguyên) ---
+// --- CÁC COMPONENT UI CHUNG ---
+
 export const FormSectionCard: React.FC<{ title: string; description: string; children: React.ReactNode }> = ({ title, description, children }) => (
   <div className="bg-white p-6 rounded-xl shadow-md ring-1 ring-gray-200/50">
     <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
@@ -39,53 +40,86 @@ export const FormSectionCard: React.FC<{ title: string; description: string; chi
 );
 
 export const TextInput: React.FC<{
-  id: string; label: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeholder?: string; helperText?: string; required?: boolean; type?: string; className?: string;
-  icon?: React.ReactNode; t: (key: string) => string; error?: string | null;
-}> = ({ id, label, value, onChange, placeholder, helperText, required, type = 'text', className = 'sm:col-span-6', icon, t, error }) => (
-  <div className={className}>
-    <label htmlFor={id} className="block text-sm font-medium text-gray-700">
-      {required && <span className="text-red-500">* </span>}{t(label)}
-    </label>
-    <div className="relative mt-1 rounded-md shadow-sm">
-      {icon && <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">{icon}</div>}
-      <input
-        type={type} id={id}
-        className={clsx(
-          'block w-full rounded-md py-2 focus:ring-indigo-500 sm:text-sm',
-          icon ? 'pl-10' : 'pl-3', 'pr-3',
-          error ? 'border-red-500 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
-        )}
-        value={value} onChange={onChange} placeholder={placeholder || ''}
-        required={required} aria-invalid={!!error} aria-describedby={error ? `${id}-error` : undefined}
-      />
+  id: string;
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
+  isTouched: boolean;
+  error?: string | null;
+  placeholder?: string;
+  helperText?: string;
+  required?: boolean;
+  type?: string;
+  className?: string;
+  icon?: React.ReactNode;
+  t: (key: string) => string;
+}> = ({ id, label, value, onChange, onBlur, isTouched, error, placeholder, helperText, required, type = 'text', className = 'sm:col-span-6', icon, t }) => {
+  const showError = !!error && isTouched;
+
+  return (
+    <div className={className}>
+      <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+        {required && <span className="text-red-500">* </span>}{t(label)}
+      </label>
+      <div className="relative mt-1 rounded-md shadow-sm">
+        {icon && <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">{icon}</div>}
+        <input
+          type={type}
+          id={id}
+          name={id}
+          className={clsx(
+            'block w-full rounded-md py-2 focus:ring-indigo-500 sm:text-sm',
+            icon ? 'pl-10' : 'pl-3', 'pr-3',
+            showError
+              ? 'border-red-500 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500'
+              : 'border-gray-300 focus:border-indigo-500'
+          )}
+          value={value}
+          onChange={onChange}
+          onBlur={onBlur}
+          placeholder={placeholder || ''}
+          required={required}
+          aria-invalid={showError}
+          aria-describedby={showError ? `${id}-error` : undefined}
+        />
+      </div>
+      {showError ? (
+        <p id={`${id}-error`} className="mt-2 text-sm text-red-600">{error}</p>
+      ) : helperText ? (
+        <p className="mt-2 text-xs text-gray-500">{t(helperText)}</p>
+      ) : null}
     </div>
-    {error ? (
-      <p id={`${id}-error`} className="mt-2 text-sm text-red-600">{error}</p>
-    ) : helperText ? (
-      <p className="mt-2 text-xs text-gray-500">{t(helperText)}</p>
-    ) : null}
-  </div>
-);
+  );
+};
+
 // -----------------------------
 
-
-// *** THAY ĐỔI TẠI ĐÂY: THÊM `topicError` VÀO INTERFACE ***
+// *** THAY ĐỔI: CẬP NHẬT INTERFACE PROPS CHÍNH ***
 export interface ConferenceDetailsStepProps {
   formData: ConferenceFormData;
   errors: Record<string, string | null>;
   dateErrors: DateError[];
   globalDateError: string | null;
-  topicError: string | null; // THÊM PROP MỚI
+  topicError: string | null;
   newTopic: string;
+  touchedFields: Set<string>;
+  // Thêm state kiểm tra tồn tại
+  existenceCheck: {
+    status: 'idle' | 'loading' | 'success' | 'error';
+    message: string | null;
+  };
   setNewTopic: (value: string) => void;
-  onFieldChange: (field: keyof ConferenceFormData, value: any) => void;
-  onLocationChange: (field: keyof LocationInput, value: any) => void;
-  onDateChange: (index: number, field: keyof ImportantDateInput, value: string) => void;
-  addDate: () => void;
-  removeDate: (index: number) => void;
-  addTopic: () => void;
-  removeTopic: (topic: string) => void;
+  handlers: {
+    handleFieldChange: (field: keyof ConferenceFormData, value: any) => void;
+    handleLocationChange: (field: keyof LocationInput, value: any) => void;
+    handleDateChange: (index: number, field: keyof ImportantDateInput, value: string) => void;
+    addDate: () => void;
+    removeDate: (index: number) => void;
+    handleAddTopic: () => void;
+    handleRemoveTopic: (topic: string) => void;
+    handleBlur: (fieldName: string) => void;
+  };
   dateTypeOptions: { value: string; name: string }[];
   t: (key: string) => string;
   cscApiKey: string;
@@ -98,7 +132,6 @@ const formSections = [
   { id: 'logistics-section', name: 'Logistics_Details', validator: isLogisticsComplete },
   { id: 'content-section', name: 'Content_and_Branding', validator: isContentComplete },
 ];
-
 
 const ConferenceDetailsStep: React.FC<ConferenceDetailsStepProps> = (props) => {
   const { t } = props;
@@ -147,7 +180,6 @@ const ConferenceDetailsStep: React.FC<ConferenceDetailsStepProps> = (props) => {
 
           return (
             <div key={section.id} id={section.id} className="relative">
-              {/* Truyền toàn bộ props xuống các component section con */}
               <SectionComponent {...props} id={section.id} />
               {isLocked && (
                 <div className={clsx(

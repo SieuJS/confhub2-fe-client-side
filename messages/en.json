@@ -1620,5 +1620,10 @@
   "Search_settings": "Search settings...",
   "No_settings_match_your_search": "No settings match your search.",
   "View_all_settings": "View all settings",
-  "Could_not_load_user_settings_title": "Could not load user settings"
+  "Could_not_load_user_settings_title": "Could not load user settings",
+  "Please_enter_a_valid_link": "Please enter a valid link",
+  "This_combination_is_available": "This title and acronym combination is available.",
+  "Conference_with_this_Title_and_Acronym_already_exists": "A conference with this title and acronym already exists.",
+  "Failed_to_check_conference_existence": "Could not check for conference existence. Please check your connection and try again.",
+  "An_error_occurred": "An error occurred while checking."
 }
