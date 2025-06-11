@@ -7714,5 +7714,547 @@
     ],
     "tester": "",
     "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_CrawlConf_001_UploadCSV",
+    "testCaseName": "Tải lên tệp CSV hợp lệ thành công",
+    "description": "Kiểm tra người dùng có thể tải lên một tệp CSV hợp lệ chứa thông tin hội nghị.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Người dùng đang ở trang 'Crawl' > 'Crawl Conferences' (Bước 1: Import CSV)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Choose File'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn một tệp CSV hợp lệ (ví dụ: 'CORE2020.csv') từ hệ thống tệp của bạn."
+      }
+    ],
+    "expectedResult": "Tệp CSV được tải lên thành công. Dòng chữ 'Parsed X conferences. Ready to proceed.' (ví dụ: 'Parsed 882 conferences. Ready to proceed.') xuất hiện. Nút 'Next: Select Conferences' được kích hoạt.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CR_001_UploadCSV"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_CrawlConf_002_SelectAllConferences",
+    "testCaseName": "Chọn tất cả các hội nghị và áp dụng hành động 'Crawl'",
+    "description": "Kiểm tra người dùng có thể chọn tất cả các hội nghị đã được parse và áp dụng hành động 'Crawl' cho chúng.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Người dùng đang ở trang 'Crawl' > 'Crawl Conferences' (Bước 2: Select Conferences).",
+      "Một tệp CSV hợp lệ đã được tải lên và parse thành công ở Bước 1."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Select All (X)' (ví dụ: 'Select All (882)')."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Đảm bảo rằng 'Action for Selected' được đặt là 'Crawl' (Nếu có tùy chọn chọn)."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Apply to All Selected (X)' (ví dụ: 'Apply to All Selected (882)')."
+      }
+    ],
+    "expectedResult": "Tất cả các hội nghị trong danh sách đều được chọn và hành động 'Crawl' được áp dụng. Nút 'Next: Configure & Process' được kích hoạt.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CR_002_SelectConf"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_CrawlConf_003_SelectIndividualConferences",
+    "testCaseName": "Chọn một số hội nghị và áp dụng hành động 'Crawl'",
+    "description": "Kiểm tra người dùng có thể chọn từng hội nghị riêng lẻ và áp dụng hành động 'Crawl' cho chúng.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Người dùng đang ở trang 'Crawl' > 'Crawl Conferences' (Bước 2: Select Conferences).",
+      "Một tệp CSV hợp lệ đã được tải lên và parse thành công ở Bước 1."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Chọn một vài hộp kiểm (checkbox) trước tên hội nghị (ví dụ: OCS, OSCW)."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Apply to Page (X)' hoặc 'Apply to Selected (X)' (nếu có tùy chọn, X là số lượng hội nghị đã chọn)."
+      }
+    ],
+    "expectedResult": "Chỉ các hội nghị đã chọn được đánh dấu để 'Crawl'. Nút 'Next: Configure & Process' được kích hoạt.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_CR_002_SelectConf"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_CrawlConf_005_ConfigureSettings_EnableChunking",
+    "testCaseName": "Cấu hình cài đặt - Kích hoạt phân đoạn tài liệu (Chunking)",
+    "description": "Kiểm tra người dùng có thể kích hoạt tùy chọn 'Enable Document Chunking' và nhập kích thước phân đoạn hợp lệ.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Người dùng đang ở trang 'Crawl' > 'Crawl Conferences' (Bước 3: Configure Settings).",
+      "Các bước trước đã hoàn thành hợp lệ."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Chọn hộp kiểm 'Enable Document Chunking'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhập một giá trị hợp lệ (ví dụ: 50) vào trường 'Chunk Size (1-50)'."
+      }
+    ],
+    "expectedResult": "Hộp kiểm 'Enable Document Chunking' được chọn và giá trị 'Chunk Size' được chấp nhận mà không có lỗi. Các tùy chọn chunking được kích hoạt.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_CR_003_ConfigureSettings"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_CrawlConf_006_StartProcessing_ValidConfiguration",
+    "testCaseName": "Bắt đầu quá trình Crawl với cấu hình hợp lệ",
+    "description": "Kiểm tra người dùng có thể bắt đầu quá trình crawl sau khi đã cấu hình đầy đủ và hợp lệ các cài đặt.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Người dùng đang ở trang 'Crawl' > 'Crawl Conferences' (Bước 3: Configure Settings).",
+      "Các bước trước đã hoàn thành hợp lệ (CSV đã tải lên, hội nghị đã chọn, tất cả API models đã được chọn 'Non-Tuned' hoặc 'Tuned')."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Chọn một tùy chọn ('Non-Tuned' hoặc 'Tuned') cho 'Determine Links Model'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn một tùy chọn ('Non-Tuned' hoặc 'Tuned') cho 'Extract Information Model'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Chọn tùy chọn 'Non-Tuned' cho 'Extract CFP Model' (vì 'Tuned' bị vô hiệu hóa)."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Next: Start Processing'."
+      },
+      {
+        "stepNumber": 5,
+        "action": "Trên màn hình 'Process & View Status', nhập một mô tả tùy chọn vào trường 'Crawl Description' (ví dụ: 'Initial crawl for ACL 2025 conference papers')."
+      },
+      {
+        "stepNumber": 6,
+        "action": "Nhấp vào nút 'Start Processing'."
+      }
+    ],
+    "expectedResult": "Hệ thống chuyển sang Bước 4 'Process & View Status'. Quá trình crawl bắt đầu và trạng thái được hiển thị trong 'Process Status & Log'. Mô tả crawl (nếu có) được chấp nhận.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_CR_005_StartCrawl"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_CrawlConf_007_ResetAllAndStartOver",
+    "testCaseName": "Đặt lại toàn bộ quá trình Crawl và bắt đầu lại",
+    "description": "Kiểm tra người dùng có thể đặt lại toàn bộ quá trình crawl về bước đầu tiên và xóa bỏ các cấu hình đã chọn.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Người dùng đang ở bất kỳ bước nào từ Bước 2 đến Bước 4 của quá trình 'Crawl Conferences'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Reset All & Start Over'."
+      }
+    ],
+    "expectedResult": "Hệ thống chuyển về Bước 1: 'Import CSV'. Mọi cấu hình, lựa chọn hội nghị và dữ liệu tải lên trước đó đều bị xóa/đặt lại, yêu cầu bắt đầu lại từ đầu.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_CR_006_ResetProcess"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_CrawlConf_008_NavigationBetweenSteps",
+    "testCaseName": "Điều hướng giữa các bước sử dụng nút 'Previous' và thanh tiến trình",
+    "description": "Kiểm tra người dùng có thể điều hướng qua lại giữa các bước của quy trình crawl mà không làm mất dữ liệu đã nhập (nếu hợp lệ).",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Người dùng đã hoàn thành ít nhất Bước 1 của quá trình 'Crawl Conferences'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Hoàn thành Bước 1 (Import CSV) và chuyển sang Bước 2 (Select Conferences)."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Previous: Import File' ở Bước 2."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Kiểm tra lại rằng tệp CSV đã tải lên vẫn được hiển thị và thông báo 'Parsed X conferences. Ready to proceed.' vẫn còn."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào thanh chỉ mục Bước 3 'Configure Settings' (khi đang ở Bước 1 hoặc 2)."
+      }
+    ],
+    "expectedResult": "Người dùng được điều hướng đến bước mong muốn. Dữ liệu và lựa chọn đã nhập/thực hiện ở các bước trước đó (nếu hợp lệ) được giữ nguyên khi điều hướng trở lại.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_CR_007_StepNavigation"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_CrawlConf_009_VerifyCFPModelDisabled",
+    "testCaseName": "Xác minh tùy chọn 'Tuned' cho 'Extract CFP Model' bị vô hiệu hóa",
+    "description": "Kiểm tra rằng tùy chọn 'Tuned' cho mô hình 'Extract CFP Model' hiển thị trạng thái 'Temporarily disabled'.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Người dùng đang ở trang 'Crawl' > 'Crawl Conferences' (Bước 3: Configure Settings)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Quan sát phần 'API Model Selection' và mục 'Extract CFP Model'."
+      }
+    ],
+    "expectedResult": "Tùy chọn 'Tuned' cho 'Extract CFP Model' hiển thị trạng thái 'Temporarily disabled' và không thể chọn được.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Low",
+    "relatedRequirements": [
+      "YC_CR_008_CFPModelStatus"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_AutoUpdate_001_ScheduleDailyUpdate",
+    "testCaseName": "Lên lịch cập nhật tự động hàng ngày",
+    "description": "Kiểm tra người dùng có thể lên lịch cập nhật dữ liệu tự động theo chu kỳ hàng ngày.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Người dùng đang ở trang 'Automatic Updates'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Chọn tab 'Daily' trong phần 'Update Cycle'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn một thời gian cụ thể (ví dụ: 12:00 AM) trong trường 'Time'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhập một giá trị cho 'Batch Size' (ví dụ: 10)."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Schedule Update'."
+      }
+    ],
+    "expectedResult": "Hệ thống chấp nhận lịch trình cập nhật. Một thông báo thành công (nếu có) được hiển thị và các thống kê 'Update Statistics' có thể được cập nhật để phản ánh lịch trình mới (ví dụ: 'Pending: 17' có thể thay đổi).",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_AU_001_ScheduleDaily"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_AutoUpdate_002_ScheduleMonthlyUpdate",
+    "testCaseName": "Lên lịch cập nhật tự động hàng tháng",
+    "description": "Kiểm tra người dùng có thể lên lịch cập nhật dữ liệu tự động theo chu kỳ hàng tháng.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Người dùng đang ở trang 'Automatic Updates'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Chọn tab 'Monthly' trong phần 'Update Cycle'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn một thời gian cụ thể (ví dụ: 12:00 AM) trong trường 'Time'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhập một giá trị cho 'Batch Size' (ví dụ: 10)."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Schedule Update'."
+      }
+    ],
+    "expectedResult": "Hệ thống chấp nhận lịch trình cập nhật. Một thông báo thành công (nếu có) được hiển thị và các thống kê 'Update Statistics' có thể được cập nhật để phản ánh lịch trình mới.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_AU_002_ScheduleMonthly"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Analysis_001_ViewLogRequestsList",
+    "testCaseName": "Xem danh sách các yêu cầu Log",
+    "description": "Kiểm tra người dùng có thể truy cập trang 'Analysis' và xem danh sách các yêu cầu log đã thực hiện.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Có ít nhất một yêu cầu crawl đã được thực hiện trước đó.",
+      "Người dùng đang ở trang tổng quan Dashboard."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào mục 'Analysis' trên menu điều hướng bên trái."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị trang 'Conference Log Analysis Overview'. Danh sách các yêu cầu log được hiển thị trong bảng 'Log Requests' với các cột: 'REQUEST ID', 'ORIGINAL REQUEST ID', 'DESCRIPTION', 'START TIME', 'END TIME', 'DURATION', 'STATUS'.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_AN_001_ViewLogs"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Analysis_002_FilterLogRequestsByID",
+    "testCaseName": "Lọc yêu cầu Log theo ID",
+    "description": "Kiểm tra người dùng có thể lọc danh sách yêu cầu log bằng cách nhập Request ID hợp lệ.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Người dùng đang ở trang 'Conference Log Analysis Overview'.",
+      "Có ít nhất một yêu cầu log với Request ID đã biết."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập một Request ID hợp lệ (ví dụ: 'req-conf-1749260600533-u8kgh') vào trường 'Filter by Request ID (e.g., batch-request-123)'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Apply'."
+      }
+    ],
+    "expectedResult": "Danh sách log trong bảng 'Log Requests' chỉ hiển thị (các) yêu cầu log khớp với Request ID đã nhập.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_AN_002_FilterLogs"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Analysis_004_ViewSuccessfulRequestDetails",
+    "testCaseName": "Xem chi tiết một yêu cầu Log thành công",
+    "description": "Kiểm tra người dùng có thể xem các chỉ số chi tiết cho một yêu cầu log đã hoàn thành thành công.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Người dùng đang ở trang 'Conference Log Analysis Overview'.",
+      "Có ít nhất một yêu cầu log có trạng thái 'Complet' trong danh sách."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào một hàng trong bảng 'Log Requests' có trạng thái 'Complet' (ví dụ: 'req-conf-1749260600533-u8kgh')."
+      }
+    ],
+    "expectedResult": "Hệ thống chuyển sang trang chi tiết cho yêu cầu log đó. Các phần 'Summary for Request', 'Gemini API Health & Performance', 'Google Search Metrics' và 'Output & Data Quality' được hiển thị với các chỉ số tương ứng (ví dụ: 'Total Duration' 12.0s, 'Tasks in Request' 1, 'Failed Tasks' 0 (0.0%), 'CSV Records Written' 1/1).",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_AN_004_ViewDetails"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Analysis_005_ViewOverallSummaryRequestsLevel",
+    "testCaseName": "Xem tổng quan hiệu suất yêu cầu ở cấp độ Requests",
+    "description": "Kiểm tra người dùng có thể xem tổng quan về hiệu suất của tất cả các yêu cầu crawl ở cấp độ Requests.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Người dùng đang ở trang 'Conference Log Analysis Overview'.",
+      "Đã có nhiều yêu cầu log được thực hiện."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Cuộn xuống phần 'Overall Summary'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Đảm bảo rằng tab 'Requests Level' đang được chọn (mặc định)."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Quan sát phần 'Requests Performance Overview'."
+      }
+    ],
+    "expectedResult": "Các chỉ số tổng quan về yêu cầu được hiển thị chính xác, bao gồm 'Total Requests' (ví dụ: 43), 'Completed' (ví dụ: 41/43), 'Failed' (ví dụ: 1/43), 'Completed with Errors' (ví dụ: 1/43), 'Avg. Duration' (ví dụ: 29.81s). Biểu đồ hình tròn hiển thị tỷ lệ hoàn thành/thất bại/hoàn thành một phần.",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_AN_005_OverallSummary"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Analysis_006_ViewOverallSummaryDetailsLevel",
+    "testCaseName": "Xem tổng quan hiệu suất chi tiết ở cấp độ Details",
+    "description": "Kiểm tra người dùng có thể xem tổng quan chi tiết về hiệu suất crawl, bao gồm API và chất lượng dữ liệu.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Người dùng đang ở trang 'Conference Log Analysis Overview'.",
+      "Đã có nhiều yêu cầu log được thực hiện."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Cuộn xuống phần 'Overall Summary'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào tab 'Details Level'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Quan sát các phần 'Overall Crawl Summary', 'Gemini API Health & Performance', 'Google Search Metrics', 'Output & Data Quality', và 'Detailed Statistics'."
+      }
+    ],
+    "expectedResult": "Các chỉ số tổng quan được hiển thị, bao gồm 'Total Duration' (ví dụ: 21m 22s), 'Conferences Processed' (ví dụ: 216/216), 'Failed Tasks' (ví dụ: 11 (5.1%)), 'Intermediate Errors' (ví dụ: 197), 'CSV Records Written' (ví dụ: 205/205).",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_AN_006_DetailedSummary"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Analysis_007_VerifyLogParsingIssues",
+    "testCaseName": "Xác minh hiển thị lỗi Log Parsing Issues",
+    "description": "Kiểm tra hệ thống hiển thị chính xác các vấn đề về phân tích log (parsing issues) trong phần 'Detailed Statistics'.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Người dùng đang ở trang 'Conference Log Analysis Overview' và tab 'Details Level' của 'Overall Summary'.",
+      "Đã có lỗi parsing xảy ra trong quá trình crawl trước đó."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Cuộn xuống phần 'Detailed Statistics'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Quan sát phần 'Log Parsing Issues'."
+      }
+    ],
+    "expectedResult": "Phần 'Log Parsing Issues' hiển thị số lượng lỗi (ví dụ: '0 errors / 0 entries' hoặc lỗi cụ thể như 'Error for req-conf-1749174503614-xvf7z: Conference 'RVP': All link processing attempts failed.').",
+    "actualResult": "",
+    "status": "",
+    "priority": "High",
+    "relatedRequirements": [
+      "YC_AN_007_ParsingErrors"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Analysis_008_RefreshLogData",
+    "testCaseName": "Làm mới dữ liệu Log",
+    "description": "Kiểm tra người dùng có thể làm mới dữ liệu log hiển thị trên trang để xem thông tin cập nhật nhất.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Người dùng đang ở trang 'Conference Log Analysis Overview' (hoặc trang chi tiết một yêu cầu log)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Refresh Now' ở góc trên bên phải của trang."
+      }
+    ],
+    "expectedResult": "Trang được làm mới, và dữ liệu log được tải lại từ nguồn, phản ánh bất kỳ thay đổi hoặc yêu cầu log mới nào đã xảy ra.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Medium",
+    "relatedRequirements": [
+      "YC_AN_008_Refresh"
+    ],
+    "tester": "",
+    "executionDate": ""
+  },
+  {
+    "testCaseId": "TC_Analysis_009_BackToListFromDetails",
+    "testCaseName": "Quay lại danh sách log từ trang chi tiết",
+    "description": "Kiểm tra người dùng có thể quay lại danh sách các yêu cầu log sau khi xem chi tiết một yêu cầu cụ thể.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống với quyền admin.",
+      "Người dùng đang ở trang chi tiết của một yêu cầu log cụ thể (sau khi nhấp vào một hàng trong bảng log)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Back to List of Requests'."
+      }
+    ],
+    "expectedResult": "Hệ thống điều hướng người dùng trở lại trang 'Conference Log Analysis Overview' hiển thị danh sách tất cả các yêu cầu log.",
+    "actualResult": "",
+    "status": "",
+    "priority": "Low",
+    "relatedRequirements": [
+      "YC_AN_009_BackNavigation"
+    ],
+    "tester": "",
+    "executionDate": ""
   }
 ]
