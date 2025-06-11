@@ -9,7 +9,7 @@ import { Location } from '@/src/models/response/conference.list.response'; // Im
 
 // Định nghĩa lại interface cho dữ liệu card Blacklist
 interface BlacklistConferenceResponseForCard {
-  id: string; // Đây là conferenceId từ API của bạn
+  conferenceId: string; // Đây là conferenceId từ API của bạn
   title: string;
   acronym: string;
   location: Location | null; // Sử dụng Location từ models
@@ -88,7 +88,7 @@ const BlacklistConferenceCard: React.FC<BlacklistConferenceCardProps> = ({
         <Link
           href={{
             pathname: '/conferences/detail',
-            query: { id: conference.id }
+            query: { id: conference.conferenceId }
           }}
         >
           <Button variant="primary" size="small" rounded className="inline-flex items-center gap-2">
