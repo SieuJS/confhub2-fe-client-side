@@ -121,17 +121,23 @@ const useNotifications = (): UseNotificationsReturn => {
     [handleCheckboxChangeSelection]
   );
 
-  const handleDeleteSelected = useCallback(async () => {
-    const idsToDelete = new Set(checkedIndices);
-    const updatedNotifications = rawNotifications.filter(n => !idsToDelete.has(n.id));
-
+  const handleDeleteSelected = async () => {
+    const idsToDelete = checkedIndices;
+    const updatedNotifications = rawNotifications.map(n => {
+      if (idsToDelete.includes(n.id)) {
+        console.log(`handleDeleteSelected - Deleting notification with id: ${n.id}`);
+        return { ...n, deletedAt: new Date().toISOString(), isDeleted : true }; // Đánh dấu là đã xóa
+      }
+      return n; // Giữ nguyên các notification khác
+    });
+    
     try {
       await updateUserNotifications(updatedNotifications); // Hàm này cần xử lý xóa trên server và cập nhật state
       setCheckedIndices([]);
     } catch (error) {
       console.error('Failed to delete selected notifications:', error);
     }
-  }, [checkedIndices, rawNotifications, updateUserNotifications, setCheckedIndices]);
+  }
 
 
   // Không cần useEffect để gọi fetchData ở đây nữa vì useNotificationData đã tự gọi nó

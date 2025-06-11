@@ -63,7 +63,7 @@ const NotificationsTab: React.FC = () => {
         handleUpdateSeenAt(selectedNotificationId)
       }
     }
-  }, [selectedNotificationId, handleUpdateSeenAt, notifications])
+  }, [selectedNotificationId, handleUpdateSeenAt, notifications, ])
 
   const handleBackToNotifications = () => {
     const newSearchParams = new URLSearchParams(searchParams.toString())

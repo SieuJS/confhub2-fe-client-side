@@ -13,17 +13,15 @@ const useNotificationState = (initialNotifications: Notification[], userId: stri
         // console.log('useNotificationState: useEffect - notificationsRef updated:', notificationsRef.current); // Log ref update
     }, [notifications]);
 
-    const updateUserNotifications = useCallback(
+    const updateUserNotifications =
         async (updatedNotifications: Notification[]) => {
-            // console.log('useNotificationState: updateUserNotifications called with:', updatedNotifications);
+            console.log('useNotificationState: updateUserNotifications called with:', updatedNotifications);
             const updatedData = { notifications: updatedNotifications };
             // The API call uses the auth token, not the userId prop.
             await updateNotifications(updatedData);
             setNotifications(updatedNotifications);
             // console.log('useNotificationState: updateUserNotifications - State updated.');
-        },
-        [] // FIX: Remove `userId`. The function has no real dependencies.
-    );
+        }
 
     const handleUpdateSeenAt = useCallback(
         async (id: string) => {
@@ -52,22 +50,27 @@ const useNotificationState = (initialNotifications: Notification[], userId: stri
         [updateUserNotifications]
     );
 
-    const handleDeleteNotification = useCallback(
+    const handleDeleteNotification =
         async (id: string) => {
             // console.log(`useNotificationState: handleDeleteNotification called for id: ${id}`); //Log
             const currentNotifications = notificationsRef.current;
             const updatedNotifications = currentNotifications.map(n =>
                 n.id === id ? { ...n, deletedAt: new Date().toISOString() } : n
             );
+            console.log(`useNotificationState: handleDeleteNotification - updatedNotifications:`, currentNotifications); // Log updated notifications
             await updateUserNotifications(updatedNotifications);
-        },
-        [updateUserNotifications]
-    );
+        }
+
+    const handleDeleteAllNotifications = async () => {
+        const currentNotifications = notifications
+        const updatedNotifications = currentNotifications.map(n => ({ ...n, deletedAt: new Date().toISOString() }));
+        await updateUserNotifications(updatedNotifications);
+    };
 
     const handleMarkUnseen = useCallback(
         async (id: string) => {
             // console.log(`useNotificationState: handleMarkUnseen called for id: ${id}`); // Log
-            const currentNotifications = notificationsRef.current;
+            const currentNotifications = notifications;
             const updatedNotifications = currentNotifications.map(n =>
                 n.id === id ? { ...n, seenAt: null } : n
             );
@@ -76,7 +79,7 @@ const useNotificationState = (initialNotifications: Notification[], userId: stri
         [updateUserNotifications]
     );
     // console.log(`useNotificationState: Returning. notifications:`, notifications); // Log state
-    return { notifications, setNotifications, handleUpdateSeenAt, handleToggleImportant, handleDeleteNotification, handleMarkUnseen, updateUserNotifications };
+    return { notifications, setNotifications, handleUpdateSeenAt, handleToggleImportant, handleDeleteNotification, handleDeleteAllNotifications, handleMarkUnseen, updateUserNotifications };
 };
 
 export default useNotificationState;
