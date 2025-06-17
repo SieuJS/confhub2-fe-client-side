@@ -6,6 +6,7 @@ import EventJournalCard from './EventJournalCard'
 import Pagination from '../utils/Pagination'
 import useJournalResults from '@/src/hooks/journals/useJournalResults'
 import { useTranslations } from 'next-intl'
+import { Loader2 } from 'lucide-react' // Import Loader2
 
 interface ResultsJournalSectionProps {}
 
@@ -26,7 +27,12 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = () => {
   } = useJournalResults()
 
   if (loading) {
-    return <p>{t('loading')}</p>
+    return (
+      <div className='flex h-96 flex-col items-center justify-center text-gray-500'>
+        <Loader2 className='h-10 w-10 animate-spin text-indigo-600' />
+        <p className='mt-4 text-lg'>{t('loading')}</p>
+      </div>
+    )
   }
 
   // journals có thể là undefined hoặc mảng rỗng
@@ -44,7 +50,7 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = () => {
           {/* Sử dụng totalJournals từ hook để hiển thị tổng số kết quả */}
           {t('resultsCount', { count: totalJournals })}
         </h2>
-        <div className='flex items-center rounded-md px-2 py-1'>
+        {/* <div className='flex items-center rounded-md px-2 py-1'>
           <svg
             xmlns='http://www.w3.org/2000/svg'
             className='mr-1 h-5 w-5'
@@ -70,7 +76,7 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = () => {
             <option value='sjr'>{t('sortBySJR')}</option>
             <option value='hIndex'>{t('sortByHIndex')}</option>
           </select>
-        </div>
+        </div> */}
       </div>
 
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>

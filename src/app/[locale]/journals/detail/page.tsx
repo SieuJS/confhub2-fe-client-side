@@ -3,8 +3,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-// Giả sử JournalData đã được cập nhật để khớp với cấu trúc API mới
-// Nếu chưa, bạn cần định nghĩa lại nó. Dựa trên JSON bạn cung cấp, nó là một object phẳng.
 import { JournalData } from '../../../../models/response/journal.response' 
 import { Header } from '../../utils/Header'
 import Footer from '../../utils/Footer'
@@ -15,14 +13,13 @@ import { RecommendedJournals } from './RecommendedJournals'
 import { RecentlyAddedJournals } from './RecentlyAddedJournals'
 import SubjectAreasJournals from '../../home/SubjectAreasJournals'
 import { useTranslations } from 'next-intl'
+import { Loader2 } from 'lucide-react' // Import Loader2
 
 const JournalDetails = ({ params: { locale } }: { params: { locale: string } }) => {
   
   const t = useTranslations()
 
   const searchParams = useSearchParams()
-  // API mới sử dụng 'id' (UUID) thay vì 'Sourceid'.
-  // Giả sử query param vẫn là 'id' và chứa UUID.
   const journalId = searchParams.get('id') 
 
   const [journal, setJournal] = useState<JournalData | null | undefined>(undefined)
@@ -43,19 +40,16 @@ const JournalDetails = ({ params: { locale } }: { params: { locale: string } }) 
       setJournal(undefined)
 
       try {
-        // Lấy base URL từ biến môi trường
         const baseUrl = process.env.NEXT_PUBLIC_DATABASE_URL;
         if (!baseUrl) {
             throw new Error("NEXT_PUBLIC_DATABASE_URL is not defined in environment variables.");
         }
 
-        // Xây dựng URL API để lấy journal cụ thể
         const apiUrl = `${baseUrl}/api/v1/journals/${journalId}`;
         console.log(`Fetching journal from: ${apiUrl}`);
 
         const response = await fetch(apiUrl);
 
-        // Xử lý trường hợp không tìm thấy (API trả về 404)
         if (response.status === 404) {
           console.log(`Journal with id ${journalId} not found (404).`);
           setJournal(null);
@@ -66,9 +60,8 @@ const JournalDetails = ({ params: { locale } }: { params: { locale: string } }) 
           throw new Error(`API call failed with status: ${response.status}`);
         }
 
-        // Dữ liệu trả về là một object journal duy nhất
         const foundJournal: JournalData = await response.json();
-        console.log(`Journal found:`, foundJournal.Title); // Truy cập trực tiếp vào Title
+        console.log(`Journal found:`, foundJournal.Title);
         setJournal(foundJournal);
 
       } catch (err: any) {
@@ -89,8 +82,9 @@ const JournalDetails = ({ params: { locale } }: { params: { locale: string } }) 
     return (
       <>
         <Header locale={locale} />
-        <div className='flex min-h-screen items-center justify-center'>
-          <p>{t('Loading_journal_details')}</p>
+        <div className='flex min-h-screen flex-col items-center justify-center text-gray-500'>
+          <Loader2 className='h-10 w-10 animate-spin text-indigo-600' />
+          <p className='mt-4 text-lg'>{t('Loading_journal_details')}</p>
         </div>
         <Footer />
       </>
@@ -114,10 +108,6 @@ const JournalDetails = ({ params: { locale } }: { params: { locale: string } }) 
   }
 
   if (journal) {
-    // QUAN TRỌNG: Vì cấu trúc dữ liệu đã thay đổi (không còn `journal.data`),
-    // bạn cần đảm bảo các component con như JournalReport, JournalTabs
-    // cũng được cập nhật để nhận props là `journal` và truy cập trực tiếp
-    // các thuộc tính (ví dụ: `journal.Title` thay vì `journal.data.title`).
     return (
       <div className=''>
         <Header locale={locale} />

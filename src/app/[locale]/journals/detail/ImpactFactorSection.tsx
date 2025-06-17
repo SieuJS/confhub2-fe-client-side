@@ -1,0 +1,81 @@
+// src/app/[locale]/journal/detail/ImpactFactorSection.tsx
+import { JournalData } from '@/src/models/response/journal.response'
+import React from 'react'
+
+interface Props {
+  journal: JournalData
+  t: (key: string) => string
+}
+
+export const ImpactFactorSection: React.FC<Props> = ({ journal, t }) => (
+  <section id='impact-factor' className='scroll-mt-28 border-b border-border py-8 md:py-12'>
+    <h2 className='mb-4 text-2xl font-bold text-foreground md:text-3xl'>
+      {t('JournalTabs.impactFactorTitle')}
+    </h2>
+    <div className='prose mb-6 max-w-none text-muted-foreground dark:prose-invert'>
+      {/* <p>
+        {t('JournalTabs.impactFactorIntro', {
+          year: journal.bioxbio?.[0]?.Year || new Date().getFullYear(),
+          title: journal.Title,
+          value: journal.bioxbio?.[0]?.Impact_factor || 'N/A',
+        })}
+        {journal.bioxbio && (
+          <span>
+            {t('JournalTabs.impactFactorComputedIn', {
+              year: parseInt(journal.bioxbio[0]?.Year || '2023') + 1,
+            })}
+          </span>
+        )}
+      </p> */}
+      <p>{t('JournalTabs.impactFactorDefinition')}</p>
+    </div>
+
+    <div className='grid grid-cols-1 gap-8 rounded-lg bg-muted/50 p-6 md:grid-cols-2'>
+      {/* Cột trái: Bảng */}
+      <div>
+        <div className='overflow-x-auto rounded-lg border border-border'>
+          <table className='w-full text-left text-sm'>
+            <thead className='bg-muted text-muted-foreground'>
+              <tr>
+                <th scope='col' className='px-6 py-3 font-semibold'>
+                  {t('JournalTabs.year')}
+                </th>
+                <th scope='col' className='px-6 py-3 font-semibold'>
+                  {t('JournalTabs.impactFactor')}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {journal.bioxbio?.map((history, index) => (
+                <tr key={index} className='border-t border-border bg-background'>
+                  <td className='px-6 py-3'>{history.Year}</td>
+                  <td className='px-6 py-3 font-medium'>{history.Impact_factor}</td>
+                </tr>
+              ))}
+              {(!journal.bioxbio || journal.bioxbio.length === 0) && (
+                <tr className='border-t border-border bg-background'>
+                  <td className='px-6 py-4 text-center' colSpan={2}>
+                    {t('JournalTabs.noHistory')}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {/* Cột phải: Giải thích */}
+      <div className='prose max-w-none text-muted-foreground dark:prose-invert'>
+        <h3 className='text-xl font-semibold text-foreground'>
+          {t('JournalTabs.howCalculated')}
+        </h3>
+        <p>{t('JournalTabs.ifCalculationText1')}</p>
+        <blockquote className='border-l-4 border-primary bg-primary/10 p-4'>
+          <p className='font-semibold italic'>
+            {t('JournalTabs.ifFormula')}
+          </p>
+        </blockquote>
+        <p>{t('JournalTabs.ifCalculationText2')}</p>
+      </div>
+    </div>
+  </section>
+)

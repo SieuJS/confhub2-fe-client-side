@@ -1,243 +1,121 @@
-// src/hooks/
-// .ts
-import { useState, useEffect, useRef, ChangeEvent, KeyboardEvent } from 'react';
+// src/hooks/journals/useSearchJournalForm.ts
+import { useState, useEffect, useRef, useCallback } from 'react'
+import locationData from '@/src/models/data/locations-list.json'; // Import JSON
 
-interface SearchJournalParams {
-    keyword?: string;
-    country?: string | null;
-    publicationType?: string | null;
-    subjectAreas?: string[];
-    quartile?: string | null;
-    openAccessTypes?: string[];
-    publisher?: string | null;
-    language?: string | null;
-    impactFactor?: string | null;
-    hIndex?: string | null;
-    citeScore?: string | null;
-    sjr?: string | null;
-    overallRank?: string | null;
-    issn?: string | null;
-}
+// Tạo một danh sách phẳng tất cả các quốc gia
+const allCountries = locationData.flatMap(region => region.countries);
 
 interface UseSearchJournalFormProps {
-    onSearch: (searchParams: SearchJournalParams) => void;
-    onClear?: () => void; // Add onClear prop
+  onSearch: (searchParams: {
+    search?: string; // Đổi từ keyword
+    country?: string | null;
+    region?: string | null; // Thêm region
+    publisher?: string | null; // Thêm publisher
+  }) => void;
+  onClear: () => void;
 }
 
 const useSearchJournalForm = ({ onSearch, onClear }: UseSearchJournalFormProps) => {
-    const [journalKeyword, setJournalKeyword] = useState<string>('');
-  const [countrySearchQuery, setCountrySearchQuery] = useState('');
+  // --- State chính ---
+  const [searchKeyword, setSearchKeyword] = useState(''); // Đổi tên cho rõ nghĩa
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
-  const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
+  
+  // --- State cho tìm kiếm nâng cao ---
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [selectedPublisher, setSelectedPublisher] = useState<string | null>(null);
+
+  // --- State cho UI ---
+  const [isAdvancedOptionsVisible, setAdvancedOptionsVisible] = useState(false);
+  const [isCountryDropdownOpen, setCountryDropdownOpen] = useState(false);
+  const [countrySearch, setCountrySearch] = useState('');
   const countryDropdownRef = useRef<HTMLDivElement>(null);
 
-  const [selectedPublicationType, setSelectedPublicationType] = useState<string | null>(null);
-  const [isPublicationTypeDropdownOpen, setIsPublicationTypeDropdownOpen] = useState(false);
-  const publicationTypeDropdownRef = useRef<HTMLDivElement>(null);
+  // Lọc danh sách quốc gia dựa trên input tìm kiếm
+  const filteredCountries = countrySearch
+    ? allCountries.filter(c => c.toLowerCase().includes(countrySearch.toLowerCase()))
+    : allCountries;
 
-  // State cho tìm kiếm nâng cao
-  const [isAdvancedOptionsVisible, setIsAdvancedOptionsVisible] = useState(false);
-  const [selectedSubjectAreas, setSelectedSubjectAreas] = useState<string[]>([]);
-  const [selectedQuartile, setSelectedQuartile] = useState<string | null>(null);
-  const [selectedOpenAccessTypes, setSelectedOpenAccessTypes] = useState<string[]>([]);
-  const [selectedPublisher, setSelectedPublisher] = useState<string | null>(null);
-  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
-  const [selectedImpactFactor, setSelectedImpactFactor] = useState<string | null>(null);
-  const [selectedHIndex, setSelectedHIndex] = useState<string | null>(null);
-  const [selectedCiteScore, setSelectedCiteScore] = useState<string | null>(null);
-  const [selectedSJR, setSelectedSJR] = useState<string | null>(null);
-  const [selectedOverallRank, setSelectedOverallRank] = useState<string | null>(null);
-  const [selectedISSN, setSelectedISSN] = useState<string | null>(null);
+  // Đóng dropdown khi click ra ngoài
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (countryDropdownRef.current && !countryDropdownRef.current.contains(event.target as Node)) {
+        setCountryDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-  const availableCountries = ['United States', 'United Kingdom', 'Germany', 'Vietnam', 'Japan', 'China', 'France', 'Canada', 'Australia']; // Ví dụ danh sách quốc gia
-  const availablePublicationTypes = ['journal', 'Conference Proceedings', 'Book Series']; // Use lowercase 'journal' to match JournalResponse "Type"
-
-  const handleKeywordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setJournalKeyword(event.target.value);
+  // --- Handlers ---
+  const handleKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchKeyword(e.target.value);
   };
 
-  const filteredCountries = availableCountries.filter(country =>
-    country.toLowerCase().includes(countrySearchQuery.toLowerCase())
-  );
+  const toggleCountryDropdown = () => setCountryDropdownOpen(!isCountryDropdownOpen);
 
- 
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      handleSearchClick();
-    }
+  const handleCountrySearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCountrySearch(e.target.value);
   };
 
-  const handleCountryClick = (country: string) => {
-    setSelectedCountry(country === "" ? null : country);
-    setIsCountryDropdownOpen(false);
-    setCountrySearchQuery("");
+  const handleCountryClick = (country: string | null) => {
+    setSelectedCountry(country);
+    setCountryDropdownOpen(false);
   };
 
-  const handlePublicationTypeClick = (type: string) => {
-    setSelectedPublicationType(type === "" ? null : type);
-    setIsPublicationTypeDropdownOpen(false);
-  };
-
-  const handleCountrySearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCountrySearchQuery(event.target.value);
-  };
-
-  const toggleCountryDropdown = () => {
-    setIsCountryDropdownOpen(!isCountryDropdownOpen);
-  };
-
-  const togglePublicationTypeDropdown = () => {
-    setIsPublicationTypeDropdownOpen(!isPublicationTypeDropdownOpen);
-  };
-
-  const handleSearchClick = () => {
-    onSearch({
-      keyword: journalKeyword,
-      country: selectedCountry,
-      publicationType: selectedPublicationType,
-      subjectAreas: selectedSubjectAreas,
-      quartile: selectedQuartile,
-      openAccessTypes: selectedOpenAccessTypes,
-      publisher: selectedPublisher,
-      language: selectedLanguage,
-      impactFactor: selectedImpactFactor,
-      hIndex: selectedHIndex,
-      citeScore: selectedCiteScore,
-      sjr: selectedSJR,
-      overallRank: selectedOverallRank,
-      issn: selectedISSN,
-    });
-  };
-
-  const toggleAdvancedOptionsVisibility = () => {
-    setIsAdvancedOptionsVisible(!isAdvancedOptionsVisible);
-  };
-
-  const handleSubjectAreasChange = (subjects: string[]) => {
-    setSelectedSubjectAreas(subjects);
-  };
-
-  const handleQuartileChange = (quartile: string | null) => {
-    setSelectedQuartile(quartile);
-  };
-
-  const handleOpenAccessTypesChange = (oaTypes: string[]) => {
-    setSelectedOpenAccessTypes(oaTypes);
+  const handleRegionChange = (region: string | null) => {
+    setSelectedRegion(region);
   };
 
   const handlePublisherChange = (publisher: string | null) => {
     setSelectedPublisher(publisher);
   };
 
-  const handleLanguageChange = (language: string | null) => {
-    setSelectedLanguage(language);
+  const handleSearchClick = () => {
+    onSearch({
+      search: searchKeyword,
+      country: selectedCountry,
+      region: selectedRegion,
+      publisher: selectedPublisher,
+    });
   };
 
-  const handleImpactFactorChange = (impactFactor: string | null) => {
-    setSelectedImpactFactor(impactFactor);
-  };
-
-  const handleHIndexChange = (hIndex: string | null) => {
-    setSelectedHIndex(hIndex);
-  };
-
-  const handleCiteScoreChange = (citeScore: string | null) => {
-    setSelectedCiteScore(citeScore);
-  };
-
-  const handleSJRChange = (sjr: string | null) => {
-    setSelectedSJR(sjr);
-  };
-
-  const handleOverallRankChange = (overallRank: string | null) => {
-    setSelectedOverallRank(overallRank);
-  };
-
-  const handleISSNChange = (issn: string | null) => {
-    setSelectedISSN(issn);
-  };
-
-  // Close dropdown if clicked outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (countryDropdownRef.current && !countryDropdownRef.current.contains(event.target as Node)) {
-        setIsCountryDropdownOpen(false);
-      }
-      if (publicationTypeDropdownRef.current && !publicationTypeDropdownRef.current.contains(event.target as Node)) {
-        setIsPublicationTypeDropdownOpen(false);
-      }
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearchClick();
     }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [countryDropdownRef, publicationTypeDropdownRef]);
+  };
 
   const handleClear = () => {
-    if (onClear) {
-      onClear();
-    }
-    setJournalKeyword('');
-    setCountrySearchQuery('');
-    setSelectedPublicationType(null);
-    setSelectedSubjectAreas([]);
-    setSelectedQuartile(null);
-    setSelectedISSN('');
-    setSelectedOpenAccessTypes([]);
-    setSelectedPublisher('');
-    setSelectedLanguage(null);
-    setSelectedImpactFactor('');
-    setSelectedHIndex('');
-    setSelectedCiteScore('');
-    setSelectedSJR('');
-    setSelectedOverallRank('');
+    setSearchKeyword('');
+    setSelectedCountry(null);
+    setSelectedRegion(null);
+    setSelectedPublisher(null);
+    onClear(); // Gọi prop onClear để reset URL ở component cha
   };
 
+  const toggleAdvancedOptionsVisibility = () => {
+    setAdvancedOptionsVisible(!isAdvancedOptionsVisible);
+  };
 
-return {
-    journalKeyword,
+  return {
+    searchKeyword,
     selectedCountry,
     countryDropdownRef,
-    filteredCountries,
     isCountryDropdownOpen,
-    selectedPublicationType,
-    publicationTypeDropdownRef,
-    isPublicationTypeDropdownOpen,
-    availablePublicationTypes,
+    filteredCountries,
     isAdvancedOptionsVisible,
-    selectedSubjectAreas,
-    selectedQuartile,
-    selectedISSN,
-    selectedOpenAccessTypes,
+    selectedRegion,
     selectedPublisher,
-    selectedLanguage,
-    selectedImpactFactor,
-    selectedHIndex,
-    selectedCiteScore,
-    selectedSJR,
-    selectedOverallRank,
     handleKeywordChange,
     handleCountryClick,
     handleCountrySearchChange,
     toggleCountryDropdown,
-    handlePublicationTypeClick,
-    togglePublicationTypeDropdown,
-    handleSubjectAreasChange,
-    handleQuartileChange,
-    handleISSNChange,
-    handleOpenAccessTypesChange,
+    handleRegionChange,
     handlePublisherChange,
-    handleLanguageChange,
-    handleImpactFactorChange,
-    handleHIndexChange,
-    handleCiteScoreChange,
-    handleSJRChange,
-    handleOverallRankChange,
     handleSearchClick,
     handleKeyPress,
     toggleAdvancedOptionsVisibility,
-    handleClear, // Return handleClear
+    handleClear,
   };
 };
 

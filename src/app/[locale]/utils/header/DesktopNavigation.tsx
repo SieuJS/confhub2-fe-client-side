@@ -36,7 +36,7 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
           }`}
         ></span>
       </Link>
-{/* 
+
       <Link
         lang={locale}
         href={`/journals`}
@@ -52,7 +52,7 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
         ></span>
       </Link>
 
-      <Link
+      {/* <Link
         lang={locale}
         href={`/visualization`}
         className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-button md:mx-4 ${isActive(`/${locale}/visualization`) ? 'text-button' : ''}`}
