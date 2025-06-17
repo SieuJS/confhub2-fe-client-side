@@ -7,7 +7,11 @@
   "Journals": "Tạp chí",
   "Journal Details": "Chi tiết Tạp chí",
   "Setting": "Cài đặt",
-  "Chatbot": "Chatbot",
+  "Chatbot": {
+    "Chatbot": "Chatbot",
+    "View_Details": "Xem chi tiết",
+    "Source_Disclaimer": "Đây là thông báo từ chối trách nhiệm về nguồn dữ liệu cho chatbot."
+  },
   "Add_Conference": "Thêm Hội nghị",
   "Light": "Sáng",
   "Dark": "Tối",
@@ -439,6 +443,8 @@
   "Conference_feedback_helps_us": "Đánh giá hội nghị giúp chúng tôi hiểu được điều mà người tham dự đánh giá cao nhất và xác định các lĩnh vực cần cải thiện trong các sự kiện tương lai...",
   "Rate_the_Conference": "Đánh giá Hội nghị",
   "feedback": {
+    "loading_summary": "Đang tải tóm tắt...",
+    "loading_feedbacks": "Đang tải tóm tắt...",
     "no_feedback_on_page": "Không có phản hồi trên trang này.",
     "no_feedback_yet": "Chưa có phản hồi nào.",
     "no_feedback_matching_filter": "{starCount, plural, =1 {Không tìm thấy phản hồi khớp với 1 sao.} other {Không tìm thấy phản hồi khớp với # sao.}}"
@@ -1613,5 +1619,10 @@
   "This_combination_is_available": "Tên và tên viết tắt này có thể sử dụng.",
   "Conference_with_this_Title_and_Acronym_already_exists": "Hội nghị với Tên và Tên viết tắt này đã tồn tại.",
   "Failed_to_check_conference_existence": "Không thể kiểm tra sự tồn tại của hội nghị. Vui lòng kiểm tra kết nối và thử lại.",
-  "An_error_occurred": "Đã có lỗi xảy ra trong quá trình kiểm tra."
+  "An_error_occurred": "Đã có lỗi xảy ra trong quá trình kiểm tra.",
+  "Close_navigation": "Đóng điều hướng",
+  "Open_navigation": "Mở điều hướng",
+  "Chat_Model_Selection_Label": "Mô hình Chat",
+  "Default_Missing_Fields_Placeholder": "Không có sẵn",
+  "Loading_topics": "Đang tải các chủ đề..."
 }

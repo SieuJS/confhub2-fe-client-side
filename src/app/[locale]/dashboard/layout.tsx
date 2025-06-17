@@ -1,8 +1,32 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '@/src/app/[locale]/utils/Header';
 import ClientDashboardSidebar from './ClientDasboardSidebar'; // Import sidebar của Client
+
+// Một custom hook đơn giản để theo dõi kích thước màn hình
+// Điều này giúp chúng ta đặt trạng thái mở/đóng mặc định cho sidebar một cách chính xác
+const useMediaQuery = (query: string) => {
+  const [matches, setMatches] = useState(false);
+
+  useEffect(() => {
+    // Đảm bảo code chỉ chạy ở phía client
+    if (typeof window !== 'undefined') {
+      const media = window.matchMedia(query);
+      if (media.matches !== matches) {
+        setMatches(media.matches);
+      }
+      const listener = () => {
+        setMatches(media.matches);
+      };
+      media.addEventListener('change', listener);
+      return () => media.removeEventListener('change', listener);
+    }
+  }, [matches, query]);
+
+  return matches;
+};
+
 
 export default function ClientDashboardLayout({
   children,
@@ -11,11 +35,21 @@ export default function ClientDashboardLayout({
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  // State và logic điều khiển sidebar được đặt ở đây, giống hệt Admin
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Mặc định mở
+  const SIDEBAR_WIDTH_PX = 256;
+  const HEADER_HEIGHT_PX = 72;
 
-  const SIDEBAR_WIDTH_PX = 256; // Chiều rộng sidebar client
-  const HEADER_HEIGHT_PX = 72;  // Chiều cao header
+  // Sử dụng hook để xác định có phải màn hình desktop hay không (>= 768px)
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+
+  // Mặc định sidebar mở trên desktop và đóng trên mobile
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  // Đồng bộ trạng thái isSidebarOpen với kích thước màn hình khi component được mount
+  // và khi kích thước màn hình thay đổi
+  useEffect(() => {
+    setIsSidebarOpen(isDesktop);
+  }, [isDesktop]);
+
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -23,19 +57,21 @@ export default function ClientDashboardLayout({
 
   return (
     <div className='relative min-h-screen bg-background'>
-      {/* 
-        Header sẽ nhận hàm toggleSidebar để có thể đóng/mở sidebar.
-        Bạn cần đảm bảo component Header của bạn có một nút (ví dụ: hamburger icon)
-        và gọi prop `toggleSidebar` khi được click.
-      */}
       <Header
         locale={locale}
-        toggleSidebar={toggleSidebar} // Truyền hàm toggle vào Header
-        isSidebarOpen={isSidebarOpen} // Truyền trạng thái để Header có thể thay đổi icon (nếu cần)
-        // Các props khác nếu Header cần
+        toggleSidebar={toggleSidebar}
+        isSidebarOpen={isSidebarOpen}
       />
 
-      {/* Sidebar của Client */}
+      {/* Lớp phủ (backdrop) chỉ hiển thị trên mobile khi sidebar mở */}
+      {isSidebarOpen && !isDesktop && (
+        <div
+          onClick={toggleSidebar}
+          className="fixed inset-0 bg-black/50 z-20 md:hidden"
+          aria-hidden="true"
+        />
+      )}
+
       <ClientDashboardSidebar
         isSidebarOpen={isSidebarOpen}
         locale={locale}
@@ -43,13 +79,15 @@ export default function ClientDashboardLayout({
         headerHeight={HEADER_HEIGHT_PX}
       />
 
-      {/* Main Content (chính là page.tsx sẽ được render ở đây) */}
+      {/* Main Content (Nội dung chính) */}
       <main
         className="transition-all duration-300 ease-in-out"
         style={{
           paddingTop: `${HEADER_HEIGHT_PX}px`,
-          // Dùng padding-left để đẩy nội dung sang phải khi sidebar mở
-          paddingLeft: isSidebarOpen ? `${SIDEBAR_WIDTH_PX}px` : '0px',
+          // SỬ DỤNG TAILWIND CLASS ĐỂ THAY THẾ CHO INLINE STYLE
+          // Chỉ áp dụng padding-left trên màn hình md trở lên khi sidebar mở
+          // Sử dụng giá trị tùy ý của Tailwind: md:pl-[256px]
+          paddingLeft: isSidebarOpen && isDesktop ? `${SIDEBAR_WIDTH_PX}px` : '0px',
         }}
       >
         <div className="p-4 md:p-6">

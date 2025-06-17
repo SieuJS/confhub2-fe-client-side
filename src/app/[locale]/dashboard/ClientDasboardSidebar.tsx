@@ -106,7 +106,7 @@ export default function ClientDashboardSidebar({
     >
       {/* Không cần phần Logo/Title ở đây nữa, Header đã xử lý */}
       
-      <nav className='w-full py-4'> {/* Thêm padding-top để tạo khoảng cách với Header */}
+      <nav className='w-full'> {/* Thêm padding-top để tạo khoảng cách với Header */}
         <ul className='w-full'>
           {menuItems.map(item => {
             // Logic active giờ dựa vào `activeTab` đọc từ URL

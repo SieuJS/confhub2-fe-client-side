@@ -7,7 +7,11 @@
   "Journals": "Journals",
   "Journal Details": "Journal Details",
   "Setting": "Setting",
-  "Chatbot": "Chatbot",
+  "Chatbot": {
+    "Chatbot": "Chatbot",
+    "View_Details": "View Details",
+    "Source_Disclaimer": "This is a source disclaimer for the chatbot."
+  },
   "Add_Conference": "Add Conference",
   "Light": "Light",
   "Dark": "Dark",
@@ -439,7 +443,9 @@
   "Conference_feedback_helps_us": "Conference feedback helps us understand what attendees valued most and identify areas for improvement in future events...",
   "Rate_the_Conference": "Rate the Conference",
   "feedback": {
+    "loading_summary": "Loading feedback...",
     "no_feedback_on_page": "No feedback on this page.",
+    "loading_feedbacks": "Loading feedbacks...",
     "no_feedback_yet": "No feedback yet.",
     "no_feedback_matching_filter": "{starCount, plural, =1 {No feedback matching 1 star found.} other {No feedback matching # stars found.}}"
   },
@@ -1625,5 +1631,10 @@
   "This_combination_is_available": "This title and acronym combination is available.",
   "Conference_with_this_Title_and_Acronym_already_exists": "A conference with this title and acronym already exists.",
   "Failed_to_check_conference_existence": "Could not check for conference existence. Please check your connection and try again.",
-  "An_error_occurred": "An error occurred while checking."
+  "An_error_occurred": "An error occurred while checking.",
+  "Close_navigation": "Close navigation",
+  "Open_navigation": "Open navigation",
+  "Chat_Model_Selection_Label": "Chat Model",
+  "Default_Missing_Fields_Placeholder": "N/A",
+  "Loading_topics": "Loading topics..."
 }

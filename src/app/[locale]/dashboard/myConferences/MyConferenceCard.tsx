@@ -1,6 +1,6 @@
 // src/app/[locale]/dashoard/myconferences/MyConferenceCard.tsx
 import React from 'react'
-import { Calendar, MapPin, Hash } from 'lucide-react'
+import { Calendar, MapPin, Hash, Factory } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { ConferenceResponse } from '@/src/models/response/conference.response'
 import StatusBadge from './StatusBadge'
@@ -22,16 +22,29 @@ const MyConferenceCard: React.FC<MyConferenceCardProps> = ({
   const language = t('language')
   const organization = conference.organizations?.[0]
   const location = organization?.locations?.[0]
+  const accessType = organization?.accessType
   const conferenceDate = organization?.conferenceDates?.find(
     d => d.type === 'conferenceDates'
   )
 
-  const locationString = location
-    ? `${location.cityStateProvince || ''}, ${location.country || ''}`.replace(
-        /^, |^ |,$| $/,
-        ''
-      )
-    : t('MyConferences.Location_Not_Available')
+  // --- START: Chỉnh sửa logic cho locationString ---
+  let locationString = t('MyConferences.Location_Not_Available'); // Giá trị mặc định
+
+  if (location) {
+    const parts = [];
+    if (location.cityStateProvince) {
+      parts.push(location.cityStateProvince);
+    }
+    if (location.country) {
+      parts.push(location.country);
+    }
+
+    if (parts.length > 0) {
+      locationString = parts.join(', ');
+    }
+  }
+  // --- END: Chỉnh sửa logic cho locationString ---
+
 
   return (
     <div className='flex flex-col overflow-hidden rounded-xl bg-white-pure shadow-md transition-shadow duration-300 hover:shadow-xl'>
@@ -71,10 +84,15 @@ const MyConferenceCard: React.FC<MyConferenceCardProps> = ({
                 : t('MyConferences.Date_Not_Available')}
             </span>
           </div>
+           <div className='flex items-center gap-2'>
+            <Factory className='h-4 w-4 flex-shrink-0 text-gray-40' />
+            <span>{accessType}</span>
+          </div>
           <div className='flex items-center gap-2'>
             <MapPin className='h-4 w-4 flex-shrink-0 text-gray-40' />
             <span>{locationString}</span>
           </div>
+
         </div>
       </div>
       {/* Footer: Các nút hành động */}

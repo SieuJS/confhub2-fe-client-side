@@ -14,10 +14,19 @@ import {
   fetchCalendarConferences,
   toggleCalendarConference
 } from '@/src/app/apis/user/calendarApi' // Helper API mới
+import { Loader2 } from 'lucide-react' // Import Loader2
 
 interface ResultsSectionProps {
   userBlacklist: string[]
 }
+
+// TÁCH COMPONENT LOADING RA ĐỂ TÁI SỬ DỤNG (Tương tự FollowedTab)
+const LoadingSpinner = ({ message }: { message: string }) => (
+  <div className='flex h-96 flex-col items-center justify-center text-gray-500'>
+    <Loader2 className='h-10 w-10 animate-spin text-indigo-600' />
+    <p className='mt-4 text-lg'>{message}</p>
+  </div>
+)
 
 const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
   const t = useTranslations('')
@@ -116,7 +125,12 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
   const loading = conferencesLoading || (isLoggedIn && statusLoading)
 
   if (loading) {
-    return <div>{t('Loading_conferences')}</div>
+    // Sử dụng LoadingSpinner thay vì div đơn giản
+    return (
+      <div className='w-full rounded-lg bg-white-pure p-4 shadow'>
+        <LoadingSpinner message={t('Loading_conferences')} />
+      </div>
+    )
   }
 
   if (error) {

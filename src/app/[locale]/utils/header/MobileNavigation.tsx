@@ -74,7 +74,7 @@ const MobileNavigation: FC<Props> = ({
           locale={locale}
           className='px-4 py-2 hover:bg-gray-10 dark:hover:bg-gray-70'
         >
-          {t('Chatbot')}
+          {t('Chatbot.Chatbot')}
           <span className='mb-1 ml-1 inline-block rounded bg-button px-1.5 py-0.5 align-middle text-xs font-semibold text-button-text'>
             {t('NEW')}
           </span>
