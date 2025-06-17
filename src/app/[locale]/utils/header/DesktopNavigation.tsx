@@ -36,7 +36,7 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
           }`}
         ></span>
       </Link>
-
+{/* 
       <Link
         lang={locale}
         href={`/journals`}
@@ -65,7 +65,7 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
               : 'scale-x-0 group-hover:scale-x-100'
           }`}
         ></span>
-      </Link>
+      </Link> */}
 
       <Link
         lang={locale}
