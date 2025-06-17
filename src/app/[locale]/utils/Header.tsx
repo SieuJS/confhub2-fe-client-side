@@ -10,12 +10,13 @@ import UserDropdown from './header/UserDropdown';
 import MobileNavigation from './header/MobileNavigation';
 import AuthButtons from './header/AuthButtons';
 import DesktopNavigation from './header/DesktopNavigation';
-import LoadingIndicator from './header/LoadingIndicator';
+import LoadingIndicator from './header/LoadingIndicator'; // Đảm bảo import đúng đường dẫn
 import { MenuIcon, CloseIcon } from './header/Icon';
 import Button from './Button';
 import { useAuth } from '@/src/contexts/AuthContext';
 import LogoIcon from '../../icons/logo';
 import { FaBars, FaTimes } from 'react-icons/fa'; // Sử dụng react-icons cho nút toggle
+import { Loader2 } from 'lucide-react'; // Import Loader2
 
 // --- BỔ SUNG PROPS MỚI ---
 interface HeaderProps {
@@ -98,7 +99,11 @@ export const Header: FC<HeaderProps> = ({
           </Link>
         </div>
         <div className='relative flex flex-row items-center gap-2 md:gap-4'>
-          <LoadingIndicator />
+          {/* Sử dụng Loader2 trực tiếp hoặc qua LoadingIndicator nếu bạn muốn thêm text */}
+          <Loader2 className='h-6 w-6 animate-spin text-indigo-600' />
+          {/* Nếu bạn muốn dùng LoadingIndicator với text, bạn có thể tạo nó như sau:
+          <LoadingIndicator message="Loading..." />
+          */}
         </div>
       </div>
     );
