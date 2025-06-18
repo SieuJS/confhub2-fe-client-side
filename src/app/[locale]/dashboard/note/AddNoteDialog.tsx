@@ -15,7 +15,8 @@ import {
   Info,
   Loader2,
   ExternalLink, // Icon cho link ra ngoài
-  ArrowRight, // Icon cho link nội bộ
+  ArrowRight,
+  Factory, // Icon cho link nội bộ
 } from 'lucide-react'
 
 interface AddNoteDialogProps {
@@ -124,7 +125,7 @@ const AddNoteDialog: React.FC<AddNoteDialogProps> = ({
   // --- END: Tạm thời comment out logic Add/Edit Note ---
   */
 
-   const renderEventDetailView = () => {
+  const renderEventDetailView = () => {
     if (loadingDetails) {
       return (
         <div className='flex h-48 items-center justify-center'>
@@ -143,6 +144,7 @@ const AddNoteDialog: React.FC<AddNoteDialogProps> = ({
 
     const orgDetails = eventDetails.organizations?.[0]
     const location = orgDetails?.locations?.[0]
+    const accessType = orgDetails?.accessType
 
     return (
       <div className='space-y-4'>
@@ -159,6 +161,17 @@ const AddNoteDialog: React.FC<AddNoteDialogProps> = ({
           </div>
         )}
 
+
+        {/* accessType */}
+        {accessType && (
+          <div className='flex items-center text-sm text-text-secondary'>
+            <Factory className='mr-3 h-4 w-4 flex-shrink-0' />
+            <span>
+              {accessType}
+            </span>
+          </div>
+        )}
+
         {/* Location */}
         {location && (
           <div className='flex items-center text-sm text-text-secondary'>
@@ -168,6 +181,7 @@ const AddNoteDialog: React.FC<AddNoteDialogProps> = ({
             </span>
           </div>
         )}
+
 
         {/* Important Dates */}
         {orgDetails?.conferenceDates && orgDetails.conferenceDates.length > 0 && (

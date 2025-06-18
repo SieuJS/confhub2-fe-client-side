@@ -1552,6 +1552,7 @@
   "Go_To_My_Conferences": "Đến hội nghị của tôi",
   "Remove_date": "Xóa ngày",
   "MyConferences": {
+    "Loading_your_followed_items": "Đang tải danh sách theo dõi của bạn...",
     "Loading_your_profile": "Đang tải thông tin của bạn...",
     "Loading_your_calendar": "Đang tải lịch của bạn...",
     "Loading_your_conferences": "Đang tải các hội nghị của bạn...",

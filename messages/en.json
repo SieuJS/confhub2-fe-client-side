@@ -1564,6 +1564,7 @@
   "Modal_Title_Reason": "Reason from Administrator",
   "Modal_Title_Review": "Review Submitted Information",
   "MyConferences": {
+    "Loading_your_followed_items":"Loading your followed items...",
     "Loading_your_profile": "Loading your profile...",
     "Loading_your_calendar": "Loading your calendar...",
     "Loading_your_conferences": "Loading your conferences...",
