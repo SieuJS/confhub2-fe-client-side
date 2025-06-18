@@ -166,7 +166,7 @@
   "Logout": "Logout",
   "Dashboard": "Dashboard",
   "Company": "Company",
-  "Copyrights": "Copyrights © 2025. All Rights Reserved.",
+  "Copyrights": "Copyright © {year}. All Rights Reserved.",
   "Terms_of_Service": "By continuing past this page, you agree to our Terms of Service, Cookie Policy, Privacy Policy and Content Policies. All trademarks are properties of their respective owners",
   "Australia": "Australia",
   "Germany": "Germany",
@@ -486,7 +486,7 @@
   "TBD": "To Be Determined",
   "Call_for_papers": "Call for papers",
   "No_summerize_available": "No summerize available.",
-  "No_Important_Dates_Available": "No Important Dates Available",
+  "No_Important_Dates_Available": "No Important Dates Available.",
   "From_Date": "From Date",
   "To_Date": "To Date",
   "No_call_for_papers_available": "No call for papers available.",
@@ -668,10 +668,17 @@
   "Select_Date_Range": "Select Date Range",
   "FeatureComparisonTable": {
     "title": "Feature Comparison: Guest vs. Logged-in Users",
+    "subtitle": "Find out all the powerful features available to you. Log in to unlock the full potential of our platform.",
     "headers": {
-      "feature": "Feature",
-      "guest": "Guest User",
-      "loggedIn": "Logged-in User"
+      "mainTitleStrong": "Compare",
+      "mainTitleNormal": "our accounts",
+      "mainSubtitle": "Find the best solution for your needs",
+      "guest": "Guest",
+      "guestDescription": "Always free",
+      "loggedIn": "Logged-in User",
+      "loggedInDescription": "Unlock all features",
+      "registerNow": "Register now",
+      "feature": "Feature"
     },
     "availability": {
       "available": "Available",
@@ -679,7 +686,7 @@
     },
     "categories": {
       "general": "General User Functions",
-      "loggedIn": "Logged-in User Functions"
+      "userAccountFeatures": "Logged In User Account Features"
     },
     "features": {
       "auth": {
@@ -706,8 +713,8 @@
         "description": [
           "Get instant answers about conferences and journals.",
           "Receive help navigating the platform.",
-          "Navigate quickly to relevant sections.",
-          "Interact via text, voice, video, or screen sharing."
+          "Navigate quickly to relevant page.",
+          "Interact via text, voice."
         ]
       },
       "follow": {
@@ -855,7 +862,7 @@
     "loading": "Loading journals...",
     "noResults": "No journals found matching your criteria. Try adjusting your filters.",
     "errorFetchingResults": "Error fetching journals: {error}",
-    "resultsCount": "{count, plural, one {# result} other {# results}}",
+    "resultsCount": "Journal Results ({count})",
     "sortByLabel": "Sort by",
     "sortByTitle": "Title",
     "sortByISSN": "ISSN"
@@ -863,6 +870,7 @@
   "Your_login_session_has_expired": "Your login session has expired.",
   "Redirecting_to_homepage_in_seconds": "Redirecting to homepage in {seconds} seconds...",
   "Session_Expired_Redirect_Home": "Session expired. Redirecting to home page...",
+  "Redirecting": "Redirecting...",
   "Please_log_in_to_view_profile": "Please log in to view profile.",
   "Chat_Mode_And_History": "Chat Mode & History",
   "Close_panel": "Close panel",
@@ -1003,7 +1011,6 @@
   "Loading_your_conferences": "Loading your conferences...",
   "By_Users": "By Users",
   "Save_Changes": "Save Changes",
-  "Location_Not_Available": "Location Not Available",
   "Add_Conference_Info": "Add Conference Information",
   "Change": "Change",
   "Loading_authentication": "Loading authentication...",
@@ -1434,7 +1441,7 @@
   "FloatingChatbot_RetryContextButton": "Retry",
   "FloatingChat_Personalize_Title": "Enable Personalization",
   "FloatingChat_Personalize_Description": "Allow the chatbot to remember your preferences and provide more personalized responses.",
-  "Location_not_available": "Location not available",
+  "Location_not_available": "No location available.",
   "Conference_Date_Start_Validation": "Conference start date must be at least 7 days from today.",
   "Conference_date_must_be_7_days_from_now": "The conference must start at least 7 days from today.",
   "Important_dates_must_end_before_conference_start": "{dateName} must end before the Conference Date begins.",
@@ -1564,7 +1571,7 @@
   "Modal_Title_Reason": "Reason from Administrator",
   "Modal_Title_Review": "Review Submitted Information",
   "MyConferences": {
-    "Loading_your_followed_items":"Loading your followed items...",
+    "Loading_your_followed_items": "Loading your followed items...",
     "Loading_your_profile": "Loading your profile...",
     "Loading_your_calendar": "Loading your calendar...",
     "Loading_your_conferences": "Loading your conferences...",
@@ -1743,5 +1750,14 @@
   "Search_followed_journals": "Search by title or ISSN...",
   "You_are_not_following_any_journals_yet": "You are not following any journals yet.",
   "No_journals_match_your_search": "No journals match your search.",
-  "Loading_your_followed_items": "Loading your followed items..."
+  "Loading_your_followed_items": "Loading your followed items...",
+  "Footer_Description": "Your professional platform for discovering and sharing academic conferences and journals worldwide.",
+  "Newsletter_Title": "Stay Updated",
+  "Newsletter_Subtitle": "Subscribe to our newsletter to get the latest conference updates directly to your inbox.",
+  "Enter_your_email": "Enter your email",
+  "Business": "Business",
+  "Banking_and_Economics": "Banking and Economics",
+  "Engineering": "Engineering",
+  "Education": "Education",
+  "Health": "Health"
 }

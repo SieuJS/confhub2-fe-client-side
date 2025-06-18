@@ -148,7 +148,7 @@ const ConferenceHeader: React.FC<ConferenceHeaderProps> = ({
 
         {/* === BƯỚC 5: CẬP NHẬT SVG ĐỊA ĐIỂM VÀ PUBLISHER === */}
         <div className='mb-2 flex flex-wrap gap-x-4 gap-y-1'>
-          {lastOrganization?.locations?.[0] ? (
+          {lastOrganization?.locations?.[0].address ? (
             <a
               href='#map'
               className='flex items-center text-sm text-blue-600 hover:underline'
@@ -158,10 +158,16 @@ const ConferenceHeader: React.FC<ConferenceHeaderProps> = ({
               {lastOrganization.locations[0]?.address ||
                 lastOrganization.locations[0]?.cityStateProvince ||
                 lastOrganization.locations[0]?.country ||
-                t('Location_Available')}
+                t('No_location_available')}
             </a>
           ) : (
-            <span className='text-sm'>{t('No_location_available')}</span>
+
+            <span className='flex items-center text-sm'>
+              <MapPin className='mr-1 h-4 w-4 flex-shrink-0' />
+
+              {t('No_location_available')}
+
+            </span>
           )}
           {lastOrganization?.publisher ? (
             <Link
@@ -176,6 +182,7 @@ const ConferenceHeader: React.FC<ConferenceHeaderProps> = ({
             </Link>
           ) : (
             <span className='flex items-center text-sm'>
+              <BookType className='mr-1 h-4 w-4 flex-shrink-0' />
               {t('No_publisher_available')}
             </span>
           )}

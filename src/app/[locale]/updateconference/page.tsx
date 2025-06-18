@@ -71,7 +71,7 @@ const UpdateConferenceContent = ({
     // Nếu chưa đăng nhập, sẽ được redirect bởi useEffect. Hiển thị loading tạm thời.
     return (
         <div className="flex h-screen items-center justify-center">
-            <div>Redirecting...</div>
+            <div>{t('Redirecting')}</div>
         </div>
     );
   }

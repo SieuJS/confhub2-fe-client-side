@@ -70,7 +70,7 @@ const rubik = localFont({
 })
 
 export const metadata: Metadata = {
-  title: 'Global Conference Hub',
+  title: 'Global Conference & Journal Hub',
   description:
     'ConFHub is a comprehensive platform for managing and discovering academic conferences and journals.',
   keywords:

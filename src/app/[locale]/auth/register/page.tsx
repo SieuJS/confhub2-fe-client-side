@@ -5,6 +5,7 @@ import RegisterForm from './RegisterForm';
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // Use standard Next.js router
 import { useAuth } from '@/src/contexts/AuthContext'; // <<<< THAY ĐỔI QUAN TRỌNG
+import { useTranslations } from 'next-intl';
 
 export default function RegisterPage({
   params: { locale }
@@ -14,7 +15,7 @@ export default function RegisterPage({
   // <<<< THAY ĐỔI QUAN TRỌNG: Sử dụng useAuth từ Context
   const { isLoggedIn, isInitializing } = useAuth();
   const router = useRouter();
-
+  const t = useTranslations();
   useEffect(() => {
     // Chỉ chuyển hướng nếu quá trình khởi tạo auth đã hoàn tất VÀ người dùng đã đăng nhập
     if (!isInitializing && isLoggedIn) {
@@ -36,7 +37,7 @@ export default function RegisterPage({
   if (isLoggedIn && !isInitializing) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div>Redirecting...</div>
+        <div>{t('Redirecting')}</div>
       </div>
     );
   }

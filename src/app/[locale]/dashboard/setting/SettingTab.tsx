@@ -31,10 +31,10 @@ import SearchInput from '../../utils/SearchInput' // <-- Đảm bảo đường 
 type ToggleSettingKey = keyof Pick<
   Setting,
   | 'receiveNotifications'
-  | 'autoAddFollowToCalendar'
+  // | 'autoAddFollowToCalendar'
   | 'notificationWhenConferencesChanges'
   | 'upComingEvent'
-  | 'notificationWhenUpdateProfile'
+  // | 'notificationWhenUpdateProfile'
   | 'notificationWhenFollow'
   | 'notificationWhenAddTocalendar'
   | 'notificationWhenAddToBlacklist'
@@ -196,13 +196,13 @@ const SettingTab: React.FC = () => {
         icon: Bell,
         section: 'general'
       },
-      {
-        key: 'autoAddFollowToCalendar',
-        label: t('Auto_add_events_to_schedule'),
-        description: t('Auto_add_events_to_schedule_describe'),
-        icon: CalendarCheck,
-        section: 'general'
-      },
+      // {
+      //   key: 'autoAddFollowToCalendar',
+      //   label: t('Auto_add_events_to_schedule'),
+      //   description: t('Auto_add_events_to_schedule_describe'),
+      //   icon: CalendarCheck,
+      //   section: 'general'
+      // },
       {
         key: 'notificationThroughEmail',
         label: t('Send_notification_through_email'),
@@ -225,13 +225,13 @@ const SettingTab: React.FC = () => {
         icon: CalendarPlus,
         section: 'notifications'
       },
-      {
-        key: 'notificationWhenUpdateProfile',
-        label: t('Notification_when_update_profile'),
-        description: t('Notification_when_update_profile_description'),
-        icon: UserCheck,
-        section: 'notifications'
-      },
+      // {
+      //   key: 'notificationWhenUpdateProfile',
+      //   label: t('Notification_when_update_profile'),
+      //   description: t('Notification_when_update_profile_description'),
+      //   icon: UserCheck,
+      //   section: 'notifications'
+      // },
       {
         key: 'notificationWhenFollow',
         label: t('Notification_when_follow'),

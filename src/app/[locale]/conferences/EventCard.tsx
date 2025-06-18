@@ -6,6 +6,15 @@ import { Link, useRouter } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
 import { useAuth } from '@/src/contexts/AuthContext'
 
+// Import các Lucide icons cần thiết
+import {
+  MapPin,
+  CalendarDays,
+  SquareArrowOutUpRight,
+  CalendarPlus,
+  Star // Star icon cho Favorite/Follow
+} from 'lucide-react'; // Đảm bảo bạn đã cài đặt lucide-react
+
 interface EventCardProps {
   event: ConferenceInfo
   className?: string
@@ -159,7 +168,7 @@ const EventCard: React.FC<EventCardProps> = ({
   const locationString =
     [event.location?.address]
       .filter(Boolean)
-      .join(', ') || t('Location_Not_Available');
+      .join(', ') || t('Location_not_available');
 
   const getRankColor = useCallback((rank?: string) => {
     rank = rank?.toUpperCase();
@@ -182,22 +191,22 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   }, []);
 
-
-  const blacklistedStyles = isBlacklisted
-    ? 'opacity-50 grayscale pointer-events-none cursor-default'
-    : ''
-  // ... JSX render sử dụng isFollowing, isAddToCalendar, followLoading, calendarLoading ...
   return (
     <div
-      className={`flex flex-col overflow-hidden rounded-lg bg-white-pure shadow-lg transition duration-300 ease-in-out ${isBlacklisted ? '' : 'hover:shadow-xl'} ${className || ''} ${blacklistedStyles}`}
+      className={`flex flex-col overflow-hidden rounded-lg bg-white-pure shadow-lg transition duration-300 ease-in-out ${isBlacklisted ? '' : 'hover:shadow-xl'} ${className || ''}`}
       style={{ position: 'relative', ...style }}
     >
-      {/* ... Phần Image và thông tin trên Image ... */}
-        {isBlacklisted && (
-            <div className='pointer-events-auto absolute left-2 top-2 z-10 rounded bg-red-600 px-2 py-1 text-xs font-semibold text-white'>
+      {/* Lớp phủ mờ và chữ Blacklisted */}
+      {isBlacklisted && (
+        <>
+          {/* Lớp phủ mờ */}
+          <div className='absolute inset-0 z-10 bg-gray-200 opacity-70 grayscale pointer-events-none'></div>
+          {/* Chữ Blacklisted */}
+          <div className='absolute left-2 top-2 z-20 rounded bg-red-600 px-2 py-1 text-xs font-semibold text-white'>
             {t('Blacklisted')}
-            </div>
-        )}
+          </div>
+        </>
+      )}
 
         <div className='relative'>
             <Image
@@ -206,7 +215,7 @@ const EventCard: React.FC<EventCardProps> = ({
             width={400}
             height={225}
             style={{ objectFit: 'cover', width: '100%', height: '180px' }}
-            className={`w-full ${isBlacklisted ? '' : 'hover:opacity-90'}`}
+            className={`w-full ${isBlacklisted ? 'grayscale' : 'hover:opacity-90'}`} 
             priority
             onError={e => {
                 (e.target as HTMLImageElement).src = '/bg-2.jpg';
@@ -229,7 +238,7 @@ const EventCard: React.FC<EventCardProps> = ({
             </div>
         </div>
 
-        <div className='flex flex-grow flex-col px-4 py-4'>
+        <div className={`flex flex-grow flex-col px-4 py-4 ${isBlacklisted ? 'pointer-events-none' : ''}`}> {/* Thêm pointer-events-none vào đây để vô hiệu hóa tương tác */}
             <div className='mb-2'>
             {isBlacklisted ? (
                 <h3 className='text-left text-base font-bold opacity-50'>
@@ -250,38 +259,38 @@ const EventCard: React.FC<EventCardProps> = ({
             )}
             </div>
             <div className='mb-3 flex items-center text-xs text-gray-600 transition duration-300 dark:text-gray-400'>
-            <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round' className='lucide lucide-map-pin mr-1.5 flex-shrink-0 text-red-600'>
-                <path d='M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0' /><circle cx='12' cy='10' r='3' />
-            </svg>
+            {/* Sử dụng Lucide MapPin */}
+            <MapPin className='mr-1.5 flex-shrink-0 text-red-600' size={16} strokeWidth={1.5} />
             <span className='line-clamp-1 text-left'>{locationString}</span>
             </div>
             <div className='mb-3 flex items-center text-xs text-gray-600 transition duration-300 dark:text-gray-400'>
-            <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round' className='lucide lucide-calendar-days mr-1.5 flex-shrink-0 text-red-600'>
-                <path d='M8 2v4' /><path d='M16 2v4' /><rect width='18' height='18' x='3' y='4' rx='2' /><path d='M3 10h18' /><path d='M8 14h.01' /><path d='M12 14h.01' /><path d='M16 14h.01' /><path d='M8 18h.01' /><path d='M12 18h.01' /><path d='M16 18h.01' />
-            </svg>
+            {/* Sử dụng Lucide CalendarDays */}
+            <CalendarDays className='mr-1.5 flex-shrink-0 text-red-600' size={16} strokeWidth={1.5} />
             <span className='text-left'>
                 {formatDateRange(event.dates?.fromDate, event.dates?.toDate)}
             </span>
             </div>
             <div className='mb-4'>
-            <div className='flex flex-wrap gap-1.5'>
+            {/* --- SỬA ĐỔI TẠI ĐÂY --- */}
+            <div className='flex flex-wrap items-center gap-1.5'>
                 {event.topics && event.topics.length > 0 ? (
                 <>
                     {event.topics.slice(0, 3).map(topic =>
                     isBlacklisted ? (
-                        <span key={topic} className='inline-block max-w-full cursor-default overflow-hidden text-ellipsis whitespace-nowrap rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 opacity-50 dark:bg-gray-700 dark:text-gray-300' title={topic}>
+                        <span key={topic} className='inline-flex items-center justify-center max-w-full cursor-default rounded-full bg-gray-100 px-2.5 py-1.5 text-center text-xs font-medium text-gray-700 opacity-50 dark:bg-gray-700 dark:text-gray-300 break-words leading-normal' title={topic}>
                         {topic}
                         </span>
                     ) : (
                         <Link key={topic} href={{ pathname: `/conferences`, query: { topics: topic } }}>
-                        <span className='inline-block max-w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 transition duration-200 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600' title={topic}>
+                        <span className='inline-flex items-center justify-center max-w-full cursor-pointer rounded-full bg-gray-100 px-2.5 py-1 text-center text-xs font-medium text-gray-700 transition duration-200 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 break-words leading-normal' title={topic}>
                             {topic}
                         </span>
                         </Link>
                     )
                     )}
                     {event.topics.length > 3 && (
-                    <span key='more-topics' className='inline-block max-w-full cursor-default overflow-hidden text-ellipsis whitespace-nowrap rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300' title={`${event.topics.length - 3} more topics`}>
+                    /* --- BỎ mt-2 TẠY ĐÂY --- */
+                    <span key='more-topics' className='inline-flex items-center justify-center max-w-full cursor-default rounded-full bg-gray-300 px-2.5 py-1 mt-1 text-xs font-medium text-gray-900 dark:bg-gray-700 dark:text-gray-300' title={`${event.topics.length - 3} more topics`}>
                         +{event.topics.length - 3} {t('more')}
                     </span>
                     )}
@@ -301,9 +310,8 @@ const EventCard: React.FC<EventCardProps> = ({
                             disabled={isBlacklisted || !event.link}
                             title={t('Go_to_Website')}
                         >
-                            <svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round' className='lucide lucide-square-arrow-out-up-right'>
-                            <path d='M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6' /><path d='m21 3-9 9' /><path d='M15 3h6v6' />
-                            </svg>
+                            {/* Sử dụng Lucide SquareArrowOutUpRight */}
+                            <SquareArrowOutUpRight size={18} strokeWidth={1.75} />
                         </button>
                     </div>
 
@@ -318,9 +326,7 @@ const EventCard: React.FC<EventCardProps> = ({
                             {calendarLoading ? (
                             <div className={`h-4 w-4 animate-spin rounded-full border-2 ${isAddToCalendar ? 'border-blue-500 border-t-blue-100' : 'border-gray-400 border-t-transparent'}`}></div>
                             ) : (
-                            <svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round' className='lucide lucide-calendar-plus'>
-                                <path d='M8 2v4' /><path d='M16 2v4' /><path d='M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8' /><path d='M3 10h18' /><path d='M16 19h6' /><path d='M19 16v6' />
-                            </svg>
+                            <CalendarPlus size={18} strokeWidth={1.75} />
                             )}
                         </button>
                     </div>
@@ -336,9 +342,7 @@ const EventCard: React.FC<EventCardProps> = ({
                             {followLoading ? (
                             <div className={`h-4 w-4 animate-spin rounded-full border-2 ${isFollowing ? 'border-yellow-500 border-t-yellow-100' : 'border-gray-400 border-t-transparent'}`}></div>
                             ) : (
-                            <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill={isFollowing ? 'currentColor' : 'none'} stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'>
-                                <path d='M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.122 2.122 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z' />
-                            </svg>
+                            <Star size={20} strokeWidth={1.5} fill={isFollowing ? 'currentColor' : 'none'} />
                             )}
                         </button>
                     </div>
@@ -346,7 +350,7 @@ const EventCard: React.FC<EventCardProps> = ({
             </div>
         </div>
     </div>
-    )
+  )
 }
 
 export default EventCard

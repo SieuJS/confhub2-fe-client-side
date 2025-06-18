@@ -1,13 +1,10 @@
-// src/app/[locale]/auth/register/RegisterForm.tsx
 'use client'
 
 import { Link, useRouter } from '@/src/navigation'
 import React, { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useSearchParams } from 'next/navigation' // <<< THAY ĐỔI: Import useSearchParams
 import { appConfig } from '@/src/middleware'
-// import { login } from '@/src/hooks/auth/useAuthApi' // DO NOT IMPORT THIS UTILITY ANYMORE
-// No direct import of useAuthApi here unless you want to immediately log in,
-// which is generally not done if email verification is pending.
 
 interface RegisterFormProps {
   // No props needed
@@ -15,19 +12,24 @@ interface RegisterFormProps {
 
 const RegisterForm: React.FC<RegisterFormProps> = () => {
   const t = useTranslations('')
-  const router = useRouter() // next-intl router
+  const router = useRouter()
+  const searchParams = useSearchParams() // <<< THAY ĐỔI: Khởi tạo hook
+
+  // <<< THAY ĐỔI: Lấy email từ query param và khởi tạo state
+  const initialEmail = searchParams.get('email') || ''
 
   const [firstname, setFirstName] = useState('')
   const [lastname, setLastName] = useState('')
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState(initialEmail) // <<< THAY ĐỔI: Sử dụng initialEmail
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [dob, setDob] = useState('')
-  const [error, setError] = useState('') // Local form error
-  const [isLoading, setIsLoading] = useState(false) // Local loading state for submission
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
+  // ... (toàn bộ phần còn lại của component giữ nguyên không đổi)
   const isOldEnough = (dateString: string): boolean => {
     if (!dateString) return false;
     try {
@@ -43,7 +45,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
-    setError('') // Clear previous local errors
+    setError('')
 
     // --- Validation ---
     if (!firstname || !lastname || !email || !password || !confirmPassword || !dob) {
@@ -95,25 +97,14 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
 
       const data = await response.json();
 
-      if (response.status === 201) { // Successfully created, awaiting verification
+      if (response.status === 201) {
         console.log('Registration pending verification:', data.message);
         localStorage.setItem('token', data.token);
-
-        // Redirect to a page informing the user to check their email.
-        // Pass email as query param if the verification page needs it to display a message.
         router.push({
-          pathname: '/auth/verify-email', // Ensure this route exists and is handled correctly
+          pathname: '/auth/verify-email',
           query: { email: email, message: data.message || 'Please check your email to verify your account.' }
         });
-        // DO NOT LOG THE USER IN HERE. They need to verify first.
-        // The old `login(data)` was incorrect for this flow.
       } else if (response.ok && data.user && data.token) {
-        // Scenario: Backend registers AND logs in the user immediately (e.g., no email verification)
-        // In this case, you would use useAuthApi to process the login.
-        // This requires `useAuthApi` to be imported and used.
-        // For now, assuming verification is the primary flow for 201.
-        // If you need immediate login after signup, you'd call something like:
-        // authApi.processTokenFromOAuth(data.token); // or a dedicated processSignupResponse
         console.warn("Signup returned OK with user data, but not 201. This flow needs clarification.");
         setError(data.message || t('Error_Registration_Unexpected_Response'));
       } else {
@@ -163,9 +154,11 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
               <div>
                 <label htmlFor='email' className='block text-sm font-medium '>{t('Email')} <span className='text-red-500'>*</span></label>
                 <div className='mt-1'>
+                  {/* Input email đã được cập nhật value */}
                   <input id='email' name='email' type='email' autoComplete='email' required value={email} onChange={e => setEmail(e.target.value)} className='block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm' placeholder='you@example.com' disabled={isLoading}/>
                 </div>
               </div>
+              {/* ... phần còn lại của form giữ nguyên */}
               <div>
                 <label htmlFor='password' className='block text-sm font-medium '>{t('Password')} <span className='text-red-500'>*</span></label>
                 <div className='mt-1'>
@@ -238,10 +231,10 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
             <div className='text-center text-sm'>
               <div className='flex items-center justify-center space-x-1'>
                 <span className=''>{t('Already_have_an_account')}</span>
-                <Link href='/auth/login' className='hover:text-button/80 font-medium text-button'>{t('Sign_In')}</Link>
+                <Link href='/auth/login' className='font-medium text-button hover:text-button/80'>{t('Sign_In')}</Link>
               </div>
-              <div className='flex items-center justify-center space-x-1 mt-2'>
-                <Link href='/' className='hover:text-button/80 font-medium text-button'>{t('Back_to_Home')}</Link>
+              <div className='mt-2 flex items-center justify-center space-x-1'>
+                <Link href='/' className='font-medium text-button hover:text-button/80'>{t('Back_to_Home')}</Link>
               </div>
             </div>
           </div>

@@ -1,282 +1,230 @@
 'use client'
 
-import React from 'react'
+import React, { ComponentType, FC, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
-import { Link, usePathname } from '@/src/navigation' // Corrected import
 
+import { Link, usePathname, AppPathname, useRouter } from '@/src/navigation'
+import {
+  BookOpenIcon,
+  GlobeAltIcon,
+  LinkIcon,
+  ArrowRightIcon
+} from '@heroicons/react/24/outline'
+import { useAuth } from '@/src/contexts/AuthContext'
+
+// --- A. ĐỊNH NGHĨA CÁC KIỂU DỮ LIỆU (TYPES) ---
+type Translator = (key: string, values?: Record<string, any>) => string;
+type FooterLink = {
+  label: string;
+  href: AppPathname | { pathname: AppPathname; query: Record<string, string | number> };
+};
+type FooterLinkColumnProps = {
+  title: string;
+  links: FooterLink[];
+  icon: ComponentType<{ className?: string }>;
+};
+type IconProps = {
+  className?: string;
+};
+
+
+// --- B. TẠO CÁC COMPONENT TÁI SỬ DỤNG VÀ DỮ LIỆU ---
+const FooterLinkColumn: FC<FooterLinkColumnProps> = ({ title, links, icon: Icon }) => (
+  <div>
+    <h4 className='mb-4 flex items-center text-sm font-semibold uppercase tracking-wider text-gray-900'>
+      <Icon className='mr-2 h-5 w-5 text-indigo-400' />
+      {title}
+    </h4>
+    <ul className='space-y-3'>
+      {links.map((link) => (
+        <li key={link.label}>
+          <Link
+            href={link.href}
+            className='text-gray-500 transition-colors duration-300 ease-in-out hover:text-gray-900'
+          >
+            {link.label}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
+const FacebookIcon: FC<IconProps> = ({ className }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
+  </svg>
+);
+const YoutubeIcon: FC<IconProps> = ({ className }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path fillRule="evenodd" d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.701V8.115l6.857 3.886-6.857 3.884z" clipRule="evenodd" />
+  </svg>
+);
+const LinkedinIcon: FC<IconProps> = ({ className }) => (
+    <svg className={className} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+    </svg>
+);
+const TiktokIcon: FC<IconProps> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path
+            d="M12.94,1.61V15.78a2.83,2.83,0,0,1-2.83,2.83h0a2.83,2.83,0,0,1-2.83-2.83h0a2.84,2.84,0,0,1,2.83-2.84h0V9.17h0A6.61,6.61,0,0,0,3.5,15.78h0a6.61,6.61,0,0,0,6.61,6.61h0a6.61,6.61,0,0,0,6.61-6.61V9.17l.2.1a8.08,8.08,0,0,0,3.58.84h0V6.33l-.11,0a4.84,4.84,0,0,1-3.67-4.7H12.94Z"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.9}
+            strokeMiterlimit={10}
+        />
+    </svg>
+);
+
+// --- C. COMPONENT FOOTER CHÍNH ---
 const Footer = () => {
-  const t = useTranslations('')
-  const pathname = usePathname() // Get the current pathname
+  const t = useTranslations('') as Translator;
+  const pathname = usePathname();
+  const router = useRouter();
+  const { isLoggedIn } = useAuth();
+  const [email, setEmail] = useState('');
 
-  // Check if the current page is the homepage.  Handle locale prefixes.
+  const handleNewsletterSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (email) {
+      router.push({
+        pathname: '/auth/register',
+        query: { email: email },
+      });
+    }
+  };
+
+  const quickLinks = [
+    { href: '/support', label: t('Support') },
+    { href: '/conferences', label: t('Conferences') },
+    { href: '/visualization', label: t('Visualization') },
+    { href: '/addconference', label: t('Add_Conference') },
+    { href: '/chatbot/landing', label: t('Chatbot.Chatbot') }
+  ] as FooterLink[];
+
+  const popularTopics = [
+    { href: { pathname: '/conferences', query: { topics: 'Business' } }, label: t('Business') },
+    { href: { pathname: '/conferences', query: { topics: 'Banking and Economics' } }, label: t('Banking_and_Economics') },
+    { href: { pathname: '/conferences', query: { topics: 'Engineering' } }, label: t('Engineering') },
+    { href: { pathname: '/conferences', query: { topics: 'Education' } }, label: t('Education') },
+    { href: { pathname: '/conferences', query: { topics: 'Health' } }, label: t('Health') }
+  ] as FooterLink[];
+
+  const popularCountries = [
+    { href: { pathname: '/conferences', query: { country: 'Australia' } }, label: t('Australia') },
+    { href: { pathname: '/conferences', query: { country: 'Germany' } }, label: t('Germany') },
+    { href: { pathname: '/conferences', query: { country: 'India' } }, label: t('India') },
+    { href: { pathname: '/conferences', query: { country: 'United States' } }, label: t('United_States') },
+    { href: { pathname: '/conferences', query: { country: 'United Kingdom' } }, label: t('United_Kingdom') }
+  ] as FooterLink[];
+
+  const socialLinks = [
+    { href: 'https://www.facebook.com/VNUHCM.US', label: 'Facebook', icon: FacebookIcon },
+    { href: 'https://www.youtube.com/channel/UCYtIjCGvl-VNizt_XWk9Uzg', label: 'YouTube', icon: YoutubeIcon },
+    { href: 'https://www.linkedin.com/school/vnuhcm---university-of-science/', label: 'LinkedIn', icon: LinkedinIcon },
+    { href: 'https://www.tiktok.com/@tvts.hcmus', label: 'TikTok', icon: TiktokIcon },
+  ];
+
   const isHomePage =
     pathname === '/' ||
     /^\/[a-z]{2}$/.test(pathname) ||
     /^\/[a-z]{2}\/$/.test(pathname)
 
+  // Determine the top margin for the bottom bar conditionally
+  const bottomBarMarginTopClass = isHomePage ? 'mt-16' : 'mt-8'; // You can adjust 'mt-8' to whatever looks good
+
   return (
-    <footer className='mx-auto w-full max-w-screen-2xl bg-gradient-to-r from-background to-background-secondary pt-12'>
-      <div className='container mx-auto px-4'>
-        {isHomePage && ( // Conditionally render the full footer
+    <footer className='w-full bg-gradient-to-r from-background to-background-secondary text-gray-700'>
+      <div className='container mx-auto max-w-screen-2xl px-12 py-16'>
+        {isHomePage && (
           <>
-            <div className='grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2 lg:grid-cols-4'>
-              {/* Quick Links (Combined with Follow Us) */}
-              <div className='md:col-span-1 lg:col-span-1'>
-                <h4 className='mb-2 text-base font-bold uppercase'>
-                  {t('Quick_link')}
-                </h4>
-                <ul className='space-y-1 text-sm'>
-                  <li>
-                    <Link href='/support' className='hover:text-text-secondary'>
-                      {t('Support')}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href='/conferences'
-                      className='hover:text-text-secondary'
-                    >
-                      {t('Conferences')}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href='/visualization'
-                      className='hover:text-text-secondary'
-                    >
-                      {t('Visualization')}
-                    </Link>
-                  </li>
-                  {/* <li><Link href="/support" className="hover:text-text-secondary">Support</Link></li> */}
-                  <li>
-                    <Link
-                      href='/addconference'
-                      className='hover:text-text-secondary'
-                    >
-                      {t('Add_Conference')}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href='/chatbot/landing'
-                      className='hover:text-text-secondary'
-                    >
-                      {t('Chatbot.Chatbot')}
-                    </Link>
-                  </li>
-                </ul>
-                {/* Follow Us */}
-                {/* <h4 className='mb-2 mt-6 text-base font-bold uppercase'>
-                  {t('Follow_us')}
-                </h4>
-                <div className='flex space-x-4'>
-                  <Link
-                    href='/'
-                    className='rounded-full bg-background p-2 hover:opacity-80'
-                  >
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      width='16'
-                      height='16'
-                      fill='currentColor'
-                      className='h-5 w-5 fill-current'
-                      viewBox='0 0 16 16'
-                    >
-                      <path d='M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951' />
-                    </svg>
-                  </Link>
-                  <Link
-                    href='/'
-                    className='rounded-full bg-background p-2 hover:opacity-80'
-                  >
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      width='16'
-                      height='16'
-                      fill='currentColor'
-                      className='h-5 w-5 fill-current'
-                      viewBox='0 0 16 16'
-                    >
-                      <path d='M5.026 15c6.038 0 9.341-5.003 9.341-9.334q.002-.211-.006-.422A6.7 6.7 0 0 0 16 3.542a6.7 6.7 0 0 1-1.889.518 3.3 3.3 0 0 0 1.447-1.817 6.5 6.5 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.32 9.32 0 0 1-6.767-3.429 3.29 3.29 0 0 0 1.018 4.382A3.3 3.3 0 0 1 .64 6.575v.045a3.29 3.29 0 0 0 2.632 3.218 3.2 3.2 0 0 1-.865.115 3 3 0 0 1-.614-.057 3.28 3.28 0 0 0 3.067 2.277A6.6 6.6 0 0 1 .78 13.58a6 6 0 0 1-.78-.045A9.34 9.34 0 0 0 5.026 15' />
-                    </svg>
-                  </Link>
-                  <Link
-                    href='/'
-                    className='rounded-full bg-background p-2 hover:opacity-80'
-                  >
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      width='16'
-                      height='16'
-                      fill='currentColor'
-                      className='h-5 w-5 fill-current'
-                      viewBox='0 0 16 16'
-                    >
-                      <path d='M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334' />
-                    </svg>
-                  </Link>
-                </div> */}
-              </div>
-
-              {/* Popular Topics */}
-              <div className='md:col-span-1 lg:col-span-1'>
-                <h4 className='mb-2 text-base font-bold uppercase'>
-                  {t('Popular_topics')}
-                </h4>
-                <ul className='space-y-1 text-sm'>
-                  <li>
-                    <Link
-                      href={{
-                        pathname: `/conferences`,
-                        query: { topics: 'Business' }
-                      }}
-                      className='hover:text-text-secondary'
-                    >
-                      Business
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href={{
-                        pathname: `/conferences`,
-                        query: { topics: 'Banking and Economics' }
-                      }}
-                      className='hover:text-text-secondary'
-                    >
-                      Banking and Economics
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href={{
-                        pathname: `/conferences`,
-                        query: { topics: 'Engineering' }
-                      }}
-                      className='hover:text-text-secondary'
-                    >
-                      Engineering
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href={{
-                        pathname: `/conferences`,
-                        query: { topics: 'Education' }
-                      }}
-                      className='hover:text-text-secondary'
-                    >
-                      Education
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href={{
-                        pathname: `/conferences`,
-                        query: { topics: 'Health' }
-                      }}
-                      className='hover:text-text-secondary'
-                    >
-                      Health
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Popular Countries */}
-              <div className='md:col-span-1 lg:col-span-1'>
-                <h4 className='mb-2 text-base font-bold uppercase'>
-                  {t('Popular_countries')}
-                </h4>
-                <ul className='space-y-1 text-sm'>
-                  <li>
-                    <Link
-                      href={{
-                        pathname: `/conferences`,
-                        query: { country: 'Australia' }
-                      }}
-                      className='hover:text-text-secondary'
-                    >
-                      {t('Australia')}
-                    </Link>
-                  </li>
-
-                  <li>
-                    <Link
-                      href={{
-                        pathname: `/conferences`,
-                        query: { country: 'Germany' }
-                      }}
-                      className='hover:text-text-secondary'
-                    >
-                      {t('Germany')}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href={{
-                        pathname: `/conferences`,
-                        query: { country: 'India' }
-                      }}
-                      className='hover:text-text-secondary'
-                    >
-                      {t('India')}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href={{
-                        pathname: `/conferences`,
-                        query: { country: 'United States' }
-                      }}
-                      className='hover:text-text-secondary'
-                    >
-                      {t('United_States')}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href={{
-                        pathname: `/conferences`,
-                        query: { country: 'United Kingdom' }
-                      }}
-                      className='hover:text-text-secondary'
-                    >
-                      {t('United_Kingdom')}
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-              {/* Company Info */}
-              <div className='md:col-span-2 lg:col-span-1'>
-                <h4 className='mb-2 text-base font-bold uppercase'>
-                  {t('Company')}
-                </h4>
-                {/* Image positioned relative to its container */}
-                <div className='relative  h-[200px] w-full  md:h-[300px] '>
+            {/* --- Main Footer Grid --- */}
+            <div className='grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-12'>
+              <div className='md:col-span-4'>
+                <div className='flex items-center'>
                   <Image
                     src={`/hcmus_logo.png`}
-                    alt='Background image'
-                    width={300} // These are defaults, overridden by style
-                    height={300}
-                    style={{
-                      objectFit: 'contain',
-                      width: '50%',
-                      height: '50%'
-                    }}
+                    alt='Company Logo'
+                    width={80}
+                    height={80}
+                    className='h-18 w-20'
                   />
+                  <Image
+                    src={`/icon-512x512-removebg-preview.png`}
+                    alt='Company Logo'
+                    width={120}
+                    height={120}
+                    className='h-18 w-18 mb-1'
+                  />
+                  <span className='ml-1 text-xl font-bold text-gray-900'>
+                    Global Conference & Journal Hub
+                  </span>
+                </div>
+                <p className='mt-4 text-md text-gray-500'>
+                  {t('Footer_Description')}
+                </p>
+              </div>
+              <div className='md:col-span-8'>
+                <div className='grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3'>
+                  <FooterLinkColumn title={t('Quick_link')} links={quickLinks} icon={LinkIcon} />
+                  <FooterLinkColumn title={t('Popular_topics')} links={popularTopics} icon={BookOpenIcon} />
+                  <FooterLinkColumn title={t('Popular_countries')} links={popularCountries} icon={GlobeAltIcon} />
                 </div>
               </div>
             </div>
+
+            {/* --- Newsletter Section --- */}
+            {!isLoggedIn && (
+              <div className='mt-16 rounded-lg bg-slate-400 p-8'>
+                <div className='grid items-center gap-8 md:grid-cols-2'>
+                  <div>
+                    <h3 className='text-2xl font-bold text-gray-900'>{t('Newsletter_Title')}</h3>
+                    <p className='mt-2 text-gray-700'>{t('Newsletter_Subtitle')}</p>
+                  </div>
+                  <form className='flex w-full mt-4 md:mt-0' onSubmit={handleNewsletterSubmit}>
+                    <input
+                      type='email'
+                      placeholder={t('Enter_your_email')}
+                      className='w-full rounded-l-md border-0 bg-slate-300 px-4 py-3 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500'
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <button type='submit' className='flex-shrink-0 rounded-r-md bg-indigo-400 px-6 py-3 font-semibold text-gray-700 transition-colors hover:bg-indigo-700'>
+                      <ArrowRightIcon className='h-6 w-6' />
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
           </>
         )}
 
-        {/* Copyright (always shown) */}
-        <div
-          className={`mb-4 border-text-secondary p-4 ${isHomePage ? 'border-t' : ''}`}
-        >
-          {/* <p className='text-center text-sm'>{t('Terms_of_Service')}</p> */}
-          <p className='text-center text-sm'>{t('Copyrights')}</p>
+        {/* --- Bottom Bar: Copyright and Socials --- */}
+        {/* Apply margin-top class conditionally */}
+        <div className={`${bottomBarMarginTopClass} flex flex-col items-center border-t border-slate-700 pt-8`}>
+          <div className='text-center mb-4 sm:mb-0'>
+            <p className='text-sm leading-relaxed text-gray-700'>
+              <span>Global Conference & Journal Hub.</span>
+              <br />
+              <span>{t('Copyrights', { year: new Date().getFullYear() })}</span>
+            </p>
+          </div>
+          <div className='flex justify-center space-x-6'>
+            {socialLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={link.label}
+                className="text-gray-500 transition-colors hover:text-indigo-400"
+              >
+                <link.icon className="mt-6 h-6 w-6" />
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </footer>

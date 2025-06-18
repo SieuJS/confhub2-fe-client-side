@@ -26,7 +26,7 @@ const SearchAdvanceJournalSection: React.FC<SearchJournalAdvanceSectionProps> = 
 
   return (
     <div>
-      <div className='mt-2 flex justify-end'>
+      <div className='mt-4 flex justify-end'>
         <button
           onClick={toggleAdvancedOptionsVisibility}
           className='text-sm hover:text-gray-800 focus:outline-none'

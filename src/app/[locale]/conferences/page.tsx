@@ -125,7 +125,7 @@ export default function Conferences({
   return (
     <>
       <Header locale={locale} />
-      <div className='text-center text-2xl'>
+      <div className='text-center text-2xl mb-10'>
         <div className='w-full bg-background py-10'></div>
         <SearchSection onSearch={handleSearch} onClear={handleClear} />
         <div className='container mx-auto mt-4 px-0 md:px-4'>

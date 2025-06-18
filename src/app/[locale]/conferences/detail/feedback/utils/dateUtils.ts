@@ -32,5 +32,6 @@ export const formatFeedbackDate = (date: Date): string => {
     if (date === defaultDateForNull || isNaN(date.getTime())) {
         return 'Date Unavailable';
     }
-    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    // Sử dụng 'vi-VN' để đảm bảo định dạng tiếng Việt và thêm hourCycle: 'h23'
+    return `${date.toLocaleDateString('vi-VN')} ${date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })}`;
 }

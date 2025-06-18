@@ -94,7 +94,7 @@ export const Header: FC<HeaderProps> = ({
           <Link href='/' locale={locale}>
             <div className='flex flex-row items-center'>
               <div className='mb-2 h-8 w-8'><GlobeIcon /></div>
-              <strong className='mx-2 hidden select-none md:block'>Global Conference Hub</strong>
+              <strong className='mx-2 hidden select-none md:block'>Global Conference & Journal Hub</strong>
             </div>
           </Link>
         </div>
@@ -127,8 +127,8 @@ export const Header: FC<HeaderProps> = ({
 
         <Link href='/' locale={locale}>
           <div className='flex flex-row items-center'>
-            <div className='mb-2 h-8 w-8'><LogoIcon /></div>
-            <strong className='mx-2 hidden select-none md:block'>Global Conference Hub</strong>
+            <div className='mb-2 h-14 w-14'><LogoIcon /></div>
+            <strong className='mx-2 hidden select-none md:block'>Global Conference & Journal Hub</strong>
           </div>
         </Link>
       </div>

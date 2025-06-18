@@ -233,10 +233,10 @@ const accessors = {
  */
 const AVAILABLE_FIELDS_TEMPLATE: DataField[] = [
     // Dimensions (Categorical or Discrete values)
-    { id: 'organizations[0].org.locations[0].continent', name: 'Continent', type: 'dimension', accessor: accessors.continent },
-    { id: 'organizations[0].org.locations[0].country', name: 'Country', type: 'dimension', accessor: accessors.country },
-    { id: 'organizations[0].org.year', name: 'Year', type: 'dimension', accessor: accessors.year },
-    { id: 'organizations[0].org.accessType', name: 'Access Type', type: 'dimension', accessor: accessors.accessType },
+    { id: 'organizations[0].locations[0].continent', name: 'Continent', type: 'dimension', accessor: accessors.continent },
+    { id: 'organizations[0].locations[0].country', name: 'Country', type: 'dimension', accessor: accessors.country },
+    { id: 'organizations[0].year', name: 'Year', type: 'dimension', accessor: accessors.year },
+    { id: 'organizations[0].accessType', name: 'Access Type', type: 'dimension', accessor: accessors.accessType },
 
     // Measures (Quantitative values)
     { id: 'count_records', name: 'Record Count', type: 'measure', aggregation: 'count' }, // Special measure to count items

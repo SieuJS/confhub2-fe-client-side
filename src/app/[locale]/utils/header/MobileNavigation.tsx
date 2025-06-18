@@ -62,13 +62,13 @@ const MobileNavigation: FC<Props> = ({
         >
           {t('Journals')}
         </Link>
-        {/* <Link
+        <Link
           href={`/visualization`}
           locale={locale}
           className='px-4 py-2 hover:bg-gray-10 dark:hover:bg-gray-70'
         >
           {t('Visualization')}
-        </Link> */}
+        </Link>
         <Link
           href={`/chatbot/landing`}
           locale={locale}

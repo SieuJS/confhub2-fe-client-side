@@ -7,7 +7,7 @@ const API_BASE_URL = appConfig.NEXT_PUBLIC_DATABASE_URL || 'http://localhost:300
 
 export async function fetchVisualizationData(): Promise<ConferenceDetailsListResponse> {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/conference?mode=detail&perPage=956`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/conference?mode=detail&perPage=10000`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

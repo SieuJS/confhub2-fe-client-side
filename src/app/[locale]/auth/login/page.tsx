@@ -6,6 +6,7 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // Use standard Next.js router for page-level redirects
 import { useAuth } from '@/src/contexts/AuthContext'; // <<<< THAY ĐỔI QUAN TRỌNG
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { useTranslations } from "next-intl";
 
 const LoginPage = ({
   params: { locale }
@@ -17,7 +18,7 @@ const LoginPage = ({
   // isLoggedIn will be updated after initialization
   const { isLoggedIn, isInitializing } = useAuth();
   const router = useRouter();
-
+  const t = useTranslations();
   useEffect(() => {
     // Only redirect if initialization is complete AND user is logged in
     if (!isInitializing && isLoggedIn) {
@@ -40,7 +41,7 @@ const LoginPage = ({
   if (isLoggedIn && !isInitializing) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div>Redirecting...</div>
+        <div>{t('Redirecting')}</div>
       </div>
     );
   }

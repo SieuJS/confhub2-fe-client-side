@@ -127,7 +127,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
   if (loading) {
     // Sử dụng LoadingSpinner thay vì div đơn giản
     return (
-      <div className='w-full rounded-lg bg-white-pure p-4 shadow'>
+      <div className='w-full'>
         <LoadingSpinner message={t('Loading_conferences')} />
       </div>
     )
@@ -142,7 +142,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
   }
 
   return (
-    <div className='w-full rounded-lg bg-white-pure p-4 shadow '>
+    <div className='w-full p-4 '>
       <div className='mb-4 flex flex-col items-center justify-between sm:flex-row'>
         <h2 className='mb-2 text-xl font-semibold sm:mb-0'>
           {t('Conference_Results')} ({totalItems})

@@ -46,7 +46,7 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = () => {
   return (
     <div className='w-full'>
       <div className='mb-4 flex items-center justify-between'>
-        <h2 className='text-2xl font-semibold'>
+        <h2 className='text-xl font-semibold'>
           {/* Sử dụng totalJournals từ hook để hiển thị tổng số kết quả */}
           {t('resultsCount', { count: totalJournals })}
         </h2>

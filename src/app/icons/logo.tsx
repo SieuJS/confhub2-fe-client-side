@@ -1,10 +1,12 @@
+import Image from "next/image"
+
 function LogoIcon() {
   return (
-    <img 
-      src='/icons/icon-76x76.png' 
+    <Image 
+      src='/icon-512x512-removebg-preview.png' 
       alt='logo' 
-      width={64} 
-      height={64} 
+      width={80} 
+      height={80} 
     />
   )
 }
