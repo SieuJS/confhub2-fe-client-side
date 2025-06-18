@@ -1732,7 +1732,7 @@
   "CitationMetrics": {
     "title": "Citation & Publication Metrics",
     "navTitle": "Citation Metrics",
-    "totalDocs2023": "Total Docs (2023)",
+    "totalDocsYearly": "Total Docs ({year})",
     "totalDocs3years": "Total Docs (3 years)",
     "totalCites3years": "Total Cites (3 years)",
     "citesPerDoc2years": "Cites / Doc (2 years)"

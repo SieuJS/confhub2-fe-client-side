@@ -1668,7 +1668,7 @@
   "CitationMetrics": {
     "title": "Chỉ số Trích dẫn & Xuất bản",
     "navTitle": "Chỉ số Trích dẫn",
-    "totalDocs2023": "Tổng số bài (2023)",
+    "totalDocsYearly": "Tổng tài liệu ({{year}})",
     "totalDocs3years": "Tổng số bài (3 năm)",
     "totalCites3years": "Tổng trích dẫn (3 năm)",
     "citesPerDoc2years": "Trích dẫn / Bài (2 năm)"

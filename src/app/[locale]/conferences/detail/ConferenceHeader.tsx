@@ -1,22 +1,31 @@
 // src/app/[locale]/conference/detail/ConferenceHeader.tsx
-import React from 'react'
+'use client' // Thêm 'use client' vì chúng ta sẽ dùng hook
+
+import React, { useMemo } from 'react' // Thêm useMemo
 import Image from 'next/image'
-import { useTranslations } from 'next-intl'
-// Import ConferenceOrganizationItem thay vì Organization cho lastOrganization
+import { useTranslations, useLocale } from 'next-intl' // Thêm useLocale
 import {
   ConferenceResponse,
   ConferenceOrganizationItem,
-  Rank
+  Rank,
 } from '@/src/models/response/conference.response'
 import { Link } from '@/src/navigation'
-// Đảm bảo đường dẫn này đúng với vị trí file conferenceUtils.ts của bạn
 import { getAccessTypeColor, getRankColor } from './utils/conferenceUtils'
-// Đảm bảo đường dẫn này đúng
 import FollowerAvatars from './FollowerAvatars'
+
+// === BƯỚC 1: IMPORT TỪ DATE-FNS VÀ LUCIDE REACT ===
+import { formatDistanceToNow } from 'date-fns'
+import { enUS, vi } from 'date-fns/locale'
+import {
+  MapPin,       // Thay cho SVG bản đồ
+  BookType,     // Thay cho SVG publisher
+  AlertTriangle, // Thay cho SVG cảnh báo
+  History,      // Icon cho thời gian cập nhật
+} from 'lucide-react'
 
 interface ConferenceHeaderProps {
   conferenceData: ConferenceResponse | null
-  lastOrganization: ConferenceOrganizationItem | undefined // <-- THAY ĐỔI Ở ĐÂY
+  lastOrganization: ConferenceOrganizationItem | undefined
   firstRankData: Rank | undefined
   dateDisplay: string | null
   overallRating: number
@@ -25,14 +34,32 @@ interface ConferenceHeaderProps {
 
 const ConferenceHeader: React.FC<ConferenceHeaderProps> = ({
   conferenceData,
-  lastOrganization, // Bây giờ lastOrganization sẽ có thuộc tính locations và conferenceDates
+  lastOrganization,
   firstRankData,
   dateDisplay,
   overallRating,
-  totalReviews
+  totalReviews,
 }) => {
   const t = useTranslations('')
+  const currentLocale = useLocale() // Lấy locale hiện tại
   const accessType = lastOrganization?.accessType
+
+  // === BƯỚC 2: LOGIC ĐỊNH DẠNG NGÀY THÁNG CẬP NHẬT ===
+  const lastUpdatedText = useMemo(() => {
+    if (!conferenceData?.updatedAt) return null
+
+    const dateLocale = currentLocale === 'vi' ? vi : enUS
+    try {
+      return formatDistanceToNow(new Date(conferenceData.updatedAt), {
+        addSuffix: true,
+        locale: dateLocale,
+      })
+    } catch (error) {
+      console.error("Invalid date format for 'updatedAt':", conferenceData.updatedAt)
+      return null
+    }
+  }, [conferenceData?.updatedAt, currentLocale])
+
 
   return (
     <div className='flex flex-col items-start md:flex-row'>
@@ -53,27 +80,14 @@ const ConferenceHeader: React.FC<ConferenceHeaderProps> = ({
 
       {/* Text details container */}
       <div className='w-full md:w-3/4 md:pl-6'>
-        {/* Warning Section (giữ nguyên) */}
+        {/* === BƯỚC 3: CẬP NHẬT SVG CẢNH BÁO === */}
         {conferenceData?.ranks?.length === 0 && (
           <div
             className='mb-4 rounded-md border-l-4 border-yellow-500 bg-yellow-100 p-4 text-yellow-700 shadow-sm'
             role='alert'
           >
             <div className='flex items-center'>
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                className='mr-3 h-6 w-6 flex-shrink-0'
-                fill='none'
-                viewBox='0 0 24 24'
-                stroke='currentColor'
-                strokeWidth='2'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
-                />
-              </svg>
+              <AlertTriangle className='mr-3 h-6 w-6 flex-shrink-0' />
               <div>
                 <p className='font-bold'>{t('Conference_Published_By_User')}</p>
                 <p className='text-sm'>
@@ -113,6 +127,14 @@ const ConferenceHeader: React.FC<ConferenceHeaderProps> = ({
           {conferenceData?.title || t('Conference_Details')}
         </h1>
 
+        {/* === BƯỚC 4: THÊM THỜI GIAN CẬP NHẬT === */}
+        {lastUpdatedText && (
+          <div className='mb-2 flex items-center gap-1.5 text-xs text-muted-foreground'>
+            <History size={14} />
+            <span>{t('JournalReport.lastUpdated', { time: lastUpdatedText })}</span>
+          </div>
+        )}
+
         {/* Rating (giữ nguyên) */}
         <div className='mb-2 flex items-center text-sm'>
           <div className='mr-1 text-xl text-yellow-500'>★</div>
@@ -124,30 +146,15 @@ const ConferenceHeader: React.FC<ConferenceHeaderProps> = ({
           </strong>
         </div>
 
-        {/* Location and Publisher Links */}
+        {/* === BƯỚC 5: CẬP NHẬT SVG ĐỊA ĐIỂM VÀ PUBLISHER === */}
         <div className='mb-2 flex flex-wrap gap-x-4 gap-y-1'>
-          {/* Bây giờ lastOrganization.locations sẽ hợp lệ */}
           {lastOrganization?.locations?.[0] ? (
             <a
               href='#map'
               className='flex items-center text-sm text-blue-600 hover:underline'
               title={lastOrganization.locations[0]?.address || t('View_map')}
             >
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                width='16'
-                height='16'
-                viewBox='0 0 24 24'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='1.5'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                className='lucide lucide-map-pin mr-1 flex-shrink-0'
-              >
-                <path d='M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0Z' />
-                <circle cx='12' cy='10' r='3' />
-              </svg>
+              <MapPin className='mr-1 h-4 w-4 flex-shrink-0' />
               {lastOrganization.locations[0]?.address ||
                 lastOrganization.locations[0]?.cityStateProvince ||
                 lastOrganization.locations[0]?.country ||
@@ -161,26 +168,10 @@ const ConferenceHeader: React.FC<ConferenceHeaderProps> = ({
               className='flex items-center text-sm text-blue-600 hover:underline'
               href={{
                 pathname: `/conferences`,
-                query: { publisher: lastOrganization.publisher }
+                query: { publisher: lastOrganization.publisher },
               }}
             >
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                width='16'
-                height='16'
-                viewBox='0 0 24 24'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='1.5'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                className='lucide lucide-book-type mr-1 flex-shrink-0'
-              >
-                <path d='M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20' />
-                <path d='M10 13h4' />
-                <path d='M12 6v7' />
-                <path d='M16 8V6H8v2' />
-              </svg>
+              <BookType className='mr-1 h-4 w-4 flex-shrink-0' />
               {lastOrganization.publisher}
             </Link>
           ) : (
