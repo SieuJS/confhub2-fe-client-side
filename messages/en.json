@@ -1674,6 +1674,7 @@
   "searchButton": "Search",
   "clearButton": "Clear",
   "JournalReport": {
+    "lastUpdated": "Updated: {time}",
     "description": "Comprehensive information about the Journal, including Impact factor, H-index, subject Area, Category, Scope, ISSN.",
     "websiteButton": "Journal Website",
     "detailsTitle": "Journal Details",
@@ -1681,9 +1682,12 @@
     "areasLabel": "Areas",
     "publisherLabel": "Publisher",
     "countryLabel": "Country",
+    "regionLabel": "Region",
     "issnLabel": "ISSN",
     "quartileLabel": "Best Quartile",
-    "coverageLabel": "Coverage History"
+    "coverageLabel": "Coverage History",
+    "howToPublishButton": "How to Publish",
+    "contactButton": "Contact"
   },
   "JournalTabs": {
     "overviewTitle": "Overview",
@@ -1714,6 +1718,29 @@
     "sjrExample": "SJR takes into account both the number of citations and the importance of the citing journals, offering a balanced perspective on the scientific impact of a journal.",
     "fieldOfResearch": "Field of Research",
     "categories": "Categories",
-    "noSubjectArea": "No Subject Areas or Categories Available."
-  }
+    "noSubjectArea": "No Subject Areas or Categories Available.",
+    "areasLabel": "Areas"
+  },
+  "DataSource": {
+    "title": "Data Source",
+    "description": "All ranking, citation, and classification data presented on this page is sourced from"
+  },
+  "QuartileHistory": {
+    "title": "Quartile History",
+    "navTitle": "Quartile History"
+  },
+  "CitationMetrics": {
+    "title": "Citation & Publication Metrics",
+    "navTitle": "Citation Metrics",
+    "totalDocs2023": "Total Docs (2023)",
+    "totalDocs3years": "Total Docs (3 years)",
+    "totalCites3years": "Total Cites (3 years)",
+    "citesPerDoc2years": "Cites / Doc (2 years)"
+  },
+  "My_Follows": "My Follows",
+  "Explore_All_Journals": "Explore All Journals",
+  "Search_followed_journals": "Search by title or ISSN...",
+  "You_are_not_following_any_journals_yet": "You are not following any journals yet.",
+  "No_journals_match_your_search": "No journals match your search.",
+  "Loading_your_followed_items": "Loading your followed items..."
 }

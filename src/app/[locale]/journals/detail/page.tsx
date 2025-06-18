@@ -11,7 +11,7 @@ import JournalReport from './JournalReport'
 import { JournalTabs } from './JournalTabs'
 import { RecommendedJournals } from './RecommendedJournals'
 import { RecentlyAddedJournals } from './RecentlyAddedJournals'
-import SubjectAreasJournals from '../../home/SubjectAreasJournals'
+import SubjectAreasJournals from './SubjectAreasJournals'
 import { useTranslations } from 'next-intl'
 import { Loader2 } from 'lucide-react' // Import Loader2
 
@@ -115,7 +115,7 @@ const JournalDetails = ({ params: { locale } }: { params: { locale: string } }) 
         <JournalReport journal={journal} />
         <JournalTabs journal={journal} />
         {/* <RecommendedJournals /> */}
-        <RecentlyAddedJournals />
+        {/* <RecentlyAddedJournals /> */}
         <SubjectAreasJournals />
         <Footer />
       </div>

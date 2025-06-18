@@ -1661,17 +1661,33 @@
   "allTypesOption": "Tất cả các loại",
   "searchButton": "Tìm kiếm",
   "clearButton": "Xóa",
+  "QuartileHistory": {
+    "title": "Lịch sử Xếp hạng (Quartile)",
+    "navTitle": "Lịch sử Xếp hạng"
+  },
+  "CitationMetrics": {
+    "title": "Chỉ số Trích dẫn & Xuất bản",
+    "navTitle": "Chỉ số Trích dẫn",
+    "totalDocs2023": "Tổng số bài (2023)",
+    "totalDocs3years": "Tổng số bài (3 năm)",
+    "totalCites3years": "Tổng trích dẫn (3 năm)",
+    "citesPerDoc2years": "Trích dẫn / Bài (2 năm)"
+  },
   "JournalReport": {
-    "description": "Thông tin toàn diện về Tạp chí, bao gồm Hệ số tác động (Impact factor), Chỉ số H (H-index), Lĩnh vực chủ đề, Hạng mục, Phạm vi, ISSN.",
+    "lastUpdated": "Cập nhật: {time}",
+    "description": "Thông tin toàn diện về Tạp chí, bao gồm Chỉ số ảnh hưởng, Chỉ số H, Lĩnh vực, Chuyên mục, Phạm vi, ISSN.",
     "websiteButton": "Trang web Tạp chí",
     "detailsTitle": "Chi tiết Tạp chí",
-    "titleLabel": "Tên tạp chí",
+    "titleLabel": "Tên Tạp chí",
     "areasLabel": "Lĩnh vực",
     "publisherLabel": "Nhà xuất bản",
     "countryLabel": "Quốc gia",
-    "issnLabel": "Mã số ISSN",
+    "regionLabel": "Khu vực",
+    "issnLabel": "ISSN",
     "quartileLabel": "Phân vị tốt nhất",
-    "coverageLabel": "Lịch sử bao phủ"
+    "coverageLabel": "Lịch sử bao phủ",
+    "howToPublishButton": "Hướng dẫn xuất bản",
+    "contactButton": "Liên hệ"
   },
   "JournalTabs": {
     "overviewTitle": "Tổng quan",
@@ -1702,6 +1718,17 @@
     "sjrExample": "SJR tính đến cả số lượng trích dẫn và tầm quan trọng của các tạp chí trích dẫn, mang lại một góc nhìn cân bằng về tác động khoa học của một tạp chí.",
     "fieldOfResearch": "Lĩnh vực Nghiên cứu",
     "categories": "Chuyên mục",
-    "noSubjectArea": "Không có thông tin về Lĩnh vực hoặc Chuyên mục."
-  }
+    "noSubjectArea": "Không có thông tin về Lĩnh vực hoặc Chuyên mục.",
+    "areasLabel": "Lĩnh vực"
+  },
+  "DataSource": {
+    "title": "Nguồn dữ liệu",
+    "description": "Toàn bộ dữ liệu xếp hạng, trích dẫn và phân loại được trình bày trên trang này có nguồn gốc từ"
+  },
+  "My_Follows": "My Follows",
+  "Explore_All_Journals": "Explore All Journals",
+  "Search_followed_journals": "Search by title or ISSN...",
+  "You_are_not_following_any_journals_yet": "You are not following any journals yet.",
+  "No_journals_match_your_search": "No journals match your search.",
+  "Loading_your_followed_items": "Loading your followed items..."
 }

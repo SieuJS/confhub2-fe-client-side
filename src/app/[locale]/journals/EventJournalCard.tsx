@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import Image from 'next/image'
 import { JournalData } from '../../../models/response/journal.response'
 import Button from '../utils/Button'
@@ -8,6 +8,9 @@ import { Link } from '@/src/navigation'
 import { useTranslations } from 'next-intl'
 import { journalFollowService } from '@/src/services/journal-follow.service'
 import { toast } from 'react-toastify'
+
+// === BƯỚC 1: IMPORT DỮ LIỆU COUNTRIES ===
+import countries from '@/src/app/[locale]/addconference/countries.json' // Điều chỉnh đường dẫn nếu cần
 
 // Import Lucide Icons
 import {
@@ -63,6 +66,20 @@ const EventJournalCard: React.FC<EventJournalCardProps> = ({ journal }) => {
     }
   }
 
+
+  // === BƯỚC 2: TÌM ISO2 CODE CỦA QUỐC GIA BẰNG useMemo ===
+  const countryIso2 = useMemo(() => {
+    if (!journal.Country) return null
+
+    // Tìm kiếm không phân biệt chữ hoa/thường để tăng tính ổn định
+    const countryData = countries.find(
+      (c) => c.name.toLowerCase() === journal.Country.toLowerCase()
+    )
+
+    // Trả về mã iso2 dưới dạng chữ thường để khớp với tên file ảnh
+    return countryData ? countryData.iso2.toLowerCase() : null
+  }, [journal.Country]) // Chỉ tính toán lại khi tên quốc gia thay đổi
+
   const getQuartileColor = (quartile: string | undefined): string => {
     switch (quartile) {
       case 'Q1':
@@ -112,12 +129,24 @@ const EventJournalCard: React.FC<EventJournalCardProps> = ({ journal }) => {
                 </p>
               </>
             )}
+            {/* === BƯỚC 3: CẬP NHẬT PHẦN HIỂN THỊ COUNTRY === */}
             {journal.Country && (
               <>
                 <Globe size={16} className="text-gray-500 dark:text-gray-400 mt-0.5" />
-                <p className='line-clamp-1 text-left'>
-                  <span className="font-semibold text-gray-700 dark:text-gray-200">{t('countryLabel')}:</span> {journal.Country}
-                </p>
+                <div className="flex items-center gap-2"> {/* Container cho cờ và tên */}
+                  {countryIso2 && (
+                    <Image
+                      src={`/country_flags/${countryIso2}.svg`}
+                      alt={journal.Country}
+                      width={20}
+                      height={15}
+                      className="flex-shrink-0 rounded-sm" // Thêm bo góc nhẹ
+                    />
+                  )}
+                  <span className='line-clamp-1 text-left'>
+                    {journal.Country}
+                  </span>
+                </div>
               </>
             )}
             {journal.SJR !== undefined && journal.SJR !== null && (
