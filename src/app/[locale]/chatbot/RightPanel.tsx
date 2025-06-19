@@ -98,7 +98,7 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
     if (enable) {
       if (!user) {
         alert(t('Error_Login_Required_Generic'))
-        event.target.checked = false 
+        event.target.checked = false
         return
       }
 
@@ -178,7 +178,7 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
             </div>
             <button
               onClick={() => setRightPanelOpen(false)}
-              className='flex h-8 w-8 items-center justify-center rounded-full  hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:hover:bg-black dark:hover:text-gray-300'
+              className='flex h-8 w-8 items-center justify-center rounded-full  hover:bg-gray-100  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:hover:bg-black '
               title={t('Close_settings')}
               aria-label={t('Close_settings')}
             >
@@ -249,17 +249,16 @@ const RightSettingsPanel: React.FC<RightSettingsPanelProps> = ({
                 )}
               </div>
             )}
-            
+
             {/* Model Selection Dropdown - Added Here */}
             {chatMode === 'regular' && (
-                 <ModelSelectionDropdown
-                    currentModel={selectedModel}
-                    availableModels={AVAILABLE_MODELS}
-                    onModelChange={setSelectedModel}
-                    // disabled={isLiveChatConnected} // Hoặc logic disable khác nếu cần
-                 />
+              <ModelSelectionDropdown
+                currentModel={selectedModel}
+                availableModels={AVAILABLE_MODELS}
+                onModelChange={setSelectedModel}
+                // disabled={isLiveChatConnected} // Hoặc logic disable khác nếu cần
+              />
             )}
-
 
             {/* Language Dropdown */}
             {isLiveChatContextActive && chatMode === 'live' ? (

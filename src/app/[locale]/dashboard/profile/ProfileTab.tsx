@@ -52,13 +52,21 @@ const ProfileTab: React.FC = () => {
     handleImageSelect: handleBackgroundSelect
   } = useImageSelection('background', setEditedData)
 
-  const predefinedTopics = ['Blockchain', 'Chemical Biology', 'AI', 'Furniture', 'Home Improvement']
+  const predefinedTopics = [
+    'Blockchain',
+    'Chemical Biology',
+    'AI',
+    'Furniture',
+    'Home Improvement'
+  ]
 
   const [showChangePasswordForm, setShowChangePasswordForm] = useState(false)
   const [formattedDob, setFormattedDob] = useState<string | null>(null)
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false)
   const [isDeletingAccount, setIsDeletingAccount] = useState(false)
-  const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null)
+  const [deleteAccountError, setDeleteAccountError] = useState<string | null>(
+    null
+  )
   const [initialLoad, setInitialLoad] = useState(true) // State cho initialLoad
 
   // Set initialLoad to false once authentication initialization is complete
@@ -102,7 +110,9 @@ const ProfileTab: React.FC = () => {
     try {
       const result = await deleteAccount()
       if (!result.success) {
-        setDeleteAccountError(result.error || t('Failed_to_delete_account_unknown_error'))
+        setDeleteAccountError(
+          result.error || t('Failed_to_delete_account_unknown_error')
+        )
       }
     } catch (error) {
       console.error('Error during account deletion:', error)
@@ -117,9 +127,13 @@ const ProfileTab: React.FC = () => {
 
   // Hàm render loading tương tự như FollowedTab
   const renderLoading = () => (
-    <div className='flex flex-col items-center justify-center h-80 text-gray-500'>
-      <Loader2 className='w-10 h-10 animate-spin text-primary' /> {/* Kích thước và màu */}
-      <p className='mt-4 text-lg'>{t('MyConferences.Loading_your_profile')}</p> {/* Dòng chữ */}
+    <div className='flex h-80 flex-col items-center justify-center '>
+      <Loader2 className='h-10 w-10 animate-spin text-primary' />{' '}
+      {/* Kích thước và màu */}
+      <p className='mt-4 text-lg'>
+        {t('MyConferences.Loading_your_profile')}
+      </p>{' '}
+      {/* Dòng chữ */}
     </div>
   )
 
@@ -135,8 +149,12 @@ const ProfileTab: React.FC = () => {
   // --- Render Error/Login Required after initial load ---
   if (authError && !isLoggedIn) {
     return (
-      <div className='container mx-auto p-4 text-center'> {/* Thêm class container mx-auto p-4 text-center */}
-        <div className='rounded-lg bg-background p-8 text-center shadow-lg'> {/* Giữ lại div này để có background và shadow */}
+      <div className='container mx-auto p-4 text-center'>
+        {' '}
+        {/* Thêm class container mx-auto p-4 text-center */}
+        <div className='rounded-lg bg-background p-8 text-center shadow-lg'>
+          {' '}
+          {/* Giữ lại div này để có background và shadow */}
           <p className='mb-4 text-red-500'>{authError}</p>
         </div>
       </div>
@@ -145,14 +163,20 @@ const ProfileTab: React.FC = () => {
 
   if (!isLoggedIn) {
     return (
-      <div className='container mx-auto p-4 text-center'> {/* <-- THAY ĐỔI Ở ĐÂY */}
+      <div className='container mx-auto p-4 text-center'>
+        {' '}
+        {/* <-- THAY ĐỔI Ở ĐÂY */}
         {/*
           Theo FollowedTab, không có rounded-lg bg-background p-8 text-center shadow-lg ở đây.
           Nó chỉ có h2 và p trực tiếp.
           Để đồng bộ, chúng ta bỏ div bọc và giữ nguyên h2, p, button.
         */}
-        <h2 className='text-xl font-semibold mb-2'>{t('MyConferences.Login_Required_Title')}</h2> {/* Sử dụng h2 và key dịch tương tự */}
-        <p className='mb-4'>{t('MyConferences.Login_Required_Message')}</p> {/* Sử dụng key dịch tương tự */}
+        <h2 className='mb-2 text-xl font-semibold'>
+          {t('MyConferences.Login_Required_Title')}
+        </h2>{' '}
+        {/* Sử dụng h2 và key dịch tương tự */}
+        <p className='mb-4'>{t('MyConferences.Login_Required_Message')}</p>{' '}
+        {/* Sử dụng key dịch tương tự */}
         <Link href='/auth/login'>
           <Button variant='primary'>{t('Sign_In')}</Button>
         </Link>
@@ -162,8 +186,13 @@ const ProfileTab: React.FC = () => {
 
   if (!authUser) {
     return (
-      <div className='container mx-auto p-4 text-center'> {/* Đồng bộ với cấu trúc trên */}
-        <h2 className='text-xl font-semibold mb-2'>{t('User_data_not_available_title')}</h2> {/* Thêm title nếu cần */}
+      <div className='container mx-auto p-4 text-center'>
+        {' '}
+        {/* Đồng bộ với cấu trúc trên */}
+        <h2 className='mb-2 text-xl font-semibold'>
+          {t('User_data_not_available_title')}
+        </h2>{' '}
+        {/* Thêm title nếu cần */}
         <p className='mb-4'>{t('User_data_not_available')}</p>
       </div>
     )
@@ -226,7 +255,10 @@ const ProfileTab: React.FC = () => {
       />
 
       {showChangePasswordForm && authUser && (
-        <ChangePasswordForm userId={authUser.id} onClose={() => setShowChangePasswordForm(false)} />
+        <ChangePasswordForm
+          userId={authUser.id}
+          onClose={() => setShowChangePasswordForm(false)}
+        />
       )}
 
       <DeleteAccountModal
@@ -240,4 +272,4 @@ const ProfileTab: React.FC = () => {
   )
 }
 
-export default ProfileTab;
+export default ProfileTab

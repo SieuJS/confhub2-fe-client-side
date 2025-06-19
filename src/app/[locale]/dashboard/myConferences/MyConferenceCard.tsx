@@ -28,23 +28,22 @@ const MyConferenceCard: React.FC<MyConferenceCardProps> = ({
   )
 
   // --- START: Chỉnh sửa logic cho locationString ---
-  let locationString = t('MyConferences.Location_Not_Available'); // Giá trị mặc định
+  let locationString = t('MyConferences.Location_Not_Available') // Giá trị mặc định
 
   if (location) {
-    const parts = [];
+    const parts = []
     if (location.cityStateProvince) {
-      parts.push(location.cityStateProvince);
+      parts.push(location.cityStateProvince)
     }
     if (location.country) {
-      parts.push(location.country);
+      parts.push(location.country)
     }
 
     if (parts.length > 0) {
-      locationString = parts.join(', ');
+      locationString = parts.join(', ')
     }
   }
   // --- END: Chỉnh sửa logic cho locationString ---
-
 
   return (
     <div className='flex flex-col overflow-hidden rounded-xl bg-white-pure shadow-md transition-shadow duration-300 hover:shadow-xl'>
@@ -56,7 +55,7 @@ const MyConferenceCard: React.FC<MyConferenceCardProps> = ({
         {/* Header: Status và Thời gian tạo */}
         <div className='mb-3 flex items-start justify-between'>
           <StatusBadge status={conference.status} />
-          <p className='text-right text-sm text-gray-500'>
+          <p className='text-right text-sm '>
             {t('MyConferences.Created')}
             <br />
             {timeAgo(conference.createdAt, language)}
@@ -67,13 +66,13 @@ const MyConferenceCard: React.FC<MyConferenceCardProps> = ({
         <h3 className='text-lg font-bold leading-tight text-indigo-700 transition-colors hover:text-indigo-900'>
           {conference.title}
         </h3>
-        <div className='mt-2 space-y-2 text-sm text-gray-60'>
+        <div className='mt-2 space-y-2 text-sm '>
           <div className='flex items-center gap-2'>
-            <Hash className='h-4 w-4 flex-shrink-0 text-gray-40' />
+            <Hash className='h-4 w-4 flex-shrink-0 ' />
             <span>{conference.acronym}</span>
           </div>
           <div className='flex items-center gap-2'>
-            <Calendar className='h-4 w-4 flex-shrink-0 text-gray-40' />
+            <Calendar className='h-4 w-4 flex-shrink-0 ' />
             <span>
               {conferenceDate
                 ? formatDateRange(
@@ -84,20 +83,19 @@ const MyConferenceCard: React.FC<MyConferenceCardProps> = ({
                 : t('MyConferences.Date_Not_Available')}
             </span>
           </div>
-           <div className='flex items-center gap-2'>
-            <Factory className='h-4 w-4 flex-shrink-0 text-gray-40' />
+          <div className='flex items-center gap-2'>
+            <Factory className='h-4 w-4 flex-shrink-0 ' />
             <span>{accessType}</span>
           </div>
           <div className='flex items-center gap-2'>
-            <MapPin className='h-4 w-4 flex-shrink-0 text-gray-40' />
+            <MapPin className='h-4 w-4 flex-shrink-0 ' />
             <span>{locationString}</span>
           </div>
-
         </div>
       </div>
       {/* Footer: Các nút hành động */}
       {/* Footer không cần flex-grow, nó sẽ tự động dính vào cuối do flex-col trên parent */}
-      <div className='border-t border-gray-200 bg-gray-10 px-5 py-3'>
+      <div className='border-t border-gray-20 bg-gray-10 px-5 py-3'>
         <ConferenceActionButtons conference={conference} {...actionHandlers} />
       </div>
     </div>

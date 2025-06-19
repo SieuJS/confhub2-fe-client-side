@@ -1,43 +1,43 @@
 // src/app/[locale]/chatbot/regularchat/ChatMessageDisplay.tsx
-import React from 'react';
+import React from 'react'
 import {
   MessageType,
   ThoughtStep,
   FrontendAction,
   ChatMessageType, // Đã import
-  SourceItem,    // <<< THÊM IMPORT SourceItem
-} from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
-import { TriangleAlert } from 'lucide-react';
-import ThoughtProcess from './ThoughtProcess';
-import { useSettingsStore } from '../stores';
-import { useShallow } from 'zustand/react/shallow';
+  SourceItem // <<< THÊM IMPORT SourceItem
+} from '@/src/app/[locale]/chatbot/lib/regular-chat.types'
+import { TriangleAlert } from 'lucide-react'
+import ThoughtProcess from './ThoughtProcess'
+import { useSettingsStore } from '../stores'
+import { useShallow } from 'zustand/react/shallow'
 
-import { useMessageEditing } from '@/src/hooks/regularchat/useMessageEditing';
-import { useMessageCopy } from '@/src/hooks/regularchat/useMessageCopy';
-import { useMessageBubbleLogic } from '@/src/hooks/regularchat/useMessageBubbleLogic';
+import { useMessageEditing } from '@/src/hooks/regularchat/useMessageEditing'
+import { useMessageCopy } from '@/src/hooks/regularchat/useMessageCopy'
+import { useMessageBubbleLogic } from '@/src/hooks/regularchat/useMessageBubbleLogic'
 
-import EditMessageForm from './EditMessageForm';
-import MessageContentRenderer from './MessageContentRenderer';
-import MessageActionsBar from './MessageActionsBar';
-import MessageSourcesDisplay from './MessageSourcesDisplay'; // <<< THÊM IMPORT
-import { Part } from '@google/genai';
+import EditMessageForm from './EditMessageForm'
+import MessageContentRenderer from './MessageContentRenderer'
+import MessageActionsBar from './MessageActionsBar'
+import MessageSourcesDisplay from './MessageSourcesDisplay' // <<< THÊM IMPORT
+import { Part } from '@google/genai'
 
 interface ChatMessageDisplayProps {
-  id: string;
-  text?: string;
-  parts?: Part[];
-  files?: ChatMessageType['files'];
-  botFiles?: ChatMessageType['botFiles'];
-  isUser: boolean;
-  type: MessageType;
-  thoughts?: ThoughtStep[];
-  location?: string;
-  action?: FrontendAction;
-  timestamp?: string | Date;
-  sources?: SourceItem[]; // <<< THÊM PROP sources
-  isInsideSmallContainer?: boolean;
-  isLatestUserMessage: boolean;
-  onConfirmEdit: (messageId: string, newText: string) => void;
+  id: string
+  text?: string
+  parts?: Part[]
+  files?: ChatMessageType['files']
+  botFiles?: ChatMessageType['botFiles']
+  isUser: boolean
+  type: MessageType
+  thoughts?: ThoughtStep[]
+  location?: string
+  action?: FrontendAction
+  timestamp?: string | Date
+  sources?: SourceItem[] // <<< THÊM PROP sources
+  isInsideSmallContainer?: boolean
+  isLatestUserMessage: boolean
+  onConfirmEdit: (messageId: string, newText: string) => void
 }
 
 const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
@@ -55,15 +55,16 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
   sources, // <<< NHẬN PROP sources
   isInsideSmallContainer = false,
   isLatestUserMessage,
-  onConfirmEdit,
+  onConfirmEdit
 }) => {
   const { isThoughtProcessHiddenInFloatingChat } = useSettingsStore(
     useShallow(state => ({
-      isThoughtProcessHiddenInFloatingChat: state.isThoughtProcessHiddenInFloatingChat,
+      isThoughtProcessHiddenInFloatingChat:
+        state.isThoughtProcessHiddenInFloatingChat
     }))
-  );
+  )
 
-  const primaryTextContent = text || (parts?.find(p => p.text)?.text) || "";
+  const primaryTextContent = text || parts?.find(p => p.text)?.text || ''
 
   const {
     isEditing,
@@ -73,43 +74,50 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
     confirmEdit,
     cancelEdit,
     handleInputChange,
-    handleKeyDown,
+    handleKeyDown
   } = useMessageEditing({
     messageId: id,
     initialMessage: primaryTextContent,
     isUser,
     isLatestUserMessage,
-    onConfirmEdit,
-  });
+    onConfirmEdit
+  })
 
-  const { isCopied, handleCopy } = useMessageCopy(primaryTextContent);
+  const { isCopied, handleCopy } = useMessageCopy(primaryTextContent)
 
   const { bubbleRef, bubbleClasses } = useMessageBubbleLogic({
     id,
     initialMessage: primaryTextContent,
     isUser,
     type,
-    isInsideSmallContainer,
-  });
+    isInsideSmallContainer
+  })
 
   const shouldShowThoughtProcess =
     !isUser &&
     thoughts &&
     thoughts.length > 0 &&
-    (!isInsideSmallContainer || (isInsideSmallContainer && !isThoughtProcessHiddenInFloatingChat));
+    (!isInsideSmallContainer ||
+      (isInsideSmallContainer && !isThoughtProcessHiddenInFloatingChat))
 
-  const handleEditButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    startEdit();
-  };
-  const handleConfirmEditClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    confirmEdit();
-  };
-  const handleCancelEditClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    cancelEdit();
-  };
+  const handleEditButtonClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.stopPropagation()
+    startEdit()
+  }
+  const handleConfirmEditClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.stopPropagation()
+    confirmEdit()
+  }
+  const handleCancelEditClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.stopPropagation()
+    cancelEdit()
+  }
 
   return (
     <div ref={bubbleRef} className={bubbleClasses}>
@@ -120,7 +128,6 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
       {type === 'warning' && (
         <TriangleAlert className='absolute -left-1.5 -top-1.5 mr-1.5 inline-block h-4 w-4 rounded-full bg-white p-0.5 text-yellow-600 shadow dark:bg-gray-800 dark:text-yellow-400' />
       )}
-
 
       {isEditing ? (
         <EditMessageForm
@@ -161,17 +168,23 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
       />
 
       {shouldShowThoughtProcess && (
-        <div className='mt-2 border-t border-black/10 pt-1.5 sm:mt-3 sm:pt-2 dark:border-white/20'>
+        <div className='mt-2 border-t border-black/10 pt-1.5 dark:border-white/20 sm:mt-3 sm:pt-2'>
           <ThoughtProcess thoughts={thoughts} />
         </div>
       )}
-       {timestamp && (
-        <div className={`text-xs mt-1 ${isUser ? 'text-gray-500 dark:text-gray-400' : 'text-gray-600 dark:text-gray-700'} ${isUser ? 'text-right' : 'text-left'}`}>
-          {new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+      {timestamp && (
+        <div
+          className={`mt-1 text-xs ${isUser ? 'text-gray-50 ' : 'text-gray-60 '} ${isUser ? 'text-right' : 'text-left'}`}
+        >
+          {new Date(timestamp).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          })}
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ChatMessageDisplay;
+export default ChatMessageDisplay

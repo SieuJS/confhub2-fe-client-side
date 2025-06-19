@@ -1,13 +1,13 @@
 // src/utils/SearchInput.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 
 // Định nghĩa props cho component
 interface SearchInputProps {
-  initialValue?: string;
-  onSearchChange: (searchTerm: string) => void;
-  placeholder?: string;
-  debounceDelay?: number;
-  className?: string;
+  initialValue?: string
+  onSearchChange: (searchTerm: string) => void
+  placeholder?: string
+  debounceDelay?: number
+  className?: string
 }
 
 const SearchInput: React.FC<SearchInputProps> = ({
@@ -15,36 +15,36 @@ const SearchInput: React.FC<SearchInputProps> = ({
   onSearchChange,
   placeholder = 'Search...',
   debounceDelay = 500,
-  className = '',
+  className = ''
 }) => {
-  const [inputValue, setInputValue] = useState(initialValue);
+  const [inputValue, setInputValue] = useState(initialValue)
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      onSearchChange(inputValue);
-    }, debounceDelay);
+      onSearchChange(inputValue)
+    }, debounceDelay)
 
     return () => {
-      clearTimeout(handler);
-    };
-  }, [inputValue, debounceDelay, onSearchChange]);
+      clearTimeout(handler)
+    }
+  }, [inputValue, debounceDelay, onSearchChange])
 
   useEffect(() => {
-    setInputValue(initialValue);
-  }, [initialValue]);
+    setInputValue(initialValue)
+  }, [initialValue])
 
   return (
     <div className={`w-full ${className}`}>
       <input
-        type="text"
+        type='text'
         placeholder={placeholder}
-        className="w-full rounded-full border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-button"
+        className='w-full rounded-full border px-4 py-2 placeholder:text-primary focus:outline-none focus:ring-2 focus:ring-button'
         value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        spellCheck="false" // <--- THÊM DÒNG NÀY VÀO ĐÂY
+        onChange={e => setInputValue(e.target.value)}
+        spellCheck='false' // <--- THÊM DÒNG NÀY VÀO ĐÂY
       />
     </div>
-  );
-};
+  )
+}
 
-export default SearchInput;
+export default SearchInput

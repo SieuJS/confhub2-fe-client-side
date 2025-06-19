@@ -121,7 +121,7 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
   }, [searchTerm, blacklistedConferences])
 
   const renderLoading = () => (
-    <div className='flex h-80 flex-col items-center justify-center text-gray-500'>
+    <div className='flex h-80 flex-col items-center justify-center '>
       <Loader2 className='h-10 w-10 animate-spin text-indigo-600' />
       <p className='mt-4 text-lg'>
         {t('MyConferences.Loading_your_conferences')}
@@ -164,7 +164,7 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
   return (
     <div className='container mx-auto min-h-screen bg-gray-10 p-4 md:p-6'>
       <div className='mb-6 flex flex-wrap items-center justify-between gap-4'>
-        <h1 className='text-xl font-semibold text-gray-80 md:text-2xl'>
+        <h1 className='text-xl font-semibold  md:text-2xl'>
           {t('Blacklisted_Conferences')} ({blacklistedConferences.length})
         </h1>
         <Link href='/conferences'>
@@ -193,7 +193,7 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
 
       {/* BƯỚC 5: CẬP NHẬT LOGIC HIỂN THỊ DỰA TRÊN filteredConferences */}
       {!loading && blacklistedConferences.length === 0 && (
-        <div className='my-10 rounded-lg bg-white-pure p-10 text-center text-gray-500 shadow-sm'>
+        <div className='my-10 rounded-lg bg-white-pure p-10 text-center  shadow-sm'>
           <p className='text-lg'>
             {t('You_have_not_blacklisted_any_conferences_yet')}
           </p>
@@ -211,7 +211,7 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
       {!loading &&
         blacklistedConferences.length > 0 &&
         filteredConferences.length === 0 && (
-          <div className='my-10 rounded-lg bg-white p-10 text-center text-gray-500 shadow-sm'>
+          <div className='my-10 rounded-lg bg-white p-10 text-center  shadow-sm'>
             <p className='text-lg'>{t('No_conferences_match_your_search')}</p>
           </div>
         )}

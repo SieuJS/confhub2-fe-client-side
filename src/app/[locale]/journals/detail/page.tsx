@@ -3,7 +3,7 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { JournalData } from '../../../../models/response/journal.response' 
+import { JournalData } from '../../../../models/response/journal.response'
 import { Header } from '../../utils/Header'
 import Footer from '../../utils/Footer'
 import NotFoundPage from '../../utils/NotFoundPage'
@@ -15,14 +15,19 @@ import SubjectAreasJournals from './SubjectAreasJournals'
 import { useTranslations } from 'next-intl'
 import { Loader2 } from 'lucide-react' // Import Loader2
 
-const JournalDetails = ({ params: { locale } }: { params: { locale: string } }) => {
-  
+const JournalDetails = ({
+  params: { locale }
+}: {
+  params: { locale: string }
+}) => {
   const t = useTranslations()
 
   const searchParams = useSearchParams()
-  const journalId = searchParams.get('id') 
+  const journalId = searchParams.get('id')
 
-  const [journal, setJournal] = useState<JournalData | null | undefined>(undefined)
+  const [journal, setJournal] = useState<JournalData | null | undefined>(
+    undefined
+  )
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -40,41 +45,42 @@ const JournalDetails = ({ params: { locale } }: { params: { locale: string } }) 
       setJournal(undefined)
 
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_DATABASE_URL;
+        const baseUrl = process.env.NEXT_PUBLIC_DATABASE_URL
         if (!baseUrl) {
-            throw new Error("NEXT_PUBLIC_DATABASE_URL is not defined in environment variables.");
+          throw new Error(
+            'NEXT_PUBLIC_DATABASE_URL is not defined in environment variables.'
+          )
         }
 
-        const apiUrl = `${baseUrl}/api/v1/journals/${journalId}`;
-        console.log(`Fetching journal from: ${apiUrl}`);
+        const apiUrl = `${baseUrl}/api/v1/journals/${journalId}`
+        console.log(`Fetching journal from: ${apiUrl}`)
 
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl)
 
         if (response.status === 404) {
-          console.log(`Journal with id ${journalId} not found (404).`);
-          setJournal(null);
-          throw new Error(`Journal not found.`);
+          console.log(`Journal with id ${journalId} not found (404).`)
+          setJournal(null)
+          throw new Error(`Journal not found.`)
         }
 
         if (!response.ok) {
-          throw new Error(`API call failed with status: ${response.status}`);
+          throw new Error(`API call failed with status: ${response.status}`)
         }
 
-        const foundJournal: JournalData = await response.json();
-        console.log(`Journal found:`, foundJournal.Title);
-        setJournal(foundJournal);
-
+        const foundJournal: JournalData = await response.json()
+        console.log(`Journal found:`, foundJournal.Title)
+        setJournal(foundJournal)
       } catch (err: any) {
-        console.error('Failed to fetch journal:', err);
-        setError(err.message || 'An unknown error occurred');
-        setJournal(null);
+        console.error('Failed to fetch journal:', err)
+        setError(err.message || 'An unknown error occurred')
+        setJournal(null)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
 
-    fetchJournalById();
-  }, [journalId]);
+    fetchJournalById()
+  }, [journalId])
 
   // --- Render Logic ---
 
@@ -82,7 +88,7 @@ const JournalDetails = ({ params: { locale } }: { params: { locale: string } }) 
     return (
       <>
         <Header locale={locale} />
-        <div className='flex min-h-screen flex-col items-center justify-center text-gray-500'>
+        <div className='flex min-h-screen flex-col items-center justify-center '>
           <Loader2 className='h-10 w-10 animate-spin text-indigo-600' />
           <p className='mt-4 text-lg'>{t('Loading_journal_details')}</p>
         </div>

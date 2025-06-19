@@ -1,28 +1,28 @@
 // src/app/[locale]/chatbot/history/ConversationHistoryPage.tsx
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'
 import {
-    useConversationListState,
-    useConversationActions,
-    useChatSettingsState,
-} from '@/src/app/[locale]/chatbot/stores/storeHooks';
-import { ConversationMetadata } from '../lib/regular-chat.types';
-import { Loader2, MessageSquarePlus } from 'lucide-react'; // Giữ lại các icon dùng ở đây
-import { useTranslations } from 'next-intl';
-import { useRouter } from '@/src/navigation';
-import HistoryTableRow from './HistoryTableRow'; // Import component con
+  useConversationListState,
+  useConversationActions,
+  useChatSettingsState
+} from '@/src/app/[locale]/chatbot/stores/storeHooks'
+import { ConversationMetadata } from '../lib/regular-chat.types'
+import { Loader2, MessageSquarePlus } from 'lucide-react' // Giữ lại các icon dùng ở đây
+import { useTranslations } from 'next-intl'
+import { useRouter } from '@/src/navigation'
+import HistoryTableRow from './HistoryTableRow' // Import component con
 
 const ConversationHistoryPage: React.FC = () => {
-  const t = useTranslations();
-  const router = useRouter();
+  const t = useTranslations()
+  const router = useRouter()
 
   const {
     conversationList: initialListFromStore,
     searchResults,
     isSearching,
-    isLoadingHistory,
-  } = useConversationListState();
+    isLoadingHistory
+  } = useConversationListState()
 
   const {
     loadConversation,
@@ -31,42 +31,43 @@ const ConversationHistoryPage: React.FC = () => {
     clearConversation,
     renameConversation,
     pinConversation,
-    searchConversations,
-  } = useConversationActions();
+    searchConversations
+  } = useConversationActions()
 
-  const { chatMode, currentLanguage } = useChatSettingsState();
+  const { chatMode, currentLanguage } = useChatSettingsState()
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [displayedConversations, setDisplayedConversations] = useState<
-    ConversationMetadata[]
-  >(initialListFromStore); // Khởi tạo với initialListFromStore
+  const [searchTerm, setSearchTerm] = useState('')
+  const [displayedConversations, setDisplayedConversations] =
+    useState<ConversationMetadata[]>(initialListFromStore) // Khởi tạo với initialListFromStore
 
   useEffect(() => {
-    searchConversations(searchTerm);
-  }, [searchTerm, searchConversations]);
+    searchConversations(searchTerm)
+  }, [searchTerm, searchConversations])
 
   useEffect(() => {
     if (searchTerm.trim() !== '') {
-      setDisplayedConversations(searchResults);
+      setDisplayedConversations(searchResults)
     } else {
-      setDisplayedConversations(initialListFromStore);
+      setDisplayedConversations(initialListFromStore)
     }
-  }, [searchTerm, searchResults, initialListFromStore]);
+  }, [searchTerm, searchResults, initialListFromStore])
 
   const handleSelectAndGoToChat = useCallback(
     (conversationId: string) => {
-      loadConversation(conversationId);
-      const targetPath = chatMode === 'live' ? '/chatbot/livechat' : '/chatbot/regularchat';
-      router.push({ pathname: targetPath });
+      loadConversation(conversationId)
+      const targetPath =
+        chatMode === 'live' ? '/chatbot/livechat' : '/chatbot/regularchat'
+      router.push({ pathname: targetPath })
     },
     [loadConversation, router, chatMode]
-  );
+  )
 
   const handleStartNewAndGoToChat = useCallback(() => {
-    startNewConversation(currentLanguage.code);
-    const targetPath = chatMode === 'live' ? '/chatbot/livechat' : '/chatbot/regularchat';
-    router.push(targetPath);
-  }, [startNewConversation, router, chatMode]);
+    startNewConversation(currentLanguage.code)
+    const targetPath =
+      chatMode === 'live' ? '/chatbot/livechat' : '/chatbot/regularchat'
+    router.push(targetPath)
+  }, [startNewConversation, router, chatMode])
 
   // Các hàm confirm sẽ được gọi bên trong HistoryTableRow nếu muốn, hoặc truyền callback đã có confirm
   const handleDeleteWithConfirm = useCallback(
@@ -79,18 +80,18 @@ const ConversationHistoryPage: React.FC = () => {
         )
       ) {
         try {
-          await deleteConversation(id);
+          await deleteConversation(id)
         } catch (error) {
-          console.error("Error deleting conversation from history page:", error);
+          console.error('Error deleting conversation from history page:', error)
           // Xử lý lỗi chung ở đây nếu cần
-          throw error; // Ném lại lỗi để HistoryTableRow có thể xử lý isProcessingAction
+          throw error // Ném lại lỗi để HistoryTableRow có thể xử lý isProcessingAction
         }
       } else {
-        throw new Error("Deletion cancelled by user"); // Ném lỗi để Row biết hủy
+        throw new Error('Deletion cancelled by user') // Ném lỗi để Row biết hủy
       }
     },
     [deleteConversation, t]
-  );
+  )
 
   const handleClearWithConfirm = useCallback(
     (id: string, title: string) => {
@@ -101,19 +102,21 @@ const ConversationHistoryPage: React.FC = () => {
           })
         )
       ) {
-        clearConversation(id);
+        clearConversation(id)
       }
     },
     [clearConversation, t]
-  );
+  )
 
-
-  const showInitialLoading = isLoadingHistory && displayedConversations.length === 0 && searchTerm.trim() === '';
+  const showInitialLoading =
+    isLoadingHistory &&
+    displayedConversations.length === 0 &&
+    searchTerm.trim() === ''
 
   return (
-    <div className='bg-gray-10 flex h-full flex-col p-4 md:p-6 dark:bg-gray-900'>
+    <div className='flex h-full flex-col bg-gray-10 p-4 dark:bg-gray-900 md:p-6'>
       <div className='mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row'>
-        <h1 className='text-2xl font-semibold text-gray-800 dark:text-gray-100'>{t('Chat_History_Full')}</h1>
+        <h1 className='text-2xl font-semibold '>{t('Chat_History_Full')}</h1>
         <button
           onClick={handleStartNewAndGoToChat}
           className='flex items-center space-x-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900'
@@ -129,24 +132,24 @@ const ConversationHistoryPage: React.FC = () => {
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
           placeholder={t('Search_Conversations_Placeholder')}
-          className='flex-grow rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400'
+          className='flex-grow rounded-md border border-gray-300 px-3 py-2 text-sm placeholder:text-primary focus:border-blue-500 focus:ring-blue-500  dark:border-gray-600 dark:placeholder-gray-400'
         />
         {isSearching && (
           <div className='flex items-center justify-center px-2'>
-            <Loader2 size={18} className='animate-spin text-gray-500 dark:text-gray-400' />
+            <Loader2 size={18} className='animate-spin ' />
           </div>
         )}
       </div>
 
       {showInitialLoading && (
-        <div className='flex flex-1 items-center justify-center text-gray-600 dark:text-gray-300'>
+        <div className='flex flex-1 items-center justify-center '>
           <Loader2 size={24} className='mr-2 animate-spin' />
           <span>{t('Loading_Initial_History')}</span>
         </div>
       )}
 
       {!showInitialLoading && displayedConversations.length === 0 && (
-        <div className='flex flex-1 items-center justify-center text-center text-gray-500 dark:text-gray-400'>
+        <div className='flex flex-1 items-center justify-center text-center '>
           {searchTerm.trim() !== ''
             ? t('No_Search_Results_Found')
             : t('No_Conversations_Found_Yet')}
@@ -160,19 +163,19 @@ const ConversationHistoryPage: React.FC = () => {
               <tr>
                 <th
                   scope='col'
-                  className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400'
+                  className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider '
                 >
                   {t('Title')}
                 </th>
                 <th
                   scope='col'
-                  className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400'
+                  className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider '
                 >
                   {t('Last_Activity')}
                 </th>
                 <th
                   scope='col'
-                  className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400'
+                  className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider '
                 >
                   {t('Actions')}
                 </th>
@@ -187,7 +190,7 @@ const ConversationHistoryPage: React.FC = () => {
                   onDelete={handleDeleteWithConfirm}
                   onClear={handleClearWithConfirm}
                   onRename={renameConversation} // Truyền trực tiếp action nếu không cần confirm ở đây
-                  onTogglePin={pinConversation}  // Truyền trực tiếp action
+                  onTogglePin={pinConversation} // Truyền trực tiếp action
                 />
               ))}
             </tbody>
@@ -195,7 +198,7 @@ const ConversationHistoryPage: React.FC = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ConversationHistoryPage;
+export default ConversationHistoryPage

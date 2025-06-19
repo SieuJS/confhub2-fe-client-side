@@ -51,7 +51,7 @@ const BlacklistConferenceCard: React.FC<BlacklistConferenceCardProps> = ({
       <div className='flex-grow p-5'>
         {/* Header: Thời gian Blacklisted */}
         <div className='mb-3 flex items-start justify-between'>
-          <p className='text-left text-sm text-gray-500'>
+          <p className='text-left text-sm '>
             {t('Blacklisted_Time')}: {timeAgo(conference.createdAt, language)}
           </p>
           {/* Có thể thêm một badge "Blacklisted" ở đây nếu muốn */}
@@ -63,13 +63,13 @@ const BlacklistConferenceCard: React.FC<BlacklistConferenceCardProps> = ({
         <h3 className='text-lg font-bold leading-tight text-indigo-700 transition-colors hover:text-indigo-900'>
           {conference.title}
         </h3>
-        <div className='mt-2 space-y-2 text-sm text-gray-60'>
+        <div className='mt-2 space-y-2 text-sm '>
           <div className='flex items-center gap-2'>
-            <Hash className='h-4 w-4 flex-shrink-0 text-gray-40' />
+            <Hash className='h-4 w-4 flex-shrink-0 ' />
             <span>{conference.acronym}</span>
           </div>
           <div className='flex items-center gap-2'>
-            <Calendar className='h-4 w-4 flex-shrink-0 text-gray-40' />
+            <Calendar className='h-4 w-4 flex-shrink-0 ' />
             <span>
               {conferenceDate
                 ? formatDateRange(
@@ -81,7 +81,7 @@ const BlacklistConferenceCard: React.FC<BlacklistConferenceCardProps> = ({
             </span>
           </div>
           <div className='flex items-center gap-2'>
-            <MapPin className='h-4 w-4 flex-shrink-0 text-gray-40' />
+            <MapPin className='h-4 w-4 flex-shrink-0 ' />
             <span>{locationString}</span>
           </div>
         </div>

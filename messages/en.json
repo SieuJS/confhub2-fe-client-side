@@ -1759,5 +1759,21 @@
   "Banking_and_Economics": "Banking and Economics",
   "Engineering": "Engineering",
   "Education": "Education",
-  "Health": "Health"
+  "Health": "Health",
+  "ConferenceDetailsPage": {
+    "ImportantDates": {
+      "sectionTitle": "Important Dates",
+      "noDatesAvailable": "No important dates are available at this time.",
+      "conferenceDatesTitle": "Conference Dates",
+      "submissionTitle": "Submission",
+      "notificationTitle": "Notification",
+      "cameraReadyTitle": "Camera-Ready",
+      "registrationTitle": "Registration",
+      "otherTitle": "Other Dates",
+      "previously": "Previously:",
+      "newBadge": "NEW",
+      "showLess": "Show less",
+      "showMore": "Show {count} more"
+    }
+  }
 }

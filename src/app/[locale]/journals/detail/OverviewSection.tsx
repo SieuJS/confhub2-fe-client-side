@@ -8,13 +8,18 @@ interface Props {
 }
 
 export const OverviewSection: React.FC<Props> = ({ journal, t }) => (
-  <section id='overview' className='scroll-mt-28 border-b border-border py-8 md:py-12'>
-    <h2 className='mb-4 text-2xl font-bold text-foreground md:text-3xl'>
+  <section
+    id='overview'
+    className='border-border scroll-mt-28 border-b py-8 md:py-12'
+  >
+    <h2 className='text-foreground mb-4 text-2xl font-bold md:text-3xl'>
       {t('JournalTabs.overviewTitle')}
     </h2>
-    <div className='prose max-w-none text-muted-foreground dark:prose-invert'>
+    <div className=' max-w-none '>
       <p>
-        {journal.Scope ?? journal['Additional Info']?.slice(5) ?? t('JournalTabs.noOverview')}
+        {journal.Scope ??
+          journal['Additional Info']?.slice(5) ??
+          t('JournalTabs.noOverview')}
       </p>
     </div>
   </section>

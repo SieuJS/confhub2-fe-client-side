@@ -33,7 +33,8 @@ export const QuartileHistoryChart: React.FC<Props> = ({ data, t }) => {
     const categories = [...new Set(data.map(item => item.Category))]
 
     // Khai báo kiểu rõ ràng cho biến 'series'
-    const series: LineSeriesOption[] = categories.map(category => { // <-- SỬA Ở ĐÂY
+    const series: LineSeriesOption[] = categories.map(category => {
+      // <-- SỬA Ở ĐÂY
       return {
         name: category,
         type: 'line', // TypeScript bây giờ sẽ kiểm tra giá trị này so với LineSeriesOption
@@ -45,7 +46,7 @@ export const QuartileHistoryChart: React.FC<Props> = ({ data, t }) => {
             d => d.Year === year && d.Category === category
           )
           return item ? getQuartileValue(item.Quartile) : null
-        }),
+        })
       }
     })
 
@@ -66,23 +67,23 @@ export const QuartileHistoryChart: React.FC<Props> = ({ data, t }) => {
             `
           })
           return tooltipHtml
-        },
+        }
       },
       legend: {
         data: categories,
         bottom: 0, // Đặt chú thích ở dưới cùng
-        type: 'scroll', // Cho phép cuộn nếu có quá nhiều chú thích
+        type: 'scroll' // Cho phép cuộn nếu có quá nhiều chú thích
       },
       grid: {
         left: '3%',
         right: '4%',
         bottom: '10%', // Dành không gian cho legend
-        containLabel: true,
+        containLabel: true
       },
       xAxis: {
         type: 'category',
         boundaryGap: false,
-        data: years,
+        data: years
       },
       yAxis: {
         type: 'value',
@@ -91,21 +92,24 @@ export const QuartileHistoryChart: React.FC<Props> = ({ data, t }) => {
         interval: 1, // Đảm bảo các vạch chia là 1, 2, 3, 4
         // Đây là phần quan trọng: hiển thị label Q1, Q2... thay vì số
         axisLabel: {
-          formatter: (value: number) => `Q${5 - value}`,
-        },
+          formatter: (value: number) => `Q${5 - value}`
+        }
       },
       series: series,
       // Tùy chọn: Thêm màu sắc cho đẹp hơn
-      color: ['#5470C6', '#91CC75', '#EE6666', '#FAC858', '#73C0DE'],
+      color: ['#5470C6', '#91CC75', '#EE6666', '#FAC858', '#73C0DE']
     }
   }, [data]) // Phụ thuộc vào `data`
 
   return (
-    <section id='quartile-history' className='scroll-mt-28 border-b border-border py-8 md:py-12'>
-      <h2 className='mb-6 text-2xl font-bold text-foreground md:text-3xl'>
+    <section
+      id='quartile-history'
+      className='border-border scroll-mt-28 border-b py-8 md:py-12'
+    >
+      <h2 className='mb-6 text-2xl font-bold  md:text-3xl'>
         {t('QuartileHistory.title')}
       </h2>
-      <div className='rounded-lg bg-background p-2 shadow-sm'>
+      <div className='rounded-lg bg-background p-2  shadow-sm'>
         <ReactECharts
           option={chartOption}
           style={{ height: '450px', width: '100%' }}
