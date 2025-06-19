@@ -2,12 +2,15 @@ export interface ConferenceFormData {
   title: string
   acronym: string
   link: string
+  cfpLink: string
+  impLink: string
   topics: string[]
   type: 'Offline' | 'Online' | 'Hybrid'
   location: LocationInput
   dates: ImportantDateInput[]
-  imageUrl: string
-  description: string
+  imageUrl?: string
+  summary: string
+  callForPaper: string
 }
 
 export interface LocationInput {

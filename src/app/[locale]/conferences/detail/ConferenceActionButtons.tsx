@@ -1,9 +1,25 @@
 // src/app/[locale]/conference/detail/ConferenceActionButtons.tsx
+
 import React, { useState, useRef } from 'react'
 import { useTranslations } from 'next-intl'
-import Button from '@/src/app/[locale]/utils/Button' // Adjust path if needed
-import useClickOutside from '@/src/hooks/conferenceDetails/useClickOutside' // Adjust path
+import Button from '@/src/app/[locale]/utils/Button'
+import useClickOutside from '@/src/hooks/conferenceDetails/useClickOutside'
 import { Organization } from '@/src/models/response/conference.response'
+
+// Import Lucide Icons
+import {
+  CalendarDays,
+  Share2,
+  Star,
+  RefreshCcw,
+  ExternalLink,
+  Ban,
+} from 'lucide-react'
+
+// ==================================================================
+// THAY ĐỔI: IMPORT SERVICE THÔNG BÁO
+// ==================================================================
+import { notification } from '@/src/utils/toast/notification'
 
 interface ConferenceActionButtonsProps {
   conferenceId: string | null
@@ -38,9 +54,10 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
   isBlacklisted,
   handleBlacklistClick,
   blacklistLoading,
-  checkLoginAndRedirect
+  checkLoginAndRedirect,
 }) => {
-  const t = useTranslations('')
+  // Sử dụng namespace để quản lý key tốt hơn, ví dụ: 'ConferenceDetail'
+  const t = useTranslations('ConferenceDetail')
   const [openMenu, setOpenMenu] = useState<'share' | null>(null)
   const menuContainerRef = useRef<HTMLDivElement>(null)
 
@@ -56,8 +73,11 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
 
   const handleBlacklistWithCheck = () => {
     if (!isBlacklisted && (isFollowing || isAddToCalendar)) {
-      alert(t('Blacklist_Requires_Unfollow_Calendar')) // Use translation
-      return // Stop the blacklist action
+      // ==================================================================
+      // THAY ĐỔI: SỬ DỤNG NOTIFICATION.WARNING THAY CHO ALERT
+      // ==================================================================
+      notification.warning(t('Blacklist_Requires_Unfollow_Calendar'))
+      return // Dừng hành động blacklist
     }
     handleBlacklistClick()
   }
@@ -80,7 +100,7 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
               })
             }}
             className={menuItemClass}
-            disabled={isBlacklisted} // Disabled if blacklisted
+            disabled={isBlacklisted}
           >
             <span className='flex items-center'>
               <svg
@@ -104,7 +124,7 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
               })
             }}
             className={menuItemClass}
-            disabled={isBlacklisted} // Disabled if blacklisted
+            disabled={isBlacklisted}
           >
             <span className='flex items-center'>
               <svg
@@ -128,7 +148,7 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
               })
             }}
             className={menuItemClass}
-            disabled={isBlacklisted} // Disabled if blacklisted
+            disabled={isBlacklisted}
           >
             <span className='flex items-center'>
               <svg
@@ -150,7 +170,6 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
     )
   }
 
-  // --- Define the tooltip message for blacklisted state ---
   const blacklistTooltip = t('Remove_Blacklist_First_Tooltip')
 
   return (
@@ -162,41 +181,18 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
           variant={isAddToCalendar ? 'primary' : 'secondary'}
           size='small'
           className='flex flex-grow items-center justify-center gap-x-2 md:flex-grow-0 md:justify-start'
-          // --- Dynamic Title ---
           title={
             isBlacklisted
               ? blacklistTooltip
               : isAddToCalendar
-                ? t('Remove_this_conference_from_your_personal_calendar')
-                : t('Add_this_conference_to_your_personal_calendar')
+                ? t('Remove_from_Calendar_Tooltip')
+                : t('Add_to_Calendar_Tooltip')
           }
-          // --- Disabled prop includes isBlacklisted ---
           disabled={calendarLoading || isBlacklisted}
         >
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='18'
-            height='18'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='1.5'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-          >
-            <path d='M8 2v4' />
-            <path d='M16 2v4' />
-            <rect width='18' height='18' x='3' y='4' rx='2' />
-            <path d='M3 10h18' />
-            <path d='M8 14h.01' />
-            <path d='M12 14h.01' />
-            <path d='M16 14h.01' />
-            <path d='M8 18h.01' />
-            <path d='M12 18h.01' />
-            <path d='M16 18h.01' />
-          </svg>
+          <CalendarDays size={18} />
           <span className='hidden sm:inline'>
-            {isAddToCalendar ? t('Added') : t('Calendar')}
+            {isAddToCalendar ? t('Added_Button') : t('Calendar_Button')}
           </span>
         </Button>
 
@@ -212,29 +208,11 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
             className='flex w-full items-center justify-center gap-x-2 md:justify-start'
             aria-haspopup='true'
             aria-expanded={openMenu === 'share'}
-            // --- Dynamic Title ---
-            title={isBlacklisted ? blacklistTooltip : t('Share')} // Share button title when not blacklisted
-            // --- Disabled prop includes isBlacklisted ---
+            title={isBlacklisted ? blacklistTooltip : t('Share_Tooltip')}
             disabled={isBlacklisted}
           >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              width='18'
-              height='18'
-              viewBox='0 0 24 24'
-              fill='none'
-              stroke='currentColor'
-              strokeWidth='1.5'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                d='M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z'
-              />
-            </svg>
-            <span className='hidden sm:inline'>{t('Share')}</span>
+            <Share2 size={18} />
+            <span className='hidden sm:inline'>{t('Share_Button')}</span>
           </Button>
           {renderShareMenu()}
         </div>
@@ -245,32 +223,18 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
           variant={isFollowing ? 'primary' : 'secondary'}
           size='small'
           className='flex flex-grow items-center justify-center gap-x-2 md:flex-grow-0 md:justify-start'
-          // --- Dynamic Title ---
           title={
             isBlacklisted
               ? blacklistTooltip
               : isFollowing
-                ? t('Remove_this_conference_from_your_personal_follow_list')
-                : t('Add_this_conference_to_your_personal_follow_list')
+                ? t('Unfollow_Tooltip')
+                : t('Follow_Tooltip')
           }
-          // --- Disabled prop includes isBlacklisted ---
           disabled={followLoading || isBlacklisted}
         >
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='18'
-            height='18'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='1.5'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-          >
-            <path d='M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.122 2.122 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z' />
-          </svg>
+          <Star size={18} />
           <span className='hidden sm:inline'>
-            {isFollowing ? t('Followed') : t('Follow')}
+            {isFollowing ? t('Followed_Button') : t('Follow_Button')}
           </span>
         </Button>
 
@@ -282,9 +246,7 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
             checkLoginAndRedirect(() => updateConference(conferenceId))
           }
           className={`flex flex-grow items-center justify-center gap-x-2 md:flex-grow-0 md:justify-start ${isUpdating ? 'cursor-not-allowed opacity-50' : ''}`}
-          // --- Dynamic Title ---
-          title={isBlacklisted ? blacklistTooltip : t('Update_this_conference')}
-          // --- Disabled prop includes isBlacklisted ---
+          title={isBlacklisted ? blacklistTooltip : t('Update_Tooltip')}
           disabled={
             isUpdating ||
             !conferenceId ||
@@ -292,24 +254,9 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
             isBlacklisted
           }
         >
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='18'
-            height='18'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='1.5'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-          >
-            <path d='M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8' />
-            <path d='M3 3v5h5' />
-            <path d='M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16' />
-            <path d='M16 16h5v5' />
-          </svg>
+          <RefreshCcw size={18} />
           <span className='hidden sm:inline'>
-            {isUpdating ? t('Updating') : t('Update')}
+            {isUpdating ? t('Updating_Button') : t('Update_Button')}
           </span>
         </Button>
 
@@ -323,35 +270,22 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
                 'noopener noreferrer'
               )
             } else {
-              alert(t('Website_link_is_not_available'))
+              // ==================================================================
+              // THAY ĐỔI: SỬ DỤNG NOTIFICATION.INFO THAY CHO ALERT
+              // ==================================================================
+              notification.info(t('Website_link_is_not_available'))
             }
           }}
           variant={'secondary'}
           size='small'
           className='flex flex-grow items-center justify-center gap-x-2 md:flex-grow-0 md:justify-start'
-          // --- Dynamic Title ---
           title={
             isBlacklisted ? blacklistTooltip : t('Go_to_conference_website')
           }
-          // --- Disabled prop includes isBlacklisted ---
           disabled={!displayOrganization?.link || isBlacklisted}
         >
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='18'
-            height='18'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='1.5'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-          >
-            <path d='M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6' />
-            <path d='m21 3-9 9' />
-            <path d='M15 3h6v6' />
-          </svg>
-          <span className='hidden sm:inline'>{t('Website')}</span>
+          <ExternalLink size={18} />
+          <span className='hidden sm:inline'>{t('Website_Button')}</span>
         </Button>
 
         {/* Blacklist Button */}
@@ -361,30 +295,15 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
           size='small'
           className='flex flex-grow items-center justify-center gap-x-2 md:flex-grow-0 md:justify-start'
           disabled={blacklistLoading}
-          // --- Blacklist button has its own title logic ---
           title={
             isBlacklisted
-              ? t('Remove_this_conference_from_your_personal_blacklist')
-              : t('Add_this_conference_to_your_personal_blacklist')
+              ? t('Remove_from_Blacklist_Tooltip')
+              : t('Add_to_Blacklist_Tooltip')
           }
         >
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='18'
-            height='18'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='1.5'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-          >
-            <path d='m2 2 20 20' />
-            <path d='M8.35 2.69A10 10 0 0 1 21.3 15.65' />
-            <path d='M19.08 19.08A10 10 0 1 1 4.92 4.92' />
-          </svg>
+          <Ban size={18} />
           <span className='hidden sm:inline'>
-            {isBlacklisted ? t('Blacklisted') : t('Blacklist')}
+            {isBlacklisted ? t('Blacklisted_Button') : t('Blacklist_Button')}
           </span>
         </Button>
       </div>

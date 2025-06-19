@@ -49,7 +49,6 @@
   "Update": "Cập nhật",
   "Overview": "Tổng quan",
   "Important_Date": "Ngày quan trọng",
-  "Call_for_paper": "Kêu gọi gửi bài",
   "Category_and_Topics": "Danh mục và Chủ đề",
   "Insights": "Thống kê",
   "Maps": "Bản đồ",
@@ -484,7 +483,7 @@
   "Blacklist": "Danh sách đen",
   "Loading_conference_details": "Đang tải chi tiết hội nghị...",
   "TBD": "Sẽ được xác định sau",
-  "Call_for_papers": "Kêu gọi gửi bài",
+  "Call_for_paper": "Kêu gọi gửi bài",
   "No_summerize_available": "Không có tóm tắt nào.",
   "No_Important_Dates_Available": "Không có ngày quan trọng nào.",
   "From_Date": "Từ ngày",
@@ -605,7 +604,7 @@
       "invalidCodeFormat": "Mã xác minh phải có 6 chữ số",
       "backendFailed": "Xác minh thất bại. Vui lòng kiểm tra mã và thử lại.",
       "network": "Đã xảy ra lỗi trong quá trình xác minh. Vui lòng thử lại sau.",
-      "generic": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.",
+      "generic": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại sau.",
       "noToken": "Mã xác thực bị thiếu. Vui lòng đăng nhập lại."
     },
     "success": {
@@ -619,7 +618,7 @@
     "resendLink": "Gửi lại mã",
     "resending": "Đang gửi lại...",
     "resendSuccess": "Mã mới đã được gửi!",
-    "resendError": "Không thể gửi lại mã. Vui lòng thử lại.",
+    "resendError": "Không thể gửi lại mã. Vui lòng thử lại sau.",
     "resendCooldown": "Gửi lại có thể trong {seconds} giây",
     "backToLogin": "Quay lại Đăng nhập",
     "returnToHomeButton": "Trở về Trang chủ"
@@ -1352,7 +1351,7 @@
       "authRelated": "Phiên đăng nhập của bạn không hợp lệ, đã hết hạn hoặc có vấn đề về kết nối xác thực. (Mã lỗi: {code}). Vui lòng đăng nhập lại.",
       "connectionFailed": "Không thể kết nối với máy chủ chatbot. Vui lòng kiểm tra kết nối mạng của bạn và thử lại.",
       "serverError": "Một lỗi nghiêm trọng đã xảy ra trên máy chủ chatbot. Vui lòng thử lại sau.",
-      "unknown": "Đã xảy ra lỗi trong quá trình hoạt động của chatbot (Mã: {code}). Vui lòng thử lại."
+      "unknown": "Đã xảy ra lỗi trong quá trình hoạt động của chatbot (Mã: {code}). Vui lòng thử lại sau."
     },
     "button": {
       "login": "Đăng nhập",
@@ -1456,6 +1455,11 @@
   "eg, ICML 2024": "ví dụ: ICML 2024",
   "The_conference_title_and_acronym_pair_must_be_unique": "Cặp tên hội nghị và tên viết tắt phải là duy nhất.",
   "Official_Website": "Trang web chính thức",
+  "Call_for_papers_link": "Liên kết trang kêu gọi nộp bài",
+  "Important_dates_link": "Liên kết trang các ngày quan trọng",
+  "Call_for_papers_link_cannot_be_the_same_as_the_official_website": "Liên kết kêu gọi nộp bài không được trùng với trang web chính thức.",
+  "Important_dates_link_cannot_be_the_same_as_the_official_website": "Liên kết các ngày quan trọng không được trùng với trang web chính thức.",
+  "Call_for_papers_and_important_dates_links_cannot_be_the_same": "Liên kết kêu gọi nộp bài và liên kết các ngày quan trọng không được trùng nhau.",
   "Logistics_Details": "Chi tiết Tổ chức",
   "Define_when_and_where_the_conference_will_take_place": "Xác định thời gian và địa điểm hội thảo sẽ diễn ra.",
   "Content_and_Branding": "Nội dung & Nhận diện",
@@ -1493,7 +1497,6 @@
   "Tooltip_RegistrationDate": "Hạn chót để người tham dự đăng ký, thường có các mức giá khác nhau (early bird, regular).",
   "Tooltip_ConferenceDates": "Ngày bắt đầu và kết thúc của sự kiện hội nghị chính.",
   "Tooltip_OtherDate": "Sử dụng cho bất kỳ mốc thời gian quan trọng nào khác không được liệt kê.",
-  "Call_for_Papers": "Kêu gọi bài viết",
   "Write_your_call_for_papers_here": "Viết nội dung kêu gọi bài viết của bạn tại đây...",
   "Markdown_preview_will_appear_here": "Bản xem trước Markdown sẽ xuất hiện ở đây",
   "Call_for_papers_cannot_exceed_characters": "Nội dung Kêu gọi bài viết không được vượt quá {count} ký tự.",
@@ -1547,7 +1550,7 @@
   "Submission_Success": "Gửi thành công",
   "Conference_Submitted_Message": "Hội nghị của bạn đã được gửi và đang chờ đội ngũ của chúng tôi xem xét. Xin cảm ơn!",
   "Submission_Failed": "Gửi thất bại",
-  "Error_Submitting_Conference_Message": "Đã xảy ra lỗi khi gửi hội nghị của bạn. Vui lòng thử lại.",
+  "Error_Submitting_Conference_Message": "Đã xảy ra lỗi khi gửi hội nghị của bạn.\nVui lòng thử lại sau.",
   "Add_Another_Conference": "Thêm hội nghị khác",
   "Go_To_My_Conferences": "Đến hội nghị của tôi",
   "Remove_date": "Xóa ngày",
@@ -1588,7 +1591,9 @@
     "Title_not_provided": "Chưa cung cấp tên",
     "Acronym": "Tên viết tắt",
     "Acronym_not_provided": "Chưa cung cấp tên viết tắt",
-    "Link": "Đường dẫn",
+    "Link": "Trang chủ chính thức",
+    "cfpLink": "Liên kết trang kêu gọi nộp bài",
+    "impLink": "Liên kết trang các ngày quan trọng",
     "Link_not_provided": "Chưa cung cấp đường dẫn",
     "Type": "Hình thức",
     "Online": "Trực tuyến",
@@ -1618,7 +1623,7 @@
     "Notification_Date": "Ngày thông báo kết quả",
     "Camera_Ready_Date": "Ngày nộp bản cuối cùng",
     "Other_Date": "Ngày khác",
-    "Call_for_Papers": "Kêu gọi bài viết"
+    "Call_for_paper": "Kêu gọi bài viết"
   },
   "Try_Again": "Thử lại",
   "Explore_All_Conferences": "Khám phá tất cả hội nghị",
@@ -1629,7 +1634,7 @@
   "Account_Management": "Quản lý tài khoản",
   "Delete_Account_Confirmation": "Bạn có chắc chắn muốn xóa tài khoản của mình không? Hành động này là vĩnh viễn và không thể hoàn tác.",
   "Error_Updating_Setting": "Lỗi khi cập nhật cài đặt",
-  "Error_DeleteAccountFailed": "Không thể xóa tài khoản. Vui lòng thử lại.",
+  "Error_DeleteAccountFailed": "Không thể xóa tài khoản. Vui lòng thử lại sau.",
   "Saving_changes": "Đang lưu thay đổi...",
   "Initializing_session": "Đang khởi tạo phiên...",
   "Please_log_in_toew_settings": "Vui lòng đăng nhập để xem cài đặt của bạn.",
@@ -1739,5 +1744,11 @@
   "Banking_and_Economics": "Kinh Tế & Ngân Hàng",
   "Engineering": "Kỹ Thuật",
   "Education": "Giáo Dục",
-  "Health": "Sức Khỏe"
+  "Health": "Sức Khỏe",
+  "Summary": "Tóm tắt",
+  "Write_a_brief_summary_of_the_conference": "Viết một bản tóm tắt ngắn gọn về hội nghị tại đây...",
+  "Markdown_is_supported_for_rich_text_formatting_brief": "Hỗ trợ Markdown. Vui lòng viết ngắn gọn.",
+  "Please_enter_the_conference_summary": "Vui lòng nhập tóm tắt hội nghị.",
+  "Summary_must_be_at_least_characters": "Tóm tắt phải có ít nhất {count} ký tự.",
+  "Summary_cannot_exceed_characters": "Tóm tắt không được vượt quá {count} ký tự."
 }

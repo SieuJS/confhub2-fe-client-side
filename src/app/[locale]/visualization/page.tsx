@@ -1,12 +1,11 @@
 // src/app/[locale]/visualization/page.tsx
 'use client'
 
-import { useCallback, useRef, useState, useEffect } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import {
   DragDropContext,
   DropResult,
-  ResponderProvided,
-  DragStart
+  ResponderProvided
 } from '@hello-pangea/dnd'
 import DataFieldPanel from '@/src/app/[locale]/visualization/DataFieldPanel'
 import ChartConfigPanel from '@/src/app/[locale]/visualization/ChartConfigPanel'
@@ -23,6 +22,11 @@ import {
 } from '@heroicons/react/20/solid'
 import { useTranslations } from 'next-intl'
 
+// ==================================================================
+// THAY ĐỔI: IMPORT SERVICE THÔNG BÁO
+// ==================================================================
+import { notification } from '@/src/utils/toast/notification';
+
 // --- Constants ---
 const FIELD_LIST_DROPPABLE_ID = 'availableFields'
 type ConfigZoneKey = 'xAxis' | 'yAxis' | 'color' | 'size'
@@ -31,7 +35,8 @@ function isConfigZoneKey(key: string): key is ConfigZoneKey {
 }
 
 const VisualizationPage: React.FC = () => {
-  const t = useTranslations()
+  // Sử dụng namespace 'Visualization' để quản lý key tốt hơn
+  const t = useTranslations('Visualization')
 
   const [isFieldsPanelCollapsed, setIsFieldsPanelCollapsed] = useState(false)
   const [isConfigPanelCollapsed, setIsConfigPanelCollapsed] = useState(false)
@@ -54,27 +59,13 @@ const VisualizationPage: React.FC = () => {
 
   const chartInstanceRef = useRef<EChartsType | null | undefined>(null)
 
-  const toggleFieldsPanel = useCallback(
-    () => setIsFieldsPanelCollapsed(prev => !prev),
-    []
-  )
-  const toggleConfigPanel = useCallback(
-    () => setIsConfigPanelCollapsed(prev => !prev),
-    []
-  )
-
-  // REMOVED: useEffect for manual resize on panel collapse/expand
-  // The ResizeObserver in ChartDisplay.tsx handles this more effectively.
-
-  const handleDragStart = useCallback((start: DragStart) => {
-    // console.log("Drag started:", start);
-  }, [])
+  const toggleFieldsPanel = useCallback(() => setIsFieldsPanelCollapsed(prev => !prev), [])
+  const toggleConfigPanel = useCallback(() => setIsConfigPanelCollapsed(prev => !prev), [])
 
   const handleDragEnd = useCallback(
     (result: DropResult, provided: ResponderProvided) => {
-      const { source, destination, draggableId } = result
-      if (!destination || destination.droppableId === FIELD_LIST_DROPPABLE_ID)
-        return
+      const { destination, draggableId } = result
+      if (!destination || destination.droppableId === FIELD_LIST_DROPPABLE_ID) return
 
       const field = availableFields.find(f => f.id === draggableId)
       if (!field) return
@@ -84,33 +75,24 @@ const VisualizationPage: React.FC = () => {
 
       let acceptedType: FieldType | 'any' = 'any'
       switch (targetZoneId) {
-        case 'xAxis':
-          acceptedType = 'dimension'
-          break
-        case 'yAxis':
-          acceptedType = 'measure'
-          break
-        case 'color':
-          acceptedType = 'dimension'
-          break
-        case 'size':
-          acceptedType = 'measure'
-          break
+        case 'xAxis': acceptedType = 'dimension'; break
+        case 'yAxis': acceptedType = 'measure'; break
+        case 'color': acceptedType = 'dimension'; break
+        case 'size': acceptedType = 'measure'; break
       }
 
       if (field.type !== acceptedType) {
-        const zoneLabel =
-          targetZoneId.charAt(0).toUpperCase() + targetZoneId.slice(1)
-        console.warn(
-          `Invalid drop: ${field.type} field into ${zoneLabel} zone (requires ${acceptedType})`
-        )
-        alert(
-          t('Cannot_drop_field_into_zone', {
-            fieldType: field.type,
+        const zoneLabel = t(`zones.${targetZoneId}`); // Lấy tên khu vực từ file dịch
+        // ==================================================================
+        // THAY ĐỔI: SỬ DỤNG NOTIFICATION.WARNING THAY CHO ALERT
+        // ==================================================================
+        notification.warning(
+          t('invalidDrop', {
+            fieldType: t(`fieldTypes.${field.type}`), // Dịch cả loại trường
             zoneLabel: zoneLabel,
-            acceptedType: acceptedType
-          }) // Example of using t for dynamic alert
-        )
+            acceptedType: t(`fieldTypes.${acceptedType}`)
+          })
+        );
         return
       }
 
@@ -119,86 +101,73 @@ const VisualizationPage: React.FC = () => {
         [targetZoneId]: { ...prevConfig[targetZoneId], fieldId: draggableId }
       }))
     },
-    [availableFields, setChartConfig, chartConfig.chartType, t] // Added t
+    [availableFields, setChartConfig, t]
   )
 
-  const handleRemoveField = useCallback(
-    (zoneId: string) => {
+  const handleRemoveField = useCallback((zoneId: string) => {
       if (!isConfigZoneKey(zoneId)) return
       setChartConfig(prevConfig => ({
         ...prevConfig,
         [zoneId]: { ...prevConfig[zoneId], fieldId: null }
       }))
-    },
-    [setChartConfig]
-  )
+    }, [setChartConfig])
 
-  const handleGetChartInstance = useCallback(
-    (instance: EChartsType | null | undefined) => {
-      if (instance !== chartInstanceRef.current) {
-        chartInstanceRef.current = instance ?? null
-      }
-    },
-    []
-  )
+  const handleGetChartInstance = useCallback((instance: EChartsType | null | undefined) => {
+      chartInstanceRef.current = instance ?? null
+    }, [])
 
   const handleDownload = useCallback(() => {
     if (chartInstanceRef.current) {
       try {
         downloadChartAsSvg(chartInstanceRef, chartOptions.title || 'chart')
+        // (Tùy chọn) Thêm thông báo thành công
+        notification.success(t('downloadSuccess'));
       } catch (error) {
         console.error(`Error during SVG download:`, error)
-        alert(
-          `${t('Failed_to_download_chart')}: ${error instanceof Error ? error.message : String(error)}`
-        )
+        // ==================================================================
+        // THAY ĐỔI: SỬ DỤNG NOTIFICATION.ERROR THAY CHO ALERT
+        // ==================================================================
+        notification.error(t('downloadFailed'));
       }
     } else {
-      console.warn(
-        `Download failed: Chart instance ref not available or chart not ready.`
-      )
+      console.warn(`Download failed: Chart instance ref not available or chart not ready.`)
+      // Thêm thông báo cảnh báo nếu người dùng cố tải xuống khi chưa sẵn sàng
+      notification.warning(t('downloadNotReady'));
     }
-  }, [chartOptions.title, t]) // Added t
+  }, [chartOptions.title, t])
 
-  if (dataLoading)
-    return (
-      <div className='flex h-screen w-screen items-center justify-center bg-gray-10'>
-        <Loading />
-      </div>
-    )
-  if (dataError)
-    return (
-      <div className='flex h-screen w-screen items-center justify-center bg-gray-10 p-4'>
-        <p className='rounded border border-red-300 bg-red-50 p-4 text-center text-red-700 shadow-md'>
-          {t('Error_loading_visualization_data')}: <br /> {dataError}
-        </p>
-      </div>
-    )
-  if (!rawData)
-    return (
-      <div className='flex h-screen w-screen items-center justify-center bg-gray-10 p-4'>
-        <p className='text-center text-gray-50'>
-          {t('No_data_loaded_or_available_for_visualization')}
-        </p>
-      </div>
-    )
+  // ... (phần render loading, error, no data giữ nguyên)
+  if (dataLoading) return <Loading />;
+  if (dataError) return (
+    <div className='flex h-screen w-screen items-center justify-center bg-gray-10 p-4'>
+      <p className='rounded border border-red-300 bg-red-50 p-4 text-center text-red-700 shadow-md'>
+        {t('errorLoadingData')}: <br /> {dataError}
+      </p>
+    </div>
+  );
+  if (!rawData) return (
+    <div className='flex h-screen w-screen items-center justify-center bg-gray-10 p-4'>
+      <p className='text-center text-gray-50'>{t('noDataAvailable')}</p>
+    </div>
+  );
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
+    <DragDropContext onDragEnd={handleDragEnd}>
       <div className='flex h-screen w-screen flex-row overflow-hidden bg-gray-10'>
+        {/* ... (JSX còn lại giữ nguyên) ... */}
         <DataFieldPanel
           fields={availableFields}
           droppableId={FIELD_LIST_DROPPABLE_ID}
           isCollapsed={isFieldsPanelCollapsed}
           onToggle={toggleFieldsPanel}
         />
-        {/* This is the main chart area container */}
-        <div className='relative flex flex-grow flex-col p-2 min-w-0'> {/* ADDED: min-w-0 */}
+        <div className='relative flex flex-grow flex-col p-2 min-w-0'>
           {isFieldsPanelCollapsed && (
             <button
               onClick={toggleFieldsPanel}
               className='absolute left-0 top-1/2 z-20 -translate-y-1/2 transform rounded-r-md bg-gray-20 p-1 shadow-md hover:bg-gray-30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1'
-              title={t('Expand_Fields_Panel')}
-              aria-label={t('Expand_Fields_Panel')}
+              title={t('expandFieldsPanel')}
+              aria-label={t('expandFieldsPanel')}
             >
               <ChevronDoubleRightIcon className='h-5 w-5' />
             </button>
@@ -216,8 +185,8 @@ const VisualizationPage: React.FC = () => {
             <button
               onClick={toggleConfigPanel}
               className='absolute right-0 top-1/2 z-20 -translate-y-1/2 transform rounded-l-md bg-gray-20 p-1 shadow-md hover:bg-gray-30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1'
-              title={t('Expand_Configuration_Panel')}
-              aria-label={t('Expand_Configuration_Panel')}
+              title={t('expandConfigPanel')}
+              aria-label={t('expandConfigPanel')}
             >
               <ChevronDoubleLeftIcon className='h-5 w-5' />
             </button>

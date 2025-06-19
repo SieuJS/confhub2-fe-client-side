@@ -22,7 +22,7 @@ export const CallForPapersSection: React.FC<CallForPapersSectionProps> = ({
       className='mt-6 rounded-lg bg-white-pure px-2 py-4 shadow-md  md:px-4'
     >
       <h2 className='mb-4 text-xl font-semibold md:text-2xl '>
-        {t('Call_for_papers')}
+        {t('Call_for_paper')}
       </h2>
       {callForPaper ? (
         <div className='prose prose-sm max-w-none dark:prose-invert sm:prose-base'>
@@ -39,7 +39,7 @@ export const CallForPapersSection: React.FC<CallForPapersSectionProps> = ({
           </ReactMarkdown>
         </div>
       ) : (
-        <p className=''>{t('No_call_for_papers_available')}</p>
+        <p className=''>{t('No_Call_for_paper_available')}</p>
       )}
     </section>
   )

@@ -67,7 +67,7 @@ const MobileNavigation: FC<Props> = ({
           locale={locale}
           className='px-4 py-2 hover:bg-gray-10 dark:hover:bg-gray-70'
         >
-          {t('Visualization')}
+          {t('Visualization.Visualization')}
         </Link>
         <Link
           href={`/chatbot/landing`}

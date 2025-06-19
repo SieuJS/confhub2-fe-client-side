@@ -63,7 +63,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
   const sectionTranslationMap: { [key: string]: string } = {
     overview: 'Overview',
     'important-dates': 'Important_Dates',
-    'call-for-papers': 'Call_for_papers',
+    'call-for-papers': 'Call_for_paper',
     'source-rank': 'Source_Rank',
     map: 'Map'
   }

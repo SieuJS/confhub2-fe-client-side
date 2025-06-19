@@ -126,6 +126,42 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
           icon={<LinkIcon className='h-5 w-5 ' />}
           t={t}
         />
+
+        {/* --- BẮT ĐẦU THAY ĐỔI --- */}
+        <TextInput
+          id='cfpLink'
+          label='Call_for_paper_link'
+          value={formData.cfpLink || ''}
+          onChange={e =>
+            handlers.handleFieldChange('cfpLink', e.target.value)
+          }
+          onBlur={() => handlers.handleBlur('cfpLink')}
+          isTouched={touchedFields.has('cfpLink')}
+          error={errors.cfpLink}
+          placeholder='https://example.com/cfp'
+          type='url'
+          className='sm:col-span-6'
+          icon={<LinkIcon className='h-5 w-5' />}
+          t={t}
+        />
+
+        <TextInput
+          id='impLink'
+          label='Important_dates_link'
+          value={formData.impLink || ''}
+          onChange={e =>
+            handlers.handleFieldChange('impLink', e.target.value)
+          }
+          onBlur={() => handlers.handleBlur('impLink')}
+          isTouched={touchedFields.has('impLink')}
+          error={errors.impLink}
+          placeholder='https://example.com/dates'
+          type='url'
+          className='sm:col-span-6'
+          icon={<LinkIcon className='h-5 w-5' />}
+          t={t}
+        />
+        {/* --- KẾT THÚC THAY ĐỔI --- */}
       </FormSectionCard>
     </div>
   )

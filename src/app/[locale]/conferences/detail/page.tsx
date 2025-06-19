@@ -3,17 +3,17 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useEffect, useCallback, Suspense } from 'react' // Thêm Suspense
-import ConferenceFeedback from './ConferenceFeedback' // Đảm bảo path đúng
+import { useEffect, useCallback, Suspense } from 'react'
+import ConferenceFeedback from './ConferenceFeedback'
 import NotFoundPage from '../../utils/NotFoundPage'
 import Loading from '../../utils/Loading'
-import { ConferenceTabs } from './ConferenceTabs' // Đảm bảo path đúng
+import { ConferenceTabs } from './ConferenceTabs'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { Header } from '../../utils/Header'
 import Footer from '../../utils/Footer'
-import { useAuth } from '@/src/contexts/AuthContext' // <<<< THAY ĐỔI QUAN TRỌNG
+import { useAuth } from '@/src/contexts/AuthContext'
 
-// Import the custom hooks
+// Import hooks
 import useSequentialConferenceData from '@/src/hooks/conferenceDetails/useSequentialConferenceData'
 import useFollowConference from '@/src/hooks/conferenceDetails/useFollowConference'
 import useShareConference from '@/src/hooks/conferenceDetails/useShareConference'
@@ -23,13 +23,18 @@ import useAddToCalendar from '@/src/hooks/conferenceDetails/useAddToCalendar'
 import useUpdateConference from '@/src/hooks/conferenceDetails/useUpdateConference'
 import useBlacklistConference from '@/src/hooks/conferenceDetails/useBlacklistConference'
 
-// Import new components
+// Import components
 import ConferenceHeader from './ConferenceHeader'
 import ConferenceTopics from './ConferenceTopics'
 import ConferenceActionButtons from './ConferenceActionButtons'
 
 // Import utility functions
 import { transformDates, calculateOverallRating } from './utils/conferenceUtils'
+
+// ==================================================================
+// BƯỚC 2.1: IMPORT SERVICE THÔNG BÁO
+// ==================================================================
+import { notification } from '@/src/utils/toast/notification'; // <<<< THAY ĐỔI QUAN TRỌNG
 
 interface DetailContentProps {
   locale: string
@@ -40,26 +45,18 @@ const DetailContent: React.FC<DetailContentProps> = ({
   locale,
   conferenceId
 }) => {
-  const t = useTranslations('')
+  const t = useTranslations('ConferenceDetail') // Sử dụng namespace để quản lý translation
   const router = useRouter()
   const pathname = usePathname()
-
-  // <<<< THAY ĐỔI QUAN TRỌNG: Sử dụng useAuth từ Context
-  const { isLoggedIn, isInitializing: isAuthInitializing, user, logout } = useAuth() // Lấy thêm user nếu cần
+  const { isLoggedIn, isInitializing: isAuthInitializing, user, logout } = useAuth()
 
   const {
     conferenceDataFromDB,
     dbError,
     loading: sequentialLoading
-  } = useSequentialConferenceData(conferenceId) // Sử dụng conferenceId từ props
-
-  // const lastOrganization =
-  //   conferenceDataFromDB?.organizations?.[
-  //     conferenceDataFromDB.organizations.length - 1
-  //   ]
+  } = useSequentialConferenceData(conferenceId)
 
   const lastOrganization = conferenceDataFromDB?.organizations?.[0]
-
   const firstRankData = conferenceDataFromDB?.ranks?.[0]
   const transformedDatesData = transformDates(lastOrganization?.conferenceDates)
 
@@ -84,7 +81,7 @@ const DetailContent: React.FC<DetailContentProps> = ({
     error: blacklistError
   } = useBlacklistConference(conferenceDataFromDB)
 
-  const language = t('language') // Hoặc có thể lấy locale từ props
+  const language = useTranslations('')('language')
   const { isUpdating, updateResult, updateConference } = useUpdateConference()
   const { handleShareClick } = useShareConference(conferenceDataFromDB)
   const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } =
@@ -98,19 +95,12 @@ const DetailContent: React.FC<DetailContentProps> = ({
   const checkLoginAndRedirect = useCallback(
     (callback: () => void) => {
       if (isAuthInitializing) {
-        // Đợi auth khởi tạo xong
-        // console.log('[Detail Page] Auth still initializing, action deferred.')
-        // Có thể hiển thị thông báo hoặc không làm gì cả
         return
       }
       if (!isLoggedIn) {
-        // console.log(
-        //   '[Detail Page] Not logged in, redirecting to login for action.'
-        // )
         const currentPath =
           pathname + (conferenceId ? `?id=${conferenceId}` : '')
         localStorage.setItem('returnUrl', currentPath)
-        // locale đã có trong pathname, hoặc có thể lấy từ props locale
         router.push(`/${locale}/auth/login`)
       } else {
         callback()
@@ -119,62 +109,63 @@ const DetailContent: React.FC<DetailContentProps> = ({
     [isLoggedIn, isAuthInitializing, pathname, router, locale, conferenceId]
   )
 
+  // ==================================================================
+  // BƯỚC 2.2: THAY THẾ ALERT() BẰNG NOTIFICATION SERVICE
+  // ==================================================================
   useEffect(() => {
     if (updateResult) {
       if (updateResult.success) {
-        alert(updateResult.message) // Thay thế bằng hệ thống thông báo tốt hơn
+        // Sử dụng notification.success
+        notification.success(updateResult.message || t('updateSuccess'));
       } else {
-        alert(`Error: ${updateResult.error}`) // Thay thế bằng hệ thống thông báo tốt hơn
+        // Sử dụng notification.error
+        notification.error(updateResult.error || t('updateError'));
       }
     }
-  }, [updateResult]) // Bỏ t nếu không dùng
+  }, [updateResult, t])
 
 
+  // ==================================================================
+  // BƯỚC 2.3: GOM CÁC useEffect LỖI VÀO MỘT CHỖ CHO GỌN
+  // ==================================================================
   useEffect(() => {
-    if (calendarError === 'User is banned')
-    {
-        alert(calendarError)
-    }
-  }, [calendarError])
+    // Lấy lỗi đầu tiên xuất hiện
+    const errorMessage = followError || calendarError || blacklistError;
 
-  useEffect(() => {
-    if (blacklistError === 'User is banned')
-    {
-        alert(blacklistError)
+    if (errorMessage) {
+      // Kiểm tra các thông điệp lỗi cụ thể nếu cần
+      if (errorMessage === 'User is banned') {
+        notification.error(t('userBannedError')); // Dùng key translation cho chuyên nghiệp
+      } else {
+        // Hiển thị các lỗi khác
+        notification.error(errorMessage);
+      }
     }
-  }, [blacklistError])
-
-  useEffect(() => {
-    if (followError === 'User is banned')
-    {
-        alert(followError)
-    }
-  }, [followError])
-
+    // Phụ thuộc vào các biến lỗi và hàm t (nếu dùng)
+  }, [followError, calendarError, blacklistError, t]);
 
 
   // --- Loading & Error States ---
   if (isAuthInitializing || (sequentialLoading && !conferenceDataFromDB)) {
-    // Ưu tiên hiển thị loading auth nếu nó đang chạy
-    // Hoặc loading data conference nếu auth đã xong
     return <Loading />
   }
 
   if (dbError === 'Conference not found' || dbError?.includes('404') || !conferenceId) {
-    // Nếu không có conferenceId từ đầu (do URL sai) hoặc API trả về không tìm thấy
     return <NotFoundPage />
   }
   if (dbError) {
-    // Các lỗi khác từ API
     return (
       <div className='flex h-screen items-center justify-center'>
-        <div>Error loading conference data: {dbError}</div>
+        {/* Hiển thị lỗi một cách thân thiện hơn */}
+        <div className='text-center'>
+          <h2 className='text-2xl font-bold text-red-500 mb-2'>{t('errorLoadingTitle')}</h2>
+          <p>{t('errorLoadingMessage', { error: dbError })}</p>
+        </div>
       </div>
     )
   }
   if (!conferenceDataFromDB) {
-    // Trường hợp không có data sau khi loading xong và không có lỗi cụ thể
-    return <NotFoundPage /> // Hoặc một thông báo lỗi khác
+    return <NotFoundPage />
   }
 
   const displayOrganization =
@@ -193,7 +184,6 @@ const DetailContent: React.FC<DetailContentProps> = ({
         )}
 
         <div className='rounded-lg bg-white-pure p-2 shadow-md md:p-4'>
-          {' '}
           <div className='flex flex-col gap-4 md:flex-row'>
             <div className='md:w-4/5'>
               <ConferenceHeader
@@ -214,7 +204,7 @@ const DetailContent: React.FC<DetailContentProps> = ({
 
             <div className='md:w-1/5'>
               <ConferenceActionButtons
-                conferenceId={conferenceId} // Truyền conferenceId đã được validate
+                conferenceId={conferenceId}
                 displayOrganization={displayOrganization}
                 isAddToCalendar={isAddToCalendar}
                 handleAddToCalendar={handleAddToCalendar}
@@ -223,13 +213,12 @@ const DetailContent: React.FC<DetailContentProps> = ({
                 isFollowing={isFollowing}
                 handleFollowClick={handleFollowClick}
                 followLoading={followLoading}
-                isUpdating={isUpdating} // Loading khi đang update từ API
+                isUpdating={isUpdating}
                 updateConference={updateConference}
                 isBlacklisted={isBlacklisted}
                 handleBlacklistClick={handleBlacklistClick}
                 blacklistLoading={blacklistLoading}
                 checkLoginAndRedirect={checkLoginAndRedirect}
-                // Cân nhắc truyền user.roles vào đây nếu cần kiểm tra quyền hạn cụ thể
               />
             </div>
           </div>
@@ -239,7 +228,6 @@ const DetailContent: React.FC<DetailContentProps> = ({
         </div>
 
         <div className='mt-8 rounded-lg bg-white-pure p-4 shadow-md md:p-6'>
-          {' '}
           <ConferenceFeedback conferenceData={conferenceDataFromDB} />
         </div>
       </main>
@@ -252,8 +240,6 @@ const DetailContent: React.FC<DetailContentProps> = ({
 const DetailPage = ({ params: { locale } }: { params: { locale: string } }) => {
   return (
     <Suspense fallback={<Loading />}>
-      {' '}
-      {/* Fallback chung cho cả trang */}
       <PageContent locale={locale} />
     </Suspense>
   )

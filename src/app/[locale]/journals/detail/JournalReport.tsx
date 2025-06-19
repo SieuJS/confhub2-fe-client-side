@@ -174,10 +174,10 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
     try {
       if (isFollowing) {
         await journalFollowService.unfollowJournal(journal.id)
-        toast.success(t('JournalCard.unfollowSuccess'))
+        // toast.success(t('JournalCard.unfollowSuccess'))
       } else {
         await journalFollowService.followJournal(journal.id)
-        toast.success(t('JournalCard.followSuccess'))
+        // toast.success(t('JournalCard.followSuccess'))
       }
       setIsFollowing(!isFollowing)
     } catch (error) {

@@ -57,7 +57,7 @@ const DesktopNavigation: FC<Props> = ({ locale }) => {
         href={`/visualization`}
         className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-button md:mx-4 ${isActive(`/${locale}/visualization`) ? 'text-button' : ''}`}
       >
-        {t('Visualization')}
+        {t('Visualization.Visualization')}
         <span
           className={`absolute bottom-0 left-0 h-0.5 w-full transform bg-button transition-transform duration-300 ease-in-out ${
             isActive('/visualization')

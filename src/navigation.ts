@@ -18,11 +18,9 @@ export const pathnames = {
   '/chatbot/livechat': '/chatbot/livechat',
   '/chatbot/history': '/chatbot/history',
   
-  '/visualization/landingvisualization': '/visualization/landingvisualization',
   '/visualization': '/visualization',
   
   '/support': '/support',
-  '/other': '/other',
   '/addconference': '/addconference',
   '/conferences/detail': '/conferences/detail',
   '/journals/detail': '/journals/detail',
@@ -31,7 +29,6 @@ export const pathnames = {
   '/auth/verify-email': '/auth/verify-email',
   '/auth/forgot-password': '/auth/forgot-password',
   '/auth/reset-password': '/auth/reset-password',
-  '/updateconference': '/updateconference'
 } satisfies Pathnames<typeof locales>
 
 export const { Link, redirect, usePathname, useRouter, getPathname } =

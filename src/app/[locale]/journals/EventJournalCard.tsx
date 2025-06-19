@@ -1,3 +1,5 @@
+// src/components/EventJournalCard.tsx (hoặc đường dẫn tương ứng)
+
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react'
@@ -26,26 +28,27 @@ import {
 } from 'lucide-react'
 
 interface EventJournalCardProps {
-  journal: JournalData
+  journal: JournalData;
+  // THÊM PROP MỚI
+  isInitiallyFollowing: boolean;
+  // THÊM PROP ĐỂ CẬP NHẬT TRẠNG THÁI FOLLOW LÊN COMPONENT CHA
+  onFollowStatusChange: (journalId: string, isFollowing: boolean) => void;
 }
 
-const EventJournalCard: React.FC<EventJournalCardProps> = ({ journal }) => {
+const EventJournalCard: React.FC<EventJournalCardProps> = ({
+  journal,
+  isInitiallyFollowing, // NHẬN PROP MỚI
+  onFollowStatusChange // NHẬN PROP MỚI
+}) => {
   const t = useTranslations('JournalCard')
-  const [isFollowing, setIsFollowing] = useState(false)
+  // Khởi tạo trạng thái isFollowing từ prop
+  const [isFollowing, setIsFollowing] = useState(isInitiallyFollowing)
   const [isLoading, setIsLoading] = useState(false)
 
+  // Cập nhật isFollowing khi prop isInitiallyFollowing thay đổi (ví dụ: khi danh sách follow được fetch lại)
   useEffect(() => {
-    const checkFollowStatus = async () => {
-      try {
-        const followedJournals =
-          await journalFollowService.getFollowedJournals()
-        setIsFollowing(followedJournals.some(fj => fj.journalId === journal.id))
-      } catch (error) {
-        console.error('Error checking follow status:', error)
-      }
-    }
-    checkFollowStatus()
-  }, [journal.id])
+    setIsFollowing(isInitiallyFollowing);
+  }, [isInitiallyFollowing]);
 
   const handleFollowToggle = async () => {
     if (isLoading) return
@@ -53,12 +56,15 @@ const EventJournalCard: React.FC<EventJournalCardProps> = ({ journal }) => {
     try {
       if (isFollowing) {
         await journalFollowService.unfollowJournal(journal.id)
-        toast.success(t('unfollowSuccess'))
+        // toast.success(t('unfollowSuccess'))
       } else {
         await journalFollowService.followJournal(journal.id)
-        toast.success(t('followSuccess'))
+        // toast.success(t('followSuccess'))
       }
-      setIsFollowing(!isFollowing)
+      const newFollowStatus = !isFollowing;
+      setIsFollowing(newFollowStatus);
+      // Gọi callback để thông báo trạng thái thay đổi lên component cha
+      onFollowStatusChange(journal.id, newFollowStatus);
     } catch (error) {
       console.error('Error toggling follow status:', error)
       toast.error(t('followError'))

@@ -86,12 +86,15 @@ const ConferenceForm: React.FC = () => {
             title={formData.title}
             acronym={formData.acronym}
             link={formData.link}
+            cfpLink={formData.cfpLink}
+            impLink={formData.impLink}
             type={formData.type}
             location={formData.location}
             dates={formData.dates}
             topics={formData.topics}
-            imageUrl={formData.imageUrl}
-            description={formData.description}
+            // imageUrl={formData.imageUrl}
+            summary={formData.summary}
+            callForPaper={formData.callForPaper}
             t={t}
             statesForReview={statesForReview}
             citiesForReview={citiesForReview}

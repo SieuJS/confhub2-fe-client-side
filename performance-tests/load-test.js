@@ -1,0 +1,100 @@
+// performance-tests/load-test.js
+// KHÔNG import SharedArray hay users ở đây nữa
+
+import http from 'k6/http';
+import { guestJourney } from './scenarios/guest.js';
+import { registeredUserJourney } from './scenarios/registered.js';
+
+export const options = {
+  // ... phần options giữ nguyên ...
+  thresholds: {
+    'http_req_failed': ['rate<0.05'],
+    'http_req_duration': ['p(95)<2000'],
+    'http_req_duration{scenario:guest_journey}': ['p(95)<1500'],
+    'http_req_duration{scenario:registered_journey}': ['p(95)<2500'],
+  },
+  scenarios: {
+    guest: {
+      executor: 'ramping-vus',
+      exec: 'runGuestJourney',
+      stages: [
+        { duration: '1m', target: 50 },
+        { duration: '3m', target: 50 },
+        { duration: '30s', target: 0 },
+      ],
+      gracefulRampDown: '30s',
+      tags: { scenario: 'guest_journey' },
+    },
+    registered: {
+      executor: 'ramping-vus',
+      exec: 'runRegisteredUserJourney',
+      startTime: '30s',
+      stages: [
+        { duration: '1m', target: 20 },
+        { duration: '3m', target: 20 },
+        { duration: '30s', target: 0 },
+      ],
+      gracefulRampDown: '30s',
+      tags: { scenario: 'registered_journey' },
+    },
+  },
+};
+
+// --- 2. Chuẩn bị dữ liệu ---
+// BỎ dòng const users = new SharedArray(...) ở đây
+
+const FRONTEND_URL = __ENV.FRONTEND_URL || 'https://confhub.ddns.net';
+const API_URL = __ENV.API_URL || 'https://confhub.westus3.cloudapp.azure.com';
+
+export function setup() {
+  console.log('Setting up the test by fetching initial data...');
+  let conferenceIds = [];
+  let journalIds = [];
+
+  try {
+    const confRes = http.get(`${API_URL}/api/v1/conference?perPage=4`);
+    if (confRes.status === 200) {
+      const conferences = confRes.json('payload');
+      if (conferences && Array.isArray(conferences)) {
+        conferenceIds = conferences.map(c => c.id);
+        console.log(`Successfully fetched ${conferenceIds.length} conference IDs.`);
+      }
+    } else {
+      console.error(`Failed to fetch conference IDs, status: ${confRes.status}, body: ${confRes.body}`);
+    }
+
+    const journalRes = http.get(`${API_URL}/api/v1/journals?limit=6`);
+    if (journalRes.status === 200) {
+      const journals = journalRes.json('data');
+      if (journals && Array.isArray(journals)) {
+        journalIds = journals.map(j => j.id);
+        console.log(`Successfully fetched ${journalIds.length} journal IDs.`);
+      }
+    } else {
+      console.error(`Failed to fetch journal IDs, status: ${journalRes.status}, body: ${journalRes.body}`);
+    }
+  } catch (e) {
+    console.error('An error occurred during setup:', e);
+  }
+
+  if (conferenceIds.length === 0 || journalIds.length === 0) {
+      throw new Error("Could not fetch initial data (conference/journal IDs). Aborting test.");
+  }
+
+  // ĐIỀU CHỈNH: Không cần trả về users nữa
+  return {
+    conferenceIds: conferenceIds,
+    journalIds: journalIds,
+    FRONTEND_URL: FRONTEND_URL,
+    API_URL: API_URL,
+  };
+}
+
+// --- 3. Các hàm thực thi ---
+export function runGuestJourney(data) {
+  guestJourney(data);
+}
+
+export function runRegisteredUserJourney(data) {
+  registeredUserJourney(data);
+}

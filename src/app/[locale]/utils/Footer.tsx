@@ -130,7 +130,7 @@ const Footer = () => {
   const quickLinks = [
     { href: '/support', label: t('Support') },
     { href: '/conferences', label: t('Conferences') },
-    { href: '/visualization', label: t('Visualization') },
+    { href: '/visualization', label: t('Visualization.Visualization') },
     { href: '/addconference', label: t('Add_Conference') },
     { href: '/chatbot/landing', label: t('Chatbot.Chatbot') }
   ] as FooterLink[]

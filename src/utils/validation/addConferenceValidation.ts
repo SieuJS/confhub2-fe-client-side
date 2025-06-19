@@ -1,5 +1,3 @@
-// src/utils/addConferenceValidation.ts
-
 import { ConferenceDetailsStepProps } from '@/src/app/[locale]/addconference/steps/ConferenceDetailsStep';
 
 // Validator cho Basic Info (Không thay đổi)
@@ -7,15 +5,16 @@ export const isBasicInfoComplete = (props: ConferenceDetailsStepProps): boolean 
   const { formData, errors } = props;
   const { title, acronym, link } = formData;
 
+  // Sửa lỗi chính tả tên trường đã có
   const hasData = !!(title.trim() && acronym.trim() && link.trim());
-  const noErrors = !errors.title && !errors.acronym && !errors.link;
+  const noErrors = !errors.title && !errors.acronym && !errors.link && !errors.callForPaperLink && !errors.importantDatesLink;
 
   return hasData && noErrors;
 };
 
-// Validator cho Logistics (CẬP NHẬT TẠI ĐÂY)
+// Validator cho Logistics (Không thay đổi)
 export const isLogisticsComplete = (props: ConferenceDetailsStepProps): boolean => {
-  const { formData, errors, dateErrors, globalDateError } = props; // Thêm globalDateError
+  const { formData, errors, dateErrors, globalDateError } = props;
   const { type, location, dates } = formData;
 
   let isLocationValid = true;
@@ -24,26 +23,22 @@ export const isLogisticsComplete = (props: ConferenceDetailsStepProps): boolean 
       location.address.trim() &&
       location.continent &&
       location.country
-      // location.cityStateProvince
     );
 
     const noLocationErrors =
       !errors['location.address'] &&
       !errors['location.continent'] &&
-      !errors['location.country']
-      // !errors['location.cityStateProvince']
-      ;
+      !errors['location.country'];
 
     isLocationValid = hasLocationData && noLocationErrors;
   }
 
   const hasTypeData = !!type;
   const noTypeError = !errors.type;
-
-  // Logic kiểm tra ngày tháng giờ đây phải bao gồm cả globalDateError
+  
   const areDatesValid = dates.length > 0 &&
     !dateErrors.some(err => Object.values(err).some(msg => !!msg)) &&
-    !globalDateError; // Kiểm tra lỗi toàn cục
+    !globalDateError;
 
   return isLocationValid && hasTypeData && noTypeError && areDatesValid;
 };
@@ -52,12 +47,15 @@ export const isLogisticsComplete = (props: ConferenceDetailsStepProps): boolean 
 export const isContentComplete = (props: ConferenceDetailsStepProps): boolean => {
   const { formData, errors, topicError } = props;
 
-  // Topics phải hợp lệ (tối thiểu 1 và không có lỗi)
   const topicsValid = formData.topics.length >= 1 && !topicError;
   
-  // Description phải hợp lệ (đủ 100 ký tự VÀ không có lỗi validation nào)
-  const descriptionValid = 
-    formData.description.trim().length >= 100 && !errors.description;
+  // --- BẮT ĐẦU THAY ĐỔI ---
+  const summaryValid =
+    formData.summary.trim().length >= 50 && !errors.summary;
 
-  return topicsValid && descriptionValid;
+  const callForPaperValid = 
+    formData.callForPaper.trim().length >= 100 && !errors.callForPaper;
+
+  return topicsValid && summaryValid && callForPaperValid;
+  // --- KẾT THÚC THAY ĐỔI ---
 };

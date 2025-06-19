@@ -1,0 +1,72 @@
+[
+    {
+        "id": "e12aff4b-aabc-451e-81ce-7c7f0a472b51",
+        "email": "croyupajilau-8192@yopmail.com",
+        "password": "12345678",
+        "firstName": "DONG",
+        "lastName": "QUAN",
+        "dob": "2000-01-01T00:00:00.000Z",
+        "avatar": null,
+        "aboutMe": null,
+        "background": null,
+        "isBanned": false,
+        "createdAt": "2025-05-06T08:27:34.417Z",
+        "updatedAt": "2025-05-06T08:27:34.417Z"
+    },
+    {
+        "id": "7aa2f356-0f61-4165-a883-8cd7834031ca",
+        "email": "biffobehureu-9244@yopmail.com",
+        "password": "12345678",
+        "firstName": "DONG",
+        "lastName": "QUAN",
+        "dob": "2000-01-01T00:00:00.000Z",
+        "avatar": null,
+        "aboutMe": null,
+        "background": null,
+        "isBanned": false,
+        "createdAt": "2025-05-08T03:39:53.531Z",
+        "updatedAt": "2025-05-08T03:39:53.531Z"
+    },
+    {
+        "id": "742a59d5-b149-4ed7-906b-109ac5b9bcb9",
+        "email": "frijauwikugre-7714@yopmail.com",
+        "password": "12345678",
+        "firstName": "Tung",
+        "lastName": "Le",
+        "dob": "2025-05-08T04:06:24.884Z",
+        "avatar": null,
+        "aboutMe": null,
+        "background": null,
+        "isBanned": false,
+        "createdAt": "2025-05-08T04:07:10.181Z",
+        "updatedAt": "2025-05-08T04:07:10.181Z"
+    },
+    {
+        "id": "6f3e7a45-6318-4716-8338-04b861dd96cc",
+        "email": "saupennadeiko-8600@yopmail.com",
+        "password": "12345678",
+        "firstName": "DONG",
+        "lastName": "QUAN",
+        "dob": "2000-01-01T00:00:00.000Z",
+        "avatar": null,
+        "aboutMe": null,
+        "background": null,
+        "isBanned": false,
+        "createdAt": "2025-05-09T02:39:38.767Z",
+        "updatedAt": "2025-05-09T02:39:38.767Z"
+    },
+    {
+        "id": "772f98c9-8a52-46c1-ba2d-a51c8fc3c851",
+        "email": "loicute5fps@gmail.com",
+        "password": "12345678",
+        "firstName": "Le",
+        "lastName": "Loi",
+        "dob": "2000-01-01T00:00:00.000Z",
+        "avatar": "/avatar3.jpg",
+        "aboutMe": "Top 1",
+        "background": null,
+        "isBanned": false,
+        "createdAt": "2025-05-06T05:12:05.238Z",
+        "updatedAt": "2025-06-09T03:23:16.665Z"
+    }
+]

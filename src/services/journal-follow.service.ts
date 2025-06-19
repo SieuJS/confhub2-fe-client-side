@@ -1,3 +1,5 @@
+// src/services/journal-follow.service.ts
+
 import { JournalFollowInput, JournalFollowedResponse, JournalFollowersResponse } from '../models/response/journal-follow.response';
 
 const API_BASE_URL = (process.env.NEXT_PUBLIC_DATABASE_URL || 'http://localhost:3000') + '/api/v1';
@@ -37,6 +39,7 @@ export const journalFollowService = {
     return response.json();
   },
 
+  // Phương thức cũ, có thể giữ lại nếu có nơi khác cần
   async getFollowedJournals(): Promise<JournalFollowedResponse[]> {
     const token = localStorage.getItem('token');
     const response = await fetch(`${API_BASE_URL}/journal-follows/user`, {
@@ -51,6 +54,25 @@ export const journalFollowService = {
     }
 
     return response.json();
+  },
+
+  // PHƯƠNG THỨC MỚI ĐỂ LẤY DANH SÁCH FOLLOWED JOURNAL IDs
+  async getFollowedJournalIdsByUser(): Promise<string[]> {
+    const token = localStorage.getItem('token');
+    // Sử dụng URL mới được cung cấp
+    const response = await fetch(`https://confhub.westus3.cloudapp.azure.com/api/v1/journal-follows/by-user`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get followed journal IDs by user');
+    }
+
+    const data: { journalIds: string[] } = await response.json();
+    return data.journalIds;
   },
 
   async getJournalFollowers(journalId: string): Promise<JournalFollowersResponse[]> {
@@ -68,4 +90,4 @@ export const journalFollowService = {
 
     return response.json();
   }
-}; 
+};

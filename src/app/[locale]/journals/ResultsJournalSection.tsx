@@ -1,12 +1,13 @@
 // ResultsJournalSection.tsx
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import EventJournalCard from './EventJournalCard'
 import Pagination from '../utils/Pagination'
 import useJournalResults from '@/src/hooks/journals/useJournalResults'
 import { useTranslations } from 'next-intl'
 import { Loader2 } from 'lucide-react' // Import Loader2
+import { journalFollowService } from '@/src/services/journal-follow.service' // Import service
 
 interface ResultsJournalSectionProps {}
 
@@ -20,13 +21,49 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = () => {
     journalsPerPage, // Số tạp chí trên mỗi trang từ meta.limit
     totalPages,    // Tổng số trang từ meta.totalPages
     sortBy,
-    loading,
+    loading, // Loading trạng thái của journals
     error,
     paginate,
     handleSortByChange
   } = useJournalResults()
 
-  if (loading) {
+  // State mới để lưu trữ danh sách ID của các journal mà user đã follow
+  const [followedJournalIds, setFollowedJournalIds] = useState<Set<string>>(new Set());
+  // State để quản lý trạng thái loading của việc fetch danh sách follow
+  const [loadingFollows, setLoadingFollows] = useState(true);
+
+  // Effect để fetch danh sách journal IDs mà user đã follow
+  useEffect(() => {
+    const fetchFollowedJournalIds = async () => {
+      try {
+        setLoadingFollows(true);
+        const ids = await journalFollowService.getFollowedJournalIdsByUser();
+        setFollowedJournalIds(new Set(ids));
+      } catch (err) {
+        console.error('Failed to fetch followed journal IDs:', err);
+        // Có thể thêm toast.error hoặc xử lý lỗi khác ở đây
+      } finally {
+        setLoadingFollows(false);
+      }
+    };
+    fetchFollowedJournalIds();
+  }, []); // Chỉ gọi một lần khi component mount
+
+  // Callback để cập nhật trạng thái follow khi người dùng nhấn nút trong EventJournalCard
+  const handleFollowStatusChange = useCallback((journalId: string, isFollowing: boolean) => {
+    setFollowedJournalIds(prevIds => {
+      const newIds = new Set(prevIds);
+      if (isFollowing) {
+        newIds.add(journalId);
+      } else {
+        newIds.delete(journalId);
+      }
+      return newIds;
+    });
+  }, []); // useCallback để tránh re-render không cần thiết
+
+  // Hiển thị loading chung cho cả journals và followedJournalIds
+  if (loading || loadingFollows) {
     return (
       <div className='flex h-96 flex-col items-center justify-center text-gray-500'>
         <Loader2 className='h-10 w-10 animate-spin text-indigo-600' />
@@ -50,49 +87,29 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = () => {
           {/* Sử dụng totalJournals từ hook để hiển thị tổng số kết quả */}
           {t('resultsCount', { count: totalJournals })}
         </h2>
-        {/* <div className='flex items-center rounded-md px-2 py-1'>
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            className='mr-1 h-5 w-5'
-            viewBox='0 0 20 20'
-            fill='currentColor'
-          >
-            <path
-              fillRule='evenodd'
-              d='M3 5a1 1 0 011-1h12a1 1 0 0110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 0110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 0110 2H4a1 1 0 01-1-1z'
-              clipRule='evenodd'
-            />
-          </svg>
-          <span className='mr-1 text-sm'>{t('sortByLabel')}:</span>
-          <select
-            className='rounded border bg-transparent px-2 py-1 text-sm focus:outline-none'
-            value={sortBy}
-            onChange={handleSortByChange}
-          >
-            <option value='title'>{t('sortByTitle')}</option>
-            <option value='issn'>{t('sortByISSN')}</option>
-            <option value='publisher'>{t('sortByPublisher')}</option>
-            <option value='impactFactor'>{t('sortByImpactFactor')}</option>
-            <option value='sjr'>{t('sortBySJR')}</option>
-            <option value='hIndex'>{t('sortByHIndex')}</option>
-          </select>
-        </div> */}
+        {/* Phần sắp xếp (đã comment out) */}
       </div>
 
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
-        {/* currentJournals (hoặc journals) là mảng JournalData[] */}
-        {journals?.map(journal => ( // Đảm bảo map qua journals hoặc currentJournals
-          <EventJournalCard key={journal.id} journal={journal} />
+        {journals?.map(journal => (
+          <EventJournalCard
+            key={journal.id}
+            journal={journal}
+            // Truyền trạng thái follow ban đầu
+            isInitiallyFollowing={followedJournalIds.has(journal.id)}
+            // Truyền callback để cập nhật trạng thái follow
+            onFollowStatusChange={handleFollowStatusChange}
+          />
         ))}
       </div>
 
       {/* Điều kiện hiển thị phân trang dựa trên totalPages */}
-      {totalPages > 1 && ( // Chỉ hiển thị phân trang nếu có nhiều hơn 1 trang
+      {totalPages > 1 && (
         <Pagination
-          eventsPerPage={journalsPerPage} // Đây là limit từ meta
-          totalEvents={totalJournals} // Đây là tổng số record từ meta
+          eventsPerPage={journalsPerPage}
+          totalEvents={totalJournals}
           paginate={paginate}
-          currentPage={currentPage} // Trang hiện tại từ meta
+          currentPage={currentPage}
         />
       )}
     </div>

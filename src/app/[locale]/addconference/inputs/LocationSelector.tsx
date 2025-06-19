@@ -56,7 +56,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = (props) => {
       </label>
       <div className="mt-2 grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-2 lg:grid-cols-4">
         <AddressInput
-          address={formData.location.address}
+          address={formData.location?.address}
           onAddressChange={value => handlers.handleLocationChange('address', value)}
           onBlur={() => handlers.handleBlur('location.address')} // Truyền onBlur
           isTouched={touchedFields.has('location.address')}   // Truyền isTouched

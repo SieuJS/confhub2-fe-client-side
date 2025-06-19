@@ -1,7 +1,6 @@
 // src/hooks/addConference/useConferenceForm.ts
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
 import {
   LocationInput,
   ImportantDateInput,
@@ -18,7 +17,7 @@ import {
   validateDatesArray,
   DateError,
 } from '@/src/utils/validation';
-import countriesData from '@/src/app/[locale]/addconference/countries.json'; // Đảm bảo đường dẫn này đúng
+// import countriesData from '@/src/app/[locale]/addconference/countries.json'; // Đảm bảo đường dẫn này đúng
 
 
 // Định nghĩa kiểu cho hàm translation
@@ -83,7 +82,8 @@ const mapResponseToFormData = (response: ConferenceResponse): Partial<Conference
     acronym: response.acronym,
     link: org.link,
     type: toConferenceType(org.accessType),
-    description: org.summary,
+    summary: org.summary,
+    callForPaper: org.callForPaper,
     location: org.locations?.[0] || { address: '', cityStateProvince: '', country: '', continent: '' },
     dates: formattedDates.length > 0 ? formattedDates : [{ type: 'conferenceDates', name: 'Conference Dates', fromDate: '', toDate: '' }],
     topics: org.topics || [],
@@ -92,9 +92,6 @@ const mapResponseToFormData = (response: ConferenceResponse): Partial<Conference
 
 // --- Custom Hook ---
 export const useConferenceForm = ({ t }: UseConferenceFormProps) => {
-  const router = useRouter();
-  const pathname = usePathname();
-
 
   // *** THÊM 2: KHỞI TẠO STATE MỚI ***
   const [existenceCheck, setExistenceCheck] = useState<ExistenceCheckState>({
@@ -103,10 +100,10 @@ export const useConferenceForm = ({ t }: UseConferenceFormProps) => {
   });
 
   const initialFormData: ConferenceFormData = {
-    title: '', acronym: '', link: '', type: 'Offline',
+    title: '', acronym: '', link: '', cfpLink: '', impLink: '', type: 'Offline',
     location: { address: '', cityStateProvince: '', country: '', continent: '' },
     dates: [{ type: 'conferenceDates', name: 'Conference Dates', fromDate: '', toDate: '' }],
-    topics: [], imageUrl: '', description: '',
+    topics: [], summary: '', callForPaper: ''
   };
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -205,7 +202,7 @@ export const useConferenceForm = ({ t }: UseConferenceFormProps) => {
     const noTopicErr = topicError === null;
     const requiredFieldsFilled =
       !!formData.title.trim() && !!formData.acronym.trim() && !!formData.link.trim() &&
-      !!formData.type && formData.topics.length > 0 && !!formData.description.trim();
+      !!formData.type && formData.topics.length > 0 && !!formData.summary.trim() && !!formData.callForPaper.trim();
 
     // Điều kiện mới: Việc kiểm tra tồn tại phải thành công
     const existenceCheckPassed = existenceCheck.status === 'success';
@@ -404,7 +401,7 @@ export const useConferenceForm = ({ t }: UseConferenceFormProps) => {
 
       setModalState({ isOpen: true, status: 'success', title: t('Submission_Success'), message: t('Conference_Submitted_Message') });
     } catch (error: any) {
-      setModalState({ isOpen: true, status: 'error', title: t('Submission_Failed'), message: `${t('Error_Submitting_Conference_Message')}: ${error.message}` });
+      setModalState({ isOpen: true, status: 'error', title: t('Submission_Failed'), message: `${t('Error_Submitting_Conference_Message')}` }); //\n: ${error.message}
     } finally {
       setIsSubmitting(false);
     }

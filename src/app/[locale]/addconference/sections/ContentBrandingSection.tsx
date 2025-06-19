@@ -1,19 +1,18 @@
-// src/app/[locale]/addconference/sections/ContentBrandingSection.tsx
 'use client';
 
 import React from 'react';
 import { ConferenceDetailsStepProps } from '../steps/ConferenceDetailsStep';
 import { FormSectionCard } from '../steps/ConferenceDetailsStep';
 import TopicsInput from '../inputs/TopicsInput';
-import ImageUploader from '../steps/ImageUploader';
-import CallForPapersInput from '../inputs/CallForPapersInput';
+// import ImageUploader from '../steps/ImageUploader';
+import CallForPaperInput from '../inputs/CallForPaperInput';
+import SummaryInput from '../inputs/SummaryInput'; // --- THÊM IMPORT ---
 
 interface ContentBrandingSectionProps extends ConferenceDetailsStepProps {
   id: string;
 }
 
 const ContentBrandingSection: React.FC<ContentBrandingSectionProps> = (props) => {
-  // Destructure các props cần thiết, bao gồm cả handlers và touchedFields
   const { id, formData, errors, touchedFields, handlers, t } = props;
 
   return (
@@ -23,38 +22,44 @@ const ContentBrandingSection: React.FC<ContentBrandingSectionProps> = (props) =>
         description={t('Describe_your_conference_and_add_visuals_to_attract_attendees')}
       >
         {/* --- Topics Input --- */}
-        {/* Truyền toàn bộ props xuống vì TopicsInput cần nhiều thứ:
-            - formData.topics
-            - newTopic, setNewTopic
-            - topicError
-            - handlers (handleAddTopic, handleRemoveTopic, handleBlur)
-        */}
         <div className="sm:col-span-6">
           <TopicsInput {...props} />
         </div>
 
+        {/* --- BẮT ĐẦU THAY ĐỔI: Thêm Summary Input --- */}
+        <SummaryInput
+          value={formData.summary || ''} // Giả sử formData có trường 'summary'
+          onChange={(value) => handlers.handleFieldChange('summary', value)}
+          onBlur={() => handlers.handleBlur('summary')}
+          isTouched={touchedFields.has('summary')}
+          error={errors.summary}
+          maxLength={2000} // Giới hạn ký tự ngắn hơn
+          t={t}
+          required={true}
+        />
+        {/* --- KẾT THÚC THAY ĐỔI --- */}
+
         {/* --- Call for Papers Input --- */}
-        {/* Component này hoạt động tương tự TextInput */}
-        <CallForPapersInput
-            value={formData.description}
-            onChange={(value) => handlers.handleFieldChange('description', value)}
-            onBlur={() => handlers.handleBlur('description')} // Thêm onBlur
-            isTouched={touchedFields.has('description')}   // Thêm isTouched
-            error={errors.description}
-            maxLength={10000}
-            t={t}
+        <CallForPaperInput
+          value={formData.callForPaper}
+          onChange={(value) => handlers.handleFieldChange('callForPaper', value)}
+          onBlur={() => handlers.handleBlur('callForPaper')}
+          isTouched={touchedFields.has('callForPaper')}
+          error={errors.callForPaper}
+          maxLength={10000}
+          t={t}
+          required={true}
+
         />
 
         {/* --- Image Uploader --- */}
-        {/* ImageUploader không có validation bắt buộc hoặc onBlur theo cách thông thường,
-            chỉ cần cập nhật handler thay đổi giá trị. */}
-        <div className="sm:col-span-6">
+        {/* <div className="sm:col-span-6">
           <ImageUploader
             imageUrl={formData.imageUrl}
             setImageUrl={(url) => handlers.handleFieldChange('imageUrl', url)}
             t={t}
           />
-        </div>
+        </div> */}
       </FormSectionCard>
     </div>
   );

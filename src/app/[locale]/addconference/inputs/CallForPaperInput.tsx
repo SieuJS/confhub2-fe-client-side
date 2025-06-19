@@ -1,4 +1,4 @@
-// src/app/[locale]/addconference/inputs/CallForPapersInput.tsx
+// src/app/[locale]/addconference/inputs/callForPaperInput.tsx
 'use client';
 
 import React from 'react';
@@ -7,7 +7,7 @@ import clsx from 'clsx';
 import { FileText } from 'lucide-react';
 
 // *** THAY ĐỔI 1: CẬP NHẬT INTERFACE ***
-interface CallForPapersInputProps {
+interface callForPaperInputProps {
   value: string;
   onChange: (value: string) => void;
   onBlur: () => void; // Thêm onBlur
@@ -15,9 +15,11 @@ interface CallForPapersInputProps {
   maxLength: number;
   t: (key: string) => string;
   error?: string | null;
+    required?: boolean; // Thêm prop này để xử lý dấu *
+
 }
 
-const CallForPapersInput: React.FC<CallForPapersInputProps> = ({
+const callForPaperInput: React.FC<callForPaperInputProps> = ({
   value,
   onChange,
   onBlur,      // Nhận onBlur
@@ -25,6 +27,7 @@ const CallForPapersInput: React.FC<CallForPapersInputProps> = ({
   maxLength,
   t,
   error,
+  required
 }) => {
   const characterCount = value.length;
   // *** THAY ĐỔI 2: TẠO BIẾN `showError` ***
@@ -34,11 +37,11 @@ const CallForPapersInput: React.FC<CallForPapersInputProps> = ({
   return (
     <div className="sm:col-span-6">
       <div className="flex justify-between items-center mb-1">
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="callForPaper" className="block text-sm font-medium text-gray-700">
           <div className="flex items-center">
             <FileText className="h-4 w-4 mr-2 text-gray-500" />
-            {<span className="text-red-500">* </span>}
-            {t('Call_for_Papers')}
+            {required && <span className="text-red-500">* </span>}
+            {t('Call_for_paper')}
           </div>
         </label>
         <span
@@ -55,7 +58,7 @@ const CallForPapersInput: React.FC<CallForPapersInputProps> = ({
         {/* Cột trái: Textarea */}
         <div>
           <textarea
-            id="description"
+            id="callForPaper"
             value={value}
             onChange={e => onChange(e.target.value)}
             onBlur={onBlur} // *** THAY ĐỔI 3: GẮN SỰ KIỆN onBlur ***
@@ -67,9 +70,9 @@ const CallForPapersInput: React.FC<CallForPapersInputProps> = ({
                 ? 'border-red-500 text-red-900 focus:border-red-500 focus:ring-red-500'
                 : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
             )}
-            placeholder={t('Write_your_call_for_papers_here')}
+            placeholder={t('Write_your_Call_for_paper_here')}
             aria-invalid={showError}
-            aria-describedby={showError ? 'description-error' : undefined}
+            aria-describedby={showError ? 'callForPaper-error' : undefined}
             spellCheck="false"
           />
         </div>
@@ -84,7 +87,7 @@ const CallForPapersInput: React.FC<CallForPapersInputProps> = ({
 
       {/* *** THAY ĐỔI 5: SỬ DỤNG `showError` ĐỂ HIỂN THỊ LỖI *** */}
       {showError ? (
-        <p id="description-error" className="mt-2 text-sm text-red-600">{error}</p>
+        <p id="callForPaper-error" className="mt-2 text-sm text-red-600">{error}</p>
       ) : (
         <p className="mt-2 text-xs text-gray-500">
           {t('Markdown_is_supported_for_rich_text_formatting')}
@@ -94,4 +97,4 @@ const CallForPapersInput: React.FC<CallForPapersInputProps> = ({
   );
 };
 
-export default CallForPapersInput;
+export default callForPaperInput;

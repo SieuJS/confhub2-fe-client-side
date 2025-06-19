@@ -7,7 +7,7 @@ import {
   MapPin,
   CalendarDays,
   ListChecks,
-  Image as ImageIcon,
+  // Image as ImageIcon,
   Link as LinkIcon,
   Globe,
   Building,
@@ -36,12 +36,15 @@ interface ConferenceReviewStepProps {
   title: string
   acronym: string
   link: string
+  cfpLink: string
+  impLink: string
   type: 'Offline' | 'Online' | 'Hybrid'
   location: LocationInput
   dates: ImportantDateInput[]
   topics: string[]
-  imageUrl: string
-  description: string
+  // imageUrl?: string
+  summary: string
+  callForPaper: string
   t: (key: string) => string
   statesForReview: State[]
   citiesForReview: City[]
@@ -98,12 +101,15 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
   title,
   acronym,
   link,
+  cfpLink,
+  impLink,
   type,
   location,
   dates,
   topics,
-  imageUrl,
-  description,
+  // imageUrl,
+  summary,
+  callForPaper,
   t,
   statesForReview,
   citiesForReview
@@ -130,7 +136,7 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
     if (type === 'Online') {
       return (
         <span className='italic text-slate-500'>
-          {t('Not_applicable_for_online')}
+          {t('Not_provided')}
         </span>
       )
     }
@@ -269,6 +275,42 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
               renderDetail(null, 'Link_not_provided')
             )}
           </InfoDisplay>
+          <InfoDisplay label={t('cfpLink')} icon={<LinkIcon />}>
+            {cfpLink ? (
+              <a
+                href={cfpLink}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='group flex items-center text-blue-600 hover:text-blue-800 hover:underline'
+              >
+                {cfpLink}{' '}
+                <ExternalLinkIcon
+                  size={14}
+                  className='ml-1.5 opacity-70 transition-opacity group-hover:opacity-100'
+                />
+              </a>
+            ) : (
+              renderDetail(null, 'Link_not_provided')
+            )}
+          </InfoDisplay>
+          <InfoDisplay label={t('impLink')} icon={<LinkIcon />}>
+            {impLink ? (
+              <a
+                href={impLink}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='group flex items-center text-blue-600 hover:text-blue-800 hover:underline'
+              >
+                {impLink}{' '}
+                <ExternalLinkIcon
+                  size={14}
+                  className='ml-1.5 opacity-70 transition-opacity group-hover:opacity-100'
+                />
+              </a>
+            ) : (
+              renderDetail(null, 'Link_not_provided')
+            )}
+          </InfoDisplay>
           <InfoDisplay
             label={t('Type')}
             icon={React.cloneElement(typeStyle.icon, {
@@ -296,22 +338,22 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
             {renderDetail(
               location.continent,
               'Not_provided',
-              'Not_applicable_for_online'
+              'Not_provided'
             )}
           </InfoDisplay>
           <InfoDisplay label={t('Country')} icon={<Map />}>
             {renderDetail(
               location.country,
               'Not_provided',
-              'Not_applicable_for_online'
+              'Not_provided'
             )}
           </InfoDisplay>
           <InfoDisplay
             label={
               statesForReview.length > 0 ||
-              (!statesForReview.length &&
-                !citiesForReview.length &&
-                location.cityStateProvince)
+                (!statesForReview.length &&
+                  !citiesForReview.length &&
+                  location.cityStateProvince)
                 ? t('State_Province')
                 : t('City')
             }
@@ -320,7 +362,7 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
             {renderDetail(
               location.cityStateProvince,
               'Not_provided',
-              'Not_applicable_for_online'
+              'Not_provided'
             )}
           </InfoDisplay>
         </Section>
@@ -387,7 +429,7 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
         </Section>
       </div>
 
-      {/* Image URL Section - Full width */}
+      {/* Image URL Section - Full width
       {imageUrl && (
         <div className='mt-6'>
           <Section title={t('Conference_Banner_Image')} icon={<ImageIcon />}>
@@ -407,25 +449,44 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
             </InfoDisplay>
           </Section>
         </div>
-      )}
+      )} */}
 
-      {/* Description / Call for Papers Section - Full width */}
+
+      {/* Summary Section - Full width */}
       <div className='mt-6'>
-        <Section title={t('Call_for_Papers')} icon={<FileText />}>
-          {description && description.trim() !== '' ? (
+        <Section title={t('Summary')} icon={<FileText />}>
+          {summary && summary.trim() !== '' ? (
             <div className='prose prose-base max-w-none dark:prose-invert'>
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {description}
+                {summary}
               </ReactMarkdown>
             </div>
           ) : (
             <div className='py-2'>
-              {renderDetail(null, 'No_description_provided')}
+              {renderDetail(null, 'No_summary_provided')}
             </div>
           )}
         </Section>
       </div>
-    </div>
+
+
+      {/* Call for Papers Section - Full width */}
+      <div className='mt-6'>
+        <Section title={t('Call_for_paper')} icon={<FileText />}>
+          {callForPaper && callForPaper.trim() !== '' ? (
+            <div className='prose prose-base max-w-none dark:prose-invert'>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {callForPaper}
+              </ReactMarkdown>
+            </div>
+          ) : (
+            <div className='py-2'>
+              {renderDetail(null, 'No_Call_for_paper_provided')}
+            </div>
+          )}
+        </Section>
+      </div>
+    </div >
   )
 }
 
