@@ -25,13 +25,19 @@ export const CallForPapersSection: React.FC<CallForPapersSectionProps> = ({
         {t('Call_for_papers')}
       </h2>
       {callForPaper ? (
-        <div className='prose prose-sm max-w-none dark:prose-invert sm:prose-base'>
+        // <div className='prose prose-sm max-w-none dark:prose-invert sm:prose-base'>
+        <div className='prose prose-sm max-w-none dark:prose-invert sm:prose-base [&_*]:text-primary '>
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkBreaks]}
             rehypePlugins={[rehypeRaw]}
             components={{
               a: ({ ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
-                <a {...props} target='_blank' rel='noopener noreferrer' />
+                <a
+                  {...props}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='text-primary'
+                />
               )
             }}
           >

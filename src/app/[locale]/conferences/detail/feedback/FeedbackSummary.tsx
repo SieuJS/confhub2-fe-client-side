@@ -39,7 +39,7 @@ const FeedbackSummary: React.FC<FeedbackSummaryProps> = ({
               <span key={index}>{star}</span>
             ))}
           </div>
-          <div className='text-sm text-gray-600'>
+          <div className='text-sm '>
             {t('review_summary', { count: totalReviews })}
           </div>
         </div>
@@ -53,7 +53,7 @@ const FeedbackSummary: React.FC<FeedbackSummaryProps> = ({
                   ★
                 </span>
               </div>
-              <div className='bg-gray-20 relative mx-2 h-4 flex-1 rounded-sm '>
+              <div className='relative mx-2 h-4 flex-1 rounded-sm bg-gray-20 '>
                 <div
                   className='absolute h-4 rounded-sm'
                   style={{
