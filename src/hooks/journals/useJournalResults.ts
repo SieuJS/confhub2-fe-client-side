@@ -1,7 +1,7 @@
 // src/hooks/journals/useJournalResults.ts
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { journalFollowService } from '@/src/services/journal-follow.service';
+// import { journalFollowService } from '@/src/services/journal-follow.service'; // KHÔNG CẦN NỮA Ở ĐÂY
 import { JournalApiResponse, JournalData } from '../../models/response/journal.response';
 import { toast } from 'react-toastify';
 import { appConfig } from '@/src/middleware';
@@ -19,38 +19,6 @@ const useJournalResults = ({}: UseJournalResultsProps = {}) => {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const journalsPerPage = 12;
-    const [followedJournals, setFollowedJournals] = useState<string[]>([]);
-
-    useEffect(() => {
-        const fetchFollowedJournals = async () => {
-            try {
-                const followed = await journalFollowService.getFollowedJournals();
-                setFollowedJournals(followed.map(fj => fj.journalId));
-            } catch (error) {
-                console.error('Error fetching followed journals:', error);
-            }
-        };
-        fetchFollowedJournals();
-    }, []);
-
-    const handleFollowToggle = async (journalId: string) => {
-        try {
-            const isFollowing = followedJournals.includes(journalId);
-            if (isFollowing) {
-                await journalFollowService.unfollowJournal(journalId);
-                setFollowedJournals(prev => prev.filter(id => id !== journalId));
-                toast.success('Successfully unfollowed journal');
-            } else {
-                await journalFollowService.followJournal(journalId);
-                setFollowedJournals(prev => [...prev, journalId]);
-                toast.success('Successfully followed journal');
-            }
-        } catch (error) {
-            console.error('Error toggling follow status:', error);
-            toast.error('Failed to update follow status');
-        }
-    };
-
     const currentPageFromUrl = parseInt(searchParams.get('page') || '1');
     const currentSortBy = (searchParams.get('sortBy') as JournalSortOption) || 'title';
 
@@ -62,16 +30,13 @@ const useJournalResults = ({}: UseJournalResultsProps = {}) => {
         params.set('page', currentPageFromUrl.toString());
         params.set('limit', journalsPerPage.toString());
 
-        // === CÁC THAY ĐỔI QUAN TRỌNG ===
-        // 1. Đổi 'keyword' thành 'search' để khớp với yêu cầu
         const searchValue = searchParams.get('search');
         if (searchValue) {
             params.set('search', searchValue);
         } else {
-            params.delete('search'); // Xóa nếu không có giá trị
+            params.delete('search');
         }
         
-        // 2. Giữ lại 'country' và 'publisher'
         const country = searchParams.get('country');
         if (country) {
             params.set('country', country);
@@ -86,7 +51,6 @@ const useJournalResults = ({}: UseJournalResultsProps = {}) => {
             params.delete('publisher');
         }
 
-        // 3. Thêm 'region' cho tìm kiếm nâng cao
         const region = searchParams.get('region');
         if (region) {
             params.set('region', region);
@@ -94,7 +58,6 @@ const useJournalResults = ({}: UseJournalResultsProps = {}) => {
             params.delete('region');
         }
 
-        // 4. Loại bỏ các param không còn sử dụng
         params.delete('keyword');
         params.delete('publicationType');
         params.delete('subjectAreas');
@@ -107,7 +70,6 @@ const useJournalResults = ({}: UseJournalResultsProps = {}) => {
         params.delete('sjr');
         params.delete('overallRank');
         params.delete('issn');
-        // === KẾT THÚC THAY ĐỔI ===
 
         params.set('sortBy', currentSortBy);
 
@@ -163,11 +125,9 @@ const useJournalResults = ({}: UseJournalResultsProps = {}) => {
         sortBy: currentSortBy,
         loading,
         error,
-        currentJournals: journals,
+        currentJournals: journals, // Giữ lại currentJournals nếu có nơi nào dùng
         paginate,
         handleSortByChange,
-        handleFollowToggle,
-        followedJournals,
     };
 };
 
