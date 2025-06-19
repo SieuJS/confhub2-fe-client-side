@@ -199,11 +199,16 @@ const EventJournalCard: React.FC<EventJournalCardProps> = ({
             The text within the buttons is centered by `justify-center` on the `span` element.
             This is appropriate for buttons. */}
         <div className='mt-4 flex items-center gap-2'>
-          <Button variant='primary' size='small' rounded className='flex-1'>
+          <Button
+            variant='primary'
+            size='small'
+            rounded
+            className='h-12 flex-1'
+          >
             {/* The Link content itself is a flex container for text and icon */}
             <Link
               href={{ pathname: '/journals/detail', query: { id: journal.id } }}
-              className='flex w-full items-center justify-center gap-1.5'
+              className='flex w-full items-center justify-center gap-1'
             >
               <Info size={16} />
               {t('detailsButton')}
@@ -213,17 +218,17 @@ const EventJournalCard: React.FC<EventJournalCardProps> = ({
             variant={isFollowing ? 'secondary' : 'primary'}
             size='small'
             rounded
-            className='flex-1'
+            className='h-12 flex-1'
             onClick={handleFollowToggle}
             disabled={isLoading}
           >
             {isLoading ? (
-              <span className='flex w-full items-center justify-center gap-1.5'>
+              <span className='flex w-full items-center justify-center gap-1'>
                 <Loader2 size={16} className='animate-spin' />
                 {t('loadingButton')}
               </span>
             ) : (
-              <span className='flex w-full items-center justify-center gap-1.5'>
+              <span className='flex w-full items-center justify-center gap-1'>
                 <Heart
                   size={16}
                   className={`${isFollowing ? 'fill-current text-red-500' : ''}`}
