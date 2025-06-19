@@ -97,7 +97,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       <ImportantDatesSection
         groupedDates={groupedDates}
         formatDate={formatDate}
-        t={t}
+        // t={t}
       />
 
       <CallForPapersSection callForPaper={callForPaper} t={t} />
