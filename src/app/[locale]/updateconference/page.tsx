@@ -5,7 +5,7 @@ import React, { useEffect, Suspense } from 'react'; // Thêm Suspense
 import { useTranslations } from 'next-intl';
 import { Header } from '../utils/Header'; //  Header component
 import Footer from '../utils/Footer'; //  Footer component
-import UpdateConferenceForm from './UpdateConferenceForm';
+// import UpdateConferenceForm from './UpdateConferenceForm';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/src/contexts/AuthContext'; // <<<< THAY ĐỔI QUAN TRỌNG
 
@@ -83,7 +83,7 @@ const UpdateConferenceContent = ({
       <main className='container mx-auto min-h-screen px-4 py-8 md:px-16'> {/* Thêm padding và min-h-screen */}
         <div className='w-full bg-background pt-14'></div> {/* Spacer cho header fixed */}
         <h1 className='mb-6 text-3xl font-bold text-gray-800'>{t('Update_Conference')}</h1>
-        <UpdateConferenceForm locale={locale} conferenceId={conferenceId} />
+        {/* <UpdateConferenceForm locale={locale} conferenceId={conferenceId} /> */}
       </main>
       <Footer />
     </>
