@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Button from '../../utils/Button'
 import { useTranslations } from 'next-intl'
 import { UserResponse } from '@/src/models/response/user.response'
-import { Camera, MoreVertical } from 'lucide-react'; // Import Lucide icons
+import { Camera, MoreVertical } from 'lucide-react' // Import Lucide icons
 
 interface ProfileHeaderProps {
   user: Partial<UserResponse>
@@ -62,8 +62,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             onClick={onBackgroundEditClick}
             className='absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black bg-opacity-0 text-transparent transition-all duration-300 hover:bg-opacity-50 hover:text-white'
           >
-            <Camera className="h-6 w-6" /> {/* Using Lucide Camera icon */}
-            <span className='text-sm font-medium'>{t('Change_Background')}</span>
+            <Camera className='h-6 w-6' /> {/* Using Lucide Camera icon */}
+            <span className='text-sm font-medium'>
+              {t('Change_Background')}
+            </span>
           </button>
         )}
       </div>
@@ -86,17 +88,20 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               onClick={onAvatarEditClick}
               className='absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-full bg-black bg-opacity-0 text-transparent transition-all duration-300 hover:bg-opacity-50 hover:text-white'
             >
-              <Camera className="h-6 w-6" /> {/* Using Lucide Camera icon */}
+              <Camera className='h-6 w-6' /> {/* Using Lucide Camera icon */}
               <span className='text-xs font-medium'>{t('Change')}</span>
             </button>
           )}
         </div>
 
         <div className='mt-4 min-w-0 flex-grow text-center md:mt-0 md:text-left'>
-          <h1 className='truncate text-2xl font-bold text-gray-900 dark:text-white md:text-3xl' style={{textShadow: '1px 1px 3px rgba(0,0,0,0.1)'}}>
+          <h1
+            className='truncate text-2xl font-bold  md:text-3xl'
+            style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.1)' }}
+          >
             {user.firstName} {user.lastName}
           </h1>
-          <p className='truncate text-sm text-gray-500 dark:text-gray-400'>{user.email}</p>
+          <p className='truncate text-sm '>{user.email}</p>
         </div>
 
         {!isEditing && (
@@ -107,9 +112,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             <div className='relative' ref={menuRef}>
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className='rounded-md p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700'
+                className='rounded-md p-2  transition hover:bg-gray-10 hover:text-gray-70 '
               >
-                <MoreVertical className="h-5 w-5" /> {/* Using Lucide MoreVertical icon */}
+                <MoreVertical className='h-5 w-5' />{' '}
+                {/* Using Lucide MoreVertical icon */}
               </button>
               {isMenuOpen && (
                 <div className='absolute right-0 top-full z-10 mt-2 w-48 origin-top-right rounded-md bg-background py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
@@ -118,7 +124,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                       onChangePasswordClick()
                       setIsMenuOpen(false)
                     }}
-                    className='block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700'
+                    className='block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10  dark:hover:bg-gray-700'
                   >
                     {t('Change_Password')}
                   </button>

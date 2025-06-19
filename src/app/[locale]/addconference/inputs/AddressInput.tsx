@@ -1,16 +1,16 @@
 // src/app/[locale]/addconference/inputs/AddressInput.tsx
-import React from 'react';
-import clsx from 'clsx';
-import { MapPin } from 'lucide-react';
+import React from 'react'
+import clsx from 'clsx'
+import { MapPin } from 'lucide-react'
 
 interface AddressInputProps {
-  address: string;
-  onAddressChange: (value: string) => void;
-  onBlur: () => void; // Thêm
-  isTouched: boolean; // Thêm
-  t: (key: string) => string;
-  required: boolean;
-  error?: string | null;
+  address: string
+  onAddressChange: (value: string) => void
+  onBlur: () => void // Thêm
+  isTouched: boolean // Thêm
+  t: (key: string) => string
+  required: boolean
+  error?: string | null
 }
 
 const AddressInput: React.FC<AddressInputProps> = ({
@@ -20,24 +20,24 @@ const AddressInput: React.FC<AddressInputProps> = ({
   isTouched,
   t,
   required,
-  error,
+  error
 }) => {
-  const showError = !!error && isTouched;
+  const showError = !!error && isTouched
 
   return (
     <div>
-      <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-        <div className="flex items-center">
-          <MapPin className="h-4 w-4 mr-2 text-gray-500" />
-          {required && <span className="text-red-500">* </span>}
+      <label htmlFor='address' className='block text-sm font-medium '>
+        <div className='flex items-center'>
+          <MapPin className='mr-2 h-4 w-4 ' />
+          {required && <span className='text-red-500'>* </span>}
           {t('Address')}:
         </div>
       </label>
       <input
-        type="text"
-        id="address"
+        type='text'
+        id='address'
         className={clsx(
-          'p-2 mt-1 block w-full rounded-md shadow-sm sm:text-sm focus:border-indigo-500 focus:ring-indigo-500',
+          'mt-1 block w-full rounded-md p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm',
           showError ? 'border-red-500' : 'border-gray-300'
         )}
         value={address}
@@ -49,12 +49,12 @@ const AddressInput: React.FC<AddressInputProps> = ({
         aria-describedby={showError ? 'address-error' : undefined}
       />
       {showError && (
-        <p id="address-error" className="mt-1 text-sm text-red-600">
+        <p id='address-error' className='mt-1 text-sm text-red-600'>
           {error}
         </p>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default AddressInput;
+export default AddressInput

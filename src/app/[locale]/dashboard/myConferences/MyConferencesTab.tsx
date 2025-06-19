@@ -144,7 +144,7 @@ const MyConferencesTab: React.FC = () => {
   // --- Render Logic ---
 
   const renderLoading = () => (
-    <div className='flex h-80 flex-col items-center justify-center text-gray-500'>
+    <div className='flex h-80 flex-col items-center justify-center '>
       <Loader2 className='h-10 w-10 animate-spin text-indigo-600' />
       <p className='mt-4 text-lg'>
         {t('MyConferences.Loading_your_conferences')}
@@ -258,12 +258,12 @@ const MyConferencesTab: React.FC = () => {
         </div>
       </div>
 
-      <h1 className='my-4 text-xl font-semibold text-gray-80 md:text-2xl'>
+      <h1 className='my-4 text-xl font-semibold  md:text-2xl'>
         {getStatusTitle(displayStatus)}
       </h1>
 
       {filteredConferences.length === 0 ? (
-        <div className='my-10 rounded-lg bg-white-pure p-10 text-center text-gray-500 shadow-sm'>
+        <div className='my-10 rounded-lg bg-white-pure p-10 text-center  shadow-sm'>
           <p className='text-lg'>
             {searchTerm && conferences && conferences.length > 0
               ? t('No_conferences_match_your_search')
@@ -313,7 +313,7 @@ const MyConferencesTab: React.FC = () => {
         }
       >
         {modalContent?.type === 'reason' && (
-          <div className='whitespace-pre-wrap rounded-md bg-gray-10 p-4 text-gray-700'>
+          <div className='whitespace-pre-wrap rounded-md bg-gray-10 p-4 '>
             {modalContent.data}
           </div>
         )}

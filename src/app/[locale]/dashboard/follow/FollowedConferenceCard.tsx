@@ -73,7 +73,7 @@ const FollowedConferenceCard: React.FC<FollowedConferenceCardProps> = ({
         {/* THÊM flex-grow */}
         {/* Header: Thời gian follow */}
         <div className='mb-3 flex items-start justify-between'>
-          <p className='text-left text-sm text-gray-500'>
+          <p className='text-left text-sm '>
             {t('Followed_Time')}: {/* Sửa cú pháp nối chuỗi */}
             {timeAgo(conference.followedAt, language)}
           </p>
@@ -85,13 +85,13 @@ const FollowedConferenceCard: React.FC<FollowedConferenceCardProps> = ({
           {/* THÊM leading-tight */}
           {conference.title}
         </h3>
-        <div className='mt-2 space-y-2 text-sm text-gray-60'>
+        <div className='mt-2 space-y-2 text-sm '>
           <div className='flex items-center gap-2'>
-            <Hash className='h-4 w-4 flex-shrink-0 text-gray-40' />
+            <Hash className='h-4 w-4 flex-shrink-0 ' />
             <span>{conference.acronym}</span>
           </div>
           <div className='flex items-center gap-2'>
-            <Calendar className='h-4 w-4 flex-shrink-0 text-gray-40' />
+            <Calendar className='h-4 w-4 flex-shrink-0 ' />
             <span>
               {conferenceDate
                 ? formatDateRange(
@@ -103,7 +103,7 @@ const FollowedConferenceCard: React.FC<FollowedConferenceCardProps> = ({
             </span>
           </div>
           <div className='flex items-center gap-2'>
-            <MapPin className='h-4 w-4 flex-shrink-0 text-gray-40' />
+            <MapPin className='h-4 w-4 flex-shrink-0 ' />
             <span>{locationString}</span>
           </div>
         </div>

@@ -9,15 +9,18 @@ interface Props {
 }
 
 export const HIndexSection: React.FC<Props> = ({ journal, t }) => (
-  <section id='h-index' className='scroll-mt-28 border-b border-border py-8 md:py-12'>
-    <h2 className='mb-4 text-2xl font-bold text-foreground md:text-3xl'>
+  <section
+    id='h-index'
+    className='border-border scroll-mt-28 border-b py-8 md:py-12'
+  >
+    <h2 className='mb-4 text-2xl font-bold  md:text-3xl'>
       {t('JournalTabs.hIndexTitle')}
     </h2>
     <div className='grid grid-cols-1 gap-8 md:grid-cols-2'>
       <div className='flex flex-col items-center'>
-        <p className='mb-4 text-lg text-muted-foreground'>
+        <p className='text-muted-foreground mb-4 text-lg'>
           {t('JournalTabs.hIndexValueIs')}
-          <strong className='ml-2 text-3xl font-bold text-primary'>
+          <strong className='ml-2 text-3xl font-bold '>
             {journal['H index'] || 'N/A'}
           </strong>
         </p>
@@ -30,17 +33,17 @@ export const HIndexSection: React.FC<Props> = ({ journal, t }) => (
           />
         </div>
       </div>
-      <div className='prose max-w-none text-muted-foreground dark:prose-invert'>
-        <h3 className='text-xl font-semibold text-foreground'>
+      <div className='  max-w-none '>
+        <h3 className='text-xl font-semibold '>
           {t('JournalTabs.whatIsHIndex')}
         </h3>
-        <p>{t('JournalTabs.hIndexDefinition')}</p>
-        <blockquote className='border-l-4 border-primary bg-primary/10 p-4'>
+        <p className='py-4'>{t('JournalTabs.hIndexDefinition')}</p>
+        <blockquote className='bg-primary/10 border-l-4 border-primary p-8'>
           <p className='font-semibold italic'>
             {t('JournalTabs.hIndexFormula')}
           </p>
         </blockquote>
-        <p>{t('JournalTabs.hIndexExample')}</p>
+        <p className='py-4'>{t('JournalTabs.hIndexExample')}</p>
       </div>
     </div>
   </section>

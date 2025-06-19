@@ -65,13 +65,13 @@ const SettingToggle: React.FC<SettingToggleProps> = ({
         <Icon className='h-5 w-5' />
       </div>
       <div>
-        <h4 className='font-semibold text-gray-80'>{label}</h4>
-        <p className='mt-0.5 text-sm text-gray-50'>{description}</p>
+        <h4 className='font-semibold '>{label}</h4>
+        <p className='mt-0.5 text-sm '>{description}</p>
       </div>
     </div>
     <button
       className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-        checked ? 'bg-blue-600' : 'bg-gray-200'
+        checked ? 'bg-blue-600' : 'bg-gray-20'
       } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
       onClick={onToggle}
       disabled={disabled}
@@ -81,7 +81,7 @@ const SettingToggle: React.FC<SettingToggleProps> = ({
       <span className='sr-only'>{label}</span>
       <span
         aria-hidden='true'
-        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white-pure shadow ring-0 transition duration-200 ease-in-out ${
           checked ? 'translate-x-5' : 'translate-x-0'
         }`}
       />
@@ -286,7 +286,7 @@ const SettingTab: React.FC = () => {
 
   // --- Hàm render loading tương tự như FollowedTab/ProfileTab ---
   const renderLoading = (messageKey: string) => (
-    <div className='flex h-80 flex-col items-center justify-center text-gray-500'>
+    <div className='flex h-80 flex-col items-center justify-center '>
       <Loader2 className='h-10 w-10 animate-spin text-primary' />
       <p className='mt-4 text-lg'>{t(messageKey)}</p>
     </div>
@@ -342,11 +342,11 @@ const SettingTab: React.FC = () => {
     <div className='flex min-h-screen w-full bg-gray-10'>
       <main className='mx-auto max-w-4xl flex-1 p-4 md:p-8'>
         <header className='mb-8 border-b border-gray-200 pb-4'>
-          <h2 className='flex items-center text-3xl font-bold text-gray-90'>
-            <Cog className='mr-3 h-8 w-8 text-gray-60' />
+          <h2 className='flex items-center text-3xl font-bold '>
+            <Cog className='mr-3 h-8 w-8 ' />
             {t('Setting')}
           </h2>
-          <p className='mt-2 text-gray-60'>
+          <p className='mt-2 '>
             {t('Manage_your_account_preferences_and_notifications')}
           </p>
         </header>
@@ -361,7 +361,7 @@ const SettingTab: React.FC = () => {
         </div>
 
         {filteredSettingItems.length === 0 && (
-          <div className='my-10 rounded-lg bg-white-pure p-10 text-center text-gray-500 shadow-sm'>
+          <div className='my-10 rounded-lg bg-white-pure p-10 text-center  shadow-sm'>
             <p className='text-lg'>{t('No_settings_match_your_search')}</p>
             <Button
               variant='link'
@@ -377,8 +377,8 @@ const SettingTab: React.FC = () => {
         {groupedFilteredSettings.general &&
           groupedFilteredSettings.general.length > 0 && (
             <section className='mb-8 rounded-lg bg-white-pure p-6 shadow-sm'>
-              <h3 className='mb-4 flex items-center text-xl font-semibold text-gray-80'>
-                <Cog className='mr-2 h-6 w-6 text-gray-500' />
+              <h3 className='mb-4 flex items-center text-xl font-semibold '>
+                <Cog className='mr-2 h-6 w-6 ' />
                 {t('General_Settings')}
               </h3>
               {groupedFilteredSettings.general.map(item => (
@@ -398,8 +398,8 @@ const SettingTab: React.FC = () => {
         {groupedFilteredSettings.notifications &&
           groupedFilteredSettings.notifications.length > 0 && (
             <section className='mb-8 rounded-lg bg-white-pure p-6 shadow-sm'>
-              <h3 className='mb-4 flex items-center text-xl font-semibold text-gray-80'>
-                <Bell className='mr-2 h-6 w-6 text-gray-500' />
+              <h3 className='mb-4 flex items-center text-xl font-semibold '>
+                <Bell className='mr-2 h-6 w-6 ' />
                 {t('Notification_Preferences')}
               </h3>
               {groupedFilteredSettings.notifications.map(item => (
@@ -417,9 +417,9 @@ const SettingTab: React.FC = () => {
           )}
 
         {/* Account Management Section (Không bị ảnh hưởng bởi tìm kiếm) */}
-        <section className='mb-8 rounded-lg bg-white-pure p-6 shadow-sm'>
-          <h3 className='mb-4 flex items-center text-xl font-semibold text-gray-80'>
-            <UserX className='mr-2 h-6 w-6 text-gray-500' />
+        {/* <section className='mb-8 rounded-lg bg-white-pure p-6 shadow-sm'>
+          <h3 className='mb-4 flex items-center text-xl font-semibold '>
+            <UserX className='mr-2 h-6 w-6 ' />
             {t('Account_Management')}
           </h3>
           <div className='flex flex-col justify-between py-4 sm:flex-row sm:items-center'>
@@ -461,7 +461,7 @@ const SettingTab: React.FC = () => {
               {deleteError}
             </p>
           )}
-        </section>
+        </section> */}
 
         {updateLoading && (
           <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-20'>

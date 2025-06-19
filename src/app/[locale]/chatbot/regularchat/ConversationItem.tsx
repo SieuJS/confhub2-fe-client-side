@@ -1,21 +1,30 @@
 // src/app/[locale]/chatbot/regularchat/ConversationItem.tsx
-import React, { useState, useRef, useEffect } from 'react';
-import { ConversationMetadata } from '../lib/regular-chat.types';
-import { Loader2, Trash2, Eraser, Pencil, Pin, PinOff, Check, X as CancelIcon } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns'; // Cân nhắc dùng date-fns/locale nếu cần đa ngôn ngữ cho format này
-import { useTranslations } from 'next-intl';
+import React, { useState, useRef, useEffect } from 'react'
+import { ConversationMetadata } from '../lib/regular-chat.types'
+import {
+  Loader2,
+  Trash2,
+  Eraser,
+  Pencil,
+  Pin,
+  PinOff,
+  Check,
+  X as CancelIcon
+} from 'lucide-react'
+import { formatDistanceToNow } from 'date-fns' // Cân nhắc dùng date-fns/locale nếu cần đa ngôn ngữ cho format này
+import { useTranslations } from 'next-intl'
 
 interface ConversationItemProps {
-  conv: ConversationMetadata;
-  isActive: boolean;
-  isBeingDeleted: boolean;
-  isLoadingList: boolean;
-  onSelect: (id: string) => void;
-  onDelete: (id: string, title: string) => void;
-  onClear: (id: string, title: string) => void;
-  onRename: (id: string, newTitle: string) => void;
-  onTogglePin: (id: string, currentPinStatus: boolean) => void;
-  disabled?: boolean; // <<<< NHẬN PROP DISABLED TỪ CHA >>>>
+  conv: ConversationMetadata
+  isActive: boolean
+  isBeingDeleted: boolean
+  isLoadingList: boolean
+  onSelect: (id: string) => void
+  onDelete: (id: string, title: string) => void
+  onClear: (id: string, title: string) => void
+  onRename: (id: string, newTitle: string) => void
+  onTogglePin: (id: string, currentPinStatus: boolean) => void
+  disabled?: boolean // <<<< NHẬN PROP DISABLED TỪ CHA >>>>
 }
 
 const ConversationItem: React.FC<ConversationItemProps> = ({
@@ -28,105 +37,123 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
   onClear,
   onRename,
   onTogglePin,
-  disabled = false, // <<<< GIÁ TRỊ MẶC ĐỊNH VÀ SỬ DỤNG >>>>
+  disabled = false // <<<< GIÁ TRỊ MẶC ĐỊNH VÀ SỬ DỤNG >>>>
 }) => {
-  const t = useTranslations();
+  const t = useTranslations()
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [editText, setEditText] = useState(conv.title || '');
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [isEditing, setIsEditing] = useState(false)
+  const [editText, setEditText] = useState(conv.title || '')
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  const title = conv.title || `Chat ${conv.id.substring(0, 6)}...`;
+  const title = conv.title || `Chat ${conv.id.substring(0, 6)}...`
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
+      inputRef.current.focus()
+      inputRef.current.select()
     }
-  }, [isEditing]);
+  }, [isEditing])
 
   useEffect(() => {
     if (!isEditing) {
-      setEditText(conv.title || '');
+      setEditText(conv.title || '')
     }
-  }, [conv.title, isEditing]);
+  }, [conv.title, isEditing])
 
   // Kết hợp tất cả các điều kiện khiến item bị vô hiệu hóa
-  const itemIsEffectivelyDisabled = disabled || isLoadingList || isBeingDeleted;
+  const itemIsEffectivelyDisabled = disabled || isLoadingList || isBeingDeleted
 
   const handleEditStart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (itemIsEffectivelyDisabled) return; // Kiểm tra điều kiện disable tổng hợp
-    setIsEditing(true);
-    setEditText(conv.title || '');
-  };
+    e.stopPropagation()
+    if (itemIsEffectivelyDisabled) return // Kiểm tra điều kiện disable tổng hợp
+    setIsEditing(true)
+    setEditText(conv.title || '')
+  }
 
   const handleEditCancel = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setIsEditing(false);
-  };
+    e?.stopPropagation()
+    setIsEditing(false)
+  }
 
   const handleEditSave = (e?: React.MouseEvent | React.FormEvent) => {
-    e?.stopPropagation();
-    e?.preventDefault();
-    if (itemIsEffectivelyDisabled) return; // Kiểm tra trước khi lưu
+    e?.stopPropagation()
+    e?.preventDefault()
+    if (itemIsEffectivelyDisabled) return // Kiểm tra trước khi lưu
     if (editText.trim() !== '') {
-      onRename(conv.id, editText.trim());
+      onRename(conv.id, editText.trim())
     }
-    setIsEditing(false);
-  };
+    setIsEditing(false)
+  }
 
   const handleDeleteClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (itemIsEffectivelyDisabled) return; // Kiểm tra
-    onDelete(conv.id, title);
-  };
+    e.stopPropagation()
+    if (itemIsEffectivelyDisabled) return // Kiểm tra
+    onDelete(conv.id, title)
+  }
 
   const handleClearClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (itemIsEffectivelyDisabled) return; // Kiểm tra
-    onClear(conv.id, title);
-  };
+    e.stopPropagation()
+    if (itemIsEffectivelyDisabled) return // Kiểm tra
+    onClear(conv.id, title)
+  }
 
   const handleTogglePinClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (itemIsEffectivelyDisabled) return; // Kiểm tra
+    e.stopPropagation()
+    if (itemIsEffectivelyDisabled) return // Kiểm tra
     // TRUYỀN TRẠNG THÁI PIN MỚI (NGƯỢC LẠI VỚI HIỆN TẠI)
-    onTogglePin(conv.id, !conv.isPinned); // <<<< THAY ĐỔI Ở ĐÂY
-  };
+    onTogglePin(conv.id, !conv.isPinned) // <<<< THAY ĐỔI Ở ĐÂY
+  }
 
   const handleSelectConvClick = () => {
     // Ngăn chọn nếu item bị disabled, hoặc đang xóa, hoặc đang sửa
-    if (itemIsEffectivelyDisabled || isEditing) return;
-    onSelect(conv.id);
-  };
+    if (itemIsEffectivelyDisabled || isEditing) return
+    onSelect(conv.id)
+  }
 
   return (
     <div
       className={`group relative rounded-md transition-colors duration-150
         ${isActive && !itemIsEffectivelyDisabled ? 'bg-blue-100 dark:bg-blue-900/50' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}
-        ${isBeingDeleted ? 'opacity-70 cursor-default animate-pulse' : ''}
-        ${itemIsEffectivelyDisabled && !isBeingDeleted ? 'opacity-60 cursor-not-allowed' : ''}
+        ${isBeingDeleted ? 'animate-pulse cursor-default opacity-70' : ''}
+        ${itemIsEffectivelyDisabled && !isBeingDeleted ? 'cursor-not-allowed opacity-60' : ''}
       `}
-    // Không cần aria-disabled ở đây vì button bên trong sẽ xử lý
+      // Không cần aria-disabled ở đây vì button bên trong sẽ xử lý
     >
       {isEditing ? (
-        <form onSubmit={handleEditSave} className='flex items-center p-2 space-x-1'>
+        <form
+          onSubmit={handleEditSave}
+          className='flex items-center space-x-1 p-2'
+        >
           <input
             ref={inputRef}
             type='text'
             value={editText}
             onChange={e => setEditText(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Escape') handleEditCancel(); }}
+            onKeyDown={e => {
+              if (e.key === 'Escape') handleEditCancel()
+            }}
             disabled={itemIsEffectivelyDisabled} // Vô hiệu hóa input nếu cần
-            className='mr-1 flex-grow rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white disabled:opacity-70 disabled:cursor-not-allowed'
+            className='mr-1 flex-grow rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-70 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
           />
-          <button type='submit' title={t('Save_Title')} className='rounded-md p-1.5 text-green-600 hover:bg-green-100 focus:outline-none focus:ring-1 focus:ring-green-500 dark:hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed'
-            disabled={itemIsEffectivelyDisabled || editText.trim() === ''}> {/* Vô hiệu hóa nút save */}
+          <button
+            type='submit'
+            title={t('Save_Title')}
+            className='rounded-md p-1.5 text-green-600 hover:bg-green-100 focus:outline-none focus:ring-1 focus:ring-green-500 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-green-800'
+            disabled={itemIsEffectivelyDisabled || editText.trim() === ''}
+          >
+            {' '}
+            {/* Vô hiệu hóa nút save */}
             <Check size={16} />
           </button>
-          <button type='button' onClick={handleEditCancel} title={t('Cancel_Edit')} className='rounded-md p-1.5 text-gray-500 hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
-            disabled={itemIsEffectivelyDisabled} > {/* Vô hiệu hóa nút cancel edit */}
+          <button
+            type='button'
+            onClick={handleEditCancel}
+            title={t('Cancel_Edit')}
+            className='rounded-md p-1.5  hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-600'
+            disabled={itemIsEffectivelyDisabled}
+          >
+            {' '}
+            {/* Vô hiệu hóa nút cancel edit */}
             <CancelIcon size={16} />
           </button>
         </form>
@@ -135,34 +162,49 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
           onClick={handleSelectConvClick}
           disabled={itemIsEffectivelyDisabled} // <<<< SỬ DỤNG itemIsEffectivelyDisabled >>>>
           className={`w-full py-2 pl-3 pr-24 text-left text-sm focus:outline-none
-            ${isActive && !itemIsEffectivelyDisabled ? 'font-semibold text-blue-800 dark:text-blue-300' : 'text-gray-700 dark:text-gray-200'}
+            ${isActive && !itemIsEffectivelyDisabled ? 'font-semibold text-blue-800 dark:text-blue-300' : ' '}
             ${isBeingDeleted ? 'cursor-not-allowed' : ''} // isBeingDeleted đã được bao gồm trong itemIsEffectivelyDisabled
-            disabled:opacity-70 disabled:cursor-not-allowed // Class chung cho disabled
+            // Class chung cho disabled disabled:cursor-not-allowed disabled:opacity-70
           `}
-          aria-current={isActive && !itemIsEffectivelyDisabled ? 'page' : undefined}
+          aria-current={
+            isActive && !itemIsEffectivelyDisabled ? 'page' : undefined
+          }
         >
           <div className='flex items-center'>
-            {conv.isPinned && <Pin size={14} className={`mr-1.5 flex-shrink-0 text-blue-500 dark:text-blue-400 ${itemIsEffectivelyDisabled ? 'opacity-50' : ''}`} />}
-            <span className='truncate font-medium' title={title}>{title}</span>
+            {conv.isPinned && (
+              <Pin
+                size={14}
+                className={`mr-1.5 flex-shrink-0 text-blue-500 dark:text-blue-400 ${itemIsEffectivelyDisabled ? 'opacity-50' : ''}`}
+              />
+            )}
+            <span className='truncate font-medium' title={title}>
+              {title}
+            </span>
           </div>
-          <div className={`text-xs ${isActive && !itemIsEffectivelyDisabled ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
+          <div
+            className={`text-xs ${isActive && !itemIsEffectivelyDisabled ? 'text-blue-600 dark:text-blue-400' : ''}`}
+          >
             {/* Cân nhắc thêm date-fns locale nếu cần */}
-            {formatDistanceToNow(new Date(conv.lastActivity), { addSuffix: true })}
+            {formatDistanceToNow(new Date(conv.lastActivity), {
+              addSuffix: true
+            })}
           </div>
         </button>
       )}
 
       {/* Các nút hành động chỉ hiển thị khi không chỉnh sửa VÀ item không bị disable hoàn toàn cho actions */}
       {!isEditing && (
-        <div className={`absolute right-0 top-0 flex h-full items-center space-x-0.5 pr-1 transition-opacity duration-150
+        <div
+          className={`absolute right-0 top-0 flex h-full items-center space-x-0.5 pr-1 transition-opacity duration-150
           ${isBeingDeleted ? 'opacity-100' : 'opacity-0 focus-within:opacity-100 group-hover:opacity-100'}
-          ${itemIsEffectivelyDisabled ? '!opacity-50 cursor-not-allowed' : ''} /* Thêm !important nếu cần override group-hover */
-        `}>
+          ${itemIsEffectivelyDisabled ? 'cursor-not-allowed !opacity-50' : ''} /* Thêm !important nếu cần override group-hover */
+        `}
+        >
           <button
             onClick={handleTogglePinClick}
             disabled={itemIsEffectivelyDisabled} // <<<< SỬ DỤNG itemIsEffectivelyDisabled >>>>
             title={conv.isPinned ? t('Unpin') : t('Pin')}
-            className={`rounded-md p-1.5 hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700 ${conv.isPinned ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}
+            className={`rounded-md p-1.5 hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700 ${conv.isPinned ? 'text-blue-600 dark:text-blue-400' : ''}`}
           >
             {conv.isPinned ? <PinOff size={14} /> : <Pin size={14} />}
           </button>
@@ -170,7 +212,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
             onClick={handleEditStart}
             disabled={itemIsEffectivelyDisabled} // <<<< SỬ DỤNG itemIsEffectivelyDisabled >>>>
             title={t('Rename')}
-            className='rounded-md p-1.5 text-gray-500 hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-gray-700'
+            className='rounded-md p-1.5  hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400 disabled:cursor-not-allowed disabled:opacity-50  dark:hover:bg-gray-700'
           >
             <Pencil size={14} />
           </button>
@@ -197,7 +239,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ConversationItem;
+export default ConversationItem

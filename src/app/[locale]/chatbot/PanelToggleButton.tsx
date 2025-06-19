@@ -1,25 +1,25 @@
 // src/app/[locale]/chatbot/PanelToggleButton.tsx
-import React from 'react';
-import { X, AlignJustify } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import React from 'react'
+import { X, AlignJustify } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface PanelToggleButtonProps {
-  isPanelOpen: boolean;
-  onTogglePanel: () => void;
-  disabled?: boolean; // <<<< THÊM PROP DISABLED >>>>
+  isPanelOpen: boolean
+  onTogglePanel: () => void
+  disabled?: boolean // <<<< THÊM PROP DISABLED >>>>
 }
 
 const PanelToggleButton: React.FC<PanelToggleButtonProps> = ({
   isPanelOpen,
   onTogglePanel,
-  disabled = false, // <<<< GIÁ TRỊ MẶC ĐỊNH >>>>
+  disabled = false // <<<< GIÁ TRỊ MẶC ĐỊNH >>>>
 }) => {
-  const t = useTranslations();
+  const t = useTranslations()
   const commonButtonInteractiveClasses =
-    'rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500';
-  const iconOnlyButtonBaseClasses = 'h-12 w-12 justify-center p-2';
-  const expandedButtonBaseClasses = 'px-3 py-2.5 text-sm font-medium';
-  const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed' : '';
+    'rounded-md text-gray-60 hover:bg-gray-100 hover:text-gray-90 0 dark:hover:bg-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-500'
+  const iconOnlyButtonBaseClasses = 'h-12 w-12 justify-center p-2'
+  const expandedButtonBaseClasses = 'px-3 py-2.5 text-sm font-medium'
+  const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed' : ''
 
   return (
     <div
@@ -49,7 +49,7 @@ const PanelToggleButton: React.FC<PanelToggleButtonProps> = ({
         )}
       </button>
     </div>
-  );
-};
+  )
+}
 
-export default PanelToggleButton;
+export default PanelToggleButton

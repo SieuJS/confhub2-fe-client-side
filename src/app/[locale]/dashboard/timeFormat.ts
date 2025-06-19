@@ -12,13 +12,13 @@ export function timeAgo(
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
   const intervals: { label: { [key: string]: string }; seconds: number }[] = [
-    { label: { en: "year", vi: "năm", "zh-CN": "年", "zh-TW": "年", ja: "年", ru: "год", fr: "an", de: "Jahr", ar: "سنة", es: "año", fa: "سال" }, seconds: 31536000 },
-    { label: { en: "month", vi: "tháng", "zh-CN": "个月", "zh-TW": "個月", ja: "ヶ月", ru: "месяц", fr: "mois", de: "Monat", ar: "شهر", es: "mes", fa: "ماه" }, seconds: 2592000 },
-    { label: { en: "week", vi: "tuần", "zh-CN": "周", "zh-TW": "週", ja: "週間", ru: "неделя", fr: "semaine", de: "Woche", ar: "أسبوع", es: "semana", fa: "هفته" }, seconds: 604800 },
-    { label: { en: "day", vi: "ngày", "zh-CN": "天", "zh-TW": "天", ja: "日", ru: "день", fr: "jour", de: "Tag", ar: "يوم", es: "día", fa: "روز" }, seconds: 86400 },
-    { label: { en: "hour", vi: "giờ", "zh-CN": "小时", "zh-TW": "小時", ja: "時間", ru: "час", fr: "heure", de: "Stunde", ar: "ساعة", es: "hora", fa: "ساعت" }, seconds: 3600 },
-    { label: { en: "minute", vi: "phút", "zh-CN": "分钟", "zh-TW": "分鐘", ja: "分", ru: "минута", fr: "minute", de: "Minute", ar: "دقيقة", es: "minuto", fa: "دقیقه" }, seconds: 60 },
-    { label: { en: "second", vi: "giây", "zh-CN": "秒", "zh-TW": "秒", ja: "秒", ru: "секунда", fr: "seconde", de: "Sekunde", ar: "ثانية", es: "segundo", fa: "ثانیه" }, seconds: 1 },
+    { label: { en: "year", vi: "năm", "zh": "年", "zh-TW": "年", ja: "年", ru: "год", fr: "an", de: "Jahr", ar: "سنة", es: "año", fa: "سال" }, seconds: 31536000 },
+    { label: { en: "month", vi: "tháng", "zh": "个月", "zh-TW": "個月", ja: "ヶ月", ru: "месяц", fr: "mois", de: "Monat", ar: "شهر", es: "mes", fa: "ماه" }, seconds: 2592000 },
+    { label: { en: "week", vi: "tuần", "zh": "周", "zh-TW": "週", ja: "週間", ru: "неделя", fr: "semaine", de: "Woche", ar: "أسبوع", es: "semana", fa: "هفته" }, seconds: 604800 },
+    { label: { en: "day", vi: "ngày", "zh": "天", "zh-TW": "天", ja: "日", ru: "день", fr: "jour", de: "Tag", ar: "يوم", es: "día", fa: "روز" }, seconds: 86400 },
+    { label: { en: "hour", vi: "giờ", "zh": "小时", "zh-TW": "小時", ja: "時間", ru: "час", fr: "heure", de: "Stunde", ar: "ساعة", es: "hora", fa: "ساعت" }, seconds: 3600 },
+    { label: { en: "minute", vi: "phút", "zh": "分钟", "zh-TW": "分鐘", ja: "分", ru: "минута", fr: "minute", de: "Minute", ar: "دقيقة", es: "minuto", fa: "دقیقه" }, seconds: 60 },
+    { label: { en: "second", vi: "giây", "zh": "秒", "zh-TW": "秒", ja: "秒", ru: "секунда", fr: "seconde", de: "Sekunde", ar: "ثانية", es: "segundo", fa: "ثانیه" }, seconds: 1 },
   ];
 
   for (const interval of intervals) {
@@ -125,7 +125,7 @@ function getLocalizedMessage(key: string, locale: string): string {
     unknown: {
       en: "Unknown",
       vi: "Không xác định",
-      "zh-CN": "未知",
+      "zh": "未知",
       "zh-TW": "未知",
       ja: "不明",
       ru: "Неизвестно",
@@ -138,7 +138,7 @@ function getLocalizedMessage(key: string, locale: string): string {
     invalidDate: {
       en: "Invalid Date",
       vi: "Ngày không hợp lệ",
-      "zh-CN": "无效日期",
+      "zh": "无效日期",
       "zh-TW": "無效日期",
       ja: "無効な日付",
       ru: "Неверная дата",
@@ -151,7 +151,7 @@ function getLocalizedMessage(key: string, locale: string): string {
     justNow: {
       en: "Just now",
       vi: "Vừa xong",
-      "zh-CN": "刚刚",
+      "zh": "刚刚",
       "zh-TW": "剛剛",
       ja: "たった今",
       ru: "Только что",
@@ -164,7 +164,7 @@ function getLocalizedMessage(key: string, locale: string): string {
     unknownDate: {
         en: "Unknown date",
         vi: "Không xác định",
-        "zh-CN": "未知日期",
+        "zh": "未知日期",
         "zh-TW": "未知日期",
         ja: "不明な日付",
         ru: "Неизвестная дата",
@@ -192,8 +192,8 @@ export function formatDateFull(
   let useLocale = locale;
   if (locale === "vi") {
     useLocale = "vi-VN";
-  } else if (locale === "zh-CN" || locale === 'zh') {
-    useLocale = "zh-CN";
+  } else if (locale === "zh" || locale === 'zh') {
+    useLocale = "zh";
   } else if (locale === "zh-TW") {
     useLocale = "zh-TW";
   } else if (locale === "ja") {
@@ -255,7 +255,7 @@ export function formatDateRange(
     // Sử dụng lại logic locale từ formatDateFull
     let useLocale = locale;
     if (locale === "vi") useLocale = "vi-VN";
-    else if (locale === "zh-CN" || locale === 'zh') useLocale = "zh-CN";
+    else if (locale === "zh" || locale === 'zh') useLocale = "zh";
     else if (locale === "zh-TW") useLocale = "zh-TW";
     else if (locale === "ja") useLocale = "ja-JP";
     else if (locale === "ru") useLocale = "ru-RU";
