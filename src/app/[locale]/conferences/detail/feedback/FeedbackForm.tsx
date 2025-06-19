@@ -62,7 +62,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({
       </div>
       <textarea
         placeholder={t('Write_your_feedback')}
-        className='mb-4 w-full rounded-md border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-blue-500'
+        className='mb-4 w-full rounded-md border border-gray-300 p-3 text-sm placeholder:text-primary focus:border-blue-500 focus:ring-blue-500'
         rows={3}
         value={description}
         onChange={e => onDescriptionChange(e.target.value)}

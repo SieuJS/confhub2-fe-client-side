@@ -55,6 +55,14 @@ const featureDataConfig: FeatureCategory[] = [
         descriptionKey:
           'FeatureComparisonTable.features.location_map.description',
         availability: { guest: true, loggedIn: true }
+      },
+      {
+        id: 'chart_visualization',
+        nameKey: 'FeatureComparisonTable.features.chart_visualization.name',
+        descriptionKey:
+          'FeatureComparisonTable.features.chart_visualization.description',
+        availability: { guest: true, loggedIn: true },
+        isNew: true
       }
     ]
   },
@@ -129,14 +137,6 @@ const featureDataConfig: FeatureCategory[] = [
           'FeatureComparisonTable.features.profile_update.description.2'
         ],
         availability: { guest: false, loggedIn: true }
-      },
-      {
-        id: 'chart_visualization',
-        nameKey: 'FeatureComparisonTable.features.chart_visualization.name',
-        descriptionKey:
-          'FeatureComparisonTable.features.chart_visualization.description',
-        availability: { guest: false, loggedIn: true },
-        isNew: true
       }
     ]
   }

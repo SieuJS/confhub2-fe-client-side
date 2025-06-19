@@ -37,10 +37,10 @@ const MobileNavigation: FC<Props> = ({
       {/* Bọc chúng trong một div để layout tốt hơn nếu cần */}
       {isClient && (
         <>
-          <div className='px-2 hover:bg-gray-10 dark:hover:bg-gray-70'>
+          <div className='px-2 hover:bg-gray-10 '>
             <ThemeSwitch />
           </div>
-          <div className='px-2 hover:bg-gray-10 dark:hover:bg-gray-70'>
+          <div className='px-2 hover:bg-gray-10 '>
             <LangSwitcher />
           </div>
         </>
@@ -51,28 +51,28 @@ const MobileNavigation: FC<Props> = ({
         <Link
           href={`/conferences`}
           locale={locale}
-          className='px-4 py-2 hover:bg-gray-10 dark:hover:bg-gray-70'
+          className='px-4 py-2 hover:bg-gray-10 '
         >
           {t('Conferences')}
         </Link>
         <Link
           href={`/journals`}
           locale={locale}
-          className='px-4 py-2 hover:bg-gray-10 dark:hover:bg-gray-70'
+          className='px-4 py-2 hover:bg-gray-10 '
         >
           {t('Journals')}
         </Link>
         <Link
           href={`/visualization`}
           locale={locale}
-          className='px-4 py-2 hover:bg-gray-10 dark:hover:bg-gray-70'
+          className='px-4 py-2 hover:bg-gray-10 '
         >
           {t('Visualization')}
         </Link>
         <Link
           href={`/chatbot/landing`}
           locale={locale}
-          className='px-4 py-2 hover:bg-gray-10 dark:hover:bg-gray-70'
+          className='px-4 py-2 hover:bg-gray-10 '
         >
           {t('Chatbot.Chatbot')}
           <span className='mb-1 ml-1 inline-block rounded bg-button px-1.5 py-0.5 align-middle text-xs font-semibold text-button-text'>
@@ -82,14 +82,14 @@ const MobileNavigation: FC<Props> = ({
         <Link
           href={`/support`}
           locale={locale}
-          className='px-4 py-2 hover:bg-gray-10 dark:hover:bg-gray-70'
+          className='px-4 py-2 hover:bg-gray-10 '
         >
           {t('Support')}
         </Link>
         <Link
           href={`/addconference`}
           locale={locale}
-          className='px-4 py-2 hover:bg-gray-10 dark:hover:bg-gray-70'
+          className='px-4 py-2 hover:bg-gray-10 '
         >
           {t('Publish')}
         </Link>
@@ -100,14 +100,14 @@ const MobileNavigation: FC<Props> = ({
             <Link
               href={`/auth/login`}
               locale={locale}
-              className='px-4 py-2 hover:bg-gray-10 dark:hover:bg-gray-70'
+              className='px-4 py-2 hover:bg-gray-10 '
             >
               {t('Login')}
             </Link>
             <Link
               href={`/auth/register`}
               locale={locale}
-              className='px-4 py-2 hover:bg-gray-10 dark:hover:bg-gray-70'
+              className='px-4 py-2 hover:bg-gray-10 '
             >
               {t('Register')}
             </Link>
