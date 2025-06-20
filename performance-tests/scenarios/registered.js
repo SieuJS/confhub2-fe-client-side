@@ -56,7 +56,7 @@ export function registeredUserJourney(data) {
         sleep(2);
 
         group('Get Profile', () => {
-            const res = http.get(`${API_URL}/api/v1/auth/me`, authParams);
+            const res = http.get(`${API_URL}/api/v1/user/me`, authParams);
             check(res, { 'Get profile status is 200': (r) => r.status === 200 });
         });
         sleep(2);
@@ -69,9 +69,14 @@ export function registeredUserJourney(data) {
         });
         sleep(3);
 
+       
+        // Khối hành động Follow và Unfollow
         if (data.conferenceIds && data.conferenceIds.length > 0) {
+            // ĐIỀU CHỈNH: Khai báo randomConfId ở đây để cả 2 group đều dùng được
+            const randomConfId = randomItem(data.conferenceIds);
+
+            // Hành động 1: Follow a Conference
             group('Follow a Conference', () => {
-                const randomConfId = randomItem(data.conferenceIds);
                 const payload = JSON.stringify({ conferenceId: randomConfId });
                 const followParams = {
                     headers: {
@@ -87,7 +92,7 @@ export function registeredUserJourney(data) {
 
             // Hành động 2: Unfollow the SAME Conference
             group('Unfollow a Conference', () => {
-                // Giả sử endpoint unfollow là 'remove' và payload tương tự
+                // Bây giờ group này có thể "nhìn thấy" randomConfId
                 const payload = JSON.stringify({ conferenceId: randomConfId });
                 const unfollowParams = {
                     headers: {
@@ -95,6 +100,7 @@ export function registeredUserJourney(data) {
                         'Authorization': `Bearer ${token}`,
                     },
                 };
+                // Giả sử endpoint unfollow là 'remove'
                 const res = http.post(`${API_URL}/api/v1/follow-conference/remove`, payload, unfollowParams);
                 check(res, { 'Unfollow conference status is 201': (r) => r.status === 201 }); // Giả sử unfollow trả về 201
             });
@@ -104,11 +110,8 @@ export function registeredUserJourney(data) {
 
         // Hành động cuối: Logout
         group('Logout', () => {
-            // ĐIỀU CHỈNH QUAN TRỌNG:
-            // Truyền `null` làm body để gửi một request POST không có nội dung,
-            // mô phỏng chính xác hành vi của `fetch` trong trình duyệt.
             const res = http.post(`${API_URL}/api/v1/auth/logout`, null, authParams);
-            check(res, { 'Logout status is 200': (r) => r.status === 200 });
+            check(res, { 'Logout status is 201': (r) => r.status === 201 });
         });
     });
 }
