@@ -236,7 +236,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
           {isLocationDropdownOpen && (
             <div className='absolute left-0 z-10 mt-2 w-48 rounded-md bg-white-pure shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none '>
               <div
-                className='max-h-48 overflow-y-scroll py-1'
+                className='max-h-80 overflow-y-scroll py-1'
                 role='menu'
                 aria-orientation='vertical'
                 aria-labelledby='options-menu'

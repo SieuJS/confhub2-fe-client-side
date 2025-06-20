@@ -18,11 +18,29 @@ interface Props {
 }
 
 export const CitationMetricsSection: React.FC<Props> = ({ journal, t }) => {
-  // 1. Tính toán năm trước đó một cách tự động
-  const previousYear = new Date().getFullYear() - 1;
+  // Logic để tìm key "Total Docs." với năm lớn nhất
+  let latestTotalDocsYear: number | null = null;
+  let latestTotalDocsValue: string | number | undefined = undefined;
 
-  // 2. Tạo key động để truy cập dữ liệu trong object 'journal'
-  const totalDocsKey = `Total Docs. (${previousYear})`;
+  // Duyệt qua tất cả các key trong đối tượng journal
+  for (const key in journal) {
+    if (key.startsWith('Total Docs. (')) {
+      // Trích xuất năm từ key, ví dụ: "Total Docs. (2023)" -> 2023
+      const match = key.match(/\((\d{4})\)/);
+      if (match && match[1]) {
+        const year = parseInt(match[1], 10);
+        // Nếu đây là năm lớn hơn hoặc là năm đầu tiên chúng ta tìm thấy
+        if (latestTotalDocsYear === null || year > latestTotalDocsYear) {
+          latestTotalDocsYear = year;
+          latestTotalDocsValue = journal[key];
+        }
+      }
+    }
+  }
+
+  // Nếu không tìm thấy Total Docs. theo năm nào, có thể fallback hoặc hiển thị N/A
+  const displayTotalDocsYear = latestTotalDocsYear || 'N/A';
+  const displayTotalDocsValue = latestTotalDocsValue;
 
   return (
     <section id='citation-metrics' className='scroll-mt-28 border-b border-border py-8 md:py-12'>
@@ -30,11 +48,11 @@ export const CitationMetricsSection: React.FC<Props> = ({ journal, t }) => {
         {t('CitationMetrics.title')}
       </h2>
       <div className='grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4'>
-        {/* 3. Sử dụng key động cho value và label */}
-        <MetricItem 
-          icon={FileText} 
-          value={journal[totalDocsKey]} 
-          label={t('CitationMetrics.totalDocsYearly', { year: previousYear })} 
+        {/* Chỉ hiển thị Total Docs. của năm gần nhất tìm được */}
+        <MetricItem
+          icon={FileText}
+          value={displayTotalDocsValue}
+          label={t('CitationMetrics.totalDocsYearly', { year: displayTotalDocsYear })}
         />
         <MetricItem icon={BookCopy} value={journal['Total Docs. (3years)']} label={t('CitationMetrics.totalDocs3years')} />
         <MetricItem icon={Quote} value={journal['Total Cites (3years)']} label={t('CitationMetrics.totalCites3years')} />

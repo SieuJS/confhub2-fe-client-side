@@ -6,70 +6,57 @@ import SearchJournalSection from './SearchJournalSection';
 import ResultsJournalSection from './ResultsJournalSection';
 import { Header } from '../utils/Header';
 import Footer from '../utils/Footer';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // Không cần useSearchParams ở đây vì handleSearch sẽ tự tạo URLSearchParams mới
 import { useCallback } from 'react';
+
+// Định nghĩa interface cho tất cả các tham số tìm kiếm mà SearchJournalSection có thể gửi
+interface SearchParamsFromComponent {
+    search?: string;
+    country?: string | null;
+    areas?: string | null; // Thêm areas
+    publisher?: string | null;
+    region?: string | null;
+    type?: string | null; // Thêm type
+    quartile?: string | null; // Thêm quartile
+    category?: string | null; // Thêm category
+    issn?: string | null; // Thêm issn
+    topic?: string | null; // Thêm topic
+    hIndex?: string | null; // Thêm hIndex
+}
 
 export default function Journals({ params: { locale } }: { params: { locale: string } }) {
     const t = useTranslations('');
     const router = useRouter();
-    // const searchParams = useSearchParams(); // Tạm thời không cần vì không giữ lại sortBy
 
-    const handleSearch = useCallback(async (searchParamsFromComponent: {
-        search?: string;
-        country?: string | null;
-        region?: string | null;
-        publisher?: string | null;
-    }) => {
+    const handleSearch = useCallback(async (searchParamsFromComponent: SearchParamsFromComponent) => {
         const newParams = new URLSearchParams();
 
-        // Tạm thời comment phần giữ lại sortBy
-        // const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
-        // if (currentParams.has('sortBy')) {
-        //     newParams.set('sortBy', currentParams.get('sortBy')!);
-        // }
-        
-        // Thêm các tham số tìm kiếm mới từ component
-        if (searchParamsFromComponent.search) {
-            newParams.set('search', searchParamsFromComponent.search);
+        // Lặp qua tất cả các key trong searchParamsFromComponent
+        // và thêm vào URLSearchParams nếu giá trị tồn tại và không rỗng
+        for (const key in searchParamsFromComponent) {
+            const value = searchParamsFromComponent[key as keyof SearchParamsFromComponent];
+            if (value && value !== '') { // Kiểm tra cả null và chuỗi rỗng
+                newParams.set(key, value);
+            }
         }
         
-        if (searchParamsFromComponent.country) {
-            newParams.set('country', searchParamsFromComponent.country);
-        }
-        
-        if (searchParamsFromComponent.region) {
-            newParams.set('region', searchParamsFromComponent.region);
-        }
-
-        if (searchParamsFromComponent.publisher) {
-            newParams.set('publisher', searchParamsFromComponent.publisher);
-        }
-        
-        // Khi thực hiện một tìm kiếm mới, luôn reset về trang 1
-        newParams.set('page', '1');
+        newParams.set('page', '1'); // Luôn reset về trang 1 khi tìm kiếm mới
 
         const paramsString = newParams.toString();
         router.push(`/${locale}/journals?${paramsString}`);
 
-    }, [locale, router]); // Bỏ searchParams khỏi dependency array
+    }, [locale, router]);
 
     const handleClear = useCallback(() => {
         const newParams = new URLSearchParams();
-
-        // Tạm thời comment phần giữ lại sortBy
-        // const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
-        // if (currentParams.has('sortBy')) {
-        //     newParams.set('sortBy', currentParams.get('sortBy')!);
-        // }
-        
         const paramsString = newParams.toString();
         router.push(`/${locale}/journals?${paramsString}`);
-    }, [locale, router]); // Bỏ searchParams khỏi dependency array
+    }, [locale, router]);
 
     return (
-        <>
+        <div className="flex min-h-screen flex-col">
             <Header locale={locale} />
-            <div className="text-center text-2xl">
+            <div className="flex-grow text-center text-2xl">
                 <div className="py-10 bg-background w-full"></div>
                 <SearchJournalSection
                     onSearch={handleSearch}
@@ -80,6 +67,6 @@ export default function Journals({ params: { locale } }: { params: { locale: str
                 </div>
             </div>
             <Footer />
-        </>
+        </div>
     );
 }

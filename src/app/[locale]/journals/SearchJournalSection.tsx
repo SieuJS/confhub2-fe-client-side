@@ -4,17 +4,12 @@
 import React from 'react'
 import Button from '../utils/Button'
 import SearchAdvanceJournalSection from './SearchAdvanceJournalSection'
-import useSearchJournalForm from '../../../hooks/journals/useSearchJounalForm'
+import useSearchJournalForm from '@/src/hooks/journals/useSearchJounalForm'
 import { useTranslations } from 'next-intl'
-import { Search, MapPin } from 'lucide-react'
+import { Search, MapPin, BookCopy, Shapes, Ticket } from 'lucide-react' // Thêm Ticket hoặc icon phù hợp
 
 interface SearchJournalSectionProps {
-  onSearch: (searchParams: {
-    search?: string
-    country?: string | null
-    region?: string | null
-    publisher?: string | null
-  }) => void
+  onSearch: (searchParams: any) => void
   onClear: () => void
 }
 
@@ -25,44 +20,159 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({
   const t = useTranslations('SearchJournal')
 
   const {
+    // Values
     searchKeyword,
     selectedCountry,
+    selectedAreas,
+    selectedQuartile, // Lấy selectedQuartile từ hook
+    selectedRegion,
+    publisher,
+    type,
+    category,
+    issn,
+    topic,
+    hIndex,
+    // UI State
     countryDropdownRef,
     isCountryDropdownOpen,
     filteredCountries,
     isAdvancedOptionsVisible,
-    selectedRegion,
-    selectedPublisher,
-    handleKeywordChange,
-    handleCountryClick,
-    handleCountrySearchChange,
+    // Areas Dropdown UI State
+    areasDropdownRef,
+    isAreasDropdownOpen,
+    filteredAreas,
+    // MỚI: Quartile Dropdown UI State
+    quartileDropdownRef,
+    isQuartileDropdownOpen,
+    quartiles, // Lấy mảng quartiles từ hook
+    // Handlers
+    setSearchKeyword,
+    setSelectedCountry,
+    setSelectedAreas,
+    setSelectedQuartile, // Setter cho selectedQuartile
+    setSelectedRegion,
+    setPublisher,
+    setType,
+    setCategory,
+    setIssn,
+    setTopic,
+    setHIndex,
+    setCountrySearch,
     toggleCountryDropdown,
-    handleRegionChange,
-    handlePublisherChange,
+    // Areas Dropdown Handlers
+    setAreasSearch,
+    toggleAreasDropdown,
+    // MỚI: Quartile Dropdown Handlers
+    toggleQuartileDropdown,
     handleSearchClick,
     handleKeyPress,
     toggleAdvancedOptionsVisibility,
-    handleClear: handleClearForm
+    handleClear
   } = useSearchJournalForm({ onSearch, onClear })
-
-  const handleClearClick = () => {
-    handleClearForm()
-  }
 
   return (
     <div className='container mx-auto px-4 text-base'>
-      <div className='flex flex-wrap items-center justify-center space-x-4 rounded-full border border-black px-3 py-2 shadow-md'>
+      <div className='flex flex-wrap items-center justify-center gap-y-2 rounded-full border border-black px-3 py-2 shadow-md'>
         {/* Search by Title Input */}
         <div className='flex flex-grow basis-full items-center md:basis-auto'>
           <Search className='mr-1 h-5 w-5' />
           <input
             type='text'
-            placeholder={t('searchByTitlePlaceholder')} // Đổi key translation
+            placeholder={t('searchByTitlePlaceholder')}
             className='w-full bg-transparent text-sm outline-none'
             value={searchKeyword}
-            onChange={handleKeywordChange}
+            onChange={e => setSearchKeyword(e.target.value)}
             onKeyDown={handleKeyPress}
           />
+        </div>
+
+        <div className='mx-2 hidden h-6 border-l border-gray-300 md:block'></div>
+
+        {/* Areas Dropdown */}
+        <div className='relative' ref={areasDropdownRef}>
+          <button
+            className='flex items-center space-x-2 px-2 bg-transparent outline-none'
+            onClick={toggleAreasDropdown}
+          >
+            <Shapes className='h-4 w-4' />
+            <span className='text-sm'>{selectedAreas || t('areasLabel')}</span>
+          </button>
+
+          {isAreasDropdownOpen && (
+            <div className='absolute left-0 z-10 mt-2 w-64 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
+              <div className='max-h-80 overflow-y-scroll py-1'>
+                <input
+                  type='text'
+                  placeholder={t('searchAreasPlaceholder')}
+                  className='block w-full px-4 py-2 text-sm text-gray-700 focus:outline-none'
+                  onChange={e => setAreasSearch(e.target.value)}
+                  onClick={e => e.stopPropagation()}
+                />
+                <button
+                  onClick={() => {
+                    setSelectedAreas(null)
+                    toggleAreasDropdown()
+                  }}
+                  className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                >
+                  {t('allAreasOption')}
+                </button>
+                {filteredAreas.map(area => (
+                  <button
+                    key={area}
+                    onClick={() => {
+                      setSelectedAreas(area)
+                      toggleAreasDropdown()
+                    }}
+                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                  >
+                    {area}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className='mx-2 hidden h-6 border-l border-gray-300 md:block'></div>
+
+        {/* MỚI: Quartile Dropdown */}
+        <div className='relative' ref={quartileDropdownRef}>
+          <button
+            className='flex items-center space-x-2 px-2 bg-transparent outline-none'
+            onClick={toggleQuartileDropdown}
+          >
+            <Ticket className='h-4 w-4' /> {/* Sử dụng icon Ticket */}
+            <span className='text-sm'>{selectedQuartile || t('quartileLabel')}</span>
+          </button>
+
+          {isQuartileDropdownOpen && (
+            <div className='absolute left-0 z-10 mt-2 w-40 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
+              <div className='py-1'>
+                <button
+                  onClick={() => {
+                    setSelectedQuartile(null)
+                    toggleQuartileDropdown()
+                  }}
+                  className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                >
+                  {t('allQuartilesOption')}
+                </button>
+                {quartiles.map(q => (
+                  <button
+                    key={q}
+                    onClick={() => {
+                      setSelectedQuartile(q)
+                      toggleQuartileDropdown()
+                    }}
+                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className='mx-2 hidden h-6 border-l border-gray-300 md:block'></div>
@@ -70,35 +180,28 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({
         {/* Country Dropdown */}
         <div className='relative' ref={countryDropdownRef}>
           <button
-            className=' flex items-center space-x-2 bg-transparent  outline-none'
+            className='flex items-center space-x-2 px-2 bg-transparent outline-none'
             onClick={toggleCountryDropdown}
           >
             <MapPin className='h-4 w-4' />
-            <span className='text-sm'>
-              {selectedCountry ? selectedCountry : t('countryLabel')}
-            </span>
+            <span className='text-sm'>{selectedCountry || t('countryLabel')}</span>
           </button>
 
           {isCountryDropdownOpen && (
-            <div
-              className='absolute left-0 z-10 mt-2 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'
-              tabIndex={-1}
-            >
-              <div
-                className='max-h-48 overflow-y-scroll py-1'
-                role='menu'
-                aria-orientation='vertical'
-                aria-labelledby='options-menu'
-              >
+            <div className='absolute left-0 z-10 mt-2 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
+              <div className='max-h-80 overflow-y-scroll py-1'>
                 <input
                   type='text'
                   placeholder={t('searchCountryPlaceholder')}
                   className='block w-full px-4 py-2 text-sm text-gray-700 focus:outline-none'
-                  onChange={handleCountrySearchChange}
+                  onChange={e => setCountrySearch(e.target.value)}
                   onClick={e => e.stopPropagation()}
                 />
                 <button
-                  onClick={() => handleCountryClick(null)}
+                  onClick={() => {
+                    setSelectedCountry(null)
+                    toggleCountryDropdown()
+                  }}
                   className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                 >
                   {t('allCountriesOption')}
@@ -106,7 +209,10 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({
                 {filteredCountries.map(location => (
                   <button
                     key={location}
-                    onClick={() => handleCountryClick(location)}
+                    onClick={() => {
+                      setSelectedCountry(location)
+                      toggleCountryDropdown()
+                    }}
                     className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                   >
                     {location}
@@ -118,7 +224,7 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({
         </div>
 
         {/* Search and Clear Buttons */}
-        <div className='mt-2 flex space-x-4 md:ml-4 md:mt-0 md:space-x-4 md:pl-4'>
+        <div className='flex space-x-2 md:ml-4 md:space-x-4 md:pl-4'>
           <Button
             variant='primary'
             size='small'
@@ -131,7 +237,7 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({
             variant='secondary'
             size='small'
             rounded
-            onClick={handleClearClick}
+            onClick={handleClear}
           >
             {t('clearButton')}
           </Button>
@@ -142,10 +248,19 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({
       <SearchAdvanceJournalSection
         isAdvancedOptionsVisible={isAdvancedOptionsVisible}
         toggleAdvancedOptionsVisibility={toggleAdvancedOptionsVisibility}
-        onRegionChange={handleRegionChange}
-        selectedRegion={selectedRegion}
-        onPublisherChange={handlePublisherChange}
-        selectedPublisher={selectedPublisher}
+        // Pass all values and setters
+        publisher={publisher}
+        onPublisherChange={setPublisher}
+        region={selectedRegion}
+        onRegionChange={setSelectedRegion}
+        category={category}
+        onCategoryChange={setCategory}
+        issn={issn}
+        onIssnChange={setIssn}
+        topic={topic}
+        onTopicChange={setTopic}
+        hIndex={hIndex}
+        onHIndexChange={setHIndex}
       />
     </div>
   )

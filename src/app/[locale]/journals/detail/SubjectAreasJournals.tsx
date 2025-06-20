@@ -83,7 +83,7 @@ interface SubjectAreasJournalsProps {
 }
 
 const SubjectAreasJournals: React.FC<SubjectAreasJournalsProps> = ({
-  speed = '150s', // Default animation duration
+  speed = '100s', // Default animation duration
   imageHeight = 'h-80', // Default image container height
   imageWidth = 'w-50', // Default image container width
   innerClasses = 'space-x-4 py-4' // Default inner spacing/padding

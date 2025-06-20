@@ -1,17 +1,15 @@
 // src/hooks/conferences/useSearchForm.ts
 import { useState, useEffect, useRef, ChangeEvent, KeyboardEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
-import continentList from '../../models/data/locations-list.json';
+// Thay thế import này
+// import continentList from '../../models/data/locations-list.json';
+// Bổ sung import mới cho country_en.json
+import countryData from '@/src/app/[locale]/addconference/countries_en.json'; // Đảm bảo đường dẫn chính xác
 
 // --- Type Definitions ---
 type SearchFieldType = 'keyword' | 'title' | 'acronym';
 type ConferenceType = 'Online' | 'Offline' | 'Hybrid';
 const AVAILABLE_TYPES: ReadonlyArray<ConferenceType> = ['Online', 'Offline', 'Hybrid'];
-
-// Add types for advanced options if needed for validation (optional)
-// Example:
-// type RankType = 'A*' | 'A' | 'B' | 'AustralasianB' | 'C' | 'AustralasianC' | 'Other';
-// const VALID_RANKS: ReadonlyArray<RankType> = ['A*', 'A', 'B', 'AustralasianB', 'C', 'AustralasianC', 'Other'];
 
 interface SearchParams {
   keyword?: string;
@@ -21,15 +19,14 @@ interface SearchParams {
   toDate?: Date | null;
   location?: string | null;
   type?: ConferenceType | null;
-  // submissionDate?: Date | null; // Keep Date | null
-  subFromDate?: Date | null; // NEW
-  subToDate?: Date | null;   // NEW
+  subFromDate?: Date | null;
+  subToDate?: Date | null;
   publisher?: string | null;
-  rank?: string | null; // Keep string | null unless validating strictly
+  rank?: string | null;
   source?: string | null;
   averageScore?: string | null;
-  topics?: string[]; // Keep string[]
-  fieldOfResearch?: string[]; // Keep string[]
+  topics?: string[];
+  fieldOfResearch?: string[];
 }
 
 interface UseSearchFormProps {
@@ -44,7 +41,7 @@ const getInitialStringParam = (
     searchParams: URLSearchParams,
     paramName: string
 ): string | null => {
-    return searchParams.get(paramName); // Returns null if not present
+    return searchParams.get(paramName);
 };
 
 // Generic helper for array parameters (like topics)
@@ -52,7 +49,7 @@ const getInitialArrayParam = (
     searchParams: URLSearchParams,
     paramName: string
 ): string[] => {
-    return searchParams.getAll(paramName) || []; // Returns empty array if not present
+    return searchParams.getAll(paramName) || [];
 }
 
 const getInitialLocationFromUrl = (
@@ -118,10 +115,9 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   // --- State Initialization ---
   const searchParams = new URLSearchParams(useSearchParams().toString());
 
-  const countriesFromContinentList: string[] = continentList.flatMap(
-    (continent) => continent.countries
-  );
-  const [availableLocations] = useState<string[]>(countriesFromContinentList);
+  // Thay đổi cách lấy danh sách quốc gia từ cấu trúc mới của country_en.json
+  const countriesList: string[] = countryData.map((country: { name: string }) => country.name);
+  const [availableLocations] = useState<string[]>(countriesList);
 
   // Initialize Basic Fields
   const initialSearchConfig = getInitialSearchConfig(searchParams);
@@ -131,11 +127,10 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   const initialToDate = getInitialDateFromUrl(searchParams, 'toDate');
 
   // Initialize Advanced Fields
-  // const initialSubmissionDate = getInitialDateFromUrl(searchParams, 'submissionDate');
   const initialPublisher = getInitialStringParam(searchParams, 'publisher');
-  const initialRank = getInitialStringParam(searchParams, 'rank'); // Add validation if needed
-  const initialSource = getInitialStringParam(searchParams, 'source'); // Add validation if needed
-  const initialAverageScore = getInitialStringParam(searchParams, 'averageScore'); // Add validation if needed
+  const initialRank = getInitialStringParam(searchParams, 'rank');
+  const initialSource = getInitialStringParam(searchParams, 'source');
+  const initialAverageScore = getInitialStringParam(searchParams, 'averageScore');
   const initialTopics = getInitialArrayParam(searchParams, 'topics');
   const initialFieldsOfResearch = getInitialArrayParam(searchParams, 'fieldOfResearch');
   const initialShowAdvanced = shouldShowAdvancedOptionsInitially(searchParams);
@@ -161,9 +156,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
 
   // Advanced
   const [isAdvancedOptionsVisible, setIsAdvancedOptionsVisible] = useState<boolean>(initialShowAdvanced);
-  // const [submissionDate, setSubmissionDate] = useState<Date | null>(initialSubmissionDate);
-  const [subFromDate, setsubFromDate] = useState<Date | null>(initialsubFromDate); // NEW
-  const [subToDate, setsubToDate] = useState<Date | null>(initialsubToDate);     // NEW
+  const [subFromDate, setsubFromDate] = useState<Date | null>(initialsubFromDate);
+  const [subToDate, setsubToDate] = useState<Date | null>(initialsubToDate);
   const [selectedPublisher, setSelectedPublisher] = useState<string | null>(initialPublisher);
   const [selectedRank, setSelectedRank] = useState<string | null>(initialRank);
   const [selectedSource, setSelectedSource] = useState<string | null>(initialSource);
@@ -171,7 +165,7 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   const [selectedTopics, setSelectedTopics] = useState<string[]>(initialTopics);
   const [selectedFieldsOfResearch, setSelectedFieldsOfResearch] = useState<string[]>(initialFieldsOfResearch);
 
-  // --- Effects --- (Keep the existing useEffect for closing dropdowns)
+  // --- Effects ---
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
        if (locationDropdownRef.current && !locationDropdownRef.current.contains(event.target as Node)) {
@@ -188,11 +182,11 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []); // No dependency change needed here
+  }, []);
 
   // --- Handlers ---
 
-  // Basic Handlers (keyword, search type, location, type, dates) - No change needed
+  // Basic Handlers
   const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => { setConfKeyword(event.target.value); };
   const handleSearchTypeChange = (type: SearchFieldType) => { setSelectSearchType(type); setIsSearchTypeDropdownOpen(false); };
   const toggleSearchTypeDropdown = () => { setIsSearchTypeDropdownOpen(!isSearchTypeDropdownOpen); };
@@ -205,10 +199,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   const toggleLocationDropdown = () => { setIsLocationDropdownOpen(!isLocationDropdownOpen); };
   const toggleTypeDropdown = () => { setIsTypeDropdownOpen(!isTypeDropdownOpen); };
 
-  // Advanced Handlers (Pass state setters directly)
+  // Advanced Handlers
   const toggleAdvancedOptionsVisibility = () => { setIsAdvancedOptionsVisible(!isAdvancedOptionsVisible); };
-  // const handleSubmissionDateChange = (date: Date | null) => { setSubmissionDate(date); };
-  // NEW Handler for Date Range Picker
   const handleSubmissionDateRangeChange = (dates: [Date | null, Date | null]) => {
     const [start, end] = dates;
     setsubFromDate(start);
@@ -223,24 +215,21 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
 
   // Combined Search/Clear
   const handleSearchClick = () => {
-    // Consolidate all current state into search params
     const searchParamsData: SearchParams = {
       fromDate,
       toDate,
       location: selectedLocation,
       type: selectedType,
-      // submissionDate,
-      subFromDate: subFromDate, // NEW
-      subToDate: subToDate,   // NEW
+      subFromDate: subFromDate,
+      subToDate: subToDate,
       publisher: selectedPublisher,
       rank: selectedRank,
       source: selectedSource,
       averageScore: selectedAverageScore,
-      topics: selectedTopics && selectedTopics.length > 0 ? selectedTopics : undefined, // Only include if non-empty
-      fieldOfResearch: selectedFieldsOfResearch && selectedFieldsOfResearch.length > 0 ? selectedFieldsOfResearch : undefined, // Only include if non-empty
+      topics: selectedTopics && selectedTopics.length > 0 ? selectedTopics : undefined,
+      fieldOfResearch: selectedFieldsOfResearch && selectedFieldsOfResearch.length > 0 ? selectedFieldsOfResearch : undefined,
     };
 
-    // Add correct search field based on selected type
     if (confKeyword) {
         searchParamsData[selectSearchType] = confKeyword;
     }
@@ -266,25 +255,21 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     setTypeSearchQuery('');
 
     // Reset Advanced state
-    // setSubmissionDate(null);
-    setsubFromDate(null); // NEW
-    setsubToDate(null);   // NEW
+    setsubFromDate(null);
+    setsubToDate(null);
     setSelectedPublisher(null);
     setSelectedRank(null);
     setSelectedSource(null);
     setSelectedAverageScore(null);
     setSelectedTopics([]);
     setSelectedFieldsOfResearch([]);
-    // Optionally reset advanced visibility, or leave it as is
-    // setIsAdvancedOptionsVisible(false);
 
-    // Call the parent's onClear AFTER resetting local state
     if (onClear) {
       onClear();
     }
   };
 
-  // Filtering Logic (no changes needed)
+  // Filtering Logic
   const filteredLocations = availableLocations.filter((location) =>
     location.toLowerCase().includes(locationSearchQuery.toLowerCase())
   );
@@ -327,19 +312,17 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     handleKeyPress,
 
     // Advanced Search State & Handlers
-    isAdvancedOptionsVisible, // Initialized based on URL
-    // submissionDate,         // Initialized from URL
-    subFromDate, // NEW
-    subToDate,   // NEW
-    selectedPublisher,      // Initialized from URL
-    selectedRank,           // Initialized from URL
-    selectedSource,         // Initialized from URL
-    selectedAverageScore,   // Initialized from URL
-    selectedTopics,         // Initialized from URL
-    selectedFieldsOfResearch, // Initialized from URL
+    isAdvancedOptionsVisible,
+    subFromDate,
+    subToDate,
+    selectedPublisher,
+    selectedRank,
+    selectedSource,
+    selectedAverageScore,
+    selectedTopics,
+    selectedFieldsOfResearch,
     toggleAdvancedOptionsVisibility,
-    // handleSubmissionDateChange,
-    handleSubmissionDateRangeChange, // NEW
+    handleSubmissionDateRangeChange,
     handlePublisherChange,
     handleRankChange,
     handleSourceChange,

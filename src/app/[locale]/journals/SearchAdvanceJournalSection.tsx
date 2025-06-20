@@ -3,26 +3,60 @@
 
 import React from 'react'
 import { useTranslations } from 'next-intl'
-import locationData from '@/src/models/data/locations-list.json'; // Import trực tiếp file JSON
-
 interface SearchJournalAdvanceSectionProps {
   isAdvancedOptionsVisible: boolean
   toggleAdvancedOptionsVisibility: () => void
-  onRegionChange: (region: string | null) => void
-  selectedRegion: string | null
-  onPublisherChange: (publisher: string | null) => void
-  selectedPublisher: string | null
+  publisher: string
+  onPublisherChange: (value: string) => void
+  region: string | null
+  onRegionChange: (value: string | null) => void
+  category: string
+  onCategoryChange: (value: string) => void
+  issn: string
+  onIssnChange: (value: string) => void
+  topic: string
+  onTopicChange: (value: string) => void
+  hIndex: string
+  onHIndexChange: (value: string) => void
 }
 
 const SearchAdvanceJournalSection: React.FC<SearchJournalAdvanceSectionProps> = ({
   isAdvancedOptionsVisible,
   toggleAdvancedOptionsVisibility,
-  onRegionChange,
-  selectedRegion,
+  publisher,
   onPublisherChange,
-  selectedPublisher
+  region,
+  onRegionChange,
+  category,
+  onCategoryChange,
+  issn,
+  onIssnChange,
+  topic,
+  onTopicChange,
+  hIndex,
+  onHIndexChange
 }) => {
   const t = useTranslations('SearchAdvancedJournal')
+  // const quartiles = ['Q1', 'Q2', 'Q3', 'Q4'] // ĐÃ DI CHUYỂN LÊN useSearchJournalForm
+
+  // Mảng các khu vực được set cứng
+  const hardcodedRegions: string[] = [
+    'Africa',
+    'Asiatic Region',
+    'Eastern Europe',
+    'Latin America',
+    'Middle East',
+    'Northern America',
+    'Pacific Region',
+    'Western Europe',
+    'ARAB COUNTRIES',
+    'BRIICS',
+    'EU-27',
+    'IBEROAMERICA',
+    'LANIC',
+    'NORDIC COUNTRIES',
+    'OECD'
+  ]
 
   return (
     <div>
@@ -39,30 +73,10 @@ const SearchAdvanceJournalSection: React.FC<SearchJournalAdvanceSectionProps> = 
 
       {isAdvancedOptionsVisible && (
         <div className='mt-4 rounded border p-4 shadow-md'>
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-            {/* Region Filter */}
-            <div>
-              <label className='mb-2 block font-bold' htmlFor='region'>
-                {t('regionLabel')}: {/* Thêm key 'regionLabel' vào file translation */}
-              </label>
-              <select
-                id='region'
-                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 text-sm leading-tight shadow focus:outline-none'
-                value={selectedRegion || ''}
-                onChange={(e) => onRegionChange(e.target.value || null)}
-              >
-                <option value=''>{t('allRegionsOption')}</option> {/* Thêm key 'allRegionsOption' */}
-                {locationData.map(region => (
-                  <option key={region.name} value={region.name}>
-                    {region.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
+          <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
             {/* Publisher Filter */}
             <div>
-              <label className='mb-2 block font-bold' htmlFor='publisher'>
+              <label className='mb-2 block text-sm font-bold' htmlFor='publisher'>
                 {t('publisherLabel')}:
               </label>
               <input
@@ -70,8 +84,89 @@ const SearchAdvanceJournalSection: React.FC<SearchJournalAdvanceSectionProps> = 
                 className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 text-sm leading-tight shadow focus:outline-none'
                 type='text'
                 placeholder={t('publisherPlaceholder')}
-                value={selectedPublisher || ''}
-                onChange={(e) => onPublisherChange(e.target.value || null)}
+                value={publisher}
+                onChange={e => onPublisherChange(e.target.value)}
+              />
+            </div>
+
+            {/* Region Filter */}
+            <div>
+              <label className='mb-2 block text-sm font-bold' htmlFor='region'>
+                {t('regionLabel')}:
+              </label>
+              <select
+                id='region'
+                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 text-sm leading-tight shadow focus:outline-none'
+                value={region || ''}
+                onChange={e => onRegionChange(e.target.value || null)}
+              >
+                <option value=''>{t('allRegionsOption')}</option>
+                {hardcodedRegions.map(reg => (
+                  <option key={reg} value={reg}>
+                    {reg}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+
+            {/* Category Filter */}
+            <div>
+              <label className='mb-2 block text-sm font-bold' htmlFor='category'>
+                {t('categoryLabel')}:
+              </label>
+              <input
+                id='category'
+                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 text-sm leading-tight shadow focus:outline-none'
+                type='text'
+                placeholder={t('categoryPlaceholder')}
+                value={category}
+                onChange={e => onCategoryChange(e.target.value)}
+              />
+            </div>
+
+            {/* Topic Filter */}
+            <div>
+              <label className='mb-2 block text-sm font-bold' htmlFor='topic'>
+                {t('topicLabel')}:
+              </label>
+              <input
+                id='topic'
+                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 text-sm leading-tight shadow focus:outline-none'
+                type='text'
+                placeholder={t('topicPlaceholder')}
+                value={topic}
+                onChange={e => onTopicChange(e.target.value)}
+              />
+            </div>
+
+            {/* ISSN Filter */}
+            <div>
+              <label className='mb-2 block text-sm font-bold' htmlFor='issn'>
+                {t('issnLabel')}:
+              </label>
+              <input
+                id='issn'
+                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 text-sm leading-tight shadow focus:outline-none'
+                type='text'
+                placeholder={t('issnPlaceholder')}
+                value={issn}
+                onChange={e => onIssnChange(e.target.value)}
+              />
+            </div>
+
+            {/* H-Index Filter */}
+            <div>
+              <label className='mb-2 block text-sm font-bold' htmlFor='hIndex'>
+                {t('hIndexLabel')}:
+              </label>
+              <input
+                id='hIndex'
+                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 text-sm leading-tight shadow focus:outline-none'
+                type='text'
+                placeholder={t('hIndexPlaceholder')}
+                value={hIndex}
+                onChange={e => onHIndexChange(e.target.value)}
               />
             </div>
           </div>

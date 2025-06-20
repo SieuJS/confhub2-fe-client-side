@@ -792,6 +792,9 @@
   "View_map": "View map",
   "No_publisher_available": "No publisher available.",
   "SearchJournal": {
+    "allQuartilesOption": "All Quartiles",
+    "areasLabel": "Areas",
+    "searchAreasPlaceholder": "Search area...",
     "keywordPlaceholder": "Enter Keyword Title/Journal Name...",
     "countryLabel": "Country",
     "searchCountryPlaceholder": "Search Country...",
@@ -825,9 +828,17 @@
     "sjrLabel": "SJR",
     "sjrPlaceholder": "Enter SJR",
     "overallRankLabel": "Overall Rank",
-    "overallRankPlaceholder": "Enter Overall Rank"
+    "overallRankPlaceholder": "Enter Overall Rank",
+    "allAreasOption": "All Areas"
   },
   "SearchAdvancedJournal": {
+    "allQuartilesOption": "All Quartiles",
+    "typeLabel": "Type",
+    "typePlaceholder": "Enter type (e.g., Journal)",
+    "categoryLabel": "Category",
+    "categoryPlaceholder": "Enter category",
+    "topicLabel": "Topic",
+    "topicPlaceholder": "Enter topic",
     "regionLabel": "Region",
     "allRegionsOption": "All Regions",
     "hideAdvancedSearch": "Hide advanced search",
@@ -861,6 +872,7 @@
     "defaultJournalAltText": "Journal cover image",
     "issnLabel": "ISSN",
     "publisherLabel": "Publisher",
+    "areasLabel": "Areas",
     "countryLabel": "Country",
     "sjrLabel": "SJR",
     "hIndexLabel": "H-Index",
@@ -1594,7 +1606,7 @@
   "Action_Edit": "Edit",
   "Action_View_Submitted_Info": "View Submitted Info",
   "Created": "Created",
-  "Date_Not_Available": "Date not available",
+  "Date_Not_Available": "Date not available.",
   "Modal_Title_Reason": "Reason from Administrator",
   "Modal_Title_Review": "Review Submitted Information",
   "MyConferences": {
@@ -1615,8 +1627,8 @@
     "Modal_Title_Reason": "Reason from Administrator",
     "Modal_Title_Review": "Review Submitted Information",
     "Created": "Created",
-    "Location_Not_Available": "Location not available",
-    "Date_Not_Available": "Date not available",
+    "Location_Not_Available": "No location available.",
+    "Date_Not_Available": "Date not available.",
     "Status_Approved": "Approved",
     "Status_Pending": "Pending",
     "Status_Rejected": "Rejected",
@@ -1890,5 +1902,6 @@
   "Markdown_is_supported_for_rich_text_formatting_brief": "Markdown is supported. Keep it concise.",
   "Please_enter_the_conference_summary": "Please enter the conference summary.",
   "Summary_must_be_at_least_characters": "Summary must be at least {count} characters.",
-  "Summary_cannot_exceed_characters": "Summary cannot exceed {count} characters."
+  "Summary_cannot_exceed_characters": "Summary cannot exceed {count} characters.",
+  "No_AccessType_Available": "No type available."
 }

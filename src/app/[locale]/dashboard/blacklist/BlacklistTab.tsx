@@ -26,6 +26,7 @@ interface BlacklistedConferenceResponse
   title: string
   acronym: string
   location: Location | null
+  accessType: string
   dates?: { fromDate?: string; toDate?: string }[]
   createdAt: string
 }

@@ -24,6 +24,7 @@ interface FollowedConferenceResponse
   followedAt: string
   dates?: { fromDate?: string; toDate?: string }[]
   location: Location | null
+  accessType: string
 }
 
 // Kiểu dữ liệu THÔ trả về từ API /journal-follows/by-user (có cấu trúc lồng nhau)

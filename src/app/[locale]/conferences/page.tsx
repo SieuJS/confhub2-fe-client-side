@@ -123,9 +123,9 @@ export default function Conferences({
   }, [pathname, router])
 
   return (
-    <>
+    <div className="flex min-h-screen flex-col"> {/* Added flex and min-h-screen */}
       <Header locale={locale} />
-      <div className='text-center text-2xl mb-10'>
+      <div className='flex-grow text-center text-2xl mb-10'> {/* Added flex-grow */}
         <div className='w-full bg-background py-10'></div>
         <SearchSection onSearch={handleSearch} onClear={handleClear} />
         <div className='container mx-auto mt-4 px-0 md:px-4'>
@@ -133,7 +133,6 @@ export default function Conferences({
         </div>
       </div>
       <Footer />
-
-    </>
+    </div>
   )
 }

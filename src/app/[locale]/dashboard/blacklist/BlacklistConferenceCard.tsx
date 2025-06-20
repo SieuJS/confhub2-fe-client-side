@@ -1,6 +1,6 @@
 // src/app/[locale]/dashboard/blacklist/BlacklistConferenceCard.tsx
 import React from 'react'
-import { Calendar, MapPin, Hash, Eye, Ban } from 'lucide-react' // Thêm icon Ban
+import { Calendar, MapPin, Hash, Eye, Ban, Factory } from 'lucide-react' // Thêm icon Factory
 import { useTranslations } from 'next-intl'
 import { Link } from '@/src/navigation'
 import Button from '../../utils/Button'
@@ -13,7 +13,8 @@ interface BlacklistConferenceResponseForCard {
   title: string
   acronym: string
   location: Location | null // Sử dụng Location từ models
-  dates?: { fromDate?: string; toDate?: string }[] // API của bạn có vẻ không có type, nên bỏ nó đi
+  dates?: { fromDate?: string; toDate?: string }[]
+  accessType: string // Thêm accessType vào interface
   createdAt: string // Đây là thời gian blacklisted
 }
 
@@ -52,7 +53,10 @@ const BlacklistConferenceCard: React.FC<BlacklistConferenceCardProps> = ({
         {/* Header: Thời gian Blacklisted */}
         <div className='mb-3 flex items-start justify-between'>
           <p className='text-left text-sm '>
-            {t('Blacklisted_Time')}: {timeAgo(conference.createdAt, language)}
+            {t('Blacklisted_Time')}:{' '}
+            {conference.createdAt
+              ? timeAgo(conference.createdAt, language)
+              : t('Not_Available')} {/* Xử lý nếu createdAt rỗng/null */}
           </p>
           {/* Có thể thêm một badge "Blacklisted" ở đây nếu muốn */}
           <Ban className='h-5 w-5 flex-shrink-0 text-red-500' />{' '}
@@ -61,12 +65,12 @@ const BlacklistConferenceCard: React.FC<BlacklistConferenceCardProps> = ({
 
         {/* Body: Thông tin chính */}
         <h3 className='text-lg font-bold leading-tight text-indigo-700 transition-colors hover:text-indigo-900'>
-          {conference.title}
+          {conference.title || t('No_Title_Available')} {/* Xử lý nếu title rỗng/null */}
         </h3>
         <div className='mt-2 space-y-2 text-sm '>
           <div className='flex items-center gap-2'>
             <Hash className='h-4 w-4 flex-shrink-0 ' />
-            <span>{conference.acronym}</span>
+            <span>{conference.acronym || t('No_Acronym_Available')}</span> {/* Xử lý nếu acronym rỗng/null */}
           </div>
           <div className='flex items-center gap-2'>
             <Calendar className='h-4 w-4 flex-shrink-0 ' />
@@ -79,6 +83,11 @@ const BlacklistConferenceCard: React.FC<BlacklistConferenceCardProps> = ({
                   )
                 : t('MyConferences.Date_Not_Available')}
             </span>
+          </div>
+          {/* Thêm Access Type */}
+          <div className='flex items-center gap-2'>
+            <Factory className='h-4 w-4 flex-shrink-0 ' />
+            <span>{conference.accessType || t('No_AccessType_Available')}</span> {/* Xử lý nếu accessType rỗng/null */}
           </div>
           <div className='flex items-center gap-2'>
             <MapPin className='h-4 w-4 flex-shrink-0 ' />
