@@ -111,13 +111,12 @@ const EventJournalCardComponent: React.FC<EventJournalCardProps> = ({
           </Link>
 
           {/* Grid for details. The `1fr` column ensures text starts from the left edge of its column. */}
-          <div className='grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 text-sm '>
-            {journal.ISSN && (
+          <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 text-sm text-gray-600 dark:text-gray-300">
+            {journal.Issn && (
               <>
                 <BookOpen size={16} className='mt-0.5' />
                 <p className='line-clamp-1 text-left'>
-                  <span className='font-semibold '>{t('issnLabel')}:</span>{' '}
-                  {journal.ISSN}
+                  <span className="font-semibold text-gray-700 dark:text-gray-200">{t('issnLabel')}:</span> {journal.Issn}
                 </p>
               </>
             )}
@@ -158,16 +157,14 @@ const EventJournalCardComponent: React.FC<EventJournalCardProps> = ({
                 </p>
               </>
             )}
-            {journal['H index'] !== undefined &&
-              journal['H index'] !== null && (
-                <>
-                  <Hash size={16} className='mt-0.5' />
-                  <p className='text-left'>
-                    <span className='font-semibold '>{t('hIndexLabel')}:</span>{' '}
-                    {journal['H index']}
-                  </p>
-                </>
-              )}
+            {journal.hIndex !== undefined && journal.hIndex !== null && (
+              <>
+                <Hash size={16} className="text-gray-500 dark:text-gray-400 mt-0.5" />
+                <p className='text-left'>
+                  <span className="font-semibold text-gray-700 dark:text-gray-200">{t('hIndexLabel')}:</span> {journal.hIndex}
+                </p>
+              </>
+            )}
             {latestQuartile && (
               <>
                 <Award
