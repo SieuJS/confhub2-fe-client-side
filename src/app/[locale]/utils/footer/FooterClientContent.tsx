@@ -166,8 +166,8 @@ export default function FooterClientContent({ linkColumns, socialLinks, texts }:
             <div className='grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-12'>
               <div className='md:col-span-4'>
                 <div className='flex items-center'>
-                  <Image src={`/hcmus_logo.png`} alt='Company Logo' width={80} height={80} className='h-14 w-16' />
-                  <Image src={`/icon-512x512-removebg-preview.png`} alt='Company Logo' width={100} height={100} className='h-18 w-18 mb-1' />
+                  <Image src={`/hcmus_logo.png`} alt='Company Logo' width={80} height={80} className='h-18 w-18' />
+                  <Image src={`/icon-512x512-removebg-preview.png`} alt='Company Logo' width={120} height={120} className='h-18 w-18 mb-1' />
                 </div>
                 <p className='ml-1 text-xl font-bold'>Global Conference & Journal Hub</p>
                 <p className='text-md mt-4'>{texts.footerDescription}</p>

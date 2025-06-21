@@ -8,7 +8,9 @@ import React, {
   useEffect,
   useCallback,
   ReactNode,
-  useMemo
+  useMemo,
+  useRef // <-- Thêm useRef
+
 } from 'react' // Thêm useMemo
 import { useRouter } from 'next/navigation'
 import { AuthResponse, UserResponse } from '@/src/models/response/user.response'
@@ -93,6 +95,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isInitializing, setIsInitializing] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const authCheckTimer = useRef<NodeJS.Timeout | null>(null); // <-- Thêm một ref để giữ timer
+
 
   // updateAuthUser đã được useCallback trong code gốc, giữ nguyên
   const updateAuthUser = useCallback((newUserData: UserResponse) => {
@@ -176,10 +180,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     [router]
   )
 
-  // useEffect của initializeAuth giữ nguyên, dependencies của nó đã ổn định
+  // SỬA LẠI useEffect NÀY
   useEffect(() => {
-    let isMounted = true
-    console.log('[AuthProvider] Initializing authentication state...')
+    // Hủy bỏ timer của lần render trước nếu có
+    if (authCheckTimer.current) {
+      clearTimeout(authCheckTimer.current);
+    }
+
+    let isMounted = true;
+
     const initializeAuth = async () => {
       const token = _getStoredToken()
       const storedLoginStatus =
@@ -244,11 +253,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       if (isMounted) setIsInitializing(false)
     }
-    initializeAuth()
+    // Đặt một timer mới. Chỉ sau 100ms không có lần F5 nào nữa thì mới chạy.
+    authCheckTimer.current = setTimeout(() => {
+      console.log('[AuthProvider] Debounced auth check triggered.');
+      initializeAuth();
+    }, 100); // 100ms là một khoảng thời gian hợp lý
+
     return () => {
-      isMounted = false
-    }
-  }, [_performLogout])
+      isMounted = false;
+      // Dọn dẹp timer khi component unmount
+      if (authCheckTimer.current) {
+        clearTimeout(authCheckTimer.current);
+      }
+    };
+  }, [_performLogout]); // Dependency vẫn là _performLogout vì nó ổn định
 
   // Bọc các hàm này trong useCallback
   const signIn = useCallback(
