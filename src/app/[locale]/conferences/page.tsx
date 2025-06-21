@@ -1,138 +1,69 @@
-// pages/conferences.tsx (Conferences Page)
-'use client'
+// app/[locale]/conferences/page.tsx
 
-import { useTranslations } from 'next-intl'
-import SearchSection from '../conferences/SearchSection' // Adjust path if necessary
-import ResultsSection from '../conferences/ResultsSection' // Adjust path if necessary
-import { Header } from '../utils/Header' // Adjust path if necessary
-import Footer from '../utils/Footer' // Adjust path if necessary
-import { useRouter, usePathname } from 'next/navigation' // Added usePathname
-import { useCallback } from 'react'
-import useUserBlacklist from '@/src/hooks/auth/useUserBlacklist'
+import { fetchConferences, FetchConferencesParams } from '@/src/app/apis/conference/getFilteredConferences';
+import ConferencesPageClient from './ConferencesPageClient'; // Component client sẽ tạo ở bước 2
+import { ConferenceListResponse } from '@/src/models/response/conference.list.response';
 
-// It's good practice to import the type from the hook if it's exported.
-// If not, define it accurately here.
-// Assuming SearchParams type from useSearchForm.ts looks like this:
-interface SearchParamsForURL {
-  keyword?: string
-  title?: string
-  acronym?: string
-  fromDate?: Date | null
-  toDate?: Date | null
-  location?: string | null
-  type?: 'Online' | 'Offline' | 'Hybrid' | null
-  subFromDate?: Date | null // <-- UPDATED
-  subToDate?: Date | null // <-- UPDATED
-  publisher?: string | null
-  rank?: string | null
-  source?: string | null
-  averageScore?: string | null
-  topics?: string[]
-  fieldOfResearch?: string[]
+// Tối ưu hóa nâng cao: Incremental Static Regeneration (ISR)
+// Trang sẽ được render lúc build và tự động render lại trên server sau mỗi 10 phút
+// nếu có request mới. Điều này giảm tải server đến mức tối đa.
+// Đối với các trang có search param, nó sẽ tự động chuyển về chế độ SSR.
+export const revalidate = 600; // 600 giây = 10 phút
+
+// Định nghĩa kiểu cho props của trang
+interface ConferencesPageProps {
+  params: { locale: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export default function Conferences({
-  params: { locale }
-}: {
-  params: { locale: string }
-}) {
-  const t = useTranslations('')
-  const { blacklistedEventIds } = useUserBlacklist()
+// Đây là một React Server Component, nó chạy trên server!
+export default async function ConferencesPage({ params, searchParams }: ConferencesPageProps) {
+  // 1. Lấy dữ liệu conference trên server cho lần tải đầu tiên
+  // Chuyển đổi searchParams từ URL thành params cho API
+  const apiParams: FetchConferencesParams = {
+    keyword: searchParams.keyword as string || undefined,
+    title: searchParams.title as string || undefined,
+    acronym: searchParams.acronym as string || undefined,
+    country: searchParams.country as string || undefined,
+    type: searchParams.type as 'Online' | 'Offline' | 'Hybrid' || undefined,
+    fromDate: searchParams.fromDate as string || undefined,
+    toDate: searchParams.toDate as string || undefined,
+    rank: searchParams.rank as string || undefined,
+    source: searchParams.source as string || undefined,
+    subFromDate: searchParams.subFromDate as string || undefined,
+    subToDate: searchParams.subToDate as string || undefined,
+    topics: searchParams.topics as string[] || [],
+    publisher: searchParams.publisher as string || undefined,
+    page: searchParams.page as string || '1',
+    perPage: searchParams.perPage as string || '4', // Đặt một giá trị mặc định hợp lý
+  };
 
-  const router = useRouter()
-  const pathname = usePathname() // Get the current pathname
+    // Khai báo initialData với kiểu dữ liệu rõ ràng
+  let initialData: ConferenceListResponse;
 
-  const handleSearch = useCallback(
-    async (searchParamsFromComponent: SearchParamsForURL) => {
-      // <-- Use the updated interface
-      const newParams = new URLSearchParams()
-      if (searchParamsFromComponent.keyword)
-        newParams.set('keyword', searchParamsFromComponent.keyword)
-      if (searchParamsFromComponent.title)
-        newParams.set('title', searchParamsFromComponent.title)
-      if (searchParamsFromComponent.acronym)
-        newParams.set('acronym', searchParamsFromComponent.acronym)
-      if (searchParamsFromComponent.location)
-        newParams.set('country', searchParamsFromComponent.location) // 'country' is what useSearchForm reads
-      if (searchParamsFromComponent.type)
-        newParams.set('type', searchParamsFromComponent.type)
-      if (searchParamsFromComponent.fromDate) {
-        newParams.set(
-          'fromDate',
-          searchParamsFromComponent.fromDate.toISOString().split('T')[0]
-        )
+  try {
+    initialData = await fetchConferences(apiParams);
+  } catch (error) {
+    console.error("Failed to fetch initial conferences data on server:", error);
+    
+    // ĐIỀU CHỈNH Ở ĐÂY: Cung cấp đầy đủ các trường cho meta
+    initialData = {
+      payload: [],
+      meta: {
+        totalItems: 0,
+        curPage: 1,
+        perPage: 4,
+        totalPage: 0,
+        prevPage: null, // Bổ sung giá trị null
+        nextPage: null, // Bổ sung giá trị null
       }
-      if (searchParamsFromComponent.toDate) {
-        newParams.set(
-          'toDate',
-          searchParamsFromComponent.toDate.toISOString().split('T')[0]
-        )
-      }
-      if (searchParamsFromComponent.rank)
-        newParams.set('rank', searchParamsFromComponent.rank)
-      if (searchParamsFromComponent.source)
-        newParams.set('source', searchParamsFromComponent.source)
-      if (searchParamsFromComponent.publisher)
-        newParams.set('publisher', searchParamsFromComponent.publisher)
-
-      // --- MODIFIED SECTION FOR SUBMISSION DATE RANGE ---
-      if (searchParamsFromComponent.subFromDate) {
-        newParams.set(
-          'subFromDate', // Parameter name expected by useSearchForm's getInitialDateFromUrl
-          searchParamsFromComponent.subFromDate.toISOString().split('T')[0]
-        )
-      }
-      if (searchParamsFromComponent.subToDate) {
-        newParams.set(
-          'subToDate', // Parameter name expected by useSearchForm's getInitialDateFromUrl
-          searchParamsFromComponent.subToDate.toISOString().split('T')[0]
-        )
-      }
-      // --- END MODIFIED SECTION ---
-
-      if (searchParamsFromComponent.averageScore)
-        newParams.set('averageScore', searchParamsFromComponent.averageScore)
-
-      if (
-        searchParamsFromComponent.topics &&
-        searchParamsFromComponent.topics.length > 0
-      ) {
-        searchParamsFromComponent.topics.forEach(topic =>
-          newParams.append('topics', topic)
-        )
-      }
-      if (
-        searchParamsFromComponent.fieldOfResearch &&
-        searchParamsFromComponent.fieldOfResearch.length > 0
-      ) {
-        searchParamsFromComponent.fieldOfResearch.forEach(field =>
-          newParams.append('fieldOfResearch', field)
-        )
-      }
-
-      const paramsString = newParams.toString()
-      // Use pathname to ensure navigation is relative to the current page structure
-      router.push(`${pathname}${paramsString ? `?${paramsString}` : ''}`)
-    },
-    [pathname, router] // locale is implicitly part of pathname from next-intl routing
-  )
-
-  const handleClear = useCallback(() => {
-    // Navigate to the current page without any query parameters
-    router.push(pathname)
-  }, [pathname, router])
+    };
+  }
 
   return (
-    <div className="flex min-h-screen flex-col"> {/* Added flex and min-h-screen */}
-      <Header locale={locale} />
-      <div className='flex-grow text-center text-2xl mb-10'> {/* Added flex-grow */}
-        <div className='w-full bg-background py-10'></div>
-        <SearchSection onSearch={handleSearch} onClear={handleClear} />
-        <div className='container mx-auto mt-4 px-0 md:px-4'>
-          <ResultsSection userBlacklist={blacklistedEventIds} />
-        </div>
-      </div>
-      <Footer />
-    </div>
-  )
+    <ConferencesPageClient
+      locale={params.locale}
+      initialData={initialData}
+    />
+  );
 }

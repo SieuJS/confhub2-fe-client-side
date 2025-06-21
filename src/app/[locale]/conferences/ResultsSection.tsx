@@ -1,45 +1,38 @@
 // src/components/conferences/ResultsSection.tsx
-import React, { useState, useEffect, useCallback } from 'react'
-import EventCard from './EventCard'
-import EventTable from './EventTable'
-import useConferenceResults from '@/src/hooks/conferences/useConferenceResults'
-import { useTranslations } from 'next-intl'
-import Pagination from '../utils/Pagination'
-import { useAuth } from '@/src/contexts/AuthContext'
-import {
-  fetchFollowedConferences,
-  toggleFollowConference
-} from '@/src/app/apis/user/followApi' // Helper API mới
-import {
-  fetchCalendarConferences,
-  toggleCalendarConference
-} from '@/src/app/apis/user/calendarApi' // Helper API mới
-import { Loader2 } from 'lucide-react' // Import Loader2
+
+import React, { useState, useEffect, useCallback } from 'react';
+import EventCard from './EventCard';
+import EventTable from './EventTable';
+import useConferenceResults from '@/src/hooks/conferences/useConferenceResults';
+import { useTranslations } from 'next-intl';
+import Pagination from '../utils/Pagination';
+import { useAuth } from '@/src/contexts/AuthContext';
+import { fetchFollowedConferences, toggleFollowConference } from '@/src/app/apis/user/followApi';
+import { fetchCalendarConferences, toggleCalendarConference } from '@/src/app/apis/user/calendarApi';
+import { Loader2 } from 'lucide-react';
+import { ConferenceListResponse } from '@/src/models/response/conference.list.response'; // Import type
 
 interface ResultsSectionProps {
-  userBlacklist: string[]
+  userBlacklist: string[];
+  initialData: ConferenceListResponse; // Thêm prop này
 }
 
-// TÁCH COMPONENT LOADING RA ĐỂ TÁI SỬ DỤNG (Tương tự FollowedTab)
 const LoadingSpinner = ({ message }: { message: string }) => (
   <div className='flex h-96 flex-col items-center justify-center text-gray-500'>
     <Loader2 className='h-10 w-10 animate-spin text-indigo-600' />
     <p className='mt-4 text-lg'>{message}</p>
   </div>
-)
+);
 
-const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
-  const t = useTranslations('')
-  const { isLoggedIn } = useAuth()
+const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist, initialData }) => {
+  const t = useTranslations('');
+  const { isLoggedIn } = useAuth();
+  const [viewType, setViewType] = useState<'card' | 'table'>('card');
+  const [followedIds, setFollowedIds] = useState<Set<string>>(new Set());
+  const [calendarIds, setCalendarIds] = useState<Set<string>>(new Set());
+  // const [statusLoading, setStatusLoading] = useState(true);
 
-  // <<< THÊM LẠI DÒNG BỊ THIẾU
-  const [viewType, setViewType] = useState<'card' | 'table'>('card')
-
-  // State tập trung cho trạng thái follow và calendar
-  const [followedIds, setFollowedIds] = useState<Set<string>>(new Set())
-  const [calendarIds, setCalendarIds] = useState<Set<string>>(new Set())
-  const [statusLoading, setStatusLoading] = useState(true)
-
+  // Truyền initialData vào hook
   const {
     sortedEvents,
     totalItems,
@@ -47,39 +40,33 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
     currentPage,
     paginate,
     handleEventPerPageChange,
-    loading: conferencesLoading, // đổi tên để tránh xung đột
+    loading: conferencesLoading,
     error
-  } = useConferenceResults()
+  } = useConferenceResults({ initialData });
 
-  // --- LOGIC TỐI ƯU ---
-  // Fetch danh sách followed và calendar một lần duy nhất
   useEffect(() => {
     if (!isLoggedIn) {
-      setStatusLoading(false)
-      return
+      return;
     }
 
     const fetchUserStatuses = async () => {
-      setStatusLoading(true)
+      // Không set loading ở đây nữa. Việc fetch này diễn ra ngầm.
       try {
-        // Gọi 2 API song song để tăng tốc
         const [followedData, calendarData] = await Promise.all([
           fetchFollowedConferences(),
           fetchCalendarConferences()
-        ])
-
-        setFollowedIds(new Set(followedData.map(conf => conf.id)))
-        setCalendarIds(new Set(calendarData.map(conf => conf.id)))
+        ]);
+        setFollowedIds(new Set(followedData.map(conf => conf.id)));
+        setCalendarIds(new Set(calendarData.map(conf => conf.id)));
       } catch (err) {
-        console.error('Failed to fetch user conference statuses:', err)
-        // Có thể set state lỗi ở đây để hiển thị cho user
-      } finally {
-        setStatusLoading(false)
+        console.error('Failed to fetch user conference statuses:', err);
       }
-    }
+      // Không có finally set loading
+    };
 
-    fetchUserStatuses()
-  }, [isLoggedIn])
+    fetchUserStatuses();
+  }, [isLoggedIn]);
+
 
   // Hàm xử lý toggle follow, được truyền xuống EventCard
   const handleToggleFollow = useCallback(
@@ -122,15 +109,13 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
   )
   // --- KẾT THÚC LOGIC TỐI ƯU ---
 
-  const loading = conferencesLoading || (isLoggedIn && statusLoading)
-
-  if (loading) {
-    // Sử dụng LoadingSpinner thay vì div đơn giản
+  // Chỉ có một nguồn loading duy nhất
+  if (conferencesLoading) {
     return (
       <div className='w-full'>
         <LoadingSpinner message={t('Loading_conferences')} />
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -138,7 +123,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist }) => {
       <div className='text-red-500'>
         {t('Error')}: {error}
       </div>
-    )
+    );
   }
 
   return (

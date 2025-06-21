@@ -1,9 +1,11 @@
+// src/app/[locale]/dashboard/ClientDashboardSidebar.tsx (CHỈNH SỬA)
+
 'use client';
 
 import React from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/src/navigation';
-import { useSearchParams } from 'next/navigation'; // <-- Import hook này
+import { useSearchParams } from 'next/navigation';
 
 // Import React Icons
 import {
@@ -19,7 +21,7 @@ import {
 interface MenuItem {
   label: string;
   icon: JSX.Element;
-  tabValue: string; // Dùng cho cả query param và key
+  tabValue: string;
 }
 
 interface ClientDashboardSidebarProps {
@@ -27,7 +29,6 @@ interface ClientDashboardSidebarProps {
   locale: string;
   sidebarWidth: number;
   headerHeight: number;
-  // Không cần prop 'activePage' nữa
 }
 
 export default function ClientDashboardSidebar({
@@ -37,10 +38,11 @@ export default function ClientDashboardSidebar({
   headerHeight,
 }: ClientDashboardSidebarProps) {
   const t = useTranslations('');
-  const searchParams = useSearchParams(); // <-- Sử dụng hook để lấy query params
-  const activeTab = searchParams.get('tab') || 'profile'; // Lấy tab hiện tại, mặc định là 'profile'
+  const searchParams = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'profile';
 
   const menuItems: MenuItem[] = [
+    // ... (giữ nguyên mảng menuItems)
     {
       label: t('Profile'),
       icon: <FaUser className="h-5 w-5" />,
@@ -78,38 +80,40 @@ export default function ClientDashboardSidebar({
     },
   ];
 
-  // Class và style cho sidebar
+  // THAY ĐỔI: Loại bỏ class `md:translate-x-0`
   const sidebarClasses = `
-    fixed left-0
-    h-screen // Chiều cao toàn màn hình
+    fixed left-0 top-0
+    h-screen
     overflow-y-auto
-    transition-transform duration-300 ease-in-out
+    transition-transform duration-300 ease-in-out // Đổi lại duration và ease để đồng bộ với content
     bg-background
     shadow-md
-    z-30 // z-index thấp hơn Header (z-40) nhưng cao hơn content
-    w-[${sidebarWidth}px] 
+    z-30
+    w-[${sidebarWidth}px]
     ${isSidebarOpen ? 'translate-x-0' : `-translate-x-full`}
   `;
+  // GIẢI THÍCH:
+  // Bằng cách loại bỏ `md:translate-x-0`, chúng ta cho phép logic
+  // `${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`
+  // hoạt động trên MỌI KÍCH THƯỚC MÀN HÌNH.
+  // Giờ đây, trạng thái đóng/mở của sidebar hoàn toàn phụ thuộc vào `isSidebarOpen`.
 
-  // Style cho nội dung bên trong sidebar (menu items)
+  // ... (phần còn lại của component giữ nguyên)
   const contentStyles = {
     opacity: isSidebarOpen ? 1 : 0,
     pointerEvents: isSidebarOpen ? 'auto' : 'none',
     visibility: isSidebarOpen ? 'visible' : 'hidden',
-    transition: 'opacity 0.3s 0.1s ease-in-out, visibility 0.3s 0.1s ease-in-out', // Thêm delay nhỏ
+    transition: 'opacity 0.2s ease-out, visibility 0.2s ease-out',
   };
 
   return (
-    <aside 
+    <aside
       className={sidebarClasses}
-      style={{ top: `${headerHeight}px` }} // <-- Sidebar bắt đầu ngay dưới Header
+      style={{ top: `${headerHeight}px` }}
     >
-      {/* Không cần phần Logo/Title ở đây nữa, Header đã xử lý */}
-      
-      <nav className='w-full'> {/* Thêm padding-top để tạo khoảng cách với Header */}
+      <nav className='h-full overflow-y-auto'>
         <ul className='w-full'>
           {menuItems.map(item => {
-            // Logic active giờ dựa vào `activeTab` đọc từ URL
             const isActive = activeTab === item.tabValue;
 
             return (
@@ -130,19 +134,21 @@ export default function ClientDashboardSidebar({
                         : 'border-transparent text-foreground hover:bg-gray-100 dark:hover:bg-gray-700'
                     }
                   `}
-                  style={{
-                    ...contentStyles,
-                    display: 'flex',
-                  } as React.CSSProperties}
+                  // Logic style này có thể không cần thiết nữa nhưng giữ lại cũng không sao
+                  style={
+                    !isSidebarOpen && typeof window !== 'undefined' && window.innerWidth < 768
+                      ? ({ ...contentStyles, display: 'flex' } as React.CSSProperties)
+                      : ({ display: 'flex' } as React.CSSProperties)
+                  }
                 >
-                  <span className="mr-3"> {/* Tăng khoảng cách một chút */}
+                  <span className="mr-3">
                     {React.cloneElement(item.icon, {
                       className: `${item.icon.props.className || ''} ${
-                        isActive ? 'text-primary' : 'text-gray-500 dark:text-gray-400' // Điều chỉnh màu icon không active
+                        isActive ? 'text-primary' : 'text-gray-500 dark:text-gray-400'
                       }`,
                     })}
                   </span>
-                  
+
                   <span className="whitespace-nowrap text-sm">
                     {item.label}
                   </span>

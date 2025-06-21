@@ -41,7 +41,7 @@ const LoginForm: React.FC<LoginFormProps> = (/* props: LoginFormProps */) => {
   // The backend will handle the Google OAuth flow and redirect to the /auth/callback page.
 
   return (
-    <div className='flex min-h-screen flex-col items-center justify-center bg-gray-10 px-4 py-12  sm:px-6 lg:px-8'>
+    <div className='flex h-screen flex-col items-center justify-center bg-gray-10 px-4 py-12  sm:px-6 lg:px-8'>
       <div className='w-full max-w-xl'>
         <div className='bg-white-pure px-8 py-10 shadow-xl  sm:rounded-lg sm:px-16'>
           <div className='space-y-8'>

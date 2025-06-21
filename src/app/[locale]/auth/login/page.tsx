@@ -58,7 +58,7 @@ const LoginPage = ({
       <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GG_CLIENT_ID || ''}>
         {/* Show login form only if not initializing and not logged in */}
         {!isInitializing && !isLoggedIn && (
-          <div className="min-h-screen bg-gradient-to-br from-background to-background-secondary">
+          <div className="h-screen bg-gradient-to-br from-background to-background-secondary">
             <LoginForm />
           </div>
         )}

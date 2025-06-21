@@ -1,72 +1,60 @@
-// Journals.tsx
-"use client";
+// app/[locale]/journals/page.tsx
 
-import { useTranslations } from 'next-intl';
-import SearchJournalSection from './SearchJournalSection';
-import ResultsJournalSection from './ResultsJournalSection';
-import { Header } from '../utils/Header';
-import Footer from '../utils/Footer';
-import { useRouter } from 'next/navigation'; // Không cần useSearchParams ở đây vì handleSearch sẽ tự tạo URLSearchParams mới
-import { useCallback } from 'react';
+import { journalService } from '@/src/services/journal.service';
+import JournalsPageClient from './JournalsPageClient';
+import { JournalApiResponse } from '@/src/models/response/journal.response';
 
-// Định nghĩa interface cho tất cả các tham số tìm kiếm mà SearchJournalSection có thể gửi
-interface SearchParamsFromComponent {
-    search?: string;
-    country?: string | null;
-    areas?: string | null; // Thêm areas
-    publisher?: string | null;
-    region?: string | null;
-    type?: string | null; // Thêm type
-    quartile?: string | null; // Thêm quartile
-    category?: string | null; // Thêm category
-    issn?: string | null; // Thêm issn
-    topic?: string | null; // Thêm topic
-    hIndex?: string | null; // Thêm hIndex
+export const revalidate = 600;
+
+interface JournalsPageProps {
+  params: { locale: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export default function Journals({ params: { locale } }: { params: { locale: string } }) {
-    const t = useTranslations('');
-    const router = useRouter();
+// HÀM HELPER ĐỂ XÁC THỰC sortOrder
+const getValidSortOrder = (order: string | string[] | undefined): 'asc' | 'desc' => {
+  if (order === 'asc') {
+    return 'asc';
+  }
+  // Mặc định là 'desc' cho tất cả các trường hợp còn lại (bao gồm 'desc', undefined, hoặc giá trị không hợp lệ)
+  return 'desc';
+}
 
-    const handleSearch = useCallback(async (searchParamsFromComponent: SearchParamsFromComponent) => {
-        const newParams = new URLSearchParams();
+export default async function JournalsPage({ params, searchParams }: JournalsPageProps) {
+  const apiParams = {
+    search: searchParams.search as string || undefined,
+    country: searchParams.country as string || undefined,
+    areas: searchParams.areas as string || undefined,
+    publisher: searchParams.publisher as string || undefined,
+    region: searchParams.region as string || undefined,
+    type: searchParams.type as string || undefined,
+    quartile: searchParams.quartile as string || undefined,
+    category: searchParams.category as string || undefined,
+    issn: searchParams.issn as string || undefined,
+    topic: searchParams.topic as string || undefined,
+    hIndex: searchParams.hIndex as string || undefined,
+    page: searchParams.page as string || '1',
+    limit: '6',
+    sortBy: searchParams.sortBy as string || 'createdAt',
+    // SỬA ĐỔI Ở ĐÂY: Sử dụng hàm helper
+    sortOrder: getValidSortOrder(searchParams.sortOrder),
+  };
 
-        // Lặp qua tất cả các key trong searchParamsFromComponent
-        // và thêm vào URLSearchParams nếu giá trị tồn tại và không rỗng
-        for (const key in searchParamsFromComponent) {
-            const value = searchParamsFromComponent[key as keyof SearchParamsFromComponent];
-            if (value && value !== '') { // Kiểm tra cả null và chuỗi rỗng
-                newParams.set(key, value);
-            }
-        }
-        
-        newParams.set('page', '1'); // Luôn reset về trang 1 khi tìm kiếm mới
+  let initialData: JournalApiResponse;
+  try {
+    initialData = await journalService.getAll(apiParams);
+  } catch (error) {
+    console.error("Failed to fetch initial journals data on server:", error);
+    initialData = {
+      data: [],
+      meta: { total: 0, page: 1, limit: 6, totalPages: 0 }
+    };
+  }
 
-        const paramsString = newParams.toString();
-        router.push(`/${locale}/journals?${paramsString}`);
-
-    }, [locale, router]);
-
-    const handleClear = useCallback(() => {
-        const newParams = new URLSearchParams();
-        const paramsString = newParams.toString();
-        router.push(`/${locale}/journals?${paramsString}`);
-    }, [locale, router]);
-
-    return (
-        <div className="flex min-h-screen flex-col">
-            <Header locale={locale} />
-            <div className="flex-grow text-center text-2xl">
-                <div className="py-10 bg-background w-full"></div>
-                <SearchJournalSection
-                    onSearch={handleSearch}
-                    onClear={handleClear}
-                />
-                <div className="container mx-auto mt-4 px-4 ">
-                    <ResultsJournalSection />
-                </div>
-            </div>
-            <Footer />
-        </div>
-    );
+  return (
+    <JournalsPageClient
+      locale={params.locale}
+      initialData={initialData}
+    />
+  );
 }

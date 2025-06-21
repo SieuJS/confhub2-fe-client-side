@@ -34,7 +34,5 @@ export const pathnames = {
 export const { Link, redirect, usePathname, useRouter, getPathname } =
   createLocalizedPathnamesNavigation({ locales, localePrefix, pathnames })
 
-
-
 // Export type này để sử dụng trong các component
 export type AppPathname = keyof typeof pathnames;

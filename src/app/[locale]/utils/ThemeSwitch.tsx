@@ -7,27 +7,28 @@ import { useOnClickOutside } from 'usehooks-ts'
 
 export default function ThemeSwitch() {
   const t = useTranslations('')
-  const [mounted, setMounted] = useState(false)
+  // const [mounted, setMounted] = useState(false) // Không cần thiết
   const [isOpen, setIsOpen] = useState(false)
   const { setTheme, resolvedTheme, themes, theme } = useTheme()
   const ref = useRef<HTMLDivElement>(null)
 
-  useEffect(() => setMounted(true), [])
+  // useEffect(() => setMounted(true), []) // Không cần thiết
   useOnClickOutside(ref, () => setIsOpen(false))
 
-  if (!mounted)
-    return (
-      <div className='flex items-center justify-center'>
-        <button
-          className='text-destructive inline-flex items-center  justify-between gap-3 text-sm text-black'
-          onClick={() => {}}
-          aria-expanded='false'
-          disabled // Disable the button when not mounted
-        >
-          <span className='ml-2'>{t('Theme')}</span>
-        </button>
-      </div>
-    )
+  // Loại bỏ khối if (!mounted)
+  // if (!mounted)
+  //   return (
+  //     <div className='flex items-center justify-center'>
+  //       <button
+  //         className='text-destructive inline-flex items-center  justify-between gap-3 text-sm text-black'
+  //         onClick={() => {}}
+  //         aria-expanded='false'
+  //         disabled // Disable the button when not mounted
+  //       >
+  //         <span className='ml-2'>{t('Theme')}</span>
+  //       </button>
+  //     </div>
+  //   )
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen)
@@ -42,9 +43,9 @@ export default function ThemeSwitch() {
           aria-expanded={isOpen}
         >
           <span>{t('Theme')}</span>
-          {/* SVG Chevron Down */}
+          {/* SVG Chevron Down LUÔN ĐƯỢC RENDER */}
           <svg
-            className={`h-5 w-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} // Added h-5 w-5 for size control
+            className={`h-5 w-5 transition-transform ${isOpen ? 'rotate-180' : ''}`}
             viewBox='0 0 20 20'
             fill='currentColor'
             aria-hidden='true'

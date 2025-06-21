@@ -1,124 +1,89 @@
 // src/hooks/journals/useJournalResults.ts
-import { useState, useEffect, useCallback } from 'react'
+
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
-import {
-  JournalApiResponse,
-  JournalData
-} from '../../models/response/journal.response'
-import { appConfig } from '@/src/middleware'
+import { JournalApiResponse, JournalData } from '../../models/response/journal.response'
+import { journalService } from '@/src/services/journal.service' // Sử dụng service
 
-// Danh sách tất cả các key filter hợp lệ từ API
-const VALID_FILTERS = [
-  'search',
-  'areas',
-  'publisher',
-  'country',
-  'region',
-  'type',
-  'quartile',
-  'category',
-  'issn',
-  'topic',
-  'hIndex'
-]
+interface UseJournalResultsProps {
+  initialData?: JournalApiResponse;
+}
 
-const useJournalResults = () => {
-  const [journals, setJournals] = useState<JournalData[] | undefined>(undefined)
-  const [meta, setMeta] = useState({
-    total: 0,
-    page: 1,
-    limit: 12,
-    totalPages: 0
-  })
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-  const journalsPerPage = 12
+const useJournalResults = ({ initialData }: UseJournalResultsProps = {}) => {
+  const [journals, setJournals] = useState<JournalData[] | undefined>(initialData?.data);
+  const [meta, setMeta] = useState(initialData?.meta || { total: 0, page: 1, limit: 6, totalPages: 0 });
+  
+  // Khởi tạo loading là false NẾU có initialData
+  const [loading, setLoading] = useState(!initialData);
+  const [error, setError] = useState<string | null>(null);
+  
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const searchParamsString = searchParams.toString();
 
-  const fetchJournals = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+  const prevSearchParamsString = useRef<string | null>(null);
 
-    const params = new URLSearchParams(searchParams.toString())
-
-    // Xóa các param không hợp lệ để đảm bảo URL sạch
-    for (const [key] of params.entries()) {
-      if (
-        !VALID_FILTERS.includes(key) &&
-        !['page', 'limit', 'sortBy', 'sortOrder'].includes(key)
-      ) {
-        params.delete(key)
-      }
-    }
-    
-    // Đảm bảo các tham số filter từ URL được thêm vào request
-    // URLSearchParams đã chứa các giá trị này từ searchParams.toString()
-    // nên không cần thêm lại, chỉ cần đảm bảo chúng không bị xóa.
-
-    // Thiết lập pagination và sorting
-    params.set('limit', journalsPerPage.toString())
-    if (!params.has('page')) {
-      params.set('page', '1')
-    }
-    if (!params.has('sortBy')) {
-      params.set('sortBy', 'createdAt') // Giá trị mặc định
-    }
-     if (!params.has('sortOrder')) {
-      params.set('sortOrder', 'desc') // Giá trị mặc định
-    }
-
-
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const apiUrl = `${
-        appConfig.NEXT_PUBLIC_DATABASE_URL
-      }/api/v1/journals?${params.toString()}`
-      const response = await fetch(apiUrl)
-
-      if (!response.ok) {
-        throw new Error(`API call failed with status: ${response.status}`)
+      // Tạo object params từ searchParams hiện tại
+      const currentParams = new URLSearchParams(searchParams.toString());
+      const apiParams: { [key: string]: any } = {};
+      for (const [key, value] of currentParams.entries()) {
+        apiParams[key] = value;
       }
+      // Đảm bảo các giá trị mặc định
+      if (!apiParams.limit) apiParams.limit = '6';
+      if (!apiParams.page) apiParams.page = '1';
+      if (!apiParams.sortBy) apiParams.sortBy = 'createdAt';
+      if (!apiParams.sortOrder) apiParams.sortOrder = 'desc';
 
-      const apiResponse: JournalApiResponse = await response.json()
-      setJournals(apiResponse.data)
-      setMeta(apiResponse.meta)
+      const apiResponse = await journalService.getAll(apiParams);
+      setJournals(apiResponse.data);
+      setMeta(apiResponse.meta);
     } catch (err: any) {
-      console.error('Failed to fetch journals:', err)
-      setError(err.message)
-      setJournals([])
-      setMeta({ total: 0, page: 1, limit: journalsPerPage, totalPages: 0 })
+      console.error('Failed to fetch journals:', err);
+      setError(err.message);
+      setJournals([]);
+      setMeta({ total: 0, page: 1, limit: 6, totalPages: 0 });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [searchParams, journalsPerPage])
+  }, [searchParams]);
 
   useEffect(() => {
-    fetchJournals()
-  }, [fetchJournals])
-
-  const paginate = useCallback(
-    (pageNumber: number) => {
-      if (pageNumber < 1 || pageNumber > meta.totalPages) {
-        return
+    if (prevSearchParamsString.current === null) {
+      if (initialData) {
+        prevSearchParamsString.current = searchParamsString;
+        return;
+      } else {
+        fetchData();
+        prevSearchParamsString.current = searchParamsString;
+        return;
       }
-      const current = new URLSearchParams(Array.from(searchParams.entries()))
-      current.set('page', pageNumber.toString())
-      router.push(`${pathname}?${current.toString()}`)
-    },
-    [searchParams, pathname, router, meta.totalPages]
-  )
+    }
 
-  const handleSortByChange = useCallback(
-    (event: React.ChangeEvent<HTMLSelectElement>) => {
-      const newSortBy = event.target.value
-      const current = new URLSearchParams(Array.from(searchParams.entries()))
-      current.set('sortBy', newSortBy)
-      current.set('page', '1')
-      router.push(`${pathname}?${current.toString()}`)
-    },
-    [searchParams, pathname, router]
-  )
+    if (prevSearchParamsString.current !== searchParamsString) {
+      fetchData();
+      prevSearchParamsString.current = searchParamsString;
+    }
+  }, [searchParamsString, initialData, fetchData]);
+
+  const paginate = useCallback((pageNumber: number) => {
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set('page', String(pageNumber));
+    router.push(`${pathname}?${newParams.toString()}`);
+  }, [searchParams, pathname, router]);
+
+  const handleSortByChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newSortBy = event.target.value;
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set('sortBy', newSortBy);
+    newParams.set('page', '1');
+    router.push(`${pathname}?${newParams.toString()}`);
+  }, [searchParams, pathname, router]);
 
   return {
     journals,
@@ -130,8 +95,8 @@ const useJournalResults = () => {
     loading,
     error,
     paginate,
-    handleSortByChange
-  }
-}
+    handleSortByChange,
+  };
+};
 
-export default useJournalResults
+export default useJournalResults;

@@ -7,11 +7,13 @@ import {
   useConversationActions,
   useChatSettingsState
 } from '@/src/app/[locale]/chatbot/stores/storeHooks'
+import { useConversationStore } from '../stores'
+import { useMessageStore } from '../stores'
 import { ConversationMetadata } from '../lib/regular-chat.types'
-import { Loader2, MessageSquarePlus } from 'lucide-react' // Giữ lại các icon dùng ở đây
+import { Loader2, MessageSquarePlus } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from '@/src/navigation'
-import HistoryTableRow from './HistoryTableRow' // Import component con
+import HistoryTableRow from './HistoryTableRow'
 
 const ConversationHistoryPage: React.FC = () => {
   const t = useTranslations()
@@ -25,8 +27,8 @@ const ConversationHistoryPage: React.FC = () => {
   } = useConversationListState()
 
   const {
+    // BỎ DÒNG NÀY: startNewConversation, // KHÔNG CẦN GỌI HÀM NÀY NỮA
     loadConversation,
-    startNewConversation,
     deleteConversation,
     clearConversation,
     renameConversation,
@@ -34,11 +36,15 @@ const ConversationHistoryPage: React.FC = () => {
     searchConversations
   } = useConversationActions()
 
+  // Lấy các actions cần thiết để reset UI
+  const { setActiveConversationId } = useConversationStore() // <<< THÊM DÒNG NÀY
+  const { resetChatUIForNewConversation } = useMessageStore() // <<< THÊM DÒNG NÀY
+
   const { chatMode, currentLanguage } = useChatSettingsState()
 
   const [searchTerm, setSearchTerm] = useState('')
   const [displayedConversations, setDisplayedConversations] =
-    useState<ConversationMetadata[]>(initialListFromStore) // Khởi tạo với initialListFromStore
+    useState<ConversationMetadata[]>(initialListFromStore)
 
   useEffect(() => {
     searchConversations(searchTerm)
@@ -57,19 +63,22 @@ const ConversationHistoryPage: React.FC = () => {
       loadConversation(conversationId)
       const targetPath =
         chatMode === 'live' ? '/chatbot/livechat' : '/chatbot/regularchat'
-      router.push({ pathname: targetPath })
+      router.push({ pathname: targetPath, query: { id: conversationId } }) // <<< QUAN TRỌNG: THÊM ID VÀO QUERY
     },
     [loadConversation, router, chatMode]
   )
 
   const handleStartNewAndGoToChat = useCallback(() => {
-    startNewConversation(currentLanguage.code)
+    // KHÔNG GỌI startNewConversation(currentLanguage.code) NỮA
+    // Thay vào đó, reset UI client-side và điều hướng
+    setActiveConversationId(null); // Đảm bảo activeConversationId là null
+    resetChatUIForNewConversation(true); // Xóa tin nhắn và reset UI
+
     const targetPath =
       chatMode === 'live' ? '/chatbot/livechat' : '/chatbot/regularchat'
-    router.push(targetPath)
-  }, [startNewConversation, router, chatMode])
+    router.push(targetPath) // Điều hướng đến trang chat cơ bản (không có ID)
+  }, [router, chatMode, setActiveConversationId, resetChatUIForNewConversation]) // Thêm dependencies
 
-  // Các hàm confirm sẽ được gọi bên trong HistoryTableRow nếu muốn, hoặc truyền callback đã có confirm
   const handleDeleteWithConfirm = useCallback(
     async (id: string, title: string) => {
       if (
@@ -83,11 +92,10 @@ const ConversationHistoryPage: React.FC = () => {
           await deleteConversation(id)
         } catch (error) {
           console.error('Error deleting conversation from history page:', error)
-          // Xử lý lỗi chung ở đây nếu cần
-          throw error // Ném lại lỗi để HistoryTableRow có thể xử lý isProcessingAction
+          throw error
         }
       } else {
-        throw new Error('Deletion cancelled by user') // Ném lỗi để Row biết hủy
+        throw new Error('Deletion cancelled by user')
       }
     },
     [deleteConversation, t]
@@ -189,8 +197,8 @@ const ConversationHistoryPage: React.FC = () => {
                   onSelectAndGoToChat={handleSelectAndGoToChat}
                   onDelete={handleDeleteWithConfirm}
                   onClear={handleClearWithConfirm}
-                  onRename={renameConversation} // Truyền trực tiếp action nếu không cần confirm ở đây
-                  onTogglePin={pinConversation} // Truyền trực tiếp action
+                  onRename={renameConversation}
+                  onTogglePin={pinConversation}
                 />
               ))}
             </tbody>

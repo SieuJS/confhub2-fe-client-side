@@ -1,7 +1,8 @@
 // src/components/EventJournalCard.tsx
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, memo } from 'react' // Thêm memo
+
 import Image from 'next/image'
 import { JournalData } from '../../../models/response/journal.response'
 import Button from '../utils/Button'
@@ -29,7 +30,8 @@ interface EventJournalCardProps {
   onFollowStatusChange: (journalId: string, isFollowing: boolean) => void;
 }
 
-const EventJournalCard: React.FC<EventJournalCardProps> = ({
+// Đổi tên component gốc
+const EventJournalCardComponent: React.FC<EventJournalCardProps> = ({
   journal,
   isInitiallyFollowing,
   onFollowStatusChange
@@ -224,4 +226,6 @@ const EventJournalCard: React.FC<EventJournalCardProps> = ({
   )
 }
 
-export default EventJournalCard
+// Export component đã được memo-hóa
+export const EventJournalCard = memo(EventJournalCardComponent);
+export default EventJournalCard;

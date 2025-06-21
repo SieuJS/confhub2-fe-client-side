@@ -1,17 +1,16 @@
 // src/app/[locale]/home/ConsumerInsights.tsx
-'use client' // Giữ nguyên dòng này
 
-import { useTranslations } from 'next-intl'
-// Tạm thời bỏ Odometer để loại bỏ hiệu ứng và CSS liên quan
-// import Odometer from 'react-odometerjs'
-import Button from '../utils/Button'
-import { Link } from '@/src/navigation'
+'use client'; // Giữ nguyên
+
+import { useTranslations } from 'next-intl';
+import Button from '../utils/Button';
+import { Link } from '@/src/navigation';
 import {
   FaUsers,
   FaChartBar,
   FaMapMarkedAlt,
-  FaHandshake
-} from 'react-icons/fa'
+  FaHandshake,
+} from 'react-icons/fa';
 
 interface ConsumerInsightsProps {}
 

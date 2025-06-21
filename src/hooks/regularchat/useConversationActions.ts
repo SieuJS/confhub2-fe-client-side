@@ -1,4 +1,5 @@
 // src/hooks/chatbot/useConversationActions.ts
+
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { usePathname, AppPathname, useRouter } from '@/src/navigation';
@@ -7,17 +8,18 @@ import {
   useConversationStore,
   useSocketStore,
   useSettingsStore,
-} from '@/src/app/[locale]/chatbot/stores'; // Adjust path
+  useMessageStore // <<< THÊM DÒNG NÀY
+} from '@/src/app/[locale]/chatbot/stores';
 import { useShallow } from 'zustand/react/shallow';
-import { urlSearchParamsToObject } from '@/src/hooks/regularchat/useUrlConversationSync'; // Assuming this is still relevant
+import { urlSearchParamsToObject } from '@/src/hooks/regularchat/useUrlConversationSync';
 
 export const CHATBOT_LIVECHAT_PATH: AppPathname = '/chatbot/livechat';
 export const CHATBOT_REGULARCHAT_PATH: AppPathname = '/chatbot/regularchat';
 
 interface UseConversationActionsProps {
-  currentView: 'chat' | 'history'; // Pass currentView from useChatViewManager
-  onDeletionStart?: () => void; // Callback when deletion process starts
-  onDeletionEnd?: () => void;   // Callback when deletion process ends (success or fail)
+  currentView: 'chat' | 'history';
+  onDeletionStart?: () => void;
+  onDeletionEnd?: () => void;
 }
 
 export function useConversationActions({
@@ -32,15 +34,23 @@ export function useConversationActions({
 
   const {
     loadConversation,
-    startNewConversation: storeStartNewConversation,
+    // BỎ DÒNG NÀY: startNewConversation: storeStartNewConversation,
     deleteConversation: storeDeleteConversation,
     isLoadingHistory,
+    setActiveConversationId: storeSetActiveConversationId, // <<< THÊM DÒNG NÀY
   } = useConversationStore(
     useShallow(state => ({
       loadConversation: state.loadConversation,
-      startNewConversation: state.startNewConversation,
+      // BỎ DÒNG NÀY: startNewConversation: state.startNewConversation,
       deleteConversation: state.deleteConversation,
       isLoadingHistory: state.isLoadingHistory,
+      setActiveConversationId: state.setActiveConversationId, // <<< THÊM DÒNG NÀY
+    }))
+  );
+
+  const { resetChatUIForNewConversation } = useMessageStore( // <<< THÊM DÒNG NÀY
+    useShallow(state => ({
+      resetChatUIForNewConversation: state.resetChatUIForNewConversation,
     }))
   );
 
@@ -101,21 +111,28 @@ export function useConversationActions({
   const handleStartNewConversation = useCallback(() => {
     if (!isConnected || !isServerReadyForCommands || isProcessingDeletion) return;
 
-    const langCode = currentLanguage?.code || 'en';
-    console.log(`[useConversationActions] Starting new conversation with language: ${langCode}`);
-    storeStartNewConversation(langCode);
+    // BỎ DÒNG NÀY: const langCode = currentLanguage?.code || 'en';
+    // BỎ DÒNG NÀY: console.log(`[useConversationActions] Starting new conversation with language: ${langCode}`);
+    // BỎ DÒNG NÀY: storeStartNewConversation(langCode); // KHÔNG GỌI LÊN SERVER NGAY LẬP TỨC NỮA
+
+    console.log(`[useConversationActions] Preparing for new conversation (client-side reset).`);
+
+    // Reset UI state to show introduction
+    storeSetActiveConversationId(null); // Set active conversation to null
+    resetChatUIForNewConversation(true); // Clear messages and reset UI
 
     const targetChatPath = chatMode === 'live' ? CHATBOT_LIVECHAT_PATH : CHATBOT_REGULARCHAT_PATH;
     const newParams = new URLSearchParams(searchParamsHook.toString());
-    newParams.delete('id');
+    newParams.delete('id'); // Ensure no ID in URL for new chat
     const newQuery = urlSearchParamsToObject(newParams);
     const currentUrlId = searchParamsHook.get('id');
 
+    // Only navigate if we are not already on the base chat path without an ID
     if (currentPathname !== targetChatPath || currentUrlId) {
       router.push({ pathname: targetChatPath, query: newQuery });
     }
   }, [
-    storeStartNewConversation,
+    // BỎ DÒNG NÀY: storeStartNewConversation,
     router,
     chatMode,
     isConnected,
@@ -123,7 +140,9 @@ export function useConversationActions({
     currentPathname,
     isProcessingDeletion,
     searchParamsHook,
-    currentLanguage,
+    currentLanguage, // Vẫn giữ nếu bạn muốn dùng langCode cho mục đích khác, nhưng không dùng cho storeStartNewConversation
+    storeSetActiveConversationId, // <<< THÊM DÒNG NÀY
+    resetChatUIForNewConversation, // <<< THÊM DÒNG NÀY
   ]);
 
   const handleDeleteConversation = useCallback(
@@ -156,10 +175,10 @@ export function useConversationActions({
 
   return {
     handleSelectConversation,
-    handleStartNewConversation,
+    handleStartNewConversation, // Vẫn expose hàm này
     handleDeleteConversation,
     isProcessingDeletion,
     idBeingDeleted,
-    resetDeletionState, // Expose this for useConversationLifecycleManager
+    resetDeletionState,
   };
 }

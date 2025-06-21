@@ -1,4 +1,4 @@
-// src/app/[locale]/layout.tsx
+// src/app/[locale]/layout.tsx (CHỈNH SỬA)
 
 import React from 'react'
 import { ThemeProvider } from '@/src/app/[locale]/utils/ThemeProvider'
@@ -12,14 +12,20 @@ import {
 } from 'next-intl'
 import localFont from 'next/font/local'
 import NextTopLoader from 'nextjs-toploader'
-import { ToastContainer } from 'react-toastify' // ToastContainer thường có z-index cao
+import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import './globals.css'
 import ChatbotGlobalInitializer from './chatbot/ChatbotGlobalInitializer'
 import { AuthProvider } from '@/src/contexts/AuthContext';
 import FloatingChatbot from './floatingchatbot/FloatingChatbot';
+import { NotificationProvider } from '@/src/contexts/NotificationContext';
+import { SidebarProvider } from '@/src/contexts/SidebarContext'
+// THÊM IMPORT MỚI
+// THÊM IMPORT MỚI
+import MainLayout from './MainLayout';
+import Header from './utils/Header'; // Import Header
+import Footer from './utils/Footer'; // Import Footer
 
-// ... (phần fonts và metadata giữ nguyên như trước)
 const spaceGrotesk = localFont({
   src: [
     {
@@ -127,86 +133,87 @@ export default function RootLayout({
   children,
   params: { locale }
 }: {
-  children: React.ReactNode
-  params: { locale: string }
+  children: React.ReactNode;
+  params: { locale: string };
 }) {
-  const messages = useMessages()
+  const messages = useMessages();
 
   return (
     <html
       lang={locale}
-      dir={locale === 'ar' || locale == 'fa' ? 'rtl' : 'ltr'}
+      dir={locale === 'ar' || locale === 'fa' ? 'rtl' : 'ltr'}
       className={`${spaceGrotesk.variable} ${inter.variable} ${rubik.variable} scroll-smooth scrollbar scrollbar-track-background scrollbar-thumb-background-secondary`}
       suppressHydrationWarning
     >
-      <head>
-      </head>
+      <head></head>
       <body>
         <AuthProvider>
-          <ThemeProvider
-            enableSystem
-            attribute='class'
-            defaultTheme='light'
-            themes={[
-              'light',
-              'dark',
-              'instagram',
-              'facebook',
-              'discord',
-              'netflix',
-              'twilight',
-              'reddit'
-            ]}
-          >
-            {/* ToastContainer thường có z-index rất cao (ví dụ: 9999) */}
-            <ToastContainer
-              position='top-right'
-              autoClose={3000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={locale === 'ar' || locale === 'fa'}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme='colored'
-            />
+          <NotificationProvider>
+            <SidebarProvider>
+              <ThemeProvider
+                enableSystem
+                attribute='class'
+                defaultTheme='light'
+                themes={[
+                  'light', 'dark', 'instagram', 'facebook', 'discord',
+                  'netflix', 'twilight', 'reddit'
+                ]}
+              >
+                <ToastContainer
+                  position='top-right'
+                  autoClose={3000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  rtl={locale === 'ar' || locale === 'fa'}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme='colored'
+                />
 
-            <NextIntlClientProvider
-              locale={locale}
-              messages={messages as AbstractIntlMessages}
-            >
-              <ChatbotGlobalInitializer />
+                <NextIntlClientProvider
+                  locale={locale}
+                  messages={messages as AbstractIntlMessages}
+                >
+                  <ChatbotGlobalInitializer />
 
-              {/* NextTopLoader cũng có thể có z-index cao */}
-              <NextTopLoader
-                color="var(--primary)"
-                initialPosition={0.08}
-                crawlSpeed={200}
-                height={3}
-                crawl={true}
-                showSpinner={false}
-                easing="ease"
-                speed={200}
-                shadow="0 0 10px var(--primary), 0 0 5px var(--primary-dark)"
-              />
-              
-              {/* FloatingChatbot được render sau main và các overlay khác như Toast, NextTopLoader */}
-              {/* Điều này, kết hợp với z-index cao trong chính FloatingChatbot, giúp nó nổi lên trên */}
-              <FloatingChatbot /> 
+                  <NextTopLoader
+                    color="var(--primary)"
+                    initialPosition={0.08}
+                    crawlSpeed={200}
+                    height={3}
+                    crawl={true}
+                    showSpinner={false}
+                    easing="ease"
+                    speed={200}
+                    shadow="0 0 10px var(--primary), 0 0 5px var(--primary-dark)"
+                  />
+
+                  <FloatingChatbot />
+
+                  {/* === THAY ĐỔI CÁCH RENDER MAINLAYOUT === */}
+                  {/*
+                    1. Chúng ta render Header và Footer ngay tại đây (trong Server Component).
+                    2. Chúng sẽ thực thi logic server của mình (Footer sẽ gọi getTranslations thành công).
+                    3. Kết quả render của chúng được truyền dưới dạng props vào MainLayout.
+                  */}
+                  <MainLayout
+                    header={<Header locale={locale} />}
+                    footer={<Footer />}
+                  >
+                    {children}
+                  </MainLayout>
+                  {/* ======================================= */}
 
 
-              {/* Nội dung chính của các trang */}
-              <main className='mx-auto max-w-screen-2xl'>
-                {children}
-                
-              </main>
 
-              
-            </NextIntlClientProvider>
-          </ThemeProvider>
+                </NextIntlClientProvider>
+              </ThemeProvider>
+            </SidebarProvider>
+          </NotificationProvider>
         </AuthProvider>
       </body>
     </html>
-  )
+  );
 }

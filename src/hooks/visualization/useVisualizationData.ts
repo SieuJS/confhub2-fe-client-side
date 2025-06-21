@@ -1,6 +1,14 @@
-import { useState, useEffect, useRef } from 'react'; // Thêm useRef
+// src/hooks/visualization/useVisualizationData.ts
+
+import { useState, useEffect } from 'react';
 import { fetchVisualizationData } from '@/src/app/apis/visualization/visualization';
 import { ConferenceDetailsListResponse } from '@/src/models/response/conference.response';
+
+// --- Props Interface ---
+interface UseVisualizationDataProps {
+  initialData: ConferenceDetailsListResponse | null;
+  initialError: string | null;
+}
 
 interface UseVisualizationDataReturn {
   data: ConferenceDetailsListResponse | null;
@@ -8,44 +16,39 @@ interface UseVisualizationDataReturn {
   error: string | null;
 }
 
-const useVisualizationData = (): UseVisualizationDataReturn => {
-  // console.log(`Hook executing`);
-  const [data, setData] = useState<ConferenceDetailsListResponse | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const dataRef = useRef<any | null>(null); // Để theo dõi tham chiếu
+const useVisualizationData = ({ initialData, initialError }: UseVisualizationDataProps): UseVisualizationDataReturn => {
+  // 1. Khởi tạo state trực tiếp từ props
+  const [data, setData] = useState<ConferenceDetailsListResponse | null>(initialData);
+  const [error, setError] = useState<string | null>(initialError);
+  
+  // 2. Loading sẽ là false nếu có dữ liệu hoặc lỗi ban đầu
+  const [loading, setLoading] = useState(!initialData && !initialError);
 
+  // 3. useEffect giờ đây chỉ chạy khi không có dữ liệu ban đầu
+  // (ví dụ: lỗi server-side, hoặc trong môi trường dev mà server render không chạy)
   useEffect(() => {
-    // console.log(`useEffect running - Fetching data...`);
+    // Nếu đã có dữ liệu hoặc lỗi từ server, không làm gì cả.
+    if (initialData || initialError) {
+      return;
+    }
+
     const loadData = async () => {
       setLoading(true);
       setError(null);
       try {
         const result = await fetchVisualizationData();
-        // console.log(`Data fetched successfully. Result length: ${result?.length}`);
-        if (dataRef.current !== result) {
-            // console.log(`Data reference CHANGED after fetch.` + 'font-weight: bold;');
-        } else {
-            //  console.log(`Data reference is STABLE after fetch.`);
-        }
-        dataRef.current = result; // Cập nhật ref *trước* khi set state
         setData(result);
       } catch (err: any) {
-        // console.error(`Error fetching data:`, err);
         setError(err.message || 'An unknown error occurred.');
-        setData(null); // Clear data on error
-        dataRef.current = null;
+        setData(null);
       } finally {
-        // console.log(`Setting loading to false.`);
         setLoading(false);
       }
     };
 
     loadData();
-    // No dependencies needed if data fetching happens only once on mount
-  }, []);
+  }, [initialData, initialError]); // Phụ thuộc vào props ban đầu
 
-  // console.log(`Returning: loading=${loading}, error=${error}, data exists=${!!data}`);
   return { data, loading, error };
 };
 

@@ -1,51 +1,37 @@
 // src/app/[locale]/page.tsx
-'use client'
 
-import dynamic from 'next/dynamic' // Import dynamic
+// BƯỚC 1: XÓA BỎ 'use client' HOÀN TOÀN
 
-// Import các components khác
-import Footer from './utils/Footer'
-import { Header } from './utils/Header'
-import IntroduceVisualization from './home/IntroduceVisualization'
-import FeatureComparisonTable from './home/FeatureComparisonTable'
-import SuperBannerFor from './home/SuperBannerFor'
-// <<< Bỏ import FloatingChatbot thông thường ở đây >>>
-// --- Dynamic Import ConsumerInsights (đã làm ở bước trước) ---
-const DynamicConsumerInsights = dynamic(
-  () => import('./home/ConsumerInsights'),
-  {
-    ssr: false
-  }
-)
-// --- End Dynamic Import ---
+import dynamic from 'next/dynamic';
 
-// --- Dynamic Import FloatingChatbot ---
-// Import FloatingChatbot một cách dynamic với ssr: false
+// Import các component tĩnh (Server Components hoặc Client Components đã được tách)
+import SuperBannerFor from './home/Banner'; // Đổi tên component cho nhất quán
+import ConsumerInsights from './home/ConsumerInsights';
+import IntroduceVisualization from './home/IntroduceVisualization';
+import FeatureComparisonTable from './home/FeatureComparisonTable';
+
+// BƯỚC 2: Dynamic import cho FloatingChatbot
+// Component này không cần thiết cho lần tải đầu tiên và có thể tải sau.
 const DynamicFloatingChatbot = dynamic(
   () => import('@/src/app/[locale]/floatingchatbot/FloatingChatbot'),
   {
-    ssr: false
-    // Tùy chọn: hiển thị gì đó khi component đang tải (chỉ ở client)
-    // loading: () => <p>Loading chatbot...</p>,
+    ssr: false, // Chỉ render ở client
+    loading: () => null, // Không hiển thị gì trong khi tải
   }
-)
-// --- End Dynamic Import ---
+);
 
-export default function HomePage({ params: { locale } }: { params: { locale: string } }) {
+// BƯỚC 3: Đây giờ là một Server Component!
+// Nó sẽ được render trên server lúc build time (SSG), tạo ra một file HTML tĩnh.
+export default function HomePage() {
   return (
-    <div className=''>
-      <Header locale={locale} />
-      {/* <SuperBannerTree /> */}
+    // Không cần truyền `locale` xuống nữa vì các component con sẽ tự xử lý
+    // hoặc không cần đến nó.
+    <div>
       <SuperBannerFor />
-      {/* <PopularConferences /> */}
-      <DynamicConsumerInsights /> {/* Sử dụng Dynamic */}
+      <ConsumerInsights />
       <IntroduceVisualization />
       <FeatureComparisonTable />
-      <Footer />
-      <DynamicFloatingChatbot /> {/* Sử dụng Dynamic */}
+      <DynamicFloatingChatbot />
     </div>
-  )
+  );
 }
-
-// Lưu ý: Metadata và Viewport nên được khai báo trong layout.tsx cha
-// hoặc trong một file page.tsx Server Component.

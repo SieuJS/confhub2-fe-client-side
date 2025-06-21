@@ -1,10 +1,13 @@
-// src/components/FeatureComparisonTable.tsx
+// src/app/[locale]/home/FeatureComparisonTable.tsx
 
-import React, { useState, ElementType } from 'react'
-import { useTranslations } from 'next-intl'
-import { Check, X, Info, LayoutGrid, UserCheck, Sparkles } from 'lucide-react'
-import { Link } from '@/src/navigation'
-import { useAuth } from '@/src/contexts/AuthContext' // BƯỚC 1: Import hook useAuth
+'use client'; // BẮT BUỘC: Vì component này dùng useState và useContext (qua useAuth)
+
+import React, { useState, ElementType } from 'react';
+import { useTranslations } from 'next-intl';
+import { Check, X, Info, LayoutGrid, UserCheck, Sparkles } from 'lucide-react';
+import { Link } from '@/src/navigation';
+import { useAuth } from '@/src/contexts/AuthContext';
+
 
 // --- Data & Type Definitions (Không thay đổi) ---
 interface Feature {
@@ -191,13 +194,11 @@ const AvailabilityCell: React.FC<{ value: boolean | string }> = ({ value }) => {
 }
 
 // --- Main Table Component ---
-const FeatureComparisonTable: React.FC = () => {
-  const t = useTranslations('FeatureComparisonTable')
-  const tg = useTranslations('') // Global namespace for features
-  const [activeTooltipId, setActiveTooltipId] = useState<string | null>(null)
-
-  // BƯỚC 2: Gọi hook và lấy trạng thái đăng nhập
-  const { isLoggedIn } = useAuth()
+export default function FeatureComparisonTable() {
+  const t = useTranslations('FeatureComparisonTable');
+  const tg = useTranslations('');
+  const [activeTooltipId, setActiveTooltipId] = useState<string | null>(null);
+  const { isLoggedIn } = useAuth();
 
   const totalFeatures = featureDataConfig.reduce(
     (acc, category) => acc + category.features.length,
@@ -329,9 +330,8 @@ const FeatureComparisonTable: React.FC = () => {
                               </div>
                             </td>
                             <td
-                              className={`border-x border-blue-600 py-5 text-center ${
-                                isLastRow ? 'rounded-b-lg border-b' : ''
-                              }`}
+                              className={`border-x border-blue-600 py-5 text-center ${isLastRow ? 'rounded-b-lg border-b' : ''
+                                }`}
                             >
                               <div className='inline-flex w-full justify-center'>
                                 <AvailabilityCell
@@ -353,5 +353,3 @@ const FeatureComparisonTable: React.FC = () => {
     </div>
   )
 }
-
-export default FeatureComparisonTable

@@ -6,13 +6,15 @@ import { useTranslations } from 'next-intl'
 import { NotificationIcon, UserIcon } from './Icon'
 import { usePathname } from 'next/navigation'
 
+// --- ĐIỀU CHỈNH INTERFACE PROPS Ở ĐÂY ---
 interface Props {
-  isLogin: boolean
-  locale: string
-  toggleNotification: () => void
-  toggleUserDropdown: () => void
-  notificationEffect: boolean
-  unreadCount: number | string
+  isLogin: boolean;
+  locale: string;
+  // Thêm dấu '?' để biến các props này thành tùy chọn (optional)
+  toggleNotification?: () => void;
+  toggleUserDropdown?: () => void;
+  notificationEffect?: boolean;
+  unreadCount?: number | string;
 }
 
 const AuthButtons: FC<Props> = ({
@@ -23,25 +25,35 @@ const AuthButtons: FC<Props> = ({
   notificationEffect,
   unreadCount
 }) => {
-  const t = useTranslations('')
-  const pathname = usePathname()
+  const t = useTranslations('');
+  const pathname = usePathname();
 
   // Render UI cho trạng thái đã đăng nhập
   if (isLogin) {
+    // Thêm kiểm tra để đảm bảo các hàm tồn tại trước khi gọi
+    // Điều này giúp code an toàn hơn về mặt logic
+    if (!toggleNotification || !toggleUserDropdown) {
+      // Có thể trả về một skeleton hoặc null nếu các hàm chưa sẵn sàng
+      // để tránh lỗi runtime
+      return null;
+    }
+
     return (
       <>
-        <button className='' onClick={toggleNotification}>
+        <button className='mr-4' onClick={toggleNotification}>
           <NotificationIcon
-            notificationEffect={notificationEffect}
-            unreadCount={unreadCount}
+            // Cung cấp giá trị mặc định nếu props là undefined
+            notificationEffect={notificationEffect || false}
+            unreadCount={unreadCount || 0}
           />
         </button>
         <button onClick={toggleUserDropdown}>
           <UserIcon />
         </button>
       </>
-    )
+    );
   }
+
 
   // Render UI cho trạng thái chưa đăng nhập
   return (
@@ -53,9 +65,8 @@ const AuthButtons: FC<Props> = ({
       <Link
         lang={locale}
         href={`/auth/login`}
-        className={`group relative inline-flex items-center rounded-md bg-button px-2 py-2 text-sm font-semibold text-button-text shadow-md transition-colors duration-200 hover:opacity-90 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-button ${
-          pathname.includes('/auth/login') ? 'bg-blue-600' : ''
-        }`}
+        className={`group relative inline-flex items-center rounded-md bg-button px-2 py-2 text-sm font-semibold text-button-text shadow-md transition-colors duration-200 hover:opacity-90 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-button ${pathname.includes('/auth/login') ? 'bg-blue-600' : ''
+          }`}
       >
         <div className='flex items-center'>
           <svg

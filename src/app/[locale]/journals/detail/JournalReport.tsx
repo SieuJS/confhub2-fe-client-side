@@ -1,21 +1,21 @@
-// src/app/[locale]/journal/JournalReport.tsx
+// src/app/[locale]/journals/detail/JournalReport.tsx
 
 'use client'
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react' // Thêm useMemo
-import Image from 'next/image' // Thêm Image
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import Image from 'next/image'
 import Button from '../../utils/Button'
 import { JournalData } from '../../../../models/response/journal.response'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { toast } from 'react-toastify'
 import { journalFollowService } from '../../../../services/journal-follow.service'
 import { useAuth } from '@/src/contexts/AuthContext'
 import { useRouter, usePathname } from '@/src/navigation'
-
-// === IMPORT DỮ LIỆU COUNTRIES ===
-import countries from '@/src/app/[locale]/addconference/countries.json' // Điều chỉnh đường dẫn nếu cần
-
-// === IMPORT CÁC ICON TỪ LUCIDE (ĐÃ CẬP NHẬT) ===
+import countries from '@/src/app/[locale]/addconference/countries.json'
+import { formatDistanceToNow } from 'date-fns'
+import { enUS, vi } from 'date-fns/locale'
+import { cn } from '@/lib/utils'
+// Import Icons
 import {
   Heart,
   Loader2,
@@ -34,75 +34,45 @@ import {
   Mail,
   Send,
   MapPin,
-  History, // Icon cho thời gian cập nhật
-
+  History,
 } from 'lucide-react'
 
-// === IMPORT TỪ DATE-FNS VÀ NEXT-INTL ===
-import { formatDistanceToNow } from 'date-fns'
-import { enUS, vi } from 'date-fns/locale' // Import các locale cần thiết
-import { useLocale } from 'next-intl' // Hook để lấy locale hiện tại
-
-
 interface JournalReportProps {
-  journal: JournalData | undefined
+  journal: JournalData; // Prop này là bắt buộc và không thể null/undefined
 }
 
 // === COMPONENT CON: MetricCard (Không thay đổi) ===
-const MetricCard = ({
-  icon: Icon,
-  label,
-  value,
-  className,
-}: {
-  icon: React.ElementType
-  label: string
-  value: string | number | undefined
-  className?: string
-}) => (
-  <div
-    className={`flex flex-col items-center justify-center rounded-xl border bg-card p-4 text-center shadow-sm transition-all hover:shadow-md ${className}`}
-  >
+const MetricCard = ({ icon: Icon, label, value, className }: { icon: React.ElementType; label: string; value: string | number | undefined; className?: string }) => (
+  <div className={`flex flex-col items-center justify-center rounded-xl border bg-card p-4 text-center shadow-sm transition-all hover:shadow-md ${className}`}>
     <Icon className='mb-2 h-7 w-7 text-primary' />
     <span className='text-sm font-medium text-muted-foreground'>{label}</span>
-    <span className='text-2xl font-bold text-card-foreground'>
-      {value || 'N/A'}
-    </span>
+    <span className='text-2xl font-bold text-card-foreground'>{value || 'N/A'}</span>
   </div>
 )
 
-// === COMPONENT CON: InfoRow (ĐÃ CẬP NHẬT Ở BƯỚC 1) ===
-const InfoRow = ({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: React.ElementType
-  label: string
-  value: React.ReactNode | string | undefined
-}) => (
+// === COMPONENT CON: InfoRow (Không thay đổi) ===
+const InfoRow = ({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: React.ReactNode | string | undefined }) => (
   <div className='flex items-start justify-between border-b border-border py-3 last:border-none'>
     <div className='flex items-center gap-3'>
       <Icon className='h-5 w-5 flex-shrink-0 text-muted-foreground' />
       <span className='font-semibold text-card-foreground'>{label}</span>
     </div>
-    <div className='text-right text-muted-foreground'>
-      {value || 'N/A'}
-    </div>
+    <div className='text-right text-muted-foreground'>{value || 'N/A'}</div>
   </div>
 )
 
 const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
   const t = useTranslations()
-  const currentLocale = useLocale() // Lấy locale hiện tại (ví dụ: 'en' hoặc 'vi')
-
+  const currentLocale = useLocale()
   const router = useRouter()
   const pathname = usePathname()
   const { isLoggedIn, isInitializing: isAuthInitializing } = useAuth()
 
   const [isFollowing, setIsFollowing] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isFollowLoading, setIsFollowLoading] = useState(false) // Đổi tên để rõ ràng hơn
 
+  // Thêm state để kiểm soát việc đã fetch trạng thái follow xong chưa
+  const [hasFetchedFollowStatus, setHasFetchedFollowStatus] = useState(false);
 
 
   // === LOGIC ĐỊNH DẠNG NGÀY THÁNG ===
@@ -137,73 +107,88 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
   }, [journal?.Country])
 
 
-  const checkLoginAndRedirect = useCallback(
-    (callback: () => void) => {
-      if (isAuthInitializing) return
-      if (!isLoggedIn) {
-        localStorage.setItem('returnUrl', pathname)
-        router.push('/auth/login')
-      } else {
-        callback()
-      }
-    },
-    [isLoggedIn, isAuthInitializing, pathname, router]
-  )
+  const checkLoginAndRedirect = useCallback((callback: () => void) => {
+    // Không cần kiểm tra isAuthInitializing ở đây nữa, vì nút đã bị disabled
+    if (!isLoggedIn) {
+      localStorage.setItem('returnUrl', pathname)
+      router.push('/auth/login')
+    } else {
+      callback()
+    }
+  }, [isLoggedIn, pathname, router]) // Bỏ isAuthInitializing khỏi dependencies
 
+
+
+  // --- TỐI ƯU HOOK ĐỂ THEO DÕI TRẠNG THÁI FOLLOW ---
   useEffect(() => {
-    if (isAuthInitializing || !isLoggedIn || !journal) {
-      setIsFollowing(false)
-      return
-    }
-    const checkFollowStatus = async () => {
-      try {
-        const followedJournals =
-          await journalFollowService.getFollowedJournals()
-        setIsFollowing(followedJournals.some(fj => fj.journalId === journal.id))
-      } catch (error) {
-        console.error('Error checking follow status:', error)
-        setIsFollowing(false)
+    // Guard Clause: Chỉ chạy khi auth xong, và có journal
+    // Nếu chưa login, setHasFetchedFollowStatus thành true để nút không bị disable vô thời hạn
+    if (isAuthInitializing || !journal) {
+      if (!isAuthInitializing) { // Nếu auth đã xong nhưng chưa login
+        setHasFetchedFollowStatus(true);
+        setIsFollowing(false); // Đảm bảo trạng thái là false nếu chưa login
       }
+      return;
     }
-    checkFollowStatus()
-  }, [journal, isLoggedIn, isAuthInitializing])
+
+    const checkFollowStatus = async () => {
+      // Reset trạng thái follow và fetched status mỗi khi journal hoặc login status thay đổi
+      setIsFollowing(false);
+      setHasFetchedFollowStatus(false);
+
+      if (!isLoggedIn) { // Nếu đã biết là chưa login, thì không cần fetch
+        setHasFetchedFollowStatus(true);
+        return;
+      }
+
+      try {
+        const followedJournalIds = await journalFollowService.getFollowedJournalIdsByUser();
+        setIsFollowing(followedJournalIds.includes(journal.id));
+      } catch (error) {
+        console.error('Error checking follow status:', error);
+        setIsFollowing(false);
+      } finally {
+        setHasFetchedFollowStatus(true); // Luôn set true sau khi cố gắng fetch
+      }
+    };
+
+    checkFollowStatus();
+  }, [journal, isLoggedIn, isAuthInitializing]); // Dependency array đã được tối ưu
+
 
   const handleFollowToggle = async () => {
-    if (isLoading || !journal) return
-    setIsLoading(true)
+    if (isFollowLoading || !journal || !isLoggedIn) return // Thêm check isLoggedIn để chắc chắn
+
+    setIsFollowLoading(true)
     try {
       if (isFollowing) {
         await journalFollowService.unfollowJournal(journal.id)
-        // toast.success(t('JournalCard.unfollowSuccess'))
       } else {
         await journalFollowService.followJournal(journal.id)
-        // toast.success(t('JournalCard.followSuccess'))
       }
-      setIsFollowing(!isFollowing)
+      // Cập nhật trạng thái một cách an toàn
+      setIsFollowing(prevState => !prevState)
     } catch (error) {
       console.error('Error toggling follow status:', error)
       toast.error(t('JournalCard.followError'))
     } finally {
-      setIsLoading(false)
+      setIsFollowLoading(false)
     }
   }
 
-  if (!journal) {
-    return (
-      <div className='container mx-auto flex h-64 items-center justify-center rounded-lg bg-card px-4 py-2 text-card-foreground'>
-        <h2 className='text-2xl font-semibold'>{t('Journal_not_found')}</h2>
-      </div>
-    )
-  }
 
-  // === Chuẩn bị dữ liệu để hiển thị (không thay đổi) ===
-  const latestImpactFactor =
-    journal.bioxbio && journal.bioxbio.length > 0
-      ? journal.bioxbio[0].Impact_factor
-      : 'N/A'
+  // === Chuẩn bị dữ liệu để hiển thị (Không thay đổi) ===
+  const latestImpactFactor = journal.bioxbio?.[0]?.Impact_factor || 'N/A'
   const overalRanking = journal['Rank']
   const hIndex = journal['H index']
   const sjr = journal.SJR
+
+  // Biến kiểm soát trạng thái disabled của nút Follow
+  // Nút bị disabled khi:
+  // 1. Đang khởi tạo Auth (chưa biết đã login hay chưa)
+  // 2. Đang trong quá trình gửi yêu cầu follow/unfollow
+  // 3. Chưa fetch xong trạng thái follow ban đầu (để tránh nút nhấp nháy hoặc hiển thị sai)
+  const isFollowButtonDisabled = isAuthInitializing || isFollowLoading || !hasFetchedFollowStatus;
 
   return (
     <div className='container mx-auto rounded-xl bg-card p-6 text-card-foreground shadow-lg md:p-8'>
@@ -218,10 +203,17 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
             <Button
               variant={isFollowing ? 'secondary' : 'primary'}
               onClick={() => checkLoginAndRedirect(handleFollowToggle)}
-              disabled={isLoading}
-              className='flex-shrink-0'
+              disabled={isFollowButtonDisabled} // Sử dụng biến disabled
+              className={cn(
+                'flex-shrink-0 ml-4',
+                // Thêm class cho trạng thái disabled ở đây
+                isFollowButtonDisabled && 'opacity-50 cursor-not-allowed' // Ví dụ với Tailwind CSS
+                // Hoặc nếu bạn muốn màu khác:
+                // isFollowButtonDisabled && 'bg-gray-400 text-gray-700 cursor-not-allowed'
+              )}
+              title={isFollowButtonDisabled ? (isFollowLoading ? t('JournalCard.loadingButton') : t('JournalCard.loadingStatus')) : (isFollowing ? t('JournalCard.unfollowButton') : t('JournalCard.followButton'))}
             >
-              {isLoading ? (
+              {isFollowLoading ? ( // Chỉ hiển thị spinner khi đang gửi yêu cầu follow/unfollow
                 <span className='flex items-center justify-center gap-1.5'>
                   <Loader2 size={16} className='animate-spin' />
                   {t('JournalCard.loadingButton')}

@@ -1,4 +1,5 @@
 // src/app/[locale]/visualization/DataFieldPanel.tsx
+
 import React from 'react'
 import { Droppable, Draggable } from '@hello-pangea/dnd'
 import { DataField } from '../../../models/visualization/visualization'
@@ -12,31 +13,31 @@ interface DataFieldPanelProps {
   droppableId: string
   isCollapsed: boolean
   onToggle: () => void
+  isDragDisabled?: boolean // <-- THÊM PROP MỚI
 }
+
 const DataFieldPanel: React.FC<DataFieldPanelProps> = React.memo(
-  ({ fields, droppableId, isCollapsed, onToggle }) => {
+  ({ fields, droppableId, isCollapsed, onToggle, isDragDisabled = false }) => { // <-- Thêm vào đây
     const t = useTranslations()
 
     const dimensions = fields.filter(f => f.type === 'dimension')
     const measures = fields.filter(f => f.type === 'measure')
 
     return (
-      // Always render the div, control visibility purely with CSS
       <div
         className={`
-                duration-400 relative flex-shrink-0 border-r border-gray-20
-                bg-gray-10 transition-all
-                duration-300 ease-in-out ease-out
-                ${
-                  isCollapsed
-                    ? 'pointer-events-none w-0 overflow-hidden border-none p-0 opacity-0'
-                    : 'w-64 overflow-y-auto p-4 opacity-100'
-                }
-            `}
+          duration-400 relative flex-shrink-0 border-r border-gray-20
+          bg-gray-10 transition-all
+          duration-300 ease-in-out ease-out
+          ${
+            isCollapsed
+              ? 'pointer-events-none w-0 overflow-hidden border-none p-0 opacity-0'
+              : 'w-64 overflow-y-auto p-4 opacity-100'
+          }
+        `}
         aria-hidden={isCollapsed}
       >
-        {/* --- Content is ALWAYS rendered, but hidden by parent CSS when collapsed --- */}
-        {/* Panel Title and Collapse Button */}
+        {/* ... JSX cho tiêu đề và nút collapse ... */}
         <div className='mb-4 flex items-center justify-between'>
           <Link href='/' className=''>
             <h3 className='whitespace-nowrap text-sm font-semibold uppercase tracking-wide '>
@@ -55,13 +56,10 @@ const DataFieldPanel: React.FC<DataFieldPanelProps> = React.memo(
         </div>
         <div className='mb-4 flex items-center justify-between'>
           <h3 className='whitespace-nowrap text-sm font-semibold uppercase tracking-wide '>
-            {' '}
-            {/* Added whitespace-nowrap */}
             {'Fields'}
           </h3>
         </div>
 
-        {/* Droppable area */}
         <Droppable droppableId={droppableId} isDropDisabled={true}>
           {(provided, snapshot) => (
             <div
@@ -69,11 +67,8 @@ const DataFieldPanel: React.FC<DataFieldPanelProps> = React.memo(
               {...provided.droppableProps}
               className='space-y-4'
             >
-              {/* Dimensions Section */}
               <section>
                 <h4 className='mb-2 whitespace-nowrap text-xs font-medium text-blue-700'>
-                  {' '}
-                  {/* Added whitespace-nowrap */}
                   {t('Dimensions')} ({dimensions.length})
                 </h4>
                 {dimensions.length > 0 ? (
@@ -82,6 +77,7 @@ const DataFieldPanel: React.FC<DataFieldPanelProps> = React.memo(
                       key={field.id}
                       draggableId={field.id}
                       index={index}
+                      isDragDisabled={isDragDisabled} // <-- SỬ DỤNG PROP Ở ĐÂY
                     >
                       {(providedDraggable, snapshotDraggable) => (
                         <FieldItem
@@ -99,11 +95,8 @@ const DataFieldPanel: React.FC<DataFieldPanelProps> = React.memo(
                 )}
               </section>
 
-              {/* Measures Section */}
               <section>
                 <h4 className='mb-2 whitespace-nowrap text-xs font-medium text-green-700'>
-                  {' '}
-                  {/* Added whitespace-nowrap */}
                   {t('Measures')} ({measures.length})
                 </h4>
                 {measures.length > 0 ? (
@@ -114,6 +107,7 @@ const DataFieldPanel: React.FC<DataFieldPanelProps> = React.memo(
                         key={field.id}
                         draggableId={field.id}
                         index={draggableIndex}
+                        isDragDisabled={isDragDisabled} // <-- SỬ DỤNG PROP Ở ĐÂY
                       >
                         {(providedDraggable, snapshotDraggable) => (
                           <FieldItem

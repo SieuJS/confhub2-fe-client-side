@@ -3,8 +3,6 @@
 
 import React, { useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import { Header } from '../utils/Header'
-import Footer from '../utils/Footer'
 import ConferenceForm from './ConferenceForm'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/src/contexts/AuthContext' // <<<< THAY ĐỔI QUAN TRỌNG
@@ -76,14 +74,12 @@ const AddConferencePage = ({
   if (isLoggedIn && !isAuthInitializing) {
     return (
       <>
-        <Header locale={locale} />
         <main className='container mx-auto min-h-screen py-8'>
           {' '}
           <div className='w-full bg-background pt-14'></div>{' '}
           <h1 className='mb-6 text-3xl font-bold'>{t('Add_New_Conference')}</h1>
           <ConferenceForm />{' '}
         </main>
-        <Footer />
       </>
     )
   }

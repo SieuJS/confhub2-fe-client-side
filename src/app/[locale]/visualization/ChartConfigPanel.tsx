@@ -1,6 +1,7 @@
 // src/app/[locale]/visualization/ChartConfigPanel.tsx
+
 import React, { useState } from 'react'
-import { Droppable } from '@hello-pangea/dnd'
+import { Droppable } from '@hello-pangea/dnd' // Đảm bảo import đúng
 import {
   ChartConfig,
   ChartOptions,
@@ -29,6 +30,7 @@ interface ChartConfigPanelProps {
   onRemoveField: (zoneId: string) => void
   isCollapsed: boolean
   onToggle: () => void
+  isDragDisabled?: boolean
 }
 
 const ChartConfigPanel: React.FC<ChartConfigPanelProps> = ({
@@ -39,7 +41,8 @@ const ChartConfigPanel: React.FC<ChartConfigPanelProps> = ({
   onOptionsChange,
   onRemoveField,
   isCollapsed,
-  onToggle
+  onToggle,
+  isDragDisabled = false
 }) => {
   const t = useTranslations()
 
@@ -56,29 +59,27 @@ const ChartConfigPanel: React.FC<ChartConfigPanelProps> = ({
     AVAILABLE_CHART_TYPES[0]
 
   const showXAxis = chartType !== 'pie'
-  const showYAxis = true // Giữ vùng thả Y-axis cho Pie (Value)
+  const showYAxis = true
   const showColor = true
 
   return (
     <div
       className={`
-                relative flex-shrink-0 border-l border-gray-20
-                bg-white-pure shadow-sm transition-all
-                duration-300 ease-in-out
-                ${isCollapsed
+        relative flex-shrink-0 border-l border-gray-20
+        bg-white-pure shadow-sm transition-all
+        duration-300 ease-in-out
+        ${isCollapsed
           ? 'pointer-events-none w-0 overflow-hidden border-none p-0 opacity-0'
           : 'w-72 overflow-y-auto p-4 opacity-100'
         }
-            `}
+      `}
       aria-hidden={isCollapsed}
     >
-      {/* --- Nội dung luôn được render, nhưng bị ẩn bởi CSS của cha khi thu gọn --- */}
-      {/* Tiêu đề Panel và Nút Thu gọn */}
+      {/* ... JSX cho tiêu đề và bộ chọn loại biểu đồ ... */}
       <div className='mb-4 flex items-center justify-between'>
         <h3 className='whitespace-nowrap text-lg  font-semibold'>
           {t('Configuration')}
-        </h3>{' '}
-        {/* Đã thêm whitespace-nowrap */}
+        </h3>
         <button
           onClick={onToggle}
           className='rounded p-1  hover:bg-gray-20 hover:text-gray-60 focus:outline-none focus:ring-1 focus:ring-gray-40'
@@ -142,11 +143,13 @@ const ChartConfigPanel: React.FC<ChartConfigPanelProps> = ({
         </Listbox>
       </div>
 
-      {/* Phần Vùng Thả */}
       <div className='space-y-3'>
         {showXAxis && (
-          <Droppable droppableId='xAxis'>
-            {(provided, snapshot) => (
+          // ==================================================================
+          // SỬA LỖI Ở ĐÂY
+          // ==================================================================
+          <Droppable droppableId='xAxis' isDropDisabled={isDragDisabled}>
+            {(provided, snapshot) => ( // Bọc DropZone trong một hàm
               <DropZone
                 id='xAxis'
                 label={t('XAxis_Category_Dimension')}
@@ -160,9 +163,12 @@ const ChartConfigPanel: React.FC<ChartConfigPanelProps> = ({
             )}
           </Droppable>
         )}
-        {showYAxis && ( // Luôn hiển thị Y-axis về mặt khái niệm, nhãn thay đổi cho Pie
-          <Droppable droppableId='yAxis'>
-            {(provided, snapshot) => (
+        {showYAxis && (
+          // ==================================================================
+          // SỬA LỖI Ở ĐÂY
+          // ==================================================================
+          <Droppable droppableId='yAxis' isDropDisabled={isDragDisabled}>
+            {(provided, snapshot) => ( // Bọc DropZone trong một hàm
               <DropZone
                 id='yAxis'
                 label={
@@ -180,9 +186,12 @@ const ChartConfigPanel: React.FC<ChartConfigPanelProps> = ({
             )}
           </Droppable>
         )}
-        {showColor && ( // Luôn hiển thị Color về mặt khái niệm, nhãn thay đổi cho Pie
-          <Droppable droppableId='color'>
-            {(provided, snapshot) => (
+        {showColor && (
+          // ==================================================================
+          // SỬA LỖI Ở ĐÂY
+          // ==================================================================
+          <Droppable droppableId='color' isDropDisabled={isDragDisabled}>
+            {(provided, snapshot) => ( // Bọc DropZone trong một hàm
               <DropZone
                 id='color'
                 label={
@@ -201,6 +210,7 @@ const ChartConfigPanel: React.FC<ChartConfigPanelProps> = ({
           </Droppable>
         )}
       </div>
+
 
       {/* Phần Tùy chọn Biểu đồ */}
       <div className='mt-6 border-t border-gray-20 pt-4'>

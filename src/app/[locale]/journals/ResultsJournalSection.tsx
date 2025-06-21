@@ -1,4 +1,5 @@
-// ResultsJournalSection.tsx
+// src/components/journals/ResultsJournalSection.tsx
+
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
@@ -8,10 +9,13 @@ import useJournalResults from '@/src/hooks/journals/useJournalResults'
 import { useTranslations } from 'next-intl'
 import { Loader2 } from 'lucide-react'
 import { journalFollowService } from '@/src/services/journal-follow.service'
+import { JournalApiResponse } from '@/src/models/response/journal.response'
 
-interface ResultsJournalSectionProps {}
+interface ResultsJournalSectionProps {
+  initialData: JournalApiResponse;
+}
 
-const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = () => {
+const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = ({ initialData }) => {
   const t = useTranslations('JournalResults')
 
   const {
@@ -20,26 +24,22 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = () => {
     currentPage,
     journalsPerPage,
     totalPages,
-    sortBy,
-    loading,
+    loading, // Chỉ còn 1 state loading
     error,
     paginate,
     handleSortByChange
-  } = useJournalResults()
+  } = useJournalResults({ initialData });
 
   const [followedJournalIds, setFollowedJournalIds] = useState<Set<string>>(new Set());
-  const [loadingFollows, setLoadingFollows] = useState(true);
 
   useEffect(() => {
+    // Fetch trạng thái follow một cách "ngầm"
     const fetchFollowedJournalIds = async () => {
       try {
-        setLoadingFollows(true);
         const ids = await journalFollowService.getFollowedJournalIdsByUser();
         setFollowedJournalIds(new Set(ids));
       } catch (err) {
         console.error('Failed to fetch followed journal IDs:', err);
-      } finally {
-        setLoadingFollows(false);
       }
     };
     fetchFollowedJournalIds();
@@ -57,7 +57,7 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = () => {
     });
   }, []);
 
-  if (loading || loadingFollows) {
+  if (loading) {
     return (
       <div className='flex h-96 flex-col items-center justify-center text-gray-500'>
         <Loader2 className='h-10 w-10 animate-spin text-indigo-600' />
@@ -66,10 +66,11 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = () => {
     )
   }
 
+  if (error) {
+    return <p className="text-red-500">{t('errorFetchingResults', { error: error })}</p>
+  }
+  
   if (!journals || journals.length === 0) {
-    if (error) {
-        return <p className="text-red-500">{t('errorFetchingResults', { error: error })}</p>
-    }
     return <p>{t('noResults')}</p>
   }
 
@@ -79,11 +80,11 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = () => {
         <h2 className='text-xl font-semibold'>
           {t('resultsCount', { count: totalJournals })}
         </h2>
+        {/* Bạn có thể thêm lại phần sort ở đây nếu cần */}
       </div>
 
-      {/* THAY ĐỔI TẠI ĐÂY: Thêm grid-auto-rows-fr */}
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 grid-auto-rows-fr'>
-        {journals?.map(journal => (
+        {journals.map(journal => (
           <EventJournalCard
             key={journal.id}
             journal={journal}
@@ -105,4 +106,4 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = () => {
   )
 }
 
-export default ResultsJournalSection
+export default ResultsJournalSection;

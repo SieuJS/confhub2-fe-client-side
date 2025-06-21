@@ -72,7 +72,7 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({
 
   return (
     <div className='container mx-auto px-4 text-base'>
-      <div className='flex flex-wrap items-center justify-center gap-y-2 rounded-full border border-black px-3 py-2 shadow-md'>
+      <div className='flex flex-wrap items-center justify-center gap-y-2 rounded-3xl border border-black px-3 py-2 shadow-md'>
         {/* Search by Title Input */}
         <div className='flex flex-grow basis-full items-center md:basis-auto'>
           <Search className='mr-1 h-5 w-5' />

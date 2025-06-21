@@ -2,25 +2,20 @@
 
 'use client'
 
-import React from 'react'
-import { Header } from '../utils/Header'
-import Footer from '../utils/Footer'
 import About from './about'
 import Support from './support'
-import SupportForm from './supportForm'
-import ContactMethods from './ContactMethods'
+// import SupportForm from './supportForm'
+// import ContactMethods from './ContactMethods'
 import PolicyPage from './policy'
 
 const FAQ = ({ params: { locale } }: { params: { locale: string } }) => {
   return (
     <>
-      <Header locale={locale} />
       <About />
       <PolicyPage />
       <Support />
       {/* <SupportForm /> */}
       {/* <ContactMethods /> */}
-      <Footer />
     </>
   )
 }

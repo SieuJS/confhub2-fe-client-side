@@ -1,58 +1,41 @@
 // src/components/conferences/EventCard.tsx
-import React, { useState, useCallback } from 'react'
-import Image from 'next/image'
-import { ConferenceInfo } from '../../../models/response/conference.list.response'
-import { Link, useRouter } from '@/src/navigation'
-import { useTranslations } from 'next-intl'
-import { useAuth } from '@/src/contexts/AuthContext'
 
-// Import các Lucide icons cần thiết
-import {
-  MapPin,
-  CalendarDays,
-  SquareArrowOutUpRight,
-  CalendarPlus,
-  Star // Star icon cho Favorite/Follow
-} from 'lucide-react' // Đảm bảo bạn đã cài đặt lucide-react
+import React, { useState, useCallback, memo } from 'react'; // Import memo
+import Image from 'next/image';
+import { ConferenceInfo } from '../../../models/response/conference.list.response';
+import { Link, useRouter } from '@/src/navigation';
+import { useTranslations } from 'next-intl';
+import { useAuth } from '@/src/contexts/AuthContext';
+import { MapPin, CalendarDays, SquareArrowOutUpRight, CalendarPlus, Star } from 'lucide-react';
 
 interface EventCardProps {
-  event: ConferenceInfo
-  className?: string
-  style?: React.CSSProperties
-  userBlacklist: string[]
-  // --- PROPS MỚI THAY THẾ CHO HOOKS ---
-  isFollowing: boolean
-  isAddToCalendar: boolean
-  onToggleFollow: (
-    conferenceId: string,
-    currentStatus: boolean
-  ) => Promise<void>
-  onToggleCalendar: (
-    conferenceId: string,
-    currentStatus: boolean
-  ) => Promise<void>
+  event: ConferenceInfo;
+  className?: string;
+  style?: React.CSSProperties;
+  userBlacklist: string[];
+  isFollowing: boolean;
+  isAddToCalendar: boolean;
+  onToggleFollow: (conferenceId: string, currentStatus: boolean) => Promise<void>;
+  onToggleCalendar: (conferenceId: string, currentStatus: boolean) => Promise<void>;
 }
 
-const EventCard: React.FC<EventCardProps> = ({
+// Đặt tên cho component gốc là EventCardComponent
+const EventCardComponent: React.FC<EventCardProps> = ({
   event,
   className,
   style,
   userBlacklist,
-  // --- NHẬN PROPS MỚI ---
   isFollowing,
   isAddToCalendar,
   onToggleFollow,
   onToggleCalendar
 }) => {
-  const t = useTranslations('')
-  const router = useRouter()
-  const { isLoggedIn } = useAuth()
-
-  // State cục bộ để quản lý loading của từng card riêng lẻ
-  const [followLoading, setFollowLoading] = useState(false)
-  const [calendarLoading, setCalendarLoading] = useState(false)
-
-  const isBlacklisted = userBlacklist?.includes(event.id) ?? false
+  const t = useTranslations('');
+  const router = useRouter();
+  const { isLoggedIn } = useAuth();
+  const [followLoading, setFollowLoading] = useState(false);
+  const [calendarLoading, setCalendarLoading] = useState(false);
+  const isBlacklisted = userBlacklist?.includes(event.id) ?? false;
 
   const checkLoginAndRedirect = useCallback(
     (callback: () => void) => {
@@ -229,7 +212,7 @@ const EventCard: React.FC<EventCardProps> = ({
           className={`w-full ${isBlacklisted ? 'grayscale' : 'hover:opacity-90'}`}
           priority
           onError={e => {
-            ;(e.target as HTMLImageElement).src = '/bg-2.jpg'
+            ; (e.target as HTMLImageElement).src = '/bg-2.jpg'
           }}
         />
         <div className='absolute right-2 top-2 flex flex-col items-end space-y-1'>
@@ -404,4 +387,8 @@ const EventCard: React.FC<EventCardProps> = ({
   )
 }
 
-export default EventCard
+// Sử dụng React.memo để bọc component
+export const EventCard = memo(EventCardComponent);
+
+// Giữ lại default export nếu các file khác đang dùng
+export default EventCard;

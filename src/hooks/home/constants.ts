@@ -1,15 +1,81 @@
-import React from 'react'
+// src/components/IntroduceVisualization/constants.ts
+import type { ContinentData, ChartType } from './types'
 
-// Định nghĩa cấu trúc dữ liệu cho mỗi quốc gia/path
-interface CountryData {
-  id: string
-  title: string
-  d: string // Dữ liệu path data
+// Dữ liệu mẫu cho các bộ dữ liệu khác nhau
+export const sampleDataSets: ContinentData[][] = [
+  [
+    { id: 'asia', value: 45, colorHex: '#3b82f6' },
+    { id: 'europe', value: 38, colorHex: '#22c55e' },
+    { id: 'northAmerica', value: 28, colorHex: '#ef4444' },
+    { id: 'southAmerica', value: 15, colorHex: '#eab308' },
+    { id: 'africa', value: 12, colorHex: '#a855f7' },
+    { id: 'oceania', value: 8, colorHex: '#ec4899' }
+  ],
+  [
+    { id: 'asia', value: 50, colorHex: '#3b82f6' },
+    { id: 'europe', value: 35, colorHex: '#22c55e' },
+    { id: 'northAmerica', value: 32, colorHex: '#ef4444' },
+    { id: 'southAmerica', value: 18, colorHex: '#eab308' },
+    { id: 'africa', value: 10, colorHex: '#a855f7' },
+    { id: 'oceania', value: 7, colorHex: '#ec4899' }
+  ],
+  [
+    { id: 'asia', value: 40, colorHex: '#3b82f6' },
+    { id: 'europe', value: 42, colorHex: '#22c55e' },
+    { id: 'northAmerica', value: 25, colorHex: '#ef4444' },
+    { id: 'southAmerica', value: 20, colorHex: '#eab308' },
+    { id: 'africa', value: 15, colorHex: '#a855f7' },
+    { id: 'oceania', value: 9, colorHex: '#ec4899' }
+  ]
+]
+
+// Các loại biểu đồ sẽ được duyệt qua
+export const chartTypes: ChartType[] = ['bar', 'pie', 'line']
+
+
+
+
+
+
+
+
+// ------ Super banner for -----
+
+// --- Framer Motion Animation Variants (Cho các phần tử nội dung chính) ---
+export const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+      delayChildren: 0.3
+    }
+  }
 }
 
-// --- Dữ liệu các Path ---
-// *** Quan trọng: Thêm tất cả các <path> khác từ file SVG gốc vào đây ***
-const countriesData: CountryData[] = [
+export const itemVariants = {
+  hidden: { y: 30, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      duration: 0.6,
+      ease: 'easeOut'
+    }
+  }
+}
+// --- End Variants ---
+
+// --- DỮ LIỆU BẢN ĐỒ VÀ ĐƯỜNG BAY ---
+export interface CountryData {
+  id: string
+  title: string
+  d: string // Dữ liệu đường dẫn SVG (giữ ngắn gọn)
+}
+
+// --- Dữ liệu quốc gia với 'd' ngắn gọn (PLACEHOLDER - THAY BẰNG DỮ LIỆU SVG THỰC) ---
+// Vẫn giữ mảng rỗng vì dữ liệu SVG thực không có trong prompt
+export const countriesData: CountryData[] = [
   {
     d: 'm 479.68275,331.6274 -0.077,0.025 -0.258,0.155 -0.147,0.054 -0.134,0.027 -0.105,-0.011 -0.058,-0.091 0.006,-0.139 -0.024,-0.124 -0.02,-0.067 0.038,-0.181 0.086,-0.097 0.119,-0.08 0.188,0.029 0.398,0.116 0.083,0.109 10e-4,0.072 -0.073,0.119 z',
     title: 'Andorra',
@@ -1291,50 +1357,160 @@ const countriesData: CountryData[] = [
     id: 'ZW'
   }
 ]
-
-// Định nghĩa kiểu cho Props của component WorldMap
-interface WorldMapProps extends React.SVGProps<SVGSVGElement> {
-  coloredCountries?: { [countryId: string]: string }
-  /**
-   * Lớp màu Tailwind mặc định cho các quốc gia không có trong coloredCountries.
-   * @default 'fill-gray-400' // Hoặc màu bạn muốn
-   */
-  defaultColor?: string
+// --- Tọa độ tâm quốc gia (Ước tính - ĐIỀU CHỈNH CẨN THẬN THEO SVG THỰC) ---
+// Giữ nguyên tọa độ
+export const countryCoordinates: { [key: string]: { x: number; y: number } } = {
+  US: { x: 190 + 65, y: 200 + 150 },
+  CA: { x: 180 + 80, y: 130 + 180 },
+  BR: { x: 300 + 35, y: 440 + 60 },
+  MX: { x: 175 + 30, y: 270 + 140 },
+  GB: { x: 445 + 25, y: 145 + 140 },
+  DE: { x: 475 + 25, y: 160 + 140 },
+  FR: { x: 458 + 20, y: 180 + 140 },
+  ES: { x: 435 + 30, y: 205 + 140 },
+  RU: { x: 650 - 30, y: 120 + 140 },
+  CN: { x: 720 + 80, y: 220 + 150 },
+  JP: { x: 840 + 25, y: 210 + 150 },
+  IN: { x: 670 + 25, y: 290 + 120 },
+  VN: { x: 770, y: 402 },
+  KR: { x: 815 + 20, y: 215 + 140 },
+  ZA: { x: 515 + 20, y: 540 + 20 },
+  AU: { x: 830 + 60, y: 500 + 65 }, // Điều chỉnh nếu cần
+  TH: { x: 770 - 10, y: 400 + 25 },
+  NZ: { x: 1000 - 30, y: 600 - 20 },
+  PH: { x: 770 + 45, y: 400 + 25 },
+  AR: { x: 170 + 110, y: 500 + 70 },
+  TW: { x: 770 + 45, y: 400 - 7 },
+  IT: { x: 470 + 50, y: 300 + 40 },
+  CU: { x: 170 + 75, y: 400 }
 }
 
-const WorldMap: React.FC<WorldMapProps> = ({
-  coloredCountries = {}, // Giá trị mặc định là object rỗng
-  defaultColor = 'fill-gray-400', // Màu mặc định nếu không được cung cấp
-  viewBox = '0 0 1009.6727 665.96301', // Đặt viewBox mặc định từ SVG gốc
-  ...restProps // Các props còn lại (className, width, height, aria-label, ...)
-}) => {
-  return (
-    <svg
-      xmlns='http://www.w3.org/2000/svg'
-      viewBox={viewBox} // Rất quan trọng để scale đúng tỷ lệ
-      {...restProps} // Áp dụng các props như className, width, height,... từ component cha
-    >
-      {countriesData.map(country => {
-        // Xác định màu fill: ưu tiên màu trong coloredCountries, nếu không có thì dùng defaultColor
-        const fillColorClass = coloredCountries[country.id] ?? defaultColor
-
-        return (
-          <path
-            key={country.id} // Key là bắt buộc khi dùng map trong React
-            id={country.id}
-            // title={country.title}
-            d={country.d}
-            // Áp dụng lớp màu đã xác định
-            // Bạn có thể thêm các lớp khác nếu muốn (ví dụ: hiệu ứng transition)
-            className={`${fillColorClass} transition-colors duration-150 ease-in-out`}
-            // Có thể thêm onClick handler ở đây nếu cần tương tác
-            // onClick={() => console.log(`Clicked on ${country.title} (${country.id})`)}
-          />
-        )
-      })}
-    </svg>
-  )
+// --- Danh sách chuyến bay ví dụ ---
+export interface Flight {
+  from: string
+  to: string
+  order: number // Thuộc tính thứ tự, CÓ THỂ TRÙNG LẶP
 }
 
-export { countriesData } // Xuất countriesData nếu cần sử dụng ở nơi khác
-export default WorldMap
+// Giữ nguyên danh sách chuyến bay
+export const exampleFlights = [
+  // === Đợt 1 (Order 1) - Khởi hành từ VN ===
+  { from: 'VN', to: 'JP', order: 1 }, // VN -> Nhật Bản
+  { from: 'VN', to: 'AU', order: 1 }, // VN -> Úc
+  { from: 'VN', to: 'US', order: 1 }, // VN -> Mỹ
+  { from: 'VN', to: 'FR', order: 1 }, // VN -> Pháp
+  { from: 'VN', to: 'TH', order: 1 }, // VN -> Thái Lan
+  { from: 'VN', to: 'KR', order: 1 }, // VN -> Hàn Quốc
+  { from: 'VN', to: 'CN', order: 1 }, // VN -> Trung Quốc
+
+  // === Đợt 2 (Order 2) - Khởi hành từ cùng điểm với Order 1 (VN) ===
+  // Logic: Bay từ điểm gốc đợt 1 đến các điểm mới hoặc đã có
+
+  // === Đợt 3 (Order 3) - Khởi hành từ đích của Order 1 ===
+  // Logic: Bay từ các điểm đến của đợt 1 (JP, AU, US, FR, TH, KR, CN)
+  { from: 'JP', to: 'KR', order: 3 }, // Nhật -> Hàn
+  { from: 'JP', to: 'US', order: 3 }, // Nhật -> Mỹ
+  { from: 'JP', to: 'CN', order: 3 }, // Thái -> Trung Quốc
+  { from: 'AU', to: 'NZ', order: 3 }, // Úc -> New Zealand
+  { from: 'AU', to: 'PH', order: 3 }, // Úc -> Philippines
+  { from: 'AU', to: 'CN', order: 3 }, // Hàn -> Trung Quốc
+  { from: 'US', to: 'CA', order: 3 }, // Mỹ -> Canada
+  { from: 'US', to: 'MX', order: 3 }, // Mỹ -> Mexico
+  { from: 'US', to: 'IT', order: 3 }, // Mỹ -> Mexico
+  { from: 'FR', to: 'DE', order: 3 }, // Pháp -> Đức
+  { from: 'FR', to: 'GB', order: 3 }, // Pháp -> Anh
+  { from: 'FR', to: 'TW', order: 3 }, // Pháp -> Anh
+  { from: 'CN', to: 'RU', order: 3 }, // Trung Quốc -> Nga
+  { from: 'CN', to: 'IN', order: 3 }, // Trung Quốc -> Ấn Độ
+  { from: 'CN', to: 'ZA', order: 3 }, // Trung Quốc -> Ấn Độ
+
+  // === Đợt 4 (Order 4) - Khởi hành từ cùng điểm với Order 3 ===
+  // Logic: Bay từ các điểm gốc của đợt 3 (JP, AU, US, FR, TH, KR, CN) đến các điểm mới
+  { from: 'JP', to: 'TW', order: 4 }, // Nhật -> Đài Loan
+  { from: 'JP', to: 'PH', order: 4 }, // Nhật -> Philippines
+  { from: 'AU', to: 'ZA', order: 4 }, // Úc -> Nam Phi
+  { from: 'AU', to: 'VN', order: 4 }, // Úc -> Việt Nam (Quay lại)
+  { from: 'US', to: 'BR', order: 4 }, // Mỹ -> Brazil
+  { from: 'US', to: 'CU', order: 4 }, // Mỹ -> Cuba
+  { from: 'FR', to: 'ES', order: 4 }, // Pháp -> Tây Ban Nha
+  { from: 'FR', to: 'IT', order: 4 }, // Pháp -> Ý
+  { from: 'TH', to: 'IN', order: 4 }, // Thái -> Ấn Độ
+  { from: 'KR', to: 'VN', order: 4 }, // Hàn -> Việt Nam (Quay lại)
+  { from: 'CN', to: 'JP', order: 4 }, // Trung Quốc -> Nhật (Quay lại)
+  { from: 'CN', to: 'KR', order: 4 }, // Trung Quốc -> Hàn (Quay lại)
+
+  // === Đợt 5 (Order 5) - Khởi hành từ đích của Order 3 ===
+  // Logic: Bay từ các điểm đến của đợt 3 (KR, US, NZ, PH, CA, MX, DE, GB, CN, RU, IN)
+  { from: 'KR', to: 'JP', order: 5 }, // Hàn -> Nhật
+  { from: 'US', to: 'GB', order: 5 }, // Mỹ -> Anh
+  { from: 'NZ', to: 'AU', order: 5 }, // New Zealand -> Úc
+  { from: 'PH', to: 'TW', order: 5 }, // Philippines -> Đài Loan
+  { from: 'CA', to: 'US', order: 5 }, // Canada -> Mỹ
+  { from: 'MX', to: 'CU', order: 5 }, // Mexico -> Cuba
+  { from: 'DE', to: 'IT', order: 5 }, // Đức -> Ý
+  { from: 'GB', to: 'FR', order: 5 }, // Anh -> Pháp
+  { from: 'CN', to: 'TH', order: 5 }, // Trung Quốc -> Thái
+  { from: 'RU', to: 'DE', order: 5 }, // Nga -> Đức
+  { from: 'IN', to: 'ZA', order: 5 }, // Ấn Độ -> Nam Phi
+
+  // === Đợt 6 (Order 6) - Khởi hành từ cùng điểm với Order 5 ===
+  // Logic: Bay từ các điểm gốc của đợt 5 (KR, US, NZ, PH, CA, MX, DE, GB, CN, RU, IN)
+  { from: 'KR', to: 'RU', order: 6 }, // Hàn -> Nga
+  { from: 'US', to: 'AR', order: 6 }, // Mỹ -> Argentina
+  { from: 'NZ', to: 'US', order: 6 }, // New Zealand -> Mỹ
+  { from: 'PH', to: 'VN', order: 6 }, // Philippines -> Việt Nam
+  { from: 'CA', to: 'GB', order: 6 }, // Canada -> Anh
+  { from: 'MX', to: 'BR', order: 6 }, // Mexico -> Brazil
+  { from: 'DE', to: 'ES', order: 6 }, // Đức -> Tây Ban Nha
+  { from: 'GB', to: 'DE', order: 6 }, // Anh -> Đức
+  { from: 'CN', to: 'VN', order: 6 }, // Trung Quốc -> Việt Nam
+  { from: 'RU', to: 'KR', order: 6 }, // Nga -> Hàn
+  { from: 'IN', to: 'AU', order: 6 }, // Ấn Độ -> Úc
+
+  // === Đợt 7 (Order 7) - Khởi hành từ đích của Order 5 ===
+  // Logic: Bay từ các điểm đến của đợt 5 (JP, GB, AU, TW, US, CU, IT, FR, TH, DE, ZA)
+  { from: 'JP', to: 'CN', order: 7 }, // Nhật -> Trung Quốc
+  { from: 'GB', to: 'US', order: 7 }, // Anh -> Mỹ
+  { from: 'AU', to: 'IN', order: 7 }, // Úc -> Ấn Độ
+  { from: 'TW', to: 'PH', order: 7 }, // Đài Loan -> Philippines
+  { from: 'US', to: 'MX', order: 7 }, // Mỹ -> Mexico
+  { from: 'CU', to: 'US', order: 7 }, // Cuba -> Mỹ
+  { from: 'IT', to: 'FR', order: 7 }, // Ý -> Pháp
+  { from: 'FR', to: 'ES', order: 7 }, // Pháp -> Tây Ban Nha
+  { from: 'TH', to: 'VN', order: 7 }, // Thái -> Việt Nam
+  { from: 'DE', to: 'GB', order: 7 }, // Đức -> Anh
+  { from: 'ZA', to: 'BR', order: 7 } // Nam Phi -> Brazil
+
+  // === Đợt 8 (Order 8) - Khởi hành từ cùng điểm với Order 7 ===
+  // Logic: Bay từ các điểm gốc của đợt 7 (JP, GB, AU, TW, US, CU, IT, FR, TH, DE, ZA)
+  // { from: 'JP', to: 'KR', order: 8 }, // Nhật -> Hàn
+  // { from: 'GB', to: 'CA', order: 8 }, // Anh -> Canada
+  // { from: 'AU', to: 'NZ', order: 8 }, // Úc -> New Zealand
+  // { from: 'TW', to: 'CN', order: 8 }, // Đài Loan -> Trung Quốc
+  // { from: 'US', to: 'CA', order: 8 }, // Mỹ -> Canada
+  // { from: 'CU', to: 'MX', order: 8 }, // Cuba -> Mexico
+  // { from: 'IT', to: 'DE', order: 8 }, // Ý -> Đức
+  // { from: 'FR', to: 'DE', order: 8 }, // Pháp -> Đức
+  // { from: 'TH', to: 'PH', order: 8 }, // Thái -> Philippines
+  // { from: 'DE', to: 'RU', order: 8 }, // Đức -> Nga
+  // { from: 'ZA', to: 'AU', order: 8 } // Nam Phi -> Úc
+]
+
+// --- Component WorldMap ---
+export interface WorldMapProps extends React.SVGProps<SVGSVGElement> {
+  flights?: Flight[]
+  coordinates?: { [key: string]: { x: number; y: number } }
+}
+
+// --- Hằng số Thời gian Animation (tính bằng giây) ---
+export const drawDuration = 2.2 // Thời gian vẽ đường bay
+export const waitDuration = -0.5 // Thời gian chờ sau khi vẽ xong (âm để thu gọn sớm)
+export const shrinkDuration = 2.0 // Thời gian đuôi thu gọn
+export const fadeOutDelay = 0.1 // Độ trễ nhỏ trước khi fade out khi thu gọn
+export const rippleDuration = 1.0 // Thời gian hiệu ứng sóng
+export const rippleDelayBetween = rippleDuration / 2.5 // Độ trễ giữa 2 vòng sóng
+export const baseInitialDelay = 0.5 // Delay cơ bản ban đầu cho nhóm order đầu tiên
+export const delayBetweenOrders = 1.1 // Khoảng cách thời gian cố định (1 giây) giữa các nhóm order
+
+// --- TÍNH TOÁN: Tổng thời gian 1 chu kỳ animation cho đường bay ---
+export const totalPathCycleDuration = drawDuration + waitDuration + shrinkDuration

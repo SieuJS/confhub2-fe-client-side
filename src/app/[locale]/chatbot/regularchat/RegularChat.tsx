@@ -63,7 +63,7 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
     }
   }, [messageLoadingState.isLoading, showConfirmationDialog, stopTimer, timeCounter]);
 
-  const showIntroduction = !activeConversationId && chatMessages.length === 0 && !isLoadingHistory;
+  const showIntroduction = chatMessages.length === 0 && !isLoadingHistory;
   const shouldShowToolbar = activeConversationId && (!isSmallContext || (isSmallContext && !isConversationToolbarHiddenInFloatingChat));
   const showLoadingIndicator = (messageLoadingState.isLoading || isLoadingHistory) && !showConfirmationDialog;
 
@@ -77,7 +77,7 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
     handleSendNewFilesAndMessage(message, files, shouldUsePageContext); // <<< TRUYỀN THAM SỐ THỨ 3
     // setChatInputValue(''); // Xóa input sau khi gửi
   };
-  
+
   return (
     <div className='bg-white-pure relative mx-auto flex h-full w-full flex-col overflow-hidden border border-gray-200 shadow-lg dark:bg-gray-850 dark:border-gray-700'>
       {/* Header: Connection Status */}

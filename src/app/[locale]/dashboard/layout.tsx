@@ -1,32 +1,10 @@
+// src/app/[locale]/dashboard/layout.tsx (CHỈNH SỬA)
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Header } from '@/src/app/[locale]/utils/Header';
-import ClientDashboardSidebar from './ClientDasboardSidebar'; // Import sidebar của Client
-
-// Một custom hook đơn giản để theo dõi kích thước màn hình
-// Điều này giúp chúng ta đặt trạng thái mở/đóng mặc định cho sidebar một cách chính xác
-const useMediaQuery = (query: string) => {
-  const [matches, setMatches] = useState(false);
-
-  useEffect(() => {
-    // Đảm bảo code chỉ chạy ở phía client
-    if (typeof window !== 'undefined') {
-      const media = window.matchMedia(query);
-      if (media.matches !== matches) {
-        setMatches(media.matches);
-      }
-      const listener = () => {
-        setMatches(media.matches);
-      };
-      media.addEventListener('change', listener);
-      return () => media.removeEventListener('change', listener);
-    }
-  }, [matches, query]);
-
-  return matches;
-};
-
+import React from 'react';
+import ClientDashboardSidebar from './ClientDashboardSidebar';
+import { useSidebar } from '@/src/contexts/SidebarContext';
 
 export default function ClientDashboardLayout({
   children,
@@ -36,38 +14,17 @@ export default function ClientDashboardLayout({
   params: { locale: string };
 }) {
   const SIDEBAR_WIDTH_PX = 256;
-  const HEADER_HEIGHT_PX = 72;
+  const HEADER_HEIGHT_PX = 60;
 
-  // Sử dụng hook để xác định có phải màn hình desktop hay không (>= 768px)
-  const isDesktop = useMediaQuery('(min-width: 768px)');
-
-  // Mặc định sidebar mở trên desktop và đóng trên mobile
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
-  // Đồng bộ trạng thái isSidebarOpen với kích thước màn hình khi component được mount
-  // và khi kích thước màn hình thay đổi
-  useEffect(() => {
-    setIsSidebarOpen(isDesktop);
-  }, [isDesktop]);
-
-
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  const { isSidebarOpen, toggleSidebar } = useSidebar();
 
   return (
-    <div className='relative min-h-screen bg-background'>
-      <Header
-        locale={locale}
-        toggleSidebar={toggleSidebar}
-        isSidebarOpen={isSidebarOpen}
-      />
-
-      {/* Lớp phủ (backdrop) chỉ hiển thị trên mobile khi sidebar mở */}
-      {isSidebarOpen && !isDesktop && (
+    <div className='relative flex'>
+      {/* Backdrop cho mobile (giữ nguyên) */}
+      {isSidebarOpen && (
         <div
           onClick={toggleSidebar}
-          className="fixed inset-0 bg-black/50 z-20 md:hidden"
+          className="fixed inset-0 z-20 bg-black/50 md:hidden"
           aria-hidden="true"
         />
       )}
@@ -79,21 +36,29 @@ export default function ClientDashboardLayout({
         headerHeight={HEADER_HEIGHT_PX}
       />
 
-      {/* Main Content (Nội dung chính) */}
-      <main
-        className="transition-all duration-300 ease-in-out"
-        style={{
-          paddingTop: `${HEADER_HEIGHT_PX}px`,
-          // SỬ DỤNG TAILWIND CLASS ĐỂ THAY THẾ CHO INLINE STYLE
-          // Chỉ áp dụng padding-left trên màn hình md trở lên khi sidebar mở
-          // Sử dụng giá trị tùy ý của Tailwind: md:pl-[256px]
-          paddingLeft: isSidebarOpen && isDesktop ? `${SIDEBAR_WIDTH_PX}px` : '0px',
-        }}
+      {/* Main Content Wrapper */}
+      {/* THAY ĐỔI: Áp dụng padding-left động cho màn hình lớn */}
+      <div
+        className={`
+          flex-1 transition-all duration-300 ease-in-out
+          ${isSidebarOpen ? `md:pl-[${SIDEBAR_WIDTH_PX}px]` : 'md:pl-0'}
+        `}
+        // GIẢI THÍCH:
+        // - Chúng ta sử dụng class động của Tailwind.
+        // - Khi isSidebarOpen là true, trên màn hình md trở lên, nó sẽ thêm class `md:pl-[256px]`.
+        // - Khi isSidebarOpen là false, trên màn hình md trở lên, nó sẽ thêm class `md:pl-0`.
+        // - `transition-all` sẽ tạo hiệu ứng trượt mượt mà cho nội dung.
+        // - Ở màn hình nhỏ, không có class nào được áp dụng, nên padding-left luôn là 0.
       >
-        <div className="p-4 md:p-6">
+        {/* THAY ĐỔI: Loại bỏ padding-left tĩnh ở đây */}
+        <div className={`p-4 pt-[${HEADER_HEIGHT_PX}px] md:p-6 md:pt-[${HEADER_HEIGHT_PX}px]`}>
+          {/* GIẢI THÍCH:
+              Loại bỏ `md:pl-[${SIDEBAR_WIDTH_PX}px]` khỏi đây vì logic đó đã được chuyển lên
+              component cha (wrapper ở trên) để điều khiển động.
+          */}
           {children}
         </div>
-      </main>
+      </div>
     </div>
   );
 }
