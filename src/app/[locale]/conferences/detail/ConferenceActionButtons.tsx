@@ -1,5 +1,3 @@
-// src/app/[locale]/conferences/detail/ConferenceActionButtons.tsx (HOÀN CHỈNH)
-
 import React, { useState, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import Button from '@/src/app/[locale]/utils/Button'
@@ -15,7 +13,7 @@ import {
   RefreshCcw,
   ExternalLink,
   Ban,
-  Loader2, // Import icon loading
+  Loader2 // Import icon loading
 } from 'lucide-react'
 
 interface ConferenceActionButtonsProps {
@@ -33,7 +31,7 @@ interface ConferenceActionButtonsProps {
   isBlacklisted: boolean
   handleBlacklistClick: () => void
   blacklistLoading: boolean
-  isAuthInitializing: boolean; // Prop mới
+  isAuthInitializing: boolean // Prop mới
   checkLoginAndRedirect: (callback: () => void) => void
 }
 
@@ -53,7 +51,7 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
   handleBlacklistClick,
   blacklistLoading,
   isAuthInitializing,
-  checkLoginAndRedirect,
+  checkLoginAndRedirect
 }) => {
   const t = useTranslations('ConferenceDetail')
   const [openMenu, setOpenMenu] = useState<'share' | null>(null)
@@ -71,11 +69,8 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
 
   const handleBlacklistWithCheck = () => {
     if (!isBlacklisted && (isFollowing || isAddToCalendar)) {
-      // ==================================================================
-      // THAY ĐỔI: SỬ DỤNG NOTIFICATION.WARNING THAY CHO ALERT
-      // ==================================================================
       notification.warning(t('Blacklist_Requires_Unfollow_Calendar'))
-      return // Dừng hành động blacklist
+      return
     }
     handleBlacklistClick()
   }
@@ -168,15 +163,29 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
     )
   }
 
-  // --- LOGIC TỐI ƯU ---
-  // Tạo một biến để kiểm soát trạng thái disabled chung cho các nút cần xác thực
-  const authDependentButtonsDisabled = isAuthInitializing || isBlacklisted;
+  // ==================================================================
+  // SỬA LỖI: TÁCH BIỆT LOGIC VÔ HIỆU HÓA
+  // Biến này chỉ dùng cho các nút bị ảnh hưởng bởi hành động Blacklist
+  const otherButtonsDisabled = isAuthInitializing || isBlacklisted
+  // ==================================================================
 
   const blacklistTooltip = t('Remove_Blacklist_First_Tooltip')
 
   // Component con để hiển thị icon hoặc spinner
-  const ActionIcon = ({ isLoading, IconComponent, ...props }: { isLoading: boolean, IconComponent: React.ElementType, [key: string]: any }) => {
-    return isLoading ? <Loader2 {...props} className="animate-spin" /> : <IconComponent {...props} />;
+  const ActionIcon = ({
+    isLoading,
+    IconComponent,
+    ...props
+  }: {
+    isLoading: boolean
+    IconComponent: React.ElementType
+    [key: string]: any
+  }) => {
+    return isLoading ? (
+      <Loader2 {...props} className='animate-spin' />
+    ) : (
+      <IconComponent {...props} />
+    )
   }
 
   return (
@@ -188,17 +197,32 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
           variant={isAddToCalendar ? 'primary' : 'secondary'}
           size='small'
           className='flex flex-grow items-center justify-center gap-x-2 md:flex-grow-0 md:justify-start'
-          title={authDependentButtonsDisabled && !isBlacklisted ? t('Authenticating') : isBlacklisted ? blacklistTooltip : isAddToCalendar ? t('Remove_from_Calendar_Tooltip') : t('Add_to_Calendar_Tooltip')}
-          disabled={authDependentButtonsDisabled || calendarLoading}
+          title={
+            isAuthInitializing
+              ? t('Authenticating')
+              : isBlacklisted
+                ? blacklistTooltip
+                : isAddToCalendar
+                  ? t('Remove_from_Calendar_Tooltip')
+                  : t('Add_to_Calendar_Tooltip')
+          }
+          disabled={otherButtonsDisabled || calendarLoading}
         >
-          <ActionIcon isLoading={calendarLoading} IconComponent={CalendarDays} size={18} />
+          <ActionIcon
+            isLoading={calendarLoading}
+            IconComponent={CalendarDays}
+            size={18}
+          />
           <span className='hidden sm:inline'>
             {isAddToCalendar ? t('Added_Button') : t('Calendar_Button')}
           </span>
         </Button>
 
         {/* Share Button */}
-        <div className='relative flex flex-grow md:flex-grow-0' ref={menuContainerRef}>
+        <div
+          className='relative flex flex-grow md:flex-grow-0'
+          ref={menuContainerRef}
+        >
           <Button
             onClick={() => checkLoginAndRedirect(toggleShareMenu)}
             variant='secondary'
@@ -207,7 +231,7 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
             aria-haspopup='true'
             aria-expanded={openMenu === 'share'}
             title={isBlacklisted ? blacklistTooltip : t('Share_Tooltip')}
-            disabled={isBlacklisted} // Share không cần auth, chỉ cần không bị blacklist
+            disabled={isBlacklisted} // Share chỉ cần check blacklist, không cần auth
           >
             <Share2 size={18} />
             <span className='hidden sm:inline'>{t('Share_Button')}</span>
@@ -221,10 +245,22 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
           variant={isFollowing ? 'primary' : 'secondary'}
           size='small'
           className='flex flex-grow items-center justify-center gap-x-2 md:flex-grow-0 md:justify-start'
-          title={authDependentButtonsDisabled && !isBlacklisted ? t('Authenticating') : isBlacklisted ? blacklistTooltip : isFollowing ? t('Unfollow_Tooltip') : t('Follow_Tooltip')}
-          disabled={authDependentButtonsDisabled || followLoading}
+          title={
+            isAuthInitializing
+              ? t('Authenticating')
+              : isBlacklisted
+                ? blacklistTooltip
+                : isFollowing
+                  ? t('Unfollow_Tooltip')
+                  : t('Follow_Tooltip')
+          }
+          disabled={otherButtonsDisabled || followLoading}
         >
-          <ActionIcon isLoading={ followLoading} IconComponent={Star} size={18} />
+          <ActionIcon
+            isLoading={followLoading}
+            IconComponent={Star}
+            size={18}
+          />
           <span className='hidden sm:inline'>
             {isFollowing ? t('Followed_Button') : t('Follow_Button')}
           </span>
@@ -234,12 +270,29 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
         <Button
           variant={'secondary'}
           size='small'
-          onClick={() => checkLoginAndRedirect(() => updateConference(conferenceId))}
+          onClick={() =>
+            checkLoginAndRedirect(() => updateConference(conferenceId))
+          }
           className='flex flex-grow items-center justify-center gap-x-2 md:flex-grow-0 md:justify-start'
-          title={authDependentButtonsDisabled && !isBlacklisted ? t('Authenticating') : isBlacklisted ? blacklistTooltip : t('Update_Tooltip')}
-          disabled={authDependentButtonsDisabled || isUpdating || !conferenceId || !displayOrganization?.link}
+          title={
+            isAuthInitializing
+              ? t('Authenticating')
+              : isBlacklisted
+                ? blacklistTooltip
+                : t('Update_Tooltip')
+          }
+          disabled={
+            otherButtonsDisabled ||
+            isUpdating ||
+            !conferenceId ||
+            !displayOrganization?.link
+          }
         >
-          <ActionIcon isLoading={isUpdating} IconComponent={RefreshCcw} size={18} />
+          <ActionIcon
+            isLoading={isUpdating}
+            IconComponent={RefreshCcw}
+            size={18}
+          />
           <span className='hidden sm:inline'>
             {isUpdating ? t('Updating_Button') : t('Update_Button')}
           </span>
@@ -255,16 +308,15 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
                 'noopener noreferrer'
               )
             } else {
-              // ==================================================================
-              // THAY ĐỔI: SỬ DỤNG NOTIFICATION.INFO THAY CHO ALERT
-              // ==================================================================
               notification.info(t('Website_link_is_not_available'))
             }
           }}
           variant={'secondary'}
           size='small'
           className='flex flex-grow items-center justify-center gap-x-2 md:flex-grow-0 md:justify-start'
-          title={isBlacklisted ? blacklistTooltip : t('Go_to_conference_website')}
+          title={
+            isBlacklisted ? blacklistTooltip : t('Go_to_conference_website')
+          }
           disabled={!displayOrganization?.link || isBlacklisted}
         >
           <ExternalLink size={18} />
@@ -277,10 +329,24 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
           variant={isBlacklisted ? 'danger' : 'secondary'}
           size='small'
           className='flex flex-grow items-center justify-center gap-x-2 md:flex-grow-0 md:justify-start'
-          title={authDependentButtonsDisabled && !isBlacklisted ? t('Authenticating') : isBlacklisted ? t('Remove_from_Blacklist_Tooltip') : t('Add_to_Blacklist_Tooltip')}
-          disabled={authDependentButtonsDisabled || blacklistLoading}
+          title={
+            isAuthInitializing
+              ? t('Authenticating')
+              : isBlacklisted
+                ? t('Remove_from_Blacklist_Tooltip')
+                : t('Add_to_Blacklist_Tooltip')
+          }
+          // ==================================================================
+          // SỬA LỖI: Chỉ vô hiệu hóa khi đang xác thực hoặc đang loading,
+          // KHÔNG vô hiệu hóa khi isBlacklisted = true
+          // ==================================================================
+          disabled={isAuthInitializing || blacklistLoading}
         >
-          <ActionIcon isLoading={ blacklistLoading} IconComponent={Ban} size={18} />
+          <ActionIcon
+            isLoading={blacklistLoading}
+            IconComponent={Ban}
+            size={18}
+          />
           <span className='hidden sm:inline'>
             {isBlacklisted ? t('Blacklisted_Button') : t('Blacklist_Button')}
           </span>

@@ -1895,7 +1895,8 @@
     "Blacklist_Button": "Blacklist",
     "Share_on_Facebook": "Share on Facebook",
     "Share_on_X": "Share on X",
-    "Share_on_Reddit": "Share on Reddit"
+    "Share_on_Reddit": "Share on Reddit",
+    "Authenticating": "Authenticating..."
   },
   "Summary": "Summary",
   "Write_a_brief_summary_of_the_conference": "Write a brief summary of the conference here...",
@@ -1917,5 +1918,14 @@
   "Start_a_new_chat_to_see_it_here": "Start a new chat to see it here",
   "Try_different_keywords": "Try different keywords",
   "Call_for_papers_link_cannot_be_the_same_as_the_official_website": "Call for papers link cannot be the same as the official website.",
-  "Call_for_papers_and_important_dates_links_cannot_be_the_same": "Call for papers and important dates links cannot be the same."
+  "Call_for_papers_and_important_dates_links_cannot_be_the_same": "Call for papers and important dates links cannot be the same.",
+  "light": "Light",
+  "dark": "Dark",
+  "system": "System",
+  "instagram": "Instagram",
+  "facebook": "Facebook",
+  "discord": "Discord",
+  "netflix": "Netflix",
+  "twillight": "Twilight",
+  "reddit": "Reddit"
 }
