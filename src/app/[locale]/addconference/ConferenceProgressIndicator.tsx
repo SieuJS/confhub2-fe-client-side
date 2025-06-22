@@ -36,10 +36,16 @@ const ConferenceProgressIndicator: React.FC<
     IconComponent: React.ElementType
     hasLineBefore?: boolean
     hasLineAfter?: boolean
-  }> = ({ stepNumber, titleKey, IconComponent, hasLineBefore, hasLineAfter }) => (
+  }> = ({
+    stepNumber,
+    titleKey,
+    IconComponent,
+    hasLineBefore,
+    hasLineAfter
+  }) => (
     <div className={getStepClasses(stepNumber)}>
       {hasLineBefore && (
-        <div className='mr-6 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
+        <div className='mr-6 hidden h-0.5 w-full bg-gray-30 lg:block'></div>
       )}
       <span className={getIconRingClasses(stepNumber)}>
         {/* Sử dụng IconComponent đã import */}
@@ -49,7 +55,7 @@ const ConferenceProgressIndicator: React.FC<
         <h3 className='font-medium leading-tight'>{t(titleKey)}</h3>
       </div>
       {hasLineAfter && (
-        <div className='ml-2 hidden h-0.5 w-full bg-gray-300 lg:block'></div>
+        <div className='ml-2 hidden h-0.5 w-full bg-gray-30 lg:block'></div>
       )}
     </div>
   )

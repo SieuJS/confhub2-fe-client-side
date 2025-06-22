@@ -156,7 +156,7 @@ const PolicyPage: React.FC = () => {
                     key={section.id}
                     onClick={() => setActiveTab(section.id)}
                     className={clsx(
-                      'group inline-flex items-center border-b-2 px-1 py-4  font-medium transition-colors duration-200 focus:outline-none',
+                      'group inline-flex items-center border-b-2 px-1 py-4  font-semibold transition-colors duration-200 focus:outline-none',
                       activeTab === section.id
                         ? 'border-secondary text-secondary'
                         : 'border-transparent  hover:border-gray-300 hover:text-gray-70'

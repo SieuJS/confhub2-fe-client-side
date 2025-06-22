@@ -1915,5 +1915,7 @@
   "Deleting_conversation_ellipsis": "Đang xóa cuộc trò chuyện...",
   "History_Loading_Message": "Đang tải các cuộc trò chuyện của bạn...",
   "Start_a_new_chat_to_see_it_here": "Bắt đầu cuộc trò chuyện mới để xem ở đây.",
-  "Try_different_keywords": "Hãy thử các từ khóa khác"
+  "Try_different_keywords": "Hãy thử các từ khóa khác",
+  "Call_for_papers_link_cannot_be_the_same_as_the_official_website": "Liên kết kêu gọi bài báo không thể giống với liên kết trang web chính thức của hội nghị.",
+  "Call_for_papers_and_important_dates_links_cannot_be_the_same_as_the_official_website": "Liên kết kêu gọi bài báo và các liên kết ngày quan trọng không thể giống với liên kết trang web chính thức của hội nghị."
 }

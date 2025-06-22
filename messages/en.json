@@ -1915,5 +1915,7 @@
   "Deleting_conversation_ellipsis": "Deleting conversation...",
   "History_Loading_Message": "Loading your conversations...",
   "Start_a_new_chat_to_see_it_here": "Start a new chat to see it here",
-  "Try_different_keywords": "Try different keywords"
+  "Try_different_keywords": "Try different keywords",
+  "Call_for_papers_link_cannot_be_the_same_as_the_official_website": "Call for papers link cannot be the same as the official website.",
+  "Call_for_papers_and_important_dates_links_cannot_be_the_same": "Call for papers and important dates links cannot be the same."
 }

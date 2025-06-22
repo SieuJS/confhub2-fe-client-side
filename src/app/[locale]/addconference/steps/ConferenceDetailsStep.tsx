@@ -114,7 +114,7 @@ export const TextInput: React.FC<{
           {error}
         </p>
       ) : helperText ? (
-        <p className='mt-2 text-xs text-gray-500'>{t(helperText)}</p>
+        <p className='mt-2 text-xs '>{t(helperText)}</p>
       ) : null}
     </div>
   )
