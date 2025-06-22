@@ -1,5 +1,5 @@
 // src/app/[locale]/chatbot/regularchat/ChatInput.tsx
-import React, { useRef, useEffect, useCallback, useState } from 'react' // Thêm useState
+import React, { useRef, useEffect, useCallback, useState } from 'react'
 import TextareaAutosize from 'react-textarea-autosize'
 import Button from '../../utils/Button'
 import { GrSend } from 'react-icons/gr'
@@ -10,15 +10,18 @@ import {
   ImageIcon,
   AlertTriangle,
   Info
-} from 'lucide-react' // Thêm Info
+} from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { usePageContextStore } from '@/src/app/[locale]/chatbot/stores/pageContextStore' // <<< IMPORT MỚI
+import { usePageContextStore } from '@/src/app/[locale]/chatbot/stores/pageContextStore'
 import {
   CURRENT_PAGE_CONTEXT_COMMAND,
   CURRENT_PAGE_CONTEXT_SUGGESTION_KEY,
   CURRENT_PAGE_CONTEXT_INFO_TEXT_KEY,
   CURRENT_PAGE_CONTEXT_DISABLED_TEXT_KEY
-} from '@/src/app/[locale]/chatbot/lib/constants' // <<< IMPORT MỚI
+} from '@/src/app/[locale]/chatbot/lib/constants'
+
+// Import Modal component
+import Modal from '@/src/app/[locale]/chatbot/Modal' // Đảm bảo đường dẫn đúng
 
 const ACCEPTED_FILE_TYPES = 'image/jpeg,image/png,application/pdf,text/csv'
 const MAX_FILE_SIZE_MB = 50
@@ -31,7 +34,7 @@ interface ChatInputProps {
     message: string,
     files: File[],
     shouldUsePageContext: boolean
-  ) => void // <<< THAY ĐỔI SIGNATURE
+  ) => void
   onRegisterFillFunction: (fillFunc: (text: string) => void) => void
   disabled?: boolean
 }
@@ -45,7 +48,7 @@ const getFileIcon = (mimeType: string) => {
 
 const ChatInput: React.FC<ChatInputProps> = ({
   inputValue,
-  onInputChange, // Prop này vẫn cần thiết để ChatInput có thể tự cập nhật giá trị của nó
+  onInputChange,
   onSendFilesAndMessage,
   onRegisterFillFunction,
   disabled = false
@@ -61,6 +64,11 @@ const ChatInput: React.FC<ChatInputProps> = ({
     string | null
   >(null)
 
+  // State cho Modal thông báo lỗi
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalTitle, setModalTitle] = useState('')
+  const [modalMessage, setModalMessage] = useState('')
+
   const {
     isCurrentPageFeatureEnabled,
     isContextAttachedNextSend,
@@ -72,7 +80,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
     const fillFunc = (text: string) => {
       if (!disabled) {
         onInputChange(text)
-        // Nếu text được fill có @currentpage, xử lý nó
         if (
           text.includes(CURRENT_PAGE_CONTEXT_COMMAND) &&
           isCurrentPageFeatureEnabled
@@ -115,7 +122,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
         setShowContextSuggestions(false)
       }
 
-      // Tự động bật/tắt cờ isContextAttachedNextSend dựa trên input
       if (
         value.includes(CURRENT_PAGE_CONTEXT_COMMAND) &&
         isCurrentPageFeatureEnabled
@@ -125,7 +131,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
         !value.includes(CURRENT_PAGE_CONTEXT_COMMAND) &&
         isContextAttachedNextSend
       ) {
-        // Nếu người dùng xóa @currentpage khỏi input, tắt cờ
         resetContextAttachedNextSend()
       }
     },
@@ -142,7 +147,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const handleSelectSuggestion = (suggestion: string) => {
     if (suggestion === CURRENT_PAGE_CONTEXT_COMMAND) {
       if (isCurrentPageFeatureEnabled) {
-        // Thêm command vào input, đảm bảo có khoảng trắng nếu input chưa có
         const currentVal = inputValue.endsWith('@')
           ? inputValue.slice(0, -1)
           : inputValue
@@ -154,19 +158,24 @@ const ChatInput: React.FC<ChatInputProps> = ({
           ' '
         onInputChange(newVal)
         toggleContextAttachedNextSend(true)
-        setContextSuggestionMessage(null) // Xóa thông báo lỗi (nếu có)
+        setContextSuggestionMessage(null)
       } else {
-        // Hiển thị thông báo lỗi ngắn gọn nếu tính năng bị vô hiệu hóa
         setContextSuggestionMessage(t(CURRENT_PAGE_CONTEXT_DISABLED_TEXT_KEY))
-        setTimeout(() => setContextSuggestionMessage(null), 3000) // Tự ẩn sau 3s
+        setTimeout(() => setContextSuggestionMessage(null), 3000)
       }
     }
     setShowContextSuggestions(false)
     inputRef.current?.focus()
   }
 
+  // Hàm hiển thị Modal
+  const showAlertDialog = (title: string, message: string) => {
+    setModalTitle(title)
+    setModalMessage(message)
+    setIsModalOpen(true)
+  }
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // ... (giữ nguyên logic file change)
     if (event.target.files) {
       const newFiles = Array.from(event.target.files)
       let validFiles: File[] = []
@@ -176,14 +185,18 @@ const ChatInput: React.FC<ChatInputProps> = ({
       newFiles.forEach(file => {
         if (selectedFiles.length + validFiles.length >= MAX_TOTAL_FILES) {
           if (!alertShownForMaxFiles) {
-            alert(t('ChatInput_Error_MaxFiles', { max: MAX_TOTAL_FILES }))
+            showAlertDialog(
+              t('ChatInput_Error_Title_MaxFiles'), // Tiêu đề mới cho Modal
+              t('ChatInput_Error_MaxFiles', { max: MAX_TOTAL_FILES })
+            )
             alertShownForMaxFiles = true
           }
           return
         }
         if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
           if (!alertShownForSize) {
-            alert(
+            showAlertDialog(
+              t('ChatInput_Error_Title_FileSize'), // Tiêu đề mới cho Modal
               t('ChatInput_Error_FileSize', {
                 name: file.name,
                 maxSize: MAX_FILE_SIZE_MB
@@ -214,16 +227,12 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const handleSendMessageInternal = useCallback(() => {
     let messageToSend = inputValue.trim()
     let shouldUseContext = false
-    let originalInputHadContextCommand = false // Cờ mới để theo dõi
+    let originalInputHadContextCommand = false
 
     if (isContextAttachedNextSend && isCurrentPageFeatureEnabled) {
       if (inputValue.includes(CURRENT_PAGE_CONTEXT_COMMAND)) {
-        // Kiểm tra inputValue gốc
         shouldUseContext = true
         originalInputHadContextCommand = true
-        // Xóa command khỏi message người dùng sẽ thấy và LLM nhận (phần query)
-        // Chỉ xóa command nếu nó thực sự là một phần của message, không phải toàn bộ message
-        // Nếu inputValue CHỈ là "@currentpage" hoặc "@currentpage ", messageToSend sẽ là ""
         const commandPattern = new RegExp(
           CURRENT_PAGE_CONTEXT_COMMAND.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') +
             '\\s*',
@@ -231,7 +240,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
         )
         messageToSend = inputValue.replace(commandPattern, '').trim()
       } else {
-        resetContextAttachedNextSend() // Cờ bật nhưng command không có, reset cờ
+        resetContextAttachedNextSend()
       }
     }
 
@@ -239,28 +248,20 @@ const ChatInput: React.FC<ChatInputProps> = ({
       !disabled &&
       (messageToSend || selectedFiles.length > 0 || shouldUseContext)
     ) {
-      // Thêm điều kiện shouldUseContext
       onSendFilesAndMessage(messageToSend, selectedFiles, shouldUseContext)
       setSelectedFiles([])
 
-      // Quyết định nội dung input mới sau khi gửi
       if (shouldUseContext && originalInputHadContextCommand) {
-        // Nếu context đã được sử dụng và command có trong input gốc,
-        // giữ lại command trong input cho lần gửi tiếp theo.
         onInputChange(CURRENT_PAGE_CONTEXT_COMMAND + ' ')
-        // Không cần gọi toggleContextAttachedNextSend(true) vì nó đã được xử lý bởi onInputChange
       } else {
-        // Nếu không dùng context, hoặc command không có sẵn, xóa input
         onInputChange('')
-        resetContextAttachedNextSend() // Đảm bảo cờ được reset nếu không giữ lại command
+        resetContextAttachedNextSend()
       }
 
       if (inputRef.current) {
         inputRef.current.style.height = 'auto'
       }
     }
-    // Không cần xử lý trường hợp chỉ có @currentpage và không có text/file khác ở đây nữa,
-    // vì logic trên đã bao gồm (messageToSend có thể rỗng nếu input chỉ là command)
   }, [
     inputValue,
     selectedFiles,
@@ -269,7 +270,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
     isCurrentPageFeatureEnabled,
     isContextAttachedNextSend,
     resetContextAttachedNextSend,
-    onInputChange // Thêm onInputChange vào dependencies
+    onInputChange
   ])
 
   const handleKeyDown = useCallback(
@@ -282,10 +283,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
           e.key === 'Enter' ||
           e.key === 'Tab')
       ) {
-        // TODO: Xử lý navigation trong suggestion list nếu có nhiều item
         if (e.key === 'Enter' || e.key === 'Tab') {
           e.preventDefault()
-          handleSelectSuggestion(CURRENT_PAGE_CONTEXT_COMMAND) // Giả sử chỉ có 1 suggestion
+          handleSelectSuggestion(CURRENT_PAGE_CONTEXT_COMMAND)
         }
       } else if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault()
@@ -310,8 +310,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
   return (
     <div className='relative flex flex-col'>
-      {' '}
-      {/* Thêm relative để định vị suggestion box */}
       {/* Suggestion Box */}
       {showContextSuggestions && (
         <div className='absolute bottom-full left-0 right-0 z-10 mb-1 max-h-40  overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg dark:border-gray-600'>
@@ -321,12 +319,11 @@ const ChatInput: React.FC<ChatInputProps> = ({
               onClick={() =>
                 handleSelectSuggestion(CURRENT_PAGE_CONTEXT_COMMAND)
               }
-              onMouseDown={e => e.preventDefault()} // Ngăn textarea mất focus
+              onMouseDown={e => e.preventDefault()}
             >
               <strong>{CURRENT_PAGE_CONTEXT_COMMAND}</strong> -{' '}
               {t(CURRENT_PAGE_CONTEXT_SUGGESTION_KEY)}
             </li>
-            {/* Thêm các suggestion khác ở đây nếu có */}
           </ul>
         </div>
       )}
@@ -415,9 +412,8 @@ const ChatInput: React.FC<ChatInputProps> = ({
           `}
           rows={1}
           disabled={disabled}
-          onBlur={() => setTimeout(() => setShowContextSuggestions(false), 150)} // Hide suggestions on blur with delay
+          onBlur={() => setTimeout(() => setShowContextSuggestions(false), 150)}
           onFocus={() => {
-            // Show suggestions if relevant on focus
             if (inputValue.endsWith('@') && isCurrentPageFeatureEnabled) {
               setShowContextSuggestions(true)
             }
@@ -440,6 +436,20 @@ const ChatInput: React.FC<ChatInputProps> = ({
           <GrSend size={16} className='h-4 w-4' />
         </Button>
       </div>
+
+      {/* Modal component */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={modalTitle}
+        footer={
+          <Button variant='primary' onClick={() => setIsModalOpen(false)}>
+            {t('Common_OK')} {/* Sử dụng bản dịch cho nút OK */}
+          </Button>
+        }
+      >
+        <p>{modalMessage}</p>
+      </Modal>
     </div>
   )
 }

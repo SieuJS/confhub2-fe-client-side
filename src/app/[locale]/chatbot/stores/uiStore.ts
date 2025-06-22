@@ -46,7 +46,7 @@ const initialUiStoreState: UiStoreState = {
     fatalErrorCode: null,
     showConfirmationDialog: false,
     confirmationData: null,
-    isLeftPanelOpen: true, // Default for main chatbot page
+    isLeftPanelOpen: false, // Default for main chatbot page
     isRightPanelOpen: false, // Default for main chatbot page
     // currentView: 'chat', // Commented out
     isFloatingChatOpen: false, // <<< NEW: Initial state for floating chat (closed by default)

@@ -32,6 +32,8 @@ export function guestJourney(data) {
         const res = http.get(`${FRONTEND_URL}/en/journals`);
         check(res, { 'Journals page status is 200': (r) => r.status === 200 });
     });
+
+    
     sleep(2);
 
     if (data.journalIds && data.journalIds.length > 0) {

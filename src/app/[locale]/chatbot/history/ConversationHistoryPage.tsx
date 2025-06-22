@@ -1,4 +1,3 @@
-// src/app/[locale]/chatbot/history/ConversationHistoryPage.tsx
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
@@ -14,20 +13,23 @@ import { Loader2, MessageSquarePlus } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from '@/src/navigation'
 import HistoryTableRow from './HistoryTableRow'
+import Modal from '@/src/app/[locale]/chatbot/Modal'
+import Button from '../../utils/Button'
 
 const ConversationHistoryPage: React.FC = () => {
   const t = useTranslations()
   const router = useRouter()
-
+ // --- THÊM STATE ĐỂ THEO DÕI MOUNTING ---
+  const [hasMounted, setHasMounted] = useState(false)
   const {
     conversationList: initialListFromStore,
     searchResults,
     isSearching,
-    isLoadingHistory
+    isLoadingHistory // Đây là state quan trọng nhất cho việc loading
   } = useConversationListState()
 
+  // Xóa bỏ `loadHistory` vì nó không tồn tại trong actions của bạn
   const {
-    // BỎ DÒNG NÀY: startNewConversation, // KHÔNG CẦN GỌI HÀM NÀY NỮA
     loadConversation,
     deleteConversation,
     clearConversation,
@@ -36,16 +38,29 @@ const ConversationHistoryPage: React.FC = () => {
     searchConversations
   } = useConversationActions()
 
-  // Lấy các actions cần thiết để reset UI
-  const { setActiveConversationId } = useConversationStore() // <<< THÊM DÒNG NÀY
-  const { resetChatUIForNewConversation } = useMessageStore() // <<< THÊM DÒNG NÀY
+  const { setActiveConversationId } = useConversationStore()
+  const { resetChatUIForNewConversation } = useMessageStore()
 
-  const { chatMode, currentLanguage } = useChatSettingsState()
+  const { chatMode } = useChatSettingsState()
 
   const [searchTerm, setSearchTerm] = useState('')
   const [displayedConversations, setDisplayedConversations] =
     useState<ConversationMetadata[]>(initialListFromStore)
 
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
+  const [confirmModalTitle, setConfirmModalTitle] = useState('')
+  const [confirmModalMessage, setConfirmModalMessage] = useState('')
+  const [modalCallbacks, setModalCallbacks] = useState<{
+    onConfirm: (() => void) | null
+    onCancel: (() => void) | null
+  }>({ onConfirm: null, onCancel: null })
+
+  // --- SỬ DỤNG USEEFFECT ĐỂ CẬP NHẬT STATE SAU KHI MOUNT ---
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
+
+  
   useEffect(() => {
     searchConversations(searchTerm)
   }, [searchTerm, searchConversations])
@@ -63,63 +78,103 @@ const ConversationHistoryPage: React.FC = () => {
       loadConversation(conversationId)
       const targetPath =
         chatMode === 'live' ? '/chatbot/livechat' : '/chatbot/regularchat'
-      router.push({ pathname: targetPath, query: { id: conversationId } }) // <<< QUAN TRỌNG: THÊM ID VÀO QUERY
+      router.push({ pathname: targetPath, query: { id: conversationId } })
     },
     [loadConversation, router, chatMode]
   )
 
   const handleStartNewAndGoToChat = useCallback(() => {
-    // KHÔNG GỌI startNewConversation(currentLanguage.code) NỮA
-    // Thay vào đó, reset UI client-side và điều hướng
-    setActiveConversationId(null); // Đảm bảo activeConversationId là null
-    resetChatUIForNewConversation(true); // Xóa tin nhắn và reset UI
-
+    setActiveConversationId(null)
+    resetChatUIForNewConversation(true)
     const targetPath =
       chatMode === 'live' ? '/chatbot/livechat' : '/chatbot/regularchat'
-    router.push(targetPath) // Điều hướng đến trang chat cơ bản (không có ID)
-  }, [router, chatMode, setActiveConversationId, resetChatUIForNewConversation]) // Thêm dependencies
+    router.push(targetPath)
+  }, [router, chatMode, setActiveConversationId, resetChatUIForNewConversation])
+
+  const showConfirmModal = useCallback(
+    (
+      title: string,
+      message: string,
+      onConfirm: () => void,
+      onCancel: () => void
+    ) => {
+      setConfirmModalTitle(title)
+      setConfirmModalMessage(message)
+      setModalCallbacks({ onConfirm, onCancel })
+      setIsConfirmModalOpen(true)
+    },
+    []
+  )
+
+  const handleConfirmAction = useCallback(() => {
+    modalCallbacks.onConfirm?.()
+    setIsConfirmModalOpen(false)
+    setModalCallbacks({ onConfirm: null, onCancel: null })
+  }, [modalCallbacks])
+
+  const handleCancelConfirm = useCallback(() => {
+    modalCallbacks.onCancel?.()
+    setIsConfirmModalOpen(false)
+    setModalCallbacks({ onConfirm: null, onCancel: null })
+  }, [modalCallbacks])
 
   const handleDeleteWithConfirm = useCallback(
-    async (id: string, title: string) => {
-      if (
-        window.confirm(
-          t('Confirm_Delete_Conversation', {
-            title: title || t('Untitled_Conversation')
-          })
+    (id: string, title: string): Promise<void> => {
+      return new Promise((resolve, reject) => {
+        const convTitle = title || t('Untitled_Conversation')
+        showConfirmModal(
+          t('Confirm_Delete_Conversation_Title'),
+          t('Confirm_Delete_Conversation', { title: convTitle }),
+          async () => {
+            try {
+              await deleteConversation(id)
+              resolve()
+            } catch (error) {
+              reject(error)
+            }
+          },
+          () => reject(new Error('Deletion cancelled by user'))
         )
-      ) {
-        try {
-          await deleteConversation(id)
-        } catch (error) {
-          console.error('Error deleting conversation from history page:', error)
-          throw error
-        }
-      } else {
-        throw new Error('Deletion cancelled by user')
-      }
+      })
     },
-    [deleteConversation, t]
+    [deleteConversation, t, showConfirmModal]
   )
 
   const handleClearWithConfirm = useCallback(
-    (id: string, title: string) => {
-      if (
-        window.confirm(
-          t('Confirm_Clear_Conversation', {
-            title: title || t('Untitled_Conversation')
-          })
+    (id: string, title: string): Promise<void> => {
+      return new Promise((resolve, reject) => {
+        const convTitle = title || t('Untitled_Conversation')
+        showConfirmModal(
+          t('Confirm_Clear_Conversation_Title'),
+          t('Confirm_Clear_Conversation', { title: convTitle }),
+          () => {
+            clearConversation(id)
+            resolve()
+          },
+          () => reject(new Error('Clear cancelled by user'))
         )
-      ) {
-        clearConversation(id)
-      }
+      })
     },
-    [clearConversation, t]
+    [clearConversation, t, showConfirmModal]
   )
 
-  const showInitialLoading =
-    isLoadingHistory &&
-    displayedConversations.length === 0 &&
-    searchTerm.trim() === ''
+  const renderLoading = () => (
+    <div className='flex h-full flex-col items-center justify-center bg-gray-10 p-4 dark:bg-gray-900 md:p-6'>
+      <Loader2 className='h-10 w-10 animate-spin text-blue-600' />
+      <p className='mt-4 text-lg text-gray-700 dark:text-gray-300'>
+        {t('History_Loading_Message')}
+      </p>
+    </div>
+  )
+
+  // --- SỬA LẠI ĐIỀU KIỆN LOADING ---
+  // Hiển thị loading nếu:
+  // 1. Component chưa mount (để tránh "flash" của nội dung không chính xác).
+  // 2. Hoặc store đang trong quá trình tải lịch sử.
+  if (!hasMounted || isLoadingHistory) {
+    return renderLoading()
+  }
+
 
   return (
     <div className='flex h-full flex-col bg-gray-10 p-4 dark:bg-gray-900 md:p-6'>
@@ -149,22 +204,22 @@ const ConversationHistoryPage: React.FC = () => {
         )}
       </div>
 
-      {showInitialLoading && (
-        <div className='flex flex-1 items-center justify-center '>
-          <Loader2 size={24} className='mr-2 animate-spin' />
-          <span>{t('Loading_Initial_History')}</span>
+      {displayedConversations.length === 0 ? (
+        <div className='flex flex-1 items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white p-12 text-center dark:border-gray-700 dark:bg-gray-800/30'>
+          <div>
+            <h3 className='text-lg font-medium text-gray-900 dark:text-white'>
+              {searchTerm.trim() !== ''
+                ? t('No_Search_Results_Found')
+                : t('No_Conversations_Found_Yet')}
+            </h3>
+            <p className='mt-1 text-sm text-gray-500 dark:text-gray-400'>
+              {searchTerm.trim() !== ''
+                ? t('Try_different_keywords')
+                : t('Start_a_new_chat_to_see_it_here')}
+            </p>
+          </div>
         </div>
-      )}
-
-      {!showInitialLoading && displayedConversations.length === 0 && (
-        <div className='flex flex-1 items-center justify-center text-center '>
-          {searchTerm.trim() !== ''
-            ? t('No_Search_Results_Found')
-            : t('No_Conversations_Found_Yet')}
-        </div>
-      )}
-
-      {displayedConversations.length > 0 && (
+      ) : (
         <div className='overflow-x-auto rounded-lg border border-gray-200 shadow-sm dark:border-gray-700'>
           <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
             <thead className='bg-gray-100 dark:bg-gray-800'>
@@ -205,6 +260,24 @@ const ConversationHistoryPage: React.FC = () => {
           </table>
         </div>
       )}
+
+      <Modal
+        isOpen={isConfirmModalOpen}
+        onClose={handleCancelConfirm}
+        title={confirmModalTitle}
+        footer={
+          <>
+            <Button variant='secondary' onClick={handleCancelConfirm}>
+              {t('Common_Cancel')}
+            </Button>
+            <Button variant='danger' onClick={handleConfirmAction}>
+              {t('Common_Confirm')}
+            </Button>
+          </>
+        }
+      >
+        <p>{confirmModalMessage}</p>
+      </Modal>
     </div>
   )
 }

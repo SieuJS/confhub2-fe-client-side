@@ -1903,5 +1903,17 @@
   "Please_enter_the_conference_summary": "Please enter the conference summary.",
   "Summary_must_be_at_least_characters": "Summary must be at least {count} characters.",
   "Summary_cannot_exceed_characters": "Summary cannot exceed {count} characters.",
-  "No_AccessType_Available": "No type available."
+  "No_AccessType_Available": "No type available.",
+  "ChatInput_Error_Title_MaxFiles": "File Limit Exceeded",
+  "ChatInput_Error_Title_FileSize": "File Too Large",
+  "Common_OK": "OK",
+  "Confirm_Delete_Conversation_Title": "Confirm Conversation Deletion",
+  "Confirm_Clear_Conversation_Title": "Confirm Message Clear",
+  "Common_Cancel": "Cancel",
+  "Common_Confirm": "Confirm",
+  "Untitled_Conversation": "Untitled Conversation",
+  "Deleting_conversation_ellipsis": "Deleting conversation...",
+  "History_Loading_Message": "Loading your conversations...",
+  "Start_a_new_chat_to_see_it_here": "Start a new chat to see it here",
+  "Try_different_keywords": "Try different keywords"
 }

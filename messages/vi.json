@@ -1903,5 +1903,17 @@
   "Please_enter_the_conference_summary": "Vui lòng nhập tóm tắt hội nghị.",
   "Summary_must_be_at_least_characters": "Tóm tắt phải có ít nhất {count} ký tự.",
   "Summary_cannot_exceed_characters": "Tóm tắt không được vượt quá {count} ký tự.",
-  "No_AccessType_Available": "Không có loại hình nào."
+  "No_AccessType_Available": "Không có loại hình nào.",
+  "ChatInput_Error_Title_MaxFiles": "Vượt quá giới hạn tệp",
+  "ChatInput_Error_Title_FileSize": "Tệp quá lớn",
+  "Common_OK": "OK",
+  "Confirm_Delete_Conversation_Title": "Xác nhận xóa cuộc trò chuyện",
+  "Confirm_Clear_Conversation_Title": "Xác nhận xóa tin nhắn",
+  "Common_Cancel": "Hủy",
+  "Common_Confirm": "Xác nhận",
+  "Untitled_Conversation": "Cuộc trò chuyện không tiêu đề",
+  "Deleting_conversation_ellipsis": "Đang xóa cuộc trò chuyện...",
+  "History_Loading_Message": "Đang tải các cuộc trò chuyện của bạn...",
+  "Start_a_new_chat_to_see_it_here": "Bắt đầu cuộc trò chuyện mới để xem ở đây.",
+  "Try_different_keywords": "Hãy thử các từ khóa khác"
 }

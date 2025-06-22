@@ -11,7 +11,13 @@ const NEXT_PUBLIC_DATABASE_URL = process.env.NEXT_PUBLIC_DATABASE_URL || 'http:/
 const socketInitializer = () => {
   console.log(`Initializing socket connection to: ${NEXT_PUBLIC_DATABASE_URL}`);
 
-  return io(`${NEXT_PUBLIC_DATABASE_URL}`, {
+  // URL cơ sở vẫn là URL chính
+  const url = new URL(NEXT_PUBLIC_DATABASE_URL);
+  const baseUrl = `${url.protocol}//${url.host}`; // Sẽ là https://confhub.ddns.net
+
+  return io(baseUrl, { // Chỉ kết nối đến host, không bao gồm path
+    // Thêm tùy chọn path ở đây!
+    path: '/database/socket.io', // Nginx sẽ nhận /database/socket.io/ và chuyển tiếp đúng
     reconnectionAttempts: 5,
     reconnectionDelay: 1000,
     transports: ['websocket', 'polling'],

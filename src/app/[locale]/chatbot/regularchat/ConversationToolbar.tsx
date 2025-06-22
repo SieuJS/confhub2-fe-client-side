@@ -3,19 +3,20 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Pencil, Pin, PinOff, Trash2, Eraser } from 'lucide-react';
-// --- IMPORT STORE MỚI HOẶC HOOKS TỪ STOREHOOKS ---
 import {
-    useActiveConversationState, // Cho activeConversationId
-    useConversationListState,   // Cho conversationList
-    useConversationActions      // Cho các actions
-} from '@/src/app/[locale]/chatbot/stores/storeHooks'; // Điều chỉnh path tới storeHooks.ts
+    useActiveConversationState,
+    useConversationListState,
+    useConversationActions
+} from '@/src/app/[locale]/chatbot/stores/storeHooks';
 import { useTranslations } from 'next-intl';
-// useShallow không cần thiết ở đây vì các hook trong storeHooks đã sử dụng nó
+
+// Import Modal và Button
+import Modal from '@/src/app/[locale]/chatbot/Modal'; // Đảm bảo đường dẫn đúng
+import Button from '../../utils/Button'; // Đảm bảo đường dẫn đúng
 
 const ConversationToolbar: React.FC = () => {
   const t = useTranslations();
 
-  // --- Lấy state và actions từ các store đã tách ---
   const { activeConversationId } = useActiveConversationState();
   const { conversationList } = useConversationListState();
   const {
@@ -25,11 +26,16 @@ const ConversationToolbar: React.FC = () => {
     deleteConversation,
   } = useConversationActions();
 
-  // --- State cục bộ cho UI của toolbar ---
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [newTitleInput, setNewTitleInput] = useState('');
 
-  // --- Tính toán activeConversation metadata ---
+  // --- State cho Modal xác nhận ---
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [confirmModalTitle, setConfirmModalTitle] = useState('');
+  const [confirmModalMessage, setConfirmModalMessage] = useState('');
+  const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
+  // --- End State cho Modal xác nhận ---
+
   const activeConversation = useMemo(() => {
     if (!activeConversationId) return null;
     return conversationList.find(conv => conv.id === activeConversationId);
@@ -37,7 +43,6 @@ const ConversationToolbar: React.FC = () => {
 
   const prevActiveConversationIdRef = useRef(activeConversationId);
 
-  // --- Đồng bộ state cục bộ với activeConversation từ store ---
   useEffect(() => {
     if (activeConversation) {
       if (!isEditingTitle) {
@@ -48,10 +53,36 @@ const ConversationToolbar: React.FC = () => {
     }
 
     if (activeConversationId !== prevActiveConversationIdRef.current) {
-      setIsEditingTitle(false); // Reset editing khi conversation thay đổi
+      setIsEditingTitle(false);
     }
     prevActiveConversationIdRef.current = activeConversationId;
   }, [activeConversation, activeConversationId, isEditingTitle, t]);
+
+  // Hàm hiển thị Modal xác nhận
+  const showConfirmModal = useCallback(
+    (title: string, message: string, onConfirm: () => void) => {
+      setConfirmModalTitle(title);
+      setConfirmModalMessage(message);
+      setConfirmAction(() => onConfirm); // Lưu callback
+      setIsConfirmModalOpen(true);
+    },
+    []
+  );
+
+  // Hàm xử lý khi người dùng xác nhận trong Modal
+  const handleConfirmAction = useCallback(() => {
+    if (confirmAction) {
+      confirmAction(); // Thực thi hành động đã lưu
+    }
+    setIsConfirmModalOpen(false); // Đóng modal
+    setConfirmAction(null); // Xóa callback
+  }, [confirmAction]);
+
+  // Hàm xử lý khi người dùng hủy trong Modal
+  const handleCancelConfirm = useCallback(() => {
+    setIsConfirmModalOpen(false); // Đóng modal
+    setConfirmAction(null); // Xóa callback
+  }, []);
 
 
   const handleRename = useCallback(() => {
@@ -71,35 +102,30 @@ const ConversationToolbar: React.FC = () => {
 
   const handleClear = useCallback(() => {
     if (!activeConversationId || !activeConversation) return;
-    if (
-      window.confirm(
-        t('Confirm_Clear_Conversation', { title: activeConversation.title })
-      )
-    ) {
-      clearConversation(activeConversationId);
-    }
-  }, [activeConversationId, activeConversation, clearConversation, t]);
+    showConfirmModal(
+      t('Confirm_Clear_Conversation_Title'),
+      t('Confirm_Clear_Conversation', { title: activeConversation.title }),
+      () => {
+        clearConversation(activeConversationId);
+      }
+    );
+  }, [activeConversationId, activeConversation, clearConversation, t, showConfirmModal]);
 
   const handleDelete = useCallback(() => {
     if (!activeConversationId || !activeConversation) return;
-    if (
-      window.confirm(
-        t('Confirm_Delete_Conversation', { title: activeConversation.title })
-      )
-    ) {
-      // deleteConversation action từ conversationStore sẽ emit event.
-      // MainLayout sẽ theo dõi activeConversationId. Nếu nó bị set về null
-      // (do _onSocketConversationDeleted xử lý), MainLayout sẽ điều hướng.
-      deleteConversation(activeConversationId);
-    }
-  }, [activeConversationId, activeConversation, deleteConversation, t]);
+    showConfirmModal(
+      t('Confirm_Delete_Conversation_Title'),
+      t('Confirm_Delete_Conversation', { title: activeConversation.title }),
+      () => {
+        deleteConversation(activeConversationId);
+      }
+    );
+  }, [activeConversationId, activeConversation, deleteConversation, t, showConfirmModal]);
 
 
    if (!activeConversationId || !activeConversation) {
-    // Thanh toolbar trống khi không có active conversation
     return (
       <div className='flex h-12 flex-shrink-0 items-center justify-between border-b border-gray-200 bg-white px-2 py-2 shadow-sm sm:h-14 sm:px-4 dark:border-gray-700 dark:bg-gray-800'>
-        {/* Có thể để trống hoặc một placeholder rất nhỏ */}
       </div>
     );
   }
@@ -109,8 +135,6 @@ const ConversationToolbar: React.FC = () => {
   const isPinned = activeConversation.isPinned;
 
   return (
-    // - `h-14` -> `h-12 sm:h-14`
-    // - `px-4 py-2` -> `px-2 py-1.5 sm:px-4 sm:py-2`
     <div className='flex h-12 flex-shrink-0 items-center justify-between border-b border-gray-200 bg-white px-2 py-1.5 shadow-sm sm:h-14 sm:px-4 sm:py-2 dark:border-gray-700 dark:bg-gray-800'>
       <div className='flex min-w-0 items-center'>
         {isEditingTitle ? (
@@ -119,19 +143,25 @@ const ConversationToolbar: React.FC = () => {
             value={newTitleInput}
             onChange={e => setNewTitleInput(e.target.value)}
             onBlur={handleRename}
-            onKeyDown={e => { /* ... */ }}
-            // - `text-sm` -> `text-xs sm:text-sm`
-            // - `px-2 py-1` -> `px-1.5 py-0.5 sm:px-2 sm:py-1`
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                handleRename();
+                e.currentTarget.blur(); // Tắt focus sau khi Enter
+              } else if (e.key === 'Escape') {
+                setIsEditingTitle(false);
+                setNewTitleInput(currentTitle); // Khôi phục tiêu đề cũ
+                e.currentTarget.blur(); // Tắt focus
+              }
+            }}
             className='mr-1.5 rounded-md border border-gray-300 px-1.5 py-0.5 text-xs text-gray-900 focus:border-blue-500 focus:ring-blue-500 sm:mr-2 sm:px-2 sm:py-1 sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white'
             autoFocus
           />
         ) : (
           <h2
-            // - `text-base` -> `text-sm sm:text-base`
             className='truncate text-sm font-semibold text-gray-800 sm:text-base dark:text-gray-100'
             title={currentTitle}
             onDoubleClick={() => {
-                setNewTitleInput(currentTitle); // Đảm bảo input được khởi tạo đúng trước khi edit
+                setNewTitleInput(currentTitle);
                 setIsEditingTitle(true);
             }}
            >
@@ -140,10 +170,7 @@ const ConversationToolbar: React.FC = () => {
         )}
       </div>
 
-      {/* - `space-x-2` -> `space-x-1 sm:space-x-1.5` (giảm khoảng cách giữa các nút) */}
       <div className='flex items-center space-x-1 sm:space-x-1.5'>
-        {/* Các nút: giảm padding và kích thước icon */}
-        {/* Ví dụ cho nút Rename/Save */}
         <button
           onClick={() => {
             if (isEditingTitle) {
@@ -186,6 +213,25 @@ const ConversationToolbar: React.FC = () => {
           <Trash2 size={16} className="sm:w-[18px] sm:h-[18px]" />
         </button>
       </div>
+
+      {/* Modal xác nhận */}
+      <Modal
+        isOpen={isConfirmModalOpen}
+        onClose={handleCancelConfirm} // Đóng modal khi hủy
+        title={confirmModalTitle}
+        footer={
+          <>
+            <Button variant='secondary' onClick={handleCancelConfirm}>
+              {t('Common_Cancel')}
+            </Button>
+            <Button variant='danger' onClick={handleConfirmAction}>
+              {t('Common_Confirm')}
+            </Button>
+          </>
+        }
+      >
+        <p>{confirmModalMessage}</p>
+      </Modal>
     </div>
   );
 };

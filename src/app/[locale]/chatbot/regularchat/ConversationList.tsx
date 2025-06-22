@@ -1,9 +1,13 @@
 // src/app/[locale]/chatbot/regularchat/ConversationList.tsx
-import React from 'react'
+import React, { useState, useCallback } from 'react' // Thêm useState, useCallback
 import { ConversationMetadata } from '../lib/regular-chat.types'
 import { PlusCircle, Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import ConversationItem from './ConversationItem'
+
+// Import Modal và Button
+import Modal from '@/src/app/[locale]/chatbot/Modal' // Đảm bảo đường dẫn đúng
+import Button from '../../utils/Button' // Đảm bảo đường dẫn đúng
 
 interface ConversationListProps {
   conversationList: ConversationMetadata[]
@@ -17,7 +21,7 @@ interface ConversationListProps {
   onPinConversation: (conversationId: string, isPinned: boolean) => void
   currentView: 'chat' | 'history'
   deletingConversationId: string | null
-  disabled?: boolean // <<<< THÊM PROP DISABLED >>>>
+  disabled?: boolean
 }
 
 const ConversationList: React.FC<ConversationListProps> = ({
@@ -32,31 +36,72 @@ const ConversationList: React.FC<ConversationListProps> = ({
   onPinConversation,
   currentView,
   deletingConversationId,
-  disabled = false // <<<< GIÁ TRỊ MẶC ĐỊNH >>>>
+  disabled = false
 }) => {
   const t = useTranslations()
 
-  const handleDeleteWithConfirm = (id: string, title: string) => {
-    if (disabled) return // Không làm gì nếu bị disabled
-    if (
-      window.confirm(
-        t('Confirm_Delete_Conversation', { title: title || 'Untitled' })
-      )
-    ) {
-      onDeleteConversation(id)
-    }
-  }
+  // --- State cho Modal xác nhận ---
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
+  const [confirmModalTitle, setConfirmModalTitle] = useState('')
+  const [confirmModalMessage, setConfirmModalMessage] = useState('')
+  const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null)
+  // --- End State cho Modal xác nhận ---
 
-  const handleClearWithConfirm = (id: string, title: string) => {
-    if (disabled) return // Không làm gì nếu bị disabled
-    if (
-      window.confirm(
-        t('Confirm_Clear_Conversation', { title: title || 'Untitled' })
-      )
-    ) {
-      onClearConversation(id)
+  // Hàm hiển thị Modal xác nhận
+  const showConfirmModal = useCallback(
+    (title: string, message: string, onConfirm: () => void) => {
+      setConfirmModalTitle(title)
+      setConfirmModalMessage(message)
+      setConfirmAction(() => onConfirm) // Lưu callback
+      setIsConfirmModalOpen(true)
+    },
+    []
+  )
+
+  // Hàm xử lý khi người dùng xác nhận trong Modal
+  const handleConfirmAction = useCallback(() => {
+    if (confirmAction) {
+      confirmAction() // Thực thi hành động đã lưu
     }
-  }
+    setIsConfirmModalOpen(false) // Đóng modal
+    setConfirmAction(null) // Xóa callback
+  }, [confirmAction])
+
+  // Hàm xử lý khi người dùng hủy trong Modal
+  const handleCancelConfirm = useCallback(() => {
+    setIsConfirmModalOpen(false) // Đóng modal
+    setConfirmAction(null) // Xóa callback
+  }, [])
+
+  const handleDeleteWithConfirm = useCallback(
+    (id: string, title: string) => {
+      if (disabled) return
+      const convTitle = title || t('Untitled_Conversation') // Sử dụng key dịch
+      showConfirmModal(
+        t('Confirm_Delete_Conversation_Title'),
+        t('Confirm_Delete_Conversation', { title: convTitle }),
+        () => {
+          onDeleteConversation(id)
+        }
+      )
+    },
+    [disabled, onDeleteConversation, t, showConfirmModal]
+  )
+
+  const handleClearWithConfirm = useCallback(
+    (id: string, title: string) => {
+      if (disabled) return
+      const convTitle = title || t('Untitled_Conversation') // Sử dụng key dịch
+      showConfirmModal(
+        t('Confirm_Clear_Conversation_Title'),
+        t('Confirm_Clear_Conversation', { title: convTitle }),
+        () => {
+          onClearConversation(id)
+        }
+      )
+    },
+    [disabled, onClearConversation, t, showConfirmModal]
+  )
 
   return (
     <div className='flex flex-grow flex-col overflow-hidden px-3 pb-3 pt-0'>
@@ -64,7 +109,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
         <span className='text-sm font-medium '>{t('Chat_History')}</span>
         <button
           onClick={onStartNewConversation}
-          disabled={disabled || isLoading || !!deletingConversationId} // <<<< SỬ DỤNG PROP DISABLED >>>>
+          disabled={disabled || isLoading || !!deletingConversationId}
           className='flex items-center space-x-1 rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50 dark:text-blue-400 dark:hover:bg-blue-900/50'
           title={t('Start_New_Chat')}
         >
@@ -94,18 +139,37 @@ const ConversationList: React.FC<ConversationListProps> = ({
               conv.id === activeConversationId &&
               currentView === 'chat' &&
               !disabled
-            } // Không active nếu disabled
+            }
             isBeingDeleted={deletingConversationId === conv.id}
             isLoadingList={isLoading}
-            onSelect={disabled ? () => {} : onSelectConversation} // Vô hiệu hóa onSelect
-            onDelete={handleDeleteWithConfirm} // handleDeleteWithConfirm đã kiểm tra disabled
-            onClear={handleClearWithConfirm} // handleClearWithConfirm đã kiểm tra disabled
-            onRename={disabled ? async () => {} : onRenameConversation} // Vô hiệu hóa onRename
-            onTogglePin={disabled ? async () => {} : onPinConversation} // Vô hiệu hóa onTogglePin
-            disabled={disabled} // <<<< TRUYỀN PROP DISABLED XUỐNG ConversationItem >>>>
+            onSelect={disabled ? () => {} : onSelectConversation}
+            onDelete={handleDeleteWithConfirm}
+            onClear={handleClearWithConfirm}
+            onRename={disabled ? async () => {} : onRenameConversation}
+            onTogglePin={disabled ? async () => {} : onPinConversation}
+            disabled={disabled}
           />
         ))}
       </div>
+
+      {/* Modal xác nhận */}
+      <Modal
+        isOpen={isConfirmModalOpen}
+        onClose={handleCancelConfirm} // Đóng modal khi hủy
+        title={confirmModalTitle}
+        footer={
+          <>
+            <Button variant='secondary' onClick={handleCancelConfirm}>
+              {t('Common_Cancel')}
+            </Button>
+            <Button variant='danger' onClick={handleConfirmAction}>
+              {t('Common_Confirm')}
+            </Button>
+          </>
+        }
+      >
+        <p>{confirmModalMessage}</p>
+      </Modal>
     </div>
   )
 }

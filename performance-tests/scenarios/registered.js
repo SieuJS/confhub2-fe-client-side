@@ -7,7 +7,6 @@ import { users } from '../data/index.js';
 
 export function registeredUserJourney(data) {
     const API_URL = data.API_URL;
-    const FRONTEND_URL = data.FRONTEND_URL;
 
     if (users.length === 0) {
         console.error("User data is empty. Skipping registered user journey.");
@@ -61,14 +60,6 @@ export function registeredUserJourney(data) {
         });
         sleep(2);
 
-        group('View Dashboard', () => {
-            const res = http.get(`${FRONTEND_URL}/en/dashboard?tab=followed`, {
-                headers: { 'Cookie': `token=${token}` } // Giả sử cookie tên là token
-            });
-            check(res, { 'Dashboard status is 200': (r) => r.status === 200 });
-        });
-        sleep(3);
-
        
         // Khối hành động Follow và Unfollow
         if (data.conferenceIds && data.conferenceIds.length > 0) {
@@ -76,7 +67,7 @@ export function registeredUserJourney(data) {
             const randomConfId = randomItem(data.conferenceIds);
 
             // Hành động 1: Follow a Conference
-            group('Follow a Conference', () => {
+            group('Follow a Conference', () =>  {
                 const payload = JSON.stringify({ conferenceId: randomConfId });
                 const followParams = {
                     headers: {
@@ -88,7 +79,7 @@ export function registeredUserJourney(data) {
                 check(res, { 'Follow conference status is 201': (r) => r.status === 201 });
             });
 
-            sleep(1); // Dừng một chút
+            sleep(3); // Dừng một chút
 
             // Hành động 2: Unfollow the SAME Conference
             group('Unfollow a Conference', () => {

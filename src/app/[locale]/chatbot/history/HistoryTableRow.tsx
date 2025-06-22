@@ -17,12 +17,10 @@ import { useTranslations } from 'next-intl'
 interface HistoryTableRowProps {
   conv: ConversationMetadata
   onSelectAndGoToChat: (conversationId: string) => void
-  onDelete: (id: string, title: string) => Promise<void> // Giả sử onDelete có thể là async
-  onClear: (id: string, title: string) => void
+  onDelete: (id: string, title: string) => Promise<void> // Kiểu dữ liệu đã đúng
+  onClear: (id: string, title: string) => Promise<void> // Nên là Promise để nhất quán
   onRename: (id: string, newTitle: string) => void
   onTogglePin: (id: string, currentPinStatus: boolean) => void
-  // Không cần isBeingDeleted ở đây nếu table không có spinner cho từng row
-  // Nếu có, bạn cần truyền deletingConversationId và so sánh
 }
 
 const HistoryTableRow: React.FC<HistoryTableRowProps> = ({
@@ -36,7 +34,7 @@ const HistoryTableRow: React.FC<HistoryTableRowProps> = ({
   const t = useTranslations()
   const [isEditing, setIsEditing] = useState(false)
   const [newTitle, setNewTitle] = useState(conv.title || '')
-  const [isProcessingAction, setIsProcessingAction] = useState(false) // Cho spinner khi delete
+  const [isProcessingAction, setIsProcessingAction] = useState(false)
 
   const currentTitleForDisplay = conv.title || t('Untitled_Conversation')
 
@@ -47,7 +45,7 @@ const HistoryTableRow: React.FC<HistoryTableRowProps> = ({
 
   const handleSaveRename = useCallback(() => {
     if (newTitle.trim() === '') {
-      setIsEditing(false) // Hủy nếu rỗng
+      setIsEditing(false)
       return
     }
     onRename(conv.id, newTitle.trim())
@@ -62,15 +60,21 @@ const HistoryTableRow: React.FC<HistoryTableRowProps> = ({
     setIsProcessingAction(true)
     try {
       await onDelete(conv.id, currentTitleForDisplay)
-      // Không cần setIsProcessingAction(false) ở đây vì row sẽ bị xóa
+      // Không cần setIsProcessingAction(false) ở đây vì row sẽ bị xóa nếu thành công
     } catch (error) {
-      console.error('Error during delete in row:', error)
-      setIsProcessingAction(false) // Reset nếu có lỗi
+      // Khối catch này sẽ chạy khi người dùng hủy hoặc có lỗi API
+      console.log('Deletion process was cancelled or failed:', (error as Error).message)
+      setIsProcessingAction(false) // Reset spinner
     }
   }, [conv.id, currentTitleForDisplay, onDelete])
 
-  const handleClearClick = useCallback(() => {
-    onClear(conv.id, currentTitleForDisplay)
+  const handleClearClick = useCallback(async () => {
+    // Mặc dù không có spinner, việc xử lý lỗi vẫn tốt
+    try {
+      await onClear(conv.id, currentTitleForDisplay)
+    } catch (error) {
+      console.log('Clear process was cancelled:', (error as Error).message)
+    }
   }, [conv.id, currentTitleForDisplay, onClear])
 
   const handleTogglePinClick = useCallback(() => {
