@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 // src/app/[locale]/journals/detail/JournalReport.tsx
 
 'use client'
@@ -176,11 +177,21 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
     }
   }
 
+  if (!journal) {
+    return (
+      <div className='container mx-auto flex h-64 items-center justify-center rounded-lg bg-card px-4 py-2 text-card-foreground'>
+        <h2 className='text-2xl font-semibold'>{t('Journal_not_found')}</h2>
+      </div>
+    )
+  }
 
-  // === Chuẩn bị dữ liệu để hiển thị (Không thay đổi) ===
-  const latestImpactFactor = journal.bioxbio?.[0]?.Impact_factor || 'N/A'
-  const overalRanking = journal['Rank']
-  const hIndex = journal['H index']
+  // === Chuẩn bị dữ liệu để hiển thị (không thay đổi) ===
+  const latestImpactFactor =
+    journal.bioxbio && journal.bioxbio.length > 0
+      ? journal.bioxbio[0].Impact_factor
+      : 'N/A'
+  const overalRanking = journal.Rank
+  const hIndex = journal.hIndex
   const sjr = journal.SJR
 
   // Biến kiểm soát trạng thái disabled của nút Follow
@@ -198,7 +209,7 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
           {/* Header với Title và nút Follow */}
           <div className='mb-4 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center'>
             <h1 className='text-3xl font-bold text-foreground md:text-4xl'>
-              {journal.title}
+              {journal.Title}
             </h1>
             <Button
               variant={isFollowing ? 'secondary' : 'primary'}
@@ -333,8 +344,8 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
             />
 
             <InfoRow icon={MapPin} label={t('JournalReport.regionLabel')} value={journal.Region} />
-            <InfoRow icon={Barcode} label={t('JournalReport.issnLabel')} value={journal.ISSN} />
-            <InfoRow icon={ShieldCheck} label={t('JournalReport.quartileLabel')} value={journal['SJR Best Quartile'] || 'N/A'} />
+            <InfoRow icon={Barcode} label={t('JournalReport.issnLabel')} value={journal.Issn} />
+            <InfoRow icon={ShieldCheck} label={t('JournalReport.quartileLabel')} value={journal.Statistics.filter(s => s.category.includes( 'Best Quartile'))[0]?.statistic || 'N/A'} />
             <InfoRow icon={CalendarClock} label={t('JournalReport.coverageLabel')} value={journal.Coverage || 'N/A'} />
           </div>
         </div>

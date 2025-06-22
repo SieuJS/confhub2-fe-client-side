@@ -30,6 +30,7 @@ type SupplementaryTableItem = {
 export type JournalData = { // Đổi tên từ JournalResponseData thành JournalData để rõ ràng hơn
   id: string;
   scimagoLink: string;
+  hIndex: number
   bioxbio: BioxbioItem[]; // API trả về mảng rỗng [], không phải null
   Image: string;
   Image_Context: string;
@@ -39,16 +40,7 @@ export type JournalData = { // Đổi tên từ JournalResponseData thành Journ
   Type: string; // "journal"
   Issn: string; // "00178969, 17488176"
   SJR: number; // Trong JSON là số (461)
-  "SJR Best Quartile": string;
-  "H index": string; // Trong JSON là chuỗi, ví dụ "40"
-  "Total Docs. (2023)": string; // Trong JSON là chuỗi, ví dụ "75"
-  "Total Docs. (3years)": string; // Trong JSON là chuỗi, ví dụ "228"
-  "Total Refs.": string; // Trong JSON là chuỗi, ví dụ "2966"
-  "Total Cites (3years)": string; // Trong JSON là chuỗi, ví dụ "337"
-  "Citable Docs. (3years)": string; // Trong JSON là chuỗi, ví dụ "226"
-  "Cites / Doc. (2years)": string; // Trong JSON là chuỗi, ví dụ "139"
-  "Ref. / Doc.": string; // Trong JSON là chuỗi, ví dụ "3955"
-  "%Female": string; // Trong JSON là chuỗi, ví dụ "6469"
+  Statistics: { category: string; statistic: string }[];
   Overton: number; // Trong JSON là số (0)
   SDG: number; // Trong JSON là số (0)
   Country: string;
@@ -57,9 +49,7 @@ export type JournalData = { // Đổi tên từ JournalResponseData thành Journ
   Coverage: string;
   Categories: string;
   Areas: string;
-  title: string; // Đôi khi có thể trùng lặp với Title nhưng vẫn nên giữ cả hai nếu API cung cấp
   "Subject Area and Category": SubjectAreaAndCategory;
-  ISSN: string; // Trùng với Issn nhưng vẫn nên giữ cả hai nếu API cung cấp
   Information: Information;
   Scope?: string; // Tùy chọn
   "Additional Info"?: string; // Tùy chọn

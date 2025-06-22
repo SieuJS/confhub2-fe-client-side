@@ -20,8 +20,8 @@ export const HIndexSection: React.FC<Props> = ({ journal, t }) => (
       <div className='flex flex-col items-center'>
         <p className='text-muted-foreground mb-4 text-lg'>
           {t('JournalTabs.hIndexValueIs')}
-          <strong className='ml-2 text-3xl font-bold '>
-            {journal['H index'] || 'N/A'}
+          <strong className='ml-2 text-3xl font-bold text-primary'>
+            {journal.hIndex || 'N/A'}
           </strong>
         </p>
         <div className='relative aspect-square w-full max-w-xs'>

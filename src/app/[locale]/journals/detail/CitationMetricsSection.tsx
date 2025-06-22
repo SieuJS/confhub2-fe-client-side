@@ -1,6 +1,7 @@
 // src/app/[locale]/journal/detail/CitationMetricsSection.tsx
 import React from 'react'
 import { BookCopy, FileText, Quote, BarChart2 } from 'lucide-react'
+import { JournalData } from '@/src/models/response/journal.response'
 
 const MetricItem = ({ icon: Icon, value, label }: any) => (
   <div className='flex items-start gap-4 rounded-lg bg-background p-4'>
@@ -13,7 +14,7 @@ const MetricItem = ({ icon: Icon, value, label }: any) => (
 )
 
 interface Props {
-  journal: any // Sử dụng any để truy cập các trường động
+  journal: JournalData // Sử dụng any để truy cập các trường động
   t: (key: string, options?: { [key: string]: any }) => string // Cập nhật kiểu cho hàm t
 }
 
@@ -32,7 +33,7 @@ export const CitationMetricsSection: React.FC<Props> = ({ journal, t }) => {
         // Nếu đây là năm lớn hơn hoặc là năm đầu tiên chúng ta tìm thấy
         if (latestTotalDocsYear === null || year > latestTotalDocsYear) {
           latestTotalDocsYear = year;
-          latestTotalDocsValue = journal[key];
+          latestTotalDocsValue = journal.Statistics.find(s => s.category.includes(key))?.statistic;
         }
       }
     }
@@ -48,15 +49,14 @@ export const CitationMetricsSection: React.FC<Props> = ({ journal, t }) => {
         {t('CitationMetrics.title')}
       </h2>
       <div className='grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4'>
-        {/* Chỉ hiển thị Total Docs. của năm gần nhất tìm được */}
-        <MetricItem
-          icon={FileText}
-          value={displayTotalDocsValue}
-          label={t('CitationMetrics.totalDocsYearly', { year: displayTotalDocsYear })}
+        {/* 3. Sử dụng key động cho value và label */}
+        <MetricItem 
+          icon={FileText} 
+          value={latestTotalDocsValue || 'N/A'}
         />
-        <MetricItem icon={BookCopy} value={journal['Total Docs. (3years)']} label={t('CitationMetrics.totalDocs3years')} />
-        <MetricItem icon={Quote} value={journal['Total Cites (3years)']} label={t('CitationMetrics.totalCites3years')} />
-        <MetricItem icon={BarChart2} value={journal['Cites / Doc. (2years)']} label={t('CitationMetrics.citesPerDoc2years')} />
+        <MetricItem icon={BookCopy} value={journal.Statistics.find(t => t.category.includes('Total Docs. (3years)'))?.statistic || 'N/A'} label={t('CitationMetrics.totalDocs3years')} />
+        <MetricItem icon={Quote} value={journal.Statistics.find(t => t.category.includes('Total Cites (3years)'))?.statistic} label={t('CitationMetrics.totalCites3years')} />
+        <MetricItem icon={BarChart2} value={journal.Statistics.find(t => t.category.includes('Cites / Doc. (2years'))?.statistic} label={t('CitationMetrics.citesPerDoc2years')} />
       </div>
     </section>
   )
