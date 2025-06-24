@@ -20,7 +20,9 @@ interface SearchJournalAdvanceSectionProps {
   onHIndexChange: (value: string) => void
 }
 
-const SearchAdvanceJournalSection: React.FC<SearchJournalAdvanceSectionProps> = ({
+const SearchAdvanceJournalSection: React.FC<
+  SearchJournalAdvanceSectionProps
+> = ({
   isAdvancedOptionsVisible,
   toggleAdvancedOptionsVisibility,
   publisher,
@@ -63,7 +65,7 @@ const SearchAdvanceJournalSection: React.FC<SearchJournalAdvanceSectionProps> = 
       <div className='mt-4 flex justify-end'>
         <button
           onClick={toggleAdvancedOptionsVisibility}
-          className='text-sm hover:text-gray-800 focus:outline-none'
+          className='text-sm hover:text-gray-80 focus:outline-none'
         >
           {isAdvancedOptionsVisible
             ? t('hideAdvancedSearch')
@@ -76,12 +78,15 @@ const SearchAdvanceJournalSection: React.FC<SearchJournalAdvanceSectionProps> = 
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
             {/* Publisher Filter */}
             <div>
-              <label className='mb-2 block text-sm font-bold' htmlFor='publisher'>
+              <label
+                className='mb-2 block text-sm font-bold'
+                htmlFor='publisher'
+              >
                 {t('publisherLabel')}:
               </label>
               <input
                 id='publisher'
-                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 text-sm leading-tight shadow focus:outline-none'
+                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 text-sm leading-tight shadow placeholder:text-primary focus:outline-none'
                 type='text'
                 placeholder={t('publisherPlaceholder')}
                 value={publisher}
@@ -109,15 +114,17 @@ const SearchAdvanceJournalSection: React.FC<SearchJournalAdvanceSectionProps> = 
               </select>
             </div>
 
-
             {/* Category Filter */}
             <div>
-              <label className='mb-2 block text-sm font-bold' htmlFor='category'>
+              <label
+                className='mb-2 block text-sm font-bold'
+                htmlFor='category'
+              >
                 {t('categoryLabel')}:
               </label>
               <input
                 id='category'
-                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 text-sm leading-tight shadow focus:outline-none'
+                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 text-sm leading-tight shadow placeholder:text-primary focus:outline-none'
                 type='text'
                 placeholder={t('categoryPlaceholder')}
                 value={category}
@@ -132,7 +139,7 @@ const SearchAdvanceJournalSection: React.FC<SearchJournalAdvanceSectionProps> = 
               </label>
               <input
                 id='topic'
-                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 text-sm leading-tight shadow focus:outline-none'
+                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 text-sm leading-tight shadow placeholder:text-primary focus:outline-none'
                 type='text'
                 placeholder={t('topicPlaceholder')}
                 value={topic}
@@ -147,7 +154,7 @@ const SearchAdvanceJournalSection: React.FC<SearchJournalAdvanceSectionProps> = 
               </label>
               <input
                 id='issn'
-                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 text-sm leading-tight shadow focus:outline-none'
+                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 text-sm leading-tight shadow placeholder:text-primary focus:outline-none'
                 type='text'
                 placeholder={t('issnPlaceholder')}
                 value={issn}
@@ -162,7 +169,7 @@ const SearchAdvanceJournalSection: React.FC<SearchJournalAdvanceSectionProps> = 
               </label>
               <input
                 id='hIndex'
-                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 text-sm leading-tight shadow focus:outline-none'
+                className='focus:shadow-outline w-full appearance-none rounded border px-3 py-2 text-sm leading-tight shadow placeholder:text-primary focus:outline-none'
                 type='text'
                 placeholder={t('hIndexPlaceholder')}
                 value={hIndex}

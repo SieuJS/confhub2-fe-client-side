@@ -120,19 +120,19 @@ const PersonalizationConfirmationModal: React.FC<
         </div>
 
         {/* Title - giảm margin dưới */}
-        <h3 className='mb-2 text-lg font-semibold leading-6 text-gray-900'>
+        <h3 className='mb-2 text-lg font-semibold leading-6 '>
           {' '}
           {/* Giảm text-xl thành text-lg, leading-7 thành leading-6 */}
           {content.title}
         </h3>
 
         {/* Message - giảm margin trên nếu có additionalMessage */}
-        <div className='text-sm text-gray-600'>
+        <div className='text-sm '>
           <p className='whitespace-pre-line leading-relaxed'>
             {content.message}
           </p>
           {content.additionalMessage && (
-            <p className='mt-2 whitespace-pre-line leading-relaxed text-gray-500'>
+            <p className='mt-2 whitespace-pre-line leading-relaxed '>
               {' '}
               {/* Giảm mt-3 thành mt-2 */}
               {content.additionalMessage}
@@ -142,7 +142,7 @@ const PersonalizationConfirmationModal: React.FC<
 
         {/* Privacy Section for 'enableBenefit' - giảm margin trên và padding */}
         {type === 'enableBenefit' && (
-          <div className='mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3 text-left text-xs text-gray-600'>
+          <div className='mt-4 rounded-lg border border-slate-200 bg-gray-5 p-3 text-left text-xs '>
             {' '}
             {/* Giảm mt-6 thành mt-4, p-4 thành p-3 */}
             <div className='flex items-start space-x-2'>
@@ -154,7 +154,7 @@ const PersonalizationConfirmationModal: React.FC<
               />{' '}
               {/* Giảm size 32 thành 28 */}
               <div>
-                <h4 className='mb-0.5 text-sm font-semibold text-slate-800'>
+                <h4 className='mb-0.5 text-sm font-semibold '>
                   {' '}
                   {/* Giảm mb-1 thành mb-0.5 */}
                   {t('Personalization_Privacy_Subheading') ||

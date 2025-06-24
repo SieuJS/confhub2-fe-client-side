@@ -218,7 +218,7 @@
   "Mark All As Read": "全部标记为已读",
   "Notification_when_add_to_calendar": "添加到日历时的通知",
   "Notification_when_follow": "关注时的通知",
-  "Notification_when_follow_description": "当会议有新更新时接收通知。",
+  "Notification_when_follow_description": "当您关注的会议有更新时接收通知。",
   "Notification_when_update_profile": "更新个人资料时的通知",
   "Receive_Notifications": "接收通知",
   "Receive_Notifications_Description": "接收有关您关注的会议、重要日期和其他更新的通知。",
@@ -1677,7 +1677,11 @@
     "Notification_Date": "通知日期",
     "Camera_Ready_Date": "终稿日期",
     "Other_Date": "其他日期",
-    "Call_for_paper": "论文征集"
+    "Call_for_paper": "论文征集",
+    "No_summary_provided": "未提供摘要",
+    "No_Call_for_paper_provided": "未提供论文征集",
+    "cfpLink": "论文征集链接",
+    "impLink": "重要日期链接"
   },
   "Try_Again": "重试",
   "Explore_All_Conferences": "探索所有会议",
@@ -1927,5 +1931,6 @@
   "discord": "Discord",
   "netflix": "Netflix",
   "twillight": "Twilight",
-  "reddit": "Reddit"
+  "reddit": "Reddit",
+  "Call_for_Papers_must_be_at_least_characters": "论文征集内容必须至少为{count}个字符。"
 }

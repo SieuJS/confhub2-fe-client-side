@@ -63,7 +63,7 @@ const NotificationsTab: React.FC = () => {
         handleUpdateSeenAt(selectedNotificationId)
       }
     }
-  }, [selectedNotificationId, handleUpdateSeenAt, notifications, ])
+  }, [selectedNotificationId, handleUpdateSeenAt, notifications])
 
   const handleBackToNotifications = () => {
     const newSearchParams = new URLSearchParams(searchParams.toString())
@@ -208,7 +208,7 @@ const NotificationsTab: React.FC = () => {
       {/* Thanh hành động hàng loạt */}
       <div className='mb-4 flex flex-wrap items-center gap-2'>
         <div className='flex items-center'>
-          <input
+          {/* <input
             type='checkbox'
             id='select-all'
             className='ml-4 mr-2 h-4 w-4 cursor-pointer rounded border-gray-30 text-blue-600 focus:ring-button'
@@ -219,7 +219,7 @@ const NotificationsTab: React.FC = () => {
           />
           <label htmlFor='select-all' className='mr-4 cursor-pointer text-sm'>
             {t('Select_All')}
-          </label>
+          </label> */}
         </div>
         {checkedIndices.length > 0 && (
           <>

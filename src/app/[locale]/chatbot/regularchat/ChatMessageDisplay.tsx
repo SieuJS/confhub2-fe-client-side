@@ -174,7 +174,7 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
       )}
       {timestamp && (
         <div
-          className={`mt-1 text-xs ${isUser ? 'text-gray-50 ' : 'text-gray-60 '} ${isUser ? 'text-right' : 'text-left'}`}
+          className={`mt-1 text-xs ${isUser ? 'text-white ' : 'text-gray-60 '} ${isUser ? 'text-right' : 'text-left'}`}
         >
           {new Date(timestamp).toLocaleTimeString([], {
             hour: '2-digit',
