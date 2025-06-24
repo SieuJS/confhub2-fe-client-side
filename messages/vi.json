@@ -1895,7 +1895,8 @@
     "Blacklist_Button": "Danh sách đen",
     "Share_on_Facebook": "Chia sẻ trên Facebook",
     "Share_on_X": "Chia sẻ trên X",
-    "Share_on_Reddit": "Chia sẻ trên Reddit"
+    "Share_on_Reddit": "Chia sẻ trên Reddit",
+    "Authenticating": "Đang xác thực..."
   },
   "Summary": "Tóm tắt",
   "Write_a_brief_summary_of_the_conference": "Viết một bản tóm tắt ngắn về hội nghị tại đây...",
@@ -1915,5 +1916,16 @@
   "Deleting_conversation_ellipsis": "Đang xóa cuộc trò chuyện...",
   "History_Loading_Message": "Đang tải các cuộc trò chuyện của bạn...",
   "Start_a_new_chat_to_see_it_here": "Bắt đầu cuộc trò chuyện mới để xem ở đây.",
-  "Try_different_keywords": "Hãy thử các từ khóa khác"
+  "Try_different_keywords": "Hãy thử các từ khóa khác",
+  "Call_for_papers_link_cannot_be_the_same_as_the_official_website": "Liên kết kêu gọi bài báo không thể giống với liên kết trang web chính thức của hội nghị.",
+  "Call_for_papers_and_important_dates_links_cannot_be_the_same_as_the_official_website": "Liên kết kêu gọi bài báo và các liên kết ngày quan trọng không thể giống với liên kết trang web chính thức của hội nghị.",
+  "light": "Sáng",
+  "dark": "Tối",
+  "system": "Hệ thống",
+  "instagram": "Instagram",
+  "facebook": "Facebook",
+  "discord": "Discord",
+  "netflix": "Netflix",
+  "twillight": "Twilight",
+  "reddit": "Reddit"
 }

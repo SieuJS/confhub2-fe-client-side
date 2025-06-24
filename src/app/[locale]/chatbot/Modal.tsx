@@ -40,7 +40,7 @@ const Modal: React.FC<ModalProps> = ({
         onClick={e => e.stopPropagation()} // Prevent close when clicking inside modal
       >
         {/* Header */}
-        <div className='flex items-center justify-between border-b border-gray-200 px-6 py-4'>
+        <div className='flex items-center justify-between border-b border-gray-20 px-6 py-4'>
           <h3 className='text-lg font-semibold '>{title}</h3>
           <button
             onClick={onClose}
@@ -52,13 +52,11 @@ const Modal: React.FC<ModalProps> = ({
         </div>
 
         {/* Body */}
-        <div className='px-6 py-4 text-sm leading-relaxed text-gray-700'>
-          {children}
-        </div>
+        <div className='px-6 py-4 text-sm leading-relaxed '>{children}</div>
 
         {/* Footer */}
         {footer && (
-          <div className='flex justify-end space-x-3 rounded-b-lg border-t border-gray-200 bg-gray-10 px-6 py-3'>
+          <div className='flex justify-end space-x-3 rounded-b-lg border-t border-gray-20 bg-gray-10 px-6 py-3'>
             {footer}
           </div>
         )}

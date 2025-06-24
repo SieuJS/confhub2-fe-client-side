@@ -59,16 +59,14 @@ interface InfoDisplayProps {
 
 const InfoDisplay: React.FC<InfoDisplayProps> = ({ label, icon, children }) => (
   <div className='border-b border-slate-200 py-2.5 last:border-b-0'>
-    <div className='mb-1 flex items-center text-sm font-medium text-slate-500'>
+    <div className='mb-1 flex items-center text-sm font-medium '>
       {icon &&
         React.cloneElement(icon as React.ReactElement, {
-          className: 'w-4 h-4 mr-2 text-slate-400 flex-shrink-0'
+          className: 'w-4 h-4 mr-2  flex-shrink-0'
         })}
       <span>{label}</span>
     </div>
-    <div className='break-words text-sm text-slate-800 sm:text-base'>
-      {children}
-    </div>
+    <div className='break-words text-sm  sm:text-base'>{children}</div>
   </div>
 )
 
@@ -86,7 +84,7 @@ const Section: React.FC<SectionProps> = ({
   children,
   className = ''
 }) => (
-  <div className={`rounded-xl bg-white p-5 shadow-lg sm:p-6 ${className}`}>
+  <div className={`rounded-xl bg-white-pure p-5 shadow-lg sm:p-6 ${className}`}>
     <div className='mb-4 flex items-center border-b border-indigo-100 pb-3 text-lg font-semibold text-indigo-700 sm:text-xl'>
       {React.cloneElement(icon as React.ReactElement, {
         className: 'w-6 h-6 mr-3 text-indigo-500 flex-shrink-0'
@@ -121,24 +119,18 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
     onlineFallbackKey?: string
   ): React.ReactNode => {
     if (type === 'Online' && onlineFallbackKey) {
-      return (
-        <span className='italic text-slate-500'>{t(onlineFallbackKey)}</span>
-      )
+      return <span className='italic '>{t(onlineFallbackKey)}</span>
     }
     if (value && String(value).trim() !== '') {
       return String(value)
     }
-    return <span className='italic text-slate-500'>{t(fallbackKey)}</span>
+    return <span className='italic '>{t(fallbackKey)}</span>
   }
 
   // Helper function to format the address for display in review
   const getFormattedAddressForDisplay = (): React.ReactNode => {
     if (type === 'Online') {
-      return (
-        <span className='italic text-slate-500'>
-          {t('Not_provided')}
-        </span>
-      )
+      return <span className='italic '>{t('Not_provided')}</span>
     }
 
     const originalAddress = location.address?.trim()
@@ -153,7 +145,7 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
     if (combinedAddressParts.length > 0) {
       return combinedAddressParts.join(', ')
     }
-    return <span className='italic text-slate-500'>{t('Not_provided')}</span>
+    return <span className='italic '>{t('Not_provided')}</span>
   }
 
   const getTypeIconAndColor = () => {
@@ -179,8 +171,8 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
       default:
         return {
           icon: <ShieldAlert className='mr-1.5 h-5 w-5' />,
-          color: 'text-slate-600',
-          chipColor: 'bg-slate-100 text-slate-700'
+          color: '',
+          chipColor: ' '
         }
     }
   }
@@ -205,7 +197,7 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
       const toDate = toDateStr ? new Date(toDateStr) : null
 
       if (!fromDate && !toDate) {
-        return <span className='italic text-slate-500'>{t('N_A')}</span>
+        return <span className='italic '>{t('N_A')}</span>
       }
 
       if (
@@ -229,19 +221,19 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
       }
     } catch (error) {
       console.error('Error formatting date:', error)
-      return <span className='italic text-slate-500'>{t('Invalid_Date')}</span>
+      return <span className='italic '>{t('Invalid_Date')}</span>
     }
-    return <span className='italic text-slate-500'>{t('N_A')}</span>
+    return <span className='italic '>{t('N_A')}</span>
   }
 
   return (
-    <div className='min-h-screen rounded-lg bg-slate-50 p-3 sm:p-6'>
+    <div className='min-h-screen rounded-lg bg-gray-5 p-3 sm:p-6'>
       <header className='mb-6 border-b border-slate-300 pb-4 sm:mb-8'>
         <h2 className='flex items-center text-2xl font-bold text-indigo-800 sm:text-3xl'>
           <PencilLine className='mr-3 h-7 w-7 flex-shrink-0 text-indigo-600 sm:h-8 sm:w-8' />
           {t('Review_Information')}
         </h2>
-        <p className='mt-2 text-sm text-slate-600'>
+        <p className='mt-2 text-sm '>
           {t(
             'Please_review_all_conference_details_carefully_before_proceeding'
           )}
@@ -335,25 +327,17 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
             {getFormattedAddressForDisplay()}
           </InfoDisplay>
           <InfoDisplay label={t('Continent')} icon={<Globe />}>
-            {renderDetail(
-              location.continent,
-              'Not_provided',
-              'Not_provided'
-            )}
+            {renderDetail(location.continent, 'Not_provided', 'Not_provided')}
           </InfoDisplay>
           <InfoDisplay label={t('Country')} icon={<Map />}>
-            {renderDetail(
-              location.country,
-              'Not_provided',
-              'Not_provided'
-            )}
+            {renderDetail(location.country, 'Not_provided', 'Not_provided')}
           </InfoDisplay>
           <InfoDisplay
             label={
               statesForReview.length > 0 ||
-                (!statesForReview.length &&
-                  !citiesForReview.length &&
-                  location.cityStateProvince)
+              (!statesForReview.length &&
+                !citiesForReview.length &&
+                location.cityStateProvince)
                 ? t('State_Province')
                 : t('City')
             }
@@ -383,7 +367,7 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
                 return (
                   <li
                     key={index}
-                    className='rounded-lg bg-slate-100 p-3 shadow-sm'
+                    className='rounded-lg bg-gray-10 p-3 shadow-sm'
                   >
                     <div className='flex items-center justify-between'>
                       <strong className='text-base text-indigo-700'>
@@ -393,7 +377,7 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
                         {displayTypeName} {/* Sử dụng tên hiển thị đã dịch */}
                       </span>
                     </div>
-                    <div className='mt-1 text-sm text-slate-600'>
+                    <div className='mt-1 text-sm '>
                       {/* Sử dụng hàm formatDateRange mới */}
                       {formatDateRange(date.fromDate, date.toDate)}
                     </div>
@@ -451,12 +435,11 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
         </div>
       )} */}
 
-
       {/* Summary Section - Full width */}
       <div className='mt-6'>
         <Section title={t('Summary')} icon={<FileText />}>
           {summary && summary.trim() !== '' ? (
-            <div className='prose prose-base max-w-none dark:prose-invert'>
+            <div className='prose prose-base max-w-none dark:prose-invert [&_*]:text-[var(--primary)]'>
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {summary}
               </ReactMarkdown>
@@ -469,12 +452,11 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
         </Section>
       </div>
 
-
       {/* Call for Papers Section - Full width */}
       <div className='mt-6'>
         <Section title={t('Call_for_paper')} icon={<FileText />}>
           {callForPaper && callForPaper.trim() !== '' ? (
-            <div className='prose prose-base max-w-none dark:prose-invert'>
+            <div className='prose prose-base max-w-none dark:prose-invert [&_*]:text-[var(--primary)]'>
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {callForPaper}
               </ReactMarkdown>
@@ -486,7 +468,7 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
           )}
         </Section>
       </div>
-    </div >
+    </div>
   )
 }
 

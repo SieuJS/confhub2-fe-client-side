@@ -162,7 +162,7 @@ const ConferenceForm: React.FC = () => {
               <>
                 <button
                   onClick={resetForm}
-                  className='rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50'
+                  className='rounded-md border border-gray-300 bg-white-pure px-4 py-2 text-sm font-medium  hover:bg-gray-50'
                 >
                   {t('Add_Another_Conference')}
                 </button>
@@ -194,7 +194,7 @@ const ConferenceForm: React.FC = () => {
           {modalState.status === 'error' && (
             <AlertTriangle className='mb-4 h-16 w-16 text-red-500' />
           )}
-          <p className='text-gray-600'>{modalState.message}</p>
+          <p className=''>{modalState.message}</p>
         </div>
       </Modal>
     </div>

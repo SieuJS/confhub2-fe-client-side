@@ -844,7 +844,7 @@ const Support = () => {
             </div>
             <input
               type='text'
-              className='block w-full rounded-full border border-gray-300  py-3 pl-10 pr-3  shadow-sm focus:border-button focus:outline-none focus:ring-1 focus:ring-button    sm:text-sm'
+              className='block w-full rounded-full border border-gray-300  py-3 pl-10 pr-3  shadow-sm placeholder:text-primary focus:border-button focus:outline-none focus:ring-1 focus:ring-button sm:text-sm'
               placeholder={t('searchPlaceholder')}
               value={searchTerm}
               onChange={handleSearchChange}
