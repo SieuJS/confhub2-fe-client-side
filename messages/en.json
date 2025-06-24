@@ -218,7 +218,7 @@
   "Mark All As Read": "Mark All As Read",
   "Notification_when_add_to_calendar": "Notification when add to calendar",
   "Notification_when_follow": "Notification when follow",
-  "Notification_when_follow_description": "Receive notifications when there are new updates about the conference.",
+  "Notification_when_follow_description": "Receive notifications when you follow a conference.",
   "Notification_when_update_profile": "Notification when update profile",
   "Receive_Notifications": "Receive Notifications",
   "Receive_Notifications_Description": "Receive notifications about conferences you follow, important dates, and other updates.",
@@ -1677,7 +1677,11 @@
     "Notification_Date": "Notification Date",
     "Camera_Ready_Date": "Camera Ready Date",
     "Other_Date": "Other Date",
-    "Call_for_paper": "Call for Papers"
+    "Call_for_paper": "Call for Papers",
+    "No_summary_provided": "No summary provided",
+    "No_Call_for_paper_provided": "No Call for Papers provided",
+    "cfpLink": "Call for Papers Link",
+    "impLink": "Important Dates Link"
   },
   "Try_Again": "Try Again",
   "Explore_All_Conferences": "Explore All Conferences",
@@ -1927,5 +1931,7 @@
   "discord": "Discord",
   "netflix": "Netflix",
   "twillight": "Twilight",
-  "reddit": "Reddit"
+  "reddit": "Reddit",
+  "Call_for_Papers_must_be_at_least_characters": "Call for Papers must be at least {count} characters.",
+  "Call_for_papers_cannot_exceed_characters": "Call for papers cannot exceed {count} characters."
 }

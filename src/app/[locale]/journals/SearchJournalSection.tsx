@@ -79,7 +79,7 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({
           <input
             type='text'
             placeholder={t('searchByTitlePlaceholder')}
-            className='w-full bg-transparent text-sm outline-none'
+            className='w-full bg-transparent text-sm outline-none placeholder:text-primary'
             value={searchKeyword}
             onChange={e => setSearchKeyword(e.target.value)}
             onKeyDown={handleKeyPress}
@@ -91,7 +91,7 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({
         {/* Areas Dropdown */}
         <div className='relative' ref={areasDropdownRef}>
           <button
-            className='flex items-center space-x-2 px-2 bg-transparent outline-none'
+            className='flex items-center space-x-2 bg-transparent px-2 outline-none'
             onClick={toggleAreasDropdown}
           >
             <Shapes className='h-4 w-4' />
@@ -99,12 +99,12 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({
           </button>
 
           {isAreasDropdownOpen && (
-            <div className='absolute left-0 z-10 mt-2 w-64 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
+            <div className='absolute left-0 z-10 mt-2 w-64 rounded-md bg-white-pure shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
               <div className='max-h-80 overflow-y-scroll py-1'>
                 <input
                   type='text'
                   placeholder={t('searchAreasPlaceholder')}
-                  className='block w-full px-4 py-2 text-sm text-gray-700 focus:outline-none'
+                  className='block w-full px-4 py-2 text-sm  focus:outline-none'
                   onChange={e => setAreasSearch(e.target.value)}
                   onClick={e => e.stopPropagation()}
                 />
@@ -113,7 +113,7 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({
                     setSelectedAreas(null)
                     toggleAreasDropdown()
                   }}
-                  className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                  className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
                 >
                   {t('allAreasOption')}
                 </button>
@@ -124,7 +124,7 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({
                       setSelectedAreas(area)
                       toggleAreasDropdown()
                     }}
-                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
                   >
                     {area}
                   </button>
@@ -139,22 +139,24 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({
         {/* MỚI: Quartile Dropdown */}
         <div className='relative' ref={quartileDropdownRef}>
           <button
-            className='flex items-center space-x-2 px-2 bg-transparent outline-none'
+            className='flex items-center space-x-2 bg-transparent px-2 outline-none'
             onClick={toggleQuartileDropdown}
           >
             <Ticket className='h-4 w-4' /> {/* Sử dụng icon Ticket */}
-            <span className='text-sm'>{selectedQuartile || t('quartileLabel')}</span>
+            <span className='text-sm'>
+              {selectedQuartile || t('quartileLabel')}
+            </span>
           </button>
 
           {isQuartileDropdownOpen && (
-            <div className='absolute left-0 z-10 mt-2 w-40 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
+            <div className='absolute left-0 z-10 mt-2 w-40 rounded-md bg-white-pure shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
               <div className='py-1'>
                 <button
                   onClick={() => {
                     setSelectedQuartile(null)
                     toggleQuartileDropdown()
                   }}
-                  className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                  className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
                 >
                   {t('allQuartilesOption')}
                 </button>
@@ -165,7 +167,7 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({
                       setSelectedQuartile(q)
                       toggleQuartileDropdown()
                     }}
-                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
                   >
                     {q}
                   </button>
@@ -180,20 +182,22 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({
         {/* Country Dropdown */}
         <div className='relative' ref={countryDropdownRef}>
           <button
-            className='flex items-center space-x-2 px-2 bg-transparent outline-none'
+            className='flex items-center space-x-2 bg-transparent px-2 outline-none'
             onClick={toggleCountryDropdown}
           >
             <MapPin className='h-4 w-4' />
-            <span className='text-sm'>{selectedCountry || t('countryLabel')}</span>
+            <span className='text-sm'>
+              {selectedCountry || t('countryLabel')}
+            </span>
           </button>
 
           {isCountryDropdownOpen && (
-            <div className='absolute left-0 z-10 mt-2 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
+            <div className='absolute left-0 z-10 mt-2 w-48 rounded-md bg-white-pure shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
               <div className='max-h-80 overflow-y-scroll py-1'>
                 <input
                   type='text'
                   placeholder={t('searchCountryPlaceholder')}
-                  className='block w-full px-4 py-2 text-sm text-gray-700 focus:outline-none'
+                  className='block w-full px-4 py-2 text-sm  focus:outline-none'
                   onChange={e => setCountrySearch(e.target.value)}
                   onClick={e => e.stopPropagation()}
                 />
@@ -202,7 +206,7 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({
                     setSelectedCountry(null)
                     toggleCountryDropdown()
                   }}
-                  className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                  className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
                 >
                   {t('allCountriesOption')}
                 </button>
@@ -213,7 +217,7 @@ const SearchJournalSection: React.FC<SearchJournalSectionProps> = ({
                       setSelectedCountry(location)
                       toggleCountryDropdown()
                     }}
-                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
                   >
                     {location}
                   </button>
