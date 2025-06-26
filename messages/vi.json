@@ -10,7 +10,10 @@
   "Chatbot": {
     "Chatbot": "Chatbot",
     "View_Details": "Xem chi tiết",
-    "Source_Disclaimer": "Đây là tuyên bố miễn trừ trách nhiệm về nguồn cho chatbot."
+    "Source_Disclaimer": "Đây là tuyên bố miễn trừ trách nhiệm về nguồn cho chatbot.",
+    "Rank": "Xếp hạng",
+    "Show_Less": "Hiển thị ít hơn",
+    "Show_More_Count": "Hiển thị thêm {count} kết quả"
   },
   "Add_Conference": "Thêm Hội nghị",
   "Light": "Sáng",
@@ -1933,5 +1936,10 @@
   "twillight": "Twilight",
   "reddit": "Reddit",
   "Call_for_Papers_must_be_at_least_characters": "Lời kêu gọi bài báo phải có ít nhất {count} ký tự.",
-  "Call_for_papers_cannot_exceed_characters": "Lời kêu gọi bài báo không được vượt quá {count} ký tự."
+  "Call_for_papers_cannot_exceed_characters": "Lời kêu gọi bài báo không được vượt quá {count} ký tự.",
+  "Loading_sources": "Đang tải nguồn...",
+  "tooltip_submission_date": "Lọc các hội nghị dựa trên khoảng thời gian nộp bài. Một hội nghị có thể có nhiều ngày nộp bài.",
+  "tooltip_rank": "Lọc các hội nghị dựa trên xếp hạng học thuật của chúng (ví dụ: A*, A, B, C, Unranked). Một hội nghị có thể có nhiều xếp hạng.",
+  "tooltip_source": "Lọc các hội nghị dựa trên nguồn dữ liệu của chúng. Một hội nghị có thể có nhiều nguồn.",
+  "tooltip_topics": "Lọc các hội nghị dựa trên các chủ đề liên quan. Bạn có thể chọn nhiều chủ đề."
 }
