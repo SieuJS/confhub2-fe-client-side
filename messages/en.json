@@ -10,7 +10,10 @@
   "Chatbot": {
     "Chatbot": "Chatbot",
     "View_Details": "View Details",
-    "Source_Disclaimer": "This is a source disclaimer for the chatbot."
+    "Source_Disclaimer": "This is a source disclaimer for the chatbot.",
+    "Rank": "Rank",
+    "Show_Less": "Show Less",
+    "Show_More_Count": "Show {count} more"
   },
   "Add_Conference": "Add Conference",
   "Light": "Light",
@@ -1933,5 +1936,11 @@
   "twillight": "Twilight",
   "reddit": "Reddit",
   "Call_for_Papers_must_be_at_least_characters": "Call for Papers must be at least {count} characters.",
-  "Call_for_papers_cannot_exceed_characters": "Call for papers cannot exceed {count} characters."
+  "Call_for_papers_cannot_exceed_characters": "Call for papers cannot exceed {count} characters.",
+  "Loading_sources": "Loading sources...",
+  "tooltip_submission_date": "Filter conferences based on their submission date range. A conference can have multiple submission dates.",
+  "tooltip_rank": "Filter conferences based on their academic rank (e.g., A*, A, B, C, Unranked). A conference can have multiple ranks.",
+  "tooltip_source": "Filter conferences based on their data source. A conference can have multiple sources.",
+  "tooltip_topics": "Filter conferences based on relevant topics. You can select multiple topics.",
+  "Disclaimer_descripstion_chatbot": "This model is not stable and may not be suitable for production use."
 }

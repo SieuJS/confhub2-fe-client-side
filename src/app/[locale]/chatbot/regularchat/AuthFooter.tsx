@@ -45,9 +45,9 @@ export default function AuthFooter({ isLeftPanelOpen }: AuthFooterProps) {
     >
       {/* Lưu ý cho người dùng về chatbot */}
       {isLeftPanelOpen && (
-        <div className="mb-3 text-xs text-amber-600 dark:text-amber-400 p-2 bg-amber-50 dark:bg-amber-950 rounded-md">
-          <p className="font-semibold">{t('Lưu ý')}:</p>
-          <p>{t('Chatbot có thể mắc sai lầm. Vui lòng kiểm tra lại thông tin quan trọng.')}</p>
+        <div className='mb-3 rounded-md bg-amber-50 p-2 text-xs text-amber-600 dark:bg-amber-950 dark:text-amber-400'>
+          <p className='font-semibold'>{t('Disclaimer')}:</p>
+          <p>{t('Disclaimer_descripstion_chatbot')}</p>
         </div>
       )}
 
