@@ -44,12 +44,12 @@ export default function AuthFooter({ isLeftPanelOpen }: AuthFooterProps) {
       className={`mt-auto border-t border-gray-200 dark:border-gray-700 ${isLeftPanelOpen ? 'p-3' : 'p-2'}`}
     >
       {/* Lưu ý cho người dùng về chatbot */}
-      {/* {isLeftPanelOpen && (
+      {isLeftPanelOpen && (
         <div className="mb-3 text-xs text-amber-600 dark:text-amber-400 p-2 bg-amber-50 dark:bg-amber-950 rounded-md">
           <p className="font-semibold">{t('Lưu ý')}:</p>
           <p>{t('Chatbot có thể mắc sai lầm. Vui lòng kiểm tra lại thông tin quan trọng.')}</p>
         </div>
-      )} */}
+      )}
 
       {isLoggedIn && user ? (
         // Logged in state

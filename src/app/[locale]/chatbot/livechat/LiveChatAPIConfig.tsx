@@ -123,7 +123,7 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
     const onToolCallCallback = async (toolCallPayload: ToolCallPayload) => {
       console.log(`[LiveChatAPIConfig] Got toolcall payload (inside callback):`, toolCallPayload);
 
-      const NEXT_PUBLIC_DATABASE_URL = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1` || "https://confhub.westus3.cloudapp.azure.com/api/v1";
+      const NEXT_PUBLIC_DATABASE_URL = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1` || "https://confhub.ddns.net/database/api/v1";
       const NEXT_PUBLIC_FRONTEND_URL = appConfig.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:8386";
 
       const handlerConfig = {
