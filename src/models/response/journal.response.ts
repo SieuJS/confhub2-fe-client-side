@@ -47,7 +47,7 @@ export type JournalData = { // Đổi tên từ JournalResponseData thành Journ
   Region: string;
   Publisher: string;
   Coverage: string;
-  Categories: string;
+  Categories: string[];
   Areas: string;
   "Subject Area and Category": SubjectAreaAndCategory;
   Information: Information;

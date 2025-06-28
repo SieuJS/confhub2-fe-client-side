@@ -114,7 +114,7 @@ const SubjectAreasJournals: React.FC<SubjectAreasJournalsProps> = ({
             // Mã hóa tất cả các ký tự đặc biệt, bao gồm cả dấu cách thành %20
             const encodedForURL = encodeURIComponent(subjectName);
             // Thay thế %20 thành + để đáp ứng yêu cầu
-            const finalQueryValue = encodedForURL.replace(/%20/g, '+');
+            const finalQueryValue = subjectName;
 
             return (
               <Link

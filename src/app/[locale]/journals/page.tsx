@@ -1,5 +1,4 @@
 // app/[locale]/journals/page.tsx
-
 import { journalService } from '@/src/services/journal.service';
 import JournalsPageClient from './JournalsPageClient';
 import { JournalApiResponse } from '@/src/models/response/journal.response';
@@ -21,6 +20,7 @@ const getValidSortOrder = (order: string | string[] | undefined): 'asc' | 'desc'
 }
 
 export default async function JournalsPage({ params, searchParams }: JournalsPageProps) {
+  console.log("JournalsPage searchParams:", searchParams);
   const apiParams = {
     search: searchParams.search as string || undefined,
     country: searchParams.country as string || undefined,
@@ -41,6 +41,7 @@ export default async function JournalsPage({ params, searchParams }: JournalsPag
   };
 
   let initialData: JournalApiResponse;
+  console.log("Fetching initial journals data with params:", apiParams);
   try {
     initialData = await journalService.getAll(apiParams);
   } catch (error) {

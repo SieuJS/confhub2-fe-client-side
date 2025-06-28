@@ -24,16 +24,16 @@ export const CitationMetricsSection: React.FC<Props> = ({ journal, t }) => {
   let latestTotalDocsValue: string | number | undefined = undefined;
 
   // Duyệt qua tất cả các key trong đối tượng journal
-  for (const key in journal) {
-    if (key.startsWith('Total Docs. (')) {
+  for (const stat of journal.Statistics) {
+    if (stat.category.startsWith('Total Docs. (')) {
       // Trích xuất năm từ key, ví dụ: "Total Docs. (2023)" -> 2023
-      const match = key.match(/\((\d{4})\)/);
+      const match = stat.category.match(/\((\d{4})\)/);
       if (match && match[1]) {
         const year = parseInt(match[1], 10);
         // Nếu đây là năm lớn hơn hoặc là năm đầu tiên chúng ta tìm thấy
         if (latestTotalDocsYear === null || year > latestTotalDocsYear) {
           latestTotalDocsYear = year;
-          latestTotalDocsValue = journal.Statistics.find(s => s.category.includes(key))?.statistic;
+          latestTotalDocsValue = journal.Statistics.find(s => s.category.includes(stat.category))?.statistic;
         }
       }
     }

@@ -49,7 +49,7 @@ export const SubjectAreaSection: React.FC<Props> = ({ journal, t }) => {
                   {t('JournalTabs.categories')}
                 </h4>
                 <div className='mt-2 flex flex-wrap gap-2'>
-                  {journal['Subject Area and Category'].Topics.map((topic, index) => (
+                  {journal.Categories.map((topic, index) => (
                     <span
                       key={index}
                       className='rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary'
