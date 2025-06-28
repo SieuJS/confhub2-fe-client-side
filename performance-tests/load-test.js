@@ -15,9 +15,9 @@ export const options = {
       executor: 'ramping-vus',
       exec: 'runGuestJourney',
       stages: [
-        // ĐIỀU CHỈNH: Tăng tải lên 200 VUs
-        { duration: '1m', target: 200 },
-        { duration: '3m', target: 200 },
+        // ĐIỀU CHỈNH: Tăng tải lên 100 VUs
+        { duration: '1m', target: 100 },
+        { duration: '3m', target: 100 },
         { duration: '30s', target: 0 },
       ],
       gracefulRampDown: '30s',
@@ -28,9 +28,9 @@ export const options = {
       exec: 'runRegisteredUserJourney',
       startTime: '30s',
       stages: [
-        // ĐIỀU CHỈNH: Tăng tải lên 100 VUs
-        { duration: '1m', target: 100 },
-        { duration: '3m', target: 100 },
+        // ĐIỀU CHỈNH: Tăng tải lên 50 VUs
+        { duration: '1m', target: 50 },
+        { duration: '3m', target: 50 },
         { duration: '30s', target: 0 },
       ],
       gracefulRampDown: '30s',
@@ -50,7 +50,7 @@ export function setup() {
 
   try {
     // Lấy 100 conference và 100 journal để có nhiều dữ liệu test hơn
-    const confRes = http.get(`${API_URL}/api/v1/conference?perPage=100`);
+    const confRes = http.get(`${API_URL}/api/v1/conference?perPage=200&page=2`);
     if (confRes.status === 200) {
       const conferences = confRes.json('payload');
       if (conferences && Array.isArray(conferences)) {
@@ -62,7 +62,7 @@ export function setup() {
     }
 
     // Lưu ý: Sửa lại endpoint là /journals (số nhiều) như file của bạn
-    const journalRes = http.get(`${API_URL}/api/v1/journals?limit=100`);
+    const journalRes = http.get(`${API_URL}/api/v1/journals?limit=28`);
     if (journalRes.status === 200) {
       const journals = journalRes.json('data');
       if (journals && Array.isArray(journals)) {

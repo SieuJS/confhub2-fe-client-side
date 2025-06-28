@@ -75,7 +75,7 @@ export const journalFollowService = {
     // PHƯƠNG THỨC MỚI ĐỂ LẤY DANH SÁCH FOLLOWED JOURNAL IDs
   async getFollowedJournalIdsByUser(): Promise<string[]> {
     const token = localStorage.getItem('token');
-    const response = await fetch(`https://confhub.westus3.cloudapp.azure.com/api/v1/journal-follows/by-user`, {
+    const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/journal-follows/by-user`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`

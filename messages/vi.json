@@ -10,7 +10,10 @@
   "Chatbot": {
     "Chatbot": "Chatbot",
     "View_Details": "Xem chi tiết",
-    "Source_Disclaimer": "Đây là tuyên bố miễn trừ trách nhiệm về nguồn cho chatbot."
+    "Source_Disclaimer": "Đây là tuyên bố miễn trừ trách nhiệm về nguồn cho chatbot.",
+    "Rank": "Xếp hạng",
+    "Show_Less": "Hiển thị ít hơn",
+    "Show_More_Count": "Hiển thị thêm {count} kết quả"
   },
   "Add_Conference": "Thêm Hội nghị",
   "Light": "Sáng",
@@ -218,7 +221,7 @@
   "Mark All As Read": "Đánh dấu tất cả là đã đọc",
   "Notification_when_add_to_calendar": "Thông báo khi thêm vào lịch",
   "Notification_when_follow": "Thông báo khi theo dõi",
-  "Notification_when_follow_description": "Nhận thông báo khi có cập nhật mới về hội nghị.",
+  "Notification_when_follow_description": "Nhận thông báo khi bạn theo dõi một hội nghị.",
   "Notification_when_update_profile": "Thông báo khi cập nhật hồ sơ",
   "Receive_Notifications": "Nhận thông báo",
   "Receive_Notifications_Description": "Nhận thông báo về các hội nghị bạn theo dõi, các ngày quan trọng và các cập nhật khác.",
@@ -1677,7 +1680,11 @@
     "Notification_Date": "Ngày thông báo",
     "Camera_Ready_Date": "Ngày nộp bản cuối",
     "Other_Date": "Ngày khác",
-    "Call_for_paper": "Kêu gọi bài báo"
+    "Call_for_paper": "Kêu gọi bài báo",
+    "No_summary_provided": "Không có tóm tắt nào được cung cấp",
+    "No_Call_for_paper_provided": "Không có lời kêu gọi bài báo nào được cung cấp",
+    "cfpLink": "Link Kêu gọi bài báo",
+    "impLink": "Link Ngày quan trọng"
   },
   "Try_Again": "Thử lại",
   "Explore_All_Conferences": "Khám phá tất cả hội nghị",
@@ -1918,7 +1925,7 @@
   "Start_a_new_chat_to_see_it_here": "Bắt đầu cuộc trò chuyện mới để xem ở đây.",
   "Try_different_keywords": "Hãy thử các từ khóa khác",
   "Call_for_papers_link_cannot_be_the_same_as_the_official_website": "Liên kết kêu gọi bài báo không thể giống với liên kết trang web chính thức của hội nghị.",
-  "Call_for_papers_and_important_dates_links_cannot_be_the_same_as_the_official_website": "Liên kết kêu gọi bài báo và các liên kết ngày quan trọng không thể giống với liên kết trang web chính thức của hội nghị.",
+  "Call_for_papers_and_important_dates_links_cannot_be_the_same": "Liên kết kêu gọi bài báo và liên kết ngày quan trọng không thể giống nhau.",
   "light": "Sáng",
   "dark": "Tối",
   "system": "Hệ thống",
@@ -1927,5 +1934,13 @@
   "discord": "Discord",
   "netflix": "Netflix",
   "twillight": "Twilight",
-  "reddit": "Reddit"
+  "reddit": "Reddit",
+  "Call_for_Papers_must_be_at_least_characters": "Lời kêu gọi bài báo phải có ít nhất {count} ký tự.",
+  "Call_for_papers_cannot_exceed_characters": "Lời kêu gọi bài báo không được vượt quá {count} ký tự.",
+  "Loading_sources": "Đang tải nguồn...",
+  "tooltip_submission_date": "Lọc các hội nghị dựa trên khoảng thời gian nộp bài. Một hội nghị có thể có nhiều ngày nộp bài.",
+  "tooltip_rank": "Lọc các hội nghị dựa trên xếp hạng học thuật của chúng (ví dụ: A*, A, B, C, Unranked). Một hội nghị có thể có nhiều xếp hạng.",
+  "tooltip_source": "Lọc các hội nghị dựa trên nguồn dữ liệu của chúng. Một hội nghị có thể có nhiều nguồn.",
+  "tooltip_topics": "Lọc các hội nghị dựa trên các chủ đề liên quan. Bạn có thể chọn nhiều chủ đề.",
+  "Disclaimer_descripstion_chatbot": "Thông tin do chatbot cung cấp có thể không hoàn toàn chính xác. Vui lòng luôn xác minh với các nguồn chính thức. Chúng tôi không chịu trách nhiệm cho bất kỳ quyết định nào được đưa ra dựa trên thông tin từ chatbot."
 }
