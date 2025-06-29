@@ -29,6 +29,7 @@ export const pathnames = {
   '/auth/verify-email': '/auth/verify-email',
   '/auth/forgot-password': '/auth/forgot-password',
   '/auth/reset-password': '/auth/reset-password',
+  '/poster': '/poster',
 } satisfies Pathnames<typeof locales>
 
 export const { Link, redirect, usePathname, useRouter, getPathname } =
