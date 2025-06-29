@@ -307,8 +307,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem(LOCAL_STORAGE_KEYS.RETURN_URL, currentPath)
     const currentOrigin =
       typeof window !== 'undefined' ? window.location.origin : ''
-    console.log(currentOrigin)
-    window.alert(currentOrigin)
     const googleAuthUrl = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/auth/google?redirectUrl=${encodeURIComponent(currentOrigin + '/apis/auth/google-callback')}`
     if (typeof window !== 'undefined') window.location.href = googleAuthUrl
     // Không setIsLoading(false) ở đây vì trang sẽ redirect
