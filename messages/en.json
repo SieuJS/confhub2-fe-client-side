@@ -886,7 +886,8 @@
     "loadingButton": "Processing...",
     "followSuccess": "Successfully followed the journal!",
     "unfollowSuccess": "Successfully unfollowed the journal.",
-    "followError": "An error occurred. Please try again later."
+    "followError": "An error occurred. Please try again later.",
+    "loadingStatus": "Loading journal details..."
   },
   "JournalResults": {
     "sortByPublisher": "Publisher",

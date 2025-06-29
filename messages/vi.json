@@ -886,7 +886,8 @@
     "loadingButton": "Đang xử lý...",
     "followSuccess": "Đã theo dõi tạp chí thành công!",
     "unfollowSuccess": "Đã bỏ theo dõi tạp chí thành công.",
-    "followError": "Đã xảy ra lỗi. Vui lòng thử lại sau."
+    "followError": "Đã xảy ra lỗi. Vui lòng thử lại sau.",
+    "loadingStatus": "Đang tải thông tin tạp chí..."
   },
   "JournalResults": {
     "sortByPublisher": "Nhà xuất bản",

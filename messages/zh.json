@@ -886,7 +886,8 @@
     "loadingButton": "处理中...",
     "followSuccess": "成功关注该期刊！",
     "unfollowSuccess": "成功取消关注该期刊。",
-    "followError": "发生错误。请稍后重试。"
+    "followError": "发生错误。请稍后重试。",
+    "loadingStatus": "正在加载期刊信息..."
   },
   "JournalResults": {
     "sortByPublisher": "出版商",

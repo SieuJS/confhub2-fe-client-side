@@ -23,7 +23,8 @@ const Poster: React.FC = () => {
       }}
     >
       {/* HEADER: Chiều cao của header sẽ tự động dựa trên nội dung */}
-      <header className='flex items-center justify-between bg-[#0056b3] px-[188px] py-[125px] font-bold text-white shadow-md'>
+      {/* Đã đổi màu nền từ bg-[#0056b3] sang bg-gray-900 */}
+      <header className='flex items-center justify-between bg-gray-900 px-[188px] py-[125px] font-bold text-white shadow-md'>
         {/* Left Section: Logo & School Info */}
         <div className='flex items-center'>
           <img
@@ -109,7 +110,7 @@ const Poster: React.FC = () => {
             </p>
             <p className='mb-[78px] text-[113px] leading-relaxed'>
               Kế thừa/Sử dụng lại: Google Custom Search API, mô hình Gemini, các
-              thư viện/framework (Next.js, NestJS, RabbitMQ...).
+              thư viện/framework (Next.js, NestJS, BullMQ...).
             </p>
           </div>
         </div>
@@ -160,7 +161,7 @@ const Poster: React.FC = () => {
               </li>
               <li className='mb-[31px] text-[113px] leading-relaxed'>
                 <strong>Backend:</strong> Node.js (NestJS), chia dịch vụ, giao
-                tiếp qua RabbitMQ.
+                tiếp qua BullMQ.
               </li>
               <li className='mb-[31px] text-[113px] leading-relaxed'>
                 <strong>Cơ sở dữ liệu:</strong> PostgreSQL (dữ liệu cấu trúc),
@@ -302,7 +303,7 @@ const Poster: React.FC = () => {
                 engineering, kiểm duyệt bán tự động.
               </li>
               <li className='mb-[31px] text-[113px] leading-relaxed'>
-                <strong>Giao tiếp giữa microservices:</strong> Sử dụng RabbitMQ
+                <strong>Giao tiếp giữa microservices:</strong> Sử dụng BullMQ
                 hiệu quả, thiết kế API rõ ràng.
               </li>
             </ul>
