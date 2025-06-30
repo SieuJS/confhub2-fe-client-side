@@ -74,7 +74,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
     navRef,
     updatedSections: sectionKeys
   })
-  useSectionNavigation({ navRef, setActiveSection })
+  // useSectionNavigation({ navRef, setActiveSection })
 
   if (!conference) {
     return (
@@ -94,26 +94,36 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
         t={t}
       />
 
-      <OverviewSection summary={summary} t={t} />
+      <div id='overview' className='scroll-mt-28'>
+        <OverviewSection summary={summary} t={t} />
+      </div>
 
-      <CallForPapersSection
-        callForPaper={callForPaper}
-        cfpLink={cfpLink}
-        t={t}
-      />
+      <div id='call-for-papers' className='scroll-mt-28'>
+        <CallForPapersSection
+          callForPaper={callForPaper}
+          cfpLink={cfpLink}
+          t={t}
+        />
+      </div>
 
-      <ImportantDatesSection
-        groupedDates={groupedDates}
-        formatDate={formatDate}
-        impLink={impLink}
-      />
+      <div id='important-dates' className='scroll-mt-28'>
+        <ImportantDatesSection
+          groupedDates={groupedDates}
+          formatDate={formatDate}
+          impLink={impLink}
+        />
+      </div>
 
       {/* Conditionally render SourceRankSection based on original logic */}
       {conference.ranks && (
-        <SourceRankSection processedRanks={processedRanks} t={t} />
+        <div id='source-rank' className='scroll-mt-28'>
+          <SourceRankSection processedRanks={processedRanks} t={t} />
+        </div>
       )}
 
-      <MapSection location={primaryLocation?.address} t={t} />
+      <div id='map' className='scroll-mt-28'>
+        <MapSection location={primaryLocation?.address} t={t} />
+      </div>
     </div>
   )
 }

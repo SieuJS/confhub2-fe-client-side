@@ -38,12 +38,13 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => {
         'sjr',
         'citation-metrics',
         'quartile-history',
-        'subject-area-category',
+        'subject-area-category'
       ].filter(key => {
         // Lọc bỏ các section không có dữ liệu để không hiển thị trên thanh Nav
         if (
           key === 'quartile-history' &&
-          (!journal.SupplementaryTable || journal.SupplementaryTable.length === 0)
+          (!journal.SupplementaryTable ||
+            journal.SupplementaryTable.length === 0)
         ) {
           return false
         }
@@ -60,14 +61,14 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => {
     sjr: 'JournalTabs.sjrTitle',
     'citation-metrics': 'CitationMetrics.navTitle',
     'quartile-history': 'QuartileHistory.navTitle',
-    'subject-area-category': 'JournalTabs.subjectAreaTitle',
+    'subject-area-category': 'JournalTabs.subjectAreaTitle'
   }
 
   const { activeSection, setActiveSection } = useActiveSection({
     navRef,
-    updatedSections: sectionKeys,
+    updatedSections: sectionKeys
   })
-  useSectionNavigation({ navRef, setActiveSection })
+  // useSectionNavigation({ navRef, setActiveSection })
 
   return (
     <div className='container mx-auto px-0 md:px-4'>
@@ -83,27 +84,45 @@ export const JournalTabs: React.FC<JournalTabsProps> = ({ journal }) => {
         {/* === BƯỚC 3: RENDER TẤT CẢ CÁC SECTION THEO ĐÚNG THỨ TỰ LOGIC === */}
 
         {/* 1. Tổng quan chung */}
-        <OverviewSection journal={journal} t={t} />
+        <div id='overview' className='scroll-mt-20'>
+          <OverviewSection journal={journal} t={t} />
+        </div>
 
         {/* 2. Các chỉ số chính */}
-        <ImpactFactorSection journal={journal} t={t} />
-        <HIndexSection journal={journal} t={t} />
-        <SjrSection journal={journal} t={t} />
+        <div id='impact-factor' className='scroll-mt-20'>
+          <ImpactFactorSection journal={journal} t={t} />
+        </div>
+        <div id='h-index' className='scroll-mt-20'>
+          <HIndexSection journal={journal} t={t} />
+        </div>
+        <div id='sjr' className='scroll-mt-20'>
+          <SjrSection journal={journal} t={t} />
+        </div>
 
         {/* 3. Các chỉ số trích dẫn chi tiết */}
-        <CitationMetricsSection journal={journal} t={t} />
+        <div id='citation-metrics' className='scroll-mt-20'>
+          <CitationMetricsSection journal={journal} t={t} />
+        </div>
 
         {/* 4. Lịch sử xếp hạng (chỉ hiển thị khi có dữ liệu) */}
-        {journal.SupplementaryTable && journal.SupplementaryTable.length > 0 && (
-          <QuartileHistoryChart data={journal.SupplementaryTable} t={t} />
-        )}
+        {journal.SupplementaryTable &&
+          journal.SupplementaryTable.length > 0 && (
+            <div id='quartile-history' className='scroll-mt-20'>
+              <QuartileHistoryChart data={journal.SupplementaryTable} t={t} />
+            </div>
+          )}
 
         {/* 5. Phân loại lĩnh vực */}
-        <SubjectAreaSection journal={journal} t={t} />
+        <div id='subject-area-category' className='scroll-mt-20'>
+          <SubjectAreaSection journal={journal} t={t} />
+        </div>
 
         {/* 6. Nguồn dữ liệu (chỉ hiển thị khi có link) */}
         {journal.scimagoLink && (
+          // <div id='overview' className='scroll-mt-20'>
+
           <DataSourceSection scimagoLink={journal.scimagoLink} t={t} />
+          // </div>
         )}
       </main>
     </div>
