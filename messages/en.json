@@ -1820,7 +1820,8 @@
       "previously": "Previously:",
       "newBadge": "NEW",
       "showLess": "Show less",
-      "showMore": "Show {count} more"
+      "showMore": "Show {count} more",
+      "Go_to_Important_Dates_website": "Go to Important Dates Website"
     }
   },
   "Policy": {
@@ -1943,5 +1944,6 @@
   "tooltip_rank": "Filter conferences based on their academic rank (e.g., A*, A, B, C, Unranked). A conference can have multiple ranks.",
   "tooltip_source": "Filter conferences based on their data source. A conference can have multiple sources.",
   "tooltip_topics": "Filter conferences based on relevant topics. You can select multiple topics.",
-  "Disclaimer_descripstion_chatbot": "This model is not stable and may not be suitable for production use."
+  "Disclaimer_descripstion_chatbot": "This model is not stable and may not be suitable for production use.",
+  "Go_to_CFP_website": "Go to CFP website"
 }

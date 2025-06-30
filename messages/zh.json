@@ -1820,7 +1820,8 @@
       "previously": "曾为：",
       "newBadge": "新",
       "showLess": "收起",
-      "showMore": "显示另外 {count} 个"
+      "showMore": "显示另外 {count} 个",
+      "Go_to_Important_Dates_website": "前往重要日期网站"
     }
   },
   "Policy": {
@@ -1943,5 +1944,6 @@
   "tooltip_rank": "根据会议的学术排名进行筛选（例如：A*、A、B、C、未评级）。一个会议可能拥有多个排名。",
   "tooltip_source": "根据数据来源筛选会议。一个会议可能拥有多个来源。",
   "tooltip_topics": "根据相关主题筛选会议。您可以选择多个主题。",
-  "Disclaimer_descripstion_chatbot": "请注意，聊天机器人提供的信息可能不完全准确。请务必与官方来源核实。我们对基于聊天机器人信息做出的任何决定概不负责。"
+  "Disclaimer_descripstion_chatbot": "请注意，聊天机器人提供的信息可能不完全准确。请务必与官方来源核实。我们对基于聊天机器人信息做出的任何决定概不负责。",
+  "Go_to_CFP_website": "前往论文征集网站"
 }

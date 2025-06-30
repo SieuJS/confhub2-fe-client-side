@@ -1,0 +1,1017 @@
+{
+  "Mã Use Case": "UC_DN_001",
+  "Tên Use Case": "Đăng nhập",
+  "Mô tả": "Cho phép người dùng và quản trị viên đăng nhập vào hệ thống để truy cập các chức năng cá nhân hóa.",
+  "Tác nhân chính": "Người dùng",
+  "Tác nhân phụ/Hỗ trợ": ["Admin"],
+  "Điều kiện tiên quyết": [
+    "Người dùng đã đăng ký một tài khoản hợp lệ.",
+    "Người dùng đang ở trang Đăng nhập."
+  ],
+  "Kết quả": [
+    "Người dùng được xác thực và đăng nhập thành công.",
+    "Người dùng được chuyển hướng đến trang chủ (Homepage).",
+    "Biểu tượng avatar của người dùng và chuông thông báo xuất hiện trên header."
+  ],
+  "Luồng chính": [
+    "1. Người dùng truy cập trang Đăng nhập.",
+    "2. Người dùng nhập Email hợp lệ vào trường 'Email'.",
+    "3. Người dùng nhập Mật khẩu hợp lệ vào trường 'Password'.",
+    "4. Người dùng nhấp vào nút 'Sign In'.",
+    "5. Hệ thống xác thực thông tin đăng nhập.",
+    "6. Hệ thống chuyển hướng người dùng đến trang chủ và hiển thị thông tin cá nhân trên header."
+  ],
+  "Luồng thay thế": [
+    {
+      "Mã Luồng": "Alt_DN_001",
+      "Tên Luồng": "Đăng nhập bằng Google",
+      "Mô tả": "Người dùng chọn đăng nhập thông qua tài khoản Google.",
+      "Bước": [
+        "1. Người dùng nhấp vào nút 'Continue with Google'.",
+        "2. Hệ thống hiển thị cửa sổ xác thực của Google.",
+        "3. Người dùng chọn tài khoản Google để đăng nhập.",
+        "4. Hệ thống xác thực và đăng nhập người dùng."
+      ],
+      "Related Test Case": "TC_Login_007"
+    }
+  ],
+  "Luồng ngoại lệ": [
+    {
+      "Mã Luồng": "Ex_DN_001",
+      "Tên Luồng": "Đăng nhập thất bại do sai mật khẩu",
+      "Mô tả": "Người dùng nhập đúng Email nhưng sai Mật khẩu.",
+      "Bước": [
+        "1. Từ bước 4 của Luồng chính, thông tin xác thực thất bại.",
+        "2. Hệ thống hiển thị thông báo lỗi 'Email hoặc Mật khẩu không chính xác'.",
+        "3. Người dùng vẫn ở trang Đăng nhập."
+      ],
+      "Related Test Case": "TC_Login_002"
+    },
+    {
+      "Mã Luồng": "Ex_DN_002",
+      "Tên Luồng": "Đăng nhập thất bại do Email không tồn tại",
+      "Mô tả": "Người dùng nhập Email chưa được đăng ký trong hệ thống.",
+      "Bước": [
+        "1. Từ bước 4 của Luồng chính, thông tin xác thực thất bại.",
+        "2. Hệ thống hiển thị thông báo lỗi 'Email hoặc Mật khẩu không chính xác'.",
+        "3. Người dùng vẫn ở trang Đăng nhập."
+      ],
+      "Related Test Case": "TC_Login_003"
+    },
+    {
+      "Mã Luồng": "Ex_DN_003",
+      "Tên Luồng": "Đăng nhập thất bại do bỏ trống trường bắt buộc",
+      "Mô tả": "Người dùng không điền vào trường Email hoặc Mật khẩu.",
+      "Bước": [
+        "1. Trước khi thực hiện bước 5 của Luồng chính, người dùng nhấp 'Sign In'.",
+        "2. Hệ thống kiểm tra validation.",
+        "3. Hệ thống hiển thị thông báo lỗi dưới các trường bị trống ('Vui lòng nhập email', 'Vui lòng nhập mật khẩu').",
+        "4. Người dùng vẫn ở trang Đăng nhập."
+      ],
+      "Related Test Case": "TC_Login_004"
+    }
+  ]
+},
+{
+  "Mã Use Case": "UC_DK_001",
+  "Tên Use Case": "Đăng ký tài khoản",
+  "Mô tả": "Cho phép người dùng mới tạo một tài khoản để sử dụng các tính năng của hệ thống.",
+  "Tác nhân chính": "Người dùng chưa có tài khoản",
+  "Tác nhân phụ/Hỗ trợ": [],
+  "Điều kiện tiên quyết": [
+    "Người dùng đang ở trang Đăng ký (Create your account)."
+  ],
+  "Kết quả": [
+    "Hệ thống tạo tài khoản mới thành công.",
+    "Người dùng được chuyển hướng đến trang Đăng nhập hoặc được tự động đăng nhập và chuyển đến trang chủ."
+  ],
+  "Luồng chính": [
+    "1. Người dùng truy cập trang Đăng ký.",
+    "2. Người dùng nhập 'First Name' hợp lệ.",
+    "3. Người dùng nhập 'Last Name' hợp lệ.",
+    "4. Người dùng chọn 'Date of Birth' hợp lệ.",
+    "5. Người dùng nhập một địa chỉ 'Email' chưa được đăng ký.",
+    "6. Người dùng nhập mật khẩu vào trường 'Password'.",
+    "7. Người dùng nhập lại mật khẩu giống hệt vào trường 'Confirm Password'.",
+    "8. Người dùng nhấp vào nút 'Create account'.",
+    "9. Hệ thống xác thực thông tin và tạo tài khoản.",
+    "10. Hệ thống chuyển hướng người dùng đến trang phù hợp."
+  ],
+  "Luồng thay thế": [],
+  "Luồng ngoại lệ": [
+    {
+      "Mã Luồng": "Ex_DK_001",
+      "Tên Luồng": "Đăng ký thất bại do Mật khẩu xác nhận không khớp",
+      "Mô tả": "Người dùng nhập mật khẩu xác nhận khác với mật khẩu đã nhập.",
+      "Bước": [
+        "1. Từ bước 8 của Luồng chính, hệ thống kiểm tra thông tin.",
+        "2. Hệ thống phát hiện Mật khẩu và Xác nhận Mật khẩu không trùng nhau.",
+        "3. Hệ thống hiển thị thông báo lỗi dưới trường 'Confirm Password', ví dụ 'Mật khẩu xác nhận không khớp'.",
+        "4. Người dùng vẫn ở lại trang Đăng ký."
+      ],
+      "Related Test Case": "TC_SignUp_002"
+    },
+    {
+      "Mã Luồng": "Ex_DK_002",
+      "Tên Luồng": "Đăng ký thất bại do Email đã tồn tại",
+      "Mô tả": "Người dùng sử dụng một email đã được đăng ký cho tài khoản khác.",
+      "Bước": [
+        "1. Từ bước 8 của Luồng chính, hệ thống kiểm tra thông tin.",
+        "2. Hệ thống phát hiện email đã tồn tại trong cơ sở dữ liệu.",
+        "3. Hệ thống hiển thị thông báo lỗi, ví dụ 'Email này đã được sử dụng'.",
+        "4. Người dùng vẫn ở lại trang Đăng ký."
+      ],
+      "Related Test Case": "TC_SignUp_003"
+    }
+  ]
+},
+{
+  "Mã Use Case": "UC_QLHS_001",
+  "Tên Use Case": "Quản lý Hồ sơ cá nhân",
+  "Mô tả": "Cho phép người dùng xem, chỉnh sửa thông tin cá nhân, thay đổi mật khẩu và quản lý tài khoản của mình.",
+  "Tác nhân chính": "Người dùng đã đăng nhập",
+  "Tác nhân phụ/Hỗ trợ": [],
+  "Điều kiện tiên quyết": [
+    "Người dùng đã đăng nhập thành công vào hệ thống."
+  ],
+  "Kết quả": [
+    "Thông tin cá nhân của người dùng được cập nhật thành công trên hệ thống.",
+    "Các thay đổi được phản ánh ngay trên trang hồ sơ."
+  ],
+  "Luồng chính": [
+    "1. Người dùng truy cập trang Hồ sơ cá nhân (Profile).",
+    "2. Người dùng nhấp vào nút 'Edit Profile'.",
+    "3. Người dùng thay đổi nội dung trong trường 'About me'.",
+    "4. Người dùng thêm một chủ đề mới trong mục 'I am also interested in these topics'.",
+    "5. Người dùng nhấp vào nút 'Save Changes'.",
+    "6. Hệ thống lưu lại thông tin và hiển thị thông báo cập nhật thành công."
+  ],
+  "Luồng thay thế": [
+    {
+      "Mã Luồng": "Alt_QLHS_001",
+      "Tên Luồng": "Hủy bỏ chỉnh sửa thông tin",
+      "Mô tả": "Người dùng quyết định không lưu các thay đổi đã thực hiện.",
+      "Bước": [
+        "1. Từ bước 3 hoặc 4 của Luồng chính, sau khi đã thay đổi thông tin.",
+        "2. Người dùng nhấp vào nút 'Cancel'.",
+        "3. Hệ thống quay trở lại chế độ xem hồ sơ, các thay đổi không được lưu."
+      ],
+      "Related Test Case": "TC_Profile_002"
+    },
+    {
+      "Mã Luồng": "Alt_QLHS_002",
+      "Tên Luồng": "Thay đổi mật khẩu",
+      "Mô tả": "Người dùng thực hiện thay đổi mật khẩu tài khoản.",
+      "Bước": [
+        "1. Từ trang Hồ sơ, người dùng nhấp vào menu hành động (...) và chọn 'Change Password'.",
+        "2. Hệ thống hiển thị pop-up thay đổi mật khẩu.",
+        "3. Người dùng nhập mật khẩu hiện tại chính xác.",
+        "4. Người dùng nhập mật khẩu mới và xác nhận mật khẩu mới.",
+        "5. Người dùng nhấp vào nút 'Change Password'.",
+        "6. Hệ thống xác thực và cập nhật mật khẩu, sau đó hiển thị thông báo thành công."
+      ],
+      "Related Test Case": "TC_Password_001"
+    },
+    {
+      "Mã Luồng": "Alt_QLHS_003",
+      "Tên Luồng": "Thay đổi ảnh đại diện (Avatar)",
+      "Mô tả": "Người dùng chọn một ảnh đại diện mới từ danh sách có sẵn.",
+      "Bước": [
+        "1. Từ chế độ 'Edit Profile', người dùng nhấp vào ảnh đại diện hiện tại.",
+        "2. Hệ thống hiển thị pop-up 'Select an Avatar'.",
+        "3. Người dùng chọn một avatar khác.",
+        "4. Người dùng nhấp 'Save Changes' trên trang chính.",
+        "5. Hệ thống cập nhật avatar mới."
+      ],
+      "Related Test Case": "TC_Profile_003"
+    },
+    {
+      "Mã Luồng": "Alt_QLHS_004",
+      "Tên Luồng": "Thay đổi ảnh nền (Background)",
+      "Mô tả": "Người dùng chọn một ảnh nền mới cho trang cá nhân.",
+      "Bước": [
+        "1. Từ chế độ 'Edit Profile', người dùng nhấp vào biểu tượng chỉnh sửa trên ảnh nền.",
+        "2. Hệ thống hiển thị pop-up 'Select a Background'.",
+        "3. Người dùng chọn một ảnh nền khác.",
+        "4. Người dùng nhấp 'Save Changes' trên trang chính.",
+        "5. Hệ thống cập nhật ảnh nền mới."
+      ],
+      "Related Test Case": "TC_Profile_004"
+    },
+    {
+      "Mã Luồng": "Alt_QLHS_005",
+      "Tên Luồng": "Xóa tài khoản vĩnh viễn",
+      "Mô tả": "Người dùng quyết định xóa tài khoản của mình khỏi hệ thống.",
+      "Bước": [
+        "1. Người dùng điều hướng đến tùy chọn xóa tài khoản (ví dụ: trong Setting).",
+        "2. Hệ thống hiển thị pop-up 'Confirm Account Deletion'.",
+        "3. Người dùng nhấp vào nút 'Delete my Account'.",
+        "4. Hệ thống xóa vĩnh viễn tài khoản, đăng xuất người dùng và chuyển về trang chủ."
+      ],
+      "Related Test Case": "TC_Account_002"
+    },
+    {
+      "Mã Luồng": "Alt_QLHS_006",
+      "Tên Luồng": "Hủy bỏ yêu cầu xóa tài khoản",
+      "Mô tả": "Người dùng hủy bỏ hành động xóa tài khoản.",
+      "Bước": [
+        "1. Từ bước 2 của luồng 'Xóa tài khoản vĩnh viễn'.",
+        "2. Người dùng nhấp vào nút 'Cancel' trong pop-up xác nhận.",
+        "3. Pop-up đóng lại và không có hành động nào được thực hiện."
+      ],
+      "Related Test Case": "TC_Account_001"
+    }
+  ],
+  "Luồng ngoại lệ": [
+    {
+      "Mã Luồng": "Ex_QLHS_001",
+      "Tên Luồng": "Thay đổi mật khẩu thất bại do sai mật khẩu hiện tại",
+      "Mô tả": "Người dùng nhập sai mật khẩu hiện tại khi cố gắng đổi mật khẩu mới.",
+      "Bước": [
+        "1. Từ bước 5 của luồng 'Thay đổi mật khẩu', hệ thống xác thực thông tin.",
+        "2. Hệ thống phát hiện mật khẩu hiện tại không chính xác.",
+        "3. Hệ thống hiển thị thông báo lỗi 'Mật khẩu hiện tại không đúng'.",
+        "4. Pop-up thay đổi mật khẩu vẫn mở."
+      ],
+      "Related Test Case": "TC_Password_002"
+    }
+  ]
+},
+{
+  "Mã Use Case": "UC_TKHN_001",
+  "Tên Use Case": "Tìm kiếm Hội nghị",
+  "Mô tả": "Cho phép người dùng tìm kiếm các hội nghị dựa trên các tiêu chí khác nhau như từ khóa, chủ đề, địa điểm, xếp hạng.",
+  "Tác nhân chính": "Người dùng",
+  "Tác nhân phụ/Hỗ trợ": [],
+  "Điều kiện tiên quyết": [
+    "Người dùng đang ở trang tìm kiếm hội nghị."
+  ],
+  "Kết quả": [
+    "Hệ thống hiển thị danh sách các hội nghị phù hợp với tiêu chí tìm kiếm của người dùng."
+  ],
+  "Luồng chính": [
+    "1. Người dùng truy cập trang tìm kiếm.",
+    "2. Người dùng nhập một từ khóa hợp lệ vào ô tìm kiếm chính.",
+    "3. Người dùng giữ nguyên bộ lọc là 'Keyword'.",
+    "4. Người dùng nhấp vào nút 'Search'.",
+    "5. Hệ thống xử lý và trả về danh sách kết quả phù hợp."
+  ],
+  "Luồng thay thế": [
+    {
+      "Mã Luồng": "Alt_TKHN_001",
+      "Tên Luồng": "Tìm kiếm nâng cao với nhiều tiêu chí",
+      "Mô tả": "Người dùng sử dụng các bộ lọc nâng cao để tìm kiếm chính xác hơn.",
+      "Bước": [
+        "1. Người dùng nhấp vào 'Show more advanced search options'.",
+        "2. Người dùng nhập các tiêu chí vào các trường nâng cao (Topics, Rank, Location, etc.).",
+        "3. Người dùng nhấp vào nút 'Search'.",
+        "4. Hệ thống hiển thị danh sách kết quả thỏa mãn tất cả các điều kiện."
+      ],
+      "Related Test Case": "TC_Search_002"
+    },
+    {
+      "Mã Luồng": "Alt_TKHN_002",
+      "Tên Luồng": "Xóa các bộ lọc tìm kiếm",
+      "Mô tả": "Người dùng muốn đặt lại tất cả các tiêu chí tìm kiếm về trạng thái ban đầu.",
+      "Bước": [
+        "1. Sau khi đã thực hiện một tìm kiếm và có kết quả.",
+        "2. Người dùng nhấp vào nút 'Clear'.",
+        "3. Hệ thống xóa tất cả các giá trị trong các trường tìm kiếm và tải lại danh sách kết quả đầy đủ."
+      ],
+      "Related Test Case": "TC_Search_003"
+    },
+    {
+      "Mã Luồng": "Alt_TKHN_003",
+      "Tên Luồng": "Chuyển đổi chế độ hiển thị",
+      "Mô tả": "Người dùng thay đổi cách hiển thị kết quả giữa dạng Lưới (Grid) và Danh sách (List).",
+      "Bước": [
+        "1. Người dùng nhấp vào biểu tượng chuyển đổi chế độ xem (List/Grid).",
+        "2. Bố cục của danh sách kết quả thay đổi tương ứng."
+      ],
+      "Related Test Case": "TC_Display_001"
+    },
+    {
+      "Mã Luồng": "Alt_TKHN_004",
+      "Tên Luồng": "Điều hướng phân trang",
+      "Mô tả": "Người dùng di chuyển qua các trang kết quả khác nhau.",
+      "Bước": [
+        "1. Người dùng cuộn xuống cuối trang.",
+        "2. Người dùng nhấp vào một số trang hoặc nút 'Next'.",
+        "3. Hệ thống tải và hiển thị trang kết quả tương ứng."
+      ],
+      "Related Test Case": "TC_Pagination_001"
+    }
+  ],
+  "Luồng ngoại lệ": [
+    {
+      "Mã Luồng": "Ex_TKHN_001",
+      "Tên Luồng": "Tìm kiếm không trả về kết quả",
+      "Mô tả": "Tiêu chí tìm kiếm của người dùng không khớp với bất kỳ hội nghị nào trong hệ thống.",
+      "Bước": [
+        "1. Từ bước 4 của Luồng chính.",
+        "2. Hệ thống xử lý và không tìm thấy kết quả nào.",
+        "3. Hệ thống hiển thị thông báo 'No results found' hoặc tương tự."
+      ],
+      "Related Test Case": "TC_Search_004"
+    }
+  ]
+},
+{
+  "Mã Use Case": "UC_THNC_001",
+  "Tên Use Case": "Thêm Hội nghị mới",
+  "Mô tả": "Cho phép người dùng đóng góp dữ liệu bằng cách thêm một hội nghị mới vào hệ thống thông qua một quy trình nhiều bước. Hội nghị sau đó sẽ chờ quản trị viên phê duyệt.",
+  "Tác nhân chính": "Người dùng đã đăng nhập",
+  "Tác nhân phụ/Hỗ trợ": ["Admin (phê duyệt)"],
+  "Điều kiện tiên quyết": [
+    "Người dùng đã đăng nhập vào hệ thống."
+  ],
+  "Kết quả": [
+    "Hội nghị được gửi thành công đến hệ thống.",
+    "Hội nghị có trạng thái 'Pending' và chờ được xét duyệt.",
+    "Người dùng được điều hướng đến trang 'My Conferences'."
+  ],
+  "Luồng chính": [
+    "1. Người dùng nhấp vào nút 'Add Conference'.",
+    "2. Tại bước 1 'Basic Information', người dùng điền đầy đủ thông tin cơ bản và nhấp 'Next'.",
+    "3. Tại bước 2 'Logistics Details', người dùng điền đầy đủ thông tin địa điểm, ngày tháng và nhấp 'Next'.",
+    "4. Tại bước 3 'Content & Branding', người dùng điền đầy đủ thông tin nội dung và nhấp 'Next'.",
+    "5. Tại bước 4 'Review Information', người dùng kiểm tra lại thông tin và nhấp 'Next'.",
+    "6. Tại bước 5 'Review & Confirm', người dùng tích vào ô 'I agree to the terms and conditions'.",
+    "7. Người dùng nhấp vào nút 'Submit Conference'.",
+    "8. Hệ thống hiển thị pop-up 'Submission Successful'."
+  ],
+  "Luồng thay thế": [
+    {
+      "Mã Luồng": "Alt_THNC_001",
+      "Tên Luồng": "Quay lại để chỉnh sửa thông tin",
+      "Mô tả": "Người dùng quay lại các bước trước từ trang Review để sửa thông tin.",
+      "Bước": [
+        "1. Từ bước 5 của Luồng chính.",
+        "2. Người dùng nhấp vào nút 'Back'.",
+        "3. Hệ thống quay lại giao diện điền thông tin 3 bước, giữ nguyên dữ liệu đã nhập."
+      ],
+      "Related Test Case": "TC_AddConf_004"
+    },
+    {
+      "Mã Luồng": "Alt_THNC_002",
+      "Tên Luồng": "Điều hướng đến 'My Conferences' sau khi gửi",
+      "Mô tả": "Người dùng chọn xem danh sách các hội nghị đã tạo sau khi gửi thành công.",
+      "Bước": [
+        "1. Từ bước 8 của Luồng chính.",
+        "2. Người dùng nhấp vào nút 'Go to My Conferences' trên pop-up thành công.",
+        "3. Hệ thống chuyển hướng người dùng đến trang 'My Conferences'."
+      ],
+      "Related Test Case": "TC_AddConf_005"
+    }
+  ],
+  "Luồng ngoại lệ": [
+    {
+      "Mã Luồng": "Ex_THNC_001",
+      "Tên Luồng": "Thêm thất bại do thiếu thông tin bắt buộc",
+      "Mô tả": "Người dùng không cung cấp đủ thông tin bắt buộc ở một bước nào đó.",
+      "Bước": [
+        "1. Tại bước 3 của Luồng chính, người dùng không điền đủ các ngày quan trọng.",
+        "2. Người dùng cố gắng chuyển sang bước tiếp theo.",
+        "3. Hệ thống hiển thị thông báo lỗi yêu cầu điền đủ thông tin và không cho phép đi tiếp."
+      ],
+      "Related Test Case": "TC_AddConf_002"
+    },
+    {
+      "Mã Luồng": "Ex_THNC_002",
+      "Tên Luồng": "Thêm thất bại do không đồng ý điều khoản",
+      "Mô tả": "Người dùng không tích vào ô đồng ý với điều khoản và điều kiện.",
+      "Bước": [
+        "1. Từ bước 6 của Luồng chính, người dùng không tích vào ô đồng ý.",
+        "2. Người dùng nhấp vào nút 'Submit Conference'.",
+        "3. Nút bị vô hiệu hóa hoặc hệ thống hiển thị thông báo lỗi yêu cầu phải đồng ý điều khoản."
+      ],
+      "Related Test Case": "TC_AddConf_003"
+    }
+  ]
+},
+{
+  "Mã Use Case": "UC_Admin_Crawl_001",
+  "Tên Use Case": "Thu thập dữ liệu Hội nghị (Crawl)",
+  "Mô tả": "Cho phép Quản trị viên thực hiện việc thu thập (crawl) hoặc cập nhật (update) thông tin hàng loạt cho các hội nghị bằng cách tải lên file CSV và cấu hình quy trình.",
+  "Tác nhân chính": "Admin",
+  "Tác nhân phụ/Hỗ trợ": [],
+  "Điều kiện tiên quyết": [
+    "Người dùng có quyền quản trị đã đăng nhập.",
+    "Người dùng đang ở trang 'Crawl Conferences'."
+  ],
+  "Kết quả": [
+    "Một quy trình thu thập/cập nhật dữ liệu được khởi chạy.",
+    "Trạng thái và log của quy trình được hiển thị theo thời gian thực.",
+    "Dữ liệu của các hội nghị trong hệ thống được tạo mới hoặc cập nhật."
+  ],
+  "Luồng chính": [
+    "1. Admin ở Bước 1 (Import CSV), nhấp 'Choose File' và chọn một file CSV hợp lệ.",
+    "2. Hệ thống xử lý file, Admin nhấp 'Next: Select Conferences'.",
+    "3. Admin ở Bước 2 (Select Conferences), chọn các hội nghị cần xử lý và nhấp 'Next: Configure & Process'.",
+    "4. Admin ở Bước 3 (Configure Process Settings), cấu hình các tham số và nhấp 'Next: Start Processing'.",
+    "5. Admin ở Bước 4 (Process & View Status), nhập mô tả cho lần chạy và nhấp 'Start Processing'.",
+    "6. Hệ thống bắt đầu quy trình và hiển thị log."
+  ],
+  "Luồng thay thế": [
+    {
+      "Mã Luồng": "Alt_Crawl_001",
+      "Tên Luồng": "Áp dụng hành động hàng loạt",
+      "Mô tả": "Admin thay đổi loại hành động (ví dụ: từ Crawl sang Update) cho nhiều hội nghị cùng lúc.",
+      "Bước": [
+        "1. Tại Bước 2, Admin chọn nhiều hội nghị.",
+        "2. Trong mục 'Action for Selected:', Admin chọn 'Update' và nhấp 'Apply'.",
+        "3. Cột 'Action Type' của các hội nghị đã chọn được cập nhật."
+      ],
+      "Related Test Case": "TC_Crawl_002"
+    },
+    {
+      "Mã Luồng": "Alt_Crawl_002",
+      "Tên Luồng": "Đặt lại quy trình",
+      "Mô tả": "Admin muốn hủy bỏ tất cả các bước đã làm và bắt đầu lại từ đầu.",
+      "Bước": [
+        "1. Ở một bước bất kỳ, Admin nhấp vào liên kết 'Reset All & Start Over'.",
+        "2. Hệ thống đưa Admin về Bước 1, tất cả các cấu hình và file đã tải lên đều bị xóa."
+      ],
+      "Related Test Case": "TC_Crawl_004"
+    }
+  ],
+  "Luồng ngoại lệ": [
+    {
+      "Mã Luồng": "Ex_Crawl_001",
+      "Tên Luồng": "Thất bại do thiếu cấu hình bắt buộc",
+      "Mô tả": "Admin không chọn các trường bắt buộc trong bước cấu hình quy trình.",
+      "Bước": [
+        "1. Tại Bước 3, Admin bỏ trống một trường bắt buộc (ví dụ: 'API Model Selection').",
+        "2. Admin nhấp vào nút 'Next'.",
+        "3. Hệ thống hiển thị thông báo lỗi và không cho phép chuyển sang bước tiếp theo."
+      ],
+      "Related Test Case": "TC_Crawl_003"
+    }
+  ]
+},
+{
+  "Mã Use Case": "UC_Admin_Mod_001",
+  "Tên Use Case": "Kiểm duyệt Hội nghị",
+  "Mô tả": "Cho phép Quản trị viên xem danh sách các hội nghị do người dùng gửi lên và quyết định phê duyệt (Approve) hoặc từ chối (Reject).",
+  "Tác nhân chính": "Admin",
+  "Tác nhân phụ/Hỗ trợ": [],
+  "Điều kiện tiên quyết": [
+    "Người dùng có quyền quản trị đã đăng nhập.",
+    "Có ít nhất một hội nghị do người dùng gửi lên đang ở trạng thái 'Pending'."
+  ],
+  "Kết quả": [
+    "Trạng thái của hội nghị được cập nhật thành 'Approved' hoặc 'Rejected'.",
+    "Hội nghị biến mất khỏi danh sách chờ duyệt."
+  ],
+  "Luồng chính": [
+    "1. Admin truy cập trang 'Moderation'.",
+    "2. Admin tìm đến một hội nghị đang chờ duyệt ('Pending').",
+    "3. Admin nhấp vào nút 'Approve'.",
+    "4. Trong pop-up xác nhận, Admin nhấp vào nút 'Approve' một lần nữa.",
+    "5. Hệ thống cập nhật trạng thái hội nghị và hiển thị thông báo thành công."
+  ],
+  "Luồng thay thế": [
+    {
+      "Mã Luồng": "Alt_Mod_001",
+      "Tên Luồng": "Từ chối một hội nghị",
+      "Mô tả": "Admin từ chối một hội nghị và cung cấp lý do.",
+      "Bước": [
+        "1. Từ bước 2 của Luồng chính.",
+        "2. Admin nhấp vào nút 'Reject'.",
+        "3. Trong pop-up 'Reject Conference', Admin nhập lý do từ chối.",
+        "4. Admin nhấp vào nút 'Reject' trong pop-up.",
+        "5. Hệ thống cập nhật trạng thái hội nghị, lưu lại lý do và hiển thị thông báo thành công."
+      ],
+      "Related Test Case": "TC_Mod_002"
+    }
+  ],
+  "Luồng ngoại lệ": [
+    {
+      "Mã Luồng": "Ex_Mod_001",
+      "Tên Luồng": "Từ chối thất bại do không nhập lý do",
+      "Mô tả": "Admin cố gắng từ chối một hội nghị mà không cung cấp lý do bắt buộc.",
+      "Bước": [
+        "1. Từ bước 3 của Luồng thay thế 'Từ chối một hội nghị'.",
+        "2. Admin để trống ô nhập lý do.",
+        "3. Admin nhấp vào nút 'Reject' trong pop-up.",
+        "4. Hệ thống hiển thị lỗi yêu cầu nhập lý do và không đóng pop-up."
+      ],
+      "Related Test Case": "TC_Mod_003"
+    }
+  ]
+},
+{
+  "Mã Use Case": "UC_KMK_001",
+  "Tên Use Case": "Khôi phục Mật khẩu",
+  "Mô tả": "Cho phép người dùng đã quên mật khẩu có thể yêu cầu đặt lại mật khẩu mới thông qua email đã đăng ký.",
+  "Tác nhân chính": "Người dùng",
+  "Tác nhân phụ/Hỗ trợ": [],
+  "Điều kiện tiên quyết": [
+    "Người dùng đang ở trang Quên mật khẩu (Forgot Password)."
+  ],
+  "Kết quả": [
+    "Hệ thống gửi một email chứa mã hoặc liên kết đặt lại mật khẩu đến địa chỉ email của người dùng.",
+    "Người dùng được thông báo về việc email đã được gửi và có thể được chuyển hướng đến trang nhập mã."
+  ],
+  "Luồng chính": [
+    "1. Người dùng truy cập trang Quên mật khẩu.",
+    "2. Người dùng nhập một địa chỉ email hợp lệ và đã được đăng ký vào trường 'Email'.",
+    "3. Người dùng nhấp vào nút 'Send Reset Code'.",
+    "4. Hệ thống xác thực email, tạo mã/liên kết và gửi email.",
+    "5. Hệ thống hiển thị thông báo thành công cho người dùng."
+  ],
+  "Luồng thay thế": [],
+  "Luồng ngoại lệ": [
+    {
+      "Mã Luồng": "Ex_KMK_001",
+      "Tên Luồng": "Yêu cầu thất bại do email không tồn tại",
+      "Mô tả": "Người dùng nhập một địa chỉ email chưa từng được đăng ký trong hệ thống.",
+      "Bước": [
+        "1. Từ bước 3 của Luồng chính.",
+        "2. Hệ thống kiểm tra và không tìm thấy email trong cơ sở dữ liệu.",
+        "3. Hệ thống hiển thị một thông báo lỗi, ví dụ 'Email không được tìm thấy'.",
+        "4. Người dùng vẫn ở lại trang Quên mật khẩu."
+      ],
+      "Related Test Case": "TC_ForgotPassword_002"
+    }
+  ]
+},
+{
+  "Mã Use Case": "UC_TTHN_001",
+  "Tên Use Case": "Tương tác với Hội nghị",
+  "Mô tả": "Cho phép người dùng thực hiện các hành động trên một hội nghị cụ thể như xem chi tiết, theo dõi, đưa vào danh sách đen hoặc gửi phản hồi.",
+  "Tác nhân chính": "Người dùng",
+  "Tác nhân phụ/Hỗ trợ": [],
+  "Điều kiện tiên quyết": [
+    "Người dùng đang ở trang tìm kiếm hoặc trang chi tiết của một hội nghị."
+  ],
+  "Kết quả": [
+    "Hành động của người dùng (theo dõi, đưa vào danh sách đen, v.v.) được hệ thống ghi nhận và cập nhật trên giao diện."
+  ],
+  "Luồng chính": [
+    "1. Người dùng tìm thấy một hội nghị quan tâm.",
+    "2. Người dùng nhấp vào hội nghị để xem trang chi tiết.",
+    "3. Người dùng nhấp vào tab 'Important Dates'.",
+    "4. Hệ thống hiển thị danh sách các mốc thời gian quan trọng của hội nghị."
+  ],
+  "Luồng thay thế": [
+    {
+      "Mã Luồng": "Alt_TTHN_001",
+      "Tên Luồng": "Theo dõi (Follow) một hội nghị",
+      "Mô tả": "Người dùng lưu hội nghị vào danh sách theo dõi của mình.",
+      "Bước": [
+        "1. Người dùng nhấp vào biểu tượng ngôi sao (Follow) trên thẻ hội nghị.",
+        "2. Biểu tượng ngôi sao chuyển sang trạng thái được tô màu, xác nhận hành động thành công."
+      ],
+      "Related Test Case": "TC_Interaction_001"
+    },
+    {
+      "Mã Luồng": "Alt_TTHN_002",
+      "Tên Luồng": "Đưa hội nghị vào danh sách đen (Blacklist)",
+      "Mô tả": "Người dùng ẩn một hội nghị khỏi các kết quả tìm kiếm trong tương lai.",
+      "Bước": [
+        "1. Từ trang chi tiết, người dùng nhấp vào nút 'Blacklist'.",
+        "2. Nút 'Blacklist' thay đổi trạng thái thành 'Blacklisted'."
+      ],
+      "Related Test Case": "TC_Conference_001"
+    },
+    {
+      "Mã Luồng": "Alt_TTHN_003",
+      "Tên Luồng": "Gỡ hội nghị khỏi danh sách đen",
+      "Mô tả": "Người dùng hoàn tác hành động đưa hội nghị vào danh sách đen.",
+      "Bước": [
+        "1. Từ trang chi tiết của một hội nghị đã bị blacklist, người dùng nhấp vào nút 'Blacklisted'.",
+        "2. Nút chuyển về trạng thái 'Blacklist' ban đầu."
+      ],
+      "Related Test Case": "TC_Conference_002"
+    },
+    {
+      "Mã Luồng": "Alt_TTHN_004",
+      "Tên Luồng": "Gửi phản hồi cho hội nghị",
+      "Mô tả": "Người dùng đánh giá và bình luận về một hội nghị.",
+      "Bước": [
+        "1. Từ trang chi tiết, người dùng đến khu vực 'Conference Feedback'.",
+        "2. Người dùng chọn số sao đánh giá.",
+        "3. Người dùng nhập nội dung nhận xét.",
+        "4. Người dùng nhấp 'Post Feedback'.",
+        "5. Hệ thống lưu và hiển thị phản hồi mới."
+      ],
+      "Related Test Case": "TC_Feedback_001"
+    },
+    {
+      "Mã Luồng": "Alt_TTHN_005",
+      "Tên Luồng": "Xem vị trí trên bản đồ",
+      "Mô tả": "Người dùng xem và tương tác với bản đồ vị trí tổ chức hội nghị.",
+      "Bước": [
+        "1. Từ trang chi tiết, người dùng nhấp vào tab 'Map'.",
+        "2. Hệ thống hiển thị bản đồ với vị trí được ghim.",
+        "3. Người dùng có thể phóng to, thu nhỏ và di chuyển bản đồ."
+      ],
+      "Related Test Case": "TC_ConfDetail_002"
+    }
+  ],
+  "Luồng ngoại lệ": [
+    {
+      "Mã Luồng": "Ex_TTHN_001",
+      "Tên Luồng": "Gửi phản hồi thất bại do thiếu đánh giá sao",
+      "Mô tả": "Người dùng cố gắng gửi phản hồi mà không chọn số sao.",
+      "Bước": [
+        "1. Từ luồng 'Gửi phản hồi cho hội nghị', người dùng không chọn sao.",
+        "2. Người dùng nhấp 'Post Feedback'.",
+        "3. Hệ thống hiển thị lỗi 'Please provide a star rating'."
+      ],
+      "Related Test Case": "TC_Feedback_002"
+    }
+  ]
+},
+{
+  "Mã Use Case": "UC_QLTB_001",
+  "Tên Use Case": "Quản lý Thông báo và Cài đặt",
+  "Mô tả": "Cho phép người dùng quản lý các thông báo đã nhận (lọc, xóa, đánh dấu quan trọng) và tùy chỉnh các loại thông báo muốn nhận trong trang Cài đặt.",
+  "Tác nhân chính": "Người dùng đã đăng nhập",
+  "Tác nhân phụ/Hỗ trợ": [],
+  "Điều kiện tiên quyết": [
+    "Người dùng đã đăng nhập vào hệ thống."
+  ],
+  "Kết quả": [
+    "Các cài đặt thông báo của người dùng được lưu lại.",
+    "Danh sách thông báo được quản lý hiệu quả theo ý muốn của người dùng."
+  ],
+  "Luồng chính": [
+    "1. Người dùng truy cập trang 'Notifications'.",
+    "2. Người dùng nhấp vào bộ lọc 'Unread'.",
+    "3. Hệ thống làm mới danh sách và chỉ hiển thị các thông báo chưa đọc."
+  ],
+  "Luồng thay thế": [
+    {
+      "Mã Luồng": "Alt_QLTB_001",
+      "Tên Luồng": "Xóa các thông báo đã chọn",
+      "Mô tả": "Người dùng chọn và xóa nhiều thông báo cùng lúc.",
+      "Bước": [
+        "1. Từ trang 'Notifications', người dùng chọn một hoặc nhiều thông báo.",
+        "2. Người dùng nhấp vào nút 'Delete Selected'.",
+        "3. Các thông báo đã chọn bị xóa khỏi danh sách."
+      ],
+      "Related Test Case": "TC_Notifications_002"
+    },
+    {
+      "Mã Luồng": "Alt_QLTB_002",
+      "Tên Luồng": "Đánh dấu thông báo là 'Quan trọng'",
+      "Mô tả": "Người dùng đánh dấu một thông báo để dễ tìm lại sau này.",
+      "Bước": [
+        "1. Người dùng chọn một hoặc nhiều thông báo.",
+        "2. Người dùng nhấp vào nút 'Mark As Important'.",
+        "3. Các thông báo được chọn có thêm dấu hiệu 'quan trọng' (ví dụ: ngôi sao)."
+      ],
+      "Related Test Case": "TC_Notifications_003"
+    },
+    {
+      "Mã Luồng": "Alt_QLTB_003",
+      "Tên Luồng": "Đánh dấu tất cả là đã đọc",
+      "Mô tả": "Người dùng nhanh chóng xóa trạng thái 'chưa đọc' của tất cả thông báo.",
+      "Bước": [
+        "1. Người dùng nhấp vào biểu tượng chuông thông báo trên header.",
+        "2. Trong menu thả xuống, người dùng nhấp vào 'Mark All As Read'.",
+        "3. Tất cả thông báo được chuyển sang trạng thái đã đọc."
+      ],
+      "Related Test Case": "TC_Notifications_004"
+    },
+    {
+      "Mã Luồng": "Alt_QLTB_004",
+      "Tên Luồng": "Tùy chỉnh cài đặt nhận thông báo",
+      "Mô tả": "Người dùng bật/tắt các loại thông báo muốn nhận.",
+      "Bước": [
+        "1. Người dùng truy cập trang 'Setting'.",
+        "2. Người dùng nhấp vào công tắc chính 'Receive Notifications' để tắt.",
+        "3. Tất cả các công tắc con bị vô hiệu hóa.",
+        "4. Người dùng bật lại công tắc chính và tắt một công tắc con cụ thể (ví dụ: 'Notification when add to blacklist').",
+        "5. Hệ thống lưu lại cài đặt."
+      ],
+      "Related Test Case": "TC_Settings_001, TC_Settings_002"
+    }
+  ],
+  "Luồng ngoại lệ": []
+},
+{
+  "Mã Use Case": "UC_SDCB_001",
+  "Tên Use Case": "Sử dụng Chatbot",
+  "Mô tả": "Cho phép người dùng tương tác với chatbot của hệ thống để nhận thông tin, tùy chỉnh trải nghiệm chatbot và quản lý lịch sử trò chuyện.",
+  "Tác nhân chính": "Người dùng",
+  "Tác nhân phụ/Hỗ trợ": [],
+  "Điều kiện tiên quyết": [
+    "Người dùng đang ở trong giao diện có chatbot (Live Chat, Regular Chat)."
+  ],
+  "Kết quả": [
+    "Người dùng nhận được phản hồi phù hợp từ chatbot.",
+    "Các cài đặt của chatbot được áp dụng cho các tương tác trong tương lai.",
+    "Lịch sử trò chuyện được quản lý theo ý muốn của người dùng."
+  ],
+  "Luồng chính": [
+    "1. Người dùng mở giao diện Live Chat.",
+    "2. Người dùng nhập một câu hỏi vào trường 'Enter message'.",
+    "3. Người dùng nhấp vào nút gửi.",
+    "4. Tin nhắn của người dùng xuất hiện trong cửa sổ chat.",
+    "5. Chatbot xử lý và cung cấp một câu trả lời có liên quan."
+  ],
+  "Luồng thay thế": [
+    {
+      "Mã Luồng": "Alt_SDCB_001",
+      "Tên Luồng": "Tùy chỉnh Chatbot",
+      "Mô tả": "Người dùng thay đổi các cài đặt của chatbot như định dạng đầu ra, mô hình AI, hoặc bật cá nhân hóa.",
+      "Bước": [
+        "1. Người dùng nhấp vào biểu tượng Cài đặt (Settings) trong giao diện chat.",
+        "2. Người dùng thay đổi 'Output Format' sang 'Text'.",
+        "3. Người dùng thay đổi 'Chat Model' sang 'Mercury'.",
+        "4. Người dùng bật công tắc 'Personalize' và xác nhận trong pop-up.",
+        "5. Các cài đặt mới được áp dụng."
+      ],
+      "Related Test Case": "TC_Chatbot_001, TC_Chatbot_003, TC_Chatbot_004"
+    },
+    {
+      "Mã Luồng": "Alt_SDCB_002",
+      "Tên Luồng": "Quản lý Lịch sử Chat",
+      "Mô tả": "Người dùng xem lại, đổi tên hoặc xóa các cuộc trò chuyện trước đây.",
+      "Bước": [
+        "1. Người dùng truy cập trang 'Chat History'.",
+        "2. Để đổi tên, người dùng nhấp vào biểu tượng bút chì, nhập tên mới và lưu lại.",
+        "3. Để xóa, người dùng nhấp vào biểu tượng thùng rác và xác nhận.",
+        "4. Danh sách lịch sử được cập nhật."
+      ],
+      "Related Test Case": "TC_ChatHistory_001, TC_ChatHistory_002"
+    }
+  ],
+  "Luồng ngoại lệ": []
+},
+{
+  "Mã Use Case": "UC_Admin_QLND_001",
+  "Tên Use Case": "(Admin) Quản lý Người dùng",
+  "Mô tả": "Cho phép Quản trị viên xem, lọc và thực hiện các hành động quản trị trên tài khoản người dùng, chẳng hạn như cấm (ban) tài khoản.",
+  "Tác nhân chính": "Admin",
+  "Tác nhân phụ/Hỗ trợ": [],
+  "Điều kiện tiên quyết": [
+    "Người dùng có quyền quản trị đã đăng nhập.",
+    "Người dùng đang ở trang quản lý tài khoản ('Accounts')."
+  ],
+  "Kết quả": [
+    "Trạng thái của tài khoản người dùng được cập nhật (ví dụ: từ 'Active' sang 'Banned').",
+    "Hành động được ghi nhận và có hiệu lực ngay lập tức."
+  ],
+  "Luồng chính": [
+    "1. Admin truy cập trang 'Accounts'.",
+    "2. Admin tìm đến một người dùng có trạng thái 'Active'.",
+    "3. Admin nhấp vào nút 'Ban' ở cột 'Actions'.",
+    "4. Admin xác nhận hành động trong pop-up và có thể nhập lý do.",
+    "5. Admin nhấp 'Confirm Ban'.",
+    "6. Hệ thống cập nhật trạng thái người dùng thành 'Banned' và hiển thị thông báo thành công."
+  ],
+  "Luồng thay thế": [
+    {
+      "Mã Luồng": "Alt_Admin_QLND_001",
+      "Tên Luồng": "Lọc tài khoản người dùng",
+      "Mô tả": "Admin lọc danh sách người dùng theo trạng thái để dễ dàng quản lý.",
+      "Bước": [
+        "1. Admin nhấp vào menu thả xuống 'All Statuses'.",
+        "2. Admin chọn 'Banned'.",
+        "3. Bảng dữ liệu được làm mới và chỉ hiển thị các tài khoản đã bị cấm."
+      ],
+      "Related Test Case": "TC_AdminUser_002"
+    }
+  ],
+  "Luồng ngoại lệ": []
+},
+{
+  "Mã Use Case": "UC_DX_001",
+  "Tên Use Case": "Đăng xuất",
+  "Mô tả": "Cho phép người dùng kết thúc phiên làm việc và đăng xuất khỏi tài khoản một cách an toàn.",
+  "Tác nhân chính": "Người dùng đã đăng nhập",
+  "Tác nhân phụ/Hỗ trợ": [],
+  "Điều kiện tiên quyết": [
+    "Người dùng đã đăng nhập thành công vào hệ thống."
+  ],
+  "Kết quả": [
+    "Phiên làm việc của người dùng được chấm dứt.",
+    "Người dùng được chuyển hướng về trang chủ ở trạng thái chưa đăng nhập.",
+    "Nút 'Login' xuất hiện lại trên header."
+  ],
+  "Luồng chính": [
+    "1. Người dùng nhấp vào biểu tượng avatar của mình trên header.",
+    "2. Một menu thả xuống xuất hiện.",
+    "3. Người dùng nhấp vào tùy chọn 'Logout' trong menu.",
+    "4. Hệ thống đăng xuất người dùng và chuyển hướng về trang chủ."
+  ],
+  "Luồng thay thế": [],
+  "Luồng ngoại lệ": []
+},
+{
+  "Mã Use Case": "UC_Admin_PTSH_001",
+  "Tên Use Case": "(Admin) Phân tích và Giám sát Hệ thống",
+  "Mô tả": "Cung cấp cho Quản trị viên các công cụ để xem và phân tích dữ liệu log, các yêu cầu xử lý, và các chỉ số hiệu suất của hệ thống.",
+  "Tác nhân chính": "Admin",
+  "Tác nhân phụ/Hỗ trợ": [],
+  "Điều kiện tiên quyết": [
+    "Người dùng có quyền quản trị đã đăng nhập.",
+    "Người dùng đang ở trang 'Analysis'."
+  ],
+  "Kết quả": [
+    "Admin có được cái nhìn tổng quan và chi tiết về hoạt động của hệ thống.",
+    "Dữ liệu được hiển thị theo các bộ lọc mà Admin đã chọn."
+  ],
+  "Luồng chính": [
+    "1. Admin truy cập trang 'Analysis'.",
+    "2. Admin xem các chỉ số tổng quan ở chế độ 'Requests Level'.",
+    "3. Admin nhấp vào nút 'Details Level'.",
+    "4. Giao diện thay đổi để hiển thị các thẻ thống kê chi tiết hơn về crawl và API."
+  ],
+  "Luồng thay thế": [
+    {
+      "Mã Luồng": "Alt_Admin_PTSH_001",
+      "Tên Luồng": "Lọc Log Requests theo thời gian",
+      "Mô tả": "Admin lọc danh sách các yêu cầu log theo một khoảng thời gian cụ thể.",
+      "Bước": [
+        "1. Admin nhấp vào menu thả xuống thời gian (ví dụ: 'All Time').",
+        "2. Admin chọn 'Last 24 Hours'.",
+        "3. Danh sách 'Log Requests' được cập nhật theo bộ lọc."
+      ],
+      "Related Test Case": "TC_Analysis_001"
+    },
+    {
+      "Mã Luồng": "Alt_Admin_PTSH_002",
+      "Tên Luồng": "Xem chi tiết một Log Request",
+      "Mô tả": "Admin xem chi tiết kết quả xử lý của một yêu cầu cụ thể.",
+      "Bước": [
+        "1. Trong danh sách 'Log Requests', Admin nhấp vào một 'REQUEST ID'.",
+        "2. Hệ thống chuyển hướng Admin đến trang 'Detailed Conference Analysis' cho yêu cầu đó, hiển thị trạng thái của từng hội nghị đã được xử lý."
+      ],
+      "Related Test Case": "TC_Analysis_002"
+    }
+  ],
+  "Luồng ngoại lệ": []
+},
+{
+  "Mã Use Case": "UC_QLHNCT_001",
+  "Tên Use Case": "Quản lý Hội nghị đã tạo",
+  "Mô tả": "Cho phép người dùng xem danh sách các hội nghị mà họ đã gửi lên hệ thống, lọc chúng theo trạng thái (Pending, Approved, Rejected) và xem lý do nếu hội nghị bị từ chối.",
+  "Tác nhân chính": "Người dùng đã đăng nhập",
+  "Tác nhân phụ/Hỗ trợ": [],
+  "Điều kiện tiên quyết": [
+    "Người dùng đã đăng nhập vào hệ thống.",
+    "Người dùng đã tạo ít nhất một hội nghị."
+  ],
+  "Kết quả": [
+    "Người dùng xem được trạng thái của các hội nghị mình đã tạo.",
+    "Người dùng biết được lý do tại sao một hội nghị bị từ chối."
+  ],
+  "Luồng chính": [
+    "1. Người dùng truy cập trang 'My Conferences'.",
+    "2. Danh sách các hội nghị đã tạo được hiển thị.",
+    "3. Người dùng nhấp vào bộ lọc trạng thái (ví dụ: 'Rejected').",
+    "4. Danh sách được cập nhật và chỉ hiển thị các hội nghị có trạng thái tương ứng."
+  ],
+  "Luồng thay thế": [
+    {
+      "Mã Luồng": "Alt_QLHNCT_001",
+      "Tên Luồng": "Xem lý do hội nghị bị từ chối",
+      "Mô tả": "Người dùng xem chi tiết lý do mà quản trị viên đã từ chối hội nghị của họ.",
+      "Bước": [
+        "1. Tìm một hội nghị có trạng thái 'Rejected' trong danh sách.",
+        "2. Nhấp vào nút 'View Reason' của hội nghị đó.",
+        "3. Một pop-up hoặc khu vực mới xuất hiện, hiển thị chi tiết lý do từ chối."
+      ],
+      "Related Test Case": "TC_MyConf_002"
+    }
+  ],
+  "Luồng ngoại lệ": [],
+  "Related Test Case": "TC_MyConf_001"
+},
+{
+  "Mã Use Case": "UC_XMTD_001",
+  "Tên Use Case": "Xem danh sách Theo dõi",
+  "Mô tả": "Cho phép người dùng xem lại danh sách các hội nghị (Conferences) và tạp chí (Journals) mà họ đã chọn theo dõi, với khả năng chuyển đổi qua lại giữa hai loại.",
+  "Tác nhân chính": "Người dùng đã đăng nhập",
+  "Tác nhân phụ/Hỗ trợ": [],
+  "Điều kiện tiên quyết": [
+    "Người dùng đã đăng nhập vào hệ thống.",
+    "Người dùng đã theo dõi ít nhất một hội nghị hoặc một tạp chí.",
+    "Người dùng đang ở trang 'Followed'."
+  ],
+  "Kết quả": [
+    "Người dùng xem được danh sách các mục đã theo dõi, được phân loại rõ ràng."
+  ],
+  "Luồng chính": [
+    "1. Người dùng truy cập trang 'Followed'.",
+    "2. Hệ thống mặc định hiển thị tab 'Conferences' với danh sách các hội nghị đã theo dõi."
+  ],
+  "Luồng thay thế": [
+    {
+      "Mã Luồng": "Alt_XMTD_001",
+      "Tên Luồng": "Chuyển sang tab Tạp chí (Journals)",
+      "Mô tả": "Người dùng muốn xem danh sách các tạp chí đã theo dõi.",
+      "Bước": [
+        "1. Từ trang 'Followed', người dùng nhấp vào tab 'Journals'.",
+        "2. Nội dung trang được cập nhật để hiển thị danh sách các tạp chí đã theo dõi."
+      ],
+      "Related Test Case": "TC_Follow_001"
+    }
+  ],
+  "Luồng ngoại lệ": []
+},
+{
+  "Mã Use Case": "UC_QLGC_001",
+  "Tên Use Case": "Quản lý Ghi chú và Lịch",
+  "Mô tả": "Cung cấp cho người dùng một giao diện để theo dõi các sự kiện và mốc thời gian quan trọng thông qua một danh sách các ghi chú sắp tới (Upcoming Notes) và một lịch trực quan.",
+  "Tác nhân chính": "Người dùng đã đăng nhập",
+  "Tác nhân phụ/Hỗ trợ": [],
+  "Điều kiện tiên quyết": [
+    "Người dùng đã đăng nhập vào hệ thống.",
+    "Người dùng đang ở trang 'Note'."
+  ],
+  "Kết quả": [
+    "Người dùng có thể hình dung được các sự kiện quan trọng của mình trên lịch."
+  ],
+  "Luồng chính": [
+    "1. Người dùng truy cập trang 'Note'.",
+    "2. Người dùng quan sát một sự kiện trong danh sách 'Upcoming Notes'.",
+    "3. Người dùng nhìn sang Lịch hiển thị bên phải.",
+    "4. Trên lịch, một sự kiện được hiển thị tương ứng với ngày tháng của ghi chú trong danh sách."
+  ],
+  "Luồng thay thế": [],
+  "Luồng ngoại lệ": [],
+  "Related Test Case": "TC_Note_001"
+},
+{
+  "Mã Use Case": "UC_Admin_QLDLHN_001",
+  "Tên Use Case": "(Admin) Quản lý Dữ liệu Hội nghị",
+  "Mô tả": "Cho phép Quản trị viên quản lý toàn diện cơ sở dữ liệu hội nghị, bao gồm lọc danh sách theo nhiều tiêu chí, xem lịch sử, chỉnh sửa thông tin chi tiết và xóa các bản ghi không cần thiết.",
+  "Tác nhân chính": "Admin",
+  "Tác nhân phụ/Hỗ trợ": [],
+  "Điều kiện tiên quyết": [
+    "Người dùng có quyền quản trị đã đăng nhập.",
+    "Người dùng đang ở trang 'Conference Management'."
+  ],
+  "Kết quả": [
+    "Dữ liệu hội nghị trong hệ thống được cập nhật hoặc xóa theo hành động của Admin.",
+    "Admin có thể tìm kiếm và truy xuất thông tin hội nghị một cách hiệu quả."
+  ],
+  "Luồng chính": [
+    "1. Admin truy cập trang 'Conference Management'.",
+    "2. Admin tìm một hội nghị và nhấp vào menu hành động để chọn 'View History'.",
+    "3. Trong pop-up lịch sử, Admin nhấp vào nút 'Edit'.",
+    "4. Trang 'Edit Conference History' được tải.",
+    "5. Admin thay đổi một số thông tin (ví dụ: thêm 'Topics').",
+    "6. Admin nhấp vào nút 'Save'.",
+    "7. Hệ thống lưu lại thay đổi và hiển thị thông báo thành công."
+  ],
+  "Luồng thay thế": [
+    {
+      "Mã Luồng": "Alt_Admin_QLDLHN_001",
+      "Tên Luồng": "Xóa một bản ghi lịch sử",
+      "Mô tả": "Admin xóa dữ liệu của một năm cụ thể cho một hội nghị.",
+      "Bước": [
+        "1. Từ pop-up 'Conference History' (bước 2 của Luồng chính).",
+        "2. Admin nhấp vào nút 'Delete'.",
+        "3. Admin xác nhận hành động.",
+        "4. Bản ghi lịch sử cho năm đó bị xóa vĩnh viễn."
+      ],
+      "Related Test Case": "TC_AdminConf_002"
+    },
+    {
+      "Mã Luồng": "Alt_Admin_QLDLHN_002",
+      "Tên Luồng": "Lọc danh sách hội nghị",
+      "Mô tả": "Admin sử dụng các bộ lọc để tìm kiếm các hội nghị cụ thể.",
+      "Bước": [
+        "1. Từ trang 'Conference Management'.",
+        "2. Admin chọn các tiêu chí trong khu vực 'Filters' (ví dụ: Status, Sources, Research Fields).",
+        "3. Bảng dữ liệu được làm mới và chỉ hiển thị các hội nghị thỏa mãn tất cả các tiêu chí."
+      ],
+      "Related Test Case": "TC_AdminConf_003"
+    }
+  ],
+  "Luồng ngoại lệ": [],
+  "Related Test Case": "TC_AdminConf_001"
+},
+{
+  "Mã Use Case": "UC_Admin_CNTD_001",
+  "Tên Use Case": "(Admin) Lên lịch Cập nhật Tự động",
+  "Mô tả": "Cho phép Quản trị viên cấu hình và lên lịch cho quy trình cập nhật dữ liệu hội nghị của hệ thống một cách tự động theo chu kỳ định sẵn.",
+  "Tác nhân chính": "Admin",
+  "Tác nhân phụ/Hỗ trợ": [],
+  "Điều kiện tiên quyết": [
+    "Người dùng quản trị đã đăng nhập.",
+    "Người dùng đang ở trang 'Automatic Updates'."
+  ],
+  "Kết quả": [
+    "Một lịch trình cập nhật tự động được kích hoạt trong hệ thống.",
+    "Trạng thái và thống kê được cập nhật để phản ánh lịch trình mới."
+  ],
+  "Luồng chính": [
+    "1. Admin truy cập trang 'Automatic Updates'.",
+    "2. Admin chọn 'Update Cycle' (ví dụ: 'Daily').",
+    "3. Admin đặt 'Time' (ví dụ: '12:00 AM').",
+    "4. Admin nhập 'Batch Size' (ví dụ: '10').",
+    "5. Admin nhấp vào nút 'Schedule Update'.",
+    "6. Hệ thống hiển thị thông báo thành công và cập nhật trạng thái."
+  ],
+  "Luồng thay thế": [],
+  "Luồng ngoại lệ": [],
+  "Related Test Case": "TC_AutoUpdate_001"
+}

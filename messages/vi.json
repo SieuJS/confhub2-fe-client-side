@@ -1820,7 +1820,8 @@
       "previously": "Trước đây:",
       "newBadge": "MỚI",
       "showLess": "Hiện ít hơn",
-      "showMore": "Hiện thêm {count}"
+      "showMore": "Hiện thêm {count}",
+      "Go_to_Important_Dates_website": "Đi tới trang web ngày quan trọng"
     }
   },
   "Policy": {
@@ -1943,5 +1944,6 @@
   "tooltip_rank": "Lọc các hội nghị dựa trên xếp hạng học thuật của chúng (ví dụ: A*, A, B, C, Unranked). Một hội nghị có thể có nhiều xếp hạng.",
   "tooltip_source": "Lọc các hội nghị dựa trên nguồn dữ liệu của chúng. Một hội nghị có thể có nhiều nguồn.",
   "tooltip_topics": "Lọc các hội nghị dựa trên các chủ đề liên quan. Bạn có thể chọn nhiều chủ đề.",
-  "Disclaimer_descripstion_chatbot": "Thông tin do chatbot cung cấp có thể không hoàn toàn chính xác. Vui lòng luôn xác minh với các nguồn chính thức. Chúng tôi không chịu trách nhiệm cho bất kỳ quyết định nào được đưa ra dựa trên thông tin từ chatbot."
+  "Disclaimer_descripstion_chatbot": "Thông tin do chatbot cung cấp có thể không hoàn toàn chính xác. Vui lòng luôn xác minh với các nguồn chính thức. Chúng tôi không chịu trách nhiệm cho bất kỳ quyết định nào được đưa ra dựa trên thông tin từ chatbot.",
+  "Go_to_CFP_website": "Đi tới trang web Kêu gọi bài báo"
 }

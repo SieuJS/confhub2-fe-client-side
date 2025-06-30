@@ -12,10 +12,12 @@ import {
   Ticket
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { ExternalLink } from 'lucide-react'
 
 interface ImportantDatesSectionProps {
   groupedDates: GroupedDateInfo[]
   formatDate: (date: string | null | undefined) => string
+  impLink?: string | undefined | null
   // Bỏ prop t vì mỗi component sẽ tự lấy
 }
 
@@ -82,7 +84,8 @@ const DateItemCard: React.FC<{
 // --- Component chính được thiết kế lại ---
 export const ImportantDatesSection: React.FC<ImportantDatesSectionProps> = ({
   groupedDates,
-  formatDate
+  formatDate,
+  impLink
 }) => {
   const t = useTranslations('ConferenceDetailsPage.ImportantDates')
 
@@ -156,9 +159,22 @@ export const ImportantDatesSection: React.FC<ImportantDatesSectionProps> = ({
       id='important-dates'
       className='mt-6 rounded-lg bg-white-pure px-2 py-4 shadow-md md:px-4'
     >
-      <h2 className='mb-6 text-xl font-semibold md:text-2xl'>
-        {t('sectionTitle')}
-      </h2>
+      <div className='mb-4 flex items-center gap-2'>
+        <h2 className=' text-xl font-semibold md:text-2xl'>
+          {t('sectionTitle')}
+        </h2>
+        {impLink && (
+          <a
+            href={impLink}
+            target='_blank'
+            rel='noopener noreferrer'
+            title={t('Go_to_Important_Dates_website')}
+            className='text-gray-50 transition-colors hover:text-primary'
+          >
+            <ExternalLink size={20} />
+          </a>
+        )}
+      </div>
       {groupedDates.length === 0 ? (
         <p className=''>{t('noDatesAvailable')}</p>
       ) : (

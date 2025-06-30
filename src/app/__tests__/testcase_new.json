@@ -1,0 +1,1694 @@
+[
+  {
+    "testCaseId": "TC_Login_001",
+    "testCaseName": "Đăng nhập thành công với tài khoản hợp lệ",
+    "description": "Kiểm tra người dùng có thể đăng nhập vào hệ thống bằng cách nhập đúng Email và Mật khẩu.",
+    "preconditions": [
+      "Người dùng đã đăng ký một tài khoản hợp lệ.",
+      "Người dùng đang ở trang Đăng nhập."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập Email hợp lệ vào trường 'Email'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhập Mật khẩu hợp lệ vào trường 'Password'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Sign In'."
+      }
+    ],
+    "expectedResult": "Hệ thống chuyển hướng người dùng đến trang chủ (Homepage). Biểu tượng avatar của người dùng và chuông thông báo xuất hiện trên header, thay thế cho nút 'Login'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Login_002",
+    "testCaseName": "Đăng nhập thất bại với mật khẩu không chính xác",
+    "description": "Kiểm tra hệ thống hiển thị thông báo lỗi khi người dùng nhập sai mật khẩu.",
+    "preconditions": [
+      "Người dùng đã đăng ký một tài khoản hợp lệ.",
+      "Người dùng đang ở trang Đăng nhập."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập Email hợp lệ vào trường 'Email'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhập Mật khẩu không chính xác vào trường 'Password'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Sign In'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo lỗi, ví dụ 'Email hoặc Mật khẩu không chính xác'. Người dùng vẫn ở lại trang Đăng nhập.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Login_003",
+    "testCaseName": "Đăng nhập thất bại với email không tồn tại",
+    "description": "Kiểm tra hệ thống hiển thị thông báo lỗi khi người dùng nhập một email chưa được đăng ký.",
+    "preconditions": [
+      "Người dùng đang ở trang Đăng nhập."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập một địa chỉ email không tồn tại trong hệ thống vào trường 'Email'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhập một mật khẩu bất kỳ vào trường 'Password'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Sign In'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo lỗi, ví dụ 'Email hoặc Mật khẩu không chính xác'. Người dùng vẫn ở lại trang Đăng nhập.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Login_004",
+    "testCaseName": "Đăng nhập thất bại khi bỏ trống các trường bắt buộc",
+    "description": "Kiểm tra hệ thống hiển thị cảnh báo khi người dùng không điền vào các trường bắt buộc.",
+    "preconditions": [
+      "Người dùng đang ở trang Đăng nhập."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Để trống trường 'Email'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Để trống trường 'Password'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Sign In'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo lỗi yêu cầu nhập liệu cho các trường bị bỏ trống, ví dụ: 'Vui lòng nhập email', 'Vui lòng nhập mật khẩu'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Login_007",
+    "testCaseName": "Kiểm tra nút 'Continue with Google'",
+    "description": "Kiểm tra nút 'Continue with Google' kích hoạt luồng đăng nhập/đăng ký bằng Google.",
+    "preconditions": [
+      "Người dùng đang ở trang Đăng nhập."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Continue with Google'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị cửa sổ popup hoặc chuyển hướng đến trang xác thực của Google để người dùng chọn tài khoản Google.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_SignUp_001",
+    "testCaseName": "Đăng ký tài khoản thành công với thông tin hợp lệ",
+    "description": "Kiểm tra người dùng có thể tạo một tài khoản mới bằng cách cung cấp đầy đủ và hợp lệ các thông tin được yêu cầu.",
+    "preconditions": [
+      "Người dùng chưa có tài khoản.",
+      "Người dùng đang ở trang Đăng ký (Create your account)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập 'First Name' hợp lệ."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhập 'Last Name' hợp lệ."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Chọn 'Date of Birth' hợp lệ."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhập một địa chỉ 'Email' chưa được đăng ký."
+      },
+      {
+        "stepNumber": 5,
+        "action": "Nhập mật khẩu vào trường 'Password'."
+      },
+      {
+        "stepNumber": 6,
+        "action": "Nhập lại mật khẩu giống hệt vào trường 'Confirm Password'."
+      },
+      {
+        "stepNumber": 7,
+        "action": "Nhấp vào nút 'Create account'."
+      }
+    ],
+    "expectedResult": "Hệ thống tạo tài khoản thành công và chuyển hướng người dùng đến trang Đăng nhập hoặc tự động đăng nhập và chuyển đến trang chủ.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_SignUp_002",
+    "testCaseName": "Đăng ký thất bại do Mật khẩu xác nhận không khớp",
+    "description": "Kiểm tra hệ thống hiển thị thông báo lỗi khi Mật khẩu và Xác nhận Mật khẩu không trùng nhau.",
+    "preconditions": [
+      "Người dùng đang ở trang Đăng ký."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Điền tất cả các trường thông tin hợp lệ."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhập mật khẩu vào trường 'Password'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhập một mật khẩu khác vào trường 'Confirm Password'."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Create account'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo lỗi dưới trường 'Confirm Password', ví dụ 'Mật khẩu xác nhận không khớp'. Người dùng vẫn ở lại trang Đăng ký.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_SignUp_003",
+    "testCaseName": "Đăng ký thất bại do Email đã tồn tại",
+    "description": "Kiểm tra hệ thống ngăn chặn việc tạo tài khoản mới với một email đã được sử dụng.",
+    "preconditions": [
+      "Tồn tại một tài khoản với email 'existinguser@example.com'.",
+      "Người dùng đang ở trang Đăng ký."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Điền tất cả các trường thông tin hợp lệ."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhập email 'existinguser@example.com' vào trường 'Email'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Create account'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo lỗi, ví dụ 'Email này đã được sử dụng'. Người dùng vẫn ở lại trang Đăng ký.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_ForgotPassword_001",
+    "testCaseName": "Yêu cầu đặt lại mật khẩu thành công với email hợp lệ",
+    "description": "Kiểm tra chức năng gửi mã đặt lại mật khẩu hoạt động khi người dùng nhập một email đã đăng ký.",
+    "preconditions": [
+      "Tồn tại một tài khoản với email 'existinguser@example.com'.",
+      "Người dùng đang ở trang Quên mật khẩu (Forgot Password?)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập email 'existinguser@example.com' vào trường 'Email'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Send Reset Code'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo thành công, ví dụ 'Mã đặt lại mật khẩu đã được gửi đến email của bạn.' và có thể chuyển hướng người dùng đến trang nhập mã.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_ForgotPassword_002",
+    "testCaseName": "Yêu cầu đặt lại mật khẩu thất bại với email không tồn tại",
+    "description": "Kiểm tra hệ thống hiển thị lỗi khi người dùng nhập một email không có trong hệ thống.",
+    "preconditions": [
+      "Người dùng đang ở trang Quên mật khẩu."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập một email không tồn tại, ví dụ 'nonexistent@example.com', vào trường 'Email'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Send Reset Code'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị một thông báo lỗi, ví dụ 'Email không được tìm thấy'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Logout_001",
+    "testCaseName": "Đăng xuất thành công khỏi hệ thống",
+    "description": "Kiểm tra người dùng có thể đăng xuất khỏi tài khoản của họ một cách an toàn.",
+    "preconditions": [
+      "Người dùng đã đăng nhập thành công vào hệ thống."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào biểu tượng avatar của người dùng ở góc trên bên phải của header."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào tùy chọn 'Logout' trong menu thả xuống."
+      }
+    ],
+    "expectedResult": "Hệ thống đăng xuất người dùng và chuyển hướng về trang chủ ở trạng thái chưa đăng nhập. Nút 'Login' xuất hiện lại trên header.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Search_001",
+    "testCaseName": "Tìm kiếm cơ bản thành công theo Từ khóa (Keyword)",
+    "description": "Kiểm tra chức năng tìm kiếm hoạt động chính xác khi người dùng nhập một từ khóa và nhấn nút 'Search'.",
+    "preconditions": [
+      "Người dùng đang ở trang tìm kiếm hội nghị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập một từ khóa hợp lệ (ví dụ: 'Communication') vào ô tìm kiếm chính."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Giữ nguyên bộ lọc là 'Keyword'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Search'."
+      }
+    ],
+    "expectedResult": "Danh sách kết quả được cập nhật để chỉ hiển thị các hội nghị có chứa từ khóa 'Communication' trong thông tin của chúng. Số lượng kết quả (ví dụ: 'Conference Results (1785)') được cập nhật tương ứng.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Search_002",
+    "testCaseName": "Tìm kiếm nâng cao với nhiều tiêu chí kết hợp",
+    "description": "Kiểm tra chức năng tìm kiếm nâng cao hoạt động khi kết hợp nhiều bộ lọc khác nhau.",
+    "preconditions": [
+      "Người dùng đang ở trang tìm kiếm hội nghị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào liên kết 'Show more advanced search options'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhập 'Big Data' vào trường 'Topics'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhập 'B' vào trường 'Rank'."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhập 'Nha Trang' vào trường 'Location'."
+      },
+      {
+        "stepNumber": 5,
+        "action": "Nhấp vào nút 'Search'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị danh sách các hội nghị thỏa mãn tất cả các điều kiện: có chủ đề 'Big Data', được xếp hạng 'B', và diễn ra tại 'Nha Trang'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Search_003",
+    "testCaseName": "Xóa các bộ lọc tìm kiếm",
+    "description": "Kiểm tra nút 'Clear' có chức năng xóa tất cả các tiêu chí đã nhập và trả lại danh sách kết quả ban đầu.",
+    "preconditions": [
+      "Người dùng đã nhập một vài tiêu chí vào các ô tìm kiếm và đã nhận được kết quả lọc."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập 'TEST' vào ô tìm kiếm và nhấp 'Search'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Clear'."
+      }
+    ],
+    "expectedResult": "Tất cả các trường nhập liệu (search, date, location, etc.) trở về trạng thái trống/mặc định. Danh sách kết quả được làm mới để hiển thị lại tất cả các hội nghị như ban đầu.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Search_004",
+    "testCaseName": "Tìm kiếm không trả về kết quả",
+    "description": "Kiểm tra hệ thống hiển thị thông báo phù hợp khi không tìm thấy hội nghị nào khớp với tiêu chí tìm kiếm.",
+    "preconditions": [
+      "Người dùng đang ở trang tìm kiếm hội nghị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập một chuỗi ký tự vô nghĩa hoặc không có khả năng tồn tại (ví dụ: 'asdfghjkl12345') vào ô tìm kiếm."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Search'."
+      }
+    ],
+    "expectedResult": "Khu vực kết quả hiển thị một thông báo như 'No results found' hoặc 'Không tìm thấy hội nghị nào phù hợp'. Số lượng kết quả hiển thị là 'Conference Results (0)'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Display_001",
+    "testCaseName": "Chuyển đổi giữa chế độ xem Lưới (Grid) và Danh sách (List)",
+    "description": "Kiểm tra người dùng có thể chuyển đổi cách hiển thị kết quả tìm kiếm giữa dạng lưới và dạng danh sách.",
+    "preconditions": [
+      "Trang tìm kiếm đang hiển thị kết quả ở chế độ xem Lưới (Grid view)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào biểu tượng chuyển đổi sang chế độ xem Danh sách (List view) ở phía trên bên phải của danh sách kết quả."
+      }
+    ],
+    "expectedResult": "Bố cục của các kết quả hội nghị thay đổi từ dạng thẻ (grid) sang dạng hàng (list/table). Tất cả thông tin của hội nghị vẫn được hiển thị đầy đủ.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Pagination_001",
+    "testCaseName": "Kiểm tra chức năng phân trang",
+    "description": "Kiểm tra người dùng có thể điều hướng qua các trang kết quả khác nhau bằng cách sử dụng các nút phân trang.",
+    "preconditions": [
+      "Có nhiều hơn một trang kết quả tìm kiếm."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Cuộn xuống cuối danh sách kết quả để thấy các nút phân trang."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào số '2' hoặc nút 'Next'."
+      }
+    ],
+    "expectedResult": "Trang web tải và hiển thị trang kết quả thứ hai. Nút phân trang cho trang '2' được làm nổi bật để cho biết đây là trang hiện tại.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Interaction_001",
+    "testCaseName": "Theo dõi (Follow) một hội nghị",
+    "description": "Kiểm tra chức năng theo dõi hội nghị khi người dùng nhấp vào biểu tượng ngôi sao.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống.",
+      "Có ít nhất một hội nghị trong kết quả tìm kiếm chưa được theo dõi."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm một thẻ hội nghị có biểu tượng ngôi sao (Follow) chưa được tô màu."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào biểu tượng ngôi sao đó."
+      }
+    ],
+    "expectedResult": "Biểu tượng ngôi sao chuyển sang trạng thái được tô màu (màu vàng). Hội nghị này được thêm vào danh sách 'Followed' của người dùng.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Profile_001",
+    "testCaseName": "Chỉnh sửa thông tin cá nhân thành công",
+    "description": "Kiểm tra người dùng có thể cập nhật thành công các thông tin trong hồ sơ của mình như 'About me' và 'Interested topics'.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống.",
+      "Người dùng đang ở trang Hồ sơ cá nhân (Profile)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Edit Profile'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Thay đổi nội dung trong trường 'About me'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Thêm một chủ đề mới trong mục 'I am also interested in these topics'."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Save Changes'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo cập nhật thành công. Trang hồ sơ được tải lại và hiển thị các thông tin đã thay đổi.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Profile_002",
+    "testCaseName": "Hủy bỏ việc chỉnh sửa thông tin cá nhân",
+    "description": "Kiểm tra chức năng 'Cancel' hoạt động đúng, không lưu lại các thay đổi đã nhập.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống.",
+      "Người dùng đang ở trang Hồ sơ cá nhân (Profile)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Edit Profile'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Thay đổi nội dung trong trường 'About me'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Cancel'."
+      }
+    ],
+    "expectedResult": "Hệ thống quay trở lại chế độ xem hồ sơ. Các thông tin đã thay đổi không được lưu lại, trường 'About me' hiển thị nội dung như ban đầu.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Password_001",
+    "testCaseName": "Thay đổi mật khẩu thành công",
+    "description": "Kiểm tra người dùng có thể thay đổi mật khẩu khi cung cấp đúng mật khẩu hiện tại và mật khẩu mới hợp lệ.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và biết mật khẩu hiện tại của mình.",
+      "Người dùng đang ở trang Hồ sơ cá nhân."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào biểu tượng ba chấm (...) bên cạnh nút 'Edit Profile'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn 'Change Password' từ menu thả xuống."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhập mật khẩu hiện tại chính xác vào trường 'Current Password'."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhập mật khẩu mới vào trường 'New Password'."
+      },
+      {
+        "stepNumber": 5,
+        "action": "Nhập lại mật khẩu mới vào trường 'Confirm New Password'."
+      },
+      {
+        "stepNumber": 6,
+        "action": "Nhấp vào nút 'Change Password'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo 'Thay đổi mật khẩu thành công'. Pop-up được đóng lại.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Password_002",
+    "testCaseName": "Thay đổi mật khẩu thất bại do sai mật khẩu hiện tại",
+    "description": "Kiểm tra hệ thống hiển thị lỗi khi người dùng nhập sai mật khẩu hiện tại.",
+    "preconditions": [
+      "Người dùng đã đăng nhập.",
+      "Người dùng đang ở trong pop-up 'Change Password'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập một mật khẩu không chính xác vào trường 'Current Password'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhập mật khẩu mới và xác nhận mật khẩu mới."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Change Password'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo lỗi, ví dụ 'Mật khẩu hiện tại không đúng'. Pop-up vẫn mở.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Conference_001",
+    "testCaseName": "Đưa một hội nghị vào danh sách đen (Blacklist)",
+    "description": "Kiểm tra người dùng có thể thêm một hội nghị vào danh sách đen từ trang chi tiết hội nghị.",
+    "preconditions": [
+      "Người dùng đã đăng nhập.",
+      "Người dùng đang ở trang chi tiết của một hội nghị chưa bị đưa vào danh sách đen."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tại trang chi tiết hội nghị, tìm nút 'Blacklist' ở thanh công cụ bên phải."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Blacklist'."
+      }
+    ],
+    "expectedResult": "Nút 'Blacklist' thay đổi trạng thái thành 'Blacklisted' (đổi màu sang đỏ). Hội nghị này sẽ xuất hiện trong mục 'Blacklisted' trong menu người dùng.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Conference_002",
+    "testCaseName": "Gỡ một hội nghị khỏi danh sách đen",
+    "description": "Kiểm tra người dùng có thể gỡ một hội nghị ra khỏi danh sách đen.",
+    "preconditions": [
+      "Người dùng đã đăng nhập.",
+      "Người dùng đang ở trang chi tiết của một hội nghị đã bị đưa vào danh sách đen."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tại trang chi tiết hội nghị, tìm nút 'Blacklisted' ở thanh công cụ bên phải."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Blacklisted'."
+      }
+    ],
+    "expectedResult": "Nút 'Blacklisted' chuyển về trạng thái 'Blacklist' ban đầu. Hội nghị này sẽ không còn xuất hiện trong mục 'Blacklisted' của người dùng.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_MyConf_001",
+    "testCaseName": "Lọc danh sách hội nghị đã tạo theo trạng thái",
+    "description": "Kiểm tra chức năng lọc các hội nghị do người dùng tạo ra theo các trạng thái 'Pending', 'Approved', và 'Rejected' hoạt động chính xác.",
+    "preconditions": [
+      "Người dùng đã đăng nhập.",
+      "Người dùng đã tạo ít nhất một hội nghị và nó đang ở trạng thái 'Rejected'.",
+      "Người dùng đang ở trang 'My Conferences'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào bộ lọc 'Rejected'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Quan sát danh sách kết quả."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào bộ lọc 'Pending'."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Quan sát danh sách kết quả."
+      }
+    ],
+    "expectedResult": "Khi nhấp vào 'Rejected', chỉ những hội nghị có trạng thái 'Rejected' được hiển thị. Tương tự, khi nhấp vào 'Pending', chỉ những hội nghị 'Pending' được hiển thị.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_MyConf_002",
+    "testCaseName": "Xem lý do hội nghị bị từ chối",
+    "description": "Kiểm tra người dùng có thể xem được lý do tại sao hội nghị họ tạo bị từ chối.",
+    "preconditions": [
+      "Người dùng đã đăng nhập.",
+      "Có ít nhất một hội nghị do người dùng tạo đã bị từ chối.",
+      "Người dùng đang ở trang 'My Conferences'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm một hội nghị có trạng thái 'Rejected'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'View Reason' của hội nghị đó."
+      }
+    ],
+    "expectedResult": "Một pop-up hoặc một khu vực mới xuất hiện, hiển thị chi tiết lý do mà quản trị viên đã từ chối hội nghị.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Profile_003",
+    "testCaseName": "Thay đổi ảnh đại diện (Avatar)",
+    "description": "Kiểm tra người dùng có thể thay đổi ảnh đại diện từ danh sách các avatar có sẵn.",
+    "preconditions": [
+      "Người dùng đã đăng nhập.",
+      "Người dùng đang ở trang chỉnh sửa hồ sơ (Edit Profile)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào ảnh đại diện hiện tại."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Trong pop-up 'Select an Avatar', chọn một avatar khác."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Save Changes' trên trang chỉnh sửa hồ sơ."
+      }
+    ],
+    "expectedResult": "Pop-up chọn avatar đóng lại. Avatar mới được hiển thị trên trang hồ sơ sau khi lưu. Avatar trên header cũng được cập nhật.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Profile_004",
+    "testCaseName": "Thay đổi ảnh nền (Background)",
+    "description": "Kiểm tra người dùng có thể thay đổi ảnh nền trang cá nhân từ danh sách có sẵn.",
+    "preconditions": [
+      "Người dùng đã đăng nhập.",
+      "Người dùng đang ở trang chỉnh sửa hồ sơ (Edit Profile)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào biểu tượng chỉnh sửa trên ảnh nền."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Trong pop-up 'Select a Background', chọn một ảnh nền khác."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Save Changes' trên trang chỉnh sửa hồ sơ."
+      }
+    ],
+    "expectedResult": "Pop-up chọn ảnh nền đóng lại. Ảnh nền mới được hiển thị trên trang hồ sơ sau khi lưu.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Account_001",
+    "testCaseName": "Hủy bỏ yêu cầu xóa tài khoản",
+    "description": "Kiểm tra nút 'Cancel' trong hộp thoại xác nhận xóa tài khoản hoạt động đúng.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đã điều hướng đến tùy chọn xóa tài khoản, làm hiện lên pop-up 'Confirm Account Deletion'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Cancel' trong pop-up."
+      }
+    ],
+    "expectedResult": "Pop-up xác nhận xóa tài khoản đóng lại. Người dùng vẫn đăng nhập và ở lại trang hiện tại. Không có dữ liệu nào bị xóa.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Account_002",
+    "testCaseName": "Xác nhận xóa tài khoản vĩnh viễn",
+    "description": "Kiểm tra luồng xóa tài khoản hoàn tất thành công.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đã điều hướng đến tùy chọn xóa tài khoản, làm hiện lên pop-up 'Confirm Account Deletion'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Delete my Account' trong pop-up."
+      }
+    ],
+    "expectedResult": "Hệ thống xóa vĩnh viễn tài khoản và tất cả dữ liệu liên quan. Người dùng được tự động đăng xuất và chuyển hướng về trang chủ hoặc trang đăng nhập.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Follow_001",
+    "testCaseName": "Chuyển đổi giữa tab Conferences và Journals trong trang 'My Follows'",
+    "description": "Kiểm tra việc chuyển đổi tab hiển thị danh sách các hội nghị và tạp chí đã theo dõi.",
+    "preconditions": [
+      "Người dùng đã đăng nhập.",
+      "Người dùng đã theo dõi ít nhất một hội nghị và một tạp chí.",
+      "Người dùng đang ở trang 'Followed'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trang được tải với tab 'Conferences' được chọn mặc định."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào tab 'Journals'."
+      }
+    ],
+    "expectedResult": "Nội dung trang được cập nhật để hiển thị danh sách các tạp chí đã theo dõi. Tab 'Journals' được làm nổi bật để chỉ ra nó đang được chọn.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Settings_001",
+    "testCaseName": "Tắt/Bật cài đặt nhận thông báo chung",
+    "description": "Kiểm tra việc bật/tắt công tắc chính 'Receive Notifications' sẽ ảnh hưởng đến các cài đặt thông báo chi tiết bên dưới.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống.",
+      "Người dùng đang ở trang 'Setting'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào công tắc (toggle) bên cạnh 'Receive Notifications' để chuyển sang trạng thái Tắt (Off)."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Quan sát các công tắc trong mục 'Notification Preferences'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp lại vào công tắc 'Receive Notifications' để chuyển sang trạng thái Bật (On)."
+      }
+    ],
+    "expectedResult": "Khi công tắc chính bị Tắt, tất cả các công tắc trong 'Notification Preferences' sẽ bị vô hiệu hóa (mờ đi). Khi công tắc chính được Bật lại, các công tắc con sẽ trở lại trạng thái có thể tương tác.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Settings_002",
+    "testCaseName": "Thay đổi một tùy chọn thông báo cụ thể",
+    "description": "Kiểm tra người dùng có thể tùy chỉnh một loại thông báo cụ thể, ví dụ như tắt thông báo khi thêm hội nghị vào danh sách đen.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang 'Setting'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm đến mục 'Notification Preferences'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào công tắc bên cạnh 'Notification when add to blacklist' để Tắt nó."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Điều hướng đến một hội nghị và thêm nó vào danh sách đen."
+      }
+    ],
+    "expectedResult": "Hệ thống lưu lại cài đặt. Người dùng sẽ không nhận được thông báo (cả trên web và email, tùy thuộc vào cài đặt khác) về hành động vừa thực hiện.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Notifications_001",
+    "testCaseName": "Lọc thông báo theo trạng thái 'Chưa đọc' (Unread)",
+    "description": "Kiểm tra chức năng lọc để chỉ hiển thị các thông báo chưa được đọc.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và có cả thông báo đã đọc và chưa đọc.",
+      "Người dùng đang ở trang 'Notifications'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào bộ lọc 'Unread'."
+      }
+    ],
+    "expectedResult": "Danh sách được cập nhật và chỉ hiển thị các thông báo chưa được đọc (thường được biểu thị bằng chữ in đậm hoặc một dấu chấm màu).",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Notifications_002",
+    "testCaseName": "Thực hiện hành động hàng loạt: Xóa các thông báo đã chọn",
+    "description": "Kiểm tra người dùng có thể chọn nhiều thông báo và xóa chúng cùng một lúc.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang 'Notifications'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào ô 'Select All' hoặc chọn thủ công một vài thông báo."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Các nút hành động hàng loạt xuất hiện. Nhấp vào nút 'Delete Selected'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Xác nhận hành động nếu có hộp thoại xuất hiện."
+      }
+    ],
+    "expectedResult": "Các thông báo đã chọn sẽ bị xóa khỏi danh sách. Danh sách được làm mới.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Notifications_003",
+    "testCaseName": "Đánh dấu thông báo là 'Quan trọng' (Important)",
+    "description": "Kiểm tra chức năng đánh dấu thông báo là quan trọng và lọc theo nó.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang 'Notifications'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Chọn một hoặc nhiều thông báo."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Mark As Important'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Bỏ chọn và nhấp vào bộ lọc 'Important' ở trên cùng."
+      }
+    ],
+    "expectedResult": "Các thông báo đã chọn được đánh dấu quan trọng (ví dụ: có biểu tượng ngôi sao màu vàng). Sau khi lọc, chỉ những thông báo quan trọng này được hiển thị.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Note_001",
+    "testCaseName": "Xem chi tiết ngày tháng trên Lịch",
+    "description": "Kiểm tra sự đồng bộ giữa danh sách 'Upcoming Notes' và Lịch hiển thị bên phải.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang 'Note'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Quan sát một sự kiện trong danh sách 'Upcoming Notes', ví dụ 'hội nghị nhỏ' từ 25-27 June 2025."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Quan sát lịch ở tháng 'June 2025'."
+      }
+    ],
+    "expectedResult": "Trên lịch, có một sự kiện được hiển thị kéo dài từ ngày 25 đến ngày 27, tương ứng với thông tin trong danh sách bên trái.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Chatbot_001",
+    "testCaseName": "Thay đổi định dạng đầu ra của Chatbot",
+    "description": "Kiểm tra người dùng có thể thay đổi định dạng phản hồi của chatbot giữa Âm thanh (Audio) và Văn bản (Text).",
+    "preconditions": [
+      "Người dùng đã đăng nhập (nếu cần).",
+      "Người dùng đang ở trong giao diện 'Live Chat'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào biểu tượng Cài đặt (Settings) ở góc trên bên phải để mở thanh cài đặt."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Trong mục 'Output Format', nhấp vào tùy chọn 'Text'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Gửi một tin nhắn cho chatbot."
+      }
+    ],
+    "expectedResult": "Tùy chọn 'Text' được chọn. Chatbot sẽ phản hồi bằng văn bản thay vì âm thanh.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Chatbot_002",
+    "testCaseName": "Gửi tin nhắn văn bản thành công trong Live Chat",
+    "description": "Kiểm tra chức năng cốt lõi của chatbot là nhận và phản hồi tin nhắn văn bản từ người dùng.",
+    "preconditions": [
+      "Người dùng đang ở trong giao diện 'Live Chat'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập một câu hỏi hoặc lệnh vào trường 'Enter message'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút gửi (biểu tượng máy bay giấy) hoặc nhấn Ctrl+Enter."
+      }
+    ],
+    "expectedResult": "Tin nhắn của người dùng xuất hiện trong cửa sổ trò chuyện. Chatbot xử lý và cung cấp một câu trả lời có liên quan.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Feedback_001",
+    "testCaseName": "Gửi phản hồi cho hội nghị thành công",
+    "description": "Kiểm tra người dùng có thể gửi đánh giá (rating) và nhận xét (comment) cho một hội nghị.",
+    "preconditions": [
+      "Người dùng đã đăng nhập.",
+      "Người dùng đang ở trang chi tiết của một hội nghị, trong khu vực 'Conference Feedback'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong mục 'Rate the Conference:', nhấp vào 4 ngôi sao."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhập nội dung nhận xét vào ô 'Write your feedback...'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Post Feedback'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo gửi phản hồi thành công. Phản hồi mới của người dùng xuất hiện trong danh sách các bài đánh giá. Điểm số trung bình và biểu đồ thống kê được cập nhật.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Feedback_002",
+    "testCaseName": "Gửi phản hồi thất bại khi không có đánh giá sao",
+    "description": "Kiểm tra validation của hệ thống khi người dùng cố gắng gửi phản hồi mà không chọn số sao đánh giá.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở khu vực 'Conference Feedback'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Không chọn bất kỳ ngôi sao nào."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhập nội dung nhận xét vào ô 'Write your feedback...'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Post Feedback'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị một thông báo lỗi yêu cầu người dùng phải đưa ra đánh giá bằng sao, ví dụ: 'Please provide a star rating'. Phản hồi không được gửi đi.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_ConfDetail_001",
+    "testCaseName": "Xem các ngày quan trọng của hội nghị",
+    "description": "Kiểm tra người dùng có thể xem chi tiết các mốc thời gian quan trọng của hội nghị.",
+    "preconditions": [
+      "Người dùng đang ở trang chi tiết một hội nghị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào tab 'Important Dates'."
+      }
+    ],
+    "expectedResult": "Trang hiển thị chi tiết các ngày quan trọng bao gồm 'Conference Date', 'Full Paper Submission', 'Acceptance Notification', v.v. Các mốc thời gian mới được đánh dấu bằng thẻ 'NEW'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_ConfDetail_002",
+    "testCaseName": "Tương tác với bản đồ vị trí hội nghị",
+    "description": "Kiểm tra chức năng hiển thị và tương tác cơ bản với bản đồ địa điểm tổ chức.",
+    "preconditions": [
+      "Người dùng đang ở trang chi tiết một hội nghị có địa điểm cụ thể."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào tab 'Map'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút phóng to ('+')."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp và kéo bản đồ để di chuyển."
+      }
+    ],
+    "expectedResult": "Bản đồ hiển thị đúng vị trí của hội nghị với một ghim đánh dấu. Người dùng có thể phóng to, thu nhỏ và di chuyển bản đồ một cách mượt mà.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Notifications_004",
+    "testCaseName": "Đánh dấu tất cả thông báo là đã đọc",
+    "description": "Kiểm tra chức năng 'Mark All As Read' trong menu thông báo thả xuống hoạt động chính xác.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống.",
+      "Có ít nhất một thông báo chưa đọc (có dấu chấm đỏ)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào biểu tượng chuông thông báo trên header để mở menu thả xuống."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào liên kết 'Mark All As Read'."
+      }
+    ],
+    "expectedResult": "Tất cả các dấu chấm đỏ chỉ thị thông báo chưa đọc trong menu sẽ biến mất. Số lượng thông báo trên biểu tượng chuông (ví dụ: '20+') sẽ được đặt lại về 0 hoặc biến mất.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Chatbot_003",
+    "testCaseName": "Bật tính năng cá nhân hóa phản hồi Chatbot",
+    "description": "Kiểm tra luồng bật tính năng cá nhân hóa, bao gồm cả việc đồng ý với điều khoản trong pop-up.",
+    "preconditions": [
+      "Người dùng đã đăng nhập.",
+      "Người dùng đang ở trong giao diện 'Regular Chat' hoặc 'Live Stream'.",
+      "Tính năng 'Personalize' đang ở trạng thái Tắt."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào biểu tượng Cài đặt (Settings) để mở thanh cài đặt."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào công tắc (toggle) bên cạnh 'Personalize'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Trong pop-up 'Enable Response Personalization', nhấp vào nút 'Enable Feature'."
+      }
+    ],
+    "expectedResult": "Pop-up đóng lại. Công tắc 'Personalize' chuyển sang trạng thái Bật. Chatbot giờ đây có thể sử dụng thông tin cá nhân của người dùng để đưa ra câu trả lời phù hợp hơn (ví dụ: chào bằng tên 'Hello Bạch Đông Quân').",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Chatbot_004",
+    "testCaseName": "Thay đổi Chat Model",
+    "description": "Kiểm tra người dùng có thể chọn một mô hình AI khác cho chatbot.",
+    "preconditions": [
+      "Người dùng đang ở trong giao diện 'Regular Chat' hoặc 'Live Stream' và đã mở thanh Cài đặt."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào menu thả xuống 'Chat Model' (hiện tại đang là 'Sirius')."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn một mô hình khác, ví dụ: 'Mercury'."
+      }
+    ],
+    "expectedResult": "Mô hình 'Mercury' được chọn và hiển thị trong menu thả xuống. Các phản hồi tiếp theo của chatbot sẽ được tạo ra bởi mô hình đã chọn.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_ChatHistory_001",
+    "testCaseName": "Xóa một cuộc trò chuyện khỏi lịch sử",
+    "description": "Kiểm tra chức năng xóa một cuộc trò chuyện cụ thể khỏi trang Lịch sử Chat.",
+    "preconditions": [
+      "Người dùng đã đăng nhập.",
+      "Có ít nhất một cuộc trò chuyện đã được lưu trong lịch sử.",
+      "Người dùng đang ở trang 'Chat History'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm đến dòng của cuộc trò chuyện cần xóa (ví dụ: 'New Chat')."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào biểu tượng thùng rác (Delete) ở cột 'ACTIONS'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Xác nhận hành động xóa nếu có hộp thoại xuất hiện."
+      }
+    ],
+    "expectedResult": "Cuộc trò chuyện được chọn sẽ bị xóa vĩnh viễn khỏi danh sách lịch sử.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_ChatHistory_002",
+    "testCaseName": "Đổi tên một cuộc trò chuyện trong lịch sử",
+    "description": "Kiểm tra người dùng có thể đổi tên một cuộc trò chuyện đã lưu để dễ quản lý hơn.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở trang 'Chat History'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm đến dòng của cuộc trò chuyện cần đổi tên (ví dụ: 'New Chat')."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào biểu tượng bút chì (Edit) ở cột 'ACTIONS'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhập tên mới vào ô chỉnh sửa xuất hiện và nhấn Enter hoặc nút Lưu."
+      }
+    ],
+    "expectedResult": "Tên của cuộc trò chuyện trong cột 'TITLE' được cập nhật thành tên mới mà người dùng đã nhập.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_AddConf_001",
+    "testCaseName": "Thêm hội nghị mới thành công với đầy đủ thông tin (Luồng đầy đủ)",
+    "description": "Kiểm tra toàn bộ quy trình thêm một hội nghị mới, từ việc điền thông tin, xem lại, đồng ý điều khoản và gửi đi thành công.",
+    "preconditions": [
+      "Người dùng đã đăng nhập vào hệ thống.",
+      "Người dùng đã nhấp vào nút 'Add Conference' và đang ở bước đầu tiên của quy trình."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tại bước 'Basic Information', điền đầy đủ các thông tin bắt buộc: Title, Acronym, Official Website."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chuyển sang bước 'Logistics Details'. Chọn 'Type' (ví dụ: Offline), điền đầy đủ thông tin 'Location' và các 'Important Dates' bắt buộc (Submission, Notification, Camera-Ready)."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Chuyển sang bước 'Content & Branding'. Điền thông tin 'Topics', 'Summary' và 'Call for papers'."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Next' sau khi hoàn thành tất cả các mục."
+      },
+      {
+        "stepNumber": 5,
+        "action": "Tại trang 'Review Information', kiểm tra lại thông tin đã nhập và nhấp 'Next'."
+      },
+      {
+        "stepNumber": 6,
+        "action": "Tại trang 'Review & Confirm', tích vào ô 'I agree to the terms and conditions'."
+      },
+      {
+        "stepNumber": 7,
+        "action": "Nhấp vào nút 'Submit Conference'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị pop-up 'Submission Successful' với thông báo hội nghị đã được gửi và đang chờ xét duyệt. Người dùng có thể chọn 'Add Another Conference' hoặc 'Go to My Conferences'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_AddConf_002",
+    "testCaseName": "Thêm hội nghị thất bại do thiếu thông tin bắt buộc ở bước Logistics",
+    "description": "Kiểm tra hệ thống hiển thị cảnh báo lỗi khi người dùng không cung cấp đủ các ngày quan trọng bắt buộc.",
+    "preconditions": [
+      "Người dùng đã đăng nhập và đang ở bước 'Logistics Details'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Hoàn thành bước 'Basic Information'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Tại bước 'Logistics Details', chỉ thêm 'Conference Dates' mà không thêm các ngày bắt buộc khác như 'Submission Date'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Cố gắng chuyển sang bước tiếp theo."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị một thông báo lỗi màu đỏ rõ ràng, ví dụ: 'Please add the following required dates: Submission Date, Notification Date, Camera-Ready Date'. Người dùng không thể tiến tới bước 'Content & Branding'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_AddConf_003",
+    "testCaseName": "Thêm hội nghị thất bại do không đồng ý với Điều khoản & Điều kiện",
+    "description": "Kiểm tra nút 'Submit Conference' bị vô hiệu hóa hoặc hiển thị lỗi khi người dùng không đồng ý với các điều khoản.",
+    "preconditions": [
+      "Người dùng đã điền đầy đủ thông tin và đang ở bước cuối cùng 'Review & Confirm'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Không tích vào ô 'I agree to the terms and conditions'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Submit Conference'."
+      }
+    ],
+    "expectedResult": "Nút 'Submit Conference' bị vô hiệu hóa (disabled). Nếu có thể nhấp, hệ thống sẽ hiển thị một thông báo lỗi ngay bên dưới ô checkbox, ví dụ: 'You must agree to the terms to proceed'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_AddConf_004",
+    "testCaseName": "Kiểm tra chức năng 'Back' từ trang Review",
+    "description": "Kiểm tra người dùng có thể quay lại để chỉnh sửa thông tin từ trang Review mà không làm mất dữ liệu đã nhập.",
+    "preconditions": [
+      "Người dùng đã điền đầy đủ thông tin ở 3 bước và đang ở trang 'Review Information'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Back' ở cuối trang Review."
+      }
+    ],
+    "expectedResult": "Hệ thống quay trở lại giao diện điền thông tin 3 bước ('Add Conference Information'). Tất cả dữ liệu người dùng đã nhập trước đó vẫn được giữ nguyên trong các trường tương ứng.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_AddConf_005",
+    "testCaseName": "Kiểm tra điều hướng sau khi gửi thành công",
+    "description": "Kiểm tra nút 'Go to My Conferences' trên pop-up thành công điều hướng đúng trang.",
+    "preconditions": [
+      "Người dùng vừa hoàn thành TC_AddConf_001 và đang thấy pop-up 'Submission Successful'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Go to My Conferences'."
+      }
+    ],
+    "expectedResult": "Người dùng được chuyển hướng đến trang 'My Conferences'. Hội nghị vừa tạo xuất hiện trong danh sách với trạng thái 'Pending'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Crawl_001",
+    "testCaseName": "Thực hiện Crawl thủ công thành công (Luồng đầy đủ)",
+    "description": "Kiểm tra toàn bộ quy trình 4 bước để thu thập dữ liệu hội nghị từ một file CSV hợp lệ.",
+    "preconditions": [
+      "Người dùng có quyền quản trị đã đăng nhập.",
+      "Người dùng đang ở trang 'Crawl' > 'Crawl Conferences'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tại Bước 1 (Import CSV), nhấp vào 'Choose File' và chọn một file CSV hợp lệ chứa các cột 'Title' và 'Acronym'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chờ hệ thống xử lý và hiển thị thông báo 'Parsed ... conferences. Ready to proceed.' sau đó nhấp vào 'Next: Select Conferences'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Tại Bước 2 (Select Conferences), nhấp vào nút 'Select All' để chọn tất cả các hội nghị."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào 'Next: Configure & Process'."
+      },
+      {
+        "stepNumber": 5,
+        "action": "Tại Bước 3 (Configure Process Settings), giữ nguyên các cài đặt mặc định và nhấp vào 'Next: Start Processing'."
+      },
+      {
+        "stepNumber": 6,
+        "action": "Tại Bước 4 (Process & View Status), nhập một mô tả tùy chọn vào ô 'Crawl Description'."
+      },
+      {
+        "stepNumber": 7,
+        "action": "Nhấp vào nút 'Start Processing'."
+      }
+    ],
+    "expectedResult": "Quá trình thu thập dữ liệu bắt đầu. Hộp 'Process Status & Log' hiển thị các thông báo log về tiến trình (ví dụ: 'Starting crawl process...', 'Processing conference X...', 'Process completed').",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Crawl_002",
+    "testCaseName": "Áp dụng hành động hàng loạt cho các hội nghị đã chọn",
+    "description": "Kiểm tra chức năng thay đổi hành động (ví dụ từ Crawl sang Update) cho nhiều hội nghị cùng lúc tại Bước 2.",
+    "preconditions": [
+      "Người dùng đã hoàn thành Bước 1 và đang ở Bước 2 (Select Conferences)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Chọn một vài hội nghị bằng cách tích vào các checkbox tương ứng."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Trong mục 'Action for Selected:', chọn 'Update' từ menu thả xuống."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Apply to Page' hoặc 'Apply to All Selected'."
+      }
+    ],
+    "expectedResult": "Cột 'Action Type' của tất cả các hội nghị đã được chọn sẽ thay đổi thành 'Update'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Crawl_003",
+    "testCaseName": "Kiểm tra trường bắt buộc trong Cài đặt Quy trình",
+    "description": "Kiểm tra hệ thống ngăn chặn việc tiếp tục nếu một trường bắt buộc trong Bước 3 không được chọn.",
+    "preconditions": [
+      "Người dùng đã hoàn thành Bước 1, 2 và đang ở Bước 3 (Configure Process Settings)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Giả sử 'API Model Selection' là một trường bắt buộc. Bỏ chọn tất cả các lựa chọn trong mục đó."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Next: Start Processing'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị một thông báo lỗi, ví dụ: 'Please select an API model'. Nút 'Next' bị vô hiệu hóa hoặc người dùng không thể chuyển sang bước tiếp theo.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Crawl_004",
+    "testCaseName": "Kiểm tra chức năng 'Reset All & Start Over'",
+    "description": "Kiểm tra nút Reset có đưa người dùng trở lại bước đầu tiên và xóa tất cả các cấu hình đã thực hiện hay không.",
+    "preconditions": [
+      "Người dùng đã đi đến Bước 4 (Process & View Status)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào liên kết 'Reset All & Start Over'."
+      }
+    ],
+    "expectedResult": "Người dùng được điều hướng trở lại Bước 1 (Import CSV). Tất cả các lựa chọn và file đã tải lên trước đó đều bị xóa. Giao diện trở về trạng thái ban đầu, yêu cầu người dùng 'Choose File'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_AutoUpdate_001",
+    "testCaseName": "Lên lịch cập nhật tự động thành công",
+    "description": "Kiểm tra chức năng lên lịch cập nhật dữ liệu tự động.",
+    "preconditions": [
+      "Người dùng quản trị đã đăng nhập và đang ở trang 'Automatic Updates'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Chọn 'Update Cycle' là 'Daily'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Đặt 'Time' là '12:00 AM'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhập 'Batch Size' là '10'."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Schedule Update'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo thành công. Khu vực 'Update Statistics' và 'Current Status' được cập nhật để phản ánh lịch trình mới đã được kích hoạt.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Mod_001",
+    "testCaseName": "Phê duyệt một hội nghị đang chờ xử lý thành công",
+    "description": "Kiểm tra quản trị viên có thể phê duyệt một hội nghị đang ở trạng thái 'Pending' từ trang Moderation.",
+    "preconditions": [
+      "Người dùng có quyền quản trị đã đăng nhập.",
+      "Người dùng đang ở trang 'Moderation'.",
+      "Có ít nhất một hội nghị với trạng thái 'Pending' trong danh sách, ví dụ 'Hội nghị XYZ (ZYX2025)'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm đến thẻ của hội nghị 'Hội nghị XYZ (ZYX2025)'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút màu xanh lá cây 'Approve'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Trong pop-up 'Approve Conference', nhấp vào nút 'Approve'."
+      }
+    ],
+    "expectedResult": "Hội nghị đó biến mất khỏi danh sách chờ duyệt (nếu có bộ lọc 'Pending'). Trạng thái của nó trong hệ thống được cập nhật thành 'Approved'. Một thông báo phê duyệt thành công được hiển thị.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Mod_002",
+    "testCaseName": "Từ chối một hội nghị đang chờ xử lý thành công",
+    "description": "Kiểm tra quản trị viên có thể từ chối một hội nghị đang ở trạng thái 'Pending' và bắt buộc phải cung cấp lý do.",
+    "preconditions": [
+      "Người dùng có quyền quản trị đã đăng nhập.",
+      "Người dùng đang ở trang 'Moderation'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm đến thẻ của một hội nghị đang chờ duyệt."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút màu đỏ 'Reject'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Trong pop-up 'Reject Conference', nhập một lý do vào ô văn bản, ví dụ: 'Thông tin không chính xác'."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Reject' trong pop-up."
+      }
+    ],
+    "expectedResult": "Hội nghị đó biến mất khỏi danh sách chờ duyệt. Trạng thái của nó được cập nhật thành 'Rejected'. Một thông báo từ chối thành công được hiển thị.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Mod_003",
+    "testCaseName": "Từ chối hội nghị thất bại do không nhập lý do",
+    "description": "Kiểm tra hệ thống validation khi quản trị viên cố gắng từ chối một hội nghị mà không cung cấp lý do.",
+    "preconditions": [
+      "Người dùng quản trị đã mở pop-up 'Reject Conference'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Để trống ô 'Enter rejection reason here...'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Reject' trong pop-up."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị một thông báo lỗi yêu cầu phải nhập lý do, hoặc nút 'Reject' bị vô hiệu hóa (disabled). Pop-up không đóng lại.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Analysis_001",
+    "testCaseName": "Lọc danh sách Log Requests theo khoảng thời gian",
+    "description": "Kiểm tra chức năng lọc các yêu cầu log theo các tùy chọn thời gian được cung cấp trong menu thả xuống.",
+    "preconditions": [
+      "Người dùng quản trị đã đăng nhập và đang ở trang 'Analysis'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào menu thả xuống thời gian (đang hiển thị 'All Time')."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn một tùy chọn khác, ví dụ 'Last 24 Hours'."
+      }
+    ],
+    "expectedResult": "Danh sách trong mục 'Log Requests' được làm mới và chỉ hiển thị các yêu cầu được thực hiện trong vòng 24 giờ qua. Các chỉ số tổng quan cũng có thể được cập nhật tương ứng.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Analysis_002",
+    "testCaseName": "Xem chi tiết một Log Request cụ thể",
+    "description": "Kiểm tra việc điều hướng từ danh sách log tổng quan đến trang phân tích chi tiết của một yêu cầu.",
+    "preconditions": [
+      "Người dùng quản trị đã đăng nhập và đang ở trang 'Analysis'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong danh sách 'Log Requests', nhấp vào một dòng có 'REQUEST ID', ví dụ: 'req-conf-1751211954947-k8ur1'."
+      }
+    ],
+    "expectedResult": "Người dùng được chuyển hướng đến trang 'Detailed Conference Analysis' cho yêu cầu đó. Trang này hiển thị danh sách các hội nghị đã được xử lý trong yêu cầu đó cùng với trạng thái chi tiết của từng hội nghị (failed, completed, ...).",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Analysis_003",
+    "testCaseName": "Chuyển đổi giữa các chế độ xem trong trang Tổng quan Phân tích",
+    "description": "Kiểm tra chức năng chuyển đổi giữa 'Requests Level' và 'Details Level' trên trang 'Overall Summary'.",
+    "preconditions": [
+      "Người dùng quản trị đã đăng nhập và đang ở trang 'Analysis'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Quan sát trang đang ở chế độ xem 'Requests Level'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Details Level'."
+      }
+    ],
+    "expectedResult": "Nội dung của khu vực 'Overall Summary' được thay đổi để hiển thị các thẻ thống kê chi tiết hơn như 'Overall Crawl Summary' và 'Gemini API Health & Performance'. Nút 'Details Level' được làm nổi bật (highlighted).",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_AdminConf_001",
+    "testCaseName": "Chỉnh sửa thông tin lịch sử của một hội nghị",
+    "description": "Kiểm tra quản trị viên có thể xem lịch sử, vào chế độ chỉnh sửa và cập nhật thành công thông tin chi tiết của một hội nghị cho một năm cụ thể.",
+    "preconditions": [
+      "Người dùng có quyền quản trị đã đăng nhập.",
+      "Người dùng đang ở trang 'Conference Management'.",
+      "Tồn tại một hội nghị có dữ liệu đã lưu, ví dụ 'ACM Symposium on Document Engineering'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm đến dòng của hội nghị 'ACM Symposium on Document Engineering' và nhấp vào menu hành động (...)."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn 'View History' từ menu."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Trong pop-up 'Conference History', nhấp vào nút 'Edit'."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Trang 'Edit Conference History' được tải. Trong mục 'Topics', thêm một chủ đề mới."
+      },
+      {
+        "stepNumber": 5,
+        "action": "Cuộn xuống cuối trang và nhấp vào nút 'Save'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo cập nhật thành công. Người dùng được điều hướng trở lại trang 'Conference Management'. Nếu xem lại lịch sử, chủ đề mới sẽ được hiển thị.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_AdminConf_002",
+    "testCaseName": "Xóa một bản ghi lịch sử của hội nghị",
+    "description": "Kiểm tra quản trị viên có thể xóa một bản ghi dữ liệu của một năm cụ thể cho một hội nghị.",
+    "preconditions": [
+      "Người dùng quản trị đã đăng nhập.",
+      "Người dùng đang xem pop-up 'Conference History' của một hội nghị."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Delete' màu đỏ trong pop-up 'Conference History'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Xác nhận hành động xóa trong hộp thoại tiếp theo (nếu có)."
+      }
+    ],
+    "expectedResult": "Bản ghi lịch sử cho năm đó bị xóa vĩnh viễn. Pop-up đóng lại và người dùng quay trở lại trang 'Conference Management'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_AdminConf_003",
+    "testCaseName": "Lọc danh sách hội nghị theo nhiều tiêu chí",
+    "description": "Kiểm tra chức năng lọc trên trang quản lý hội nghị hoạt động chính xác khi kết hợp nhiều bộ lọc.",
+    "preconditions": [
+      "Người dùng quản trị đã đăng nhập và đang ở trang 'Conference Management'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong mục 'Filters', chọn 'Status' là 'PENDING'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn 'Sources' là 'CORE2023'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhập 'Computer' vào trường 'Research Fields'."
+      }
+    ],
+    "expectedResult": "Bảng dữ liệu được làm mới và chỉ hiển thị các hội nghị thỏa mãn đồng thời tất cả các tiêu chí đã chọn.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_AdminUser_001",
+    "testCaseName": "Cấm (Ban) một tài khoản người dùng thành công",
+    "description": "Kiểm tra quy trình cấm một người dùng từ trang quản lý tài khoản.",
+    "preconditions": [
+      "Người dùng quản trị đã đăng nhập và đang ở trang 'Accounts'.",
+      "Tồn tại một người dùng có trạng thái 'Active', ví dụ 'Liona Kashine'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm đến dòng của người dùng 'Liona Kashine' và nhấp vào nút 'Ban' ở cột 'Actions'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Trong pop-up xác nhận đầu tiên, nhấp vào nút 'Ban'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Trong pop-up 'Reason for ban...', nhập một lý do (tùy chọn) và nhấp 'Confirm Ban'."
+      }
+    ],
+    "expectedResult": "Trạng thái của người dùng 'Liona Kashine' trong bảng được cập nhật thành 'Banned'. Một thông báo thành công được hiển thị.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_AdminUser_002",
+    "testCaseName": "Lọc tài khoản người dùng theo trạng thái 'Banned'",
+    "description": "Kiểm tra chức năng lọc người dùng theo trạng thái.",
+    "preconditions": [
+      "Người dùng quản trị đã đăng nhập và đang ở trang 'Accounts'.",
+      "Có ít nhất một tài khoản đã bị cấm."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào menu thả xuống 'All Statuses'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn 'Banned' từ danh sách."
+      }
+    ],
+    "expectedResult": "Bảng dữ liệu được làm mới và chỉ hiển thị danh sách các tài khoản người dùng có trạng thái 'Banned'.",
+    "actualResult": "",
+    "status": ""
+  }
+]

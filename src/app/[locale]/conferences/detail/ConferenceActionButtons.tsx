@@ -1,3 +1,5 @@
+// src/app/[locale]/conferences/detail/ConferenceActionButtons.tsx
+
 import React, { useState, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import Button from '@/src/app/[locale]/utils/Button'
@@ -187,6 +189,8 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
       <IconComponent {...props} />
     )
   }
+
+  // console.log('displayOrganization:', displayOrganization)
 
   return (
     <div className='sticky top-24'>

@@ -38,6 +38,8 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
     processedRanks,
     summary,
     callForPaper,
+    cfpLink,
+    impLink,
     primaryLocation
   } = useFormatConferenceData(conference, t)
 
@@ -51,8 +53,8 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       conference
         ? [
             'overview',
-            'important-dates',
             'call-for-papers',
+            'important-dates',
             ...(conference.ranks ? ['source-rank'] : []),
             'map'
           ]
@@ -62,8 +64,8 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
 
   const sectionTranslationMap: { [key: string]: string } = {
     overview: 'Overview',
-    'important-dates': 'Important_Dates',
     'call-for-papers': 'Call_for_paper',
+    'important-dates': 'Important_Dates',
     'source-rank': 'Source_Rank',
     map: 'Map'
   }
@@ -94,13 +96,17 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
 
       <OverviewSection summary={summary} t={t} />
 
+      <CallForPapersSection
+        callForPaper={callForPaper}
+        cfpLink={cfpLink}
+        t={t}
+      />
+
       <ImportantDatesSection
         groupedDates={groupedDates}
         formatDate={formatDate}
-        // t={t}
+        impLink={impLink}
       />
-
-      <CallForPapersSection callForPaper={callForPaper} t={t} />
 
       {/* Conditionally render SourceRankSection based on original logic */}
       {conference.ranks && (
