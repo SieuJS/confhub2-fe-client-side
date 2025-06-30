@@ -1790,7 +1790,8 @@
     "totalDocsYearly": "Tổng số tài liệu ({year})",
     "totalDocs3years": "Tổng số tài liệu (3 năm)",
     "totalCites3years": "Tổng số trích dẫn (3 năm)",
-    "citesPerDoc2years": "Trích dẫn / Tài liệu (2 năm)"
+    "citesPerDoc2years": "Trích dẫn / Tài liệu (2 năm)",
+    "totalDocs": "Tổng số tài liệu ({count})"
   },
   "My_Follows": "Mục theo dõi của tôi",
   "Explore_All_Journals": "Khám phá tất cả Tạp chí",

@@ -133,7 +133,7 @@ const SearchAdvanceJournalSection: React.FC<
             </div>
 
             {/* Topic Filter */}
-            <div>
+            {/* <div>
               <label className='mb-2 block text-sm font-bold' htmlFor='topic'>
                 {t('topicLabel')}:
               </label>
@@ -145,7 +145,7 @@ const SearchAdvanceJournalSection: React.FC<
                 value={topic}
                 onChange={e => onTopicChange(e.target.value)}
               />
-            </div>
+            </div> */}
 
             {/* ISSN Filter */}
             <div>

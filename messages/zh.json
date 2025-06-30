@@ -1790,7 +1790,8 @@
     "totalDocsYearly": "年度总文献数 ({year})",
     "totalDocs3years": "总文献数 (3年)",
     "totalCites3years": "总引用数 (3年)",
-    "citesPerDoc2years": "引用/文献 (2年)"
+    "citesPerDoc2years": "引用/文献 (2年)",
+    "totalDocs": "总文献数 ({year})"
   },
   "My_Follows": "我的关注",
   "Explore_All_Journals": "探索所有期刊",

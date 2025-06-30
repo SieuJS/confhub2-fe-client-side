@@ -1790,7 +1790,8 @@
     "totalDocsYearly": "Total Docs ({year})",
     "totalDocs3years": "Total Docs (3 years)",
     "totalCites3years": "Total Cites (3 years)",
-    "citesPerDoc2years": "Cites / Doc (2 years)"
+    "citesPerDoc2years": "Cites / Doc (2 years)",
+    "totalDocs": "Total Documents ({year})"
   },
   "My_Follows": "My Follows",
   "Explore_All_Journals": "Explore All Journals",
