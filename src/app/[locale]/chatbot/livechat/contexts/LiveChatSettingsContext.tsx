@@ -38,7 +38,7 @@ export const LiveChatSettingsProvider: React.FC<LiveChatSettingsProviderProps> =
     const [isLiveChatConnected, setLiveChatConnected] = useState<boolean>(false);
 
     const setCurrentModality = (modality: OutputModality) => {
-        console.log('[LiveChatSettingsContext] Setting modality to:', modality, SDKModality[modality]); // Log the enum value and its string name
+        // console.log('[LiveChatSettingsContext] Setting modality to:', modality, SDKModality[modality]); // Log the enum value and its string name
         _setCurrentModality(modality);
     };
 

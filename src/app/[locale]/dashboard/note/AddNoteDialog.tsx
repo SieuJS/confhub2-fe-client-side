@@ -114,10 +114,7 @@ const AddNoteDialog: React.FC<AddNoteDialogProps> = ({
     }
   }, [showStartTimeDropdown, showEndTimeDropdown])
 
-  const handleDelete = () => {
-    console.log('Delete event:', event)
-    onClose()
-  }
+
 
   const renderAddEditView = () => {
     // JSX for Add/Edit view

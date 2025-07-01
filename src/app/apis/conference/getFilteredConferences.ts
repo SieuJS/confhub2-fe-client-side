@@ -39,7 +39,7 @@ export const fetchConferences = async (params: FetchConferencesParams): Promise<
   });
 
   const url = `${API_FILTERED_CONFERENCES_ENDPOINT}?${queryParams.toString()}`;
-  console.log(`Query: ${url}`);
+  // console.log(`Query: ${url}`);
 
   const response = await fetch(url);
 

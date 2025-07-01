@@ -89,19 +89,19 @@ export default function MainLayoutComponent({
     urlIdParam: searchParamsHook.get('id'),
     searchParamsString: searchParamsHook.toString(),
     onDeletionProcessed: () => {
-      console.log(
-        '[MainLayout] onDeletionProcessed called from LifecycleManager. Resetting deletion state.'
-      )
+      // console.log(
+      //   '[MainLayout] onDeletionProcessed called from LifecycleManager. Resetting deletion state.'
+      // )
       resetDeletionState()
     },
     didAttemptLoadFromUrlRef: didAttemptLoadFromUrlRef,
     onNotFoundProcessed: () => {
-      console.log(
-        '[MainLayout] onNotFoundProcessed called from LifecycleManager.'
-      )
+      // console.log(
+      //   '[MainLayout] onNotFoundProcessed called from LifecycleManager.'
+      // )
       if (didAttemptLoadFromUrlRef.current) {
         didAttemptLoadFromUrlRef.current = false
-        console.log('[MainLayout] Reset didAttemptLoadFromUrlRef to false.')
+        // console.log('[MainLayout] Reset didAttemptLoadFromUrlRef to false.')
       }
     }
   })

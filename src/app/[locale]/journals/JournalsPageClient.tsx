@@ -32,7 +32,7 @@ export default function JournalsPageClient({ locale, initialData }: JournalsPage
   const t = useTranslations('')
   const router = useRouter()
   const pathname = usePathname()
-  console.log('JournalsPageClient initialData:', initialData)
+  // console.log('JournalsPageClient initialData:', initialData)
   const handleSearch = useCallback(
     (searchParamsFromComponent: SearchParamsFromComponent) => {
       const newParams = new URLSearchParams()

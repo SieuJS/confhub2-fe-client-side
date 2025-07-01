@@ -34,7 +34,7 @@ export const getNotifications = async (): Promise<Notification[]> => {
     const data: Notification[] = await response.json();
     return data;
   } catch (error: any) {
-    console.error('Error fetching notifications:', error);
+    // console.error('Error fetching notifications:', error);
     if (!error.status) {
         (error as any).status = 0;
     }

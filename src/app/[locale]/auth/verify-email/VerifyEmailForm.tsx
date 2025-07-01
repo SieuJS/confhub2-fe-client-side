@@ -101,7 +101,7 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = () => {
         setError(data.message || t('verifyEmail.error.backendFailed'))
       }
     } catch (err: any) {
-      console.error('Verification error:', err)
+      // console.error('Verification error:', err)
       if (err.message === 'Failed to fetch') {
         setError(t('verifyEmail.error.network'))
       } else {
@@ -163,7 +163,7 @@ const VerifyEmailForm: React.FC<VerifyEmailFormProps> = () => {
       }
     } catch (err: any) {
       // Use 'any' or specific error type
-      console.error('Resend error:', err)
+      // console.error('Resend error:', err)
       if (err.message === 'Failed to fetch') {
         setResendError(t('verifyEmail.error.network'))
       } else {

@@ -26,11 +26,11 @@ export const usePageContextFetcher = ({
   const { setPageContext } = usePageContextStore();
 
   useEffect(() => {
-    console.log(
-      '[usePageContextFetcher] Effect triggered. Pathname:', currentPathname,
-      'isChatOpen:', isChatOpen,
-      'shouldRender:', shouldRender
-    );
+    // console.log(
+    //   '[usePageContextFetcher] Effect triggered. Pathname:', currentPathname,
+    //   'isChatOpen:', isChatOpen,
+    //   'shouldRender:', shouldRender
+    // );
 
     let attemptCount = 0;
     let animationFrameId: number | null = null;
@@ -57,22 +57,22 @@ export const usePageContextFetcher = ({
             const pageUrl = getCurrentPageUrl();
 
             if (pageText && !pageText.toLowerCase().includes("loading...") && pageText.length > MIN_REASONABLE_TEXT_LENGTH) {
-              console.log(`[usePageContextFetcher] Updating page context (Attempt ${attemptCount + 1}) for: ${path}. Text length: ${pageText.length}`);
+              // console.log(`[usePageContextFetcher] Updating page context (Attempt ${attemptCount + 1}) for: ${path}. Text length: ${pageText.length}`);
               setPageContext(pageText, pageUrl, true);
               attemptCount = 0;
             } else {
               attemptCount++;
-              console.warn(`[usePageContextFetcher] Page content might be loading or too short (Attempt ${attemptCount}) for: ${path}. Text: "${pageText ? pageText.substring(0, 100) + '...' : 'null'}"`);
+              // console.warn(`[usePageContextFetcher] Page content might be loading or too short (Attempt ${attemptCount}) for: ${path}. Text: "${pageText ? pageText.substring(0, 100) + '...' : 'null'}"`);
               if (attemptCount < MAX_CONTEXT_FETCH_ATTEMPTS) {
                 retryTimerId = setTimeout(() => fetchPageContextForPath(path), CONTEXT_FETCH_RETRY_DELAY);
               } else {
-                console.error(`[usePageContextFetcher] Max attempts reached for fetching context for: ${path}. Setting context to null.`);
+                // console.error(`[usePageContextFetcher] Max attempts reached for fetching context for: ${path}. Setting context to null.`);
                 setPageContext(null, null, false);
                 attemptCount = 0;
               }
             }
           } else {
-            console.log(`[usePageContextFetcher] Clearing page context (rAF) for chatbot page: ${path}`);
+            // console.log(`[usePageContextFetcher] Clearing page context (rAF) for chatbot page: ${path}`);
             setPageContext(null, null, false);
             attemptCount = 0;
           }
@@ -87,11 +87,11 @@ export const usePageContextFetcher = ({
     return () => {
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
-        console.log('[usePageContextFetcher] Cleaning up page context rAF.');
+        // console.log('[usePageContextFetcher] Cleaning up page context rAF.');
       }
       if (retryTimerId) {
         clearTimeout(retryTimerId);
-        console.log('[usePageContextFetcher] Cleaning up page context retry timer.');
+        // console.log('[usePageContextFetcher] Cleaning up page context retry timer.');
       }
       attemptCount = 0; // Reset attempt count on cleanup
     };

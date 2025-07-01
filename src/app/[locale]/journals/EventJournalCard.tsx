@@ -57,7 +57,7 @@ const EventJournalCardComponent: React.FC<EventJournalCardProps> = ({
       setIsFollowing(newFollowStatus);
       onFollowStatusChange(journal.id, newFollowStatus);
     } catch (error) {
-      console.error('Error toggling follow status:', error)
+      // console.error('Error toggling follow status:', error)
       toast.error(t('followError'))
     } finally {
       setIsLoading(false)

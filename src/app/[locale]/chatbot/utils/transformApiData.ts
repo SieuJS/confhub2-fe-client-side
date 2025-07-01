@@ -133,7 +133,7 @@ export function transformConferenceData(
 
     // 1. Validate the input data structure using the type guard
     if (!isConferenceApiResponse(dataInput)) {
-        console.error("Transformation Error: Input data does not match expected structure { payload: [], meta: {} }.", dataInput);
+        // console.error("Transformation Error: Input data does not match expected structure { payload: [], meta: {} }.", dataInput);
         // logToFile(`Transformation Error: Invalid data structure received.`);
         // Provide a more informative error message
         return "Error: Invalid data structure received from API. Expected 'payload' array and 'meta' object.";

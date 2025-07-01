@@ -47,10 +47,10 @@ const useNotifications = (): UseNotificationsReturn => {
         if (user && user.id) {
           setUserId(user.id);
         } else {
-          console.error('User data from localStorage is missing id:', user);
+          // console.error('User data from localStorage is missing id:', user);
         }
       } catch (error) {
-        console.error('Error parsing user data from localStorage:', error);
+        // console.error('Error parsing user data from localStorage:', error);
       }
     }
   }, []);
@@ -125,7 +125,7 @@ const useNotifications = (): UseNotificationsReturn => {
     const idsToDelete = checkedIndices;
     const updatedNotifications = rawNotifications.map(n => {
       if (idsToDelete.includes(n.id)) {
-        console.log(`handleDeleteSelected - Deleting notification with id: ${n.id}`);
+        // console.log(`handleDeleteSelected - Deleting notification with id: ${n.id}`);
         return { ...n, deletedAt: new Date().toISOString(), isDeleted : true }; // Đánh dấu là đã xóa
       }
       return n; // Giữ nguyên các notification khác
@@ -135,7 +135,7 @@ const useNotifications = (): UseNotificationsReturn => {
       await updateUserNotifications(updatedNotifications); // Hàm này cần xử lý xóa trên server và cập nhật state
       setCheckedIndices([]);
     } catch (error) {
-      console.error('Failed to delete selected notifications:', error);
+      // console.error('Failed to delete selected notifications:', error);
     }
   }
 

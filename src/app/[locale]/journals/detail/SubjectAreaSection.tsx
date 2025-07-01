@@ -8,7 +8,7 @@ interface Props {
 }
 
 export const SubjectAreaSection: React.FC<Props> = ({ journal, t }) => {
-  console.log('Journal Data:', journal) // Kiểm tra dữ liệu đã được truyền đúng chưa
+  // console.log('Journal Data:', journal) // Kiểm tra dữ liệu đã được truyền đúng chưa
   // 1. Xử lý chuỗi Areas thành một mảng, loại bỏ khoảng trắng thừa
   const areaList = journal.Areas
     ? journal.Areas.split(';')

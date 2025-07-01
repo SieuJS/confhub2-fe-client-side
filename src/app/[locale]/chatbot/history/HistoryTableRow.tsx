@@ -63,7 +63,7 @@ const HistoryTableRow: React.FC<HistoryTableRowProps> = ({
       // Không cần setIsProcessingAction(false) ở đây vì row sẽ bị xóa nếu thành công
     } catch (error) {
       // Khối catch này sẽ chạy khi người dùng hủy hoặc có lỗi API
-      console.log('Deletion process was cancelled or failed:', (error as Error).message)
+      // console.log('Deletion process was cancelled or failed:', (error as Error).message)
       setIsProcessingAction(false) // Reset spinner
     }
   }, [conv.id, currentTitleForDisplay, onDelete])
@@ -73,7 +73,7 @@ const HistoryTableRow: React.FC<HistoryTableRowProps> = ({
     try {
       await onClear(conv.id, currentTitleForDisplay)
     } catch (error) {
-      console.log('Clear process was cancelled:', (error as Error).message)
+      // console.log('Clear process was cancelled:', (error as Error).message)
     }
   }, [conv.id, currentTitleForDisplay, onClear])
 

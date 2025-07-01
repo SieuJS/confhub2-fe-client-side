@@ -112,7 +112,7 @@ const SettingTab: React.FC = () => {
 
   const fetchUserSettings = useCallback(async () => {
     if (!isLoggedIn) {
-      console.warn('[SettingTab] Skipping fetch: User not logged in.')
+      // console.warn('[SettingTab] Skipping fetch: User not logged in.')
       setIsFetchingSettings(false)
       setInitialLoad(false)
       return
@@ -123,10 +123,10 @@ const SettingTab: React.FC = () => {
       if (userSetting) {
         setSetting(userSetting)
       } else {
-        console.error('Failed to get user settings:', getSettingError)
+        // console.error('Failed to get user settings:', getSettingError)
       }
     } catch (err) {
-      console.error('[SettingTab] Critical error fetching user settings:', err)
+      // console.error('[SettingTab] Critical error fetching user settings:', err)
       if (getSettingError?.includes('403')) {
         logout({ callApi: true, preventRedirect: true })
       }
@@ -148,9 +148,9 @@ const SettingTab: React.FC = () => {
   const handleToggle = useCallback(
     async (settingKey: ToggleSettingKey) => {
       if (!setting) {
-        console.error(
-          'Attempted to toggle setting when setting object is null.'
-        )
+        // console.error(
+        //   'Attempted to toggle setting when setting object is null.'
+        // )
         return
       }
       const currentValue = setting[settingKey] ?? false
@@ -164,7 +164,7 @@ const SettingTab: React.FC = () => {
         setSetting(prev =>
           prev ? { ...prev, [settingKey]: currentValue } : null
         )
-        console.error(`Failed to update setting ${settingKey}:`, error)
+        // console.error(`Failed to update setting ${settingKey}:`, error)
         alert(
           `${t('Error_Updating_Setting')}: ${error.message || error.toString()}`
         )

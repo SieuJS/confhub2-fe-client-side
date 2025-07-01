@@ -211,7 +211,7 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
         setRowSaveStatus(nextRowStatus);
         setRowSaveErrors(nextRowErrors);
 
-        console.log(`Starting bulk save for: ${selectedTitles.join(', ')}`);
+        // console.log(`Starting bulk save for: ${selectedTitles.join(', ')}`);
 
         // Filter items to save based on current selection
         const itemsToSave = conferenceDataArray.filter(conf => selectedConferences[conf.title]);
@@ -226,7 +226,7 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
         );
 
         const results = await Promise.allSettled(savePromises);
-        console.log(`Bulk save results:`, JSON.stringify(results));
+        // console.log(`Bulk save results:`, JSON.stringify(results));
         // Process results (logic này vẫn đúng để cập nhật row status)
         const finalRowStatus: Record<string, RowSaveStatus> = { ...nextRowStatus };
         const finalRowErrors: Record<string, string> = { ...nextRowErrors };
@@ -246,7 +246,7 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
                     : String(result.reason);
                 finalRowStatus[currentTitle] = 'error';
                 finalRowErrors[currentTitle] = errorMessage;
-                console.error(`Bulk Save Error (Rejected): ${currentTitle}`, errorMessage);
+                // console.error(`Bulk Save Error (Rejected): ${currentTitle}`, errorMessage);
             } else if (result.status === 'fulfilled') {
                 // API có thể trả về { success: boolean, title: string, message?: string }
                 const response = result.value as { success: boolean, title?: string, message?: string }; // Type assertion
@@ -257,11 +257,11 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
                     failedSaves++;
                     finalRowStatus[titleFromResponse] = 'error';
                     finalRowErrors[titleFromResponse] = response.message || 'Save operation failed (no specific message).';
-                    console.error(`Bulk Save Error (Fulfilled, Backend Fail): ${titleFromResponse}`, response.message);
+                    // console.error(`Bulk Save Error (Fulfilled, Backend Fail): ${titleFromResponse}`, response.message);
                 } else {
                     successfulSaves++;
                     finalRowStatus[titleFromResponse] = 'success';
-                    console.log(`Bulk Save Success: ${titleFromResponse}`);
+                    // console.log(`Bulk Save Success: ${titleFromResponse}`);
                 }
             }
         });
@@ -271,12 +271,12 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
 
         if (overallSuccess) {
             setMainSaveStatus('success');
-            console.log(`Bulk save completed successfully for ${successfulSaves} items.`);
+            // console.log(`Bulk save completed successfully for ${successfulSaves} items.`);
             handleDeselectAll();
             // setTimeout(() => setMainSaveStatus('idle'), 3000);
         } else {
             setMainSaveStatus('error');
-            console.error(`Bulk save completed with ${failedSaves} error(s) out of ${selectedTitles.length} selected items.`);
+            // console.error(`Bulk save completed with ${failedSaves} error(s) out of ${selectedTitles.length} selected items.`);
         }
     }
 
@@ -284,8 +284,8 @@ export const useConferenceTableManager = ({ initialData }: UseConferenceTableMan
     // Mock Crawl Again Logic (giữ nguyên)
     const handleCrawlAgain = useCallback(() => {
         if (selectedTitles.length === 0) return;
-        console.log("--- MOCK CRAWL AGAIN ---");
-        console.log("Would trigger crawl for:", selectedTitles.join(', '));
+        // console.log("--- MOCK CRAWL AGAIN ---");
+        // console.log("Would trigger crawl for:", selectedTitles.join(', '));
         alert(`Mock: Triggering crawl again for ${selectedTitles.length} conference(s):\n${selectedTitles.join('\n')}`);
     }, [selectedTitles]);
 

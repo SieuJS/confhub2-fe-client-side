@@ -39,7 +39,7 @@ const ResultsJournalSection: React.FC<ResultsJournalSectionProps> = ({ initialDa
         const ids = await journalFollowService.getFollowedJournalIdsByUser();
         setFollowedJournalIds(new Set(ids));
       } catch (err) {
-        console.error('Failed to fetch followed journal IDs:', err);
+        // console.error('Failed to fetch followed journal IDs:', err);
       }
     };
     fetchFollowedJournalIds();

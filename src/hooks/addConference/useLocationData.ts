@@ -164,7 +164,7 @@ export const useLocationData = ({
           }
         }
       } catch (error) {
-        console.error('Error fetching location data (states/cities):', error);
+        // console.error('Error fetching location data (states/cities):', error);
         setStates([]); setCities([]);
         setStatesForReview([]); setCitiesForReview([]);
       }

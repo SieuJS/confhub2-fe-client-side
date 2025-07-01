@@ -68,7 +68,7 @@ export class AudioStreamer {
         const int16 = dataView.getInt16(i * 2, true);
         float32Array[i] = int16 / 32768;
       } catch (e) {
-        console.error(e);
+        // console.error(e);
         // console.log(
         //   `dataView.length: ${dataView.byteLength},  i * 2: ${i * 2}`,
         // );

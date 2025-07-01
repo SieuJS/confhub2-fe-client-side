@@ -16,7 +16,7 @@ export const fetchLogAnalysisData = async (
         url.searchParams.append('filterEndTime', filterEndTime.toString());
     }
 
-    console.log(`Fetching log analysis data from: ${url.toString()}`); // Log URL để debug
+    // console.log(`Fetching log analysis data from: ${url.toString()}`); // Log URL để debug
 
     const response = await fetch(url.toString()); // Gọi API với URL đã có tham số
 

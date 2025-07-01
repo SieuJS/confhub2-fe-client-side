@@ -20,7 +20,7 @@ export const base64ToAudioBuffer = async (
     }
 
     if (bytes.byteLength % 2 !== 0) {
-      console.error("Raw PCM data length is not a multiple of 2 (expected 16-bit samples).");
+      // console.error("Raw PCM data length is not a multiple of 2 (expected 16-bit samples).");
       throw new Error("Invalid audio data: Incomplete sample data.");
     }
 
@@ -39,7 +39,7 @@ export const base64ToAudioBuffer = async (
     }
     return buffer;
   } catch (e: any) {
-    console.error("Error processing base64 to AudioBuffer (raw PCM assumption):", e);
+    // console.error("Error processing base64 to AudioBuffer (raw PCM assumption):", e);
     if (e.name === 'DOMException' && e.message.includes('atob')) {
       throw new Error("Failed to decode base64. String might be corrupted.");
     }

@@ -76,7 +76,7 @@ export const useUiStore = create<UiStoreState & UiStoreActions>()(
 
                 // --- Complex Actions ---
                 handleError: (errorInput, stopLoadingInMessageStore = true, isFatal = false) => {
-                    console.error("Chat Error/Warning (UI Store):", errorInput);
+                    // console.error("Chat Error/Warning (UI Store):", errorInput);
                     // It's generally better to avoid calling getState() from other stores directly inside a store action
                     // if it can be avoided or passed as a parameter. However, for existing logic, we'll keep it.
                     const messageStore = useMessageStore.getState();
@@ -137,7 +137,7 @@ export const useUiStore = create<UiStoreState & UiStoreActions>()(
 
                     if (isFatal || isAuthError || isGenericFatal) {
                         const errorCodeToSet = finalError.code || 'UNKNOWN_FATAL_ERROR';
-                        console.warn(`[UiStore] Fatal error detected (${finalError.message}, code: ${errorCodeToSet}). Setting fatal error flag.`);
+                        // console.warn(`[UiStore] Fatal error detected (${finalError.message}, code: ${errorCodeToSet}). Setting fatal error flag.`);
                         get().setHasFatalError(true, errorCodeToSet); // Use get() for self-reference
 
                         if (isAuthError) {
@@ -169,7 +169,7 @@ export const useUiStore = create<UiStoreState & UiStoreActions>()(
                     if (socketStore.isConnected) {
                         socketStore.emitUserCancelEmail(confirmationId);
                     } else {
-                        console.warn('[UiStore] Cannot cancel: Not connected.');
+                        // console.warn('[UiStore] Cannot cancel: Not connected.');
                     }
                     set({ showConfirmationDialog: false, confirmationData: null }); // Always close dialog on cancel
                 },
@@ -187,10 +187,10 @@ export const useUiStore = create<UiStoreState & UiStoreActions>()(
                 }),
                 onRehydrateStorage: () => (state, error) => {
                     if (error) {
-                        console.error('[UiStore] Failed to rehydrate from storage:', error);
+                        // console.error('[UiStore] Failed to rehydrate from storage:', error);
                     }
                     if (state) {
-                        console.log('[UiStore] Rehydrated from storage.');
+                        // console.log('[UiStore] Rehydrated from storage.');
                         // Optionally reset transient states that might have been persisted by mistake or due to older versions
                         // state.hasFatalError = false;
                         // state.fatalErrorCode = null;

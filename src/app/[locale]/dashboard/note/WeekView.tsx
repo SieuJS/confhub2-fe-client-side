@@ -41,7 +41,7 @@ const WeekView: React.FC<WeekViewProps> = ({
         })
       );
       */
-      console.log("Clicked on an empty day area. Add-note is disabled.");
+      // console.log("Clicked on an empty day area. Add-note is disabled.");
     }
   }
 

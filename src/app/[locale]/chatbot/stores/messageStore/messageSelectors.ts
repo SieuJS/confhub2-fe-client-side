@@ -23,7 +23,7 @@ export const getPersonalizationData = (): PersonalizationPayload | null => {
             interestedTopics: userData.interestedTopics,
         };
     } catch (error) {
-        console.error("Error parsing user data from localStorage for personalization:", error);
+        // console.error("Error parsing user data from localStorage for personalization:", error);
         return null;
     }
 };

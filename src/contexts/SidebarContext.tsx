@@ -65,7 +65,8 @@ export const useSidebar = (): SidebarContextType => {
     // Điều này hữu ích cho các trang không có sidebar
     return {
       isSidebarOpen: false,
-      toggleSidebar: () => console.warn('useSidebar must be used within a SidebarProvider to function.'),
+      toggleSidebar: () => {}
+        // console.warn('useSidebar must be used within a SidebarProvider to function.'),
     };
   }
   return context;

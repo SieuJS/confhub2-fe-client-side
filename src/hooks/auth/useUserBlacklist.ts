@@ -32,14 +32,14 @@ const useUserBlacklist = (): UseUserBlacklistResult => {
     const token = getToken(); // Lấy token từ AuthContext
 
     if (!token) {
-      console.warn('[useUserBlacklist] User is logged in, but no token found. Cannot fetch blacklist.');
+      // console.warn('[useUserBlacklist] User is logged in, but no token found. Cannot fetch blacklist.');
       setBlacklistedEventIds([]);
       setLoading(false);
       setError('Authentication token not available.'); // Thông báo lỗi rõ ràng hơn
       return;
     }
 
-    console.log('[useUserBlacklist] Fetching blacklist data...');
+    // console.log('[useUserBlacklist] Fetching blacklist data...');
     setLoading(true);
     setError(null);
 
@@ -67,13 +67,13 @@ const useUserBlacklist = (): UseUserBlacklistResult => {
       } else if (Array.isArray(responseData)) { // Nếu response là một mảng trực tiếp
          ids = responseData.map((item: any) => item.conferenceId).filter((id: any) => typeof id === 'string');
       } else {
-        console.warn('[useUserBlacklist] Unexpected data format for blacklist:', responseData);
+        // console.warn('[useUserBlacklist] Unexpected data format for blacklist:', responseData);
       }
 
       setBlacklistedEventIds(ids);
 
     } catch (err: any) {
-      console.error('[useUserBlacklist] Failed to fetch blacklist data:', err);
+      // console.error('[useUserBlacklist] Failed to fetch blacklist data:', err);
       setError(err.message || 'Failed to fetch blacklist data');
       setBlacklistedEventIds([]);
     } finally {

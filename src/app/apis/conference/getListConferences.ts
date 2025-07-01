@@ -20,7 +20,7 @@ async function getListConferenceFromDB(): Promise<ConferenceListResponse> {
     }
 
     const responseData = await response.json();
-    console.log('responseData', responseData);
+    // console.log('responseData', responseData);
 
     if (responseData.payload != null && Array.isArray(responseData.payload)) {
         responseData.payload.forEach((event: any) => {
@@ -35,9 +35,9 @@ async function getListConferenceFromDB(): Promise<ConferenceListResponse> {
       throw new Error('Invalid API response format or empty data.');
     }
   } catch (error: any) {
-    console.error('Error fetching or saving conferences:', error.message);
+    // console.error('Error fetching or saving conferences:', error.message);
     if (error instanceof TypeError) {
-      console.error('Network error:', error.message);
+      // console.error('Network error:', error.message);
     }
     throw error; // Re-throw the error to be handled by the caller
   }

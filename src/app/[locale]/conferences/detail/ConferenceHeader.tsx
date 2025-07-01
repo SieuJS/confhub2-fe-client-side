@@ -9,7 +9,6 @@ import {
   ConferenceOrganizationItem,
   Rank,
 } from '@/src/models/response/conference.response'
-import { Link } from '@/src/navigation'
 import { getAccessTypeColor, getRankColor } from './utils/conferenceUtils'
 import FollowerAvatars from './FollowerAvatars'
 
@@ -55,7 +54,7 @@ const ConferenceHeader: React.FC<ConferenceHeaderProps> = ({
         locale: dateLocale,
       })
     } catch (error) {
-      console.error("Invalid date format for 'updatedAt':", conferenceData.updatedAt)
+      // console.error("Invalid date format for 'updatedAt':", conferenceData.updatedAt)
       return null
     }
   }, [conferenceData?.updatedAt, currentLocale])
@@ -170,16 +169,11 @@ const ConferenceHeader: React.FC<ConferenceHeaderProps> = ({
             </span>
           )}
           {lastOrganization?.publisher ? (
-            <Link
-              className='flex items-center text-sm text-blue-600 hover:underline'
-              href={{
-                pathname: `/conferences`,
-                query: { publisher: lastOrganization.publisher },
-              }}
-            >
+            // Thay Link bằng span và bỏ thuộc tính href
+            <span className='flex items-center text-sm'>
               <BookType className='mr-1 h-4 w-4 flex-shrink-0' />
               {lastOrganization.publisher}
-            </Link>
+            </span>
           ) : (
             <span className='flex items-center text-sm'>
               <BookType className='mr-1 h-4 w-4 flex-shrink-0' />

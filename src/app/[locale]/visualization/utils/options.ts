@@ -20,12 +20,12 @@ export const generateChartOption = (
     options: ChartOptions,
     availableFields: DataField[]
 ): EChartsOption => {
-    console.log(`${logPrefixOptions} generateChartOption: Start. Type: ${config.chartType}, Title: "${options.title}"`);
+    // console.log(`${logPrefixOptions} generateChartOption: Start. Type: ${config.chartType}, Title: "${options.title}"`);
 
     // 1. Xử lý Dữ liệu
-    console.log(`${logPrefixOptions} generateChartOption: Calling processDataForChart...`);
+    // console.log(`${logPrefixOptions} generateChartOption: Calling processDataForChart...`);
     const { categories, series, legendData } = processDataForChart(rawData, config, availableFields);
-    console.log(`${logPrefixOptions} generateChartOption: Data processed. Series: ${series.length}, Categories: ${categories?.length}, Legend: ${legendData?.length}`);
+    // console.log(`${logPrefixOptions} generateChartOption: Data processed. Series: ${series.length}, Categories: ${categories?.length}, Legend: ${legendData?.length}`);
 
     // Tìm các trường để lấy tên trục, v.v.
     const xAxisField = availableFields.find(f => f.id === config.xAxis?.fieldId);
@@ -35,7 +35,7 @@ export const generateChartOption = (
     // 2. Xác định Loại Trục
     // Vì scatter đã bị loại bỏ, trục X cho các biểu đồ thanh/đường luôn là 'category'.
     const xAxisType: 'category' = 'category';
-    console.log(`${logPrefixOptions} generateChartOption: X-Axis type: ${xAxisType}`);
+    // console.log(`${logPrefixOptions} generateChartOption: X-Axis type: ${xAxisType}`);
 
     // 3. Xây dựng Tùy chọn Trục
     let xAxisOption: EChartsOption['xAxis'] = undefined;
@@ -141,7 +141,7 @@ export const generateChartOption = (
     // Thêm DataZoom cho các biểu đồ có nhiều danh mục
     const addDataZoom = categories && categories.length > 20;
     if (config.chartType !== 'pie' && addDataZoom) {
-        console.log(`Adding dataZoom for X-axis.`, 'color: purple;');
+        // console.log(`Adding dataZoom for X-axis.`, 'color: purple;');
         finalOption.dataZoom = [
             {
                 type: 'slider',
@@ -171,7 +171,7 @@ export const generateChartOption = (
         }
     }
 
-    console.log(`Final ECharts option constructed.`, 'color: purple; font-weight: bold;');
+    // console.log(`Final ECharts option constructed.`, 'color: purple; font-weight: bold;');
     // console.log(JSON.stringify(finalOption, null, 2)); // Ghi log sâu tùy chọn cuối cùng nếu cần
 
     return finalOption;

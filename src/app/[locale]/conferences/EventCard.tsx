@@ -60,7 +60,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({
         try {
           await onToggleFollow(event.id, isFollowing)
         } catch (error) {
-          console.error('Failed to toggle follow:', error)
+          // console.error('Failed to toggle follow:', error)
           // Hiển thị thông báo lỗi cho người dùng ở đây nếu cần
         } finally {
           setFollowLoading(false)
@@ -86,7 +86,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({
         try {
           await onToggleCalendar(event.id, isAddToCalendar)
         } catch (error) {
-          console.error('Failed to toggle calendar:', error)
+          // console.error('Failed to toggle calendar:', error)
           // Hiển thị thông báo lỗi cho người dùng ở đây nếu cần
         } finally {
           setCalendarLoading(false)
@@ -114,7 +114,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({
         day: 'numeric'
       })
     } catch (e) {
-      console.error('Error formatting date:', dateString, e)
+      // console.error('Error formatting date:', dateString, e)
       return 'Invalid Date'
     }
   }, [])
@@ -145,7 +145,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({
       if (!isBlacklisted && url) {
         window.open(url, '_blank', 'noopener noreferrer')
       } else if (!url) {
-        console.warn('No URL provided for Go to Website')
+        // console.warn('No URL provided for Go to Website')
       }
     },
     [isBlacklisted]

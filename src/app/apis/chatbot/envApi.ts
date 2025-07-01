@@ -19,7 +19,7 @@ export const getEnvVariables = async (): Promise<EnvResponse> => {
         const data = await response.json();
         return { success: true, data };
     } catch (error: any) {
-        console.error("Could not fetch environment variables:", error);
+        // console.error("Could not fetch environment variables:", error);
         return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 };
@@ -37,7 +37,7 @@ export const saveAllEnvVariables = async (updatedEnvVariables: any): Promise<Env
         const data = await response.json();
         return { success: true, data };
     } catch (error: any) {
-        console.error("Could not save environment variables:", error);
+        // console.error("Could not save environment variables:", error);
         return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 };

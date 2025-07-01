@@ -28,10 +28,10 @@ export const getEchartsOption = ({
       // Lỗi đã được sửa ở đây, vì `t` giờ đã có kiểu đúng là (key: string) => string
       return t(`continent.${tickItem}`);
     } catch (e) {
-      console.warn(
-        `next-intl MISSING_MESSAGE: Could not resolve IntroduceVisualization.continent.${tickItem}. Check your messages file.`,
-        e
-      );
+      // console.warn(
+      //   `next-intl MISSING_MESSAGE: Could not resolve IntroduceVisualization.continent.${tickItem}. Check your messages file.`,
+      //   e
+      // );
       return tickItem; // Trả về nguyên bản nếu không dịch được
     }
   };

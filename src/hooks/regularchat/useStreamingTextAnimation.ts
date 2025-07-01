@@ -143,7 +143,7 @@ export function useStreamingTextAnimation(
 
     const startStreaming = useCallback((messageId: string) => {
         stopAnimation(); // Stop any previous animation
-        console.log("[StreamingText] Starting stream for ID:", messageId);
+        // console.log("[StreamingText] Starting stream for ID:", messageId);
         streamingMessageIdRef.current = messageId;
         fullStreamedTextRef.current = '';
         displayedTextLengthRef.current = 0;
@@ -168,7 +168,7 @@ export function useStreamingTextAnimation(
     }, [animateText, animationIntervalMs]);
 
     const completeStream = useCallback(() => {
-        console.log("[StreamingText] Stream marked as complete by server:", streamingMessageIdRef.current);
+        // console.log("[StreamingText] Stream marked as complete by server:", streamingMessageIdRef.current);
         isStreamingCompleteRef.current = true;
         // Animation loop (`animateText`) will naturally stop itself when text is fully displayed
         // No need to call stopAnimation() here unless immediate stop is desired.
@@ -179,7 +179,7 @@ export function useStreamingTextAnimation(
     }, []);
 
      const stopStreaming = useCallback(() => {
-        console.log("[StreamingText] Force stopping stream:", streamingMessageIdRef.current);
+        // console.log("[StreamingText] Force stopping stream:", streamingMessageIdRef.current);
         stopAnimation(); // Explicitly stop the animation loop
         // Reset internal state
         streamingMessageIdRef.current = null;

@@ -965,10 +965,10 @@ const ChatIntroductionDisplay: React.FC<ChatIntroductionProps> = ({
         }
       }
     } catch (error) {
-      console.error(
-        'Lỗi khi parse dữ liệu người dùng từ localStorage lúc mount:',
-        error
-      )
+      // console.error(
+      //   'Lỗi khi parse dữ liệu người dùng từ localStorage lúc mount:',
+      //   error
+      // )
     }
 
     // Chọn ngẫu nhiên 3 loại introduction với 1 câu hỏi ngẫu nhiên cho mỗi loại

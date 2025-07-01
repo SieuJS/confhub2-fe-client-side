@@ -19,7 +19,7 @@ export default function RegisterPage({
   useEffect(() => {
     // Chỉ chuyển hướng nếu quá trình khởi tạo auth đã hoàn tất VÀ người dùng đã đăng nhập
     if (!isInitializing && isLoggedIn) {
-      console.log("[RegisterPage] Already logged in, redirecting...");
+      // console.log("[RegisterPage] Already logged in, redirecting...");
       router.push(`/${locale}`); // Chuyển hướng về trang chủ của locale hiện tại
     }
   }, [isLoggedIn, isInitializing, router, locale]); // Dependencies của useEffect

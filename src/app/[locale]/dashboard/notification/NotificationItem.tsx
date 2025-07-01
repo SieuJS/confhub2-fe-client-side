@@ -38,9 +38,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 
   const handleCheckboxChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      console.log(
-        `NotificationItem: handleCheckboxChange called.  notification.id: ${notification.id}, checked: ${event.target.checked}`
-      )
+      // console.log(
+      //   `NotificationItem: handleCheckboxChange called.  notification.id: ${notification.id}, checked: ${event.target.checked}`
+      // )
       onCheckboxChange(event.target.checked)
     },
     [onCheckboxChange, notification.id]
@@ -49,9 +49,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   const handleMarkUnseenCallback = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation()
-      console.log(
-        `NotificationItem: handleMarkUnseenCallback called. notification.id: ${notification.id}`
-      )
+      // console.log(
+      //   `NotificationItem: handleMarkUnseenCallback called. notification.id: ${notification.id}`
+      // )
       onMarkUnseen(notification.id)
     },
     [notification.id, onMarkUnseen]
@@ -60,9 +60,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   const handleDeleteClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation()
-      console.log(
-        `NotificationItem: handleDeleteClick called for id: ${notificationId}`
-      )
+      // console.log(
+      //   `NotificationItem: handleDeleteClick called for id: ${notificationId}`
+      // )
       onDelete()
     },
     [onDelete, notificationId]

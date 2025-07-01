@@ -10,12 +10,14 @@ import { ExternalLink } from 'lucide-react'
 
 interface CallForPapersSectionProps {
   callForPaper: string | undefined | null
+  mainLink: string | undefined | null // Đây là link gốc của hội nghị
   cfpLink?: string | undefined | null
   t: (key: string) => string
 }
 
 export const CallForPapersSection: React.FC<CallForPapersSectionProps> = ({
   callForPaper,
+  mainLink,
   cfpLink,
   t
 }) => {
@@ -33,7 +35,7 @@ export const CallForPapersSection: React.FC<CallForPapersSectionProps> = ({
             href={cfpLink}
             target='_blank'
             rel='noopener noreferrer'
-            title={t('Go_to_CFP_website')} // Tooltip cho người dùng
+            title={t('Go_to_CFP_website')}
             className='text-gray-50 transition-colors hover:text-primary'
           >
             <ExternalLink size={20} />
@@ -42,20 +44,43 @@ export const CallForPapersSection: React.FC<CallForPapersSectionProps> = ({
       </div>
 
       {callForPaper ? (
-        // <div className='prose prose-sm max-w-none dark:prose-invert sm:prose-base'>
         <div className='prose prose-sm max-w-none dark:prose-invert sm:prose-base [&_*]:text-primary '>
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkBreaks]}
             rehypePlugins={[rehypeRaw]}
             components={{
-              a: ({ ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
-                <a
-                  {...props}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='text-primary'
-                />
-              )
+              // --- BẮT ĐẦU PHẦN CẬP NHẬT ---
+              a: ({ node, ...props }) => {
+                // Lấy href từ props của thẻ <a>
+                const { href } = props
+
+                let resolvedHref = href // Mặc định giữ nguyên href gốc
+
+                // Chỉ xử lý khi có href và mainLink (link gốc của hội nghị)
+                if (href && mainLink) {
+                  try {
+                    // Sử dụng URL constructor để gộp link một cách chuẩn xác.
+                    // - Nếu href là link tương đối ('/path'), nó sẽ được ghép với mainLink.
+                    // - Nếu href đã là link tuyệt đối ('https://...'), nó sẽ được giữ nguyên.
+                    resolvedHref = new URL(href, mainLink).toString()
+                  } catch (error) {
+                    // Nếu có lỗi (ví dụ: mainLink không hợp lệ), giữ nguyên href gốc
+                    console.error('Failed to resolve URL:', error)
+                    resolvedHref = href
+                  }
+                }
+
+                return (
+                  <a
+                    {...props}
+                    href={resolvedHref} // Sử dụng link đã được xử lý
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='text-primary'
+                  />
+                )
+              }
+              // --- KẾT THÚC PHẦN CẬP NHẬT ---
             }}
           >
             {callForPaper}

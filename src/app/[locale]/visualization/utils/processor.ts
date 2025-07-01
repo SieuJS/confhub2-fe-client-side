@@ -17,17 +17,17 @@ const aggregateData = (
 ): Record<string, number> => {
     const measureId = measureField.id;
     const aggregationType = measureField.aggregation;
-    console.log(`${logPrefixProcessor} aggregateData: Aggregating "${measureId}" (${aggregationType}) for groups: [${Object.keys(groupedData).join(', ')}]`);
+    // console.log(`${logPrefixProcessor} aggregateData: Aggregating "${measureId}" (${aggregationType}) for groups: [${Object.keys(groupedData).join(', ')}]`);
 
     if (!aggregationType) {
-        console.warn(`${logPrefixProcessor} aggregateData: Missing aggregation type for "${measureId}". Returning 0.`);
+        // console.warn(`${logPrefixProcessor} aggregateData: Missing aggregation type for "${measureId}". Returning 0.`);
         return mapValues(groupedData, () => 0);
     }
 
     switch (aggregationType) {
         case 'sum':
             if (!measureField.accessor) {
-                console.warn(`${logPrefixProcessor} aggregateData: SUM needs accessor for "${measureId}". Returning 0.`);
+                // console.warn(`${logPrefixProcessor} aggregateData: SUM needs accessor for "${measureId}". Returning 0.`);
                 return mapValues(groupedData, () => 0);
             }
             return mapValues(groupedData, (group, key) => {
@@ -37,9 +37,9 @@ const aggregateData = (
 
         case 'average':
             const avgTargetProp = (measureField as any).avgTargetProperty;
-            console.log(`${logPrefixProcessor} aggregateData: AVERAGE for "${measureId}" ${avgTargetProp ? `(prop: "${avgTargetProp}")` : ''}.`);
+            // console.log(`${logPrefixProcessor} aggregateData: AVERAGE for "${measureId}" ${avgTargetProp ? `(prop: "${avgTargetProp}")` : ''}.`);
             if (!measureField.accessor) {
-                console.warn(`${logPrefixProcessor} aggregateData: AVERAGE needs accessor for "${measureId}". Returning 0.`);
+                // console.warn(`${logPrefixProcessor} aggregateData: AVERAGE needs accessor for "${measureId}". Returning 0.`);
                 return mapValues(groupedData, () => 0);
             }
             return mapValues(groupedData, (group, key) => {
@@ -55,7 +55,7 @@ const aggregateData = (
                         const numValue = parseNumericValue(accessedValue, `${measureId} for AVERAGE item ${index}`);
                         if (!isNaN(numValue)) allValues.push(numValue);
                     } else {
-                        console.warn(`${logPrefixProcessor} aggregateData: AVERAGE - Mismatch for "${measureId}" in group "${key}". Expected array for avgTargetProp.`);
+                        // console.warn(`${logPrefixProcessor} aggregateData: AVERAGE - Mismatch for "${measureId}" in group "${key}". Expected array for avgTargetProp.`);
                     }
                 });
                 const average = allValues.length > 0 ? sumBy(allValues) / allValues.length : 0;
@@ -69,7 +69,7 @@ const aggregateData = (
             });
 
         default:
-            console.warn(`${logPrefixProcessor} aggregateData: Unknown aggregation type: "${aggregationType}" for "${measureId}". Returning 0.`);
+            // console.warn(`${logPrefixProcessor} aggregateData: Unknown aggregation type: "${aggregationType}" for "${measureId}". Returning 0.`);
             return mapValues(groupedData, () => 0);
     }
 };
@@ -89,10 +89,10 @@ export const processDataForChart = (
     availableFields: DataField[]
 ): ProcessedChartData => {
     const chartType = config.chartType as ChartType;
-    console.log(`${logPrefixProcessor} processDataForChart: Start. Type: "${chartType}", Data length: ${rawData?.length ?? 0}`);
+    // console.log(`${logPrefixProcessor} processDataForChart: Start. Type: "${chartType}", Data length: ${rawData?.length ?? 0}`);
 
     if (!rawData || rawData.length === 0) {
-        console.warn(`${logPrefixProcessor} processDataForChart: No raw data. Returning empty.`);
+        // console.warn(`${logPrefixProcessor} processDataForChart: No raw data. Returning empty.`);
         return { categories: [], series: [], legendData: [] };
     }
 
@@ -102,7 +102,7 @@ export const processDataForChart = (
     const colorField = availableFields.find(f => f.id === config.color?.fieldId);
     // REMOVED: sizeField không còn cần thiết
 
-    console.log(`${logPrefixProcessor} processDataForChart: Fields - X:${xAxisField?.id || 'N/A'} Y:${yAxisField?.id || 'N/A'} Color:${colorField?.id || 'N/A'}`);
+    // console.log(`${logPrefixProcessor} processDataForChart: Fields - X:${xAxisField?.id || 'N/A'} Y:${yAxisField?.id || 'N/A'} Color:${colorField?.id || 'N/A'}`);
 
     // --- Xác thực đầu vào ---
     if (!yAxisField) {
@@ -123,7 +123,7 @@ export const processDataForChart = (
     let series: any[] = [];
     let legendData: string[] = [];
 
-    console.log(`${logPrefixProcessor} processDataForChart: Processing logic for ${chartType}...`);
+    // console.log(`${logPrefixProcessor} processDataForChart: Processing logic for ${chartType}...`);
 
     // --- Logic Biểu đồ Cột/Đường ---
     if (chartType === 'bar' || chartType === 'line') {
@@ -175,6 +175,6 @@ export const processDataForChart = (
     }
     // --- Logic Biểu đồ Phân tán đã được loại bỏ ---
 
-    console.log(`${logPrefixProcessor} processDataForChart: Finished. Series: ${series.length}, Categories: ${categories.length}, Legend: ${legendData.length}`);
+    // console.log(`${logPrefixProcessor} processDataForChart: Finished. Series: ${series.length}, Categories: ${categories.length}, Legend: ${legendData.length}`);
     return { categories, series, legendData };
 };

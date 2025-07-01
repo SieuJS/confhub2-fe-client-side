@@ -117,7 +117,7 @@ const MessageRenderer = ({ logEntry }: MessageRendererProps) => {
     return null;
   }
 
-  console.warn("[MessageRenderer] Rendering with AnyMessage for unhandled/debug log type:", type, "Message:", message);
+  // console.warn("[MessageRenderer] Rendering with AnyMessage for unhandled/debug log type:", type, "Message:", message);
   return <AnyMessage message={message as any} />;
 };
 

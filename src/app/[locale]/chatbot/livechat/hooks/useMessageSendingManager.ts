@@ -21,13 +21,13 @@ export function useMessageSendingManager({ logs }: UseMessageSendingManagerProps
   const lastSentLogIndexRef = useRef<number | null>(null);
 
   const startSending = useCallback((sentLogIndex: number) => {
-    console.log(`[useMessageSendingManager] startSending called. Index: ${sentLogIndex}`);
+    // console.log(`[useMessageSendingManager] startSending called. Index: ${sentLogIndex}`);
     setIsSendingMessage(true);
     lastSentLogIndexRef.current = sentLogIndex;
   }, []);
 
   const stopSending = useCallback((reason?: string) => {
-    console.log(`[useMessageSendingManager] stopSending called. Reason: ${reason || 'direct error or manual stop'}`);
+    // console.log(`[useMessageSendingManager] stopSending called. Reason: ${reason || 'direct error or manual stop'}`);
     setIsSendingMessage(false);
     lastSentLogIndexRef.current = null;
   }, []);
@@ -48,7 +48,7 @@ export function useMessageSendingManager({ logs }: UseMessageSendingManagerProps
       let serverContentFromLog: ServerContentPayload | undefined = undefined;
 
       if (isServerAudioMessage(message)) {
-        console.log(`[useMessageSendingManager] ServerAudio received. Stopping loading.`);
+        // console.log(`[useMessageSendingManager] ServerAudio received. Stopping loading.`);
         shouldStopLoading = true;
       }
       else if (
@@ -70,9 +70,9 @@ export function useMessageSendingManager({ logs }: UseMessageSendingManagerProps
             // Check if modelTurnData and modelTurnData.parts are defined
             if (modelTurnData && modelTurnData.parts) { // <<<< FIX: Check modelTurnData.parts
               if (modelTurnData.parts.some(part => part.text !== undefined || part.functionCall !== undefined)) {
-                console.log(`[useMessageSendingManager] Model turn content (text or functionCall) received. Continuing loading. Parts:`, modelTurnData.parts);
+                // console.log(`[useMessageSendingManager] Model turn content (text or functionCall) received. Continuing loading. Parts:`, modelTurnData.parts);
               } else if (modelTurnData.parts.length > 0) { // Now safe to access .length
-                console.log(`[useMessageSendingManager] Model turn received with parts, but no immediate text/functionCall. Parts:`, modelTurnData.parts);
+                // console.log(`[useMessageSendingManager] Model turn received with parts, but no immediate text/functionCall. Parts:`, modelTurnData.parts);
               }
               // else: modelTurnData.parts is an empty array, or all parts are empty/non-text/non-functionCall
             }
@@ -82,10 +82,10 @@ export function useMessageSendingManager({ logs }: UseMessageSendingManagerProps
             // For now, the existing logic doesn't stop loading on just any modelTurn, so this is fine.
 
           } else if (serverContentFromLog && isTurnComplete(serverContentFromLog)) {
-            console.log(`[useMessageSendingManager] TurnComplete received. Stopping loading.`);
+            // console.log(`[useMessageSendingManager] TurnComplete received. Stopping loading.`);
             shouldStopLoading = true;
           } else if (serverContentFromLog && isInterrupted(serverContentFromLog)) {
-            console.log(`[useMessageSendingManager] Interrupted received. Stopping loading.`);
+            // console.log(`[useMessageSendingManager] Interrupted received. Stopping loading.`);
             shouldStopLoading = true;
           }
         }

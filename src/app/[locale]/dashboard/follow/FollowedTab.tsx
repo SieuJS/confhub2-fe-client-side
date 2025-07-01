@@ -101,7 +101,7 @@ const FollowedTab: React.FC = () => {
       data.sort((a, b) => new Date(b.followedAt).getTime() - new Date(a.followedAt).getTime())
       return data
     } catch (error) {
-      console.error('Failed to fetch followed conferences:', error)
+      // console.error('Failed to fetch followed conferences:', error)
       return [] // Trả về mảng rỗng khi có lỗi
     }
   }, [])
@@ -134,7 +134,7 @@ const FollowedTab: React.FC = () => {
       processedData.sort((a, b) => new Date(b.followedAt).getTime() - new Date(a.followedAt).getTime())
       return processedData
     } catch (error) {
-      console.error('Failed to fetch followed journals:', error)
+      // console.error('Failed to fetch followed journals:', error)
       return [] // Trả về mảng rỗng khi có lỗi
     }
   }, [])

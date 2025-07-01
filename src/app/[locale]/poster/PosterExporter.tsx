@@ -41,13 +41,13 @@ const PosterExporter: React.FC = () => {
         }
       }
 
-      console.log(
-        `Bắt đầu xuất file ảnh với kích thước: ${options.width}x${options.height}...`
-      )
+      // console.log(
+      //   `Bắt đầu xuất file ảnh với kích thước: ${options.width}x${options.height}...`
+      // )
 
       const dataUrl = await domtoimage.toPng(posterNode, options)
 
-      console.log('Xuất file thành công! Bắt đầu tải xuống...')
+      // console.log('Xuất file thành công! Bắt đầu tải xuống...')
 
       // Tạo một thẻ <a> ảo để tải file về
       const link = document.createElement('a')
@@ -55,7 +55,7 @@ const PosterExporter: React.FC = () => {
       link.href = dataUrl
       link.click()
     } catch (error) {
-      console.error('Oops, có lỗi xảy ra!', error)
+      // console.error('Oops, có lỗi xảy ra!', error)
       alert(
         'Đã có lỗi xảy ra trong quá trình xuất file. Vui lòng thử lại hoặc kiểm tra console.'
       )
@@ -63,7 +63,7 @@ const PosterExporter: React.FC = () => {
       // QUAN TRỌNG: Đặt lại transform để giao diện hiển thị đúng như cũ
       posterNode.style.transform = originalTransform
       setIsExporting(false)
-      console.log('Hoàn tất.')
+      // console.log('Hoàn tất.')
     }
   }
 

@@ -37,7 +37,7 @@ export default async function DetailPage({ params, searchParams }: DetailPagePro
     }
     // Với các lỗi khác, có thể hiển thị một trang lỗi chung
     // Ở đây chúng ta re-throw để Next.js xử lý
-    console.error("Failed to fetch initial conference detail on server:", error);
+    // console.error("Failed to fetch initial conference detail on server:", error);
     throw new Error('Failed to load conference data.');
   }
 

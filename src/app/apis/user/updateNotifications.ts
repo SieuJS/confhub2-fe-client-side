@@ -26,7 +26,7 @@ async function updateNotifications( data: UpdateNotificationsData): Promise<void
     //No need to return anything.
 
   } catch (error: any) {
-    console.error('Error updating notifications:', error);
+    // console.error('Error updating notifications:', error);
     throw error; // Re-throw the error for the calling function to handle
   }
 }

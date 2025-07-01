@@ -64,7 +64,7 @@ export const useAudioEngine = ({
       gainNode.gain.value = isMuted ? 0 : lastVolumeRef.current;
       gainNode.connect(context.destination);
     } catch (e) {
-      console.error("Failed to create AudioContext:", e);
+      // console.error("Failed to create AudioContext:", e);
       setError("Audio playback is not supported on this browser.");
     }
     return () => {
@@ -110,7 +110,7 @@ export const useAudioEngine = ({
     const gainNode = gainNodeRef.current;
 
     if (!context || !buffer || !gainNode) {
-      console.warn("Cannot play: Audio resources not ready.");
+      // console.warn("Cannot play: Audio resources not ready.");
       setIsPlaying(false); // Ensure isPlaying is false if we can't play
       return;
     }
@@ -123,7 +123,7 @@ export const useAudioEngine = ({
     const actualBufferDuration = buffer.duration;
 
     if (actualBufferDuration === 0) {
-        console.warn("Cannot play: Audio buffer duration is zero.");
+        // console.warn("Cannot play: Audio buffer duration is zero.");
         setCurrentTime(0); // Ensure time is at 0 for zero duration
         bufferOffsetRef.current = 0;
         setIsPlaying(false);
@@ -170,7 +170,7 @@ export const useAudioEngine = ({
       source.start(0, playOffset);
       setIsPlaying(true);
     } catch (e) {
-      console.error("Failed to start playback:", e);
+      // console.error("Failed to start playback:", e);
       setError(`Could not play audio: ${(e as Error).message}`);
       stopPlayback(true); // Reset fully on error
     }
@@ -211,7 +211,7 @@ export const useAudioEngine = ({
             setError("Failed to decode audio: buffer is null.");
         }
       } catch (e: any) {
-        console.error("Error decoding audio:", e);
+        // console.error("Error decoding audio:", e);
         setError(e.message || "Failed to process audio.");
         setDuration(0);
         setCurrentTime(0);

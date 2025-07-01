@@ -63,7 +63,7 @@ const useChartBuilder = ({ rawData }: UseChartBuilderProps): UseChartBuilderRetu
                 const option = generateChartOption(rawData.payload, chartConfig, chartOptions, availableFields);
                 setEchartsOption(option);
             } catch (error: any) {
-                console.error(`Error generating chart option:`, error);
+                // console.error(`Error generating chart option:`, error);
                 setEchartsOption(null);
                 notification.error(t('chartGenerationError'));
             }

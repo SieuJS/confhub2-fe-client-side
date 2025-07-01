@@ -47,7 +47,7 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
         );
       } catch (err: any) {
         setError(err.message || 'Error fetching calendar data');
-        console.error('Error fetching calendar data:', err);
+        // console.error('Error fetching calendar data:', err);
       } finally {
         setLoading(false);
       }
@@ -92,7 +92,7 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
 
     } catch (err: any) {
       setError(err.message || 'Error updating calendar status.');
-      console.error('Error updating calendar status:', err);
+      // console.error('Error updating calendar status:', err);
     } finally {
       setLoading(false);
     }

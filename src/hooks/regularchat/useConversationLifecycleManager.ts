@@ -67,7 +67,7 @@ export function useConversationLifecycleManager({
       const activeWasDeletedAndNowNull = prevActiveIdRef.current === idBeingDeleted && activeConversationId === null;
 
       if (!conversationExistsInList || activeWasDeletedAndNowNull) {
-        console.log(`[useConversationLifecycleManager] Deletion of ${idBeingDeleted} confirmed by store. Finalizing.`);
+        // console.log(`[useConversationLifecycleManager] Deletion of ${idBeingDeleted} confirmed by store. Finalizing.`);
 
         if (urlIdParam === idBeingDeleted) {
           const cleanedParams = new URLSearchParams(searchParamsString);
@@ -106,7 +106,7 @@ export function useConversationLifecycleManager({
       // Hoặc, một conversation khác đang active.
       // Trong trường hợp này, chúng ta nên đợi, vì `useUrlConversationSync` đang xử lý việc set activeId.
       if (activeConversationId !== urlIdParam) {
-        console.log(`[useConversationLifecycleManager] Waiting. urlIdParam (${urlIdParam}) differs from activeConversationId (${activeConversationId}). didAttemptRef is true.`);
+        // console.log(`[useConversationLifecycleManager] Waiting. urlIdParam (${urlIdParam}) differs from activeConversationId (${activeConversationId}). didAttemptRef is true.`);
         // Có thể `useUrlConversationSync` đang trong quá trình gọi `loadConversation` (sẽ set activeId)
         // hoặc một conversation khác đang active và `useUrlConversationSync` sẽ xử lý sau.
         // Nếu `isLoadingHistory` là true, đó là dấu hiệu tốt là có gì đó đang load.
@@ -122,7 +122,7 @@ export function useConversationLifecycleManager({
 
       // Bây giờ, vì activeConversationId đã khớp với urlIdParam, ta mới kiểm tra trạng thái loading của NÓ.
       if (isLoadingHistory) {
-        console.log(`[useConversationLifecycleManager] Active conversation (${activeConversationId}) matches urlIdParam and is loading (isLoadingHistory true). Waiting.`);
+        // console.log(`[useConversationLifecycleManager] Active conversation (${activeConversationId}) matches urlIdParam and is loading (isLoadingHistory true). Waiting.`);
         return; // Đợi cho nó load xong (isHistoryLoaded sẽ thành true, isLoadingHistory sẽ thành false)
       }
 
@@ -139,7 +139,7 @@ export function useConversationLifecycleManager({
       if (!isHistoryLoaded && !conversationExistsInList) {
         // Nếu nó không được load thành công (isHistoryLoaded = false) VÀ cũng không có trong danh sách
         // thì coi như "not found".
-        console.log(`[useConversationLifecycleManager] urlIdParam ${urlIdParam} (which is active) is NOT loaded (isHistoryLoaded: ${isHistoryLoaded}) AND NOT in list. Redirecting. (didAttemptRef: ${didAttemptLoadFromUrlRef.current})`);
+        // console.log(`[useConversationLifecycleManager] urlIdParam ${urlIdParam} (which is active) is NOT loaded (isHistoryLoaded: ${isHistoryLoaded}) AND NOT in list. Redirecting. (didAttemptRef: ${didAttemptLoadFromUrlRef.current})`);
         const params = new URLSearchParams(searchParamsString);
         params.delete('id');
         router.replace(
@@ -149,7 +149,7 @@ export function useConversationLifecycleManager({
         router.push(CHATBOT_HISTORY_PATH);
         onNotFoundProcessed();
       } else if (isHistoryLoaded) { // Nó đã được load thành công (dù có trong list hay không)
-        console.log(`[useConversationLifecycleManager] Conversation ${urlIdParam} (active) is successfully loaded (isHistoryLoaded true). No redirect. (listHasIt: ${conversationExistsInList})`);
+        // console.log(`[useConversationLifecycleManager] Conversation ${urlIdParam} (active) is successfully loaded (isHistoryLoaded true). No redirect. (listHasIt: ${conversationExistsInList})`);
         // Nếu bạn muốn reset didAttemptLoadFromUrlRef khi thành công, onNotFoundProcessed có thể không phù hợp về tên.
         // Có thể cần một callback onUrlLoadProcessed() riêng.
         // Hoặc, chấp nhận didAttemptLoadFromUrlRef giữ nguyên true cho urlIdParam này cho đến khi urlIdParam thay đổi.
@@ -160,7 +160,7 @@ export function useConversationLifecycleManager({
         // Đây là trường hợp lạ, có thể là conversation bị lỗi không load được message.
         // Hoặc có thể là một trạng thái chuyển tiếp rất ngắn.
         // Tạm thời coi như nó tồn tại và không redirect. `useUrlConversationSync` có thể thử load lại nếu cần.
-        console.log(`[useConversationLifecycleManager] Conversation ${urlIdParam} (active) IS IN LIST but NOT loaded (isHistoryLoaded: ${isHistoryLoaded}, isLoadingHistory: ${isLoadingHistory}). No redirect for now.`);
+        // console.log(`[useConversationLifecycleManager] Conversation ${urlIdParam} (active) IS IN LIST but NOT loaded (isHistoryLoaded: ${isHistoryLoaded}, isLoadingHistory: ${isLoadingHistory}). No redirect for now.`);
       }
     }
   }, [
@@ -183,7 +183,7 @@ export function useConversationLifecycleManager({
   // Cleanup if path changes significantly during deletion
   useEffect(() => {
     if (isProcessingDeletion && currentPathname === CHATBOT_HISTORY_PATH && idBeingDeleted) {
-      console.log("[useConversationLifecycleManager Cleanup] Navigated to history while deletion was processing. Resetting deletion state via onDeletionProcessed.");
+      // console.log("[useConversationLifecycleManager Cleanup] Navigated to history while deletion was processing. Resetting deletion state via onDeletionProcessed.");
       onDeletionProcessed();
     }
   }, [isProcessingDeletion, currentPathname, idBeingDeleted, onDeletionProcessed]);

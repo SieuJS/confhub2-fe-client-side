@@ -69,8 +69,7 @@ const FollowUpdateDisplay: React.FC<FollowUpdateDisplayProps> = ({
   const ItemIcon = itemType === 'conference' ? FileText : Newspaper
 
   // Determine the detail page path based on itemType
-  const detailPathname =
-    itemType === 'conference' ? '/conferences/detail' : '/journals/detail' // Adjust for journal path
+  const detailPathname = '/conferences/detail'
 
   return (
     <div className='mt-1 rounded-md border border-gray-200 p-3 dark:border-gray-600 dark:bg-gray-700/50'>
@@ -81,7 +80,7 @@ const FollowUpdateDisplay: React.FC<FollowUpdateDisplayProps> = ({
           <MinusCircle className='mr-2 h-5 w-5 flex-shrink-0 text-red-500 dark:text-red-400' />
         )}
         <p className='text-sm font-semibold text-gray-800 dark:text-gray-200'>
-          {itemType === 'conference' ? t('Conference') : t('Journal')}{' '}
+          {t('Conference')}{' '}
           {followed ? t('Followed_status') : t('Unfollowed_status')}
         </p>
       </div>
@@ -136,9 +135,9 @@ const FollowUpdateDisplay: React.FC<FollowUpdateDisplayProps> = ({
           */}
           <a
             className='inline-flex items-center justify-center rounded-md bg-blue-500 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-offset-gray-800'
-            // If using your custom Button component that doesn't render <a>:
-            // Replace <a> with <Button variant='primary' size={'small'} rounded> ... </Button>
-            // Ensure your Button component can be used within a Link correctly.
+          // If using your custom Button component that doesn't render <a>:
+          // Replace <a> with <Button variant='primary' size={'small'} rounded> ... </Button>
+          // Ensure your Button component can be used within a Link correctly.
           >
             {t('View_Details')}
             <ExternalLink className='ml-1.5 h-3.5 w-3.5' />

@@ -16,7 +16,7 @@ export function useMessageCopy(messageToCopy: string) {
         setTimeout(() => setIsCopied(false), 2000);
       })
       .catch(err => {
-        console.error('Failed to copy message: ', err);
+        // console.error('Failed to copy message: ', err);
         toast.error('Copy failed. Please try again.');
       });
   };

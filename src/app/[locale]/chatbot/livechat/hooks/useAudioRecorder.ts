@@ -54,7 +54,7 @@ const useAudioRecorder = ({
           accumulateAudioChunk(bytes);
 
         } catch (error) {
-          console.error("Error processing/sending audio data in onData:", error);
+          // console.error("Error processing/sending audio data in onData:", error);
           log({ date: new Date(), type: "error.audioSend", message: `Error sending audio: ${ (error instanceof Error ? error.message : String(error))}`});
         }
       };
@@ -78,7 +78,7 @@ const useAudioRecorder = ({
 
       if (!audioRecorder.recording) { // Check if not already recording
         audioRecorder.start().catch(error => {
-          console.error("Failed to start audio recorder:", error);
+          // console.error("Failed to start audio recorder:", error);
           log({ date: new Date(), type: "error.audioRecordStart", message: `Failed to start recorder: ${ (error instanceof Error ? error.message : String(error))}`});
         });
       }
@@ -108,7 +108,7 @@ const useAudioRecorder = ({
               });
             }
           } catch (error) {
-             console.error("Error encoding base64 for final audio segment in cleanup", error);
+            //  console.error("Error encoding base64 for final audio segment in cleanup", error);
              log({ date: new Date(), type: "error.finalAudioSegment", message: `Cleanup error: ${ (error instanceof Error ? error.message : String(error))}`});
           }
         }
@@ -132,7 +132,7 @@ const useAudioRecorder = ({
               });
             }
           } catch (error) {
-             console.error("Error encoding base64 for final audio segment on mute/disconnect", error);
+            //  console.error("Error encoding base64 for final audio segment on mute/disconnect", error);
           }
         }
     }

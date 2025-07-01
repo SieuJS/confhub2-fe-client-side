@@ -28,7 +28,7 @@ const UpdateConferenceContent = ({
     // 1. Quá trình khởi tạo auth đã hoàn tất (isAuthInitializing là false)
     // 2. Người dùng chưa đăng nhập (isLoggedIn là false)
     if (!isAuthInitializing && !isLoggedIn) {
-      console.log('[UpdateConference] Not logged in and auth initialized, redirecting to login.');
+      // console.log('[UpdateConference] Not logged in and auth initialized, redirecting to login.');
       // Lưu lại URL hiện tại để quay lại sau khi đăng nhập
       const currentPath = window.location.pathname + window.location.search;
       localStorage.setItem('returnUrl', currentPath);
@@ -58,7 +58,7 @@ const UpdateConferenceContent = ({
   // Hoặc nếu conferenceId không có (quan trọng cho form)
   if (!isLoggedIn || !conferenceId) {
     if (!conferenceId) {
-        console.error("[UpdateConference] Conference ID is missing from URL.");
+        // console.error("[UpdateConference] Conference ID is missing from URL.");
         // Có thể hiển thị thông báo lỗi hoặc redirect về trang trước
         return (
             <div className="flex h-screen items-center justify-center">

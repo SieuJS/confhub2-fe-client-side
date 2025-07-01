@@ -55,7 +55,7 @@ const LandingVisualizationPage: React.FC = () => {
     const setupChart = async () => {
       // Ensure the DOM element is available via ref
       if (!chartRef.current) {
-        console.warn('Chart container ref not available.')
+        // console.warn('Chart container ref not available.')
         return // Exit if ref is not ready
       }
 
@@ -63,33 +63,33 @@ const LandingVisualizationPage: React.FC = () => {
       if (!chartInstance.current) {
         const myChart = echarts.init(chartRef.current)
         chartInstance.current = myChart // Store the instance
-        console.log('ECharts instance initialized.')
+        // console.log('ECharts instance initialized.')
       } else {
         // If instance exists (e.g., component re-rendered but not unmounted), just resize
         // This case is less likely with [] dependency, but good practice.
         chartInstance.current.resize()
-        console.log('ECharts instance already exists, resizing.')
+        // console.log('ECharts instance already exists, resizing.')
       }
 
       try {
         // Fetch the data using the correct public path
-        console.log(`Attempting to fetch data from: ${DATA_PATH}`)
+        // console.log(`Attempting to fetch data from: ${DATA_PATH}`)
         const response = await fetch(DATA_PATH)
 
         if (!response.ok) {
           // Log the response status and text for better debugging
           const errorText = await response.text()
-          console.error(
-            `HTTP error! status: ${response.status}, response: ${errorText}`
-          )
+          // console.error(
+          //   `HTTP error! status: ${response.status}, response: ${errorText}`
+          // )
           throw new Error(`Failed to fetch data: ${response.status}`)
         }
 
         const data = await response.json()
-        console.log('Data fetched successfully:', data)
-
+        // console.log('Data fetched successfully:', data)
+// 
         if (!chartInstance.current) {
-          console.error('ECharts instance not found after data fetch.')
+          // console.error('ECharts instance not found after data fetch.')
           return // Should not happen if init was successful
         }
 
@@ -165,7 +165,7 @@ const LandingVisualizationPage: React.FC = () => {
 
         // Set the initial option
         chartInstance.current.setOption(currentOption)
-        console.log('Initial chart option set (Treemap).')
+        // console.log('Initial chart option set (Treemap).')
 
         // Set interval to switch charts
         intervalRef.current = window.setInterval(() => {
@@ -176,12 +176,12 @@ const LandingVisualizationPage: React.FC = () => {
 
           // Use notMerge: false for the transition to work correctly
           chartInstance.current.setOption(currentOption, { notMerge: false })
-          console.log(
-            `Switched to ${currentOption === treemapOption ? 'Treemap' : 'Sunburst'}`
-          )
+          // console.log(
+          //   `Switched to ${currentOption === treemapOption ? 'Treemap' : 'Sunburst'}`
+          // )
         }, 3000) // Switch every 3 seconds
       } catch (error) {
-        console.error('Error setting up chart:', error)
+        // console.error('Error setting up chart:', error)
         // You might want to display an error message in the UI,
         // e.g., by setting a state variable like `setError(true)`.
         if (chartRef.current) {
@@ -195,18 +195,18 @@ const LandingVisualizationPage: React.FC = () => {
 
     // Return cleanup function for useEffect
     return () => {
-      console.log('Running ECharts cleanup...')
+      // console.log('Running ECharts cleanup...')
       // Clear the interval first
       if (intervalRef.current !== null) {
         window.clearInterval(intervalRef.current)
         intervalRef.current = null
-        console.log('Interval cleared.')
+        // console.log('Interval cleared.')
       }
       // Dispose the chart instance
       if (chartInstance.current) {
         chartInstance.current.dispose()
         chartInstance.current = null // Clear the ref
-        console.log('ECharts instance disposed.')
+        // console.log('ECharts instance disposed.')
       }
     }
   }, []) // Empty dependency array: effect runs only once on mount and cleans up on unmount
@@ -215,18 +215,18 @@ const LandingVisualizationPage: React.FC = () => {
   useEffect(() => {
     const handleResize = () => {
       if (chartInstance.current) {
-        console.log('Resizing chart...')
+        // console.log('Resizing chart...')
         chartInstance.current.resize()
       }
     }
     // Add event listener
     window.addEventListener('resize', handleResize)
-    console.log('Resize listener added.')
+    // console.log('Resize listener added.')
 
     // Cleanup: remove event listener
     return () => {
       window.removeEventListener('resize', handleResize)
-      console.log('Resize listener removed.')
+      // console.log('Resize listener removed.')
     }
   }, []) // Empty dependency array: adds listener on mount, removes on unmount
 

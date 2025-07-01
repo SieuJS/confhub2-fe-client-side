@@ -51,7 +51,7 @@ const useInteractionHandlers = ({
         const currentLogs = useLoggerStore.getState().logs;
         const nextLogIndex = currentLogs.length;
 
-        console.log(`[InteractionHandlers] Triggered handleSendMessage. Next log index: ${nextLogIndex}. Setting loading TRUE.`);
+        // console.log(`[InteractionHandlers] Triggered handleSendMessage. Next log index: ${nextLogIndex}. Setting loading TRUE.`);
         startLoading(nextLogIndex);
 
         try {
@@ -78,14 +78,14 @@ const useInteractionHandlers = ({
             // Loading sẽ được dừng bởi useEffect trong component chính khi có phản hồi hoặc lỗi
 
         } catch (error) {
-            console.error("Failed to send message via sendClientContent:", error);
+            // console.error("Failed to send message via sendClientContent:", error);
             const errorMessage = error instanceof Error ? error.message : String(error);
             log({
                 date: new Date(),
                 type: "error.send",
                 message: `Failed to send message: ${errorMessage}`,
             });
-            console.log("[InteractionHandlers] Error during sendClientContent. Setting loading FALSE.");
+            // console.log("[InteractionHandlers] Error during sendClientContent. Setting loading FALSE.");
             stopLoading();
         }
     };
@@ -99,7 +99,7 @@ const useInteractionHandlers = ({
                 // và useEffect trong component chính sẽ re-render.
                 // Không cần kiểm tra lại `connected` ngay tại đây.
             } catch (error) {
-                console.error("Failed to connect with permissions for voice:", error);
+                // console.error("Failed to connect with permissions for voice:", error);
                 log({
                     date: new Date(),
                     type: "error.connectVoice",

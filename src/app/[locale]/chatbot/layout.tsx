@@ -33,7 +33,7 @@ export default function ChatbotRootLayout({
 
 
     if (typeof API_KEY !== "string" || !API_KEY) {
-        console.error("NEXT_PUBLIC_GEMINI_API_KEY is not set or invalid.");
+        // console.error("NEXT_PUBLIC_GEMINI_API_KEY is not set or invalid.");
         return (
             <div className="flex h-screen items-center justify-center text-lg font-semibold text-red-600">
                 Configuration Error: Live Chat API Key is missing. Please contact support.

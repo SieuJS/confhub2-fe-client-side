@@ -34,7 +34,7 @@ export function useChatInteractions({ onChatStart, startTimer }: UseChatInteract
       if (!trimmedMessage && filesFromInput.length === 0 && !shouldUsePageContext) return;
 
       if (!isConnected) {
-        console.warn('[useChatInteractions] Attempted to send message while disconnected.');
+        // console.warn('[useChatInteractions] Attempted to send message while disconnected.');
         setLoadingState({ isLoading: false, step: 'error', message: 'Cannot send: Not connected.' });
         return;
       }
@@ -48,7 +48,7 @@ export function useChatInteractions({ onChatStart, startTimer }: UseChatInteract
       let pageContextUrlForBackend: string | undefined = undefined; // <<< BIẾN MỚI
 
       const freshPageContextState = usePageContextStore.getState();
-      console.log('[useChatInteractions] Fresh page context state:', freshPageContextState);
+      // console.log('[useChatInteractions] Fresh page context state:', freshPageContextState);
 
       if (shouldUsePageContext && freshPageContextState.isCurrentPageFeatureEnabled && freshPageContextState.currentPageText) {
         const contextText = freshPageContextState.currentPageText.length > 50000
@@ -61,9 +61,9 @@ export function useChatInteractions({ onChatStart, startTimer }: UseChatInteract
         partsForBackend.push(contextPartForBackend);
         if (freshPageContextState.currentPageUrl) {
           pageContextUrlForBackend = freshPageContextState.currentPageUrl;
-          console.log('[useChatInteractions] Page context URL for backend:', pageContextUrlForBackend);
+          // console.log('[useChatInteractions] Page context URL for backend:', pageContextUrlForBackend);
         } else {
-          console.warn('[useChatInteractions] Page context is being used, but currentPageUrl is null/undefined in store. URL will not be sent.');
+          // console.warn('[useChatInteractions] Page context is being used, but currentPageUrl is null/undefined in store. URL will not be sent.');
         }
       }
 
@@ -92,7 +92,7 @@ export function useChatInteractions({ onChatStart, startTimer }: UseChatInteract
 
           if (!uploadResponse.ok) {
             const errorData = await uploadResponse.json().catch(() => ({ message: 'Failed to upload files. Server error.' }));
-            console.error("Error uploading files to backend:", uploadResponse.status, errorData);
+            // console.error("Error uploading files to backend:", uploadResponse.status, errorData);
             setLoadingState({ isLoading: false, step: 'error', message: errorData.message || `Failed to upload files (status: ${uploadResponse.status})` });
             userFilesForDisplayOptimistic.forEach(f => { if (f.dataUrl) URL.revokeObjectURL(f.dataUrl); });
             return;
@@ -101,7 +101,7 @@ export function useChatInteractions({ onChatStart, startTimer }: UseChatInteract
           const responseData: { files: BackendUploadedFile[] } = await uploadResponse.json();
 
           if (!responseData.files) {
-            console.error("Backend returned no file data or malformed response after upload.");
+            // console.error("Backend returned no file data or malformed response after upload.");
             setLoadingState({ isLoading: false, step: 'error', message: 'File upload processing failed on server (no file data).' });
             userFilesForDisplayOptimistic.forEach(f => { if (f.dataUrl) URL.revokeObjectURL(f.dataUrl); });
             return;
@@ -133,13 +133,13 @@ export function useChatInteractions({ onChatStart, startTimer }: UseChatInteract
                 }
                 userFilesForDisplayOptimistic.splice(indexToRemove, 1);
               }
-              console.warn(`File ${uploadedFile.name} processed by backend but no URI returned. Skipping this file.`);
+              // console.warn(`File ${uploadedFile.name} processed by backend but no URI returned. Skipping this file.`);
             }
           });
           setLoadingState({ isLoading: true, step: 'processing_files', message: 'Processing files with message...' });
 
         } catch (error) {
-          console.error("Error calling backend file upload API:", error);
+          // console.error("Error calling backend file upload API:", error);
           const errorMessage = error instanceof Error ? error.message : 'Network error or failed to reach upload server.';
           setLoadingState({ isLoading: false, step: 'error', message: `Upload error: ${errorMessage}` });
           userFilesForDisplayOptimistic.forEach(f => { if (f.dataUrl) URL.revokeObjectURL(f.dataUrl); });
@@ -156,7 +156,7 @@ export function useChatInteractions({ onChatStart, startTimer }: UseChatInteract
 
       // Kiểm tra lại nếu không có gì để gửi cho backend
       if (partsForBackend.length === 0) {
-        console.warn("No message content (text, files, or context) to send to backend.");
+        // console.warn("No message content (text, files, or context) to send to backend.");
         setLoadingState({ isLoading: false, step: 'idle', message: '' });
         if (userFilesForDisplayOptimistic.length > 0 && filesFromInput.length > 0) {
           userFilesForDisplayOptimistic.forEach(f => { if (f.dataUrl) URL.revokeObjectURL(f.dataUrl); });
@@ -164,7 +164,7 @@ export function useChatInteractions({ onChatStart, startTimer }: UseChatInteract
         return;
       }
 
-      console.log('[useChatInteractions] Calling sendMessage with pageContextUrlForBackend:', pageContextUrlForBackend);
+      // console.log('[useChatInteractions] Calling sendMessage with pageContextUrlForBackend:', pageContextUrlForBackend);
 
       // Cần cập nhật signature của sendMessage trong messageStore và messageActionHandlers
       sendMessage(
@@ -183,7 +183,7 @@ export function useChatInteractions({ onChatStart, startTimer }: UseChatInteract
   const handleConfirmEdit = useCallback(
     (messageId: string, newText: string) => {
       if (!isConnected) {
-        console.warn('[useChatInteractions] Attempted to submit edited message while disconnected.');
+        // console.warn('[useChatInteractions] Attempted to submit edited message while disconnected.');
         setLoadingState({ isLoading: false, step: 'error', message: 'Cannot edit: Not connected.' });
         return;
       }

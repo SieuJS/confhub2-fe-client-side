@@ -97,7 +97,7 @@ const getInitialDateFromUrl = (
             const timestamp = Date.parse(dateString);
             if (!isNaN(timestamp)) return new Date(timestamp);
         } catch (e) {
-             console.error(`Error parsing date parameter "${paramName}":`, e);
+             // console.error(`Error parsing date parameter "${paramName}":`, e);
         }
     }
     return null;

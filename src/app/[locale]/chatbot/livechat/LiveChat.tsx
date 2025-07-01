@@ -160,7 +160,7 @@ export default function LiveChatExperience() {
           log(logEntry);
         }
       } catch (error) {
-        console.error("Error encoding base64 for client audio segment:", error);
+        // console.error("Error encoding base64 for client audio segment:", error);
         const errorLogEntry: StreamingLog = {
           date: new Date(),
           type: "error.clientAudioSegment",
@@ -218,7 +218,7 @@ export default function LiveChatExperience() {
 
   const handleStartVoiceAndInteract = () => {
     if (!audioRecorderRef.current) {
-      console.error("AudioRecorder not initialized yet.");
+      // console.error("AudioRecorder not initialized yet.");
       return;
     }
     // When user starts voice, clear any pending chunks from a previous segment

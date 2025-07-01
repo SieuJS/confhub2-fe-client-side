@@ -38,7 +38,7 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
       const cutoffDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
       return birthDate <= cutoffDate;
     } catch (e) {
-      console.error('Error parsing date:', e);
+      // console.error('Error parsing date:', e);
       return false;
     }
   };
@@ -98,20 +98,20 @@ const RegisterForm: React.FC<RegisterFormProps> = () => {
       const data = await response.json();
 
       if (response.status === 201) {
-        console.log('Registration pending verification:', data.message);
+        // console.log('Registration pending verification:', data.message);
         localStorage.setItem('token', data.token);
         router.push({
           pathname: '/auth/verify-email',
           query: { email: email, message: data.message || 'Please check your email to verify your account.' }
         });
       } else if (response.ok && data.user && data.token) {
-        console.warn("Signup returned OK with user data, but not 201. This flow needs clarification.");
+        // console.warn("Signup returned OK with user data, but not 201. This flow needs clarification.");
         setError(data.message || t('Error_Registration_Unexpected_Response'));
       } else {
         setError(data.message || t('Error_Registration_Failed_Status', { status: response.status }));
       }
     } catch (error: any) {
-      console.error('Registration error:', error);
+      // console.error('Registration error:', error);
       setError(t('Error_Registration_Generic'));
     } finally {
       setIsLoading(false);

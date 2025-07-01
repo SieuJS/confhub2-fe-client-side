@@ -40,7 +40,7 @@ export const handleSocketConversationList = (
         if (!state.activeConversationId || state.isHistoryLoaded) {
             newIsLoadingHistory = false;
         } else {
-            console.log(`[ConversationStore _onSocketConversationList] Active conversation (${state.activeConversationId}) exists and its history is not yet loaded. Keeping isLoadingHistory (${state.isLoadingHistory}) as is.`);
+            // console.log(`[ConversationStore _onSocketConversationList] Active conversation (${state.activeConversationId}) exists and its history is not yet loaded. Keeping isLoadingHistory (${state.isLoadingHistory}) as is.`);
         }
         return {
             conversationList: sortedList,
@@ -66,7 +66,7 @@ export const handleSocketInitialHistory = (
         useMessageStore.getState().loadHistoryMessages(historyItemsBackend);
     } else {
         useMessageStore.getState().loadHistoryMessages([]);
-        console.warn(`[ConversationStore _onSocketInitialHistory] Received payload for ${conversationId} with non-array messages. Resetting messages in messageStore.`);
+        // console.warn(`[ConversationStore _onSocketInitialHistory] Received payload for ${conversationId} with non-array messages. Resetting messages in messageStore.`);
     }
 };
 
@@ -75,7 +75,7 @@ export const handleSocketNewConversationStarted = (
     set: StoreSet,
     payload: { conversationId: string; title: string; lastActivity?: string; isPinned?: boolean; language?: string }
 ) => {
-    console.log(`[ConversationStore _onSocketNewConversationStarted] New Conversation ID: ${payload.conversationId}. Title: "${payload.title}". Explicit flow: ${get().isProcessingExplicitNewChat}`);
+    // console.log(`[ConversationStore _onSocketNewConversationStarted] New Conversation ID: ${payload.conversationId}. Title: "${payload.title}". Explicit flow: ${get().isProcessingExplicitNewChat}`);
     set(state => {
         const langCode = payload.language?.slice(0, 2) || 'en';
         const newConv: ConversationMetadata = {
@@ -96,11 +96,11 @@ export const handleSocketNewConversationStarted = (
     }, false, `_onSocketNewConversationStarted/${payload.conversationId}`);
 
     if (get().isProcessingExplicitNewChat) {
-        console.log('[ConversationStore _onSocketNewConversationStarted] Explicit new chat flow detected. Resetting message loading state.');
+        // console.log('[ConversationStore _onSocketNewConversationStarted] Explicit new chat flow detected. Resetting message loading state.');
         useMessageStore.getState().setLoadingState({ isLoading: false, step: 'new_chat_ready', message: '' });
         set({ isProcessingExplicitNewChat: false }, false, '_onSocketNewConversationStarted/resetExplicitFlag');
     } else {
-        console.log('[ConversationStore _onSocketNewConversationStarted] Implicit new chat flow. Message loading state will be handled by message events.');
+        // console.log('[ConversationStore _onSocketNewConversationStarted] Implicit new chat flow. Message loading state will be handled by message events.');
     }
     useUiStore.getState().setShowConfirmationDialog(false);
 };
@@ -110,14 +110,14 @@ export const handleSocketConversationDeleted = (
     payload: ConversationDeletedPayload
 ) => {
     const deletedId = payload.conversationId;
-    console.log(`[ConversationStore _onSocketConversationDeleted] Received confirmation for ${deletedId}`);
+    // console.log(`[ConversationStore _onSocketConversationDeleted] Received confirmation for ${deletedId}`);
     set(state => {
         const newConvList = state.conversationList.filter(conv => conv.id !== deletedId);
         let newActiveId = state.activeConversationId;
         let newIsHistoryLoaded = state.isHistoryLoaded;
 
         if (state.activeConversationId === deletedId) {
-            console.log(`[ConversationStore _onSocketConversationDeleted] Deleted conversation ${deletedId} was active. Resetting active state.`);
+            // console.log(`[ConversationStore _onSocketConversationDeleted] Deleted conversation ${deletedId} was active. Resetting active state.`);
             newActiveId = null;
             newIsHistoryLoaded = false;
             useMessageStore.getState().resetChatUIForNewConversation(true);

@@ -9,7 +9,7 @@ interface UseSocketConnectionProps {
 }
 const NEXT_PUBLIC_DATABASE_URL = process.env.NEXT_PUBLIC_DATABASE_URL || 'http://localhost:3000';
 const socketInitializer = () => {
-  console.log(`Initializing socket connection to: ${NEXT_PUBLIC_DATABASE_URL}`);
+  // console.log(`Initializing socket connection to: ${NEXT_PUBLIC_DATABASE_URL}`);
 
   // URL cơ sở vẫn là URL chính
   const url = new URL(NEXT_PUBLIC_DATABASE_URL);
@@ -49,10 +49,10 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
           const filteredNotifications = data.filter(n => n.deletedAt === null);
           setNotifications(filteredNotifications);
         } else {
-          console.error('Failed to fetch notifications:', response.status);
+          // console.error('Failed to fetch notifications:', response.status);
         }
       } catch (error) {
-        console.error('Error fetching notifications:', error);
+        // console.error('Error fetching notifications:', error);
       } finally {
         setIsLoadingNotifications(false);
       }
@@ -83,19 +83,19 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
         );
 
       } else {
-        console.error('Failed to mark all as read:', response.status);
+        // console.error('Failed to mark all as read:', response.status);
       }
     } catch (error) {
-      console.error('Error marking all as read:', error);
+      // console.error('Error marking all as read:', error);
     }
   }, [user?.id]); // Add fetchNotifications if you choose to refetch
 
   // Setup socket event listeners
   const setupSocketListeners = useCallback((socket: Socket) => {
-    console.log('Setting up socket listeners for user:', user?.id);
+    // console.log('Setting up socket listeners for user:', user?.id);
 
     socket.on('connect', () => {
-      console.log('Socket connected successfully, registering user:', user?.id);
+      // console.log('Socket connected successfully, registering user:', user?.id);
       setSocketConnected(true);
       if (user?.id) {
         socket.emit('register', user.id);
@@ -103,18 +103,18 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
     });
 
     socket.on('disconnect', (reason) => {
-      console.log('Socket disconnected:', reason);
+      // console.log('Socket disconnected:', reason);
       setSocketConnected(false);
     });
 
     socket.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
+      // console.error('Socket connection error:', error);
       setSocketConnected(false);
     });
 
 
     socket.on('notification', (newNotification: Notification) => {
-      console.log("Received new notification:", newNotification);
+      // console.log("Received new notification:", newNotification);
       setNotifications(prevNotifications => {
         if (prevNotifications.some(n => n.id === newNotification.id) || newNotification.deletedAt !== null) {
           return prevNotifications;
@@ -132,7 +132,7 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
   useEffect(() => {
     if (!loginStatus || !user || isInitializedRef.current) return;
 
-    console.log('Initial socket setup for user:', user?.id);
+    // console.log('Initial socket setup for user:', user?.id);
     isInitializedRef.current = true;
 
     // Initial fetch of notifications
@@ -147,7 +147,7 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
 
     // Cleanup function
     return () => {
-      console.log('Cleaning up socket on unmount');
+      // console.log('Cleaning up socket on unmount');
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -163,7 +163,7 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
 
     // If socket exists but user changed, update the registration
     if (currentSocket && currentSocket.connected && user?.id) {
-      console.log('User changed, re-registering with socket:', user.id);
+      // console.log('User changed, re-registering with socket:', user.id);
       currentSocket.emit('register', user.id);
     }
   }, [user?.id]); // Only depend on user ID changes

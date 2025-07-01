@@ -79,7 +79,7 @@ export const handleSocketChatUpdate = (
     } = get();
 
     if (!animationControls) {
-        console.warn("[MessageStore _onSocketChatUpdate] ChatUpdate received but no animationControls");
+        // console.warn("[MessageStore _onSocketChatUpdate] ChatUpdate received but no animationControls");
         return;
     }
 
@@ -88,7 +88,7 @@ export const handleSocketChatUpdate = (
     let targetMessageId = pendingBotMessageId;
 
     if (!targetMessageId) {
-        console.warn("[MessageStore _onSocketChatUpdate] Fallback: No pendingBotMessageId. Creating new one.");
+        // console.warn("[MessageStore _onSocketChatUpdate] Fallback: No pendingBotMessageId. Creating new one.");
         targetMessageId = `streaming-fallback-${generateMessageId()}`;
         // storeSetPendingBotMessageId(targetMessageId); // Replaced
         set({ pendingBotMessageId: targetMessageId }, false, 'setPendingBotMessageId/chatUpdateFallback');
@@ -219,7 +219,7 @@ export const handleSocketChatError = (
     const { activeConversationId, setActiveConversationId, setIsHistoryLoaded, setIsLoadingHistory } = useConversationStore.getState();
     const { handleError } = useUiStore.getState();
 
-    console.error("[MessageStore _onSocketChatError] Event: Chat Error received from server:", errorData);
+    // console.error("[MessageStore _onSocketChatError] Event: Chat Error received from server:", errorData);
     resetAwaitFlag();
     animationControls?.stopStreaming();
     // storeSetPendingBotMessageId(null); // Replaced
@@ -277,7 +277,7 @@ export const handleSocketConversationUpdatedAfterEdit = (
     const { setLoadingState } = get();
 
     if (activeConversationId !== conversationId) {
-        console.warn('[MessageStore _onSocketConvUpdatedAfterEdit] Received update for a non-active conversation. Ignoring.');
+        // console.warn('[MessageStore _onSocketConvUpdatedAfterEdit] Received update for a non-active conversation. Ignoring.');
         return;
     }
 
@@ -291,14 +291,14 @@ export const handleSocketConversationUpdatedAfterEdit = (
 
     // If the edited user message itself becomes non-displayable (highly unlikely for user edits, but for completeness)
     if (!mappedEditedUserMessage) {
-        console.warn(`[MessageStore _onSocketConvUpdatedAfterEdit] Edited user message (ID: ${backendUserMessage.uuid}) became non-displayable after mapping. This is unusual. Aborting update for this message.`);
+        // console.warn(`[MessageStore _onSocketConvUpdatedAfterEdit] Edited user message (ID: ${backendUserMessage.uuid}) became non-displayable after mapping. This is unusual. Aborting update for this message.`);
         // Decide on recovery strategy: maybe remove it from chatMessages? Or just log and do nothing further with it.
         // For now, let's not proceed with updating this specific message if it's null.
         // The rest of the logic might still need to clean up the bot placeholder.
     }
 
 
-    console.log(`[MessageStore _onSocketConvUpdatedAfterEdit] Definitive. UserMsg ID (backend): ${mappedEditedUserMessage?.id}. Original Edit ID (state): ${originalEditingId}. BotMsg ID (backend): ${mappedNewBotMessageDataOnly?.id}. Pending Bot ID (state): ${currentPendingBotId}`);
+    // console.log(`[MessageStore _onSocketConvUpdatedAfterEdit] Definitive. UserMsg ID (backend): ${mappedEditedUserMessage?.id}. Original Edit ID (state): ${originalEditingId}. BotMsg ID (backend): ${mappedNewBotMessageDataOnly?.id}. Pending Bot ID (state): ${currentPendingBotId}`);
 
     set(state => {
         let chatMessages = [...state.chatMessages];
@@ -309,12 +309,12 @@ export const handleSocketConversationUpdatedAfterEdit = (
             if (userMessageIndex !== -1) {
                 chatMessages[userMessageIndex] = mappedEditedUserMessage; // mappedEditedUserMessage là ChatMessageType đầy đủ
             } else {
-                console.warn(`[MessageStore _onSocketConvUpdatedAfterEdit] User message (ID: ${originalEditingId}) not found for definitive update.`);
+                // console.warn(`[MessageStore _onSocketConvUpdatedAfterEdit] User message (ID: ${originalEditingId}) not found for definitive update.`);
             }
         } else {
             const userMessageIndex = chatMessages.findIndex(msg => msg.id === originalEditingId);
             if (userMessageIndex !== -1) {
-                console.log(`[MessageStore _onSocketConvUpdatedAfterEdit] Original user message (ID: ${originalEditingId}) became non-displayable. Removing it.`);
+                // console.log(`[MessageStore _onSocketConvUpdatedAfterEdit] Original user message (ID: ${originalEditingId}) became non-displayable. Removing it.`);
                 chatMessages.splice(userMessageIndex, 1);
             }
         }
@@ -344,9 +344,9 @@ export const handleSocketConversationUpdatedAfterEdit = (
                     thoughts: targetBotMsgForUpdate.thoughts, // Giữ lại thoughts đang stream nếu có
                     // sources đã có trong mappedNewBotMessageDataOnly
                 };
-                console.log(`[MessageStore _onSocketConvUpdatedAfterEdit] Updated/Finalized bot message (ID: ${chatMessages[targetBotMsgIndex].id}) preserving thoughts.`);
+                // console.log(`[MessageStore _onSocketConvUpdatedAfterEdit] Updated/Finalized bot message (ID: ${chatMessages[targetBotMsgIndex].id}) preserving thoughts.`);
             } else {
-                console.warn(`[MessageStore _onSocketConvUpdatedAfterEdit] Bot message (Placeholder ID: ${currentPendingBotId}, Backend ID: ${mappedNewBotMessageDataOnly.id}) not found. Inserting new.`);
+                // console.warn(`[MessageStore _onSocketConvUpdatedAfterEdit] Bot message (Placeholder ID: ${currentPendingBotId}, Backend ID: ${mappedNewBotMessageDataOnly.id}) not found. Inserting new.`);
                 // Find the index of the (potentially updated or removed) user message
                 const finalUserMsgIdx = mappedEditedUserMessage ? chatMessages.findIndex(m => m.id === mappedEditedUserMessage.id) : -1;
                  const newBotMsgWithDefaults: ChatMessageType = {
@@ -364,7 +364,7 @@ export const handleSocketConversationUpdatedAfterEdit = (
             if (botPlaceholderBeingFinalized) {
                 const idxToRemove = chatMessages.findIndex(msg => msg.id === botPlaceholderBeingFinalized.id);
                 if (idxToRemove !== -1) {
-                    console.log(`[MessageStore _onSocketConvUpdatedAfterEdit] No new bot message or bot message non-displayable. Removing placeholder (ID: ${botPlaceholderBeingFinalized.id}).`);
+                    // console.log(`[MessageStore _onSocketConvUpdatedAfterEdit] No new bot message or bot message non-displayable. Removing placeholder (ID: ${botPlaceholderBeingFinalized.id}).`);
                     chatMessages.splice(idxToRemove, 1);
                 }
             }

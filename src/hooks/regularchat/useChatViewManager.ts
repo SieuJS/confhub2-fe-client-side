@@ -59,7 +59,7 @@ export function useChatViewManager() {
       justNavigatedToRegularChatBase &&
       activeConversationId !== null
     ) {
-      console.log('[useChatViewManager] Blank Slate: Navigated to /chatbot/regularchat. Resetting.');
+      // console.log('[useChatViewManager] Blank Slate: Navigated to /chatbot/regularchat. Resetting.');
       storeSetActiveConversationId(null);
       resetChatUIForNewConversation(true);
     }

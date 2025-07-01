@@ -37,7 +37,7 @@ const useMyConferences = (
             return;
         }
 
-        console.log(`[useMyConferences] Fetching conferences for user: ${userId}`);
+        // console.log(`[useMyConferences] Fetching conferences for user: ${userId}`);
         setIsLoading(true);
         setError(null);
 
@@ -61,7 +61,7 @@ const useMyConferences = (
             // console.log("[useMyConferences] Data received:", data);
             setConferences(data);
         } catch (err: any) {
-            console.error("[useMyConferences] Fetch error:", err);
+            // console.error("[useMyConferences] Fetch error:", err);
             setError(err.message || 'An unknown error occurred while fetching conferences.');
             setConferences(null); // Xóa data cũ nếu có lỗi
         } finally {

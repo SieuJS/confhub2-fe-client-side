@@ -32,7 +32,7 @@ export function useLeftPanelAuthControls() {
     try {
       await logout({ callApi: true });
     } catch (error) {
-      console.error("[useLeftPanelAuthControls] Error during logout:", error);
+      // console.error("[useLeftPanelAuthControls] Error during logout:", error);
     }
   };
 
@@ -42,18 +42,18 @@ export function useLeftPanelAuthControls() {
     try {
       localStorage.setItem('returnUrl', fullUnlocalizedUrl);
     } catch (e) {
-      console.error('[useLeftPanelAuthControls] Failed to set returnUrl in localStorage', e);
+      // console.error('[useLeftPanelAuthControls] Failed to set returnUrl in localStorage', e);
     }
 
     if (pathname.includes('/chatbot')) {
       const shouldAttemptLogout = isLoggedIn || (uiHasFatalError && isCurrentFatalErrorAuthRelated && uiFatalErrorCode !== 'AUTH_REQUIRED');
       if (shouldAttemptLogout) {
-        console.log('[useLeftPanelAuthControls] Attempting pre-login logout. isLoggedIn:', isLoggedIn, 'uiHasFatalError:', uiHasFatalError, 'isCurrentFatalErrorAuthRelated:', isCurrentFatalErrorAuthRelated, 'uiFatalErrorCode:', uiFatalErrorCode);
+        // console.log('[useLeftPanelAuthControls] Attempting pre-login logout. isLoggedIn:', isLoggedIn, 'uiHasFatalError:', uiHasFatalError, 'isCurrentFatalErrorAuthRelated:', isCurrentFatalErrorAuthRelated, 'uiFatalErrorCode:', uiFatalErrorCode);
         try {
           await logout({ callApi: true, preventRedirect: true });
-          console.log('[useLeftPanelAuthControls] Pre-login logout successful.');
+          // console.log('[useLeftPanelAuthControls] Pre-login logout successful.');
         } catch (e) {
-          console.error('[useLeftPanelAuthControls] Error during pre-login logout:', e);
+          // console.error('[useLeftPanelAuthControls] Error during pre-login logout:', e);
         }
       }
     }

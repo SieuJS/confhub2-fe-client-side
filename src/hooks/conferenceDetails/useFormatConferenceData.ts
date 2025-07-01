@@ -213,6 +213,7 @@ export const useFormatConferenceData = (
   const summary = latestOrganization?.summary || latestOrganization?.summerize
   const callForPaper = latestOrganization?.callForPaper
   const primaryLocation = latestOrganization?.locations?.[0]
+  const mainLink = latestOrganization?.link
   const cfpLink = latestOrganization?.cfpLink
   const impLink = latestOrganization?.impLink
 
@@ -222,6 +223,7 @@ export const useFormatConferenceData = (
     processedRanks,
     summary,
     callForPaper,
+    mainLink,
     cfpLink,
     impLink,
     primaryLocation

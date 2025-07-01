@@ -21,10 +21,10 @@ const SupportForm: React.FC = () => {
       return
     }
 
-    console.log('Form submitted!')
+    // console.log('Form submitted!')
     const formData = new FormData(event.currentTarget)
     const data = Object.fromEntries(formData.entries())
-    console.log(data)
+    // console.log(data)
     // Thêm logic gửi form ở đây (ví dụ: gọi API)
   }
 

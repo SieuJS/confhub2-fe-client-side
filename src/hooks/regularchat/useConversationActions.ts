@@ -111,11 +111,7 @@ export function useConversationActions({
   const handleStartNewConversation = useCallback(() => {
     if (!isConnected || !isServerReadyForCommands || isProcessingDeletion) return;
 
-    // BỎ DÒNG NÀY: const langCode = currentLanguage?.code || 'en';
-    // BỎ DÒNG NÀY: console.log(`[useConversationActions] Starting new conversation with language: ${langCode}`);
-    // BỎ DÒNG NÀY: storeStartNewConversation(langCode); // KHÔNG GỌI LÊN SERVER NGAY LẬP TỨC NỮA
-
-    console.log(`[useConversationActions] Preparing for new conversation (client-side reset).`);
+    // console.log(`[useConversationActions] Preparing for new conversation (client-side reset).`);
 
     // Reset UI state to show introduction
     storeSetActiveConversationId(null); // Set active conversation to null
@@ -148,7 +144,7 @@ export function useConversationActions({
   const handleDeleteConversation = useCallback(
     async (conversationIdToDelete: string) => {
       if (!isConnected || isProcessingDeletion) return;
-      console.log(`[useConversationActions handleDeleteConversation] Initiating deletion for ${conversationIdToDelete}.`);
+      // console.log(`[useConversationActions handleDeleteConversation] Initiating deletion for ${conversationIdToDelete}.`);
       setIsProcessingDeletion(true);
       setIdBeingDeleted(conversationIdToDelete);
       onDeletionStart?.();
@@ -156,7 +152,7 @@ export function useConversationActions({
         await storeDeleteConversation(conversationIdToDelete);
         // Lifecycle manager will handle resetting UI if active convo was deleted
       } catch (error) {
-        console.error(`[useConversationActions] Error emitting delete request for ${conversationIdToDelete}:`, error);
+        // console.error(`[useConversationActions] Error emitting delete request for ${conversationIdToDelete}:`, error);
       } finally {
         // Note: setIsProcessingDeletion(false) and setIdBeingDeleted(null)
         // will be handled by onDeletionProcessed callback from useConversationLifecycleManager

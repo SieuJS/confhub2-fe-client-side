@@ -110,7 +110,7 @@ export const useNoteData = (t: (key: string) => string) => {
               name: eventName
             };
           } catch (locationError) {
-            console.error(`Error fetching location for conference ${event.conferenceId}:`, locationError);
+            // console.error(`Error fetching location for conference ${event.conferenceId}:`, locationError);
             // SỬA LỖI Ở ĐÂY: Thêm thuộc tính 'id' từ 'event.conferenceId'
             return {
               ...event,
@@ -177,7 +177,7 @@ export const useNoteData = (t: (key: string) => string) => {
 
       setUpcomingNotes(finalUpcomingNotes);
     } catch (err: any) {
-      console.error('Failed to fetch calendar data:', err);
+      // console.error('Failed to fetch calendar data:', err);
       setError(err.message);
       setUpcomingNotes([]);
       setCalendarEvents([]);

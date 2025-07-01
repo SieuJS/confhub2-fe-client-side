@@ -102,7 +102,7 @@ export const UserIcon: FC = () => {
           }
         }
       } catch (error) {
-        console.error('Error reading or parsing user from localStorage:', error)
+        // console.error('Error reading or parsing user from localStorage:', error)
         // Giữ avatar mặc định nếu có lỗi
       }
     }

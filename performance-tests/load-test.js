@@ -15,27 +15,27 @@ export const options = {
       executor: 'ramping-vus',
       exec: 'runGuestJourney',
       stages: [
-        // ĐIỀU CHỈNH: Tăng tải lên 100 VUs
-        { duration: '1m', target: 100 },
-        { duration: '3m', target: 100 },
+        // ĐIỀU CHỈNH: Tăng tải lên 150 VUs
+        { duration: '1m', target: 150 },
+        { duration: '3m', target: 150 },
         { duration: '30s', target: 0 },
       ],
       gracefulRampDown: '30s',
       tags: { scenario: 'guest_journey' },
     },
-    registered: {
-      executor: 'ramping-vus',
-      exec: 'runRegisteredUserJourney',
-      startTime: '30s',
-      stages: [
-        // ĐIỀU CHỈNH: Tăng tải lên 50 VUs
-        { duration: '1m', target: 50 },
-        { duration: '3m', target: 50 },
-        { duration: '30s', target: 0 },
-      ],
-      gracefulRampDown: '30s',
-      tags: { scenario: 'registered_journey' },
-    },
+    // registered: {
+    //   executor: 'ramping-vus',
+    //   exec: 'runRegisteredUserJourney',
+    //   startTime: '30s',
+    //   stages: [
+    //     // ĐIỀU CHỈNH: Tăng tải lên 75 VUs
+    //     { duration: '1m', target: 75 },
+    //     { duration: '3m', target: 75 },
+    //     { duration: '30s', target: 0 },
+    //   ],
+    //   gracefulRampDown: '30s',
+    //   tags: { scenario: 'registered_journey' },
+    // },
   },
 };
 
@@ -93,6 +93,6 @@ export function runGuestJourney(data) {
   guestJourney(data);
 }
 
-export function runRegisteredUserJourney(data) {
-  registeredUserJourney(data);
-}
+// export function runRegisteredUserJourney(data) {
+//   registeredUserJourney(data);
+// }

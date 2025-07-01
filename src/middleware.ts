@@ -22,7 +22,7 @@ export const appConfig: Config = {
 
 type CustomMiddleware = (req: NextRequest) => Promise<NextRequest>
 const customMiddleware: CustomMiddleware = async req => { 
-  console.log('Custom middleware executed before next-intl')
+  // console.log('Custom middleware executed before next-intl')
   return req
 }
 

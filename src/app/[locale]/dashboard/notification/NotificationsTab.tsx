@@ -148,9 +148,9 @@ const NotificationsTab: React.FC = () => {
         />
       )
     } else {
-      console.warn(
-        `Notification with id ${selectedNotificationId} not found in the list.`
-      )
+      // console.warn(
+      //   `Notification with id ${selectedNotificationId} not found in the list.`
+      // )
       return (
         <div className='container mx-auto p-4'>
           {t('Notification_not_found')}{' '}

@@ -29,14 +29,14 @@ if (typeof window !== 'undefined' && BACKEND_URL_CONFIG) {
             normalizedBackendPath += '/';
         }
         socketIoPathOption = normalizedBackendPath + 'socket.io/';
-        console.log(`[SocketManager Init] Calculated socket base URL: ${socketIoBaseUrl}`);
-        console.log(`[SocketManager Init] Calculated socket path option: ${socketIoPathOption}`);
+        // console.log(`[SocketManager Init] Calculated socket base URL: ${socketIoBaseUrl}`);
+        // console.log(`[SocketManager Init] Calculated socket path option: ${socketIoPathOption}`);
     } catch (e) {
-        console.error("[SocketManager Init] Failed to parse backend URL from config:", e);
+        // console.error("[SocketManager Init] Failed to parse backend URL from config:", e);
         socketIoBaseUrl = ''; // Invalidate
     }
 } else if (!BACKEND_URL_CONFIG && typeof window !== 'undefined') { // Log chỉ khi ở client và không có config
-    console.warn("[SocketManager Init] NEXT_PUBLIC_BACKEND_URL is not configured. Socket connection will not be attempted.");
+    // console.warn("[SocketManager Init] NEXT_PUBLIC_BACKEND_URL is not configured. Socket connection will not be attempted.");
 }
 
 
@@ -71,13 +71,13 @@ export function useChatSocketManager() {
         isMountedRef.current = true;
         setCurrentAuthTokenForSocket(currentAuthToken);
 
-        console.log(`[SocketManager Connect Effect] Running. AuthToken from AuthContext: ${currentAuthToken ? 'exists' : 'null'}, isLoggedIn: ${isLoggedIn}, isAuthInitializing: ${isAuthInitializing}, Base URL: ${socketIoBaseUrl}`);
+        // console.log(`[SocketManager Connect Effect] Running. AuthToken from AuthContext: ${currentAuthToken ? 'exists' : 'null'}, isLoggedIn: ${isLoggedIn}, isAuthInitializing: ${isAuthInitializing}, Base URL: ${socketIoBaseUrl}`);
 
         // 1. Chờ AuthContext khởi tạo xong
         if (isAuthInitializing) {
-            console.log("[SocketManager Connect Effect] AuthContext is initializing. Skipping connection attempt.");
+            // console.log("[SocketManager Connect Effect] AuthContext is initializing. Skipping connection attempt.");
             if (socketInstanceRef.current && socketInstanceRef.current.connected) {
-                console.log("[SocketManager Connect Effect] Disconnecting existing socket while AuthContext initializes.");
+                // console.log("[SocketManager Connect Effect] Disconnecting existing socket while AuthContext initializes.");
                 socketInstanceRef.current.disconnect();
                 // Instance ref sẽ được set là null nếu ngắt kết nối ở đây để logic sau đó có thể tạo mới
                 socketInstanceRef.current = null;
@@ -87,7 +87,7 @@ export function useChatSocketManager() {
 
         // 2. Handle missing base URL
         if (!socketIoBaseUrl) {
-            console.warn("[SocketManager Connect Effect] Socket Base URL is not valid. Skipping connection.");
+            // console.warn("[SocketManager Connect Effect] Socket Base URL is not valid. Skipping connection.");
             if (socketInstanceRef.current) {
                 socketInstanceRef.current.disconnect();
                 socketInstanceRef.current = null;
@@ -104,7 +104,7 @@ export function useChatSocketManager() {
         // - Nó tồn tại (socketInstanceRef.current không null) VÀ
         //   ( (Token đã thay đổi) HOẶC (không có token VÀ socket vẫn đang kết nối) )
         if (socketInstanceRef.current && (tokenHasChanged || (!currentAuthToken && isSocketCurrentlyConnected))) {
-            console.log(`[SocketManager Connect Effect] Disconnecting previous socket. Instance ID: ${socketInstanceRef.current.id}. Token changed: ${tokenHasChanged}, No token & connected: ${!currentAuthToken && isSocketCurrentlyConnected}`);
+            // console.log(`[SocketManager Connect Effect] Disconnecting previous socket. Instance ID: ${socketInstanceRef.current.id}. Token changed: ${tokenHasChanged}, No token & connected: ${!currentAuthToken && isSocketCurrentlyConnected}`);
             socketInstanceRef.current.disconnect();
             socketInstanceRef.current = null; // Xóa ref sau khi disconnect để logic tạo mới có thể chạy
         }
@@ -113,7 +113,7 @@ export function useChatSocketManager() {
         // - Chưa có socket instance nào (socketInstanceRef.current là null)
         //   (Điều này xảy ra ở lần chạy đầu tiên, hoặc sau khi socket cũ đã bị ngắt ở trên)
         if (!socketInstanceRef.current) {
-            console.log(`[SocketManager Connect Effect] Attempting to create socket instance. Token for auth: ${currentAuthToken ? 'VALID' : 'NULL'}`);
+            // console.log(`[SocketManager Connect Effect] Attempting to create socket instance. Token for auth: ${currentAuthToken ? 'VALID' : 'NULL'}`);
 
 
 
@@ -151,7 +151,9 @@ export function useChatSocketManager() {
             newSocket.on('disconnect', createMountedAwareHandler(useSocketStore.getState()._onSocketDisconnect));
             newSocket.on('connect_error', createMountedAwareHandler(useSocketStore.getState()._onSocketConnectError));
             newSocket.on('auth_error', createMountedAwareHandler(useSocketStore.getState()._onSocketAuthError));
-            newSocket.on('error', createMountedAwareHandler((error) => { console.error(`[SocketManager] Generic Socket Error: ${error.message}`, error); }));
+            newSocket.on('error', createMountedAwareHandler((error) => {
+                // console.error(`[SocketManager] Generic Socket Error: ${error.message}`, error); 
+            }));
 
             // Custom events
             newSocket.on('connection_ready', createMountedAwareHandler(useSocketStore.getState()._onSocketConnectionReady));
@@ -174,17 +176,19 @@ export function useChatSocketManager() {
             newSocket.on('conversation_updated_after_edit', createMountedAwareHandler(useMessageStore.getState()._onSocketConversationUpdatedAfterEdit));
 
             // Manager (reconnect) events
-            newSocket.io.on('reconnect_attempt', createMountedAwareHandler((attempt) => console.log(`[SocketManager] Reconnect attempt ${attempt}`)));
+            newSocket.io.on('reconnect_attempt', createMountedAwareHandler((attempt) => { }
+                // console.log(`[SocketManager] Reconnect attempt ${attempt}`
+            ));
             newSocket.io.on('reconnect_error', createMountedAwareHandler((error) => {
-                console.error(`[SocketManager] Reconnect error (Manager): ${error.message}`, error);
+                // console.error(`[SocketManager] Reconnect error (Manager): ${error.message}`, error);
                 useSocketStore.getState()._onSocketConnectError(error); // SỬA Ở ĐÂY
             }));
             newSocket.io.on('reconnect_failed', createMountedAwareHandler(() => {
-                console.error("[SocketManager] Reconnect failed (Manager).");
+                // console.error("[SocketManager] Reconnect failed (Manager).");
                 useSocketStore.getState()._onSocketConnectError(new Error("Failed to reconnect to server after multiple attempts.")); // SỬA Ở ĐÂY
             }));
             newSocket.io.on('reconnect', createMountedAwareHandler((attemptNumber) => {
-                console.log(`[SocketManager] Reconnected successfully after ${attemptNumber} attempts.`);
+                // console.log(`[SocketManager] Reconnected successfully after ${attemptNumber} attempts.`);
             }));
         }
 
@@ -193,9 +197,9 @@ export function useChatSocketManager() {
         // Cleanup function for component unmount
         return () => {
             isMountedRef.current = false; // Đánh dấu component đã unmount
-            console.log(`[SocketManager Connect Effect Cleanup] Running cleanup for component unmount. Current Socket ID: ${socketInstanceRef.current?.id}`);
+            // console.log(`[SocketManager Connect Effect Cleanup] Running cleanup for component unmount. Current Socket ID: ${socketInstanceRef.current?.id}`);
             if (socketInstanceRef.current) {
-                console.log("[SocketManager Connect Effect Cleanup] Disconnecting socket on component unmount.");
+                // console.log("[SocketManager Connect Effect Cleanup] Disconnecting socket on component unmount.");
                 socketInstanceRef.current.off(); // Gỡ bỏ tất cả listeners trên instance này
                 socketInstanceRef.current.disconnect();
                 socketInstanceRef.current = null;

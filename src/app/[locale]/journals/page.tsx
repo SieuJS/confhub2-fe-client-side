@@ -20,7 +20,7 @@ const getValidSortOrder = (order: string | string[] | undefined): 'asc' | 'desc'
 }
 
 export default async function JournalsPage({ params, searchParams }: JournalsPageProps) {
-  console.log("JournalsPage searchParams:", searchParams);
+  // console.log("JournalsPage searchParams:", searchParams);
   const apiParams = {
     search: searchParams.search as string || undefined,
     country: searchParams.country as string || undefined,
@@ -41,11 +41,11 @@ export default async function JournalsPage({ params, searchParams }: JournalsPag
   };
 
   let initialData: JournalApiResponse;
-  console.log("Fetching initial journals data with params:", apiParams);
+  // console.log("Fetching initial journals data with params:", apiParams);
   try {
     initialData = await journalService.getAll(apiParams);
   } catch (error) {
-    console.error("Failed to fetch initial journals data on server:", error);
+    // console.error("Failed to fetch initial journals data on server:", error);
     initialData = {
       data: [],
       meta: { total: 0, page: 1, limit: 6, totalPages: 0 }

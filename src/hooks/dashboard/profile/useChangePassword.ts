@@ -93,7 +93,7 @@ export const useChangePassword = (userId: string, onClose: () => void) => {
         toast.error(errorMessage); // Toast error
       }
     } catch (err: any) {
-      console.error('Change password API error:', err); // Log lỗi chi tiết
+      // console.error('Change password API error:', err); // Log lỗi chi tiết
       const unexpectedErrorMessage = err.message || 'An unexpected error occurred. Please try again.';
       setError(unexpectedErrorMessage);
       toast.error(unexpectedErrorMessage); // Toast error

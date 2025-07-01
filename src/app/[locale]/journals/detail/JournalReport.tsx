@@ -92,7 +92,7 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
         locale: dateLocale,
       })
     } catch (error) {
-      console.error("Invalid date format for 'updatedAt':", journal.updatedAt)
+      // console.error("Invalid date format for 'updatedAt':", journal.updatedAt)
       return null // Trả về null nếu ngày không hợp lệ
     }
   }, [journal?.updatedAt, currentLocale])
@@ -146,7 +146,7 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
         const followedJournalIds = await journalFollowService.getFollowedJournalIdsByUser();
         setIsFollowing(followedJournalIds.includes(journal.id));
       } catch (error) {
-        console.error('Error checking follow status:', error);
+        // console.error('Error checking follow status:', error);
         setIsFollowing(false);
       } finally {
         setHasFetchedFollowStatus(true); // Luôn set true sau khi cố gắng fetch
@@ -170,7 +170,7 @@ const JournalReport: React.FC<JournalReportProps> = ({ journal }) => {
       // Cập nhật trạng thái một cách an toàn
       setIsFollowing(prevState => !prevState)
     } catch (error) {
-      console.error('Error toggling follow status:', error)
+      // console.error('Error toggling follow status:', error)
       toast.error(t('JournalCard.followError'))
     } finally {
       setIsFollowLoading(false)

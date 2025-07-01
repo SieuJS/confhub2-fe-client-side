@@ -55,7 +55,7 @@ export function useMessageEditing({
         setGlobalEditingMessageId(messageId); // Thông báo cho store là message này đang được edit
         // setIsEditingThisInstance(true); // Sẽ được cập nhật bởi useEffect ở trên
       } else {
-        console.warn(`Cannot edit message ${messageId} because message ${globalEditingMessageId} is already being edited.`);
+        // console.warn(`Cannot edit message ${messageId} because message ${globalEditingMessageId} is already being edited.`);
         // Có thể hiển thị toast cho người dùng
       }
     }

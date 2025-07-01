@@ -153,13 +153,13 @@ const VisualizationPageClient: React.FC<VisualizationPageClientProps> = ({
         downloadChartAsSvg(chartInstanceRef, chartOptions.title || 'chart')
         notification.success(t('downloadSuccess'))
       } catch (error) {
-        console.error(`Error during SVG download:`, error)
+        // console.error(`Error during SVG download:`, error)
         notification.error(t('downloadFailed'))
       }
     } else {
-      console.warn(
-        `Download failed: Chart instance ref not available or chart not ready.`
-      )
+      // console.warn(
+      //   `Download failed: Chart instance ref not available or chart not ready.`
+      // )
       notification.warning(t('downloadNotReady'))
     }
   }, [chartOptions.title, t])

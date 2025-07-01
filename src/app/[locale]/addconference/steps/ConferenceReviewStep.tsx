@@ -220,7 +220,7 @@ const ConferenceReviewStep: React.FC<ConferenceReviewStepProps> = ({
         return toDate.toLocaleDateString(undefined, options)
       }
     } catch (error) {
-      console.error('Error formatting date:', error)
+      // console.error('Error formatting date:', error)
       return <span className='italic '>{t('Invalid_Date')}</span>
     }
     return <span className='italic '>{t('N_A')}</span>

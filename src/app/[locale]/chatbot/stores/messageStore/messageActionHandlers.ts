@@ -52,7 +52,7 @@ export const handleSendMessage = (
     const { activeConversationId } = useConversationStore.getState();
 
     if (partsForBackend.length === 0) {
-        console.warn("[MessageStore] sendMessage called with empty partsForBackend.");
+        // console.warn("[MessageStore] sendMessage called with empty partsForBackend.");
         setLoadingState({ isLoading: false, step: 'idle', message: '' });
         return;
     }
@@ -98,7 +98,7 @@ export const handleSendMessage = (
         model: selectedModel.value, // <<< GỬI GIÁ TRỊ CỦA MODEL ĐÃ CHỌN
     };
     
-    console.log('[MessageActionHandlers handleSendMessage] Payload for socket:', JSON.stringify(payloadForSocket, null, 2));
+    // console.log('[MessageActionHandlers handleSendMessage] Payload for socket:', JSON.stringify(payloadForSocket, null, 2));
     useSocketStore.getState().emitSendMessage(payloadForSocket);
 };
 
@@ -129,16 +129,16 @@ export const handleSubmitEditedMessage = (
     const { activeConversationId } = useConversationStore.getState();
 
     if (!activeConversationId) {
-        console.warn("[MessageStore submitEditedMessage] No active conversation ID.");
+        // console.warn("[MessageStore submitEditedMessage] No active conversation ID.");
         return;
     }
     const trimmedNewText = newText.trim();
     if (!trimmedNewText) {
-        console.warn("[MessageStore submitEditedMessage] New text is empty after trimming.");
+        // console.warn("[MessageStore submitEditedMessage] New text is empty after trimming.");
         return;
     }
 
-    console.log(`[MessageStore submitEditedMessage] Submitting edit for message ID: ${messageIdToEdit} in conv: ${activeConversationId}`);
+    // console.log(`[MessageStore submitEditedMessage] Submitting edit for message ID: ${messageIdToEdit} in conv: ${activeConversationId}`);
 
     animationControls?.stopStreaming();
     resetAwaitFlag();
@@ -148,7 +148,7 @@ export const handleSubmitEditedMessage = (
     setChatMessages(currentMessages => {
         const userMessageIndex = currentMessages.findIndex(msg => msg.id === messageIdToEdit);
         if (userMessageIndex === -1) {
-            console.warn(`[MessageStore submitEditedMessage] Message to edit (ID: ${messageIdToEdit}) not found for optimistic update.`);
+            // console.warn(`[MessageStore submitEditedMessage] Message to edit (ID: ${messageIdToEdit}) not found for optimistic update.`);
             return currentMessages;
         }
 
@@ -181,7 +181,7 @@ export const handleSubmitEditedMessage = (
             thoughts: [],
         };
         newMessagesList.push(botPlaceholder);
-        console.log(`[MessageStore submitEditedMessage] Optimistic update: UserMsg (ID ${updatedUserMessage.id}) updated, BotPlaceholder (ID ${botPlaceholder.id}) added. New list length: ${newMessagesList.length}`);
+        // console.log(`[MessageStore submitEditedMessage] Optimistic update: UserMsg (ID ${updatedUserMessage.id}) updated, BotPlaceholder (ID ${botPlaceholder.id}) added. New list length: ${newMessagesList.length}`);
         return newMessagesList;
     });
 
@@ -221,7 +221,7 @@ export const handleResetChatUIForNewConversation = (
 export const handleClearAuthErrorMessages = (
     set: StoreSet
 ) => {
-    console.log("[MessageStore] Clearing authentication error messages from chat.");
+    // console.log("[MessageStore] Clearing authentication error messages from chat.");
     set(state => ({
         chatMessages: state.chatMessages.filter(msg =>
             !(msg.type === 'error' && msg.errorCode === 'AUTH_REQUIRED')

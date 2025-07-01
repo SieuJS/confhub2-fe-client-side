@@ -174,7 +174,7 @@ const getLoadingPhaseIcon = (step: string): React.ElementType => {
   // ===============================
 
   // --- Mặc định / Fallback ---
-  console.warn(`LoadingIndicator: Unknown step "${step}", using default icon.`)
+  // console.warn(`LoadingIndicator: Unknown step "${step}", using default icon.`)
   return FiCpu // Thinking làm mặc định
 }
 

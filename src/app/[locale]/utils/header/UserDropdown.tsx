@@ -56,10 +56,10 @@ const UserDropdown: FC<Props> = ({
         }
       }
     } catch (error) {
-      console.error(
-        'Lỗi khi parse dữ liệu người dùng từ localStorage lúc mount:',
-        error
-      )
+      // console.error(
+      //   'Lỗi khi parse dữ liệu người dùng từ localStorage lúc mount:',
+      //   error
+      // )
       // Không cần xóa dữ liệu lỗi ở đây vội, sẽ xóa khi click link nếu cần
     }
 
@@ -86,22 +86,22 @@ const UserDropdown: FC<Props> = ({
         if (parsedUser && typeof parsedUser === 'object' && parsedUser.id) {
           isValidUser = true
         } else {
-          console.warn(
-            'Dữ liệu người dùng trong localStorage không hợp lệ (thiếu id hoặc định dạng sai).'
-          )
+          // console.warn(
+          //   'Dữ liệu người dùng trong localStorage không hợp lệ (thiếu id hoặc định dạng sai).'
+          // )
           // Có thể xóa dữ liệu lỗi ngay nếu muốn, hoặc đợi đến khi chuyển hướng
           localStorage.removeItem('user')
         }
       } catch (parseError) {
-        console.error(
-          'Lỗi khi parse dữ liệu người dùng từ localStorage:',
-          parseError
-        )
+        // console.error(
+        //   'Lỗi khi parse dữ liệu người dùng từ localStorage:',
+        //   parseError
+        // )
         // Dữ liệu không phải JSON hợp lệ, xóa nó đi
         localStorage.removeItem('user')
       }
     } else {
-      console.warn('Không tìm thấy dữ liệu người dùng trong localStorage.')
+      // console.warn('Không tìm thấy dữ liệu người dùng trong localStorage.')
     }
 
     if (!isValidUser) {

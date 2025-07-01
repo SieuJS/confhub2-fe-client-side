@@ -50,7 +50,7 @@ export async function GET(request: Request) {
               const returnUrl = localStorage.getItem('returnUrl') || '/';
               window.location.href = returnUrl;
             } catch (e) {
-              console.error('Error setting localStorage:', e);
+              // console.error('Error setting localStorage:', e);
               window.location.href = '/';
             }
           </script>
@@ -64,7 +64,7 @@ export async function GET(request: Request) {
       }
     );
   } catch (error) {
-    console.error('Error in backend callback:', error);
+    // console.error('Error in backend callback:', error);
     return new NextResponse(
       `
       <html>

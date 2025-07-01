@@ -67,7 +67,7 @@ export const useSocketStore = create<SocketStoreState & SocketStoreActions>()(
 
             // --- Setters ---
             setCurrentAuthTokenForSocket: (token) => {
-                console.log(`[SocketStore] setCurrentAuthTokenForSocket called with token: ${token ? 'exists' : 'null'}`);
+                // console.log(`[SocketStore] setCurrentAuthTokenForSocket called with token: ${token ? 'exists' : 'null'}`);
                 set({ currentAuthTokenForSocket: token, hasFatalConnectionError: false }, false, 'setCurrentAuthTokenForSocket');
             },
             // initializeAuth: BỊ LOẠI BỎ
@@ -75,7 +75,7 @@ export const useSocketStore = create<SocketStoreState & SocketStoreActions>()(
             setSocketInstance: (socket) => {
                 const currentStoreSocketRef = get().socketRef;
                 currentStoreSocketRef.current = socket;
-                console.log('[SocketStore] setSocketInstance called. New socket.current set.', socket ? socket.id : null);
+                // console.log('[SocketStore] setSocketInstance called. New socket.current set.', socket ? socket.id : null);
             },
             setIsConnected: (status, socketId = null) => set({ isConnected: status, socketId: status ? socketId : null }, false, 'setIsConnected'),
             setIsServerReadyForCommands: (isReady) => set({ isServerReadyForCommands: isReady }, false, 'setIsServerReadyForCommands'),
@@ -83,14 +83,14 @@ export const useSocketStore = create<SocketStoreState & SocketStoreActions>()(
             disconnectSocket: () => {
                 const socket = get().socketRef.current;
                 if (socket) {
-                    console.log('[SocketStore] disconnectSocket called. Disconnecting...');
+                    // console.log('[SocketStore] disconnectSocket called. Disconnecting...');
                     socket.disconnect();
                 }
             },
 
             // --- Socket Event Handlers (Giữ nguyên logic bên trong) ---
             _onSocketConnect: (socketIdParam) => {
-                console.log(`[SocketStore _onSocketConnect] Connected with ID ${socketIdParam}`);
+                // console.log(`[SocketStore _onSocketConnect] Connected with ID ${socketIdParam}`);
                 set({
                     isConnected: true,
                     socketId: socketIdParam,
@@ -99,7 +99,7 @@ export const useSocketStore = create<SocketStoreState & SocketStoreActions>()(
                 useMessageStore.getState().setLoadingState({ isLoading: false, step: 'connected', message: 'Connected' });
             },
             _onSocketDisconnect: (reason) => {
-                console.log(`[SocketStore _onSocketDisconnect] Disconnected. Reason: ${reason}`);
+                // console.log(`[SocketStore _onSocketDisconnect] Disconnected. Reason: ${reason}`);
                 useMessageStore.getState().animationControls?.stopStreaming();
                 useMessageStore.getState().resetAwaitFlag();
                 set(state => ({
@@ -110,7 +110,7 @@ export const useSocketStore = create<SocketStoreState & SocketStoreActions>()(
                 useMessageStore.getState().setLoadingState({ isLoading: false, step: 'disconnected', message: `Disconnected: ${reason}` });
             },
             _onSocketConnectError: (error) => { // error ở đây thường là Error của JS, có thể có `data` nếu server gửi
-                console.error("[SocketStore _onSocketConnectError]", error);
+                // console.error("[SocketStore _onSocketConnectError]", error);
 
                 let errorCode = 'CONNECTION_FAILED'; // Mã lỗi mặc định
                 let errorMessage = error.message;
@@ -133,13 +133,13 @@ export const useSocketStore = create<SocketStoreState & SocketStoreActions>()(
             },
 
             _onSocketAuthError: (error) => { // error ở đây là { message: string } từ server
-                console.error("[SocketStore _onSocketAuthError]", error);
+                // console.error("[SocketStore _onSocketAuthError]", error);
                 set({ isConnected: false, socketId: null, isServerReadyForCommands: false, hasFatalConnectionError: true }, false, '_onSocketAuthError/setFatal');
                 // Giữ nguyên việc truyền code AUTH_REQUIRED
                 useUiStore.getState().handleError({ message: error.message, type: 'error', code: 'AUTH_REQUIRED' }, true, true);
             },
             _onSocketConnectionReady: (payload) => {
-                console.log(`[SocketStore _onSocketConnectionReady] Server ready. UserID: ${payload.userId}`);
+                // console.log(`[SocketStore _onSocketConnectionReady] Server ready. UserID: ${payload.userId}`);
                 set({ isServerReadyForCommands: true }, false, '_onSocketConnectionReady');
                 get().emitGetInitialConversations();
             },
@@ -149,28 +149,28 @@ export const useSocketStore = create<SocketStoreState & SocketStoreActions>()(
             emitGetInitialConversations: () => {
                 const { socketRef, isConnected } = get();
                 if (socketRef.current && isConnected) {
-                    console.log('[SocketStore] Emitting get_initial_conversations');
+                    // console.log('[SocketStore] Emitting get_initial_conversations');
                     socketRef.current.emit('get_initial_conversations');
                 } else {
-                    console.warn('[SocketStore] Cannot emit get_initial_conversations: Socket not ready.');
+                    // console.warn('[SocketStore] Cannot emit get_initial_conversations: Socket not ready.');
                 }
             },
             emitLoadConversation: (conversationId) => {
                 const { socketRef, isConnected } = get();
                 if (socketRef.current && isConnected && conversationId) {
-                    console.log(`[SocketStore] Emitting load_conversation for ID: ${conversationId}`);
+                    // console.log(`[SocketStore] Emitting load_conversation for ID: ${conversationId}`);
                     socketRef.current.emit('load_conversation', { conversationId });
                 } else {
-                    console.warn('[SocketStore] Cannot emit load_conversation: Socket not ready or no ID.');
+                    // console.warn('[SocketStore] Cannot emit load_conversation: Socket not ready or no ID.');
                 }
             },
             emitStartNewConversation: (payload = {}) => { // payload will now be { language: 'en' } or { language: 'vi' }
                 const { socketRef, isConnected } = get();
                 if (socketRef.current && isConnected) {
-                    console.log('[SocketStore] Emitting start_new_conversation with payload:', payload); // Log to verify
+                    // console.log('[SocketStore] Emitting start_new_conversation with payload:', payload); // Log to verify
                     socketRef.current.emit('start_new_conversation', payload);
                 } else {
-                    console.warn('[SocketStore] Cannot emit start_new_conversation: Socket not ready.');
+                    // console.warn('[SocketStore] Cannot emit start_new_conversation: Socket not ready.');
                 }
             },
             emitUserConfirmEmail: (confirmationId) => {
@@ -216,7 +216,7 @@ export const useSocketStore = create<SocketStoreState & SocketStoreActions>()(
                     return;
                 }
                 // Log the parts to verify
-                console.log(`[SocketStore] Emitting 'send_message'. ConvID: ${payload.conversationId}, Lang: ${payload.language}, Stream: ${payload.isStreaming}. Parts:`, payload.parts);
+                // console.log(`[SocketStore] Emitting 'send_message'. ConvID: ${payload.conversationId}, Lang: ${payload.language}, Stream: ${payload.isStreaming}. Parts:`, payload.parts);
                 socketRef.current.emit('send_message', payload); // Backend will receive the payload with `parts`
             },
 
@@ -226,7 +226,7 @@ export const useSocketStore = create<SocketStoreState & SocketStoreActions>()(
                     useUiStore.getState().handleError({ message: "Cannot edit message: Not connected or server not ready.", type: 'error' }, false, false);
                     return;
                 }
-                console.log(`[SocketStore] Emitting 'edit_user_message'. ConvID: ${payload.conversationId}, MsgID: ${payload.messageIdToEdit}`);
+                // console.log(`[SocketStore] Emitting 'edit_user_message'. ConvID: ${payload.conversationId}, MsgID: ${payload.messageIdToEdit}`);
                 socketRef.current.emit('edit_user_message', payload);
             },
         }),

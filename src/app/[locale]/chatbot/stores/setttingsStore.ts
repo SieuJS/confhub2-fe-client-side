@@ -104,7 +104,7 @@ export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions
                 // onRehydrateStorage để khôi phục state đầy đủ từ persisted state
                 onRehydrateStorage: () => (state, error) => {
                     if (error) {
-                        console.error("Failed to rehydrate settings store:", error);
+                        // console.error("Failed to rehydrate settings store:", error);
                         // Có thể reset về initial state nếu có lỗi nghiêm trọng
                         // Object.assign(state, initialSettingsStoreState);
                         // return;

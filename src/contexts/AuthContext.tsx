@@ -100,10 +100,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // updateAuthUser đã được useCallback trong code gốc, giữ nguyên
   const updateAuthUser = useCallback((newUserData: UserResponse) => {
-    console.log(
-      '[AuthProvider] Updating auth user state with new data:',
-      newUserData
-    )
+    // console.log(
+    //   '[AuthProvider] Updating auth user state with new data:',
+    //   newUserData
+    // )
     setUserState(newUserData)
     _persistUserToLocalStorage(newUserData)
   }, [])
@@ -125,7 +125,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         '/'
       if (typeof window !== 'undefined')
         localStorage.removeItem(LOCAL_STORAGE_KEYS.RETURN_URL)
-      console.log('[AuthProvider] Auth success. Redirecting to:', returnUrl)
+      // console.log('[AuthProvider] Auth success. Redirecting to:', returnUrl)
       router.push(returnUrl)
     },
     [router]
@@ -134,13 +134,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // _performLogout đã được useCallback trong code gốc, giữ nguyên
   const _performLogout = useCallback(
     async (options?: { preventRedirect?: boolean; callApi?: boolean }) => {
-      console.log('[AuthProvider] Performing logout. Options:', options)
+      // console.log('[AuthProvider] Performing logout. Options:', options)
       const previousToken = _getStoredToken()
       _clearAuthDataFromLocalStorage()
       setUserState(null)
       setIsLoggedIn(false)
       setError(null)
-      console.log('[AuthProvider] Resetting related chatbot stores on logout.')
+      // console.log('[AuthProvider] Resetting related chatbot stores on logout.')
       useMessageStore.getState().resetChatUIForNewConversation(true)
       useConversationStore.getState().resetConversationState()
       useUiStore.getState().clearFatalError()
@@ -163,18 +163,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               headers: headers
             }
           )
-          console.log('[AuthProvider] Called server logout API successfully.')
+          // console.log('[AuthProvider] Called server logout API successfully.')
         } catch (e) {
-          console.warn('[AuthProvider] Failed to call server logout API.', e)
+          // console.warn('[AuthProvider] Failed to call server logout API.', e)
         }
       }
       if (!options?.preventRedirect) {
-        console.log('[AuthProvider] Redirecting to / after logout.')
+        // console.log('[AuthProvider] Redirecting to / after logout.')
         router.push('/')
       } else {
-        console.log(
-          '[AuthProvider] Logout performed, redirect prevented by options.'
-        )
+        // console.log(
+        //   '[AuthProvider] Logout performed, redirect prevented by options.'
+        // )
       }
     },
     [router]
@@ -195,9 +195,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         typeof window !== 'undefined' &&
         localStorage.getItem(LOCAL_STORAGE_KEYS.LOGIN_STATUS) === 'true'
       if (token && storedLoginStatus) {
-        console.log(
-          '[AuthProvider] Token found. Verifying with /me endpoint...'
-        )
+        // console.log(
+        //   '[AuthProvider] Token found. Verifying with /me endpoint...'
+        // )
         try {
           const response = await fetch(
             `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/user/me`,
@@ -212,41 +212,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           if (!isMounted) return
           if (response.ok) {
             const userData = (await response.json()) as UserResponse
-            console.log(
-              '[AuthProvider] /me verification successful. User:',
-              userData.email
-            )
+            // console.log(
+            //   '[AuthProvider] /me verification successful. User:',
+            //   userData.email
+            // )
             _persistAuthDataToLocalStorage({ user: userData, token })
             setUserState(userData)
             setIsLoggedIn(true)
             useUiStore.getState().clearFatalError()
             useMessageStore.getState().clearAuthErrorMessages()
           } else if (response.status === 401 || response.status === 403) {
-            console.warn(
-              `[AuthProvider] /me verification failed (${response.status}). Token invalid or expired. Logging out.`
-            )
+            // console.warn(
+            //   `[AuthProvider] /me verification failed (${response.status}). Token invalid or expired. Logging out.`
+            // )
             await _performLogout({ preventRedirect: true, callApi: false })
           } else {
-            console.error(
-              `[AuthProvider] /me verification failed with status: ${response.status}. Logging out.`
-            )
+            // console.error(
+            //   `[AuthProvider] /me verification failed with status: ${response.status}. Logging out.`
+            // )
             if (isMounted)
               setError(`Session check failed (Status: ${response.status})`)
             await _performLogout({ preventRedirect: true, callApi: false })
           }
         } catch (err) {
           if (!isMounted) return
-          console.error(
-            '[AuthProvider] Network or fetch error during /me verification:',
-            err
-          )
+          // console.error(
+          //   '[AuthProvider] Network or fetch error during /me verification:',
+          //   err
+          // )
           if (isMounted) setError('Network error during session verification.')
           await _performLogout({ preventRedirect: true, callApi: false })
         }
       } else {
-        console.log(
-          '[AuthProvider] No valid token or login status. Ensuring logged out state.'
-        )
+        // console.log(
+        //   '[AuthProvider] No valid token or login status. Ensuring logged out state.'
+        // )
         if (isLoggedIn || user) {
           await _performLogout({ preventRedirect: true, callApi: false })
         }
@@ -255,7 +255,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
     // Đặt một timer mới. Chỉ sau 100ms không có lần F5 nào nữa thì mới chạy.
     authCheckTimer.current = setTimeout(() => {
-      console.log('[AuthProvider] Debounced auth check triggered.');
+      // console.log('[AuthProvider] Debounced auth check triggered.');
       initializeAuth();
     }, 100); // 100ms là một khoảng thời gian hợp lý
 
@@ -374,7 +374,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Đảm bảo có user ID và token trước khi xóa
     if (!user?.id || !getToken()) {
       const errorMessage = 'User not authenticated or ID missing.'
-      console.error('[AuthProvider] ' + errorMessage)
+      // console.error('[AuthProvider] ' + errorMessage)
       return { success: false, error: errorMessage }
     }
 
@@ -394,7 +394,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       )
 
       if (response.ok) {
-        console.log('[AuthProvider] Account deleted successfully on server.')
+        // console.log('[AuthProvider] Account deleted successfully on server.')
         // Sau khi xóa thành công trên server, thực hiện logout cục bộ
         // Không gọi API logout của server nữa vì tài khoản đã bị xóa
         await _performLogout({ callApi: false, preventRedirect: false }) // Chuyển hướng về trang chủ
@@ -404,14 +404,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const errorMessage =
           errorData.message ||
           `Failed to delete account (Status: ${response.status})`
-        console.error('[AuthProvider] Failed to delete account:', errorMessage)
+        // console.error('[AuthProvider] Failed to delete account:', errorMessage)
         return { success: false, error: errorMessage }
       }
     } catch (err: any) {
-      console.error(
-        '[AuthProvider] Network or fetch error during account deletion:',
-        err
-      )
+      // console.error(
+      //   '[AuthProvider] Network or fetch error during account deletion:',
+      //   err
+      // )
       return { success: false, error: 'Network error during account deletion.' }
     } finally {
       setIsLoading(false) // Kết thúc trạng thái loading

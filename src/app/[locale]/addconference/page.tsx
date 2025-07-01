@@ -30,9 +30,9 @@ const AddConferencePage = ({
     // 1. Quá trình khởi tạo auth đã hoàn tất (isAuthInitializing là false)
     // 2. Người dùng chưa đăng nhập (isLoggedIn là false)
     if (!isAuthInitializing && !isLoggedIn) {
-      console.log(
-        '[AddConferencePage] Not logged in and auth initialized, redirecting to login.'
-      )
+      // console.log(
+      //   '[AddConferencePage] Not logged in and auth initialized, redirecting to login.'
+      // )
       // Lưu lại URL hiện tại để quay lại sau khi đăng nhập
       const currentPath = window.location.pathname + window.location.search // Mặc dù trang này không có search param quan trọng
       localStorage.setItem('returnUrl', currentPath)

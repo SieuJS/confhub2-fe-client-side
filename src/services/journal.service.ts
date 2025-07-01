@@ -62,7 +62,7 @@ const getAll = async (params: GetAllJournalsParams = {}): Promise<JournalApiResp
     return apiResponse;
 
   } catch (err: any) {
-    console.error('Error in journalService.getAll:', err);
+    // console.error('Error in journalService.getAll:', err);
     // Ném lại lỗi để component cha có thể xử lý và hiển thị thông báo cho người dùng
     throw err;
   }

@@ -115,7 +115,7 @@ const ProfileTab: React.FC = () => {
         )
       }
     } catch (error) {
-      console.error('Error during account deletion:', error)
+      // console.error('Error during account deletion:', error)
       setDeleteAccountError(t('Failed_to_delete_account_network_error'))
     } finally {
       setIsDeletingAccount(false)

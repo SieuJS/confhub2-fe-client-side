@@ -59,7 +59,7 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
       setCurrentPage(data.meta.curPage);
       setEventPerPage(params.perPage!);
     } catch (error: any) {
-      console.error("Failed to fetch conferences:", error);
+      // console.error("Failed to fetch conferences:", error);
       setError(error.message);
     } finally {
       setLoading(false);

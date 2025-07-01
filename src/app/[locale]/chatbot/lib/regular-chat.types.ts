@@ -203,7 +203,7 @@ export interface ThoughtStep {
 }
 
 
-export type AgentId = 'HostAgent' | 'ConferenceAgent' | 'JournalAgent' | 'AdminContactAgent' | 'NavigationAgent' | 'WebsiteInfoAgent' | string;
+export type AgentId = 'HostAgent' | 'ConferenceAgent' | 'AdminContactAgent' | 'NavigationAgent' | 'WebsiteInfoAgent' | string;
 
 export interface LoadingState {
   isLoading: boolean;
@@ -242,7 +242,7 @@ export interface DisplayListPayload {
   items: any[]; // Array of items to display (e.g., FollowItem[], CalendarItem[])
   // Using 'any[]' for now for flexibility, but ideally should be more specific
   // like (FollowItem[] | CalendarItem[])
-  itemType: 'conference' | 'journal'; // Type of items in the list
+  itemType: 'conference'; // Type of items in the list
   listType: 'followed' | 'calendar' | string; // Describes the nature of the list
   title?: string; // Optional title for the list display
 }
@@ -323,7 +323,6 @@ export interface FollowItem {
   dates?: FollowItemDate; // Optional
   location?: FollowItemLocation; // Optional
   // Thêm các trường khác nếu cần từ API
-  // Ví dụ: nếu là journal, có thể có 'publisher', 'issn', etc.
   // Nếu là conference, có thể có 'websiteUrl', 'submissionDeadline' etc.
   // Hiện tại, chúng ta sẽ giữ các trường chung nhất từ ví dụ của bạn.
 }
@@ -338,7 +337,7 @@ export interface FollowItem {
  */
 export interface ItemFollowStatusUpdatePayload {
   item: FollowItem; // The item whose follow status was updated
-  itemType: 'conference' | 'journal';
+  itemType: 'conference';
   followed: boolean; // true if the item is now followed (after a 'follow' action),
   // false if the item is now unfollowed (after an 'unfollow' action)
 }
@@ -355,7 +354,6 @@ export interface CalendarItem {
   dates?: FollowItemDate; // Optional
   location?: FollowItemLocation; // Optional
   // Thêm các trường khác nếu cần từ API
-  // Ví dụ: nếu là journal, có thể có 'publisher', 'issn', etc.
   // Nếu là conference, có thể có 'websiteUrl', 'submissionDeadline' etc.
   // Hiện tại, chúng ta sẽ giữ các trường chung nhất từ ví dụ của bạn.
 }

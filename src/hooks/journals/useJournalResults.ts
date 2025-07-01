@@ -44,7 +44,7 @@ const useJournalResults = ({ initialData }: UseJournalResultsProps = {}) => {
       setJournals(apiResponse.data);
       setMeta(apiResponse.meta);
     } catch (err: any) {
-      console.error('Failed to fetch journals:', err);
+      // console.error('Failed to fetch journals:', err);
       setError(err.message);
       setJournals([]);
       setMeta({ total: 0, page: 1, limit: 6, totalPages: 0 });

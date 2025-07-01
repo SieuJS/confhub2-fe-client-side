@@ -49,9 +49,9 @@ function ChatbotErrorDisplay({
 
   useEffect(() => {
     if (user && hasFatalError && getIsAuthRelated(fatalErrorCode)) {
-      console.log(
-        `[ChatbotErrorDisplay ${isFloatingContext ? '(Floating)' : '(Global)'}] User '${user.email}' is logged in and an auth error ('${fatalErrorCode}') is present. Clearing it.`
-      )
+      // console.log(
+      //   `[ChatbotErrorDisplay ${isFloatingContext ? '(Floating)' : '(Global)'}] User '${user.email}' is logged in and an auth error ('${fatalErrorCode}') is present. Clearing it.`
+      // )
       clearFatalErrorAction()
       clearAuthErrorMessages()
     }
@@ -80,9 +80,9 @@ function ChatbotErrorDisplay({
       // );
 
       if (user && fatalErrorCode === 'AUTH_REQUIRED') {
-        console.warn(
-          `[ChatbotErrorDisplay ${isFloatingContext ? '(Floating)' : '(Global)'}] Main Effect: User '${user.email}' is logged in, but fatalErrorCode is still 'AUTH_REQUIRED'. This may indicate an issue or a new error.`
-        )
+        // console.warn(
+        //   `[ChatbotErrorDisplay ${isFloatingContext ? '(Floating)' : '(Global)'}] Main Effect: User '${user.email}' is logged in, but fatalErrorCode is still 'AUTH_REQUIRED'. This may indicate an issue or a new error.`
+        // )
       }
 
       if (!userDismissedError) {
@@ -167,7 +167,7 @@ function ChatbotErrorDisplay({
             clearFatalErrorAction()
           }
         } catch (error) {
-          console.error('Error during logout from ChatbotErrorDisplay:', error)
+          // console.error('Error during logout from ChatbotErrorDisplay:', error)
           router.push('/auth/login' as any)
           if (hasFatalError && fatalErrorCode === currentFatalErrorCode) {
             clearFatalErrorAction()

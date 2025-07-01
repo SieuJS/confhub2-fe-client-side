@@ -78,7 +78,7 @@ const getInitialSizeValue = (
         ),
       };
     } catch (e) {
-      console.error(`[FWC InitSize] Failed to parse saved size ${lsKey}:`, e);
+      // console.error(`[FWC InitSize] Failed to parse saved size ${lsKey}:`, e);
       // Fall through to default if parsing fails
     }
   }
@@ -114,7 +114,7 @@ const getInitialPositionValue = (
         ),
       };
     } catch (e) {
-      console.error(`[FWC InitPos] Failed to parse saved position ${lsKey}:`, e);
+      // console.error(`[FWC InitPos] Failed to parse saved position ${lsKey}:`, e);
       // Fall through to default if parsing fails
     }
   }

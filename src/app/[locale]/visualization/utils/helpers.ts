@@ -47,7 +47,7 @@ export const getNestedValue = (obj: any, path: string): any => {
         // console.log(`${logPrefixHelper} getNestedValue: Path "${path}" resolved to value:`, current);
         return current;
     } catch (error) {
-        console.error(`${logPrefixHelper} getNestedValue: Error accessing path "${path}":`, error);
+        // console.error(`${logPrefixHelper} getNestedValue: Error accessing path "${path}":`, error);
         return undefined;
     }
 };

@@ -35,11 +35,11 @@ export const useEditProfile = (
 
   const handleSaveClick = useCallback(async () => {
     if (!user || !isLoggedIn) { // Kiểm tra cả isLoggedIn
-      console.error('User not logged in, cannot save profile.');
+      // console.error('User not logged in, cannot save profile.');
       return;
     }
     if (!initialUserData) {
-      console.error('Initial user data is not available for comparison.');
+      // console.error('Initial user data is not available for comparison.');
       return;
     }
 
@@ -68,14 +68,14 @@ export const useEditProfile = (
 
 
       if (!hasChanges) {
-        console.log('No changes detected. Not saving.');
+        // console.log('No changes detected. Not saving.');
         setIsEditing(false);
         return;
       }
 
       const currentToken = getToken();
       if (!currentToken) {
-        console.error('No token found. Cannot update profile.');
+        // console.error('No token found. Cannot update profile.');
         return;
       }
 
@@ -102,7 +102,7 @@ export const useEditProfile = (
       // ProfileTab nên lấy initialUserData từ user của AuthContext để luôn có dữ liệu mới nhất.
 
     } catch (error: any) {
-      console.error('Failed to update user:', error);
+      // console.error('Failed to update user:', error);
       // Xử lý lỗi: hiển thị thông báo cho người dùng
     }
   }, [user, isLoggedIn, initialUserData, editedData, getToken, updateAuthUser]); // Thêm updateAuthUser vào dependencies

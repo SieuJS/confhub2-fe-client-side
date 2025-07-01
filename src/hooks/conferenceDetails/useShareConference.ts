@@ -34,7 +34,7 @@ const useShareConference = (conferenceData: ConferenceResponse | null) => {
         shareLink = `https://www.reddit.com/submit?url=${shareUrl}&title=${encodedText}`;
         break;
       default:
-        console.error('Unsupported platform');
+        // console.error('Unsupported platform');
         return;
     }
 

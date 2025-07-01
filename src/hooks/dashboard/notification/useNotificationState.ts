@@ -15,7 +15,7 @@ const useNotificationState = (initialNotifications: Notification[], userId: stri
 
     const updateUserNotifications =
         async (updatedNotifications: Notification[]) => {
-            console.log('useNotificationState: updateUserNotifications called with:', updatedNotifications);
+            // console.log('useNotificationState: updateUserNotifications called with:', updatedNotifications);
             const updatedData = { notifications: updatedNotifications };
             // The API call uses the auth token, not the userId prop.
             await updateNotifications(updatedData);
@@ -57,7 +57,7 @@ const useNotificationState = (initialNotifications: Notification[], userId: stri
             const updatedNotifications = currentNotifications.map(n =>
                 n.id === id ? { ...n, deletedAt: new Date().toISOString() } : n
             );
-            console.log(`useNotificationState: handleDeleteNotification - updatedNotifications:`, currentNotifications); // Log updated notifications
+            // console.log(`useNotificationState: handleDeleteNotification - updatedNotifications:`, currentNotifications); // Log updated notifications
             await updateUserNotifications(updatedNotifications);
         }
 

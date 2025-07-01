@@ -38,6 +38,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
     processedRanks,
     summary,
     callForPaper,
+    mainLink,
     cfpLink,
     impLink,
     primaryLocation
@@ -101,6 +102,7 @@ export const ConferenceTabs: React.FC<ConferenceTabsProps> = ({
       <div id='call-for-papers' className='scroll-mt-28'>
         <CallForPapersSection
           callForPaper={callForPaper}
+          mainLink={mainLink}
           cfpLink={cfpLink}
           t={t}
         />

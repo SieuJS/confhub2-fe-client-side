@@ -37,12 +37,12 @@ const useLoginForm = (): LoginFormResult => {
         if (!email) {
             // Thay vì alert, bạn có thể muốn set một state lỗi cục bộ cho form
             // hoặc nếu `signIn` có thể trả về lỗi cụ thể, hãy dựa vào `error` từ `useAuth`.
-            console.error('Please enter email');
+            // console.error('Please enter email');
             // Ví dụ: setErrorFormLocal('Please enter email'); // Nếu có state lỗi cục bộ
             return;
         }
         if (!password) {
-            console.error('Please enter password');
+            // console.error('Please enter password');
             return;
         }
         // `signIn` từ `useAuth` sẽ xử lý việc gọi API và cập nhật state trong AuthContext

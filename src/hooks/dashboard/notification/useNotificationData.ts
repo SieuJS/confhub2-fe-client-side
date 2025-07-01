@@ -29,7 +29,7 @@ const useNotificationData = (userId: string) => {
             setLoggedIn(true);
 
         } catch (error: any) {
-            console.error('useNotificationData: Error fetching notifications:', error);
+            // console.error('useNotificationData: Error fetching notifications:', error);
             setNotifications([]);
             setLoggedIn(false);
 

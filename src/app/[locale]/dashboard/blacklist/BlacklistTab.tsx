@@ -72,11 +72,11 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
 
       if (!response.ok) {
         if (response.status === 403) {
-          console.error('User is banned.')
+          // console.error('User is banned.')
           setLoggedIn(false)
           setIsBanned(true)
         } else if (response.status === 401) {
-          console.error('Authentication error. Please log in.')
+          // console.error('Authentication error. Please log in.')
           setLoggedIn(false)
         } else {
           throw new Error(`HTTP error! status: ${response.status}`)
@@ -95,7 +95,7 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
 
       setBlacklistedConferences(blacklist)
     } catch (error) {
-      console.error('Failed to fetch blacklist data:', error)
+      // console.error('Failed to fetch blacklist data:', error)
       setBlacklistedConferences([])
       setLoggedIn(false)
     } finally {

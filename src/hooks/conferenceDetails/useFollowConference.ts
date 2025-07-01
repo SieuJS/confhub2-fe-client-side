@@ -54,7 +54,7 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
         );
       } catch (err: any) {
         setError(err.message || 'Error fetching user data');
-        console.error('Error fetching user data:', err);
+        // console.error('Error fetching user data:', err);
       } finally {
         setLoading(false);
       }
@@ -74,7 +74,7 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
 
     if (!userData) {
       setError("User not logged in.");
-      console.error('User not logged in');
+      // console.error('User not logged in');
       return;
     }
 
@@ -106,12 +106,12 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
       }
 
       const follows: Follow[] = await response.json();
-      console.log('follows', follows);
+      // console.log('follows', follows);
       setIsFollowing(!isFollowing);
       // setIsFollowing(follows?.some(conf => conf.conferenceId === conferenceId) ?? false); // FIXED HERE
     } catch (err: any) {
       setError(err.message || 'Error following/unfollowing conference.');
-      console.error('Error following/unfollowing conference:', err);
+      // console.error('Error following/unfollowing conference:', err);
     } finally {
       setLoading(false);
     }

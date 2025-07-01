@@ -26,9 +26,9 @@ const ModelInfoTooltip: React.FC<ModelInfoTooltipProps> = ({
   useEffect(() => {
     portalRootRef.current = document.getElementById('tooltip-portal-root')
     if (!portalRootRef.current) {
-      console.warn(
-        "Tooltip portal root ('tooltip-portal-root') not found in the DOM!"
-      )
+      // console.warn(
+      //   "Tooltip portal root ('tooltip-portal-root') not found in the DOM!"
+      // )
     }
   }, [])
 

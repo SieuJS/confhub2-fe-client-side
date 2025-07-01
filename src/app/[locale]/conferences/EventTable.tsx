@@ -75,12 +75,12 @@ const EventTable: React.FC<EventTableProps> = ({ events, userBlacklist }) => {
         options
       )} - ${endDate.toLocaleDateString('en-US', options)}`
     } catch (e) {
-      console.error(
-        'Error formatting date range in table:',
-        fromDate,
-        toDate,
-        e
-      )
+      // console.error(
+      //   'Error formatting date range in table:',
+      //   fromDate,
+      //   toDate,
+      //   e
+      // )
       return 'Invalid Date Range'
     }
   }

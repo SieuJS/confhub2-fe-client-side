@@ -45,7 +45,7 @@ const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
         );
       } catch (err: any) {
         setError(err.message || 'Error fetching blacklist data');
-        console.error('Error fetching blacklist data:', err);
+        // console.error('Error fetching blacklist data:', err);
       } finally {
         setLoading(false);
       }
@@ -89,7 +89,7 @@ const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
 
     } catch (err: any) {
       setError(err.message || 'Error updating blacklist status.');
-      console.error('Error updating blacklist status:', err);
+      // console.error('Error updating blacklist status:', err);
     } finally {
       setLoading(false);
     }

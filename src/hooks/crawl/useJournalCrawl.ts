@@ -54,7 +54,7 @@ export const useJournalCrawl = (): UseJournalCrawlReturn => {
         setCrawlError(null);
         setCrawlProgress({ status: 'idle' });
         setCrawlMessages([]);
-        console.log("Journal crawl state reset.");
+        // console.log("Journal crawl state reset.");
     }, []);
 
     // --- File Handling and Parsing (Now reads raw content too) ---
@@ -100,7 +100,7 @@ export const useJournalCrawl = (): UseJournalCrawlReturn => {
             }
             // Store the raw content
             setRawCsvContent(fileContent);
-            console.log(`Stored raw CSV content (${fileContent.length} chars).`);
+            // console.log(`Stored raw CSV content (${fileContent.length} chars).`);
 
             // Now parse the content *for preview purposes only*
             Papa.parse<Journal>(fileContent, {
@@ -111,18 +111,18 @@ export const useJournalCrawl = (): UseJournalCrawlReturn => {
                 transformHeader: header => header.trim(),
                 transform: (value) => value.trim(),
                 complete: (results) => {
-                    console.log("Papaparse Raw Results (for preview):", results);
+                    // console.log("Papaparse Raw Results (for preview):", results);
                     const validJournals = results.data.filter(row => row.Title && row.Title.trim() !== '');
 
                     if (results.errors.length > 0) {
-                        console.warn("CSV Parsing Errors (for preview):", results.errors);
+                        // console.warn("CSV Parsing Errors (for preview):", results.errors);
                         setCrawlMessages(prev => [...prev, `Warning: Encountered ${results.errors.length} parsing errors during preview generation.`]);
                     }
 
                     if (validJournals.length > 0) {
                         setParsedDataForPreview(validJournals); // Set data for preview table
                         setCrawlMessages(prev => [...prev, `Successfully parsed ${validJournals.length} journals for preview.`]);
-                        console.log("Parsed Journals (for preview):", validJournals.slice(0, 5));
+                        // console.log("Parsed Journals (for preview):", validJournals.slice(0, 5));
                     } else {
                         // We still have the raw content, but parsing for preview failed
                         setParseError(`No valid journal data found for preview. Check header and delimiter (';'). Raw data is still available for sending.`);
@@ -131,7 +131,7 @@ export const useJournalCrawl = (): UseJournalCrawlReturn => {
                     setIsParsing(false);
                 },
                 error: (error: Error) => {
-                    console.error("CSV Parsing Error (for preview):", error);
+                    // console.error("CSV Parsing Error (for preview):", error);
                     // Critical parsing error likely means the raw content is also bad
                     setParseError(`Error parsing CSV for preview: ${error.message}. Cannot proceed reliably.`);
                     setRawCsvContent(null); // Clear raw content if parsing fails badly
@@ -170,7 +170,7 @@ export const useJournalCrawl = (): UseJournalCrawlReturn => {
                 timeout: 600000 // 10 minutes timeout (might need adjustment)
             });
 
-            console.log(`${description} - Response Status:`, response.status);
+            // console.log(`${description} - Response Status:`, response.status);
             setCrawlMessages(prev => [...prev, `${description}: ${response.data.message} (Runtime: ${response.data.runtime ?? 'N/A'}s)`]);
             // Add any data returned in the response if needed
             // if (response.data.data) {
@@ -180,7 +180,7 @@ export const useJournalCrawl = (): UseJournalCrawlReturn => {
 
         } catch (err) {
             const error = err as AxiosError<ApiCrawlResponse>;
-            console.error(`API Error during ${description}:`, error);
+            // console.error(`API Error during ${description}:`, error);
             let errorMessage = `Error sending ${description}: ${error.message}`;
             if (error.response) {
                 // Include backend error message if available
@@ -199,7 +199,7 @@ export const useJournalCrawl = (): UseJournalCrawlReturn => {
     const startCrawl = useCallback(async () => {
         // Check if we have the RAW content to send
         if (!rawCsvContent || isCrawling) {
-            console.warn("Cannot start journal crawl: No raw CSV content available or already crawling.");
+            // console.warn("Cannot start journal crawl: No raw CSV content available or already crawling.");
             setCrawlError("No valid CSV content loaded to send.");
             return;
         }
@@ -209,15 +209,15 @@ export const useJournalCrawl = (): UseJournalCrawlReturn => {
         setCrawlMessages(prev => [`Sending journal data to backend...`]);
         setCrawlProgress({ status: 'crawling' }); // Set progress to crawling
 
-        console.log("Starting journal crawl: Sending raw CSV content.");
+        // console.log("Starting journal crawl: Sending raw CSV content.");
         const success = await sendApiRequest(rawCsvContent);
 
         if (success) {
-            console.log("Finished sending journal data successfully.");
+            // console.log("Finished sending journal data successfully.");
             setCrawlProgress({ status: 'success' });
             setCrawlMessages(prev => [...prev, `Backend acknowledged processing request.`]);
         } else {
-            console.error(`Journal crawl failed during API request.`);
+            // console.error(`Journal crawl failed during API request.`);
             setCrawlProgress({ status: 'error' });
             // Error message is already set by sendApiRequest
         }

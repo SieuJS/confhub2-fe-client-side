@@ -13,12 +13,12 @@ export const safeGetDate = (dateInput: string | Date | null | undefined): Date =
     const date = new Date(dateInput);
     // Check if the date is valid
     if (isNaN(date.getTime())) {
-      console.warn('Invalid date input:', dateInput);
+      // console.warn('Invalid date input:', dateInput);
       return defaultDateForNull;
     }
     return date;
   } catch (e) {
-    console.error('Error parsing date:', dateInput, e);
+    // console.error('Error parsing date:', dateInput, e);
     return defaultDateForNull; // Fallback to epoch on error
   }
 };

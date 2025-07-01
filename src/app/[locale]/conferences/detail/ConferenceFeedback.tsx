@@ -115,12 +115,12 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
 
   const handleSubmit = async () => {
     if (!conferenceId || star === null || description.trim() === '') {
-      console.error('Missing conferenceId, star, or description');
+      // console.error('Missing conferenceId, star, or description');
       return;
     }
     // Kiểm tra xem user có tồn tại không trước khi gửi feedback
     if (!user || !user.id) {
-        console.error('User is not available for submitting feedback.');
+        // console.error('User is not available for submitting feedback.');
         // Có thể hiển thị thông báo lỗi cho người dùng
         return;
     }
@@ -139,7 +139,7 @@ const ConferenceFeedback: React.FC<ConferenceFeedbackProps> = ({
     try {
       localStorage.setItem('returnUrl', fullUrl);
     } catch (e) {
-      console.error('Failed to set returnUrl in localStorage', e);
+      // console.error('Failed to set returnUrl in localStorage', e);
     }
     const pathWithLocale = `/${localePrefix}/auth/login`;
     router.push(pathWithLocale);

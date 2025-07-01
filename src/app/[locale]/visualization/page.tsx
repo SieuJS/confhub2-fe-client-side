@@ -19,7 +19,7 @@ export default async function VisualizationPage() {
   try {
     initialData = await fetchVisualizationData();
   } catch (error: any) {
-    console.error("Failed to fetch initial visualization data on server:", error);
+    // console.error("Failed to fetch initial visualization data on server:", error);
     initialError = error.message || "An unknown error occurred while fetching data.";
     // Trong trường hợp lỗi, chúng ta vẫn render trang client nhưng với initialData là null
     // và một thông báo lỗi ban đầu.

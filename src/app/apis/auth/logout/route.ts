@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
 export async function POST(request: Request) { // Changed to POST for simplicity, can be POST
-  console.log("[Server API - /api/auth/logout] Attempting to clear cookies...");
+  // console.log("[Server API - /api/auth/logout] Attempting to clear cookies...");
 
   // If you set HttpOnly cookies from the backend for authentication, clear them here.
   // Example:
@@ -28,7 +28,7 @@ export async function POST(request: Request) { // Changed to POST for simplicity
   cookies().delete('loginStatus');
 
 
-  console.log("[Server API - /api/auth/logout] Cookie clearing process completed.");
+  // console.log("[Server API - /api/auth/logout] Cookie clearing process completed.");
   // It's good practice to ensure the client knows the logout was processed,
   // even if the main effect is clearing HttpOnly cookies.
   return NextResponse.json({ message: 'Logged out successfully from server.' });

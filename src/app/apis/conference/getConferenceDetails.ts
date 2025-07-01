@@ -17,7 +17,7 @@ async function getConferenceFromDB(id: string): Promise<ConferenceResponse> {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`HTTP error fetching conference! Status: ${response.status}, Body: ${errorText}`);
+      // console.error(`HTTP error fetching conference! Status: ${response.status}, Body: ${errorText}`);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
@@ -25,12 +25,16 @@ async function getConferenceFromDB(id: string): Promise<ConferenceResponse> {
     return responseData; // Trả về dữ liệu đã gửi đi
 
   } catch (error: any) {
-    console.error('--- Error in getConferenceFromDB ---');
-    console.error('Error message:', error.message);
-    if (error.cause) { console.error('Error cause:', error.cause); }
-    console.error('Stack trace:', error.stack);
-    if (responseData) { console.error('Response data received before error:', responseData); }
-    console.error('------------------------------------');
+    // console.error('--- Error in getConferenceFromDB ---');
+    // console.error('Error message:', error.message);
+    if (error.cause) { 
+      // console.error('Error cause:', error.cause); 
+      }
+    // console.error('Stack trace:', error.stack);
+    if (responseData) { 
+      // console.error('Response data received before error:', responseData); 
+      }
+    // console.error('------------------------------------');
     throw error;
   }
 }

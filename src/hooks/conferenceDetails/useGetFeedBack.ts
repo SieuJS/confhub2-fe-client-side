@@ -23,7 +23,7 @@ const useGetFeedBack = (
             const data = await getFeedBack(conferenceId); // Gọi API.
             setFeedbackResponse(data);
         } catch (error: any) {
-        console.error("Failed to fetch conferences:", error);
+        // console.error("Failed to fetch conferences:", error);
             setError(error.message); // Lấy message từ error object.
             setFeedbackResponse([]);
         } finally {

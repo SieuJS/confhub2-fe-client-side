@@ -46,7 +46,7 @@ export async function makeFrontendApiCall(
     } else {
       errorData = await response.text();
     }
-    console.error(`Frontend API call to ${url} (method ${method}) failed with status ${response.status}:`, errorData);
+    // console.error(`Frontend API call to ${url} (method ${method}) failed with status ${response.status}:`, errorData);
     const message = (typeof errorData === 'object' && errorData?.message) ? errorData.message :
       (typeof errorData === 'string' && errorData.trim() !== '') ? errorData :
         `API Error (${response.status})`;
@@ -68,12 +68,12 @@ export async function makeFrontendApiCall(
 export async function fetchItemDetailsFromApi(
   identifier: string,
   identifierType: 'acronym' | 'title' | 'id',
-  itemType: 'conference' | 'journal',
+  itemType: 'conference',
   databaseUrl: string // Pass the base URL
 ): Promise<{ id: string; name: string }> {
   if (!identifier) throw new Error("Identifier is required.");
 
-  const searchApiUrl = `${databaseUrl}/${itemType}`; // e.g., /api/v1/conference or /api/v1/journal
+  const searchApiUrl = `${databaseUrl}/${itemType}`; // e.g., /api/v1/conference
   const params = new URLSearchParams({ perPage: '1' });
 
   if (identifierType === 'id') {

@@ -23,7 +23,7 @@ function CallbackContent() {
   useEffect(() => {
     // Nếu AuthProvider chưa khởi tạo xong, chưa làm gì cả
     if (isAuthInitializing) {
-      console.log('[CallbackPage] Auth is still initializing. Waiting...');
+      // console.log('[CallbackPage] Auth is still initializing. Waiting...');
       return;
     }
 
@@ -31,7 +31,7 @@ function CallbackContent() {
     if (isLoggedIn) {
       const returnUrl = localStorage.getItem('returnUrl') || '/';
       localStorage.removeItem('returnUrl'); // Xóa sau khi đọc
-      console.log('[CallbackPage] Already logged in. Redirecting to:', returnUrl);
+      // console.log('[CallbackPage] Already logged in. Redirecting to:', returnUrl);
       router.push(returnUrl);
       return;
     }
@@ -41,7 +41,7 @@ function CallbackContent() {
     const errorParam = searchParams.get('error'); // Lỗi từ backend (nếu có)
 
     if (errorParam) {
-      console.error('[CallbackPage] OAuth Error from server:', errorParam);
+      // console.error('[CallbackPage] OAuth Error from server:', errorParam);
       // Chuyển hướng về trang login với thông báo lỗi
       // Không cần thiết phải set lỗi trong useAuth ở đây, vì trang login sẽ hiển thị lỗi từ query param
       router.push(`/auth/login?error=${encodeURIComponent(errorParam)}`);
@@ -49,13 +49,13 @@ function CallbackContent() {
     }
 
     if (accessToken) {
-      console.log('[CallbackPage] Access Token found. Processing...');
+      // console.log('[CallbackPage] Access Token found. Processing...');
       // processTokenFromOAuth sẽ xử lý việc xác thực token, lấy user info,
       // cập nhật state trong AuthProvider và tự động chuyển hướng khi thành công.
       processTokenFromOAuth(accessToken, localStorage.getItem('returnUrl') || '/');
     } else if (!isProcessingLogin && !isLoggedIn) {
       // Chỉ chuyển hướng nếu không có accessToken, không đang xử lý, và chưa đăng nhập
-      console.warn('[CallbackPage] Missing access token and not currently processing. Redirecting to login.');
+      // console.warn('[CallbackPage] Missing access token and not currently processing. Redirecting to login.');
       router.push('/auth/login?error=missing_oauth_tokens_on_callback');
     }
   }, [

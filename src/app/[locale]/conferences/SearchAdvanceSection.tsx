@@ -71,7 +71,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
           const data: string[] = await response.json()
           setAvailableTopics(data)
         } catch (error) {
-          console.error('Could not fetch topics:', error)
+          // console.error('Could not fetch topics:', error)
         } finally {
           setTopicsLoading(false)
         }
@@ -97,15 +97,15 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
           )
           if (!response.ok) {
             const errorBody = await response.text()
-            console.error(
-              `HTTP error! status: ${response.status}, body: ${errorBody}`
-            )
+            // console.error(
+            //   `HTTP error! status: ${response.status}, body: ${errorBody}`
+            // )
             throw new Error(`HTTP error! status: ${response.status}`)
           }
           const data: string[] = await response.json()
           setAvailableSources(data)
         } catch (error) {
-          console.error('Could not fetch sources:', error)
+          // console.error('Could not fetch sources:', error)
         } finally {
           setSourcesLoading(false)
         }

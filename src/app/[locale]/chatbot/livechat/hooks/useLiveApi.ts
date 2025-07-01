@@ -144,7 +144,7 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
             setVolume(ev.data.volume);
           })
           .then(() => {
-            console.log("Audio output VUmeter worklet added.");
+            // console.log("Audio output VUmeter worklet added.");
           });
       });
     }
@@ -161,7 +161,7 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
   useEffect(() => {
     const handleFinalizeInputTranscription = () => {
       if (accumulatedInputTranscriptionRef.current.trim()) {
-        console.log(`[useLiveAPI] Finalizing input transcription via clientSpeechSegmentEnd event: "${accumulatedInputTranscriptionRef.current}"`);
+        // console.log(`[useLiveAPI] Finalizing input transcription via clientSpeechSegmentEnd event: "${accumulatedInputTranscriptionRef.current}"`);
         emitter.emit("log", {
           date: new Date(),
           type: "transcription.inputEvent.final",
@@ -178,7 +178,7 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
   }, [emitter]); // emitter là stable
 
   const handleServerMessage = useCallback((message: SDKLiveServerMessage) => {
-    console.log("RAW SERVER MESSAGE:", JSON.stringify(message, null, 2)); // Bỏ comment nếu cần debug sâu
+    // console.log("RAW SERVER MESSAGE:", JSON.stringify(message, null, 2)); // Bỏ comment nếu cần debug sâu
 
     // Xử lý các message không thuộc serverContent trước
     if (message.setupComplete) {
@@ -232,7 +232,7 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
 
         if (isFinishedByServer) {
           // accumulatedInputTranscriptionRef.current giờ đã chứa toàn bộ text từ các chunk
-          console.log(`[useLiveAPI] Server indicated input finished. Emitting clientSpeechSegmentEnd. Accumulated: "${accumulatedInputTranscriptionRef.current.trim()}"`);
+          // console.log(`[useLiveAPI] Server indicated input finished. Emitting clientSpeechSegmentEnd. Accumulated: "${accumulatedInputTranscriptionRef.current.trim()}"`);
           emitter.emit("clientSpeechSegmentEnd");
           serverIndicatedInputFinishedThisCycle = true; // Đánh dấu server đã chốt hạ input
           // Listener của clientSpeechSegmentEnd sẽ log và reset accumulatedInputTranscriptionRef
@@ -240,7 +240,7 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
           // Nếu CHƯA finished bởi server, và CÓ nội dung tích lũy -> đặt/đặt lại timer VAD.
           inputTranscriptionSilenceTimerRef.current = setTimeout(() => {
             // Timer hết hạn, chỉ phát clientSpeechSegmentEnd. Listener sẽ lo phần còn lại.
-            console.log(`[useLiveAPI] Input SILENCE timer expired. Emitting clientSpeechSegmentEnd. Accumulated: "${accumulatedInputTranscriptionRef.current.trim()}"`);
+            // console.log(`[useLiveAPI] Input SILENCE timer expired. Emitting clientSpeechSegmentEnd. Accumulated: "${accumulatedInputTranscriptionRef.current.trim()}"`);
             emitter.emit("clientSpeechSegmentEnd");
             inputTranscriptionSilenceTimerRef.current = null;
           }, INPUT_TRANSCRIPTION_SILENCE_DURATION);
@@ -258,7 +258,7 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
       ) {
         // Model bắt đầu trả lời text, VAD client đang hoạt động.
         // Dấu hiệu lượt nói user có thể đã kết thúc. Dừng VAD client.
-        console.log(`[useLiveAPI] Model sent TEXT & client VAD active. Clearing VAD timer. Input: "${accumulatedInputTranscriptionRef.current.trim()}"`);
+        // console.log(`[useLiveAPI] Model sent TEXT & client VAD active. Clearing VAD timer. Input: "${accumulatedInputTranscriptionRef.current.trim()}"`);
         clearTimeout(inputTranscriptionSilenceTimerRef.current);
         inputTranscriptionSilenceTimerRef.current = null;
         // KHÔNG phát clientSpeechSegmentEnd ở đây.
@@ -311,7 +311,7 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
                 emitter.emit("audio", audioArrayBuffer); // Phát audio data để play real-time
                 emitter.emit("audioResponse", { data: part.inlineData.data }); // Event này có thể trùng với "audio"
               } catch (e) {
-                console.error("Error processing server audio data:", e);
+                // console.error("Error processing server audio data:", e);
               }
             }
           }
@@ -322,7 +322,7 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
       if (serverContent.generationComplete) {
         // Đây là thời điểm tốt để finalize output transcription nếu còn và output không phải TEXT
         if (currentOutputModality !== SDKModality.TEXT && accumulatedOutputTranscriptionRef.current.trim()) {
-          console.warn("[useLiveAPI] GenerationComplete with pending output transcription:", accumulatedOutputTranscriptionRef.current);
+          // console.warn("[useLiveAPI] GenerationComplete with pending output transcription:", accumulatedOutputTranscriptionRef.current);
           emitter.emit("log", {
             date: new Date(),
             type: "transcription.outputEvent.final",
@@ -347,7 +347,7 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
         }
         // Nếu còn input chưa được finalize (ví dụ, server chưa bao giờ gửi finished:true cho nó)
         if (accumulatedInputTranscriptionRef.current.trim()) {
-          console.log(`[useLiveAPI] INTERRUPTED. Emitting clientSpeechSegmentEnd for input: "${accumulatedInputTranscriptionRef.current.trim()}"`);
+          // console.log(`[useLiveAPI] INTERRUPTED. Emitting clientSpeechSegmentEnd for input: "${accumulatedInputTranscriptionRef.current.trim()}"`);
           emitter.emit("clientSpeechSegmentEnd"); // Listener sẽ log và reset
         }
         // Không reset accumulatedInputTranscriptionRef ở đây, listener sẽ làm
@@ -392,7 +392,7 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
         }
         // Nếu còn input chưa được finalize (ví dụ, server không gửi finished, timer không hết hạn kịp)
         if (accumulatedInputTranscriptionRef.current.trim()) {
-          console.log(`[useLiveAPI] TURN COMPLETE. Emitting clientSpeechSegmentEnd for input: "${accumulatedInputTranscriptionRef.current.trim()}"`);
+          // console.log(`[useLiveAPI] TURN COMPLETE. Emitting clientSpeechSegmentEnd for input: "${accumulatedInputTranscriptionRef.current.trim()}"`);
           emitter.emit("clientSpeechSegmentEnd"); // Listener sẽ log và reset
         }
         emitter.emit("turncomplete");
@@ -403,12 +403,12 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
 
   const connect = useCallback(async () => {
     if (!appConfig) {
-      console.error("useLiveApi: Configuration (appConfig) is not set before connecting.");
+      // console.error("useLiveApi: Configuration (appConfig) is not set before connecting.");
       emitter.emit("serverError", new Error("Configuration (appConfig) is not set."));
       return;
     }
     if (session || isConnecting) {
-      console.log("useLiveApi: Already connected or connecting.");
+      // console.log("useLiveApi: Already connected or connecting.");
       return;
     }
     setIsConnecting(true);
@@ -428,7 +428,7 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
           },
           onmessage: handleServerMessage,
           onerror: (e: ErrorEvent) => {
-            console.error("useLiveApi: SDK WebSocket error:", e);
+            // console.error("useLiveApi: SDK WebSocket error:", e);
             emitter.emit("serverError", new Error(e.message || "SDK WebSocket error"));
             setSession(null);
             setConnected(false);
@@ -455,7 +455,7 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
       });
       setSession(newSession);
     } catch (error) {
-      console.error("useLiveApi: Connection failed", error);
+      // console.error("useLiveApi: Connection failed", error);
       const errorMessage = error instanceof Error ? error : new Error(String(error));
       emitter.emit("serverError", errorMessage);
       setSession(null);
@@ -484,12 +484,12 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
         });
         // emitter.emit("log", { date: new Date(), type: "client.send.clientContent", message: JSON.stringify(params.turns).substring(0, 100) + "..." });
       } catch (e) {
-        console.error("Error sending client content:", e);
+        // console.error("Error sending client content:", e);
         emitter.emit("log", { date: new Date(), type: "client.send.clientContent.error", message: (e as Error).message });
         emitter.emit("serverError", e as Error);
       }
     } else {
-      console.warn(`Cannot send clientContent: Session is ${session ? 'defined' : 'null'}, Connected is ${connected}`);
+      // console.warn(`Cannot send clientContent: Session is ${session ? 'defined' : 'null'}, Connected is ${connected}`);
       emitter.emit("log", { date: new Date(), type: "client.send.clientContent.noconnection", message: `Not connected (session: ${!!session}, connected: ${connected})` });
     }
   }, [session, connected, emitter]); // ĐÃ THÊM session VÀO ĐÂY
@@ -507,12 +507,12 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
         if (params.audioStreamEnd) logMsg += `audioStreamEnd, `;
         // emitter.emit("log", { date: new Date(), type: "client.send.realtimeInput", message: logMsg });
       } catch (e) {
-        console.error("Error sending realtime input:", e);
+        // console.error("Error sending realtime input:", e);
         emitter.emit("log", { date: new Date(), type: "client.send.realtimeInput.error", message: (e as Error).message });
         emitter.emit("serverError", e as Error);
       }
     } else {
-      console.warn(`Cannot send realtimeInput: Session is ${session ? 'defined' : 'null'}, Connected is ${connected}`);
+      // console.warn(`Cannot send realtimeInput: Session is ${session ? 'defined' : 'null'}, Connected is ${connected}`);
       emitter.emit("log", { date: new Date(), type: "client.send.realtimeInput.noconnection", message: `Not connected (session: ${!!session}, connected: ${connected})` });
     }
   }, [session, connected, emitter]); // ĐÃ THÊM session VÀO ĐÂY
@@ -523,12 +523,12 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
         session.sendToolResponse(params);
         // emitter.emit("log", { date: new Date(), type: "client.send.toolResponse", message: JSON.stringify(params.functionResponses), count: params.functionResponses.length });
       } catch (e) {
-        console.error("Error sending tool response:", e);
+        // console.error("Error sending tool response:", e);
         emitter.emit("log", { date: new Date(), type: "client.send.toolResponse.error", message: (e as Error).message });
         emitter.emit("serverError", e as Error);
       }
     } else {
-      console.warn(`Cannot send toolResponse: Session is ${session ? 'defined' : 'null'}, Connected is ${connected}`);
+      // console.warn(`Cannot send toolResponse: Session is ${session ? 'defined' : 'null'}, Connected is ${connected}`);
       emitter.emit("log", { date: new Date(), type: "client.send.toolResponse.noconnection", message: `Not connected (session: ${!!session}, connected: ${connected})` });
     }
   }, [session, connected, emitter]); // ĐÃ THÊM session VÀO ĐÂY

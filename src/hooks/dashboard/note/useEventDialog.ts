@@ -45,7 +45,7 @@ const useEventDialog = ({
   const openEventDetailsDialog = useCallback(
     async (event: CalendarEvent, clickEvent: React.MouseEvent) => {
       if (!event.conferenceId) {
-        console.log('Event is not a conference, dialog will not open.')
+        // console.log('Event is not a conference, dialog will not open.')
         return
       }
 
@@ -64,7 +64,7 @@ const useEventDialog = ({
         const conferenceDetails = await getConferenceFromDB(event.conferenceId)
         setSelectedEventDetail(conferenceDetails)
       } catch (error) {
-        console.error('Failed to fetch conference details:', error)
+        // console.error('Failed to fetch conference details:', error)
         setSelectedEventDetail(null)
       } finally {
         setLoadingDetails(false)

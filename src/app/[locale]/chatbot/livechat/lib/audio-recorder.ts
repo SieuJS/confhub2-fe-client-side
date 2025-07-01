@@ -73,7 +73,7 @@ export class AudioRecorder extends EventEmitter {
         this.recording = true;
         resolve();
       } catch (error) {
-        console.error("Error starting AudioRecorder:", error);
+        // console.error("Error starting AudioRecorder:", error);
         reject(error); // Reject promise nếu có lỗi
       } finally {
         this.starting = null;

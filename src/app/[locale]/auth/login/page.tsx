@@ -22,7 +22,7 @@ const LoginPage = ({
   useEffect(() => {
     // Only redirect if initialization is complete AND user is logged in
     if (!isInitializing && isLoggedIn) {
-      console.log("[LoginPage] Already logged in, redirecting...");
+      // console.log("[LoginPage] Already logged in, redirecting...");
       router.push(`/${locale}`); // Redirect to the locale's home page
     }
   }, [isLoggedIn, isInitializing, router, locale]); // Add all dependencies

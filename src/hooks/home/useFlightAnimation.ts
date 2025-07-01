@@ -62,7 +62,7 @@ export const useFlightAnimation = ({
           !startCoords || typeof startCoords.x !== 'number' || typeof startCoords.y !== 'number' ||
           !endCoords || typeof endCoords.x !== 'number' || typeof endCoords.y !== 'number'
         ) {
-          console.warn(`Invalid coordinates for flight: ${flight.from} -> ${flight.to}`)
+          // console.warn(`Invalid coordinates for flight: ${flight.from} -> ${flight.to}`)
           return null
         }
 

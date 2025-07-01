@@ -58,7 +58,7 @@ const useConnection = (/* props: UseConnectionProps */) => {
             // streamStartTime sẽ được set trong useEffect khi 'open' event được nhận
 
         } catch (err) {
-            console.error("Error getting media permissions or connecting via SDK:", err);
+            // console.error("Error getting media permissions or connecting via SDK:", err);
             const connectionError = err instanceof Error ? err : new Error(String(err));
             setError(connectionError);
             log({ date: new Date(), type: "error.connection", message: `Connection failed: ${connectionError.message}` });

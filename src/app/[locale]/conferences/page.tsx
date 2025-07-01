@@ -44,7 +44,7 @@ export default async function ConferencesPage({ params, searchParams }: Conferen
   try {
     initialData = await fetchConferences(apiParams);
   } catch (error) {
-    console.error("Failed to fetch initial conferences data on server:", error);
+    // console.error("Failed to fetch initial conferences data on server:", error);
     
     // ĐIỀU CHỈNH Ở ĐÂY: Cung cấp đầy đủ các trường cho meta
     initialData = {

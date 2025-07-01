@@ -59,7 +59,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist, initialD
         setFollowedIds(new Set(followedData.map(conf => conf.id)));
         setCalendarIds(new Set(calendarData.map(conf => conf.id)));
       } catch (err) {
-        console.error('Failed to fetch user conference statuses:', err);
+        // console.error('Failed to fetch user conference statuses:', err);
       }
       // Không có finally set loading
     };

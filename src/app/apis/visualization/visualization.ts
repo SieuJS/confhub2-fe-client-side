@@ -20,13 +20,13 @@ export async function fetchVisualizationData(): Promise<ConferenceDetailsListRes
         }
 
         const responseData: ConferenceDetailsListResponse = await response.json();
-        console.log(responseData.payload.slice(0,2))
+        // console.log(responseData.payload.slice(0,2))
         return responseData;
 
     } catch (error: any) {
-        console.error('Error fetching conference details:', error.message);
+        // console.error('Error fetching conference details:', error.message);
         if (error instanceof TypeError) {
-            console.error('Network error:', error.message);
+            // console.error('Network error:', error.message);
         }
         throw error; // Re-throw for the caller
     }

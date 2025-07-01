@@ -57,7 +57,7 @@ export function useLeftPanelNavigation({
   // Bọc bằng useCallback để ổn định hàm này
   const handleNavItemClick = useCallback((itemMode: 'live' | 'regular', targetPath: AppPathname) => {
     if (disableChatModeSelection && chatMode !== itemMode) {
-      console.warn('Cannot switch chat mode while live service is connected.');
+      // console.warn('Cannot switch chat mode while live service is connected.');
       return;
     }
     if (chatMode !== itemMode) {

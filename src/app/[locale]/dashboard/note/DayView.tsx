@@ -38,7 +38,7 @@ const DayView: React.FC<DayViewProps> = ({
         })
       );
       */
-      console.log("Clicked on an empty day area. Add-note is disabled.");
+      // console.log("Clicked on an empty day area. Add-note is disabled.");
     }
   }
 

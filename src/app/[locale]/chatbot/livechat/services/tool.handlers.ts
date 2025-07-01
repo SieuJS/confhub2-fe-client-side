@@ -49,7 +49,7 @@ async function handleGetConferences(fc: SDKFunctionCall, config: HandlerConfig):
     : undefined;
   const finalUrl = searchQuery ? `${apiUrl}?${searchQuery}` : apiUrl;
 
-  console.log(`[LiveChat ToolHandler] Calling API for getConferences using GET at: ${finalUrl}`);
+  // console.log(`[LiveChat ToolHandler] Calling API for getConferences using GET at: ${finalUrl}`);
   const response = await fetch(finalUrl, { method: 'GET', headers: {} });
   if (!response.ok) {
     const errorText = await response.text();
@@ -58,23 +58,6 @@ async function handleGetConferences(fc: SDKFunctionCall, config: HandlerConfig):
   const responseData = await response.json();
   const contentToSend = transformConferenceData(responseData, searchQuery);
   return { response: { content: contentToSend }, id: fc.id || `conf-fallback-${Date.now()}` };
-}
-
-async function handleGetJournals(fc: SDKFunctionCall, config: HandlerConfig): Promise<ToolHandlerResponse> {
-  const apiUrl = `${config.databaseUrl}/journal`;
-  const searchQuery = fc.args && typeof fc.args['searchQuery'] === 'string'
-    ? fc.args['searchQuery']
-    : undefined;
-  const finalUrl = searchQuery ? `${apiUrl}?${searchQuery}` : apiUrl;
-
-  console.log(`[LiveChat ToolHandler] Calling API for getJournals using GET at: ${finalUrl}`);
-  const response = await fetch(finalUrl, { method: 'GET', headers: {} });
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`API Error (${response.status}) for getJournals: ${errorText.substring(0, 200)}`);
-  }
-  const responseData = await response.json();
-  return { response: { content: responseData }, id: fc.id || `journal-fallback-${Date.now()}` };
 }
 
 async function handleGetWebsiteInfo(fc: SDKFunctionCall, _config: HandlerConfig): Promise<ToolHandlerResponse> {
@@ -98,21 +81,21 @@ async function handleNavigation(fc: SDKFunctionCall, config: HandlerConfig): Pro
   if (typeof window !== 'undefined') {
     window.open(urlToOpen, '_blank', 'noopener,noreferrer');
   } else {
-    console.warn("[LiveChat ToolHandler] window object not available for navigation.");
+    // console.warn("[LiveChat ToolHandler] window object not available for navigation.");
   }
   return { response: { content: { message: `Navigating to ${urlToOpen}`, status: 'success' } }, id: fc.id || `nav-fallback-${Date.now()}` };
 }
 
 async function handleManageFollow(fc: SDKFunctionCall, config: HandlerConfig): Promise<ToolHandlerResponse> {
   const args = fc.args || {};
-  const itemType = args['itemType'] as 'conference' | 'journal' | undefined;
+  const itemType = args['itemType'] as 'conference' | undefined;
   const action = args['action'] as 'follow' | 'unfollow' | 'list' | undefined;
   const identifier = args['identifier'] as string | undefined;
   const identifierType = args['identifierType'] as 'acronym' | 'title' | 'id' | undefined;
 
   // Validation
-  if (!itemType || !['conference', 'journal'].includes(itemType)) {
-    throw new Error("Invalid or missing 'itemType' for manageFollow. Must be 'conference' or 'journal'.");
+  if (!itemType || !['conference'].includes(itemType)) {
+    throw new Error("Invalid or missing 'itemType' for manageFollow. Must be 'conference'.");
   }
   if (!action || !['follow', 'unfollow', 'list'].includes(action)) {
     throw new Error("Invalid or missing 'action' for manageFollow. Must be 'follow', 'unfollow', or 'list'.");
@@ -132,21 +115,21 @@ async function handleManageFollow(fc: SDKFunctionCall, config: HandlerConfig): P
   let modelMessage = "";
 
   if (action === 'list') {
-    const listUrl = `${config.databaseUrl}/${itemType === 'conference' ? 'follow-conference' : 'follow-journal'}/followed`;
-    console.log(`[LiveChat ToolHandler ManageFollow] Listing followed ${itemType}s from ${listUrl}`);
+    const listUrl = `${config.databaseUrl}/follow-conference/followed`;
+    // console.log(`[LiveChat ToolHandler ManageFollow] Listing followed ${itemType}s from ${listUrl}`);
     const followedItems: any[] = await makeFrontendApiCall(listUrl, 'GET', token); // API returns array of FollowItem
     modelMessage = formatGenericListForModel(followedItems, itemType, 'followed');
   } else { // 'follow' or 'unfollow'
     const itemDetails = await fetchItemDetailsFromApi(identifier!, identifierType!, itemType, config.databaseUrl);
     const itemId = itemDetails.id;
     const itemName = itemDetails.name;
-    console.log(`[LiveChat ToolHandler ManageFollow] Found item: ID=${itemId}, Name=${itemName} for ${action}`);
+    // console.log(`[LiveChat ToolHandler ManageFollow] Found item: ID=${itemId}, Name=${itemName} for ${action}`);
 
     // Check current follow status
-    const listUrl = `${config.databaseUrl}/${itemType === 'conference' ? 'follow-conference' : 'follow-journal'}/followed`;
+    const listUrl = `${config.databaseUrl}/follow-conference/followed`;
     const currentFollowedItems: any[] = await makeFrontendApiCall(listUrl, 'GET', token);
     const isCurrentlyFollowing = currentFollowedItems.some(item => item.id === itemId);
-    console.log(`[LiveChat ToolHandler ManageFollow] Item ${itemId} currently following: ${isCurrentlyFollowing}`);
+    // console.log(`[LiveChat ToolHandler ManageFollow] Item ${itemId} currently following: ${isCurrentlyFollowing}`);
 
     if (action === 'follow') {
       if (isCurrentlyFollowing) {
@@ -155,18 +138,18 @@ async function handleManageFollow(fc: SDKFunctionCall, config: HandlerConfig): P
         // CROSS-CHECK: For 'follow' conference, check blacklist
         if (itemType === 'conference') {
           const blacklistUrl = `${config.databaseUrl}/blacklist-conference`;
-          console.log(`[LiveChat ToolHandler ManageFollow] Checking blacklist status for conference ${itemId} from ${blacklistUrl}`);
+          // console.log(`[LiveChat ToolHandler ManageFollow] Checking blacklist status for conference ${itemId} from ${blacklistUrl}`);
           const blacklistedItems: any[] = await makeFrontendApiCall(blacklistUrl, 'GET', token); // API returns array of BlacklistItem
           const isBlacklisted = blacklistedItems.some(item => item.conferenceId === itemId);
           if (isBlacklisted) {
             throw new Error(`The conference "${itemName}" is currently in your blacklist. You must remove it from the blacklist before following.`);
           }
-          console.log(`[LiveChat ToolHandler ManageFollow] Conference ${itemId} is not blacklisted. Safe to follow.`);
+          // console.log(`[LiveChat ToolHandler ManageFollow] Conference ${itemId} is not blacklisted. Safe to follow.`);
         }
 
-        const actionUrl = `${config.databaseUrl}/${itemType === 'conference' ? 'follow-conference' : 'follow-journal'}/add`;
-        const payload = itemType === 'conference' ? { conferenceId: itemId } : { journalId: itemId };
-        console.log(`[LiveChat ToolHandler ManageFollow] Following ${itemType} ${itemId} at ${actionUrl}`);
+        const actionUrl = `${config.databaseUrl}/follow-conference/add`;
+        const payload = { conferenceId: itemId }
+        // console.log(`[LiveChat ToolHandler ManageFollow] Following ${itemType} ${itemId} at ${actionUrl}`);
         await makeFrontendApiCall(actionUrl, 'POST', token, payload);
         modelMessage = `Successfully followed the ${itemType} "${itemName}".`;
       }
@@ -174,9 +157,9 @@ async function handleManageFollow(fc: SDKFunctionCall, config: HandlerConfig): P
       if (!isCurrentlyFollowing) {
         modelMessage = `You are not currently following the ${itemType} "${itemName}".`;
       } else {
-        const actionUrl = `${config.databaseUrl}/${itemType === 'conference' ? 'follow-conference' : 'follow-journal'}/remove`;
-        const payload = itemType === 'conference' ? { conferenceId: itemId } : { journalId: itemId };
-        console.log(`[LiveChat ToolHandler ManageFollow] Unfollowing ${itemType} ${itemId} at ${actionUrl}`);
+        const actionUrl = `${config.databaseUrl}/follow-conference/remove`;
+        const payload = { conferenceId: itemId }
+        // console.log(`[LiveChat ToolHandler ManageFollow] Unfollowing ${itemType} ${itemId} at ${actionUrl}`);
         await makeFrontendApiCall(actionUrl, 'POST', token, payload);
         modelMessage = `Successfully unfollowed the ${itemType} "${itemName}".`;
       }
@@ -215,20 +198,20 @@ async function handleManageCalendar(fc: SDKFunctionCall, config: HandlerConfig):
 
   if (action === 'list') {
     const listUrl = `${config.databaseUrl}/calendar/conference-events`;
-    console.log(`[LiveChat ToolHandler ManageCalendar] Listing calendar items from ${listUrl}`);
+    // console.log(`[LiveChat ToolHandler ManageCalendar] Listing calendar items from ${listUrl}`);
     const calendarItems: any[] = await makeFrontendApiCall(listUrl, 'GET', token); // API returns array of CalendarItem
     modelMessage = formatGenericListForModel(calendarItems, 'conferences', 'calendar');
   } else { // 'add' or 'remove'
     const itemDetails = await fetchItemDetailsFromApi(identifier!, identifierType!, "conference", config.databaseUrl);
     const itemId = itemDetails.id; // This is the conferenceId
     const itemName = itemDetails.name;
-    console.log(`[LiveChat ToolHandler ManageCalendar] Found conference: ID=${itemId}, Name=${itemName} for ${action}`);
+    // console.log(`[LiveChat ToolHandler ManageCalendar] Found conference: ID=${itemId}, Name=${itemName} for ${action}`);
 
     // Check current calendar status
     const listUrl = `${config.databaseUrl}/calendar/conference-events`;
     const currentCalendarItems: any[] = await makeFrontendApiCall(listUrl, 'GET', token);
     const isCurrentlyInCalendar = currentCalendarItems.some(item => item.id === itemId); // CalendarItem has 'id' which is conferenceId
-    console.log(`[LiveChat ToolHandler ManageCalendar] Conference ${itemId} currently in calendar: ${isCurrentlyInCalendar}`);
+    // console.log(`[LiveChat ToolHandler ManageCalendar] Conference ${itemId} currently in calendar: ${isCurrentlyInCalendar}`);
 
     if (action === 'add') {
       if (isCurrentlyInCalendar) {
@@ -236,17 +219,17 @@ async function handleManageCalendar(fc: SDKFunctionCall, config: HandlerConfig):
       } else {
         // CROSS-CHECK: For 'add' to calendar, check blacklist
         const blacklistUrl = `${config.databaseUrl}/blacklist-conference`;
-        console.log(`[LiveChat ToolHandler ManageCalendar] Checking blacklist status for conference ${itemId} from ${blacklistUrl}`);
+        // console.log(`[LiveChat ToolHandler ManageCalendar] Checking blacklist status for conference ${itemId} from ${blacklistUrl}`);
         const blacklistedItems: any[] = await makeFrontendApiCall(blacklistUrl, 'GET', token);
         const isBlacklisted = blacklistedItems.some(item => item.conferenceId === itemId);
         if (isBlacklisted) {
           throw new Error(`The conference "${itemName}" is currently in your blacklist. You must remove it from the blacklist before adding it to the calendar.`);
         }
-        console.log(`[LiveChat ToolHandler ManageCalendar] Conference ${itemId} is not blacklisted. Safe to add to calendar.`);
+        // console.log(`[LiveChat ToolHandler ManageCalendar] Conference ${itemId} is not blacklisted. Safe to add to calendar.`);
 
         const actionUrl = `${config.databaseUrl}/calendar/add`;
         const payload = { conferenceId: itemId };
-        console.log(`[LiveChat ToolHandler ManageCalendar] Adding conference ${itemId} to calendar at ${actionUrl}`);
+        // console.log(`[LiveChat ToolHandler ManageCalendar] Adding conference ${itemId} to calendar at ${actionUrl}`);
         await makeFrontendApiCall(actionUrl, 'POST', token, payload);
         modelMessage = `Successfully added conference "${itemName}" to your calendar.`;
       }
@@ -256,7 +239,7 @@ async function handleManageCalendar(fc: SDKFunctionCall, config: HandlerConfig):
       } else {
         const actionUrl = `${config.databaseUrl}/calendar/remove`;
         const payload = { conferenceId: itemId };
-        console.log(`[LiveChat ToolHandler ManageCalendar] Removing conference ${itemId} from calendar at ${actionUrl}`);
+        // console.log(`[LiveChat ToolHandler ManageCalendar] Removing conference ${itemId} from calendar at ${actionUrl}`);
         await makeFrontendApiCall(actionUrl, 'POST', token, payload);
         modelMessage = `Successfully removed conference "${itemName}" from your calendar.`;
       }
@@ -295,20 +278,20 @@ async function handleManageBlacklist(fc: SDKFunctionCall, config: HandlerConfig)
 
   if (action === 'list') {
     const listUrl = `${config.databaseUrl}/blacklist-conference`;
-    console.log(`[LiveChat ToolHandler ManageBlacklist] Listing blacklisted conferences from ${listUrl}`);
+    // console.log(`[LiveChat ToolHandler ManageBlacklist] Listing blacklisted conferences from ${listUrl}`);
     const blacklistedItems: any[] = await makeFrontendApiCall(listUrl, 'GET', token); // API returns array of BlacklistItem
     modelMessage = formatGenericListForModel(blacklistedItems, 'conferences', 'blacklist', 'conferenceId');
   } else { // 'add' or 'remove'
     const itemDetails = await fetchItemDetailsFromApi(identifier!, identifierType!, "conference", config.databaseUrl);
     const itemId = itemDetails.id; // This is the conferenceId
     const itemName = itemDetails.name;
-    console.log(`[LiveChat ToolHandler ManageBlacklist] Found conference: ID=${itemId}, Name=${itemName} for ${action}`);
+    // console.log(`[LiveChat ToolHandler ManageBlacklist] Found conference: ID=${itemId}, Name=${itemName} for ${action}`);
 
     // Check current blacklist status
     const listUrl = `${config.databaseUrl}/blacklist-conference`;
     const currentBlacklistedItems: any[] = await makeFrontendApiCall(listUrl, 'GET', token);
     const isCurrentlyBlacklisted = currentBlacklistedItems.some(item => item.conferenceId === itemId);
-    console.log(`[LiveChat ToolHandler ManageBlacklist] Conference ${itemId} currently blacklisted: ${isCurrentlyBlacklisted}`);
+    // console.log(`[LiveChat ToolHandler ManageBlacklist] Conference ${itemId} currently blacklisted: ${isCurrentlyBlacklisted}`);
 
     if (action === 'add') {
       if (isCurrentlyBlacklisted) {
@@ -319,22 +302,22 @@ async function handleManageBlacklist(fc: SDKFunctionCall, config: HandlerConfig)
 
         // 1. Check Follow status
         const followUrl = `${config.databaseUrl}/follow-conference/followed`;
-        console.log(`[LiveChat ToolHandler ManageBlacklist] Checking follow status for conference ${itemId} from ${followUrl}`);
+        // console.log(`[LiveChat ToolHandler ManageBlacklist] Checking follow status for conference ${itemId} from ${followUrl}`);
         const followedItems: any[] = await makeFrontendApiCall(followUrl, 'GET', token);
         const isFollowed = followedItems.some(item => item.id === itemId);
         if (isFollowed) {
           conflictMessages.push(`it is currently in your followed list`);
-          console.log(`[LiveChat ToolHandler ManageBlacklist] Conflict: Conference ${itemId} is followed.`);
+          // console.log(`[LiveChat ToolHandler ManageBlacklist] Conflict: Conference ${itemId} is followed.`);
         }
 
         // 2. Check Calendar status
         const calendarUrl = `${config.databaseUrl}/calendar/conference-events`;
-        console.log(`[LiveChat ToolHandler ManageBlacklist] Checking calendar status for conference ${itemId} from ${calendarUrl}`);
+        // console.log(`[LiveChat ToolHandler ManageBlacklist] Checking calendar status for conference ${itemId} from ${calendarUrl}`);
         const calendarItems: any[] = await makeFrontendApiCall(calendarUrl, 'GET', token);
         const isInCalendar = calendarItems.some(item => item.id === itemId); // CalendarItem has 'id'
         if (isInCalendar) {
           conflictMessages.push(`it is currently in your calendar`);
-          console.log(`[LiveChat ToolHandler ManageBlacklist] Conflict: Conference ${itemId} is in calendar.`);
+          // console.log(`[LiveChat ToolHandler ManageBlacklist] Conflict: Conference ${itemId} is in calendar.`);
         }
 
         if (conflictMessages.length > 0) {
@@ -348,11 +331,11 @@ async function handleManageBlacklist(fc: SDKFunctionCall, config: HandlerConfig)
           }
           throw new Error(fullConflictMessage);
         }
-        console.log(`[LiveChat ToolHandler ManageBlacklist] Conference ${itemId} is not followed and not in calendar. Safe to blacklist.`);
+        // console.log(`[LiveChat ToolHandler ManageBlacklist] Conference ${itemId} is not followed and not in calendar. Safe to blacklist.`);
 
         const actionUrl = `${config.databaseUrl}/blacklist-conference/add`;
         const payload = { conferenceId: itemId };
-        console.log(`[LiveChat ToolHandler ManageBlacklist] Adding conference ${itemId} to blacklist at ${actionUrl}`);
+        // console.log(`[LiveChat ToolHandler ManageBlacklist] Adding conference ${itemId} to blacklist at ${actionUrl}`);
         await makeFrontendApiCall(actionUrl, 'POST', token, payload);
         modelMessage = `Successfully added conference "${itemName}" to your blacklist.`;
       }
@@ -362,7 +345,7 @@ async function handleManageBlacklist(fc: SDKFunctionCall, config: HandlerConfig)
       } else {
         const actionUrl = `${config.databaseUrl}/blacklist-conference/remove`;
         const payload = { conferenceId: itemId };
-        console.log(`[LiveChat ToolHandler ManageBlacklist] Removing conference ${itemId} from blacklist at ${actionUrl}`);
+        // console.log(`[LiveChat ToolHandler ManageBlacklist] Removing conference ${itemId} from blacklist at ${actionUrl}`);
         await makeFrontendApiCall(actionUrl, 'POST', token, payload);
         modelMessage = `Successfully removed conference "${itemName}" from your blacklist.`;
       }
@@ -397,7 +380,6 @@ async function handleOpenGoogleMap(fc: SDKFunctionCall, _config: HandlerConfig):
 // Dispatcher for tool handlers
 export const toolHandlers: Record<string, (fc: SDKFunctionCall, config: HandlerConfig) => Promise<ToolHandlerResponse>> = {
   "getConferences": handleGetConferences,
-  "getJournals": handleGetJournals,
   "getWebsiteInfo": handleGetWebsiteInfo,
   "navigation": handleNavigation,
   "manageFollow": handleManageFollow,

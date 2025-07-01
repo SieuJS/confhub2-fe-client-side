@@ -50,7 +50,7 @@ const toConferenceType = (accessType: string | undefined | null): ConferenceType
     case 'ONLINE': return 'Online';
     case 'HYBRID': return 'Hybrid';
     default:
-      console.warn(`Unknown conference type "${accessType}". Defaulting to "Offline".`);
+      // console.warn(`Unknown conference type "${accessType}". Defaulting to "Offline".`);
       return 'Offline';
   }
 };
@@ -64,7 +64,7 @@ const toYyyyMmDd = (isoDateString: string | undefined | null): string => {
     const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   } catch (error) {
-    console.error(`Invalid date string for conversion: ${isoDateString}`, error);
+    // console.error(`Invalid date string for conversion: ${isoDateString}`, error);
     return '';
   }
 };
@@ -180,7 +180,7 @@ export const useConferenceForm = ({ t }: UseConferenceFormProps) => {
             setExistenceCheck({ status: 'success', message: t('This_combination_is_available') });
           }
         } catch (err) {
-          console.error("Failed to check conference existence:", err);
+          // console.error("Failed to check conference existence:", err);
           setExistenceCheck({ status: 'error', message: t('Failed_to_check_conference_existence') });
         }
       };
@@ -322,7 +322,7 @@ export const useConferenceForm = ({ t }: UseConferenceFormProps) => {
     if (currentStep === 1 && !isStep1Complete) {
       const allFieldKeys = new Set(Object.keys(fieldValidationSchema));
       setTouchedFields(prev => new Set([...prev, ...allFieldKeys]));
-      console.error("Validation failed: Cannot proceed. Displaying all errors.");
+      // console.error("Validation failed: Cannot proceed. Displaying all errors.");
       return;
     }
     if (currentStep < 3) setCurrentStep(currentStep + 1);

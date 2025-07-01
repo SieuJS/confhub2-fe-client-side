@@ -117,7 +117,7 @@ export const useConferenceCrawl = (): UseConferenceCrawlReturn => {
                 return response.json();
             })
             .then((data) => {
-                console.log("File uploaded successfully:", data);
+                // console.log("File uploaded successfully:", data);
                 if (data.data && Array.isArray(data.data)) {
                     setParsedData(data.data);
                     setCrawlMessages(prev => [...prev, `File uploaded successfully. ${data.data.length} records parsed.`]);
@@ -128,7 +128,7 @@ export const useConferenceCrawl = (): UseConferenceCrawlReturn => {
                 setIsParsing(false);
             })
             .catch((error) => {
-                console.error("Error uploading or parsing file:", error);
+                // console.error("Error uploading or parsing file:", error);
                 setParseError(error.message || "Error uploading or parsing file. Please try again.");
                 setParsedData(null); // Đảm bảo không có data cũ hiển thị khi có lỗi parse
                 setIsParsing(false);
@@ -158,17 +158,17 @@ export const useConferenceCrawl = (): UseConferenceCrawlReturn => {
                 timeout: 600000
             });
 
-            console.log(`${description} - Response Status:`, response.status);
+            // console.log(`${description} - Response Status:`, response.status);
             setCrawlMessages(prev => [...prev, `${description}: ${response.data.message} (Runtime: ${response.data.runtime ?? 'N/A'}s)`]);
             return true;
 
         } catch (err) {
             const error = err as AxiosError<ApiCrawlResponse>;
-            console.error(`API Error during ${description}:`, error);
+            // console.error(`API Error during ${description}:`, error);
             let errorMessage = `Error sending ${description}: ${error.message}`;
             if (error.response) {
-                console.error('Server Response Status:', error.response.status);
-                console.error('Server Response Data:', error.response.data);
+                // console.error('Server Response Status:', error.response.status);
+                // console.error('Server Response Data:', error.response.data);
                 errorMessage += ` (Server: ${error.response.status} - ${error.response.data?.message || error.response.data?.error || 'Unknown server error'})`;
             } else if (error.request) {
                 errorMessage += ' (No response received from server)';
@@ -188,7 +188,7 @@ export const useConferenceCrawl = (): UseConferenceCrawlReturn => {
             return;
         }
         if (isCrawling) {
-            console.warn("Crawl is already in progress.");
+            // console.warn("Crawl is already in progress.");
             return;
         }
 
@@ -258,7 +258,7 @@ export const useConferenceCrawl = (): UseConferenceCrawlReturn => {
         setCrawlProgress({ current: 0, total: 0, status: 'idle' });
         setCrawlMessages([]);
         setSelectedRows([]); // Quan trọng: reset cả các hàng đã chọn
-        console.log("Crawl state reset.");
+        // console.log("Crawl state reset.");
     }, []);
 
 
