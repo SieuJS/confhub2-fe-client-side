@@ -120,6 +120,9 @@ export const metadata: Metadata = {
       }
     ],
   },
+  other: {
+    'google-site-verification': 'fOVmVdyzfnrq0C5IBFXwfD8BS2yRHfrqCc3u45xSozg',
+  },
 }
 
 export const viewport: Viewport = {
