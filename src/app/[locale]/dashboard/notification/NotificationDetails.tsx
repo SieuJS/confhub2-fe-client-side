@@ -1,4 +1,5 @@
-// components/NotificationDetail.tsx
+// src/app/[locale]/dashboard/notifications/NotificationDetail.tsx
+
 import React, { useState, useEffect, useCallback } from 'react'
 import { Notification } from '../../../../models/response/user.response'
 import { formatDateFull } from '../timeFormat'
@@ -9,7 +10,8 @@ import rehypeRaw from 'rehype-raw'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/src/navigation'
 import Button from '../../utils/Button'
-
+import { Trash2 } from 'lucide-react' // Import icon Trash2
+import remarkBreaks from 'remark-breaks'
 interface NotificationDetailProps {
   notification: Notification
   onBack: () => void
@@ -58,11 +60,10 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
           aria-label='Mark as important'
         >
           <span
-            className={`${
-              isStarred || notification.isImportant
+            className={`${isStarred || notification.isImportant
                 ? 'text-yellow-500'
                 : 'text-gray-400'
-            } text-lg`}
+              } text-lg`}
           >
             ★
           </span>
@@ -77,41 +78,8 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
       <div className='rounded-lg bg-white-pure p-4 shadow'>
         {/* Use ReactMarkdown to render the message */}
         <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
+          remarkPlugins={[remarkGfm, remarkBreaks]}
           rehypePlugins={[rehypeRaw]}
-          components={{
-            // Customize components (optional, for more control)
-            p: ({ node, ...props }) => <p className='mb-2' {...props} />, // Add margin to paragraphs
-            a: ({ node, ...props }) => (
-              <a className='text-blue-600 hover:underline' {...props} />
-            ), // Style links
-            // Add more component overrides as needed (ul, ol, li, code, etc.)
-            pre: ({ node, ...props }) => (
-              <pre
-                className='overflow-x-auto rounded-md bg-gray-100 p-2'
-                {...props}
-              />
-            ),
-            code: ({ node, ...props }) => (
-              <code className='rounded bg-gray-100 px-1' {...props} />
-            ),
-            h1: ({ node, ...props }) => (
-              <h1 className='my-4 text-2xl font-bold' {...props} />
-            ),
-            h2: ({ node, ...props }) => (
-              <h2 className='my-3 text-xl font-semibold' {...props} />
-            ),
-            h3: ({ node, ...props }) => (
-              <h3 className='my-2 text-lg font-medium' {...props} />
-            ),
-            ul: ({ node, ...props }) => (
-              <ul className='my-2 list-inside list-disc' {...props} />
-            ),
-            ol: ({ node, ...props }) => (
-              <ol className='my-2 list-inside list-decimal' {...props} />
-            ),
-            li: ({ node, ...props }) => <li className='my-1' {...props} />
-          }}
         >
           {notification.message}
         </ReactMarkdown>
@@ -146,24 +114,8 @@ const NotificationDetail: React.FC<NotificationDetailProps> = ({
           className=' hover:text-red-500 focus:outline-none'
           aria-label='Delete notification'
         >
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='20'
-            height='20'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='1.75'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            className='lucide lucide-trash-2'
-          >
-            <path d='M3 6h18' />
-            <path d='M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6' />
-            <path d='M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2' />
-            <line x1='10' x2='10' y1='11' y2='17' />
-            <line x1='14' x2='14' y1='11' y2='17' />
-          </svg>
+          {/* Thay thế SVG bằng icon Lucide Trash2 */}
+          <Trash2 size={20} strokeWidth={1.75} />
         </button>
       </div>
     </div>

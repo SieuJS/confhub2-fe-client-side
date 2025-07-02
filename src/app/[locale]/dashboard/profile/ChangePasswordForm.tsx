@@ -55,19 +55,20 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
           className='block w-full rounded-md border-gray-30 p-2.5 pr-10 shadow-sm focus:border-button focus:ring-button  sm:text-sm'
           aria-label={label}
         />
-        {value && (
-          <button
-            type='button'
-            onClick={() => setShow(!show)}
-            className='absolute inset-y-0 right-0 flex items-center pr-3 '
-          >
-            {show ? (
-              <EyeOff className='h-5 w-5' />
-            ) : (
-              <Eye className='h-5 w-5' />
-            )}
-          </button>
-        )}
+        {/* Nút này luôn hiển thị, icon bên trong sẽ thay đổi dựa vào 'show'
+        <button
+          type='button'
+          onClick={() => setShow(!show)}
+          className='absolute inset-y-0 right-0 flex items-center pr-3 '
+          // Thêm aria-label để cải thiện khả năng tiếp cận
+          aria-label={show ? 'Hide password' : 'Show password'}
+        >
+          {show ? (
+            <EyeOff className='h-5 w-5' />
+          ) : (
+            <Eye className='h-5 w-5' />
+          )}
+        </button> */}
       </div>
     </div>
   )

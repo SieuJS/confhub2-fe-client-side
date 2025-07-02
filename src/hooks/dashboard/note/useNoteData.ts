@@ -1,9 +1,8 @@
 // srchooks/dashboard/note/useNoteData.ts
 import { useState, useEffect, useCallback } from 'react';
 import { CalendarEvent } from '@/src/app/[locale]/dashboard/note/types/calendar';
-import { ConferenceResponse, ImportantDate } from '@/src/models/response/conference.response';
-import { getConferenceFromDB } from '@/src/app/apis/conference/getConferenceDetails';
 import { areDatesContiguous, getTypeText, NoteType } from '@/src/app/[locale]/dashboard/note/utils/noteUtils';
+import { useAuth } from '@/src/contexts/AuthContext'; // <-- IMPORT useAuth
 
 export const API_GET_USER_CALENDAR_ENDPOINT = `${process.env.NEXT_PUBLIC_DATABASE_URL}/api/v1/calendar/events`;
 
@@ -11,7 +10,6 @@ export interface ProcessedNote {
   type: NoteType;
   conference: string;
   id: string;
-  location: string;
   date: string;
   countdown: string;
   year: number;
@@ -22,10 +20,12 @@ export interface ProcessedNote {
 }
 
 export const useNoteData = (t: (key: string) => string) => {
+  const { isLoggedIn, logout } = useAuth(); // <-- LẤY isLoggedIn VÀ logout TỪ useAuth
+
   const [upcomingNotes, setUpcomingNotes] = useState<ProcessedNote[]>([]);
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loggedIn, setLoggedIn] = useState(false);
+  // const [loggedIn, setLoggedIn] = useState(false); // <-- BỎ DÒNG NÀY
   const [error, setError] = useState<string | null>(null);
   const [initialLoad, setInitialLoad] = useState(true);
   const [isBanned, setIsBanned] = useState(false);
@@ -35,15 +35,28 @@ export const useNoteData = (t: (key: string) => string) => {
     setError(null);
     try {
       const token = localStorage.getItem('token');
-      const userData = localStorage.getItem('user');
-      if (!userData || !token) {
-        setLoggedIn(false);
+      // const userData = localStorage.getItem('user'); // Không cần thiết nếu chỉ dựa vào isLoggedIn
+
+      // Sử dụng isLoggedIn từ context thay vì kiểm tra token/userData cục bộ
+      if (!isLoggedIn) { // <-- SỬ DỤNG isLoggedIn TỪ CONTEXT
         setUpcomingNotes([]);
         setCalendarEvents([]);
+        setLoading(false); // Đảm bảo loading được tắt
+        setInitialLoad(false); // Đảm bảo initialLoad được tắt
         return;
       }
 
-      setLoggedIn(true);
+      // Nếu isLoggedIn là true, nhưng token lại không có (trường hợp hiếm nhưng có thể xảy ra do đồng bộ),
+      // thì coi như chưa đăng nhập và thoát.
+      if (!token) {
+        // Có thể gọi logout ở đây nếu muốn đảm bảo trạng thái nhất quán
+        // logout({ callApi: false, preventRedirect: true });
+        setUpcomingNotes([]);
+        setCalendarEvents([]);
+        setLoading(false);
+        setInitialLoad(false);
+        return;
+      }
 
       const calendarResponse = await fetch(API_GET_USER_CALENDAR_ENDPOINT, {
         method: 'GET',
@@ -56,9 +69,12 @@ export const useNoteData = (t: (key: string) => string) => {
       if (!calendarResponse.ok) {
         if (calendarResponse.status === 403) {
           setIsBanned(true);
-          setLoggedIn(false);
+          // Khi bị ban, AuthContext sẽ tự động xử lý logout nếu cần,
+          // hoặc bạn có thể gọi logout ở đây để đảm bảo.
+          // logout({ callApi: true, preventRedirect: true });
         } else if (calendarResponse.status === 401) {
-          setLoggedIn(false);
+          // AuthContext sẽ tự động xử lý logout khi nhận 401
+          // Không cần setLoggedIn(false) thủ công ở đây
         } else {
           throw new Error(`HTTP error! status: ${calendarResponse.status}`);
         }
@@ -77,55 +93,22 @@ export const useNoteData = (t: (key: string) => string) => {
         .filter(event => new Date(event.year, event.month - 1, event.day) >= today)
         .sort((a, b) => new Date(a.year, a.month - 1, a.day).getTime() - new Date(b.year, b.month - 1, b.day).getTime());
 
-      const notesWithLocation = await Promise.all(
-        upcoming.map(async event => {
-          const eventDate = new Date(event.year, event.month - 1, event.day);
-          const timeDiff = eventDate.getTime() - new Date().getTime();
-          const daysLeft = Math.max(0, Math.floor(timeDiff / (1000 * 60 * 60 * 24)));
-          const hoursLeft = Math.max(0, Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
-          const countdownString = `${daysLeft}d ${hoursLeft}h `;
+      const processedUpcoming = upcoming.map(event => {
+        const eventDate = new Date(event.year, event.month - 1, event.day);
+        const timeDiff = eventDate.getTime() - new Date().getTime();
+        const daysLeft = Math.max(0, Math.floor(timeDiff / (1000 * 60 * 60 * 24)));
+        const hoursLeft = Math.max(0, Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
+        const countdownString = `${daysLeft}d ${hoursLeft}h`;
 
-          try {
-            const conferenceDetails: ConferenceResponse = await getConferenceFromDB(event.conferenceId);
-            let eventName = '';
-            if (conferenceDetails.organizations[0]?.conferenceDates) {
-              const matchingDate = conferenceDetails.organizations[0].conferenceDates.find((d: ImportantDate) => {
-                if (!d) return false;
-                const fromDate = d.fromDate ? new Date(d.fromDate) : null;
-                const toDate = d.toDate ? new Date(d.toDate) : null;
-                const checkDate = new Date(event.year, event.month - 1, event.day);
-                return (
-                  (fromDate && checkDate.getFullYear() === fromDate.getFullYear() && checkDate.getMonth() === fromDate.getMonth() && checkDate.getDate() === fromDate.getDate()) ||
-                  (fromDate && toDate && checkDate >= fromDate && checkDate <= toDate)
-                );
-              });
-              if (matchingDate?.name) eventName = matchingDate.name;
-            }
-            // SỬA LỖI Ở ĐÂY: Thêm thuộc tính 'id' từ 'event.conferenceId'
-            return {
-              ...event,
-              id: event.conferenceId, // <-- Thêm dòng này
-              location: `${conferenceDetails.organizations[0]?.locations[0]?.cityStateProvince}, ${conferenceDetails.organizations[0]?.locations[0]?.country}`,
-              countdown: countdownString,
-              name: eventName
-            };
-          } catch (locationError) {
-            // console.error(`Error fetching location for conference ${event.conferenceId}:`, locationError);
-            // SỬA LỖI Ở ĐÂY: Thêm thuộc tính 'id' từ 'event.conferenceId'
-            return {
-              ...event,
-              id: event.conferenceId, // <-- Thêm dòng này
-              location: 'Location unavailable',
-              countdown: countdownString,
-              name: ''
-            };
-          }
-        })
-      );
+        return {
+          ...event,
+          id: event.conferenceId,
+          countdown: countdownString,
+        };
+      });
 
       const groupedNotes: { [key: string]: any } = {};
-      notesWithLocation.forEach(note => {
-        // Bây giờ 'note.id' đã tồn tại và code sẽ chạy đúng
+      processedUpcoming.forEach(note => {
         const key = `${note.id}-${note.type}`;
         let addedToGroup = false;
         for (const existingKey in groupedNotes) {
@@ -164,29 +147,30 @@ export const useNoteData = (t: (key: string) => string) => {
             } else {
               formattedDateRange = `${startDateObj.toLocaleDateString('en-US', options)} - ${endDateObj.toLocaleDateString('en-US', options)}`;
             }
-            return { ...note, date: formattedDateRange, typeText };
+            const { location, ...rest } = note;
+            return { ...rest, date: formattedDateRange, typeText };
           } else {
             const date = note.dates[0];
             const dateObj = new Date(date.year, date.month - 1, date.day);
             const options: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
             const formattedDate = dateObj.toLocaleDateString('en-US', options);
-            return { ...note, date: formattedDate, typeText };
+            const { location, ...rest } = note;
+            return { ...rest, date: formattedDate, typeText };
           }
         })
-        .slice(0, 6);
+        .slice(0, 9); // Giới hạn 9 mục, có thể cần phân trang ở đây nếu muốn hiển thị nhiều hơn
 
       setUpcomingNotes(finalUpcomingNotes);
     } catch (err: any) {
-      // console.error('Failed to fetch calendar data:', err);
       setError(err.message);
       setUpcomingNotes([]);
       setCalendarEvents([]);
-      setLoggedIn(false);
+      // Không cần setLoggedIn(false) ở đây, AuthContext sẽ quản lý
     } finally {
       setLoading(false);
       setInitialLoad(false);
     }
-  }, [t]);
+  }, [isLoggedIn, t]); // <-- THÊM isLoggedIn VÀO DEPENDENCY ARRAY
 
   useEffect(() => {
     fetchData();
@@ -196,9 +180,10 @@ export const useNoteData = (t: (key: string) => string) => {
     upcomingNotes,
     calendarEvents,
     loading,
-    loggedIn,
+    // loggedIn, // <-- KHÔNG TRẢ VỀ loggedIn NỮA
     error,
     initialLoad,
-    isBanned
+    isBanned,
+    isLoggedIn // <-- TRẢ VỀ isLoggedIn TỪ CONTEXT
   };
 };

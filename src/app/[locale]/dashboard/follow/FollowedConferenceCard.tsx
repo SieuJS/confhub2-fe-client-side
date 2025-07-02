@@ -88,13 +88,10 @@ const FollowedConferenceCard: React.FC<FollowedConferenceCardProps> = ({
           </p>
         </div>
         <h3 className='text-lg font-bold leading-tight text-indigo-700 transition-colors hover:text-indigo-900'>
-          {conference.title || t('No_Title_Available')} {/* Xử lý nếu title rỗng/null */}
+          {conference.title || t('No_Title_Available')}{' '}
+          {conference.acronym && `(${conference.acronym})`}
         </h3>
         <div className='mt-2 space-y-2 text-sm '>
-          <div className='flex items-center gap-2'>
-            <Hash className='h-4 w-4 flex-shrink-0 ' />
-            <span>{conference.acronym || t('No_Acronym_Available')}</span> {/* Xử lý nếu acronym rỗng/null */}
-          </div>
           <div className='flex items-center gap-2'>
             <Calendar className='h-4 w-4 flex-shrink-0 ' />
             <span>

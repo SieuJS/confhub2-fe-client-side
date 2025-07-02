@@ -46,7 +46,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
   return (
     <div
       ref={datePickerRef}
-      className='absolute z-10 mt-2 rounded-md bg-background p-4 shadow-lg hover:bg-background-secondary'
+      className='absolute z-10 mt-2 rounded-md bg-background p-4 shadow-lg'
       style={{ top: '50px', left: '50px' }} // Keep original inline style
     >
       <div className='mb-2 flex items-center justify-between'>

@@ -9,11 +9,9 @@ import useEventFiltering from '../../../../hooks/dashboard/note/useEventFilterin
 import useDatePickerControl from '../../../../hooks/dashboard/note/useDatePickerControl'
 import useViewSwitching from '../../../../hooks/dashboard/note/useViewSwitching'
 import AddNoteDialog from './AddNoteDialog'
-// import useDialogPosition from '../../../../hooks/dashboard/note/useDialogPosition' // Bỏ import này
 import { useTranslations } from 'next-intl'
 
 import { CalendarEvent, ViewType } from './types/calendar'
-// import { DEFAULT_DOM_RECT } from './constants/calendar' // Bỏ import này
 import useEventManagement from '../../../../hooks/dashboard/note/useEventManagement'
 import useEventDialog from '../../../../hooks/dashboard/note/useEventDialog'
 import CalendarHeader from './CalendarHeader'
@@ -26,7 +24,6 @@ interface CalendarProps {
 const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
   const t = useTranslations('')
 
-  // ... các hooks khác giữ nguyên
   const dateNavigation = useDateNavigation()
   const {
     currentDate,
@@ -60,7 +57,6 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
   const { searchText, setSearchText } = useEventFiltering(currentDate)
 
   const calendarRef = useRef<HTMLDivElement>(null)
-  // const dialogRef = useRef<HTMLDivElement>(null) // Không cần ref này nữa nếu không tính vị trí
 
   const [highlightedDate, setHighlightedDate] = useState<Date | null>(null)
 
@@ -69,16 +65,6 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
     currentDate,
     searchText,
   })
-
-  // Bỏ hoàn toàn hook useDialogPosition
-  /*
-  const { dialogPosition, calculateDialogPosition } = useDialogPosition(
-    calendarRef,
-    dialogRef,
-    DEFAULT_DOM_RECT,
-    view as ViewType
-  )
-  */
 
   const {
     showDialog,
@@ -89,8 +75,6 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
     closeDialog,
   } = useEventDialog({
     calendarRef,
-    // dialogRef, // Không cần truyền ref này nữa
-    // calculateDialogPosition, // Không cần truyền hàm này nữa
     setHighlightedDate,
   })
 
@@ -133,7 +117,6 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
       className='relative rounded-md bg-background px-2 pt-2 shadow'
       ref={calendarRef}
     >
-      {/* ... Các component CalendarHeader, DatePicker, Views giữ nguyên */}
       <CalendarHeader
         currentDate={currentDate}
         view={view}
@@ -196,7 +179,7 @@ const Calendar: React.FC<CalendarProps> = ({ calendarEvents }) => {
         />
       )}
 
-      {/* --- SỬA PHẦN RENDER DIALOG --- */}
+      {/* Dialog được render trong một lớp phủ toàn màn hình */}
       {showDialog && dialogDate && (
         // Lớp nền mờ (backdrop/overlay)
         <div

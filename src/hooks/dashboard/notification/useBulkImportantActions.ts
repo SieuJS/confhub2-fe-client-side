@@ -1,25 +1,39 @@
-// src/hooks/useBulkImportantActions.ts
+// src/hooks/dashboard/notification/useBulkImportantActions.ts
 import { useCallback } from 'react';
 import { Notification } from '@/src/models/response/user.response';
+
+// === THAY ĐỔI ===
+type PatchFunction = (patches: Array<{ id: string } & Partial<Notification>>) => void;
 
 const useBulkImportantActions = (
     selectedIds: string[],
     notifications: Notification[],
-    updateUserNotifications: (updatedUserNotifications: Notification[]) => void
+    // === THAY ĐỔI ===
+    patchUserNotifications: PatchFunction
 ) => {
     const handleMarkSelectedAsImportant = useCallback(async () => {
-        const updatedUserNotifications = notifications.map(n =>
-            selectedIds.includes(n.id) && !n.isImportant ? { ...n, isImportant: true } : n
-        );
-        updateUserNotifications(updatedUserNotifications);
-    }, [selectedIds, notifications, updateUserNotifications]);
+        // === THAY ĐỔI ===
+        const patches = selectedIds
+            .map(id => notifications.find(n => n.id === id))
+            .filter(n => n && !n.isImportant) // Lọc những cái chưa quan trọng
+            .map(n => ({ id: n!.id, isImportant: true })); // Tạo bản vá
+
+        if (patches.length > 0) {
+            await patchUserNotifications(patches);
+        }
+    }, [selectedIds, notifications, patchUserNotifications]);
 
     const handleMarkSelectedAsUnimportant = useCallback(async () => {
-        const updatedUserNotifications = notifications.map(n =>
-            selectedIds.includes(n.id) && n.isImportant ? { ...n, isImportant: false } : n
-        );
-        updateUserNotifications(updatedUserNotifications);
-    }, [selectedIds, notifications, updateUserNotifications]);
+        // === THAY ĐỔI ===
+        const patches = selectedIds
+            .map(id => notifications.find(n => n.id === id))
+            .filter(n => n && n.isImportant) // Lọc những cái đang quan trọng
+            .map(n => ({ id: n!.id, isImportant: false })); // Tạo bản vá
+
+        if (patches.length > 0) {
+            await patchUserNotifications(patches);
+        }
+    }, [selectedIds, notifications, patchUserNotifications]);
 
     const allSelectedAreImportant = selectedIds.length > 0 && selectedIds.every(id => {
         const notification = notifications.find(n => n.id === id);

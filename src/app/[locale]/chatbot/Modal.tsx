@@ -30,7 +30,10 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out'
+      // Thay đổi z-50 thành z-[9999] hoặc một giá trị đủ lớn để đảm bảo nó luôn trên cùng
+      // Hoặc nếu z-50 là đủ, hãy kiểm tra xem có phần tử nào khác có z-index cao hơn không.
+      // Trong trường hợp này, z-[9999] là một giá trị an toàn để đảm bảo Modal luôn hiển thị trên cùng.
+      className='fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out'
       onClick={onClose} // Close on overlay click
       aria-modal='true'
       role='dialog'

@@ -1,5 +1,5 @@
 // src/app/[locale]/dashboard/note/UpcomingNotesSection.tsx
-import React, { useState, useLayoutEffect, useRef, useMemo } from 'react';
+import React from 'react';
 import { useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
 import NoteCard from './NoteCard';
@@ -20,36 +20,10 @@ const renderLoading = (t: any) => (
 
 const UpcomingNotesSection: React.FC<UpcomingNotesSectionProps> = ({ loading, initialLoad, notes }) => {
   const t = useTranslations('');
-  const notesContainerRef = useRef<HTMLDivElement>(null);
-  const [notesPerRow, setNotesPerRow] = useState(3);
-
-  // useLayoutEffect để tính toán trước khi trình duyệt paint, tránh flicker
-  useLayoutEffect(() => {
-    const updateNotesPerRow = () => {
-      if (notesContainerRef.current) {
-        const width = notesContainerRef.current.offsetWidth;
-        if (width < 640) setNotesPerRow(1);
-        else if (width < 1024) setNotesPerRow(2);
-        else setNotesPerRow(3);
-      }
-    };
-
-    updateNotesPerRow(); // Chạy lần đầu
-    const resizeObserver = new ResizeObserver(updateNotesPerRow);
-    if (notesContainerRef.current) {
-      resizeObserver.observe(notesContainerRef.current);
-    }
-    return () => resizeObserver.disconnect();
-  }, []); // Chỉ chạy một lần để thiết lập observer
-
-  const noteWidth = useMemo(() => {
-    if (notesPerRow === 1) return '100%';
-    return `calc((100% / ${notesPerRow}) - 1rem)`; // 1rem là gap
-  }, [notesPerRow]);
 
   return (
-    <section className="mb-4 rounded-md bg-background p-2 shadow md:p-4">
-      <h2 className="mb-2 text-lg font-semibold">{t('Upcoming_Notes')}</h2>
+    <section>
+      <h2 className="mb-4 text-lg font-semibold">{t('Upcoming_Notes')}</h2>
       
       {loading && !initialLoad && renderLoading(t)}
 
@@ -57,9 +31,17 @@ const UpcomingNotesSection: React.FC<UpcomingNotesSectionProps> = ({ loading, in
         <p>{t('Nothing_important_dates_coming_up')}</p>
       ) : (
         !loading && (
-          <div ref={notesContainerRef} className="flex flex-row flex-wrap gap-4">
+          <div className="flex flex-wrap gap-4">
             {notes.map((note, index) => (
-              <NoteCard key={index} note={note} style={{ width: noteWidth }} />
+              <NoteCard 
+                key={index} 
+                note={note} 
+                // FIX: Điều chỉnh class để responsive.
+                // - w-full: Trên mobile, mỗi card sẽ chiếm toàn bộ chiều rộng, buộc chúng phải xuống hàng, tạo thành layout 1 cột.
+                // - md:w-auto: Trên desktop, chiều rộng sẽ tự động.
+                // - md:min-w-[320px] và md:flex-1: Các thuộc tính này chỉ áp dụng trên desktop để giữ layout flex-wrap như cũ.
+                className="w-full md:w-auto md:min-w-[320px] md:flex-1"
+              />
             ))}
           </div>
         )

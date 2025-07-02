@@ -1,5 +1,5 @@
 // BlacklistTab.tsx
-import React, { useState, useEffect, useCallback, useMemo } from 'react' // <-- Thêm useMemo
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { Link } from '@/src/navigation'
 import Button from '../../utils/Button'
 import BlacklistConferenceCard from './BlacklistConferenceCard'
@@ -7,15 +7,12 @@ import {
   ConferenceInfo,
   Location
 } from '../../../../models/response/conference.list.response'
-// import { timeAgo, formatDateFull } from '../timeFormat'; // Có thể bỏ nếu không dùng trực tiếp ở đây
-// import Tooltip from '../../utils/Tooltip'; // Có thể bỏ nếu không dùng trực tiếp ở đây
 import { useTranslations } from 'next-intl'
 import { appConfig } from '@/src/middleware'
-import { useAuth } from '@/src/contexts/AuthContext'
+import { useAuth } from '@/src/contexts/AuthContext' // <-- Đảm bảo import useAuth
 import { Loader2 } from 'lucide-react'
-
-// BƯỚC 1: IMPORT COMPONENT TÌM KIẾM MỚI
-import SearchInput from '../../utils/SearchInput' // <-- Đảm bảo đường dẫn này chính xác
+import SearchInput from '../../utils/SearchInput'
+import GeneralPagination from '../../utils/GeneralPagination'
 
 interface BlacklistTabProps {}
 
@@ -32,35 +29,37 @@ interface BlacklistedConferenceResponse
 }
 
 const API_GET_BLACKLIST_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/blacklist-conference`
+const ITEMS_PER_PAGE = 8; // Số lượng mục trên mỗi trang, bạn có thể điều chỉnh
 
 const BlacklistTab: React.FC<BlacklistTabProps> = () => {
   const t = useTranslations('')
-  const language = t('language')
+  // const language = t('language') // Không cần thiết nếu không sử dụng
 
   const [blacklistedConferences, setBlacklistedConferences] = useState<
     BlacklistedConferenceResponse[]
   >([])
   const [loading, setLoading] = useState(true)
-  const [loggedIn, setLoggedIn] = useState(false)
+  // const [loggedIn, setLoggedIn] = useState(false) // <-- BỎ DÒNG NÀY
   const [initialLoad, setInitialLoad] = useState(true)
-  const { logout } = useAuth()
+  const { logout, isLoggedIn } = useAuth() // <-- LẤY isLoggedIn TỪ useAuth
   const [isBanned, setIsBanned] = useState(false)
 
-  // BƯỚC 2: THÊM STATE CHO TÌM KIẾM
   const [searchTerm, setSearchTerm] = useState('')
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
       const token = localStorage.getItem('token')
 
-      if (!token) {
-        setLoggedIn(false)
+      // Sử dụng isLoggedIn từ context thay vì kiểm tra token cục bộ
+      if (!isLoggedIn) { // <-- SỬ DỤNG isLoggedIn TỪ CONTEXT
+        // setLoggedIn(false) // Không cần thiết
         setBlacklistedConferences([])
         return
       }
 
-      setLoggedIn(true)
+      // setLoggedIn(true) // Không cần thiết
 
       const response = await fetch(`${API_GET_BLACKLIST_ENDPOINT}`, {
         method: 'GET',
@@ -72,12 +71,11 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
 
       if (!response.ok) {
         if (response.status === 403) {
-          // console.error('User is banned.')
-          setLoggedIn(false)
           setIsBanned(true)
+          // setLoggedIn(false) // Không cần thiết
         } else if (response.status === 401) {
-          // console.error('Authentication error. Please log in.')
-          setLoggedIn(false)
+          // setLoggedIn(false) // Không cần thiết
+          // Nếu 401, AuthContext sẽ tự động xử lý logout nếu cần
         } else {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
@@ -95,23 +93,26 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
 
       setBlacklistedConferences(blacklist)
     } catch (error) {
-      // console.error('Failed to fetch blacklist data:', error)
       setBlacklistedConferences([])
-      setLoggedIn(false)
+      // setLoggedIn(false) // Không cần thiết
     } finally {
       setLoading(false)
       setInitialLoad(false)
     }
-  }, [])
+  }, [isLoggedIn]) // <-- THÊM isLoggedIn VÀO DEPENDENCY ARRAY CỦA useCallback
 
   useEffect(() => {
     fetchData()
   }, [fetchData])
 
-  // BƯỚC 3: TẠO DANH SÁCH ĐÃ LỌC BẰNG useMemo
+  // Reset current page when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
   const filteredConferences = useMemo(() => {
     if (!searchTerm) {
-      return blacklistedConferences // Trả về danh sách đầy đủ nếu không có từ khóa tìm kiếm
+      return blacklistedConferences
     }
     const lowercasedSearchTerm = searchTerm.toLowerCase()
     return blacklistedConferences.filter(
@@ -120,6 +121,20 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
         conference.acronym.toLowerCase().includes(lowercasedSearchTerm)
     )
   }, [searchTerm, blacklistedConferences])
+
+  // --- PAGINATION LOGIC ---
+  const totalPages = Math.ceil(filteredConferences.length / ITEMS_PER_PAGE);
+
+  const paginatedConferences = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredConferences.slice(startIndex, endIndex);
+  }, [currentPage, filteredConferences]);
+
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   const renderLoading = () => (
     <div className='flex h-80 flex-col items-center justify-center '>
@@ -134,7 +149,8 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
     return <div className='container mx-auto p-4'>{renderLoading()}</div>
   }
 
-  if (!loggedIn) {
+  // Sử dụng isLoggedIn từ context
+  if (!isLoggedIn) { // <-- SỬ DỤNG isLoggedIn TỪ CONTEXT
     if (isBanned) {
       logout({ callApi: true, preventRedirect: true })
       return (
@@ -175,8 +191,6 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
         </Link>
       </div>
 
-      {/* BƯỚC 4: THÊM COMPONENT SEARCHINPUT VÀO UI */}
-      {/* Chỉ hiển thị thanh tìm kiếm nếu có hội nghị để tìm */}
       {blacklistedConferences.length > 0 && (
         <div className='mb-6'>
           <SearchInput
@@ -192,7 +206,6 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
 
       {loading && !initialLoad && renderLoading()}
 
-      {/* BƯỚC 5: CẬP NHẬT LOGIC HIỂN THỊ DỰA TRÊN filteredConferences */}
       {!loading && blacklistedConferences.length === 0 && (
         <div className='my-10 rounded-lg bg-white-pure p-10 text-center  shadow-sm'>
           <p className='text-lg'>
@@ -218,14 +231,25 @@ const BlacklistTab: React.FC<BlacklistTabProps> = () => {
         )}
 
       {!loading && filteredConferences.length > 0 && (
-        <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-          {filteredConferences.map(conference => (
-            <BlacklistConferenceCard
-              key={conference.conferenceId} // Sử dụng conferenceId làm key
-              conference={conference}
-            />
-          ))}
-        </div>
+        <>
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+            {paginatedConferences.map(conference => (
+              <BlacklistConferenceCard
+                key={conference.conferenceId}
+                conference={conference}
+              />
+            ))}
+          </div>
+          {totalPages > 1 && (
+            <div className='mt-8'>
+              <GeneralPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   )

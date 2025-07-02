@@ -119,31 +119,23 @@ const FollowUpdateDisplay: React.FC<FollowUpdateDisplayProps> = ({
 
       {/* Details Button Section */}
       <div className='mt-3 flex justify-end border-t border-gray-200 pt-2 dark:border-gray-600/50'>
+        {/* === CORRECTED CODE START === */}
         <Link
           href={{
             pathname: detailPathname,
-            query: { id: item.id } // item.id should be the ID for the detail page
+            query: { id: item.id }
           }}
-          passHref // Important for custom components like a styled Button
-          legacyBehavior // Recommended if your Button isn't directly an <a> tag
+          // Move the className from the <a> tag to the <Link> component
+          className='inline-flex items-center justify-center rounded-md bg-blue-500 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-offset-gray-800'
+        // No more `passHref` or `legacyBehavior`
         >
-          {/* 
-            If your Button component internally renders an <a> tag, you might not need legacyBehavior.
-            If your Button component is a <button> or <div> that you style, legacyBehavior + an inner <a> is needed,
-            or your Button must accept an `href` and render an `<a>`.
-            Simplest is to wrap a styled <a>.
-          */}
-          <a
-            className='inline-flex items-center justify-center rounded-md bg-blue-500 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-offset-gray-800'
-          // If using your custom Button component that doesn't render <a>:
-          // Replace <a> with <Button variant='primary' size={'small'} rounded> ... </Button>
-          // Ensure your Button component can be used within a Link correctly.
-          >
-            {t('View_Details')}
-            <ExternalLink className='ml-1.5 h-3.5 w-3.5' />
-          </a>
+          {/* The content now goes directly inside the Link, no more <a> tag */}
+          {t('View_Details')}
+          <ExternalLink className='ml-1.5 h-3.5 w-3.5' />
         </Link>
+        {/* === CORRECTED CODE END === */}
       </div>
+
     </div>
   )
 }

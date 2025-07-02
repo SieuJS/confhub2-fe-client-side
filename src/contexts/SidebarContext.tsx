@@ -37,7 +37,7 @@ const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 // 3. Tạo Provider Component
 export const SidebarProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const isDesktop = useMediaQuery('(min-width: 768px)');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Đồng bộ trạng thái mở/đóng mặc định với kích thước màn hình
   useEffect(() => {

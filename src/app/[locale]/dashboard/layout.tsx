@@ -1,4 +1,4 @@
-// src/app/[locale]/dashboard/layout.tsx (CHỈNH SỬA)
+// src/app/[locale]/dashboard/layout.tsx
 
 'use client';
 
@@ -19,8 +19,11 @@ export default function ClientDashboardLayout({
   const { isSidebarOpen, toggleSidebar } = useSidebar();
 
   return (
-    <div className='relative flex'>
-      {/* Backdrop cho mobile (giữ nguyên) */}
+    // FIX: Loại bỏ `h-screen`. Bây giờ container này sẽ có chiều cao tự động.
+    // `min-h-screen` được thêm vào để đảm bảo trang luôn chiếm ít nhất toàn bộ chiều cao màn hình,
+    // hữu ích cho các trang có ít nội dung.
+    <div className='relative flex min-h-screen bg-muted/40'>
+      {/* Backdrop cho mobile */}
       {isSidebarOpen && (
         <div
           onClick={toggleSidebar}
@@ -29,6 +32,7 @@ export default function ClientDashboardLayout({
         />
       )}
 
+      {/* Sidebar vẫn cần được định vị `fixed` để nó không cuộn cùng trang */}
       <ClientDashboardSidebar
         isSidebarOpen={isSidebarOpen}
         locale={locale}
@@ -37,28 +41,31 @@ export default function ClientDashboardLayout({
       />
 
       {/* Main Content Wrapper */}
-      {/* THAY ĐỔI: Áp dụng padding-left động cho màn hình lớn */}
-      <div
+      {/* FIX: Loại bỏ `h-full`, `flex-col`, `overflow-hidden`.
+          Bây giờ nó chỉ là một block đơn giản để xử lý padding-left cho sidebar.
+      */}
+      <main
         className={`
           flex-1 transition-all duration-300 ease-in-out
           ${isSidebarOpen ? `md:pl-[${SIDEBAR_WIDTH_PX}px]` : 'md:pl-0'}
         `}
-        // GIẢI THÍCH:
-        // - Chúng ta sử dụng class động của Tailwind.
-        // - Khi isSidebarOpen là true, trên màn hình md trở lên, nó sẽ thêm class `md:pl-[256px]`.
-        // - Khi isSidebarOpen là false, trên màn hình md trở lên, nó sẽ thêm class `md:pl-0`.
-        // - `transition-all` sẽ tạo hiệu ứng trượt mượt mà cho nội dung.
-        // - Ở màn hình nhỏ, không có class nào được áp dụng, nên padding-left luôn là 0.
       >
-        {/* THAY ĐỔI: Loại bỏ padding-left tĩnh ở đây */}
-        <div className={`p-4 pt-[${HEADER_HEIGHT_PX}px] md:p-6 md:pt-[${HEADER_HEIGHT_PX}px]`}>
-          {/* GIẢI THÍCH:
-              Loại bỏ `md:pl-[${SIDEBAR_WIDTH_PX}px]` khỏi đây vì logic đó đã được chuyển lên
-              component cha (wrapper ở trên) để điều khiển động.
-          */}
-          {children}
+        {/* Container cho header (nếu có) */}
+        <div
+          className="w-full p-2 md:p-4"
+        >
+          {/* Header của bạn có thể đặt ở đây */}
         </div>
-      </div>
+
+        {/* Container cho `children` (trang con) */}
+        {/* FIX: Loại bỏ `flex-1`, `min-h-0`, `overflow-y-auto`.
+            Nó chỉ còn là một container với padding.
+        */}
+        <div className="p-4 pt-0 md:p-6 md:pt-0">
+           {/* `children` bây giờ sẽ quyết định chiều cao của trang. */}
+           {children}
+        </div>
+      </main>
     </div>
   );
 }

@@ -67,7 +67,7 @@ const MessageContentRenderer: React.FC<MessageContentRendererProps> = ({
       // ÁP DỤNG TAILWIND TYPOGRAPHY TẠI ĐÂY
 
       <div
-        className={`prose-xs prose max-w-none dark:prose-invert sm:prose-sm  ${isUserMessage ? '[&_*]:text-white' : ''}`}
+        className={`sm:prose-sm prose-xs prose max-w-none dark:prose-invert   ${isUserMessage ? '[&_*]:text-white' : ''}`}
       >
         {/*
           prose: class chính của plugin

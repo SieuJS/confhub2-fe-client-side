@@ -1,15 +1,16 @@
 // src/components/EventJournalCard.tsx
 'use client'
 
-import React, { useState, useEffect, useMemo, memo } from 'react' // Thêm memo
-
+import React, { useState, useEffect, useMemo, memo, useCallback } from 'react' // Thêm memo và useCallback
 import Image from 'next/image'
 import { JournalData } from '../../../models/response/journal.response'
 import Button from '../utils/Button'
-import { Link } from '@/src/navigation'
+import { Link, usePathname } from '@/src/navigation' // <-- Thêm useRouter, usePathname
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { journalFollowService } from '@/src/services/journal-follow.service'
 import { toast } from 'react-toastify'
+import { useAuth } from '@/src/contexts/AuthContext' // <-- Thêm useAuth
 
 import countries from '@/src/app/[locale]/addconference/countries.json'
 
@@ -30,21 +31,49 @@ interface EventJournalCardProps {
   onFollowStatusChange: (journalId: string, isFollowing: boolean) => void;
 }
 
-// Đổi tên component gốc
 const EventJournalCardComponent: React.FC<EventJournalCardProps> = ({
   journal,
   isInitiallyFollowing,
   onFollowStatusChange
 }) => {
   const t = useTranslations('JournalCard')
+  const t_common = useTranslations('') // Để lấy locale
   const [isFollowing, setIsFollowing] = useState(isInitiallyFollowing)
   const [isLoading, setIsLoading] = useState(false)
+
+  // --- BƯỚC 1: LẤY TRẠNG THÁI AUTH VÀ ROUTER ---
+  const { isLoggedIn, isInitializing: isAuthInitializing } = useAuth()
+  const router = useRouter()
+  const pathname = usePathname()
+  const locale = t_common('language')
 
   useEffect(() => {
     setIsFollowing(isInitiallyFollowing);
   }, [isInitiallyFollowing]);
 
-  const handleFollowToggle = async () => {
+  // --- BƯỚC 2: TẠO HÀM KIỂM TRA ĐĂNG NHẬP ---
+  const checkLoginAndRedirect = useCallback(
+    (callback: () => void) => {
+      if (isAuthInitializing) {
+        // Nếu đang khởi tạo auth, không làm gì cả để tránh chuyển hướng sai
+        return;
+      }
+      if (!isLoggedIn) {
+        // Nếu chưa đăng nhập, lưu URL hiện tại và chuyển hướng đến trang đăng nhập
+        // toast.info(t('loginToFollow')); // Thông báo cho người dùng
+        localStorage.setItem('returnUrl', pathname);
+        router.push(`/${locale}/auth/login`);
+      } else {
+        // Nếu đã đăng nhập, thực hiện hành động (callback)
+        callback();
+      }
+    },
+    [isLoggedIn, isAuthInitializing, pathname, router, locale, t]
+  );
+
+  // --- BƯỚC 3: TÁCH LOGIC FOLLOW RA HÀM RIÊNG ---
+  // Hàm này chứa logic gọi API, sẽ được gọi sau khi đã kiểm tra đăng nhập
+  const performFollowToggle = async () => {
     if (isLoading) return
     setIsLoading(true)
     try {
@@ -57,52 +86,45 @@ const EventJournalCardComponent: React.FC<EventJournalCardProps> = ({
       setIsFollowing(newFollowStatus);
       onFollowStatusChange(journal.id, newFollowStatus);
     } catch (error) {
-      // console.error('Error toggling follow status:', error)
       toast.error(t('followError'))
     } finally {
       setIsLoading(false)
     }
   }
 
+  // --- BƯỚC 4: TẠO HÀM HANDLER MỚI CHO NÚT BẤM ---
+  // Hàm này sẽ được gắn vào sự kiện onClick của nút
+  const handleFollowClick = () => {
+    checkLoginAndRedirect(performFollowToggle);
+  };
+
   const countryIso2 = useMemo(() => {
     if (!journal.Country) return null
-
     const countryData = countries.find(
       c => c.name.toLowerCase() === journal.Country.toLowerCase()
     )
-
     return countryData ? countryData.iso2.toLowerCase() : null
   }, [journal.Country])
 
   const getQuartileColor = (quartile: string | undefined): string => {
     switch (quartile) {
-      case 'Q1':
-        return 'text-green-500 dark:text-green-400 font-bold'
-      case 'Q2':
-        return 'text-lime-500 dark:text-lime-400 font-bold'
-      case 'Q3':
-        return 'text-yellow-500 dark:text-yellow-400 font-bold'
-      case 'Q4':
-        return 'text-red-500 dark:text-red-400 font-bold'
-      default:
-        return 'text-gray-500 dark:text-gray-400'
+      case 'Q1': return 'text-green-500 dark:text-green-400 font-bold'
+      case 'Q2': return 'text-lime-500 dark:text-lime-400 font-bold'
+      case 'Q3': return 'text-yellow-500 dark:text-yellow-400 font-bold'
+      case 'Q4': return 'text-red-500 dark:text-red-400 font-bold'
+      default: return 'text-gray-500 dark:text-gray-400'
     }
   }
 
-  const latestQuartile =
-    journal.SupplementaryTable?.[journal.SupplementaryTable.length - 1]
-      ?.Quartile
+  const latestQuartile = journal.SupplementaryTable?.[journal.SupplementaryTable.length - 1]?.Quartile
 
   return (
-    // THAY ĐỔI TẠI ĐÂY: Thêm h-full
     <div
       className='flex h-full overflow-hidden rounded-xl border border-gray-200
                  bg-white-pure shadow-md transition-all duration-300 ease-in-out hover:shadow-lg dark:border-gray-700'
     >
       <div className='flex flex-grow flex-col justify-between p-4'>
-        {/* Top section for information */}
         <div>
-          {/* TIÊU ĐỀ LÀM THÀNH LINK */}
           <Link
             href={{ pathname: '/journals/detail', query: { id: journal.id } }}
             className='mb-3 block cursor-pointer text-lg font-bold text-gray-800 hover:text-blue-600 hover:underline dark:text-gray-200 dark:hover:text-blue-400'
@@ -110,7 +132,6 @@ const EventJournalCardComponent: React.FC<EventJournalCardProps> = ({
             <h3 className='line-clamp-2'>{journal.Title}</h3>
           </Link>
 
-          {/* Grid for details. The `1fr` column ensures text starts from the left edge of its column. */}
           <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 text-sm text-gray-600 dark:text-gray-300">
             {journal.Issn && (
               <>
@@ -180,15 +201,14 @@ const EventJournalCardComponent: React.FC<EventJournalCardProps> = ({
           </div>
         </div>
 
-        {/* Action buttons. Chỉ còn nút Follow/Unfollow */}
         <div className='mt-4 flex items-center justify-end'>
           <Button
             variant={isFollowing ? 'secondary' : 'primary'}
             size='small'
             rounded
             className='h-8 w-full'
-            onClick={handleFollowToggle}
-            disabled={isLoading}
+            onClick={handleFollowClick} // <-- BƯỚC 5: SỬ DỤNG HANDLER MỚI
+            disabled={isLoading || isAuthInitializing} // Vô hiệu hóa nút khi đang loading hoặc đang xác thực
           >
             {isLoading ? (
               <span className='flex w-full items-center justify-center gap-1'>
@@ -208,7 +228,6 @@ const EventJournalCardComponent: React.FC<EventJournalCardProps> = ({
         </div>
       </div>
 
-      {/* Image container */}
       <div className='relative w-1/2 flex-shrink-0 rounded-xl overflow-hidden'>
         <Image
           src={journal.Image || '/bg-2.jpg'}
@@ -223,6 +242,5 @@ const EventJournalCardComponent: React.FC<EventJournalCardProps> = ({
   )
 }
 
-// Export component đã được memo-hóa
 export const EventJournalCard = memo(EventJournalCardComponent);
 export default EventJournalCard;

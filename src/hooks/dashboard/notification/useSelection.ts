@@ -1,49 +1,45 @@
 // src/hooks/useSelection.ts
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
-const useSelection = (itemIds: string[]) => {
-    const [checkedIndices, setCheckedIndices] = useState<string[]>([]);
+const useSelection = (visibleItemIds: string[]) => {
+    // checkedOnCurrentPage lưu trữ các ID được chọn TRÊN TRANG HIỆN TẠI
+    // Khi `visibleItemIds` thay đổi (chuyển trang, lọc), state này sẽ reset.
+    const [checkedOnCurrentPage, setCheckedOnCurrentPage] = useState<string[]>([]);
 
-    // FIX 1: `selectAllChecked` is derived state. Calculate it with `useMemo`
-    // instead of storing it in `useState`. This eliminates sync issues.
-    const selectAllChecked = useMemo(() => {
-        // It's "all checked" if the list isn't empty and all item IDs are present in the checked list.
-        return itemIds.length > 0 && checkedIndices.length === itemIds.length;
-    }, [checkedIndices, itemIds]);
+    // Reset lựa chọn trên trang hiện tại khi danh sách item hiển thị thay đổi
+    useEffect(() => {
+        setCheckedOnCurrentPage([]);
+    }, [visibleItemIds]);
+
+    const selectAllCheckedOnCurrentPage = useMemo(() => {
+        if (visibleItemIds.length === 0) return false;
+        return visibleItemIds.every(id => checkedOnCurrentPage.includes(id));
+    }, [checkedOnCurrentPage, visibleItemIds]);
 
     const handleCheckboxChange = useCallback((id: string, checked: boolean) => {
-        setCheckedIndices(prevIndices => {
-            const newIndices = new Set(prevIndices);
+        setCheckedOnCurrentPage(prevIds => {
+            const newIds = new Set(prevIds);
             if (checked) {
-                newIndices.add(id);
+                newIds.add(id);
             } else {
-                newIndices.delete(id);
+                newIds.delete(id);
             }
-            return Array.from(newIndices);
+            return Array.from(newIds);
         });
-    }, []); // This handler is self-contained and needs no dependencies.
+    }, []);
 
     const handleSelectAllChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
             const checked = event.target.checked;
-            // FIX 2: Depend directly on `itemIds`. When the user clicks "select all",
-            // the checked list becomes a copy of the current `itemIds`.
-            setCheckedIndices(checked ? [...itemIds] : []);
+            setCheckedOnCurrentPage(checked ? [...visibleItemIds] : []);
         },
-        [itemIds] // Correctly depend on `itemIds`.
+        [visibleItemIds]
     );
 
-    // FIX 3: Simplify the effect. Its only job is to sync the selection
-    // when the source `itemIds` list changes (e.g., due to filtering).
-    useEffect(() => {
-        // If an item is checked but is no longer in the master list, uncheck it.
-        setCheckedIndices(prev => prev.filter(id => itemIds.includes(id)));
-    }, [itemIds]); // This effect should *only* run when the `itemIds` array changes.
-
     return {
-        checkedIndices,
-        setCheckedIndices,
-        selectAllChecked, // Return the memoized, derived value.
+        checkedOnCurrentPage,
+        setCheckedOnCurrentPage, // Giúp NotificationTab có thể reset hoặc điều chỉnh cục bộ
+        selectAllCheckedOnCurrentPage,
         handleCheckboxChange,
         handleSelectAllChange
     };

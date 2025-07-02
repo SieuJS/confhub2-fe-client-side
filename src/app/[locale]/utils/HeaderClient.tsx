@@ -19,6 +19,7 @@ import LogoIcon from '../../icons/logo';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { usePathname } from '@/src/navigation';
 import { useSidebar } from '@/src/contexts/SidebarContext';
+import { WhatsNewButton } from '../home/whatnews/WhatsNewButton';
 
 // [BẮT ĐẦU THAY ĐỔI]
 // Skeleton mới, mô phỏng trạng thái rộng nhất (chưa đăng nhập) để đảm bảo độ rộng không đổi.
@@ -77,6 +78,12 @@ const HeaderClient: FC<HeaderClientProps> = ({ locale }) => {
 
       <div className='relative flex flex-row items-center gap-2 md:gap-4'>
         <DesktopNavigation locale={locale} />
+
+        {/* [BẮT ĐẦU THAY ĐỔI] */}
+        {/* Thêm nút "What's New" ở đây, bên trong flex container */}
+        <WhatsNewButton />
+        {/* [KẾT THÚC THAY ĐỔI] */}
+
 
         {/* [BẮT ĐẦU THAY ĐỔI] */}
         {/* 

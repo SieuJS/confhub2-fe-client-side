@@ -38,18 +38,18 @@ interface UseSearchFormProps {
 
 // Generic helper for single string parameters
 const getInitialStringParam = (
-    searchParams: URLSearchParams,
-    paramName: string
+  searchParams: URLSearchParams,
+  paramName: string
 ): string | null => {
-    return searchParams.get(paramName);
+  return searchParams.get(paramName);
 };
 
 // Generic helper for array parameters (like topics)
 const getInitialArrayParam = (
-    searchParams: URLSearchParams,
-    paramName: string
+  searchParams: URLSearchParams,
+  paramName: string
 ): string[] => {
-    return searchParams.getAll(paramName) || [];
+  return searchParams.getAll(paramName) || [];
 }
 
 const getInitialLocationFromUrl = (
@@ -67,51 +67,66 @@ const getInitialTypeFromUrl = (
   searchParams: URLSearchParams,
   availableTypes: ReadonlyArray<ConferenceType>
 ): ConferenceType | null => {
-    const typeParam = searchParams.get('type');
-    if (!typeParam) return null;
-    const foundType = availableTypes.find(
-        (t) => t.toLowerCase() === typeParam.toLowerCase()
-    );
-    return foundType ? (foundType as ConferenceType) : null;
+  const typeParam = searchParams.get('type');
+  if (!typeParam) return null;
+  const foundType = availableTypes.find(
+    (t) => t.toLowerCase() === typeParam.toLowerCase()
+  );
+  return foundType ? (foundType as ConferenceType) : null;
 };
 
 const getInitialSearchConfig = (
-    searchParams: URLSearchParams
+  searchParams: URLSearchParams
 ): { type: SearchFieldType; value: string } => {
-    const title = searchParams.get('title');
-    if (title !== null) return { type: 'title', value: title };
-    const acronym = searchParams.get('acronym');
-    if (acronym !== null) return { type: 'acronym', value: acronym };
-    const keyword = searchParams.get('keyword');
-    if (keyword !== null) return { type: 'keyword', value: keyword };
-    return { type: 'keyword', value: '' };
+  const title = searchParams.get('title');
+  if (title !== null) return { type: 'title', value: title };
+  const acronym = searchParams.get('acronym');
+  if (acronym !== null) return { type: 'acronym', value: acronym };
+  const keyword = searchParams.get('keyword');
+  if (keyword !== null) return { type: 'keyword', value: keyword };
+  return { type: 'keyword', value: '' };
 };
 
 const getInitialDateFromUrl = (
-    searchParams: URLSearchParams,
-    paramName: string
+  searchParams: URLSearchParams,
+  paramName: string
 ): Date | null => {
-    const dateString = searchParams.get(paramName);
-    if (dateString && /^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-        try {
-            const timestamp = Date.parse(dateString);
-            if (!isNaN(timestamp)) return new Date(timestamp);
-        } catch (e) {
-             // console.error(`Error parsing date parameter "${paramName}":`, e);
-        }
+  const dateString = searchParams.get(paramName);
+  if (dateString && /^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+    try {
+      const timestamp = Date.parse(dateString);
+      if (!isNaN(timestamp)) return new Date(timestamp);
+    } catch (e) {
+      // console.error(`Error parsing date parameter "${paramName}":`, e);
     }
-    return null;
+  }
+  return null;
 };
 
 // Helper to check if any advanced params exist to auto-show the section
 const shouldShowAdvancedOptionsInitially = (searchParams: URLSearchParams): boolean => {
-    const advancedParams = ['submissionDate', 'publisher', 'rank', 'source', 'averageScore', 'topics', 'fieldOfResearch', 'subFromDate', 'subToDate'];
-    return advancedParams.some(param => searchParams.has(param));
+  const advancedParams = ['submissionDate', 'publisher', 'rank', 'source', 'averageScore', 'topics', 'fieldOfResearch', 'subFromDate', 'subToDate'];
+  return advancedParams.some(param => searchParams.has(param));
 };
 
 const dbUrl = process.env.NEXT_PUBLIC_DATABASE_URL;
 // --- Custom Hook ---
 const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
+
+  // Hàm trợ giúp để chuẩn hóa Date object về nửa đêm UTC của ngày đã chọn
+  const adjustToUTCMidnight = (date: Date | null): Date | null => {
+    if (!date) return null;
+    // Lấy năm, tháng, ngày từ đối tượng Date theo múi giờ cục bộ của nó
+    // Điều này quan trọng để đảm bảo chúng ta lấy đúng ngày mà người dùng nhìn thấy
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
+    // Tạo một đối tượng Date mới đại diện cho nửa đêm của ngày đó theo múi giờ UTC
+    // Điều này đảm bảo khi toISOString() được gọi, nó sẽ trả về đúng ngày
+    return new Date(Date.UTC(year, month, day));
+  };
+
+
   // --- State Initialization ---
   const searchParams = new URLSearchParams(useSearchParams().toString());
 
@@ -134,8 +149,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   const initialTopics = getInitialArrayParam(searchParams, 'topics');
   const initialFieldsOfResearch = getInitialArrayParam(searchParams, 'fieldOfResearch');
   const initialShowAdvanced = shouldShowAdvancedOptionsInitially(searchParams);
-  const initialsubFromDate =  getInitialDateFromUrl(searchParams, 'subFromDate');
-  const initialsubToDate =  getInitialDateFromUrl(searchParams, 'subToDate');
+  const initialsubFromDate = getInitialDateFromUrl(searchParams, 'subFromDate');
+  const initialsubToDate = getInitialDateFromUrl(searchParams, 'subToDate');
 
   // --- State Variables ---
   // Basic
@@ -168,15 +183,15 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   // --- Effects ---
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-       if (locationDropdownRef.current && !locationDropdownRef.current.contains(event.target as Node)) {
-            setIsLocationDropdownOpen(false);
-        }
-        if (typeDropdownRef.current && !typeDropdownRef.current.contains(event.target as Node)) {
-            setIsTypeDropdownOpen(false);
-        }
-        if (searchTypeDropdownRef.current && !searchTypeDropdownRef.current.contains(event.target as Node)) {
-            setIsSearchTypeDropdownOpen(false);
-        }
+      if (locationDropdownRef.current && !locationDropdownRef.current.contains(event.target as Node)) {
+        setIsLocationDropdownOpen(false);
+      }
+      if (typeDropdownRef.current && !typeDropdownRef.current.contains(event.target as Node)) {
+        setIsTypeDropdownOpen(false);
+      }
+      if (searchTypeDropdownRef.current && !searchTypeDropdownRef.current.contains(event.target as Node)) {
+        setIsSearchTypeDropdownOpen(false);
+      }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
@@ -203,9 +218,11 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   const toggleAdvancedOptionsVisibility = () => { setIsAdvancedOptionsVisible(!isAdvancedOptionsVisible); };
   const handleSubmissionDateRangeChange = (dates: [Date | null, Date | null]) => {
     const [start, end] = dates;
-    setsubFromDate(start);
-    setsubToDate(end);
-};
+    // Áp dụng hàm chuẩn hóa cho cả ngày bắt đầu và ngày kết thúc
+    setsubFromDate(adjustToUTCMidnight(start));
+    setsubToDate(adjustToUTCMidnight(end));
+  };
+
   const handlePublisherChange = (publisher: string | null) => { setSelectedPublisher(publisher); };
   const handleRankChange = (rank: string | null) => { setSelectedRank(rank); };
   const handleSourceChange = (source: string | null) => { setSelectedSource(source); };
@@ -231,7 +248,7 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     };
 
     if (confKeyword) {
-        searchParamsData[selectSearchType] = confKeyword;
+      searchParamsData[selectSearchType] = confKeyword;
     }
 
     onSearch(searchParamsData);

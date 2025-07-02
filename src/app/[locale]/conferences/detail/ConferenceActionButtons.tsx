@@ -6,6 +6,7 @@ import Button from '@/src/app/[locale]/utils/Button'
 import useClickOutside from '@/src/hooks/conferenceDetails/useClickOutside'
 import { Organization } from '@/src/models/response/conference.response'
 import { notification } from '@/src/utils/toast/notification'
+import Modal from '@/src/app/[locale]/chatbot/Modal' // Import Modal component
 
 // Import Lucide Icons
 import {
@@ -15,7 +16,9 @@ import {
   RefreshCcw,
   ExternalLink,
   Ban,
-  Loader2 // Import icon loading
+  Loader2, // Import icon loading,
+  Send // Import icon cho nút Submit
+
 } from 'lucide-react'
 
 interface ConferenceActionButtonsProps {
@@ -58,6 +61,7 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
   const t = useTranslations('ConferenceDetail')
   const [openMenu, setOpenMenu] = useState<'share' | null>(null)
   const menuContainerRef = useRef<HTMLDivElement>(null)
+  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false) // State cho Modal Submit
 
   const toggleShareMenu = () => {
     setOpenMenu(prev => (prev === 'share' ? null : 'share'))
@@ -76,6 +80,17 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
     }
     handleBlacklistClick()
   }
+
+  // Hàm xử lý khi click nút Submit bài
+  const handleSubmitPaperClick = () => {
+    setIsSubmitModalOpen(true)
+  }
+
+  // Hàm đóng Modal Submit bài
+  const closeSubmitModal = () => {
+    setIsSubmitModalOpen(false)
+  }
+
 
   const renderShareMenu = () => {
     if (openMenu !== 'share') return null
@@ -193,8 +208,13 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
   // console.log('displayOrganization:', displayOrganization)
 
   return (
-    <div className='sticky top-24'>
+    // ==================================================================
+    // SỬA LỖI Z-INDEX TẠI ĐÂY
+    // Thêm `z-40` để nâng khối này lên trên thanh điều hướng (có z-30)
+    // ==================================================================
+    <div className='z-40'>
       <div className='flex flex-row flex-wrap justify-center gap-2 md:flex-col md:items-stretch md:justify-start md:gap-3'>
+        {/* Các nút bấm không thay đổi */}
         {/* Calendar Button */}
         <Button
           onClick={() => checkLoginAndRedirect(handleAddToCalendar)}
@@ -355,6 +375,43 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
             {isBlacklisted ? t('Blacklisted_Button') : t('Blacklist_Button')}
           </span>
         </Button>
+
+
+        {/* NEW: Submit Paper Button */}
+        <Button
+          onClick={() => checkLoginAndRedirect(handleSubmitPaperClick)}
+          variant={'secondary'}
+          size='small'
+          className='flex flex-grow items-center justify-center gap-x-2 md:flex-grow-0 md:justify-start'
+          title={
+            isAuthInitializing
+              ? t('Authenticating')
+              : isBlacklisted
+                ? blacklistTooltip
+                : t('Submit_Paper_Tooltip')
+          }
+          disabled={otherButtonsDisabled}
+        >
+          <Send size={18} />
+          <span className='hidden sm:inline'>{t('Submit_Paper_Button')}</span>
+        </Button>
+
+
+        {/* Modal for Submit Paper */}
+        <Modal
+          isOpen={isSubmitModalOpen}
+          onClose={closeSubmitModal}
+          title={t('Submit_Paper_Modal_Title')}
+          size='sm'
+          footer={
+            <Button onClick={closeSubmitModal} variant='secondary'>
+              {t('Close_Button')}
+            </Button>
+          }
+        >
+          <p>{t('Submit_Paper_Modal_Message')}</p>
+        </Modal>
+
       </div>
     </div>
   )

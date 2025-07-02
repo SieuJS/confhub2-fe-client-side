@@ -58,7 +58,7 @@ export default function MainLayout({
       {/* THAY ĐỔI: Render prop `header` thay vì import và render component */}
       {showHeader && header}
 
-      <main className={`relative ${showHeader ? 'pt-[60px]' : ''}`}>
+      <main className={`relative ${showHeader ? 'pt-[50px]' : ''}`}>
         {children}
       </main>
 

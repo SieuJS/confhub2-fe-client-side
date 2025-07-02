@@ -14,6 +14,8 @@ import { appConfig } from '@/src/middleware'
 import { useAuth } from '@/src/contexts/AuthContext'
 import { Loader2 } from 'lucide-react'
 import SearchInput from '../../utils/SearchInput'
+// Import component phân trang
+import GeneralPagination from '../../utils/GeneralPagination'
 
 // --- TYPE DEFINITIONS ---
 
@@ -54,6 +56,7 @@ interface ProcessedFollowedJournal {
 // --- CONSTANTS & HELPER COMPONENTS ---
 
 const API_BASE_ENDPOINT = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1`
+const ITEMS_PER_PAGE = 4; // Số lượng mục trên mỗi trang
 
 const LoadingSpinner = ({ message }: { message: string }) => (
   <div className='flex h-80 flex-col items-center justify-center '>
@@ -81,6 +84,7 @@ const FollowedTab: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [isBanned, setIsBanned] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [currentPage, setCurrentPage] = useState(1); // State cho trang hiện tại
 
   // --- DATA FETCHING (Tách thành 2 hàm riêng biệt để đảm bảo type-safety) ---
 
@@ -120,7 +124,7 @@ const FollowedTab: React.FC = () => {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
       const rawData: ApiFollowedJournalResponse[] = await response.json()
-      
+
       // Chuyển đổi dữ liệu từ cấu trúc lồng nhau sang phẳng
       const processedData: ProcessedFollowedJournal[] = rawData.map(item => ({
         id: item.belongsTo.id,
@@ -153,7 +157,7 @@ const FollowedTab: React.FC = () => {
         fetchFollowedConferences(),
         fetchFollowedJournals()
       ])
-      
+
       setFollowedConferences(conferences)
       setFollowedJournals(journals)
 
@@ -162,6 +166,12 @@ const FollowedTab: React.FC = () => {
 
     loadAllData()
   }, [isLoggedIn, fetchFollowedConferences, fetchFollowedJournals])
+
+  // Reset current page when active tab or search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, searchTerm]);
+
 
   // --- FILTERING LOGIC ---
   const filteredConferences = useMemo(() => {
@@ -184,6 +194,29 @@ const FollowedTab: React.FC = () => {
           journal.ISSN.toLowerCase().includes(lowercasedSearchTerm))
     )
   }, [searchTerm, followedJournals])
+
+  // --- PAGINATION LOGIC ---
+  const totalConferencesPages = Math.ceil(filteredConferences.length / ITEMS_PER_PAGE);
+  const totalJournalsPages = Math.ceil(filteredJournals.length / ITEMS_PER_PAGE);
+
+  const paginatedConferences = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredConferences.slice(startIndex, endIndex);
+  }, [currentPage, filteredConferences]);
+
+  const paginatedJournals = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredJournals.slice(startIndex, endIndex);
+  }, [currentPage, filteredJournals]);
+
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+    // Cuộn lên đầu trang khi chuyển trang
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
 
   // --- RENDER LOGIC ---
   if (loading) {
@@ -237,14 +270,25 @@ const FollowedTab: React.FC = () => {
           </div>
         )
       return (
-        <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-          {filteredConferences.map(conference => (
-            <FollowedConferenceCard
-              key={conference.id}
-              conference={conference}
-            />
-          ))}
-        </div>
+        <>
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+            {paginatedConferences.map(conference => (
+              <FollowedConferenceCard
+                key={conference.id}
+                conference={conference}
+              />
+            ))}
+          </div>
+          {totalConferencesPages > 1 && (
+            <div className='mt-8'>
+              <GeneralPagination
+                currentPage={currentPage}
+                totalPages={totalConferencesPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
       )
     }
 
@@ -262,11 +306,22 @@ const FollowedTab: React.FC = () => {
           </div>
         )
       return (
-        <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-          {filteredJournals.map(journal => (
-            <FollowedJournalCard key={journal.id} journal={journal} />
-          ))}
-        </div>
+        <>
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+            {paginatedJournals.map(journal => (
+              <FollowedJournalCard key={journal.id} journal={journal} />
+            ))}
+          </div>
+          {totalJournalsPages > 1 && (
+            <div className='mt-8'>
+              <GeneralPagination
+                currentPage={currentPage}
+                totalPages={totalJournalsPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
       )
     }
     return null

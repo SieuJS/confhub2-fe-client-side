@@ -25,6 +25,7 @@ import { SidebarProvider } from '@/src/contexts/SidebarContext'
 import MainLayout from './MainLayout';
 import Header from './utils/Header'; // Import Header
 import Footer from './utils/Footer'; // Import Footer
+import { WhatsNewController } from './home/whatnews/WhatsNewController'
 
 const spaceGrotesk = localFont({
   src: [
@@ -191,6 +192,12 @@ export default function RootLayout({
                   />
 
                   <FloatingChatbot />
+
+
+                  {/* === THÊM COMPONENT MỚI Ở ĐÂY === */}
+                  <WhatsNewController />
+                  {/* ================================= */}
+
 
                   {/* === THAY ĐỔI CÁCH RENDER MAINLAYOUT === */}
                   {/*

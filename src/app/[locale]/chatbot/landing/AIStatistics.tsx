@@ -12,6 +12,8 @@ interface Statistic {
   value: number
   unit?: string
   description?: string
+  // Thêm một trường để lưu giá trị hiển thị ban đầu (ước tính)
+  initialDisplayValue?: number | string
 }
 
 const AIStatistics = () => {
@@ -23,13 +25,17 @@ const AIStatistics = () => {
       label: t('Model_Accuracy'),
       value: 95.7,
       unit: '%',
-      description: t('Model_Accuracy_describe')
+      description: t('Model_Accuracy_describe'),
+      // Giá trị ban đầu để hiển thị khi chưa có số chính xác
+      // Có thể là một số nhỏ, hoặc một giá trị ngẫu nhiên trong một khoảng
+      initialDisplayValue: 70 // Ví dụ: bắt đầu từ 70%
     },
     {
       label: t('Inference_Speed'),
       value: 5.5,
       unit: 'ms',
-      description: t('Inference_Speed_describe')
+      description: t('Inference_Speed_describe'),
+      initialDisplayValue: 100 // Ví dụ: bắt đầu từ 100ms
     }
   ]
 
@@ -40,11 +46,14 @@ const AIStatistics = () => {
     lineHeight: 1.2
   }
 
+  // Khởi tạo odometerValues với giá trị initialDisplayValue hoặc 0 nếu không có
   const [odometerValues, setOdometerValues] = useState(
-    statistics.map(stat => 0)
+    statistics.map(stat => stat.initialDisplayValue || 0)
   )
   const [isIntersecting, setIsIntersecting] = useState(false)
   const componentRef = useRef<HTMLDivElement>(null)
+  // Biến trạng thái để kiểm soát việc chuyển đổi đến giá trị cuối cùng
+  const [hasLoadedPreciseData, setHasLoadedPreciseData] = useState(false)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -73,32 +82,17 @@ const AIStatistics = () => {
   }, [])
 
   useEffect(() => {
-    if (!isIntersecting) return
+    if (!isIntersecting || hasLoadedPreciseData) return // Chỉ chạy một lần sau khi giao điểm và chưa tải dữ liệu chính xác
 
-    const intervals = statistics.map((stat, index) => {
-      const intervalId = setInterval(() => {
-        const increment = Math.random() * (stat.value / 5)
-        const currentValue = odometerValues[index]
+    // Giả lập việc tải dữ liệu chính xác sau một khoảng thời gian
+    // Trong thực tế, bạn sẽ thay thế đoạn này bằng một API call hoặc logic tải dữ liệu thực sự
+    const dataLoadingTimeout = setTimeout(() => {
+      setOdometerValues(statistics.map(stat => stat.value)) // Gán giá trị chính xác
+      setHasLoadedPreciseData(true) // Đánh dấu đã tải dữ liệu chính xác
+    }, 2000) // Ví dụ: 2 giây sau khi component hiển thị trên màn hình
 
-        const newValue = Math.min(currentValue + increment, stat.value)
-        setOdometerValues(prevValues => {
-          const newValues = [...prevValues]
-          newValues[index] = newValue
-          return newValues
-        })
-
-        if (newValue >= stat.value) {
-          clearInterval(intervalId)
-        }
-      }, 50)
-
-      return intervalId
-    })
-
-    return () => {
-      intervals.forEach(intervalId => clearInterval(intervalId))
-    }
-  }, [statistics, isIntersecting])
+    return () => clearTimeout(dataLoadingTimeout)
+  }, [statistics, isIntersecting, hasLoadedPreciseData]) // Thêm hasLoadedPreciseData vào dependency array
 
   return (
     <div
@@ -129,8 +123,10 @@ const AIStatistics = () => {
               </h2>
               <div className='text-xl font-semibold md:text-3xl'>
                 <Odometer
+                  // Nếu chưa tải dữ liệu chính xác và có initialDisplayValue, sử dụng nó
+                  // Nếu không, sử dụng giá trị hiện tại (ban đầu là initialDisplayValue, sau đó là giá trị chính xác)
                   value={Number(odometerValues[index])}
-                  format='(,ddd).d'
+                  format={stat.unit === '%' ? '(,ddd).d' : '(,ddd)'} // Định dạng cho phần trăm có 1 số thập phân, còn lại không có
                   theme='default'
                   style={odometerStyle}
                 />
@@ -143,6 +139,11 @@ const AIStatistics = () => {
               {stat.description && (
                 <p className='mt-2 text-base text-gray-400 md:text-3xl'>
                   {stat.description}
+                </p>
+              )}
+              {!hasLoadedPreciseData && (
+                <p className='mt-2 text-sm text-yellow-300 md:text-xl'>
+                  {t('Estimated_Value')} {/* Ví dụ: "Giá trị ước tính" */}
                 </p>
               )}
             </div>

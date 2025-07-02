@@ -64,22 +64,20 @@ const MyConferenceCard: React.FC<MyConferenceCardProps> = ({
         {/* Body: Thông tin chính */}
         {/* THÊM leading-tight để xử lý tiêu đề nhiều dòng */}
         <h3 className='text-lg font-bold leading-tight text-indigo-700 transition-colors hover:text-indigo-900'>
-          {conference.title}
+          {conference.title || t('No_Title_Available')}{' '}
+          {conference.acronym && `(${conference.acronym})`}
         </h3>
         <div className='mt-2 space-y-2 text-sm '>
-          <div className='flex items-center gap-2'>
-            <Hash className='h-4 w-4 flex-shrink-0 ' />
-            <span>{conference.acronym}</span>
-          </div>
+          
           <div className='flex items-center gap-2'>
             <Calendar className='h-4 w-4 flex-shrink-0 ' />
             <span>
               {conferenceDate
                 ? formatDateRange(
-                    conferenceDate.fromDate,
-                    conferenceDate.toDate,
-                    language
-                  )
+                  conferenceDate.fromDate,
+                  conferenceDate.toDate,
+                  language
+                )
                 : t('MyConferences.Date_Not_Available')}
             </span>
           </div>

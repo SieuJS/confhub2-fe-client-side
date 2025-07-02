@@ -1,3 +1,5 @@
+// src/app/[locale]/dashboard/page.tsx
+
 'use client'
 
 import React, { useState, useEffect } from 'react'
@@ -22,7 +24,6 @@ const LoadingSpinner = ({ message }: { message: string }) => (
   </div>
 );
 
-// *** BƯỚC 1: ĐỊNH NGHĨA CẤU HÌNH CÁC TAB ***
 const TABS = [
   { name: 'Profile', component: <ProfileTab /> },
   { name: 'Followed', component: <FollowedTab /> },
@@ -61,14 +62,15 @@ export default function DashboardPage() {
     );
   }
 
-  // *** BƯỚC 2: RENDER TẤT CẢ CÁC TAB VÀ DÙNG CSS ĐỂ ẨN/HIỆN ***
-  return (
-    <>
+    return (
+    // Container này chiếm toàn bộ chiều cao được cấp bởi layout cha.
+    <div className="h-full">
       {TABS.map(tab => (
-        <div key={tab.name} className={activePage === tab.name ? 'block' : 'hidden'}>
+        // Tab đang hoạt động cũng chiếm toàn bộ chiều cao, truyền nó xuống component con.
+        <div key={tab.name} className={activePage === tab.name ? 'block h-full' : 'hidden'}>
           {tab.component}
         </div>
       ))}
-    </>
+    </div>
   );
 }

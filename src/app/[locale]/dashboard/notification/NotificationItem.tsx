@@ -1,17 +1,17 @@
-// components/NotificationItem.tsx
-import React, { useState, useEffect, useCallback } from 'react'
-import { Notification } from '../../../../models/response/user.response'
-import { Link } from '@/src/navigation'
-import { useSearchParams } from 'next/navigation'
+import React, { useState, useEffect, useCallback } from 'react';
+import { Notification } from '../../../../models/response/user.response';
+import { Link } from '@/src/navigation';
+import { useSearchParams } from 'next/navigation';
+import { Eye, Trash2, Star } from 'lucide-react'; // Import Star icon
 
 interface NotificationItemProps {
-  notification: Notification
-  onDelete: () => void
-  isChecked: boolean
-  onCheckboxChange: (checked: boolean) => void
-  onToggleImportant: (id: string) => void
-  onMarkUnseen: (id: string) => void
-  notificationId: string
+  notification: Notification;
+  onDelete: () => void;
+  isChecked: boolean;
+  onCheckboxChange: (checked: boolean) => void;
+  onToggleImportant: (id: string) => Promise<void>; // Đảm bảo hàm này trả về Promise<void>
+  onMarkUnseen: (id: string) => void;
+  notificationId: string;
 }
 
 const NotificationItem: React.FC<NotificationItemProps> = ({
@@ -21,91 +21,100 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   onCheckboxChange,
   onToggleImportant,
   onMarkUnseen,
-  notificationId
+  notificationId,
 }) => {
-  const [isStarred, setIsStarred] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
-  const searchParams = useSearchParams()
+  // LOẠI BỎ isStarred state cục bộ.
+  // const [isStarred, setIsStarred] = useState(false); // Xóa dòng này
+  const [isHovered, setIsHovered] = useState(false);
+  const [isTogglingImportant, setIsTogglingImportant] = useState(false); // Thêm state loading cho hành động này
+  const searchParams = useSearchParams();
 
-  useEffect(() => {
-    setIsStarred(notification.isImportant)
-  }, [notification.isImportant, notification.id])
+  // LOẠI BỎ useEffect này vì trạng thái isImportant sẽ được quản lý từ prop notification
+  // useEffect(() => {
+  //   setIsStarred(notification.isImportant);
+  // }, [notification.isImportant, notification.id]);
 
-  const toggleStar = useCallback(() => {
-    setIsStarred(prevIsStarred => !prevIsStarred)
-    onToggleImportant(notification.id)
-  }, [notification.id, onToggleImportant])
+  const handleToggleStar = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Ngăn chặn sự kiện click lan truyền
+    if (isTogglingImportant) return; // Ngăn chặn click liên tục
+
+    setIsTogglingImportant(true); // Bắt đầu loading
+    try {
+      await onToggleImportant(notification.id); // Chờ API hoàn tất
+      // Không cần cập nhật state cục bộ ở đây,
+      // vì `onToggleImportant` sẽ kích hoạt cập nhật dữ liệu tổng thể
+      // và prop `notification.isImportant` sẽ tự động thay đổi.
+    } catch (error) {
+      console.error('Failed to toggle important status:', error);
+      // Lỗi sẽ được xử lý bởi `performAction` trong `NotificationsTab` và hiển thị modal lỗi.
+      // Không cần làm gì thêm ở đây ngoài việc log lỗi.
+    } finally {
+      setIsTogglingImportant(false); // Kết thúc loading
+    }
+  }, [notification.id, onToggleImportant, isTogglingImportant]);
+
 
   const handleCheckboxChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      // console.log(
-      //   `NotificationItem: handleCheckboxChange called.  notification.id: ${notification.id}, checked: ${event.target.checked}`
-      // )
-      onCheckboxChange(event.target.checked)
+      onCheckboxChange(event.target.checked);
     },
     [onCheckboxChange, notification.id]
-  )
+  );
 
   const handleMarkUnseenCallback = useCallback(
     (e: React.MouseEvent) => {
-      e.stopPropagation()
-      // console.log(
-      //   `NotificationItem: handleMarkUnseenCallback called. notification.id: ${notification.id}`
-      // )
-      onMarkUnseen(notification.id)
+      e.stopPropagation();
+      onMarkUnseen(notification.id);
     },
     [notification.id, onMarkUnseen]
-  )
+  );
 
   const handleDeleteClick = useCallback(
     (e: React.MouseEvent) => {
-      e.stopPropagation()
-      // console.log(
-      //   `NotificationItem: handleDeleteClick called for id: ${notificationId}`
-      // )
-      onDelete()
+      e.stopPropagation();
+      onDelete();
     },
     [onDelete, notificationId]
-  )
+  );
 
   const formatDate = (dateString: string | undefined): string => {
-    if (!dateString) return 'Unknown'
+    if (!dateString) return 'Unknown';
 
-    const date = new Date(dateString)
-    const now = new Date()
+    const date = new Date(dateString);
+    const now = new Date();
     const isToday =
       date.getDate() === now.getDate() &&
       date.getMonth() === now.getMonth() &&
-      date.getFullYear() === now.getFullYear()
+      date.getFullYear() === now.getFullYear();
 
     if (isToday) {
       return date.toLocaleTimeString('vi-VN', {
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false
-      })
+        hour12: false,
+      });
     } else {
       return date.toLocaleDateString('vi-VN', {
         day: 'numeric',
-        month: 'short'
-      })
+        month: 'short',
+      });
     }
-  }
+  };
 
-  const isSeen = !!notification.seenAt
+  const isSeen = !!notification.seenAt;
 
   return (
     <div
       className={`flex cursor-pointer items-center border border-background px-4 py-2 ${
-        isStarred || notification.isImportant ? 'bg-yellow-50' : ''
+        notification.isImportant ? 'bg-yellow-50' : '' // Dùng trực tiếp notification.isImportant
       } ${isChecked ? 'bg-background-secondary' : ''} ${
         !isSeen ? 'bg-background' : ''
       } ${isHovered ? 'border-primary' : ''}`}
       onMouseEnter={() => {
-        setIsHovered(true)
+        setIsHovered(true);
       }}
       onMouseLeave={() => {
-        setIsHovered(false)
+        setIsHovered(false);
       }}
     >
       {/* Nút chọn và đánh dấu quan trọng */}
@@ -114,26 +123,23 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         className='mr-3 h-4 w-4 cursor-pointer rounded border-background text-button-text focus:ring-button'
         checked={isChecked}
         onChange={handleCheckboxChange}
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
         aria-label='Select notification'
       />
       <button
-        onClick={e => {
-          toggleStar()
-          e.stopPropagation()
-        }}
+        onClick={handleToggleStar} // Gọi hàm mới
         className='mr-3 focus:outline-none'
         aria-label='Mark as important'
+        disabled={isTogglingImportant} // Vô hiệu hóa nút khi đang loading
       >
-        <span
+        {/* Thay thế span ★ bằng icon Lucide Star */}
+        <Star
+          size={20}
+          strokeWidth={1.75}
           className={`${
-            isStarred || notification.isImportant
-              ? 'text-yellow-500'
-              : 'text-gray-400'
-          } text-lg`}
-        >
-          ★
-        </span>
+            notification.isImportant ? 'text-yellow-500 fill-yellow-500' : 'text-gray-400'
+          } ${isTogglingImportant ? 'animate-pulse' : ''}`} // Thêm hiệu ứng loading
+        />
       </button>
 
       <div className='grid flex-1 grid-cols-[2fr_7fr_1fr] items-center gap-2'>
@@ -149,7 +155,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           <Link
             href={{
               pathname: '/dashboard',
-              query: { ...Object.fromEntries(searchParams), id: notificationId }
+              query: { ...Object.fromEntries(searchParams), id: notificationId },
             }}
             className=''
           >
@@ -175,52 +181,21 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
                 className='text-gray-70 hover:text-blue-500 focus:outline-none'
                 aria-label='Mark as unseen'
               >
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  width='20'
-                  height='20'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  stroke='currentColor'
-                  strokeWidth='1.75'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  className='lucide lucide-eye'
-                >
-                  <path d='M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0' />
-                  <circle cx='12' cy='12' r='3' />
-                </svg>
+                <Eye size={20} strokeWidth={1.75} />
               </button>
               <button
                 onClick={handleDeleteClick}
                 className='text-gray-70 hover:text-red-500 focus:outline-none'
                 aria-label='Delete notification'
               >
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  width='20'
-                  height='20'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  stroke='currentColor'
-                  strokeWidth='1.75'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  className='lucide lucide-trash-2'
-                >
-                  <path d='M3 6h18' />
-                  <path d='M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6' />
-                  <path d='M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2' />
-                  <line x1='10' x2='10' y1='11' y2='17' />
-                  <line x1='14' x2='14' y1='11' y2='17' />
-                </svg>
+                <Trash2 size={20} strokeWidth={1.75} />
               </button>
             </div>
           )}
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default NotificationItem
+export default NotificationItem;

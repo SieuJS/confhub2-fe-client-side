@@ -73,8 +73,8 @@ const PersonalizationConfirmationModal: React.FC<
           {type === 'missingInfo' ? (
             <Link
               href={{ pathname: '/dashboard', query: { tab: 'profile' } }}
-              passHref
-              legacyBehavior
+              // passHref
+              // legacyBehavior
             >
               <button
                 type='button'

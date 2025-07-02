@@ -164,19 +164,10 @@ const ProfileTab: React.FC = () => {
   if (!isLoggedIn) {
     return (
       <div className='container mx-auto p-4 text-center'>
-        {' '}
-        {/* <-- THAY ĐỔI Ở ĐÂY */}
-        {/*
-          Theo FollowedTab, không có rounded-lg bg-background p-8 text-center shadow-lg ở đây.
-          Nó chỉ có h2 và p trực tiếp.
-          Để đồng bộ, chúng ta bỏ div bọc và giữ nguyên h2, p, button.
-        */}
         <h2 className='mb-2 text-xl font-semibold'>
           {t('MyConferences.Login_Required_Title')}
-        </h2>{' '}
-        {/* Sử dụng h2 và key dịch tương tự */}
-        <p className='mb-4'>{t('MyConferences.Login_Required_Message')}</p>{' '}
-        {/* Sử dụng key dịch tương tự */}
+        </h2>
+        <p className='mb-4'>{t('MyConferences.Login_Required_Message')}</p>
         <Link href='/auth/login'>
           <Button variant='primary'>{t('Sign_In')}</Button>
         </Link>

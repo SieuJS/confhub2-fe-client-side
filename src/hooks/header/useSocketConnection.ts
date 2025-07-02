@@ -37,7 +37,7 @@ export const useSocketConnection = ({ loginStatus, user }: UseSocketConnectionPr
     if (user?.id) {
       setIsLoadingNotifications(true);
       try {
-        const response = await fetch(`${NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/user`, {
+        const response = await fetch(`${NEXT_PUBLIC_DATABASE_URL}/api/v1/notification/user?take=21`, {
           method: 'GET',
           headers: {
             "Authorization": `Bearer ${localStorage.getItem('token')}`, // Add userId to the headers
