@@ -3,7 +3,7 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
-import NotificationItem from './NotificationItem'; // <-- Điều chỉnh đường dẫn nếu cần
+import NotificationItem from './NotificationItem';
 import { Notification } from '@/src/models/response/user.response';
 
 interface NotificationListProps {
@@ -13,7 +13,8 @@ interface NotificationListProps {
   checkedIndices: string[];
   onCheckboxChange: (notificationId: string, checked: boolean) => void;
   onDelete: (notificationId: string) => void;
-  onToggleImportant: (notificationId: string) => void;
+  // SỬA LỖI Ở ĐÂY: Thay đổi 'void' thành 'Promise<void>'
+  onToggleImportant: (notificationId: string) => Promise<void>;
   onMarkUnseen: (notificationId: string) => void;
 }
 
@@ -63,6 +64,7 @@ const NotificationList: React.FC<NotificationListProps> = ({
             onCheckboxChange={checked =>
               onCheckboxChange(notification.id, checked)
             }
+            // Bây giờ prop này đã khớp với kiểu dữ liệu mong muốn
             onToggleImportant={onToggleImportant}
             onMarkUnseen={onMarkUnseen}
             notificationId={notification.id}
