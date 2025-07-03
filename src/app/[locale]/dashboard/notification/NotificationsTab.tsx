@@ -1,3 +1,5 @@
+// src/app/[locale]/dashboard/notifications/NotificationsTab.tsx
+
 import React, { useEffect, useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -13,7 +15,7 @@ import { useAuth } from '@/src/contexts/AuthContext';
 import Button from '../../utils/Button';
 import SearchInput from '../../utils/SearchInput';
 import GeneralPagination from '../../utils/GeneralPagination';
-import Modal from '@/src/app/[locale]/chatbot/Modal'; // Đảm bảo đường dẫn chính xác
+import Modal from '@/src/app/[locale]/chatbot/Modal';
 import { Link } from '@/src/navigation';
 
 // Child Components
@@ -76,7 +78,7 @@ const NotificationsTab: React.FC = () => {
     handleUpdateSeenAt,
     handleToggleImportant,
     handleDeleteNotification,
-    handleMarkUnseen,
+    handleToggleReadStatus, // <--- THÊM HÀM NÀY
     handleCheckboxChangeTab,
     handleDeleteSelected,
     handleSelectAllChange,
@@ -86,7 +88,7 @@ const NotificationsTab: React.FC = () => {
     handleMarkSelectedAsImportant,
     handleMarkSelectedAsUnimportant,
     allSelectedAreImportant,
-  } = useNotifications({ filter, showErrorModal }); // <--- TRUYỀN showErrorModal VÀO ĐÂY
+  } = useNotifications({ filter, showErrorModal });
 
   // Hooks của Next.js để quản lý routing
   const pathname = usePathname();
@@ -116,7 +118,7 @@ const NotificationsTab: React.FC = () => {
       setIsSubmitting(false);
       hideConfirmationModal();
     }
-  }, [isSubmitting, hideConfirmationModal, showErrorModal, t]); // Thêm showErrorModal và t vào dependencies
+  }, [isSubmitting, hideConfirmationModal, showErrorModal, t]);
 
   // Mở modal xác nhận trước khi xóa một thông báo
   const confirmDeleteSingle = useCallback((notificationId: string) => {
@@ -157,10 +159,11 @@ const NotificationsTab: React.FC = () => {
     if (selectedNotificationId) {
       const notification = notifications.find(n => n.id === selectedNotificationId);
       if (notification && !notification.seenAt) {
-        handleUpdateSeenAt(selectedNotificationId);
+        // Sử dụng handleToggleReadStatus để đánh dấu là đã đọc
+        handleToggleReadStatus(selectedNotificationId, false); // false vì hiện tại nó chưa đọc, muốn đánh dấu là đã đọc
       }
     }
-  }, [selectedNotificationId, handleUpdateSeenAt, notifications]);
+  }, [selectedNotificationId, handleToggleReadStatus, notifications]); // Đổi handleUpdateSeenAt thành handleToggleReadStatus
 
   // === RENDER LOGIC ===
 
@@ -214,6 +217,7 @@ const NotificationsTab: React.FC = () => {
           onBack={handleBackToNotifications}
           onDelete={() => confirmDeleteSingle(notification.id)}
           onToggleImportant={(id) => performAction(() => handleToggleImportant(id))}
+          // Không cần onMarkUnseen ở đây vì đã dùng handleToggleReadStatus ở useEffect
         />
       );
     }
@@ -230,7 +234,7 @@ const NotificationsTab: React.FC = () => {
 
   // 5. Giao diện chính của danh sách thông báo
   return (
-    <div className='container mx-auto'>
+    <div className='container mx-auto p-2'>
       {/* Thanh điều khiển: Lọc và Tìm kiếm */}
       <div className='mb-4 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center'>
         <div className='w-full md:w-auto'>
@@ -270,7 +274,7 @@ const NotificationsTab: React.FC = () => {
           onCheckboxChange={handleCheckboxChangeTab}
           onDelete={confirmDeleteSingle}
           onToggleImportant={(id) => performAction(() => handleToggleImportant(id))}
-          onMarkUnseen={(id) => performAction(() => handleMarkUnseen(id))}
+          onToggleReadStatus={(id, isRead) => performAction(() => handleToggleReadStatus(id, isRead))}
         />
       </div>
 

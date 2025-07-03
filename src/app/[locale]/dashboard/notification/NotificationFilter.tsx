@@ -29,7 +29,7 @@ const NotificationFilter: React.FC<NotificationFilterProps> = ({
         <button
           key={key}
           onClick={() => onFilterChange(key)}
-          className={`rounded px-3 py-1 text-sm md:px-4 md:py-2 ${
+          className={`rounded-lg px-3 py-1 text-sm md:px-4 md:py-2 ${
             currentFilter === key
               ? 'bg-button text-white'
               : 'bg-gray-20 hover:bg-gray-30'

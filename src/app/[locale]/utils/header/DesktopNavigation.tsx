@@ -1,31 +1,28 @@
-// components/Header/components/DesktopNavigation.tsx (SỬA FILE)
-
-import { FC, memo } from 'react'; // Import memo
+import { FC, memo } from 'react';
 import { Link } from '@/src/navigation';
 import { useTranslations } from 'next-intl';
 import { usePathname } from '@/src/navigation';
 import ThemeSwitch from '../ThemeSwitch';
 import LangSwitcher from '../LangSwitcher';
-import Button from '../Button';
+import Button from '../../utils/Button'; // Sửa đường dẫn import nếu cần
 
 interface Props {
   locale: string;
 }
 
-// Component gốc
 const DesktopNavigationComponent: FC<Props> = ({ locale }) => {
   const t = useTranslations('');
-  const pathname = usePathname(); // Hook này không gây re-render khi state khác thay đổi
+  const pathname = usePathname();
 
-  // Sửa logic isActive để xử lý đúng locale
   const isActive = (href: string) => {
-    // pathname từ next/navigation sẽ có dạng /en/conferences
-    return pathname === `/${locale}${href}`;
+    // Giả sử href có dạng /conferences, pathname có dạng /en/conferences
+    const targetPath = href === '/' ? `/${locale}` : `/${locale}${href}`;
+    return pathname === targetPath || (href !== '/' && pathname.startsWith(targetPath));
   };
 
-
   return (
-    <nav className='mr-2 hidden gap-0 lg:inline-flex lg:items-center lg:justify-center lg:gap-0  lg:text-sm lg:font-semibold'>
+    // THAY ĐỔI Ở ĐÂY: Thay lg:inline-flex thành xl:inline-flex
+    <nav className='mr-2 hidden gap-0 xl:inline-flex xl:items-center xl:justify-center xl:gap-0 xl:text-sm xl:font-semibold'>
       <Link
         href={`/conferences`}
         className={`group relative mx-2 font-semibold transition-colors duration-300 ease-in-out hover:text-button md:mx-4 ${isActive(`/conferences`) ? 'text-button' : ''}`}
@@ -123,6 +120,5 @@ const DesktopNavigationComponent: FC<Props> = ({ locale }) => {
   )
 }
 
-// Export phiên bản đã được memo-hóa
 const DesktopNavigation = memo(DesktopNavigationComponent);
 export default DesktopNavigation;

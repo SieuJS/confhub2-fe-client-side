@@ -4,8 +4,11 @@
 import React from 'react'
 import Button from '../utils/Button'
 import SearchAdvanceSection from './SearchAdvanceSection'
-import useSearchForm from '../../../hooks/conferences/useSearchForm' // Import the hook
+import useSearchForm from '../../../hooks/conferences/useSearchForm'
 import { useTranslations } from 'next-intl'
+
+// Import Lucide icons
+import { Search, ChevronDown, MapPin, Menu } from 'lucide-react'
 
 interface SearchSectionProps {
   onSearch: (searchParams: {
@@ -14,9 +17,8 @@ interface SearchSectionProps {
     toDate?: Date | null
     location?: string | null
     type?: 'Online' | 'Offline' | 'Hybrid' | null
-    // submissionDate?: Date | null
-    subFromDate?: Date | null // NEW
-    subToDate?: Date | null // NEW
+    subFromDate?: Date | null
+    subToDate?: Date | null
     publisher?: string | null
     rank?: string | null
     source?: string | null
@@ -24,13 +26,12 @@ interface SearchSectionProps {
     topics?: string[]
     fieldOfResearch?: string[]
   }) => void
-  onClear: () => void // Add onClear prop
+  onClear: () => void
 }
 
 const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
   const t = useTranslations('')
 
-  // Destructure onClear
   const {
     confKeyword,
     selectSearchType,
@@ -63,8 +64,6 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
     toggleLocationDropdown,
     toggleTypeDropdown,
     toggleAdvancedOptionsVisibility,
-    // handleSubmissionDateChange,
-    // submissionDate,
     handleRankChange,
     selectedRank,
     handleSourceChange,
@@ -80,29 +79,19 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
     subFromDate,
     subToDate,
     handleSubmissionDateRangeChange,
-    handleClear // Get handleClear from the hook
-  } = useSearchForm({ onSearch, onClear }) // Pass onClear to the hook
+    handleClear
+  } = useSearchForm({ onSearch, onClear })
 
   return (
     <div className='container mx-auto px-4 text-base'>
-      {/* Use flex-wrap and justify-center for responsiveness */}
-      <div className='flex flex-wrap items-center justify-between  rounded-3xl border border-black-pure px-2 py-2 shadow-md'>
+      {/* Giữ `relative` để làm điểm neo cho dropdown trên mobile/tablet */}
+      <div className='relative flex flex-wrap items-center justify-between gap-x-2 gap-y-3 rounded-3xl border border-black-pure px-2 py-2 shadow-md'>
+        {/* Thay đổi breakpoint từ `md` sang `xl` để có layout tablet tốt hơn */}
         <div
-          className='flex w-40 flex-grow basis-full items-center  md:max-w-[500px] md:basis-auto'
+          className='flex w-40 flex-grow basis-full items-center xl:max-w-[500px] xl:basis-auto'
           ref={searchTypeDropdownRef}
         >
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            className='mr-1 h-5 w-5'
-            viewBox='0 0 20 20'
-            fill='currentColor'
-          >
-            <path
-              fillRule='evenodd'
-              d='M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z'
-              clipRule='evenodd'
-            />
-          </svg>
+          <Search className='mr-1 h-5 w-5' />
           <input
             type='text'
             placeholder={t('Type_a_command_or_search')}
@@ -124,21 +113,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
                     ? t('Title')
                     : t('Acronym')}
               </span>
-              {/* Hiển thị searchType hiện tại */}
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                fill='none'
-                viewBox='0 0 24 24'
-                strokeWidth={1.5}
-                stroke='currentColor'
-                className='ml-1 inline-block h-4 w-4'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  d='M19.5 8.25l-7.5 7.5-7.5-7.5'
-                />
-              </svg>
+              <ChevronDown className='ml-1 inline-block h-4 w-4' />
             </button>
             {isSearchTypeDropdownOpen && (
               <div className='absolute left-0 z-10 mt-2 w-32 rounded-md bg-white-pure shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none '>
@@ -150,19 +125,19 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
                 >
                   <button
                     onClick={() => handleSearchTypeChange('keyword')}
-                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
+                    className='block w-full px-4 py-2 text-left text-sm hover:bg-gray-10 hover:text-gray-90'
                   >
                     {t('Keyword')}
                   </button>
                   <button
                     onClick={() => handleSearchTypeChange('title')}
-                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
+                    className='block w-full px-4 py-2 text-left text-sm hover:bg-gray-10 hover:text-gray-90'
                   >
                     {t('Title')}
                   </button>
                   <button
                     onClick={() => handleSearchTypeChange('acronym')}
-                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
+                    className='block w-full px-4 py-2 text-left text-sm hover:bg-gray-10 hover:text-gray-90'
                   >
                     {t('Acronym')}
                   </button>
@@ -172,8 +147,8 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
           </div>
         </div>
 
-        {/* Use hidden and block with media queries for dividers */}
-        <div className='mx-2 hidden h-6 border-l border-gray-30 md:block'></div>
+        {/* Dấu ngăn cách chỉ hiện trên desktop lớn */}
+        <div className='mx-2 hidden h-6 border-l border-gray-30 xl:block'></div>
 
         <div className='flex items-center space-x-2 px-2'>
           <label htmlFor='fromDate' className='text-sm'>
@@ -201,40 +176,71 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
           />
         </div>
 
-        {/* Use hidden and block with media queries for dividers */}
-        <div className='mx-2 hidden h-6 border-l border-gray-300 md:block'></div>
+        {/* Dấu ngăn cách chỉ hiện trên desktop lớn */}
+        <div className='mx-2 hidden h-6 border-l border-gray-300 xl:block'></div>
 
-        <div className='relative' ref={locationDropdownRef}>
+        {/* Đổi vị trí Type lên trước Location */}
+        {/* Thay đổi breakpoint từ `md` sang `xl` */}
+        <div className='xl:relative' ref={typeDropdownRef}>
+          <button
+            className=' flex items-center space-x-2 bg-transparent outline-none'
+            onClick={toggleTypeDropdown}
+          >
+            <Menu className='h-4 w-4' />
+            <span className='text-sm'>
+              {selectedType ? selectedType : t('Type')}
+            </span>
+          </button>
+
+          {isTypeDropdownOpen && (
+            <div
+              className='absolute left-4 right-4 z-10 mt-2 rounded-md bg-white-pure shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none xl:left-0 xl:right-auto xl:w-28'
+              tabIndex={0}
+            >
+              <div
+                className='py-1'
+                role='menu'
+                aria-orientation='vertical'
+                aria-labelledby='options-menu'
+              >
+                <button
+                  key='all'
+                  onClick={() => handleTypeClick('')}
+                  className='block w-full px-4 py-2 text-left text-sm hover:bg-gray-10 hover:text-gray-90'
+                >
+                  {t('All_Types')}
+                </button>
+                {filteredTypes.map(type => (
+                  <button
+                    key={type}
+                    onClick={() => handleTypeClick(type)}
+                    className='block w-full px-4 py-2 text-left text-sm hover:bg-gray-10 hover:text-gray-90'
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Dấu ngăn cách chỉ hiện trên desktop lớn */}
+        <div className='mx-2 hidden h-6 border-l border-gray-300 xl:block'></div>
+
+        {/* Thay đổi breakpoint từ `md` sang `xl` */}
+        <div className='xl:relative' ref={locationDropdownRef}>
           <button
             className='flex items-center space-x-2 bg-transparent outline-none'
             onClick={toggleLocationDropdown}
           >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              fill='none'
-              viewBox='0 0 24 24'
-              strokeWidth={1.5}
-              stroke='currentColor'
-              className='h-4 w-4'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                d='M15 10.5a3 3 0 11-6 0 3 3 0 016 0z'
-              />
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                d='M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z'
-              />
-            </svg>
+            <MapPin className='h-4 w-4' />
             <span className='text-sm'>
               {selectedLocation ? selectedLocation : t('Location')}
             </span>
           </button>
 
           {isLocationDropdownOpen && (
-            <div className='absolute left-0 z-10 mt-2 w-48 rounded-md bg-white-pure shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none '>
+            <div className='absolute left-4 right-4 z-10 mt-2 rounded-md bg-white-pure shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none xl:left-0 xl:right-auto xl:w-48'>
               <div
                 className='max-h-80 overflow-y-scroll py-1'
                 role='menu'
@@ -251,7 +257,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
                 <button
                   key='all'
                   onClick={() => handleLocationClick('')}
-                  className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
+                  className='block w-full px-4 py-2 text-left text-sm hover:bg-gray-10 hover:text-gray-90'
                 >
                   {t('All_Locations')}
                 </button>
@@ -259,7 +265,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
                   <button
                     key={location}
                     onClick={() => handleLocationClick(location)}
-                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
+                    className='block w-full px-4 py-2 text-left text-sm hover:bg-gray-10 hover:text-gray-90'
                   >
                     {location}
                   </button>
@@ -269,67 +275,8 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
           )}
         </div>
 
-        {/* Use hidden and block with media queries for dividers */}
-        <div className='mx-2 hidden h-6 border-l border-gray-300 md:block'></div>
-
-        <div className='relative' ref={typeDropdownRef}>
-          <button
-            className=' flex items-center space-x-2 bg-transparent  outline-none'
-            onClick={toggleTypeDropdown}
-          >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              fill='none'
-              viewBox='0 0 24 24'
-              strokeWidth={1.5}
-              stroke='currentColor'
-              className='h-4 w-4'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                d='M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5'
-              />
-            </svg>
-            <span className='text-sm'>
-              {selectedType ? selectedType : t('Type')}
-            </span>
-          </button>
-
-          {isTypeDropdownOpen && (
-            <div
-              className='absolute left-0 z-10 mt-2 w-28 rounded-md bg-white-pure shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none '
-              tabIndex={0}
-            >
-              <div
-                className='py-1'
-                role='menu'
-                aria-orientation='vertical'
-                aria-labelledby='options-menu'
-              >
-                <button
-                  key='all'
-                  onClick={() => handleTypeClick('')}
-                  className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
-                >
-                  {t('All_Types')}
-                </button>
-                {filteredTypes.map(type => (
-                  <button
-                    key={type}
-                    onClick={() => handleTypeClick(type)}
-                    className="role='menuitem' block w-full px-4 py-2 text-left text-sm  hover:bg-gray-10 hover:text-gray-90"
-                  >
-                    {type}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Use margin and padding for spacing on smaller screens */}
-        <div className='mt-2 flex space-x-4 md:ml-4 md:mt-0 md:space-x-4 md:pl-4'>
+        {/* Thay đổi breakpoint từ `md` sang `xl` và dùng ml-auto để đẩy sang phải */}
+        <div className='flex w-full basis-full justify-end space-x-4 xl:ml-auto xl:w-auto xl:basis-auto xl:pl-4'>
           <Button
             variant='primary'
             size='small'
@@ -354,8 +301,6 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
       <SearchAdvanceSection
         isAdvancedOptionsVisible={isAdvancedOptionsVisible}
         toggleAdvancedOptionsVisibility={toggleAdvancedOptionsVisibility}
-        // onSubmissionDateChange={handleSubmissionDateChange}
-        // submissionDate={submissionDate}
         onRankChange={handleRankChange}
         selectedRank={selectedRank}
         onSourceChange={handleSourceChange}

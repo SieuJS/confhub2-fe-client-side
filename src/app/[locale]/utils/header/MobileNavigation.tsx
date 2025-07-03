@@ -1,14 +1,16 @@
-import { FC, useState, useEffect } from 'react'
-import { Link } from '@/src/navigation'
-import { useTranslations } from 'next-intl'
-import ThemeSwitch from '../ThemeSwitch'
-import LangSwitcher from '../LangSwitcher'
+'use client';
+
+import { FC, useState, useEffect } from 'react';
+import { Link } from '@/src/navigation';
+import { useTranslations } from 'next-intl';
+import ThemeSwitch from '../ThemeSwitch';
+import LangSwitcher from '../LangSwitcher';
 
 interface Props {
-  isMobileMenuOpen: boolean
-  closeAllMenus: () => void
-  locale: string
-  isLogin: boolean
+  isMobileMenuOpen: boolean;
+  closeAllMenus: () => void;
+  locale: string;
+  isLogin: boolean;
 }
 
 const MobileNavigation: FC<Props> = ({
@@ -17,24 +19,20 @@ const MobileNavigation: FC<Props> = ({
   locale,
   isLogin
 }) => {
-  const t = useTranslations('')
-  const [isClient, setIsClient] = useState(false)
+  const t = useTranslations('');
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true)
-  }, [])
-
-  // ---- Đảm bảo không có gì ở giữa đây ----
+    setIsClient(true);
+  }, []);
 
   return (
     <div
-      className={`mobile-navigation border-border absolute right-0 top-full z-40 w-40 border-b bg-background-secondary shadow-md lg:hidden ${
+      // THAY ĐỔI Ở ĐÂY: Thay lg:hidden thành xl:hidden
+      className={`mobile-navigation border-border absolute right-0 top-full z-40 w-40 border-b bg-background-secondary shadow-md xl:hidden ${
         isMobileMenuOpen ? '' : 'hidden'
       }`}
-      // suppressHydrationWarning // Nếu cần, đặt nó làm prop của div
     >
-      {/* Render ThemeSwitch/LangSwitcher ở client */}
-      {/* Bọc chúng trong một div để layout tốt hơn nếu cần */}
       {isClient && (
         <>
           <div className='px-2 hover:bg-gray-10 '>
@@ -47,7 +45,6 @@ const MobileNavigation: FC<Props> = ({
       )}
 
       <div className='flex flex-col text-sm '>
-        {/* Các link này không phụ thuộc isLogin, nên giữ nguyên */}
         <Link
           href={`/conferences`}
           locale={locale}
@@ -94,7 +91,6 @@ const MobileNavigation: FC<Props> = ({
           {t('Publish')}
         </Link>
 
-        {/* Chỉ render phần này sau khi đã chắc chắn ở client */}
         {isClient && !isLogin && (
           <>
             <Link
@@ -115,7 +111,7 @@ const MobileNavigation: FC<Props> = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MobileNavigation
+export default MobileNavigation;

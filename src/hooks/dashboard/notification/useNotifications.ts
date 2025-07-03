@@ -1,3 +1,5 @@
+// src/hooks/dashboard/notification/useNotifications.ts
+
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Notification } from '@/src/models/response/user.response';
 import { useAuth } from '@/src/contexts/AuthContext';
@@ -15,7 +17,7 @@ import useBulkImportantActions from './useBulkImportantActions';
  */
 interface UseNotificationsProps {
   filter: 'all' | 'unread' | 'read' | 'important';
-  showErrorModal: (title: string, message: string) => void; // <--- THÊM PROP NÀY
+  showErrorModal: (title: string, message: string) => void;
 }
 
 /**
@@ -38,10 +40,10 @@ interface UseNotificationsReturn {
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
   fetchData: () => Promise<void>;
-  handleUpdateSeenAt: (id: string) => Promise<void>;
+  handleUpdateSeenAt: (id: string) => Promise<void>; // Giữ lại cho chi tiết thông báo
   handleToggleImportant: (id: string) => Promise<void>;
   handleDeleteNotification: (id: string) => Promise<void>;
-  handleMarkUnseen: (id: string) => Promise<void>;
+  handleToggleReadStatus: (id: string, isRead: boolean) => Promise<void>; // <--- THÊM HÀM NÀY
   handleCheckboxChangeTab: (id: string, checked: boolean) => void;
   handleDeleteSelected: () => Promise<void>;
   handleSelectAllChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -58,7 +60,7 @@ interface UseNotificationsReturn {
  * @param {UseNotificationsProps} props - Props cho hook, bao gồm bộ lọc hiện tại.
  * @returns {UseNotificationsReturn} - Các state và hàm cần thiết cho component UI.
  */
-const useNotifications = ({ filter, showErrorModal }: UseNotificationsProps): UseNotificationsReturn => { // <--- NHẬN showErrorModal
+const useNotifications = ({ filter, showErrorModal }: UseNotificationsProps): UseNotificationsReturn => {
   // === STATE QUẢN LÝ INPUT TỪ UI ===
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -78,18 +80,17 @@ const useNotifications = ({ filter, showErrorModal }: UseNotificationsProps): Us
     isBanned,
     initialLoad,
     fetchData,
-  } = useNotificationData(showErrorModal); // <--- TRUYỀN showErrorModal VÀO useNotificationData
+  } = useNotificationData(showErrorModal);
 
   // 2. Hook quản lý state của danh sách thông báo và các hành động đơn lẻ
   const {
     notifications: rawNotifications,
     setNotifications,
-    handleUpdateSeenAt,
+    handleUpdateSeenAt, // Giữ lại hàm này nếu vẫn cần cho chi tiết thông báo
     handleToggleImportant,
     handleDeleteNotification,
-    handleMarkUnseen,
-    updateUserNotifications, // Giữ tên này để truyền xuống, nhưng nó là hàm patch
-  } = useNotificationState(initialNotifications, userId, showErrorModal); // <--- TRUYỀN showErrorModal VÀO useNotificationState
+    updateUserNotifications,
+  } = useNotificationState(initialNotifications, userId, showErrorModal);
 
   // === LOGIC XỬ LÝ VÀ BIẾN ĐỔI DỮ LIỆU ===
 
@@ -202,21 +203,42 @@ const useNotifications = ({ filter, showErrorModal }: UseNotificationsProps): Us
     setCheckedIndices([]); // Reset lựa chọn sau khi thành công
   };
 
-  // Hàm xóa đã có sẵn logic này, chúng ta giữ nguyên
   const handleDeleteSelected = async () => {
-    const updatedNotifications = rawNotifications.map(n =>
-      checkedIndices.includes(n.id) ? { ...n, deletedAt: new Date().toISOString(), isDeleted: true } : n
-    );
+    // Tạo một mảng các bản vá chỉ chứa ID và trạng thái deletedAt
+    const patches = checkedIndices.map(id => ({
+      id: id,
+      deletedAt: new Date().toISOString(),
+    }));
+
+    if (patches.length === 0) {
+      return; // Không làm gì nếu không có gì được chọn
+    }
+
     try {
-      await updateUserNotifications(updatedNotifications);
-      setCheckedIndices([]); // Đã có sẵn, rất tốt!
+      // Gọi hàm patchUserNotifications với chỉ các bản vá của các thông báo được chọn
+      await updateUserNotifications(patches);
+      setCheckedIndices([]); // Reset lựa chọn sau khi thành công
     } catch (error) {
       console.error('Failed to delete selected notifications:', error);
-      // Lỗi sẽ được bắt bởi performAction trong NotificationsTab.tsx
       throw error; // Re-throw để performAction có thể bắt
     }
   };
-  // === USEEFFECTS ĐỂ ĐỒNG BỘ STATE ===
+
+  // --- HÀM MỚI: Đánh dấu đã đọc/chưa đọc cho một thông báo ---
+  const handleToggleReadStatus = useCallback(async (id: string, isCurrentlyRead: boolean) => {
+    try {
+      const patch = {
+        id: id,
+        seenAt: isCurrentlyRead ? null : new Date().toISOString(), // Nếu đang đọc thì đặt null (chưa đọc), ngược lại thì đặt thời gian hiện tại (đã đọc)
+      };
+      await updateUserNotifications([patch]);
+    } catch (error) {
+      console.error(`Failed to toggle read status for notification ${id}:`, error);
+      showErrorModal('Operation Failed', 'Failed to update notification read status.');
+      throw error;
+    }
+  }, [updateUserNotifications, showErrorModal]);
+
 
   // Đồng bộ dữ liệu từ API vào state cục bộ
   useEffect(() => {
@@ -255,7 +277,7 @@ const useNotifications = ({ filter, showErrorModal }: UseNotificationsProps): Us
     checkedIndices,
     selectAllChecked: selectAllCheckedOnCurrentPage,
     loading,
-    loggedIn: isLoggedIn, // Trả về isLoggedIn từ AuthContext
+    loggedIn: isLoggedIn,
     isBanned,
     initialLoad,
     searchTerm,
@@ -270,7 +292,7 @@ const useNotifications = ({ filter, showErrorModal }: UseNotificationsProps): Us
     handleUpdateSeenAt,
     handleToggleImportant,
     handleDeleteNotification,
-    handleMarkUnseen,
+    handleToggleReadStatus, // <--- TRẢ VỀ HÀM MỚI
     handleCheckboxChangeTab,
     handleDeleteSelected,
     handleSelectAllChange,

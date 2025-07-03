@@ -6,7 +6,6 @@ import { useTranslations } from 'next-intl'
 import { ConferenceResponse } from '../../../../models/response/conference.response'
 
 // Hooks
-import useSectionNavigation from '../../../../hooks/conferenceDetails/useSectionNavigation'
 import useActiveSection from '../../../../hooks/conferenceDetails/useActiveSection'
 import { useFormatConferenceData } from '@/src/hooks/conferenceDetails/useFormatConferenceData'
 

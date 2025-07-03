@@ -1,5 +1,3 @@
-// src/components/layout/HeaderClient.tsx (ĐÃ CHỈNH SỬA THEO GIẢI PHÁP TỐI ƯU)
-
 'use client';
 
 import { FC, useRef } from 'react';
@@ -21,22 +19,17 @@ import { usePathname } from '@/src/navigation';
 import { useSidebar } from '@/src/contexts/SidebarContext';
 import { WhatsNewButton } from '../home/whatnews/WhatsNewButton';
 
-// [BẮT ĐẦU THAY ĐỔI]
-// Skeleton mới, mô phỏng trạng thái rộng nhất (chưa đăng nhập) để đảm bảo độ rộng không đổi.
 const AuthSectionSkeleton: FC = () => (
   <div className="flex w-full items-center justify-end gap-2">
     <div className="h-9 w-20 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
     <div className="h-9 w-20 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
   </div>
 );
-// [KẾT THÚC THAY ĐỔI]
 
-// --- Props Interface ---
 interface HeaderClientProps {
   locale: string;
 }
 
-// --- Component HeaderClient ---
 const HeaderClient: FC<HeaderClientProps> = ({ locale }) => {
   const headerRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -79,20 +72,8 @@ const HeaderClient: FC<HeaderClientProps> = ({ locale }) => {
       <div className='relative flex flex-row items-center gap-2 md:gap-4'>
         <DesktopNavigation locale={locale} />
 
-        {/* [BẮT ĐẦU THAY ĐỔI] */}
-        {/* Thêm nút "What's New" ở đây, bên trong flex container */}
         <WhatsNewButton />
-        {/* [KẾT THÚC THAY ĐỔI] */}
 
-
-        {/* [BẮT ĐẦU THAY ĐỔI] */}
-        {/* 
-          Giải pháp: Tạo một khung chứa cố định cho toàn bộ khu vực xác thực.
-          - `w-44` (11rem): Độ rộng cố định, đủ lớn để chứa 2 button "Đăng nhập" & "Đăng ký". 
-            Bạn có thể cần điều chỉnh giá trị này cho phù hợp với độ dài chữ của bạn.
-          - `flex justify-end`: Đảm bảo nội dung bên trong (dù là 2 icon hay 2 button) luôn được căn về bên phải của khung.
-          Kết quả: Khung này sẽ không bao giờ thay đổi kích thước, do đó không "đẩy" navigation bên trái, loại bỏ hoàn toàn hiện tượng giật.
-        */}
         <div className="flex w-24 justify-end">
           {isInitializing ? (
             <AuthSectionSkeleton />
@@ -109,10 +90,10 @@ const HeaderClient: FC<HeaderClientProps> = ({ locale }) => {
             <AuthButtons isLogin={false} locale={locale} />
           )}
         </div>
-        {/* [KẾT THÚC THAY ĐỔI] */}
 
+        {/* THAY ĐỔI Ở ĐÂY: Thay lg:hidden thành xl:hidden */}
         <Button
-          className='block lg:hidden'
+          className='block xl:hidden'
           onClick={e => { e.stopPropagation(); openMobileMenu(); }}
         >
           {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}

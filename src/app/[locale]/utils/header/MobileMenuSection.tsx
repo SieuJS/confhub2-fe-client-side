@@ -1,5 +1,3 @@
-// src/app/[locale]/utils/header/MobileMenuSection.tsx (TẠO FILE MỚI)
-
 'use client';
 
 import { FC } from 'react';
@@ -17,11 +15,11 @@ const MobileMenuSection: FC<MobileMenuSectionProps> = ({ locale }) => {
   const { isLoggedIn } = useAuth();
   const { isMobileMenuOpen, openMobileMenu, closeAllMenus } = useMenuState();
 
-  // Không cần skeleton cho nút bấm này
   return (
     <>
+      {/* THAY ĐỔI Ở ĐÂY: Thay lg:hidden thành xl:hidden */}
       <Button
-        className='block lg:hidden'
+        className='block xl:hidden'
         onClick={e => { e.stopPropagation(); openMobileMenu(); }}
       >
         {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}

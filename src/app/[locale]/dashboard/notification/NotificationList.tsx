@@ -13,9 +13,8 @@ interface NotificationListProps {
   checkedIndices: string[];
   onCheckboxChange: (notificationId: string, checked: boolean) => void;
   onDelete: (notificationId: string) => void;
-  // SỬA LỖI Ở ĐÂY: Thay đổi 'void' thành 'Promise<void>'
   onToggleImportant: (notificationId: string) => Promise<void>;
-  onMarkUnseen: (notificationId: string) => void;
+  onToggleReadStatus: (notificationId: string, isRead: boolean) => Promise<void>; // Đổi tên và thêm isRead
 }
 
 const NotificationList: React.FC<NotificationListProps> = ({
@@ -26,7 +25,7 @@ const NotificationList: React.FC<NotificationListProps> = ({
   onCheckboxChange,
   onDelete,
   onToggleImportant,
-  onMarkUnseen,
+  onToggleReadStatus, // Sử dụng tên mới
 }) => {
   const t = useTranslations('');
 
@@ -53,24 +52,46 @@ const NotificationList: React.FC<NotificationListProps> = ({
   }
 
   return (
-    <>
-      {!loading &&
-        notifications.map(notification => (
-          <NotificationItem
-            key={notification.id}
-            notification={notification}
-            onDelete={() => onDelete(notification.id)}
-            isChecked={checkedIndices.includes(notification.id)}
-            onCheckboxChange={checked =>
-              onCheckboxChange(notification.id, checked)
-            }
-            // Bây giờ prop này đã khớp với kiểu dữ liệu mong muốn
-            onToggleImportant={onToggleImportant}
-            onMarkUnseen={onMarkUnseen}
-            notificationId={notification.id}
-          />
-        ))}
-    </>
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-20">
+          <tr>
+            <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
+              {/* Checkbox header (có thể ẩn nếu không cần) */}
+            </th>
+            <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
+              {/* Star header */}
+            </th>
+            <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[300px] md:w-auto">
+              {t('Title') || 'Title'}
+            </th>
+            <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[300px] md:w-auto">
+              {t('Message') || 'Message'}
+            </th>
+            <th scope="col" className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px] md:w-auto">
+              {t('Time') || 'Time'}
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {!loading &&
+            notifications.map(notification => (
+              <NotificationItem
+                key={notification.id}
+                notification={notification}
+                onDelete={() => onDelete(notification.id)}
+                isChecked={checkedIndices.includes(notification.id)}
+                onCheckboxChange={checked =>
+                  onCheckboxChange(notification.id, checked)
+                }
+                onToggleImportant={onToggleImportant}
+                onToggleReadStatus={onToggleReadStatus} // Truyền prop mới
+                notificationId={notification.id}
+              />
+            ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 

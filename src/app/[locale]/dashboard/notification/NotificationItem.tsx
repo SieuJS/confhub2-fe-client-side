@@ -1,16 +1,20 @@
+// src/app/[locale]/dashboard/notifications/NotificationItem.tsx
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Notification } from '../../../../models/response/user.response';
 import { Link } from '@/src/navigation';
 import { useSearchParams } from 'next/navigation';
-import { Eye, Trash2, Star } from 'lucide-react'; // Import Star icon
+import { Eye, EyeOff, Trash2, Star } from 'lucide-react'; // Import EyeOff
+import { useLocale, useTranslations } from 'next-intl';
+import { formatDate as formatConferenceDate } from '../../conferences/detail/utils/conferenceUtils';
 
 interface NotificationItemProps {
   notification: Notification;
   onDelete: () => void;
   isChecked: boolean;
   onCheckboxChange: (checked: boolean) => void;
-  onToggleImportant: (id: string) => Promise<void>; // Đảm bảo hàm này trả về Promise<void>
-  onMarkUnseen: (id: string) => void;
+  onToggleImportant: (id: string) => Promise<void>;
+  onToggleReadStatus: (id: string, isRead: boolean) => Promise<void>; // Đổi tên và thêm isRead
   notificationId: string;
 }
 
@@ -20,53 +24,52 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   isChecked,
   onCheckboxChange,
   onToggleImportant,
-  onMarkUnseen,
+  onToggleReadStatus, // Sử dụng tên mới
   notificationId,
 }) => {
-  // LOẠI BỎ isStarred state cục bộ.
-  // const [isStarred, setIsStarred] = useState(false); // Xóa dòng này
   const [isHovered, setIsHovered] = useState(false);
-  const [isTogglingImportant, setIsTogglingImportant] = useState(false); // Thêm state loading cho hành động này
+  const [isTogglingImportant, setIsTogglingImportant] = useState(false);
+  const [isTogglingRead, setIsTogglingRead] = useState(false); // Thêm state cho trạng thái đọc/chưa đọc
   const searchParams = useSearchParams();
-
-  // LOẠI BỎ useEffect này vì trạng thái isImportant sẽ được quản lý từ prop notification
-  // useEffect(() => {
-  //   setIsStarred(notification.isImportant);
-  // }, [notification.isImportant, notification.id]);
+  const locale = useLocale();
+  const t = useTranslations('');
 
   const handleToggleStar = useCallback(async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Ngăn chặn sự kiện click lan truyền
-    if (isTogglingImportant) return; // Ngăn chặn click liên tục
+    e.stopPropagation();
+    if (isTogglingImportant) return;
 
-    setIsTogglingImportant(true); // Bắt đầu loading
+    setIsTogglingImportant(true);
     try {
-      await onToggleImportant(notification.id); // Chờ API hoàn tất
-      // Không cần cập nhật state cục bộ ở đây,
-      // vì `onToggleImportant` sẽ kích hoạt cập nhật dữ liệu tổng thể
-      // và prop `notification.isImportant` sẽ tự động thay đổi.
+      await onToggleImportant(notification.id);
     } catch (error) {
       console.error('Failed to toggle important status:', error);
-      // Lỗi sẽ được xử lý bởi `performAction` trong `NotificationsTab` và hiển thị modal lỗi.
-      // Không cần làm gì thêm ở đây ngoài việc log lỗi.
     } finally {
-      setIsTogglingImportant(false); // Kết thúc loading
+      setIsTogglingImportant(false);
     }
   }, [notification.id, onToggleImportant, isTogglingImportant]);
+
+  const handleToggleReadClick = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isTogglingRead) return; // Ngăn chặn click liên tục
+
+    setIsTogglingRead(true); // Bắt đầu loading
+    try {
+      // Nếu đã đọc (có seenAt), thì đánh dấu là chưa đọc (false)
+      // Nếu chưa đọc (không có seenAt), thì đánh dấu là đã đọc (true)
+      await onToggleReadStatus(notification.id, !!notification.seenAt);
+    } catch (error) {
+      console.error('Failed to toggle read status:', error);
+    } finally {
+      setIsTogglingRead(false); // Kết thúc loading
+    }
+  }, [notification.id, notification.seenAt, onToggleReadStatus, isTogglingRead]);
 
 
   const handleCheckboxChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onCheckboxChange(event.target.checked);
     },
-    [onCheckboxChange, notification.id]
-  );
-
-  const handleMarkUnseenCallback = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      onMarkUnseen(notification.id);
-    },
-    [notification.id, onMarkUnseen]
+    [onCheckboxChange]
   );
 
   const handleDeleteClick = useCallback(
@@ -74,11 +77,11 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       e.stopPropagation();
       onDelete();
     },
-    [onDelete, notificationId]
+    [onDelete]
   );
 
-  const formatDate = (dateString: string | undefined): string => {
-    if (!dateString) return 'Unknown';
+  const formatNotificationDate = (dateString: string | undefined): string => {
+    if (!dateString) return t('Unknown');
 
     const date = new Date(dateString);
     const now = new Date();
@@ -88,28 +91,26 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       date.getFullYear() === now.getFullYear();
 
     if (isToday) {
-      return date.toLocaleTimeString('vi-VN', {
+      return date.toLocaleTimeString(locale, {
         hour: '2-digit',
         minute: '2-digit',
         hour12: false,
       });
     } else {
-      return date.toLocaleDateString('vi-VN', {
-        day: 'numeric',
-        month: 'short',
-      });
+      return formatConferenceDate(dateString, t, locale);
     }
   };
 
   const isSeen = !!notification.seenAt;
 
   return (
-    <div
-      className={`flex cursor-pointer items-center border border-background px-4 py-2 ${
-        notification.isImportant ? 'bg-yellow-50' : '' // Dùng trực tiếp notification.isImportant
-      } ${isChecked ? 'bg-background-secondary' : ''} ${
-        !isSeen ? 'bg-background' : ''
-      } ${isHovered ? 'border-primary' : ''}`}
+    <tr
+      className={`
+        ${notification.isImportant ? 'bg-yellow-50' : ''}
+        ${isChecked ? 'bg-background-secondary' : ''}
+        ${!isSeen ? 'bg-background' : ''}
+        ${isHovered ? 'bg-gray-100' : ''} cursor-pointer
+      `}
       onMouseEnter={() => {
         setIsHovered(true);
       }}
@@ -117,84 +118,98 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         setIsHovered(false);
       }}
     >
-      {/* Nút chọn và đánh dấu quan trọng */}
-      <input
-        type='checkbox'
-        className='mr-3 h-4 w-4 cursor-pointer rounded border-background text-button-text focus:ring-button'
-        checked={isChecked}
-        onChange={handleCheckboxChange}
-        onClick={(e) => e.stopPropagation()}
-        aria-label='Select notification'
-      />
-      <button
-        onClick={handleToggleStar} // Gọi hàm mới
-        className='mr-3 focus:outline-none'
-        aria-label='Mark as important'
-        disabled={isTogglingImportant} // Vô hiệu hóa nút khi đang loading
-      >
-        {/* Thay thế span ★ bằng icon Lucide Star */}
-        <Star
-          size={20}
-          strokeWidth={1.75}
-          className={`${
-            notification.isImportant ? 'text-yellow-500 fill-yellow-500' : 'text-gray-400'
-          } ${isTogglingImportant ? 'animate-pulse' : ''}`} // Thêm hiệu ứng loading
+      {/* Cell 1: Checkbox */}
+      <td className="px-4 py-2 whitespace-nowrap">
+        <input
+          type='checkbox'
+          className='h-4 w-4 cursor-pointer rounded border-background text-button-text focus:ring-button'
+          checked={isChecked}
+          onChange={handleCheckboxChange}
+          onClick={(e) => e.stopPropagation()}
+          aria-label='Select notification'
         />
-      </button>
+      </td>
 
-      <div className='grid flex-1 grid-cols-[2fr_7fr_1fr] items-center gap-2'>
-        {/* Column 1: Type (1fr) */}
-        <div className='overflow-hidden text-ellipsis whitespace-nowrap'>
-          <span className={`${!isSeen ? 'font-bold' : ''} text-gray-70`}>
-            {notification.type.replace(/_/g, ' ')}
-          </span>
-        </div>
+      {/* Cell 2: Star/Important */}
+      <td className="px-4 py-2 whitespace-nowrap">
+        <button
+          onClick={handleToggleStar}
+          className='focus:outline-none'
+          aria-label='Mark as important'
+          disabled={isTogglingImportant}
+        >
+          <Star
+            size={20}
+            strokeWidth={1.75}
+            className={`${
+              notification.isImportant ? 'text-yellow-500 fill-yellow-500' : 'text-gray-400'
+            } ${isTogglingImportant ? 'animate-pulse' : ''}`}
+          />
+        </button>
+      </td>
 
-        {/* Column 2: Message (3fr) */}
-        <div className='overflow-hidden text-ellipsis whitespace-nowrap'>
-          <Link
-            href={{
-              pathname: '/dashboard',
-              query: { ...Object.fromEntries(searchParams), id: notificationId },
-            }}
-            className=''
+      {/* Cell 3: Type */}
+      <td className="px-4 py-2">
+        <span className={`
+          ${!isSeen ? 'font-bold' : ''} text-gray-70
+          whitespace-nowrap md:whitespace-normal md:overflow-hidden md:text-ellipsis block
+        `}>
+          {notification.type.replace(/_/g, ' ')}
+        </span>
+      </td>
+
+      {/* Cell 4: Message */}
+      <td className="px-4 py-2">
+        <Link
+          href={{
+            pathname: '/dashboard',
+            query: { ...Object.fromEntries(searchParams), id: notificationId },
+          }}
+          className='block'
+        >
+          <p className={`
+            ${!isSeen ? 'font-bold' : ''} text-sm text-gray-70
+            whitespace-nowrap md:whitespace-normal md:overflow-hidden md:text-ellipsis
+          `}>
+            {notification.message}
+          </p>
+        </Link>
+      </td>
+
+      {/* Cell 5: Time and Actions */}
+      <td className="px-4 py-2 text-right whitespace-nowrap">
+        {!isHovered && (
+          <span
+            className={`${!isSeen ? 'font-bold' : ''} text-xs text-gray-70`}
           >
-            <p className={`${!isSeen ? 'font-bold' : ''} text-sm text-gray-70`}>
-              {notification.message}
-            </p>
-          </Link>
-        </div>
-
-        {/* Column 3: Time and Actions (1fr) */}
-        <div className='text-right'>
-          {!isHovered && (
-            <span
-              className={`${!isSeen ? 'font-bold' : ''} whitespace-nowrap text-xs text-gray-70`}
+            {formatNotificationDate(notification.createdAt)}
+          </span>
+        )}
+        {isHovered && (
+          <div className='flex items-center justify-end space-x-2'>
+            <button
+              onClick={handleToggleReadClick} // Gọi hàm mới
+              className='text-gray-70 hover:text-blue-500 focus:outline-none'
+              aria-label={isSeen ? 'Mark as unread' : 'Mark as read'} // Thay đổi aria-label
+              disabled={isTogglingRead} // Vô hiệu hóa khi đang xử lý
             >
-              {formatDate(notification.createdAt)}
-            </span>
-          )}
-          {isHovered && (
-            <div className='flex items-center justify-end space-x-2'>
-              <button
-                onClick={handleMarkUnseenCallback}
-                className='text-gray-70 hover:text-blue-500 focus:outline-none'
-                aria-label='Mark as unseen'
-              >
-                <Eye size={20} strokeWidth={1.75} />
-              </button>
-              <button
-                onClick={handleDeleteClick}
-                className='text-gray-70 hover:text-red-500 focus:outline-none'
-                aria-label='Delete notification'
-              >
-                <Trash2 size={20} strokeWidth={1.75} />
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+              {isSeen ? (
+                <EyeOff size={20} strokeWidth={1.75} className={`${isTogglingRead ? 'animate-pulse' : ''}`} /> // Icon cho chưa đọc
+              ) : (
+                <Eye size={20} strokeWidth={1.75} className={`${isTogglingRead ? 'animate-pulse' : ''}`} /> // Icon cho đã đọc
+              )}
+            </button>
+            <button
+              onClick={handleDeleteClick}
+              className='text-gray-70 hover:text-red-500 focus:outline-none'
+              aria-label='Delete notification'
+            >
+              <Trash2 size={20} strokeWidth={1.75} />
+            </button>
+          </div>
+        )}
+      </td>
+    </tr>
   );
 };
 

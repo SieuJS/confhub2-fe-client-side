@@ -1,13 +1,18 @@
-// src/contexts/SidebarContext.tsx
-
 'use client';
 
-import React, { createContext, useState, useContext, ReactNode, FC, useEffect } from 'react';
+import React, { 
+  createContext, 
+  useState, 
+  useContext, 
+  ReactNode, 
+  FC, 
+  useEffect,
+  useRef // Thêm useRef
+} from 'react';
 
-// Một custom hook đơn giản để theo dõi kích thước màn hình
-const useMediaQuery = (query: string) => {
+// useMediaQuery giữ nguyên
+const useMediaQuery = (query: string): boolean => {
   const [matches, setMatches] = useState(false);
-
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const media = window.matchMedia(query);
@@ -19,30 +24,60 @@ const useMediaQuery = (query: string) => {
       return () => media.removeEventListener('change', listener);
     }
   }, [matches, query]);
-
   return matches;
 };
 
-// 1. Định nghĩa kiểu dữ liệu cho Context
 interface SidebarContextType {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
-  // Có thể thêm các giá trị khác nếu cần, ví dụ:
-  // setSidebarOpen: (isOpen: boolean) => void;
 }
 
-// 2. Tạo Context với giá trị mặc định
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
-// 3. Tạo Provider Component
-export const SidebarProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const isDesktop = useMediaQuery('(min-width: 768px)');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+const SIDEBAR_STATE_KEY = 'app-sidebar-state';
 
-  // Đồng bộ trạng thái mở/đóng mặc định với kích thước màn hình
+export const SidebarProvider: FC<{ children: ReactNode }> = ({ children }) => {
+  // State khởi tạo vẫn là false để đảm bảo không có lỗi hydration.
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+  
+  // FIX: Sử dụng useRef để theo dõi lần render đầu tiên.
+  // Giá trị của ref sẽ tồn tại qua các lần render mà không kích hoạt render lại.
+  const isInitialMount = useRef(true);
+
+  // useEffect để KHÔI PHỤC state từ localStorage.
+  // Nó chỉ chạy một lần sau khi component mount.
   useEffect(() => {
-    setIsSidebarOpen(isDesktop);
-  }, [isDesktop]);
+    let initialValue;
+    try {
+      const savedState = window.localStorage.getItem(SIDEBAR_STATE_KEY);
+      if (savedState !== null) {
+        initialValue = JSON.parse(savedState);
+      } else {
+        initialValue = isDesktop;
+      }
+    } catch (error) {
+      console.error("Error reading sidebar state from localStorage", error);
+      initialValue = isDesktop;
+    }
+    setIsSidebarOpen(initialValue);
+  }, [isDesktop]); // Giữ isDesktop để xử lý trường hợp người dùng vào trang lần đầu tiên
+
+  // useEffect để LƯU state vào localStorage.
+  useEffect(() => {
+    // FIX: Kiểm tra ref. Nếu đây là lần mount đầu tiên, chúng ta bỏ qua việc lưu.
+    if (isInitialMount.current) {
+      // Đánh dấu là đã qua lần mount đầu tiên cho các lần chạy sau.
+      isInitialMount.current = false;
+    } else {
+      // Từ lần render thứ hai trở đi, chúng ta mới bắt đầu lưu state.
+      try {
+        window.localStorage.setItem(SIDEBAR_STATE_KEY, JSON.stringify(isSidebarOpen));
+      } catch (error) {
+        console.error("Error saving sidebar state to localStorage", error);
+      }
+    }
+  }, [isSidebarOpen]); // Vẫn phụ thuộc vào isSidebarOpen
 
   const toggleSidebar = () => {
     setIsSidebarOpen(prev => !prev);
@@ -57,17 +92,11 @@ export const SidebarProvider: FC<{ children: ReactNode }> = ({ children }) => {
   );
 };
 
-// 4. Tạo hook tùy chỉnh để dễ dàng sử dụng Context
+// Hook useSidebar giữ nguyên
 export const useSidebar = (): SidebarContextType => {
   const context = useContext(SidebarContext);
   if (context === undefined) {
-    // Cung cấp một giá trị mặc định "an toàn" nếu không nằm trong Provider
-    // Điều này hữu ích cho các trang không có sidebar
-    return {
-      isSidebarOpen: false,
-      toggleSidebar: () => {}
-        // console.warn('useSidebar must be used within a SidebarProvider to function.'),
-    };
+    throw new Error('useSidebar must be used within a SidebarProvider');
   }
   return context;
 };

@@ -62,12 +62,13 @@ export default function DashboardPage() {
     );
   }
 
-    return (
-    // Container này chiếm toàn bộ chiều cao được cấp bởi layout cha.
-    <div className="h-full">
+  return (
+    // FIX (Optional): Loại bỏ h-full.
+    // Layout cha (layout.tsx) đã quản lý chiều cao tối thiểu.
+    // Container này giờ chỉ cần tồn tại để chứa các tab.
+    <div>
       {TABS.map(tab => (
-        // Tab đang hoạt động cũng chiếm toàn bộ chiều cao, truyền nó xuống component con.
-        <div key={tab.name} className={activePage === tab.name ? 'block h-full' : 'hidden'}>
+        <div key={tab.name} className={activePage === tab.name ? 'block' : 'hidden'}>
           {tab.component}
         </div>
       ))}

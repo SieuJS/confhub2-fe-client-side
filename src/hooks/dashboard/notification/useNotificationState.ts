@@ -1,13 +1,30 @@
+// src/hooks/dashboard/notification/useNotificationState.ts
+
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Notification } from '@/src/models/response/user.response';
-import { updateNotifications, NotificationUpdatePayload } from '../../../app/apis/user/updateNotifications';
+import { updateNotifications, NotificationUpdatePayload } from '@/src/app/apis/user/updateNotifications';
+import { AxiosError } from 'axios';
 
-type NotificationPatch = { id: string } & Partial<Omit<Notification, 'id'>>;
+// --- Thêm interface này ---
+interface ApiErrorResponse {
+  message?: string; // API của bạn có thể trả về một trường 'message'
+  // Thêm các trường lỗi khác nếu có, ví dụ:
+  // code?: string;
+  // errors?: { [key: string]: string[] };
+}
+// -------------------------
+
+type NotificationPatch = {
+  id: string;
+  seenAt?: string | null;
+  isImportant?: boolean;
+  deletedAt?: string | null;
+};
 
 const useNotificationState = (
     initialNotifications: Notification[],
     userId: string,
-    showErrorModal: (title: string, message: string) => void // <--- NHẬN showErrorModal
+    showErrorModal: (title: string, message: string) => void
 ) => {
     const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
     const notificationsRef = useRef(notifications);
@@ -16,7 +33,11 @@ const useNotificationState = (
         notificationsRef.current = notifications;
     }, [notifications]);
 
-    const patchUserNotifications = useCallback(async (patches: NotificationPatch[]) => {
+    useEffect(() => {
+        setNotifications(initialNotifications);
+    }, [initialNotifications]);
+
+    const updateUserNotifications = useCallback(async (patches: NotificationPatch[]) => {
         if (patches.length === 0) {
             return;
         }
@@ -27,7 +48,10 @@ const useNotificationState = (
 
         currentNotifications.forEach(notification => {
             if (patchMap.has(notification.id)) {
-                const updatedNotification = { ...notification, ...patchMap.get(notification.id) };
+                const updatedNotification: NotificationUpdatePayload = {
+                    ...notification,
+                    ...patchMap.get(notification.id)
+                };
                 fullNotificationsToUpdate.push(updatedNotification);
             }
         });
@@ -41,52 +65,59 @@ const useNotificationState = (
 
             setNotifications(prevNotifications => {
                 return prevNotifications.map(notification => {
-                    if (patchMap.has(notification.id)) {
-                        return { ...notification, ...patchMap.get(notification.id) };
+                    const patch = patchMap.get(notification.id);
+                    if (patch) {
+                        return { ...notification, ...patch };
                     }
                     return notification;
-                });
+                }).filter(n => !n.deletedAt);
             });
         } catch (error: any) {
             console.error('Failed to update notifications:', error);
-            // Hiển thị modal lỗi khi có lỗi từ API
-            showErrorModal('Update Failed', error.message || 'An unexpected error occurred while updating notifications.');
-            throw error; // Re-throw lỗi để các hook gọi nó có thể bắt và xử lý thêm nếu cần (ví dụ: `performAction` trong NotificationsTab)
+            const axiosError = error as AxiosError<ApiErrorResponse>; // <--- SỬ DỤNG INTERFACE Ở ĐÂY
+            const errorMessage = axiosError.response?.data?.message || axiosError.message || 'An unexpected error occurred while updating notifications.';
+            showErrorModal('Update Failed', errorMessage);
+            throw error;
         }
-    }, [showErrorModal]); // Thêm showErrorModal vào dependencies
+    }, [showErrorModal]);
 
     const handleUpdateSeenAt = useCallback(async (id: string) => {
         const notification = notificationsRef.current.find(n => n.id === id);
         if (notification && !notification.seenAt) {
-            await patchUserNotifications([{ id, seenAt: new Date().toISOString() }]);
+            await updateUserNotifications([{ id, seenAt: new Date().toISOString() }]);
         }
-    }, [patchUserNotifications]);
+    }, [updateUserNotifications]);
 
     const handleToggleImportant = useCallback(async (id: string) => {
         const notification = notificationsRef.current.find(n => n.id === id);
         if (notification) {
-            await patchUserNotifications([{ id, isImportant: !notification.isImportant }]);
+            await updateUserNotifications([{ id, isImportant: !notification.isImportant }]);
         }
-    }, [patchUserNotifications]);
+    }, [updateUserNotifications]);
 
     const handleDeleteNotification = useCallback(async (id: string) => {
-        await patchUserNotifications([{ id, deletedAt: new Date().toISOString() }]);
-    }, [patchUserNotifications]);
+        await updateUserNotifications([{ id, deletedAt: new Date().toISOString() }]);
+    }, [updateUserNotifications]);
 
-    const handleMarkUnseen = useCallback(async (id: string) => {
+    const handleToggleReadStatusInternal = useCallback(async (id: string, markAsRead: boolean) => {
         const notification = notificationsRef.current.find(n => n.id === id);
-        if (notification && notification.seenAt) {
-            await patchUserNotifications([{ id, seenAt: null }]);
+        if (notification) {
+            const newSeenAt = markAsRead ? new Date().toISOString() : null;
+            if ((!!notification.seenAt && !markAsRead) || (!notification.seenAt && markAsRead)) {
+                 await updateUserNotifications([{ id, seenAt: newSeenAt }]);
+            }
         }
-    }, [patchUserNotifications]);
+    }, [updateUserNotifications]);
 
-    const handleDeleteAllNotifications = async () => {
+    const handleDeleteAllNotifications = useCallback(async () => {
         const patches = notificationsRef.current.map(n => ({
             id: n.id,
             deletedAt: new Date().toISOString()
         }));
-        await patchUserNotifications(patches);
-    };
+        if (patches.length > 0) {
+            await updateUserNotifications(patches);
+        }
+    }, [updateUserNotifications]);
 
     return {
         notifications,
@@ -95,8 +126,8 @@ const useNotificationState = (
         handleToggleImportant,
         handleDeleteNotification,
         handleDeleteAllNotifications,
-        handleMarkUnseen,
-        updateUserNotifications: patchUserNotifications,
+        handleToggleReadStatusInternal,
+        updateUserNotifications,
     };
 };
 
