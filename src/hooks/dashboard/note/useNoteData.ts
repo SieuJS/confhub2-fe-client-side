@@ -109,7 +109,7 @@ export const useNoteData = (t: (key: string) => string) => {
 
       const groupedNotes: { [key: string]: any } = {};
       processedUpcoming.forEach(note => {
-        const key = `${note.id}-${note.type}`;
+        const key = `${note.id}-${note.name}-${note.type}`;
         let addedToGroup = false;
         for (const existingKey in groupedNotes) {
           if (existingKey.startsWith(key)) {
