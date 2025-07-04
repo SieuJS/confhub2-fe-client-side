@@ -8,8 +8,8 @@ import { ConferenceListResponse } from '@/src/models/response/conference.list.re
 // Trang sẽ được render lúc build và tự động render lại trên server sau mỗi 10 phút
 // nếu có request mới. Điều này giảm tải server đến mức tối đa.
 // Đối với các trang có search param, nó sẽ tự động chuyển về chế độ SSR.
-export const revalidate = 600; // 600 giây = 10 phút
-
+// export const revalidate = 600; // 600 giây = 10 phút
+// 
 // Định nghĩa kiểu cho props của trang
 interface ConferencesPageProps {
   params: { locale: string };

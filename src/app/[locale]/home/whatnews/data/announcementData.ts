@@ -207,14 +207,14 @@ export const guideData: GuideCategory[] = [
 export const surveyLinks: SurveyLinkItem[] = [
   {
     icon: Lightbulb,
-    title: 'Khảo sát Nhu cầu',
-    description: 'Chia sẻ ý tưởng và tính năng bạn mong muốn có trong tương lai.',
-    url: 'https://forms.gle/mzKDwAUVPf6Dhnq18',
+    title: 'Khảo sát Ý Kiến',
+    description: 'Chia sẻ ý kiến, đóng góp, nhu cầu của bạn về hệ thống.',
+    url: 'https://forms.gle/DaTqTaPTSCNRkyrz6',
   },
   {
     icon: Star,
     title: 'Khảo sát Trải nghiệm',
     description: 'Đánh giá trải nghiệm của bạn và báo cáo các vấn đề gặp phải.',
-    url: 'https://forms.gle/hpUV2atuV3zABZxX8',
+    url: 'https://forms.gle/tnktJSqPMdVzpboc6',
   },
 ];
