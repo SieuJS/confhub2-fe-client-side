@@ -7,7 +7,7 @@ export const isBasicInfoComplete = (props: ConferenceDetailsStepProps): boolean 
 
   // Sửa lỗi chính tả tên trường đã có
   const hasData = !!(title.trim() && acronym.trim() && link.trim());
-  const noErrors = !errors.title && !errors.acronym && !errors.link && !errors.callForPaperLink && !errors.importantDatesLink;
+  const noErrors = !errors.title && !errors.acronym && !errors.link && !errors.cfpLink && !errors.impLink;
 
   return hasData && noErrors;
 };

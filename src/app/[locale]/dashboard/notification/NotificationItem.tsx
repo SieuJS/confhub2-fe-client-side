@@ -109,7 +109,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         ${notification.isImportant ? 'bg-yellow-50' : ''}
         ${isChecked ? 'bg-background-secondary' : ''}
         ${!isSeen ? 'bg-background' : ''}
-        ${isHovered ? 'bg-gray-100' : ''} cursor-pointer
+        ${isHovered ? 'bg-gray-20' : ''} cursor-pointer
       `}
       onMouseEnter={() => {
         setIsHovered(true);

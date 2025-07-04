@@ -150,19 +150,20 @@ const ConferenceForm: React.FC = () => {
         </div>
       </form>
 
-      {/* --- Modal không thay đổi --- */}
+       {/* Modal cho thông báo thành công/lỗi */}
       <Modal
         isOpen={modalState.isOpen}
         onClose={closeModal}
         title={modalState.title}
-        size='md'
+        size='md' // Giữ size md hoặc thay đổi nếu muốn nhỏ hơn
+        // THAY ĐỔI QUAN TRỌNG Ở ĐÂY: Bọc các nút trong div với flexbox
         footer={
-          <>
+          <div className='flex justify-end space-x-2'> {/* justify-end và space-x-2 */}
             {modalState.status === 'success' ? (
               <>
                 <button
                   onClick={resetForm}
-                  className='rounded-md border border-gray-300 bg-white-pure px-4 py-2 text-sm font-medium  hover:bg-gray-50'
+                  className='rounded-md border border-gray-300 bg-white-pure px-3 py-1.5 text-sm font-medium  hover:bg-gray-20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600' // Điều chỉnh padding/font-size và thêm dark mode
                 >
                   {t('Add_Another_Conference')}
                 </button>
@@ -171,7 +172,7 @@ const ConferenceForm: React.FC = () => {
                     const localePrefix = pathname.split('/')[1]
                     router.push(`/${localePrefix}/dashboard?tab=myconferences`)
                   }}
-                  className='rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700'
+                  className='rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600' // Điều chỉnh padding/font-size
                 >
                   {t('Go_To_My_Conferences')}
                 </button>
@@ -179,12 +180,12 @@ const ConferenceForm: React.FC = () => {
             ) : (
               <button
                 onClick={closeModal}
-                className='rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700'
+                className='rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600' // Điều chỉnh padding/font-size
               >
                 {t('Close')}
               </button>
             )}
-          </>
+          </div>
         }
       >
         <div className='flex flex-col items-center text-center'>
@@ -194,7 +195,7 @@ const ConferenceForm: React.FC = () => {
           {modalState.status === 'error' && (
             <AlertTriangle className='mb-4 h-16 w-16 text-red-500' />
           )}
-          <p className=''>{modalState.message}</p>
+          <p className='text-gray-700 dark:text-gray-300'>{modalState.message}</p> {/* Thêm màu chữ */}
         </div>
       </Modal>
     </div>

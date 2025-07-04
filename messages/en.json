@@ -926,6 +926,7 @@
   "Live_Stream_Output_Settings": "Live Stream Output Settings",
   "Personalize_Responses_Toggle_Label": "Personalize Responses",
   "Personalization_Login_Required_Message": "Log in to enable response personalization.",
+  "Personalization_Enabled_Tooltip": "Response will be personalized with your information.",
   "Personalization_Benefit_Privacy_Popup_Title": "Enable Response Personalization?",
   "Personalization_Benefit_Privacy_Popup_Message": "By enabling this feature, the chatbot will use your personal information (like name, interests, and 'about me') to provide more relevant and tailored responses. Your data will be handled securely and only used to enhance your chat experience. Do you want to proceed?",
   "Personalization_Warning_Missing_Info_Message": "To get the best personalized experience, please complete your profile with: {fields}.",
@@ -1475,7 +1476,7 @@
   "ChatInput_Error_FileSize": "File \"{name}\" is too large. Maximum size is {maxSize}MB.",
   "ChatInput_Remove_File": "Remove file {fileName}",
   "ChatInput_Attach_File_Button_Label": "Attach file",
-  "Type_message_or_attach_files": "Type message or attach files...",
+  "Type_message_or_attach_files": "Type message or @currentpage ...",
   "User_data_not_available": "User data not available",
   "dob_must_be_18_or_older": "Date of birth must indicate you are 18 years or older.",
   "Minimize_Chat": "Minimize Chat",
@@ -1667,6 +1668,7 @@
     "Action_View_Submitted_Info": "View Submitted Info"
   },
   "AddConference": {
+    "Summary": "Summary",
     "Review_Information": "Review Information",
     "Please_review_all_conference_details_carefully_before_proceeding": "Please review all conference details carefully before proceeding.",
     "General_Information": "General Information",
@@ -1977,5 +1979,6 @@
   "tooltip_topics": "Filter conferences based on relevant topics. You can select multiple topics.",
   "Disclaimer_descripstion_chatbot": "Models may make mistakes, so double-check outputs.",
   "Go_to_CFP_website": "Go to CFP website",
-  "Chat": "Chat"
+  "Chat": "Chat",
+  "Please_enter_the_Call_for_Papers": "Please enter the Call for Papers"
 }

@@ -175,10 +175,10 @@ export const guideData: GuideCategory[] = [
         title: 'Thiết lập Hồ sơ cá nhân',
         guideContent: 'Hướng dẫn cách tạo và tùy chỉnh hồ sơ, lưu các tìm kiếm và theo dõi hội nghị yêu thích. Nội dung sẽ được cập nhật sớm.',
       },
-      {
-        title: 'Tích hợp Lịch và Cảnh báo',
-        guideContent: 'Hướng dẫn cách đồng bộ hóa hạn chót với lịch cá nhân (Google Calendar, Outlook) và cách thiết lập hệ thống cảnh báo qua email. Nội dung sẽ được cập nhật sớm.',
-      },
+      // {
+      //   title: 'Tích hợp Lịch và Cảnh báo',
+      //   guideContent: 'Hướng dẫn cách đồng bộ hóa hạn chót với lịch cá nhân (Google Calendar, Outlook) và cách thiết lập hệ thống cảnh báo qua email. Nội dung sẽ được cập nhật sớm.',
+      // },
     ],
   },
   {

@@ -73,7 +73,7 @@ const NotificationList: React.FC<NotificationListProps> = ({
             </th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="bg-background divide-y divide-gray-200">
           {!loading &&
             notifications.map(notification => (
               <NotificationItem

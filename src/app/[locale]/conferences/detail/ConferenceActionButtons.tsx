@@ -404,9 +404,12 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
           title={t('Submit_Paper_Modal_Title')}
           size='sm'
           footer={
-            <Button onClick={closeSubmitModal} variant='secondary'>
-              {t('Close_Button')}
-            </Button>
+            // THAY ĐỔI QUAN TRỌNG Ở ĐÂY: justify-start thay vì justify-end
+            <div className='flex justify-end'> {/* Thay đổi justify-end thành justify-start */}
+              <Button onClick={closeSubmitModal} variant='secondary' className='px-4 py-2 text-sm'> {/* Thêm padding và text-size để nút trông đẹp hơn */}
+                {t('Close_Button')}
+              </Button>
+            </div>
           }
         >
           <p>{t('Submit_Paper_Modal_Message')}</p>

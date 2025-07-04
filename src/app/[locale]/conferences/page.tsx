@@ -5,14 +5,10 @@ import ConferencesPageClient from './ConferencesPageClient'; // Component client
 import { ConferenceListResponse } from '@/src/models/response/conference.list.response';
 
 // Tối ưu hóa nâng cao: Incremental Static Regeneration (ISR)
-// Trang sẽ được render lúc build và tự động render lại trên server sau mỗi 10 phút
-// nếu có request mới. Điều này giảm tải server đến mức tối đa.
-// Đối với các trang có search param, nó sẽ tự động chuyển về chế độ SSR.
-// export const revalidate = 600; // 600 giây = 10 phút
-// 
-// Định nghĩa kiểu cho props của trang
+export const revalidate = 30; // 30 giây
+
 interface ConferencesPageProps {
-  params: { locale: string };
+  params: { locale: string }; 
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
@@ -54,8 +50,8 @@ export default async function ConferencesPage({ params, searchParams }: Conferen
         curPage: 1,
         perPage: 4,
         totalPage: 0,
-        prevPage: null, // Bổ sung giá trị null
-        nextPage: null, // Bổ sung giá trị null
+        prevPage: null,
+        nextPage: null,
       }
     };
   }

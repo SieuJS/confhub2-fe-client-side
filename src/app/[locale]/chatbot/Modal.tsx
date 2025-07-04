@@ -7,8 +7,10 @@ interface ModalProps {
   onClose: () => void
   title?: string
   children: ReactNode
-  footer?: ReactNode // Optional footer for buttons
-  size?: 'sm' | 'md' | 'lg' | '4xl' // Optional size
+  footer?: ReactNode
+  size?: 'sm' | 'md' | 'lg' | '4xl'
+  // THÊM PROP MỚI: 'fixed' cho toàn trang, 'absolute' cho component con
+  positioning?: 'fixed' | 'absolute'
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -17,7 +19,8 @@ const Modal: React.FC<ModalProps> = ({
   title,
   children,
   footer,
-  size = 'md'
+  size = 'md',
+  positioning = 'fixed' // Mặc định là 'fixed'
 }) => {
   if (!isOpen) return null
 
@@ -28,38 +31,48 @@ const Modal: React.FC<ModalProps> = ({
     '4xl': 'max-w-4xl'
   }
 
+  // Lớp CSS cho container chính, thay đổi tùy theo 'positioning'
+  const containerClasses =
+    positioning === 'fixed'
+      ? 'fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50'
+      : 'absolute inset-0 z-20 flex items-center justify-center bg-white-pure/80 dark:bg-gray-800/80 backdrop-blur-sm'
+
   return (
     <div
-      // Thay đổi z-50 thành z-[9999] hoặc một giá trị đủ lớn để đảm bảo nó luôn trên cùng
-      // Hoặc nếu z-50 là đủ, hãy kiểm tra xem có phần tử nào khác có z-index cao hơn không.
-      // Trong trường hợp này, z-[9999] là một giá trị an toàn để đảm bảo Modal luôn hiển thị trên cùng.
-      className='fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out'
-      onClick={onClose} // Close on overlay click
+      className={containerClasses}
+      onClick={onClose}
       aria-modal='true'
       role='dialog'
     >
       <div
-        className={`transform rounded-lg bg-white-pure shadow-xl transition-all duration-300 ease-in-out ${sizeClasses[size]} m-4 w-full sm:m-6`}
-        onClick={e => e.stopPropagation()} // Prevent close when clicking inside modal
+        // Giới hạn chiều cao và chiều rộng, cho phép cuộn bên trong
+        className={`flex w-full flex-col overflow-hidden rounded-lg bg-white-pure shadow-xl dark:bg-gray-900 ${sizeClasses[size]} m-4 max-h-[95%]`}
+        onClick={e => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className='flex items-center justify-between border-b border-gray-20 px-6 py-4'>
-          <h3 className='text-lg font-semibold '>{title}</h3>
-          <button
-            onClick={onClose}
-            className=' focus:outline-none'
-            aria-label='Close modal'
-          >
-            <X size={24} />
-          </button>
+        {/* Header: Không co lại */}
+        {title && (
+          <div className='flex flex-shrink-0 items-center justify-between border-b border-gray-200 p-4 dark:border-gray-700'>
+            <h3 className='text-base font-semibold text-gray-900 dark:text-white-pure'>
+              {title}
+            </h3>
+            <button
+              onClick={onClose}
+              className='rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:bg-gray-700'
+              aria-label='Close modal'
+            >
+              <X size={20} />
+            </button>
+          </div>
+        )}
+
+        {/* Body: Tự động co giãn và cuộn nếu cần */}
+        <div className='flex-grow overflow-y-auto p-4 text-sm leading-relaxed text-gray-600 dark:text-gray-300'>
+          {children}
         </div>
 
-        {/* Body */}
-        <div className='px-6 py-4 text-sm leading-relaxed '>{children}</div>
-
-        {/* Footer */}
+        {/* Footer: Không co lại */}
         {footer && (
-          <div className='flex justify-end space-x-3 rounded-b-lg border-t border-gray-20 bg-gray-10 px-6 py-3'>
+          <div className='flex-shrink-0 rounded-b-lg border-t border-gray-200 bg-gray-10 p-3 dark:border-gray-700 dark:bg-gray-800'>
             {footer}
           </div>
         )}

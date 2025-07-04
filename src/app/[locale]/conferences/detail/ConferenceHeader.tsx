@@ -59,6 +59,8 @@ const ConferenceHeader: React.FC<ConferenceHeaderProps> = ({
     }
   }, [conferenceData?.updatedAt, currentLocale])
 
+  // === THÊM BIẾN ĐỂ XỬ LÝ ĐỊA ĐIỂM MỘT CÁCH AN TOÀN HƠN ===
+  const firstLocation = lastOrganization?.locations?.[0];
 
   return (
     <div className='flex flex-col items-start md:flex-row'>
@@ -145,37 +147,37 @@ const ConferenceHeader: React.FC<ConferenceHeaderProps> = ({
           </strong>
         </div>
 
-        {/* === BƯỚC 5: CẬP NHẬT SVG ĐỊA ĐIỂM VÀ PUBLISHER === */}
+        {/* === BƯỚC 5: CẬP NHẬT SVG ĐỊA ĐIỂM VÀ PUBLISHER (ĐÃ SỬA LỖI) === */}
         <div className='mb-2 flex flex-wrap gap-x-4 gap-y-1'>
-          {lastOrganization?.locations?.[0].address ? (
+          {firstLocation?.address ? (
             <a
               href='#map'
               className='flex items-center text-sm text-blue-600 hover:underline'
-              title={lastOrganization.locations[0]?.address || t('View_map')}
+              title={firstLocation.address || t('View_map')}
             >
               <MapPin className='mr-1 h-4 w-4 flex-shrink-0' />
-              {lastOrganization.locations[0]?.address ||
-                lastOrganization.locations[0]?.cityStateProvince ||
-                lastOrganization.locations[0]?.country ||
+              {/* Ưu tiên hiển thị thông tin chi tiết nhất trước, sau đó đến các thông tin ít chi tiết hơn */}
+              {firstLocation.address ||
+                firstLocation.cityStateProvince ||
+                firstLocation.country ||
                 t('No_location_available')}
             </a>
           ) : (
-
-            <span className='flex items-center text-sm'>
+            // Hiển thị placeholder khi không có địa điểm
+            <span className='flex items-center text-sm text-gray-500'>
               <MapPin className='mr-1 h-4 w-4 flex-shrink-0' />
-
               {t('No_location_available')}
-
             </span>
           )}
+
           {lastOrganization?.publisher ? (
-            // Thay Link bằng span và bỏ thuộc tính href
             <span className='flex items-center text-sm'>
               <BookType className='mr-1 h-4 w-4 flex-shrink-0' />
               {lastOrganization.publisher}
             </span>
           ) : (
-            <span className='flex items-center text-sm'>
+            // Hiển thị placeholder khi không có publisher
+            <span className='flex items-center text-sm text-gray-500'>
               <BookType className='mr-1 h-4 w-4 flex-shrink-0' />
               {t('No_publisher_available')}
             </span>

@@ -86,6 +86,8 @@ const MyConferencesTab: React.FC = () => {
       title: conferenceData.title,
       acronym: conferenceData.acronym,
       link: organization?.link || '',
+      cfpLink: organization?.cfpLink,
+      impLink: organization?.impLink,
       type: toConferenceType(organization?.accessType),
       location: location || {
         address: '',
@@ -96,7 +98,9 @@ const MyConferencesTab: React.FC = () => {
       dates: organization?.conferenceDates || [],
       topics: organization?.topics || [],
       // imageUrl: organization?.imageUrl || '',
-      description: organization?.summary || '',
+      summary: organization?.summary || '',
+      callForPaper: organization?.callForPaper || '',
+
       t: (key: string) => t(`AddConference.${key}`),
       statesForReview: [],
       citiesForReview: []
@@ -271,17 +275,17 @@ const MyConferencesTab: React.FC = () => {
           </p>
           {(displayStatus !== 'All' ||
             (searchTerm && conferences && conferences.length > 0)) && (
-            <Button
-              variant='link'
-              onClick={() => {
-                setDisplayStatus('All')
-                setSearchTerm('')
-              }}
-              className='mt-2 text-sm text-indigo-600 hover:text-indigo-800'
-            >
-              {t('MyConferences.View_all_conferences')}
-            </Button>
-          )}
+              <Button
+                variant='link'
+                onClick={() => {
+                  setDisplayStatus('All')
+                  setSearchTerm('')
+                }}
+                className='mt-2 text-sm text-indigo-600 hover:text-indigo-800'
+              >
+                {t('MyConferences.View_all_conferences')}
+              </Button>
+            )}
         </div>
       ) : (
         <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
@@ -296,7 +300,6 @@ const MyConferencesTab: React.FC = () => {
           ))}
         </div>
       )}
-
       <Modal
         isOpen={!!modalContent}
         onClose={closeModal}
@@ -307,13 +310,16 @@ const MyConferencesTab: React.FC = () => {
         }
         size={modalContent?.type === 'review' ? '4xl' : 'lg'}
         footer={
-          <Button onClick={closeModal} variant='secondary'>
-            {t('Close')}
-          </Button>
+          // THAY ĐỔI QUAN TRỌNG Ở ĐÂY: justify-start thay vì justify-end
+          <div className='flex justify-end'> {/* Thay đổi justify-end thành justify-start */}
+            <Button onClick={closeModal} variant='secondary' className='px-4 py-2 text-sm'> {/* Thêm padding và text-size để nút trông đẹp hơn */}
+              {t('Close')}
+            </Button>
+          </div>
         }
       >
         {modalContent?.type === 'reason' && (
-          <div className='whitespace-pre-wrap rounded-md bg-gray-10 p-4 '>
+          <div className='whitespace-pre-wrap rounded-md bg-gray-10 p-4 dark:bg-gray-700 dark:text-gray-200'> {/* Thêm dark mode */}
             {modalContent.data}
           </div>
         )}

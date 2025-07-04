@@ -926,6 +926,7 @@
   "Live_Stream_Output_Settings": "Cài đặt đầu ra luồng trực tiếp",
   "Personalize_Responses_Toggle_Label": "Cá nhân hóa phản hồi",
   "Personalization_Login_Required_Message": "Đăng nhập để bật cá nhân hóa phản hồi.",
+  "Personalization_Enabled_Tooltip": "Phản hồi sẽ được cá nhân hóa theo thông tin của bạn.",
   "Personalization_Benefit_Privacy_Popup_Title": "Bật cá nhân hóa phản hồi?",
   "Personalization_Benefit_Privacy_Popup_Message": "Bằng cách bật tính năng này, chatbot sẽ sử dụng thông tin cá nhân của bạn (như tên, sở thích và phần 'giới thiệu bản thân') để cung cấp các phản hồi phù hợp và được cá nhân hóa hơn. Dữ liệu của bạn sẽ được xử lý an toàn và chỉ được sử dụng để nâng cao trải nghiệm trò chuyện của bạn. Bạn có muốn tiếp tục không?",
   "Personalization_Warning_Missing_Info_Message": "Để có được trải nghiệm cá nhân hóa tốt nhất, vui lòng hoàn thành hồ sơ của bạn với: {fields}.",
@@ -1475,7 +1476,7 @@
   "ChatInput_Error_FileSize": "Tệp \"{name}\" quá lớn. Kích thước tối đa là {maxSize}MB.",
   "ChatInput_Remove_File": "Xóa tệp {fileName}",
   "ChatInput_Attach_File_Button_Label": "Đính kèm tệp",
-  "Type_message_or_attach_files": "Gõ tin nhắn hoặc đính kèm tệp...",
+  "Type_message_or_attach_files": "Gõ tin nhắn hoặc @currentpage...",
   "User_data_not_available": "Dữ liệu người dùng không có sẵn",
   "dob_must_be_18_or_older": "Ngày sinh phải cho thấy bạn từ 18 tuổi trở lên.",
   "Minimize_Chat": "Thu nhỏ Chat",
@@ -1965,5 +1966,6 @@
   "tooltip_topics": "Lọc các hội nghị dựa trên các chủ đề liên quan. Bạn có thể chọn nhiều chủ đề.",
   "Disclaimer_descripstion_chatbot": "Chatbot có thể mắc sai lầm. Vui lòng kiểm tra lại kết quả",
   "Go_to_CFP_website": "Đi tới trang web Kêu gọi bài báo",
-  "Chat": "Nhắn"
+  "Chat": "Nhắn",
+  "Please_enter_the_Call_for_Papers": "Vui lòng nhập nội dung Kêu gọi bài viết"
 }

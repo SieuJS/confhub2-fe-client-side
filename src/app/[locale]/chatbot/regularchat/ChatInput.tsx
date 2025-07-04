@@ -450,6 +450,8 @@ const ChatInput: React.FC<ChatInputProps> = ({
       >
         <p>{modalMessage}</p>
       </Modal>
+
+      
     </div>
   )
 }

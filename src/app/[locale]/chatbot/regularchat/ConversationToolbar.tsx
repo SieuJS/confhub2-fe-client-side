@@ -10,9 +10,8 @@ import {
 } from '@/src/app/[locale]/chatbot/stores/storeHooks';
 import { useTranslations } from 'next-intl';
 
-// Import Modal và Button
-import Modal from '@/src/app/[locale]/chatbot/Modal'; // Đảm bảo đường dẫn đúng
-import Button from '../../utils/Button'; // Đảm bảo đường dẫn đúng
+import Modal from '@/src/app/[locale]/chatbot/Modal';
+import Button from '../../utils/Button';
 
 const ConversationToolbar: React.FC = () => {
   const t = useTranslations();
@@ -29,12 +28,10 @@ const ConversationToolbar: React.FC = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [newTitleInput, setNewTitleInput] = useState('');
 
-  // --- State cho Modal xác nhận ---
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [confirmModalTitle, setConfirmModalTitle] = useState('');
   const [confirmModalMessage, setConfirmModalMessage] = useState('');
   const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
-  // --- End State cho Modal xác nhận ---
 
   const activeConversation = useMemo(() => {
     if (!activeConversationId) return null;
@@ -58,30 +55,27 @@ const ConversationToolbar: React.FC = () => {
     prevActiveConversationIdRef.current = activeConversationId;
   }, [activeConversation, activeConversationId, isEditingTitle, t]);
 
-  // Hàm hiển thị Modal xác nhận
   const showConfirmModal = useCallback(
     (title: string, message: string, onConfirm: () => void) => {
       setConfirmModalTitle(title);
       setConfirmModalMessage(message);
-      setConfirmAction(() => onConfirm); // Lưu callback
+      setConfirmAction(() => onConfirm);
       setIsConfirmModalOpen(true);
     },
     []
   );
 
-  // Hàm xử lý khi người dùng xác nhận trong Modal
   const handleConfirmAction = useCallback(() => {
     if (confirmAction) {
-      confirmAction(); // Thực thi hành động đã lưu
+      confirmAction();
     }
-    setIsConfirmModalOpen(false); // Đóng modal
-    setConfirmAction(null); // Xóa callback
+    setIsConfirmModalOpen(false);
+    setConfirmAction(null);
   }, [confirmAction]);
 
-  // Hàm xử lý khi người dùng hủy trong Modal
   const handleCancelConfirm = useCallback(() => {
-    setIsConfirmModalOpen(false); // Đóng modal
-    setConfirmAction(null); // Xóa callback
+    setIsConfirmModalOpen(false);
+    setConfirmAction(null);
   }, []);
 
 
@@ -146,11 +140,11 @@ const ConversationToolbar: React.FC = () => {
             onKeyDown={e => {
               if (e.key === 'Enter') {
                 handleRename();
-                e.currentTarget.blur(); // Tắt focus sau khi Enter
+                e.currentTarget.blur();
               } else if (e.key === 'Escape') {
                 setIsEditingTitle(false);
-                setNewTitleInput(currentTitle); // Khôi phục tiêu đề cũ
-                e.currentTarget.blur(); // Tắt focus
+                setNewTitleInput(currentTitle);
+                e.currentTarget.blur();
               }
             }}
             className='mr-1.5 rounded-md border border-gray-300 px-1.5 py-0.5 text-xs text-gray-900 focus:border-blue-500 focus:ring-blue-500 sm:mr-2 sm:px-2 sm:py-1 sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white'
@@ -217,20 +211,21 @@ const ConversationToolbar: React.FC = () => {
       {/* Modal xác nhận */}
       <Modal
         isOpen={isConfirmModalOpen}
-        onClose={handleCancelConfirm} // Đóng modal khi hủy
+        onClose={handleCancelConfirm}
         title={confirmModalTitle}
+        // THAY ĐỔI QUAN TRỌNG Ở ĐÂY: Thêm div bọc và các lớp flexbox
         footer={
-          <>
-            <Button variant='secondary' onClick={handleCancelConfirm}>
+          <div className='flex justify-end space-x-2'> {/* space-x-2 để các nút sát nhau */}
+            <Button variant='secondary' onClick={handleCancelConfirm} className="px-3 py-1.5 text-sm"> {/* Điều chỉnh padding và text-size */}
               {t('Common_Cancel')}
             </Button>
-            <Button variant='danger' onClick={handleConfirmAction}>
+            <Button variant='danger' onClick={handleConfirmAction} className="px-3 py-1.5 text-sm"> {/* Điều chỉnh padding và text-size */}
               {t('Common_Confirm')}
             </Button>
-          </>
+          </div>
         }
       >
-        <p>{confirmModalMessage}</p>
+        <p className="text-gray-700 dark:text-gray-300">{confirmModalMessage}</p> {/* Thêm màu chữ */}
       </Modal>
     </div>
   );

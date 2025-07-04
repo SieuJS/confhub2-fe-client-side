@@ -70,9 +70,8 @@ const SettingToggle: React.FC<SettingToggleProps> = ({
       </div>
     </div>
     <button
-      className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-        checked ? 'bg-blue-600' : 'bg-gray-20'
-      } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
+      className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${checked ? 'bg-blue-600' : 'bg-gray-20'
+        } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
       onClick={onToggle}
       disabled={disabled}
       role='switch'
@@ -81,9 +80,8 @@ const SettingToggle: React.FC<SettingToggleProps> = ({
       <span className='sr-only'>{label}</span>
       <span
         aria-hidden='true'
-        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white-pure shadow ring-0 transition duration-200 ease-in-out ${
-          checked ? 'translate-x-5' : 'translate-x-0'
-        }`}
+        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white-pure shadow ring-0 transition duration-200 ease-in-out ${checked ? 'translate-x-5' : 'translate-x-0'
+          }`}
       />
     </button>
   </div>
@@ -196,13 +194,6 @@ const SettingTab: React.FC = () => {
         icon: Bell,
         section: 'general'
       },
-      // {
-      //   key: 'autoAddFollowToCalendar',
-      //   label: t('Auto_add_events_to_schedule'),
-      //   description: t('Auto_add_events_to_schedule_describe'),
-      //   icon: CalendarCheck,
-      //   section: 'general'
-      // },
       {
         key: 'notificationThroughEmail',
         label: t('Send_notification_through_email'),
@@ -225,13 +216,6 @@ const SettingTab: React.FC = () => {
         icon: CalendarPlus,
         section: 'notifications'
       },
-      // {
-      //   key: 'notificationWhenUpdateProfile',
-      //   label: t('Notification_when_update_profile'),
-      //   description: t('Notification_when_update_profile_description'),
-      //   icon: UserCheck,
-      //   section: 'notifications'
-      // },
       {
         key: 'notificationWhenFollow',
         label: t('Notification_when_follow'),
@@ -415,54 +399,6 @@ const SettingTab: React.FC = () => {
               ))}
             </section>
           )}
-
-        {/* Account Management Section (Không bị ảnh hưởng bởi tìm kiếm) */}
-        {/* <section className='mb-8 rounded-lg bg-white-pure p-6 shadow-sm'>
-          <h3 className='mb-4 flex items-center text-xl font-semibold '>
-            <UserX className='mr-2 h-6 w-6 ' />
-            {t('Account_Management')}
-          </h3>
-          <div className='flex flex-col justify-between py-4 sm:flex-row sm:items-center'>
-            <div>
-              <h4 className='font-semibold text-red-700'>
-                {t('Delete_Account')}
-              </h4>
-              <p className='mt-0.5 text-sm text-red-500'>
-                {t('Delete_Account_describe')}
-              </p>
-            </div>
-            <button
-              data-testid='delete-account-button'
-              onClick={handleDeleteAccount}
-              disabled={isDeleting || updateLoading}
-              className={`mt-4 flex items-center justify-center rounded-md px-6 py-2 font-semibold text-white transition-colors duration-200 sm:mt-0
-                ${
-                  isDeleting || updateLoading
-                    ? 'cursor-not-allowed bg-red-400'
-                    : 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
-                } focus:outline-none focus:ring-2 focus:ring-offset-2
-              `}
-            >
-              {isDeleting ? (
-                <>
-                  <Loader2 className='mr-2 h-5 w-5 animate-spin' />
-                  {t('Deleting')}
-                </>
-              ) : (
-                <>
-                  <UserX className='mr-2 h-5 w-5' />
-                  {t('Delete_Account')}
-                </>
-              )}
-            </button>
-          </div>
-          {deleteError && (
-            <p data-testid='delete-error' className='mt-2 text-sm text-red-500'>
-              {deleteError}
-            </p>
-          )}
-        </section> */}
-
         {updateLoading && (
           <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-20'>
             <div className='flex items-center rounded-lg bg-white-pure p-4 shadow-lg'>

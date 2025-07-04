@@ -155,20 +155,21 @@ const ConversationList: React.FC<ConversationListProps> = ({
       {/* Modal xác nhận */}
       <Modal
         isOpen={isConfirmModalOpen}
-        onClose={handleCancelConfirm} // Đóng modal khi hủy
+        onClose={handleCancelConfirm}
         title={confirmModalTitle}
+        // THAY ĐỔI QUAN TRỌNG Ở ĐÂY: Thêm div bọc và các lớp flexbox
         footer={
-          <>
-            <Button variant='secondary' onClick={handleCancelConfirm}>
+          <div className='flex justify-end space-x-2'> {/* space-x-2 để các nút sát nhau */}
+            <Button variant='secondary' onClick={handleCancelConfirm} className="px-3 py-1.5 text-sm"> {/* Điều chỉnh padding và text-size */}
               {t('Common_Cancel')}
             </Button>
-            <Button variant='danger' onClick={handleConfirmAction}>
+            <Button variant='danger' onClick={handleConfirmAction} className="px-3 py-1.5 text-sm"> {/* Điều chỉnh padding và text-size */}
               {t('Common_Confirm')}
             </Button>
-          </>
+          </div>
         }
       >
-        <p>{confirmModalMessage}</p>
+        <p className="text-gray-700 dark:text-gray-300">{confirmModalMessage}</p> {/* Thêm màu chữ */}
       </Modal>
     </div>
   )

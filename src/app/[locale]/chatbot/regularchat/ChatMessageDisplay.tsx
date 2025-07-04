@@ -119,6 +119,9 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
     cancelEdit()
   }
 
+  // Xác định xem tin nhắn có thể chỉnh sửa được hay không
+  const canMessageBeEdited = type === 'text' || (type === 'multimodal' && !!text);
+
   return (
     <div ref={bubbleRef} className={bubbleClasses}>
       {/* ... (Error/Warning icons) ... */}
@@ -164,7 +167,7 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
         onStartEdit={handleEditButtonClick}
         onConfirmEdit={handleConfirmEditClick}
         onCancelEdit={handleCancelEditClick}
-        canEditText={type === 'text' || (type === 'multimodal' && !!text)}
+        canEditText={canMessageBeEdited} // <<< TRUYỀN PROP canEditText vào đây
       />
 
       {shouldShowThoughtProcess && (

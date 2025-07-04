@@ -1,6 +1,6 @@
 // src/app/[locale]/chatbot/PersonalizationConfirmationModal.tsx
 import React from 'react'
-import Modal from './Modal' // Assuming Modal handles the basic shell, overlay, and centering
+import Modal from './Modal'
 import { useTranslations } from 'next-intl'
 import { ShieldCheck, UserCheck, AlertTriangle } from 'lucide-react'
 import { Link } from '@/src/navigation'
@@ -10,12 +10,22 @@ interface PersonalizationConfirmationModalProps {
   onClose: () => void
   onConfirm: () => void
   type: 'enableBenefit' | 'missingInfo'
-  missingFieldsText?: string // Only for 'missingInfo' type
+  missingFieldsText?: string
+  size?: 'sm' | 'md' | 'lg' | '4xl'
+  positioning?: 'fixed' | 'absolute' // Thêm prop để truyền xuống Modal
 }
 
 const PersonalizationConfirmationModal: React.FC<
   PersonalizationConfirmationModalProps
-> = ({ isOpen, onClose, onConfirm, type, missingFieldsText }) => {
+> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  type,
+  missingFieldsText,
+  size,
+  positioning
+}) => {
   const t = useTranslations()
 
   const getModalContent = () => {
@@ -31,7 +41,7 @@ const PersonalizationConfirmationModal: React.FC<
           'bg-blue-600 hover:bg-blue-700 focus-visible:outline-blue-600',
         cancelText: t('Cancel_Button') || 'Cancel'
       }
-    } else if (type === 'missingInfo') {
+    } else {
       return {
         title:
           t('Personalization_Warning_Missing_Info_Title') ||
@@ -54,7 +64,6 @@ const PersonalizationConfirmationModal: React.FC<
         cancelText: t('Update_Profile_Button') || 'Update Profile'
       }
     }
-    return null
   }
 
   const content = getModalContent()
@@ -66,20 +75,21 @@ const PersonalizationConfirmationModal: React.FC<
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      size='lg' // e.g., max-w-md or max-w-lg
+      title={content.title}
+      size={size || 'lg'}
+      positioning={positioning || 'fixed'} // Truyền prop positioning
       footer={
-        <div className='flex flex-col-reverse space-y-2 space-y-reverse px-4 py-3 sm:flex-row sm:justify-end sm:space-x-3 sm:space-y-0 sm:px-6'>
+        // Các nút luôn nằm trên 1 hàng, căn giữa, khoảng cách nhỏ
+        <div className='flex w-full flex-row items-center justify-center space-x-2'>
           {/* Nút "Cancel" hoặc "Update Profile" (Secondary) */}
           {type === 'missingInfo' ? (
             <Link
               href={{ pathname: '/dashboard', query: { tab: 'profile' } }}
-              // passHref
-              // legacyBehavior
             >
               <button
                 type='button'
                 onClick={onClose}
-                className='inline-flex w-full justify-center rounded-md bg-white-pure px-4 py-2 text-sm font-medium shadow-sm  ring-1 ring-inset ring-gray-300 hover:bg-gray-10 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto'
+                className='rounded-md bg-white-pure px-3 py-1.5 text-xs font-medium shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-10 dark:bg-gray-700 dark:text-gray-200 dark:ring-gray-600 dark:hover:bg-gray-600'
               >
                 {content.cancelText}
               </button>
@@ -88,7 +98,7 @@ const PersonalizationConfirmationModal: React.FC<
             <button
               type='button'
               onClick={onClose}
-              className='inline-flex w-full justify-center rounded-md bg-white-pure px-4 py-2 text-sm font-medium shadow-sm  ring-1 ring-inset ring-gray-300 hover:bg-gray-10 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto'
+              className='rounded-md bg-white-pure px-3 py-1.5 text-xs font-medium shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-10 dark:bg-gray-700 dark:text-gray-200 dark:ring-gray-600 dark:hover:bg-gray-600'
             >
               {content.cancelText}
             </button>
@@ -101,68 +111,48 @@ const PersonalizationConfirmationModal: React.FC<
               onConfirm()
               onClose()
             }}
-            className={`inline-flex w-full justify-center rounded-md px-4 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:w-auto ${content.confirmButtonClass}`}
+            className={`rounded-md px-3 py-1.5 text-xs font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${content.confirmButtonClass}`}
           >
             {content.confirmText}
           </button>
         </div>
       }
     >
-      {/* Main content area */}
-      {/* Giảm padding trên và dưới (py-4 thay vì p-6), giữ padding ngang (px-6) */}
-      <div className='px-6 py-4 text-center'>
-        {/* Icon with background - giảm kích thước và margin */}
+      {/* Nội dung được tối ưu hóa cho không gian nhỏ */}
+      <div className='text-center'>
+        {/* Icon nhỏ hơn */}
         <div
-          className={`mx-auto flex h-12 w-12 items-center justify-center rounded-full ${iconBgColor} mb-3`}
+          className={`mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full ${iconBgColor}`}
         >
-          {/* Giảm kích thước icon */}
-          <IconComponent size={28} className={iconColor} aria-hidden='true' />
+          <IconComponent size={24} className={iconColor} aria-hidden='true' />
         </div>
 
-        {/* Title - giảm margin dưới */}
-        <h3 className='mb-2 text-lg font-semibold leading-6 '>
-          {' '}
-          {/* Giảm text-xl thành text-lg, leading-7 thành leading-6 */}
-          {content.title}
-        </h3>
-
-        {/* Message - giảm margin trên nếu có additionalMessage */}
-        <div className='text-sm '>
-          <p className='whitespace-pre-line leading-relaxed'>
-            {content.message}
-          </p>
+        {/* Message với font nhỏ hơn */}
+        <div className='text-sm text-gray-600 dark:text-gray-300'>
+          <p className='whitespace-pre-line leading-snug'>{content.message}</p>
           {content.additionalMessage && (
-            <p className='mt-2 whitespace-pre-line leading-relaxed '>
-              {' '}
-              {/* Giảm mt-3 thành mt-2 */}
+            <p className='mt-2 whitespace-pre-line leading-snug'>
               {content.additionalMessage}
             </p>
           )}
         </div>
 
-        {/* Privacy Section for 'enableBenefit' - giảm margin trên và padding */}
+        {/* Privacy Section nhỏ gọn */}
         {type === 'enableBenefit' && (
-          <div className='mt-4 rounded-lg border border-slate-200 bg-gray-5 p-3 text-left text-xs '>
-            {' '}
-            {/* Giảm mt-6 thành mt-4, p-4 thành p-3 */}
+          <div className='mt-3 rounded-md border border-slate-200 bg-gray-10 p-2 text-left text-xs dark:border-gray-700 dark:bg-gray-800'>
             <div className='flex items-start space-x-2'>
-              {' '}
-              {/* Giảm space-x-3 thành space-x-2 */}
               <ShieldCheck
-                size={28}
-                className='mt-0.5 flex-shrink-0 text-green-600'
-              />{' '}
-              {/* Giảm size 32 thành 28 */}
+                className='mt-0.5 h-5 w-5 flex-shrink-0 text-green-600'
+                aria-hidden='true'
+              />
               <div>
-                <h4 className='mb-0.5 text-sm font-semibold '>
-                  {' '}
-                  {/* Giảm mb-1 thành mb-0.5 */}
+                <h4 className='mb-0.5 font-semibold text-gray-800 dark:text-gray-100'>
                   {t('Personalization_Privacy_Subheading') ||
                     'Your Privacy Matters'}
                 </h4>
-                <p className='leading-relaxed'>
+                <p className='leading-snug text-gray-500 dark:text-gray-400'>
                   {t('Personalization_Privacy_Detail') ||
-                    'We are committed to protecting your data. The information used for personalization is processed securely and is not shared with third parties. You can disable this feature at any time.'}
+                    'We are committed to protecting your data...'}
                 </p>
               </div>
             </div>

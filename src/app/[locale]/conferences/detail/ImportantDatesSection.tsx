@@ -226,7 +226,7 @@ export const ImportantDatesSection: React.FC<ImportantDatesSectionProps> = ({
                       <Disclosure>
                         {({ open }) => (
                           <>
-                            <Disclosure.Button className='flex w-full items-center justify-center rounded-md bg-gray-100 px-4 py-2 text-sm font-medium  hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75'>
+                            <Disclosure.Button className='flex w-full items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium  hover:bg-gray-20 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75'>
                               <span>
                                 {open
                                   ? t('showLess')

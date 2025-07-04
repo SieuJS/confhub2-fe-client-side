@@ -167,6 +167,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({
       case 'C':
         return 'bg-orange-100 text-orange-700 border border-orange-300'
       default:
+        // Default color for unknown ranks, though 'By Users' will override this
         return 'bg-gray-100 text-gray-60 border border-gray-300'
     }
   }, [])
@@ -184,6 +185,9 @@ const EventCardComponent: React.FC<EventCardProps> = ({
         return 'bg-gray-100 text-gray-60 border border-gray-300'
     }
   }, [])
+
+  // DETERMINE IF IT'S A "BY USERS" EVENT
+  const isByUserEvent = event.creatorId !== null && event.creatorId !== undefined;
 
   return (
     <div
@@ -216,11 +220,21 @@ const EventCardComponent: React.FC<EventCardProps> = ({
           }}
         />
         <div className='absolute right-2 top-2 flex flex-col items-end space-y-1'>
-          <span
-            className={`font-semibold ${getRankColor(event?.rank || 'No info')} rounded px-2 py-1 text-xs`}
-          >
-            {event.rank ? `Rank: ${event.rank}` : t('By_Users')}
-          </span>
+          {/* LOGIC ĐIỀU CHỈNH RANK/BY USERS */}
+          {isByUserEvent ? (
+            <span
+              className={`font-semibold bg-gray-100 text-gray-60 border border-gray-300 rounded px-2 py-1 text-xs`}
+            >
+              {t('By_Users')}
+            </span>
+          ) : (
+            (event.rank && 
+            <span
+              className={`font-semibold ${getRankColor(event?.rank || 'No info')} rounded px-2 py-1 text-xs`}
+            >
+              {`Rank: ${event.rank}`}
+            </span>)
+          )}
           {event.accessType && (
             <span
               className={`rounded px-2 py-1 text-xs font-semibold ${getAccessTypeColor(event.accessType)}`}
@@ -362,7 +376,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({
             <div className='relative'>
               <button
                 onClick={handleFavoriteClick}
-                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-10 p-2 transition hover:bg-gray-20 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1  ${isBlacklisted ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''}  ${isFollowing ? 'bg-yellow-50 text-yellow-500 hover:text-yellow-600 ' : ' hover:text-gray-800 '} ${followLoading ? 'opacity-70' : ''}`}
+                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-10 p-2 transition hover:bg-gray-20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1  ${isBlacklisted ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''}  ${isFollowing ? 'bg-blue-50 text-blue-600 hover:text-blue-700  dark:text-blue-400 dark:hover:text-blue-300' : ' hover:text-gray-80 '} ${followLoading ? 'opacity-70' : ''}`}
                 style={{ minWidth: '36px', minHeight: '36px' }}
                 disabled={isBlacklisted || followLoading}
                 title={isFollowing ? t('Unfollow') : t('Follow')}

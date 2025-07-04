@@ -69,34 +69,13 @@ const MessageContentRenderer: React.FC<MessageContentRendererProps> = ({
       <div
         className={`sm:prose-sm prose-xs prose max-w-none dark:prose-invert   ${isUserMessage ? '[&_*]:text-white' : ''}`}
       >
-        {/*
-          prose: class chính của plugin
-          prose-sm sm:prose-base: Điều chỉnh kích thước font chữ (tùy chọn, có thể bỏ nếu mặc định đã ổn)
-          dark:prose-invert: Tự động đổi màu cho dark mode (nếu bạn dùng class 'dark' ở thẻ html/body)
-          max-w-none: Mặc định `prose` sẽ giới hạn chiều rộng của nội dung.
-                      Trong chat bubble, ta thường muốn nó chiếm hết chiều rộng có thể, nên dùng `max-w-none`.
-        */}
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkBreaks]}
           rehypePlugins={[rehypeRaw]}
           components={{
-            // GIỜ BẠN CÓ THỂ BỎ HẦU HẾT CÁC CUSTOM STYLES Ở ĐÂY
-            // @tailwindcss/typography sẽ lo việc này
-            // Chỉ giữ lại những gì thực sự cần override hoặc những thuộc tính không liên quan đến style trực tiếp
-            // Ví dụ: target, rel cho thẻ <a>
             a: ({ ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
               <a {...props} target='_blank' rel='noopener noreferrer' />
-              // Plugin typography sẽ tự style màu sắc, gạch chân cho link
-              // Nếu muốn màu cụ thể, bạn vẫn có thể thêm class: className='text-blue-600 hover:underline dark:text-blue-400'
-              // nhưng thường thì màu mặc định của prose đã khá ổn.
             )
-            // Các thẻ h1, h2, h3, p, ul, ol, li, pre, code sẽ được `prose` style.
-            // Bạn có thể xóa các class tùy chỉnh ở đây để xem `prose` hoạt động ra sao.
-            // Nếu cần tinh chỉnh nhỏ, bạn có thể thêm lại class, nhưng nên hạn chế.
-            // Ví dụ, nếu bạn muốn code block có nền khác biệt một chút so với prose mặc định:
-            // pre: ({ node, ...props }) => <pre className='bg-gray-100 dark:bg-gray-800 rounded-md' {...props} />,
-            // code: ({ node, ...props }) => <code className='text-red-600 dark:text-red-400 px-1 rounded' {...props} />,
-            // Nhưng hãy thử bỏ trống trước!
           }}
         >
           {content}
@@ -111,7 +90,7 @@ const MessageContentRenderer: React.FC<MessageContentRendererProps> = ({
       <div className='map-content-wrapper py-1'>
         {text &&
           text.toLowerCase() !==
-            `showing map for: ${location.toLowerCase()}` && (
+          `showing map for: ${location.toLowerCase()}` && (
             <div className='mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 sm:mb-2'>
               {renderMarkdown(text)}
             </div>
