@@ -1,6 +1,7 @@
 // src/app/[locale]/chatbot/regularchat/MessageActionsBar.tsx
 import React from 'react';
-import { Copy, Pencil, Check, X } from 'lucide-react';
+// <<< MODIFIED: Thêm ThumbsUp, ThumbsDown
+import { Copy, Pencil, Check, X, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { MessageType } from '../lib/regular-chat.types';
 
 interface MessageActionsBarProps {
@@ -9,11 +10,13 @@ interface MessageActionsBarProps {
   messageType: MessageType;
   isEditing: boolean;
   isCopied: boolean;
-  onCopy: (event: React.MouseEvent<HTMLButtonElement>) => void; // Corrected event type
-  onStartEdit: (event: React.MouseEvent<HTMLButtonElement>) => void; // Corrected event type
-  onConfirmEdit: (event: React.MouseEvent<HTMLButtonElement>) => void; // Corrected event type
-  onCancelEdit: (event: React.MouseEvent<HTMLButtonElement>) => void; // Corrected event type
-  canEditText?: boolean; // <<< ADD THIS PROP (make it optional if it's not always provided)
+  onCopy: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onStartEdit: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onConfirmEdit: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onCancelEdit: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  canEditText?: boolean;
+  // <<< NEW PROPS
+  onFeedback: (type: 'like' | 'dislike') => void;
 }
 
 const MessageActionsBar: React.FC<MessageActionsBarProps> = ({
@@ -26,25 +29,30 @@ const MessageActionsBar: React.FC<MessageActionsBarProps> = ({
   onStartEdit,
   onConfirmEdit,
   onCancelEdit,
-  canEditText = true, // <<< PROVIDE A DEFAULT VALUE or handle undefined
+  canEditText = true,
+  // <<< NEW PROP
+  onFeedback,
 }) => {
   const showCopyButton = !isEditing && (isUser || (messageType !== 'map' && messageType !== 'follow_update'));
-  // Use canEditText to determine if the edit button should be shown
   const showEditButton = isUser && isLatestUserMessage && !isEditing && canEditText;
-  const showConfirmCancelButtons = isUser && isEditing; // This implies editing is possible
+  const showConfirmCancelButtons = isUser && isEditing;
+  // <<< NEW: Điều kiện hiển thị nút feedback (chỉ cho bot và không đang chỉnh sửa)
+  const showFeedbackButtons = !isUser && !isEditing;
 
-  if (!showCopyButton && !showEditButton && !showConfirmCancelButtons) {
+  // <<< MODIFIED: Điều kiện kiểm tra để không render gì cả
+  if (!showCopyButton && !showEditButton && !showConfirmCancelButtons && !showFeedbackButtons) {
     return null; // No actions to show
   }
 
   return (
     <div
       className={`
-        absolute -bottom-2 flex space-x-1 opacity-0 transition-opacity duration-150 group-hover:opacity-100
+        absolute -bottom-2 flex items-center space-x-1 opacity-0 transition-opacity duration-150 group-hover:opacity-100
         ${isUser ? '-right-2' : '-left-2'}
         ${isEditing ? 'opacity-100' : ''}
       `}
     >
+      {/* ... (Các nút copy, edit, confirm, cancel giữ nguyên) ... */}
       {showCopyButton && (
         <button
           onClick={onCopy}
@@ -57,7 +65,7 @@ const MessageActionsBar: React.FC<MessageActionsBarProps> = ({
         </button>
       )}
 
-      {showEditButton && ( // This button's visibility is now controlled by canEditText
+      {showEditButton && (
         <button
           onClick={onStartEdit}
           className="rounded-full border border-gray-300 bg-white p-1.5 text-gray-500 shadow-sm hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-gray-200"
@@ -85,6 +93,28 @@ const MessageActionsBar: React.FC<MessageActionsBarProps> = ({
             title="Cancel edit"
           >
             <X size={14} />
+          </button>
+        </>
+      )}
+
+      {/* <<< NEW: Feedback Buttons >>> */}
+      {showFeedbackButtons && (
+        <>
+          <button
+            onClick={() => onFeedback('like')}
+            className="rounded-full border border-gray-300 bg-white p-1.5 text-gray-500 shadow-sm transition-colors hover:bg-gray-100 hover:text-green-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-green-400"
+            aria-label="Like this response"
+            title="Like"
+          >
+            <ThumbsUp size={14} />
+          </button>
+          <button
+            onClick={() => onFeedback('dislike')}
+            className="rounded-full border border-gray-300 bg-white p-1.5 text-gray-500 shadow-sm transition-colors hover:bg-gray-100 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-red-400"
+            aria-label="Dislike this response"
+            title="Dislike"
+          >
+            <ThumbsDown size={14} />
           </button>
         </>
       )}

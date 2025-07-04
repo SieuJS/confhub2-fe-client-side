@@ -2,17 +2,23 @@
 import React from 'react';
 import ChatMessageDisplay from './ChatMessageDisplay';
 import { ChatMessageType } from '@/src/app/[locale]/chatbot/lib/regular-chat.types';
+// <<< NEW: Import FeedbackType
+import { FeedbackType } from './feedback/FeedbackModal';
 
 interface ChatHistoryProps {
     messages: ChatMessageType[];
     isInsideSmallContainer?: boolean;
     onConfirmEdit: (messageId: string, newText: string) => void;
+    // <<< NEW PROP
+    onOpenFeedbackModal: (messageId: string, type: FeedbackType) => void;
 }
 
 const ChatHistory: React.FC<ChatHistoryProps> = ({
     messages,
     isInsideSmallContainer = false,
     onConfirmEdit,
+    // <<< NEW PROP
+    onOpenFeedbackModal,
 }) => {
     // ... (logic lấy latestUserMessageId và displayableMessages giữ nguyên) ...
     let latestUserMessageId: string | null = null;
@@ -28,15 +34,15 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({
             return true;
         }
         if (msg.role === 'model' || msg.role === 'function') {
-            if ((!msg.parts || msg.parts.length === 0) && !msg.text && !msg.botFiles && !msg.action && (!msg.sources || msg.sources.length === 0) ) { // <<< THÊM KIỂM TRA SOURCES
+            if ((!msg.parts || msg.parts.length === 0) && !msg.text && !msg.botFiles && !msg.action && (!msg.sources || msg.sources.length === 0) ) {
                 if (msg.role === 'function') return false;
             }
             if (msg.parts && msg.parts.length > 0) {
                 const hasDisplayablePartContent = msg.parts.some(part => part.text || part.inlineData || part.fileData);
-                if (!hasDisplayablePartContent && !msg.text && !msg.botFiles && !msg.action && (!msg.sources || msg.sources.length === 0)) { // <<< THÊM KIỂM TRA SOURCES
+                if (!hasDisplayablePartContent && !msg.text && !msg.botFiles && !msg.action && (!msg.sources || msg.sources.length === 0)) {
                     const allPartsAreSystemProcessing = msg.parts.every(part => part.functionCall || part.functionResponse);
                     if (allPartsAreSystemProcessing) {
-                        return false; 
+                        return false;
                     }
                 }
             }
@@ -70,10 +76,12 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({
                             location={msg.location}
                             action={msg.action}
                             timestamp={msg.timestamp}
-                            sources={msg.sources} // <<< TRUYỀN PROP sources
+                            sources={msg.sources}
                             isInsideSmallContainer={isInsideSmallContainer}
                             isLatestUserMessage={msg.isUser && msg.id === latestUserMessageId}
                             onConfirmEdit={onConfirmEdit}
+                            // <<< PASS THE PROP DOWN
+                            onOpenFeedbackModal={onOpenFeedbackModal}
                         />
                     </div>
                 );

@@ -376,7 +376,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({
             <div className='relative'>
               <button
                 onClick={handleFavoriteClick}
-                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-10 p-2 transition hover:bg-gray-20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1  ${isBlacklisted ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''}  ${isFollowing ? 'bg-blue-50 text-blue-600 hover:text-blue-700  dark:text-blue-400 dark:hover:text-blue-300' : ' hover:text-gray-80 '} ${followLoading ? 'opacity-70' : ''}`}
+                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-10 p-2 transition hover:bg-gray-20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1  ${isBlacklisted ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''}  ${isFollowing ? 'bg-yellow-50 text-yellow-500 hover:text-yellow-600 ' : ' hover:text-gray-800 '} ${followLoading ? 'opacity-70' : ''}`}
                 style={{ minWidth: '36px', minHeight: '36px' }}
                 disabled={isBlacklisted || followLoading}
                 title={isFollowing ? t('Unfollow') : t('Follow')}

@@ -1967,5 +1967,8 @@
   "Disclaimer_descripstion_chatbot": "Chatbot có thể mắc sai lầm. Vui lòng kiểm tra lại kết quả",
   "Go_to_CFP_website": "Đi tới trang web Kêu gọi bài báo",
   "Chat": "Nhắn",
-  "Please_enter_the_Call_for_Papers": "Vui lòng nhập nội dung Kêu gọi bài viết"
+  "Please_enter_the_Call_for_Papers": "Vui lòng nhập nội dung Kêu gọi bài viết",
+  "Feedback_Error_MessageNotFound": "Có lỗi ảy ra khi gửi đánh giá",
+  "Feedback_Success_Message": "Gửi đánh giá thành công",
+  "Feedback_Error_SubmitFailed": "Có lỗi xảy ra khi gửi đánh giá"
 }

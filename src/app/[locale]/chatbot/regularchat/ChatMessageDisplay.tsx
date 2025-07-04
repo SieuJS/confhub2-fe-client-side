@@ -4,10 +4,10 @@ import {
   MessageType,
   ThoughtStep,
   FrontendAction,
-  ChatMessageType, // Đã import
-  SourceItem // <<< THÊM IMPORT SourceItem
+  ChatMessageType,
+  SourceItem
 } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'
-import { TriangleAlert } from 'lucide-react'
+import { TriangleAlert, Info } from 'lucide-react' // <<< MODIFIED: Thêm Info icon
 import ThoughtProcess from './ThoughtProcess'
 import { useSettingsStore } from '../stores'
 import { useShallow } from 'zustand/react/shallow'
@@ -19,7 +19,7 @@ import { useMessageBubbleLogic } from '@/src/hooks/regularchat/useMessageBubbleL
 import EditMessageForm from './EditMessageForm'
 import MessageContentRenderer from './MessageContentRenderer'
 import MessageActionsBar from './MessageActionsBar'
-import MessageSourcesDisplay from './MessageSourcesDisplay' // <<< THÊM IMPORT
+import MessageSourcesDisplay from './MessageSourcesDisplay'
 import { Part } from '@google/genai'
 
 interface ChatMessageDisplayProps {
@@ -34,10 +34,12 @@ interface ChatMessageDisplayProps {
   location?: string
   action?: FrontendAction
   timestamp?: string | Date
-  sources?: SourceItem[] // <<< THÊM PROP sources
+  sources?: SourceItem[]
   isInsideSmallContainer?: boolean
   isLatestUserMessage: boolean
   onConfirmEdit: (messageId: string, newText: string) => void
+  // <<< NEW PROP
+  onOpenFeedbackModal: (messageId: string, type: 'like' | 'dislike') => void;
 }
 
 const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
@@ -52,10 +54,12 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
   location,
   action,
   timestamp,
-  sources, // <<< NHẬN PROP sources
+  sources,
   isInsideSmallContainer = false,
   isLatestUserMessage,
-  onConfirmEdit
+  onConfirmEdit,
+  // <<< NEW PROP
+  onOpenFeedbackModal
 }) => {
   const { isThoughtProcessHiddenInFloatingChat } = useSettingsStore(
     useShallow(state => ({
@@ -119,7 +123,11 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
     cancelEdit()
   }
 
-  // Xác định xem tin nhắn có thể chỉnh sửa được hay không
+  // <<< NEW: Handler for feedback buttons
+  const handleFeedback = (type: 'like' | 'dislike') => {
+    onOpenFeedbackModal(id, type);
+  };
+
   const canMessageBeEdited = type === 'text' || (type === 'multimodal' && !!text);
 
   return (
@@ -152,7 +160,6 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
         />
       )}
 
-      {/* --- HIỂN THỊ SOURCES (CHỈ CHO TIN NHẮN CỦA MODEL) --- */}
       {!isUser && sources && sources.length > 0 && (
         <MessageSourcesDisplay sources={sources} />
       )}
@@ -167,8 +174,19 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
         onStartEdit={handleEditButtonClick}
         onConfirmEdit={handleConfirmEditClick}
         onCancelEdit={handleCancelEditClick}
-        canEditText={canMessageBeEdited} // <<< TRUYỀN PROP canEditText vào đây
+        canEditText={canMessageBeEdited}
+        onFeedback={handleFeedback} // <<< PASS HANDLER
       />
+
+      {/* <<< NEW: Survey Notification Message (only for bot messages) >>> */}
+      {!isUser && type !== 'error' && type !== 'warning' && (
+        <div className="mt-2.5 border-t border-black/10 pt-1.5 dark:border-white/20">
+          <p className="flex items-center text-xs text-green-500 dark:text-gray-400">
+            <Info size={14} className="mr-1.5 flex-shrink-0" />
+            <span>Vui lòng đánh giá phản hồi này để giúp nhóm chúng em cải thiện chất lượng!.</span>
+          </p>
+        </div>
+      )}
 
       {shouldShowThoughtProcess && (
         <div className='mt-2 border-t border-black/10 pt-1.5 dark:border-white/20 sm:mt-3 sm:pt-2'>

@@ -2,17 +2,10 @@
 import React from 'react';
 
 interface PaginationProps {
-  /** The currently active page (1-based index) */
   currentPage: number;
-  /** Total number of pages available */
   totalPages: number;
-  /** Callback function triggered when a page button is clicked. Receives the target page number (1-based). */
   onPageChange: (page: number) => void;
-  /** Maximum number of page number buttons to display directly (excluding Previous/Next/Ellipsis). Default is 5.
-   *  For best visual results, consider using an odd number.
-   */
   maxPageNumbersToShow?: number;
-  /** Optional additional CSS classes for the container */
   className?: string;
 }
 
@@ -20,11 +13,9 @@ const GeneralPagination: React.FC<PaginationProps> = ({
   currentPage,
   totalPages,
   onPageChange,
-  // Đảm bảo maxPageNumbersToShow luôn là số lẻ để căn giữa tốt hơn
   maxPageNumbersToShow = 5,
   className = '',
 }) => {
-  // Don't render pagination if there's only one page or fewer
   if (totalPages <= 1) {
     return null;
   }

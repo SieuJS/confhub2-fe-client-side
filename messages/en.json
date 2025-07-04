@@ -1980,5 +1980,9 @@
   "Disclaimer_descripstion_chatbot": "Models may make mistakes, so double-check outputs.",
   "Go_to_CFP_website": "Go to CFP website",
   "Chat": "Chat",
-  "Please_enter_the_Call_for_Papers": "Please enter the Call for Papers"
+  "Please_enter_the_Call_for_Papers": "Please enter the Call for Papers",
+  "Feedback_Error_MessageNotFound": "Feedback Error Message Not Found",
+  "Feedback_Success_Message": "Feedback Success Message",
+  "Feedback_Error_SubmitFailed": "Feedback Error Submit Failed"
+
 }
