@@ -1,13 +1,32 @@
-// Poster.tsx
-
 'use client'
 
 import React from 'react'
+// IMPORT COMPONENT GIAO DIỆN CHATBOT
+import ChatbotInterface from './ChatbotInterface' // Giữ lại import này
+// BƯỚC 1: IMPORT 2 COMPONENT GIAO DIỆN MỚI
+import ConferenceSearchInterface from './ConferenceSearchInterface'
+import ConferenceDetailInterface from './ConferenceDetailInterface'
 
 const Poster: React.FC = () => {
-  // Kích thước A0 ngang ở độ phân giải cao (~300 DPI)
   const A0_WIDTH_PX = 14043
   const A0_HEIGHT_PX = 9933
+
+  const evaluationResults = [
+    { label: 'Tìm link hội nghị chính xác', value: '90%' },
+    { label: 'Ngày diễn ra hội nghị', value: '80%' },
+    { label: 'Địa điểm tổ chức', value: '80%' },
+    { label: 'Ngày nộp bài', value: '80%' },
+    { label: 'Ngày thông báo', value: '80%' },
+    { label: 'Ngày camera ready', value: '80%' },
+    { label: 'Ngày register', value: '80%' }
+  ]
+
+  const mainResult = evaluationResults.find(
+    r => r.label === 'Tìm link hội nghị chính xác'
+  )
+  const otherResults = evaluationResults.filter(
+    r => r.label !== 'Tìm link hội nghị chính xác'
+  )
 
   return (
     <div
@@ -16,16 +35,13 @@ const Poster: React.FC = () => {
         width: `${A0_WIDTH_PX}px`,
         height: `${A0_HEIGHT_PX}px`,
         fontFamily: 'Arial, sans-serif',
-        // Scale nhỏ lại để xem trên màn hình. Bỏ transform này khi chuẩn bị file in
-        transform: 'scale(0.08)', // Thu nhỏ còn 8%
+        transform: 'scale(0.08)',
         transformOrigin: 'top left',
         margin: 'auto'
       }}
     >
-      {/* HEADER: Chiều cao của header sẽ tự động dựa trên nội dung */}
-      {/* Đã đổi màu nền từ bg-[#0056b3] sang bg-gray-900 */}
+      {/* HEADER (Giữ nguyên không đổi) */}
       <header className='flex items-center justify-between bg-gray-900 px-[188px] py-[125px] font-bold text-white shadow-md'>
-        {/* Left Section: Logo & School Info */}
         <div className='flex items-center'>
           <img
             src='/hcmus_logo.png'
@@ -37,8 +53,6 @@ const Poster: React.FC = () => {
             <p className='m-0 text-[113px]'>KHOA CÔNG NGHỆ THÔNG TIN</p>
           </div>
         </div>
-
-        {/* Center Section: Title */}
         <div className='flex-grow px-[60px] text-center'>
           <h1 className='mb-[63px] text-[340px] font-extrabold leading-tight'>
             GLOBAL CONFERENCE & JOURNAL HUB
@@ -47,10 +61,7 @@ const Poster: React.FC = () => {
             HỆ THỐNG TÌM KIẾM KHOA HỌC TÍCH HỢP MÔ HÌNH NGÔN NGỮ LỚN
           </h2>
         </div>
-
-        {/* Right Section: Team Info - ĐÃ ĐƯỢC TÁCH THÀNH 2 CỘT */}
         <div className='ml-[94px] flex flex-shrink-0 gap-[94px] text-[113px] leading-relaxed'>
-          {/* Cột 1: Giảng viên hướng dẫn */}
           <div className='text-left'>
             <p className='m-0'>GIẢNG VIÊN HƯỚNG DẪN:</p>
             <ul className='m-0 list-none p-0'>
@@ -58,8 +69,6 @@ const Poster: React.FC = () => {
               <li>PGS.TS Lê Nguyễn Hoài Nam</li>
             </ul>
           </div>
-
-          {/* Cột 2: Sinh viên thực hiện */}
           <div className='text-left'>
             <p className='m-0'>SINH VIÊN THỰC HIỆN:</p>
             <ul className='m-0 list-none p-0'>
@@ -74,11 +83,11 @@ const Poster: React.FC = () => {
         </div>
       </header>
 
-      {/* MAIN CONTENT - `flex-1` sẽ làm cho khu vực này chiếm hết không gian dọc còn lại */}
+      {/* MAIN CONTENT */}
       <div className='flex flex-1 gap-[156px] p-[125px]'>
-        {/* Column 1: Introduction & Problem */}
-        <div className='flex flex-1 flex-col justify-between rounded-[47px] border-[3px] border-gray-200 p-[125px] shadow-sm'>
-          <div>
+        {/* Column 1: Bối cảnh, Tóm tắt & Giải pháp (Giữ nguyên không đổi) */}
+        <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[125px] shadow-sm'>
+          <div className='mb-[94px]'>
             <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
               1. Bối cảnh & Mục tiêu
             </h3>
@@ -87,242 +96,152 @@ const Poster: React.FC = () => {
               học trong việc tìm kiếm, lựa chọn các hội nghị và tạp chí khoa học
               phù hợp.
             </p>
-            <p className='mb-[78px] text-[113px] leading-relaxed'>
-              Mục tiêu là xây dựng một ứng dụng web toàn diện Global Conference
-              & Journal Hub để tự động hóa quy trình này, cung cấp một công cụ
-              thông minh, thân thiện và đáng tin cậy cho cộng đồng nghiên cứu.
+            <p className='mb-[94px] text-[113px] leading-relaxed'>
+              Mục tiêu là xây dựng một ứng dụng web toàn diện để tự động hóa quy
+              trình này, cung cấp một công cụ thông minh, thân thiện và đáng tin
+              cậy.
             </p>
-          </div>
-          <div>
             <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
               2. Tóm tắt đồ án
             </h3>
             <p className='mb-[78px] text-[113px] leading-relaxed'>
               Ứng dụng web thông minh với khả năng thu thập dữ liệu tự động từ
               hàng ngàn nguồn thông qua{' '}
-              <strong className='text-[#e67e22]'>LLM</strong> và cung cấp các
-              tính năng tìm kiếm, quản lý, tương tác đa dạng.
-            </p>
-            <p className='mb-[78px] text-[113px] leading-relaxed'>
-              Điểm nổi bật: Tích hợp{' '}
-              <strong className='text-[#e67e22]'>LLM (Gemini)</strong> để tự
-              động hóa việc bóc tách thông tin phức tạp.
-            </p>
-            <p className='mb-[78px] text-[113px] leading-relaxed'>
-              Kế thừa/Sử dụng lại: Google Custom Search API, mô hình Gemini, các
-              thư viện/framework (Next.js, NestJS, BullMQ...).
+              <strong className='text-[#e67e22]'>LLM</strong>, cung cấp các tính
+              năng tìm kiếm, quản lý và tương tác đa dạng.
             </p>
           </div>
-        </div>
-
-        {/* Column 2: Solution & Architecture */}
-        <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[125px] shadow-sm'>
-          <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
-            3. Giải pháp & Công nghệ cốt lõi
-          </h3>
-          <p className='mb-[78px] text-[113px] leading-relaxed'>
-            Hệ thống được xây dựng dựa trên các giải pháp công nghệ hiện đại:
-          </p>
-
-          {/* Section cho sơ đồ 1 */}
-          <div className='mb-[94px] flex flex-1 flex-col'>
-            <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
-              Quy trình thu thập dữ liệu tự động bằng LLM
-            </h4>
-            <ul className='m-0 mb-[78px] list-disc pl-[94px]'>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                Sử dụng Google Custom Search API để tìm trang web tiềm năng.
-              </li>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                LLM (Gemini) phân loại và xác định trang chủ hội nghị.
-              </li>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                LLM (Gemini) tự động bóc tách thông tin chi tiết (tên, thời
-                gian, địa điểm, chủ đề...).
-              </li>
-            </ul>
-            <div className='flex w-full flex-1 items-center justify-center rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-200 text-[125px] font-bold text-gray-600'>
-              [SƠ ĐỒ QUY TRÌNH THU THẬP DỮ LIỆU BẰNG LLM]
+          <div>
+            <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
+              3. Giải pháp & Công nghệ
+            </h3>
+            <div className='mb-[94px] flex flex-1 flex-col'>
+              <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
+                Quy trình thu thập dữ liệu bằng LLM
+              </h4>
+              <ul className='m-0 mb-[78px] list-disc pl-[94px] text-[113px]'>
+                <li className='mb-[31px]'>Tìm trang web bằng Google API.</li>
+                <li className='mb-[31px]'>LLM (Gemini) phân loại trang chủ.</li>
+                <li className='mb-[31px]'>LLM (Gemini) bóc tách thông tin.</li>
+              </ul>
+              <div className='flex h-[400px] w-full items-center justify-center rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-200 text-[125px] font-bold text-gray-600'>
+                [SƠ ĐỒ]
+              </div>
             </div>
-          </div>
-
-          {/* Section cho sơ đồ 2 */}
-          <div className='flex flex-1 flex-col'>
-            <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
-              Kiến trúc Microservices
-            </h4>
-            <p className='mb-[78px] text-[113px] leading-relaxed'>
-              Thiết kế linh hoạt, dễ bảo trì và mở rộng, bao gồm:
-            </p>
-            <ul className='m-0 mb-[78px] list-disc pl-[94px]'>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                <strong>Frontend:</strong> Next.js, TailwindCSS (người dùng &
-                quản trị).
-              </li>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                <strong>Backend:</strong> Node.js (NestJS), chia dịch vụ, giao
-                tiếp qua BullMQ.
-              </li>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                <strong>Cơ sở dữ liệu:</strong> PostgreSQL (dữ liệu cấu trúc),
-                MongoDB (dữ liệu linh hoạt).
-              </li>
-            </ul>
-            <div className='flex w-full flex-1 items-center justify-center rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-200 text-[125px] font-bold text-gray-600'>
-              [SƠ ĐỒ KIẾN TRÚC MICROSERVICES]
+            <div className='flex flex-1 flex-col'>
+              <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
+                Kiến trúc Microservices
+              </h4>
+              <ul className='m-0 mb-[78px] list-disc pl-[94px] text-[113px]'>
+                <li className='mb-[31px]'>
+                  <strong>Frontend:</strong> Next.js, TailwindCSS.
+                </li>
+                <li className='mb-[31px]'>
+                  <strong>Backend:</strong> NestJS, BullMQ.
+                </li>
+                <li className='mb-[31px]'>
+                  <strong>Database:</strong> PostgreSQL, MongoDB.
+                </li>
+              </ul>
+              <div className='flex h-[400px] w-full items-center justify-center rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-200 text-[125px] font-bold text-gray-600'>
+                [SƠ ĐỒ]
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Column 3: Key Features */}
+        {/* Column 2: Các tính năng chính (ĐÃ CẬP NHẬT) */}
         <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[125px] shadow-sm'>
           <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
             4. Các tính năng chính
           </h3>
-
-          {/* Section cho ảnh 1 */}
-          <div className='mb-[94px] flex flex-1 flex-col'>
+          <div className='flex flex-1 flex-col'>
             <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
               Đối với người dùng
             </h4>
-            <ul className='m-0 mb-[78px] list-disc pl-[94px]'>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
+            <ul className='m-0 mb-[78px] list-disc pl-[94px] text-[113px] leading-relaxed'>
+              <li className='mb-[31px]'>
                 <strong>Tìm kiếm nâng cao:</strong> Theo chủ đề, thời gian, địa
                 điểm, xếp hạng...
               </li>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
+              <li className='mb-[31px]'>
                 <strong>Quản lý cá nhân:</strong> Theo dõi hội nghị, nhận thông
                 báo, thêm vào lịch.
               </li>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
+              <li className='mb-[31px]'>
                 <strong>Tương tác & Đóng góp:</strong> Đánh giá, bình luận, đề
                 xuất hội nghị.
               </li>
             </ul>
-            <div className='flex w-full flex-1 items-center justify-center rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-200 text-[125px] font-bold text-gray-600'>
-              [ẢNH GIAO DIỆN NGƯỜI DÙNG]
-            </div>
-          </div>
 
-          {/* Section cho ảnh 2 */}
-          <div className='mb-[94px] flex flex-1 flex-col'>
-            <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
-              Tính năng thông minh
-            </h4>
-            <ul className='m-0 mb-[78px] list-disc pl-[94px]'>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                <strong>Chatbot Đa Tác Tử:</strong> Điều phối câu hỏi đến các
-                chatbot chuyên môn để truy vấn CSDL và trả lời chính xác.
-              </li>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                <strong>Trực quan hóa dữ liệu:</strong> Công cụ vẽ biểu đồ tùy
-                chỉnh để phân tích, so sánh xu hướng hội nghị.
-              </li>
-            </ul>
-            <div className='flex w-full flex-1 items-center justify-center rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-200 text-[125px] font-bold text-gray-600'>
-              [ẢNH GIAO DIỆN CHATBOT & BIỂU ĐỒ]
+            {/* BƯỚC 2: THAY THẾ PLACEHOLDER BẰNG COMPONENT GIAO DIỆN */}
+            <div className='mb-[78px] flex w-full  items-center justify-center overflow-hidden rounded-[31px] border-[6px] border-dashed border-gray-400 bg-white p-[31px]'>
+              {/* THAY ĐỔI Ở ĐÂY: Thêm class w-full */}
+              <div className='w-full'>
+                <ConferenceSearchInterface />
+              </div>
             </div>
-          </div>
-
-          {/* New Section: Đối với Quản trị viên */}
-          <div className='flex flex-1 flex-col'>
-            <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
-              Đối với Quản trị viên
-            </h4>
-            <ul className='m-0 mb-[78px] list-disc pl-[94px]'>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                <strong>Quản lý toàn diện:</strong> Kiểm duyệt, thêm/sửa/xóa
-                thông tin hội nghị và người dùng.
-              </li>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                <strong>Giám sát hệ thống:</strong> Theo dõi hiệu quả quá trình
-                thu thập dữ liệu qua biểu đồ.
-              </li>
-            </ul>
-            <div className='flex w-full flex-1 items-center justify-center rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-200 text-[125px] font-bold text-gray-600'>
-              [ẢNH GIAO DIỆN QUẢN TRỊ]
+            <div className='flex w-full flex-1 items-center justify-center overflow-hidden rounded-[31px] border-[6px] border-dashed border-gray-400 bg-white p-[31px]'>
+              {/* THAY ĐỔI Ở ĐÂY: Thêm class w-full */}
+              <div className='w-full'>
+                <ConferenceDetailInterface />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Column 4: Results & Learnings */}
-        <div className='flex flex-1 flex-col justify-between rounded-[47px] border-[3px] border-gray-200 p-[125px] shadow-sm'>
-          <div>
+        {/* Column 3: Live Chat & Kết quả đánh giá (Giữ nguyên không đổi) */}
+        <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[125px] shadow-sm'>
+          <div className='mb-[94px] flex flex-1 flex-col'>
             <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
-              5. Kết quả đánh giá
+              5. Chatbot Đa Tác Tử
             </h3>
             <p className='mb-[78px] text-[113px] leading-relaxed'>
-              Hệ thống được đánh giá trên bộ dữ liệu 921 hội nghị (Core2023) và
-              cho kết quả tích cực:
+              Điều phối câu hỏi đến các chatbot chuyên môn (tìm kiếm, hỏi
+              đáp,...) để trả lời chính xác và tự nhiên.
             </p>
-            <p className='mb-[78px] text-center text-[113px] leading-relaxed'>
-              <span className='block text-[250px] font-bold text-[#e67e22]'>
-                93.6%
-              </span>
-              Độ chính xác trong việc tìm đúng link hội nghị.
-            </p>
-            <p className='mb-[78px] text-center text-[113px] leading-relaxed'>
-              <span className='block text-[250px] font-bold text-[#e67e22]'>
-                88%
-              </span>
-              Độ chính xác trong việc trích xuất thông tin (từ các link đúng).
-            </p>
-            <div className='mb-[94px] flex h-[1094px] w-full items-center justify-center rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-200 text-[125px] font-bold text-gray-600'>
-              [BIỂU ĐỒ ĐÁNH GIÁ KẾT QUẢ]
+            <div className='flex w-full flex-1 items-center justify-center rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-200 p-[31px]'>
+              <ChatbotInterface />
             </div>
-            <p className='mb-[78px] text-[113px] leading-relaxed'>
-              Hạn chế chính: Cấu trúc web phức tạp, thông tin trong ảnh, yêu cầu
-              đăng nhập.
-            </p>
           </div>
           <div>
             <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
-              6. Tự đánh giá & Bài học
+              6. Kết quả đánh giá
             </h3>
-            <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
-              Điểm làm tốt:
-            </h4>
-            <ul className='m-0 mb-[78px] list-disc pl-[94px]'>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                Vận dụng thành công LLM giải quyết vấn đề thực tế.
-              </li>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                Kiến trúc Microservices linh hoạt, có khả năng mở rộng.
-              </li>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                Giao diện thân thiện, đa dạng tính năng.
-              </li>
-            </ul>
-
-            <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
-              Khó khăn & Khắc phục:
-            </h4>
-            <ul className='m-0 mb-[78px] list-disc pl-[94px]'>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                <strong>Xử lý dữ liệu phi cấu trúc:</strong> Tối ưu prompt
-                engineering, kiểm duyệt bán tự động.
-              </li>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                <strong>Giao tiếp giữa microservices:</strong> Sử dụng BullMQ
-                hiệu quả, thiết kế API rõ ràng.
-              </li>
-            </ul>
-
-            <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
-              Bài học rút ra:
-            </h4>
-            <ul className='m-0 mb-[78px] list-disc pl-[94px]'>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                Tầm quan trọng của thiết kế kiến trúc.
-              </li>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                Khả năng thích nghi & học hỏi công nghệ mới (LLM,
-                Microservices).
-              </li>
-              <li className='mb-[31px] text-[113px] leading-relaxed'>
-                Kỹ năng làm việc nhóm & quản lý dự án hiệu quả.
-              </li>
-            </ul>
+            <p className='mb-[78px] text-[113px] leading-relaxed'>
+              Hệ thống cho thấy hiệu quả vượt trội trong việc tự động hóa thu
+              thập dữ liệu:
+            </p>
+            {mainResult && (
+              <div className='mb-[62px] rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-100 p-[94px] text-center'>
+                <p className='mb-[31px] text-[113px] font-semibold text-gray-700'>
+                  {mainResult.label}
+                </p>
+                <p className='text-[280px] font-extrabold text-[#e67e22]'>
+                  {mainResult.value}
+                </p>
+              </div>
+            )}
+            <div className='grid grid-cols-2 gap-[62px]'>
+              {otherResults.map((result, index) => (
+                <div
+                  key={index}
+                  className='flex flex-col items-center justify-center rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-100 p-[62px]'
+                >
+                  <span className='mb-[31px] text-center text-[113px] text-gray-700'>
+                    {result.label}
+                  </span>
+                  <span className='text-[220px] font-extrabold text-[#e67e22]'>
+                    {result.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p className='mt-[94px] text-[113px] leading-relaxed'>
+              <strong className='text-[#c0392b]'>Hạn chế:</strong> Độ chính xác
+              phụ thuộc vào cấu trúc website, thông tin dạng ảnh, hoặc các trang
+              yêu cầu đăng nhập.
+            </p>
           </div>
         </div>
       </div>
