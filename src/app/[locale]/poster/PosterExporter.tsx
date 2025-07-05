@@ -4,10 +4,9 @@
 
 import React, { useRef, useState } from 'react'
 import domtoimage from 'dom-to-image-more'
-import Poster from './Poster' // Giả sử Poster.tsx nằm cùng thư mục hoặc bạn chỉnh lại đường dẫn
+import Poster from './Poster'
 
 const PosterExporter: React.FC = () => {
-  // useRef để lấy tham chiếu đến DOM element của poster
   const posterRef = useRef<HTMLDivElement>(null)
   const [isExporting, setIsExporting] = useState(false)
 
@@ -20,54 +19,55 @@ const PosterExporter: React.FC = () => {
     setIsExporting(true)
 
     const posterNode = posterRef.current
-
-    // RẤT QUAN TRỌNG: Tạm thời bỏ transform: scale() để thư viện render ở kích thước đầy đủ
     const originalTransform = posterNode.style.transform
     posterNode.style.transform = 'none'
-    // Đảm bảo trình duyệt có thời gian render lại trước khi chụp
     await new Promise(resolve => setTimeout(resolve, 100))
 
     try {
-      // Các tùy chọn để đảm bảo chất lượng cao nhất
       const options = {
-        quality: 1.0, // Chất lượng ảnh PNG (1.0 là cao nhất)
-        width: posterNode.offsetWidth, // Lấy chiều rộng thực tế của element
-        height: posterNode.offsetHeight, // Lấy chiều cao thực tế của element
+        quality: 1.0,
+        width: posterNode.offsetWidth,
+        height: posterNode.offsetHeight,
+
+        // --- SỬA LẠI PHẦN NÀY ---
+        filter: (node: Node) => {
+          if (node.nodeType === 1) {
+            // Chỉ áp dụng cho HTMLElement
+            const element = node as HTMLElement
+            // Tấn công tổng lực: xóa hết các thuộc tính có khả năng gây ra viền
+            element.style.outline = 'none'
+            element.style.border = 'none' // Thử xóa cả border
+            element.style.boxShadow = 'none' // Thử xóa cả box-shadow
+          }
+          return true
+        },
+        // --- KẾT THÚC PHẦN SỬA ---
+
         style: {
-          transform: 'scale(1)', // Đảm bảo scale là 1 trong quá trình render
+          transform: 'scale(1)',
           transformOrigin: 'top left',
           margin: '0'
-          // Bạn có thể thêm các style ghi đè khác ở đây nếu cần
         }
       }
 
-      // console.log(
-      //   `Bắt đầu xuất file ảnh với kích thước: ${options.width}x${options.height}...`
-      // )
-
       const dataUrl = await domtoimage.toPng(posterNode, options)
-
-      // console.log('Xuất file thành công! Bắt đầu tải xuống...')
-
-      // Tạo một thẻ <a> ảo để tải file về
       const link = document.createElement('a')
       link.download = 'do-an-poster.png'
       link.href = dataUrl
       link.click()
     } catch (error) {
-      // console.error('Oops, có lỗi xảy ra!', error)
+      console.error('Oops, có lỗi xảy ra!', error)
       alert(
         'Đã có lỗi xảy ra trong quá trình xuất file. Vui lòng thử lại hoặc kiểm tra console.'
       )
     } finally {
-      // QUAN TRỌNG: Đặt lại transform để giao diện hiển thị đúng như cũ
       posterNode.style.transform = originalTransform
       setIsExporting(false)
-      // console.log('Hoàn tất.')
     }
   }
 
   return (
+    // ...Phần JSX của bạn không thay đổi
     <div className='flex min-h-screen w-full flex-col items-center bg-gray-200 p-8'>
       <div className='mb-8'>
         <button
@@ -86,8 +86,6 @@ const PosterExporter: React.FC = () => {
           </p>
         )}
       </div>
-
-      {/* Bao bọc Poster trong một div có ref */}
       <div ref={posterRef}>
         <Poster />
       </div>
