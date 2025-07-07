@@ -1,14 +1,15 @@
 // src/app/[locale]/chatbot/livechat/utils/api.helpers.ts
 
+// --- IMPORT CÁC TYPE CẦN THIẾT ---
+// Giả sử các type này được export từ tool.handlers.ts hoặc một file types chung
+import { FollowItem, CalendarItem } from '../services/tool.handlers';
+
 // Placeholder for client-side auth token retrieval
-// IMPORTANT: Implement this based on your application's auth mechanism
 export const getAuthTokenClientSide = async (): Promise<string | null> => {
+  // IMPORTANT: Implement this based on your application's auth mechanism
   const token = localStorage.getItem('token');
-  if (!token || token === "YOUR_ACTUAL_USER_TOKEN_FROM_CLIENT_STORAGE_OR_CONTEXT") {
-    // console.warn("getAuthTokenClientSide: Dummy or no token returned. Implement actual token retrieval.");
-    // In a real scenario, you might want to throw an error or return null
-    // if the action requires auth and no token is available.
-    // return null; // Or throw new Error("Authentication token not found.");
+  if (!token) {
+    // console.warn("getAuthTokenClientSide: No token found.");
   }
   return token;
 };
@@ -46,37 +47,49 @@ export async function makeFrontendApiCall(
     } else {
       errorData = await response.text();
     }
-    // console.error(`Frontend API call to ${url} (method ${method}) failed with status ${response.status}:`, errorData);
     const message = (typeof errorData === 'object' && errorData?.message) ? errorData.message :
       (typeof errorData === 'string' && errorData.trim() !== '') ? errorData :
         `API Error (${response.status})`;
     throw new Error(message);
   }
 
-  // Handle 204 No Content or responses with content-length 0 (e.g., some successful POST/DELETE)
-  if (response.status === 204 || response.status === 201 && response.headers.get("content-length") === "0" ) {
-    return { success: true, message: "Operation successful." };
-  }
-  if (response.headers.get("content-length") === "0") { // General check for no content
-      return { success: true, message: "Operation successful, no content returned." };
+  // Handle 204 No Content or responses with content-length 0
+  if (response.status === 204 || response.headers.get("content-length") === "0") {
+    return { success: true, message: "Operation successful, no content returned." };
   }
 
-  return response.json(); // Assuming successful responses with content are JSON
+  return response.json();
 }
 
-// Helper to find item ID and name by identifier (acronym, title, or ID)
+// =================================================================
+// --- ĐIỀU CHỈNH QUAN TRỌNG NHẤT ---
+// =================================================================
+
+/**
+ * Fetches the full details of an item (conference) from the API.
+ * This function is now more generic and returns the entire item object.
+ *
+ * @param identifier The value to search for (e.g., "ICML", "12345").
+ * @param identifierType The type of the identifier ('acronym', 'title', 'id').
+ * @param itemType The type of item to fetch (currently only 'conference').
+ * @param databaseUrl The base URL for the API.
+ * @returns A promise that resolves to the full item object (e.g., FollowItem, CalendarItem).
+ */
 export async function fetchItemDetailsFromApi(
   identifier: string,
   identifierType: 'acronym' | 'title' | 'id',
   itemType: 'conference',
-  databaseUrl: string // Pass the base URL
-): Promise<{ id: string; name: string }> {
+  databaseUrl: string
+): Promise<FollowItem | CalendarItem> { // CHANGE: Trả về một object đầy đủ
   if (!identifier) throw new Error("Identifier is required.");
 
   const searchApiUrl = `${databaseUrl}/${itemType}`; // e.g., /api/v1/conference
   const params = new URLSearchParams({ perPage: '1' });
 
+  // API có thể tìm kiếm theo các trường khác nhau
   if (identifierType === 'id') {
+    // Nếu tìm theo ID, API có thể có một endpoint riêng, ví dụ /conference/:id
+    // Hoặc vẫn dùng query param
     params.set('id', identifier);
   } else if (identifierType === 'acronym') {
     params.set('acronym', identifier);
@@ -95,23 +108,40 @@ export async function fetchItemDetailsFromApi(
   }
   const result = await response.json();
 
+  // API có thể trả về dữ liệu trong 'payload' hoặc trực tiếp là một mảng
   let itemData;
   if (result && Array.isArray(result.payload) && result.payload.length > 0) {
     itemData = result.payload[0];
   } else if (Array.isArray(result) && result.length > 0) {
     itemData = result[0];
-  } else if (result && result.id) {
+  } else if (result && result.id) { // Trường hợp API trả về một object duy nhất
     itemData = result;
   }
 
   if (itemData && itemData.id) {
-    return { id: itemData.id, name: itemData.title || itemData.acronym || itemData.id };
+    // CHANGE: Trả về toàn bộ object đã được chuẩn hóa thay vì chỉ id và name
+    // Điều này đảm bảo các trường như 'dates', 'location' có sẵn
+    return {
+      id: itemData.id,
+      title: itemData.title || itemData.name || 'Unknown Title',
+      acronym: itemData.acronym || '',
+      // Cung cấp giá trị mặc định để đảm bảo cấu trúc object luôn hợp lệ
+      dates: itemData.dates || [],
+      location: itemData.location || { address: '', cityStateProvince: '', country: '', continent: '' },
+      // Các trường khác có thể có hoặc không, tùy thuộc vào context
+      ...itemData
+    };
   } else {
     throw new Error(`${itemType} not found with ${identifierType} "${identifier}", or ID missing in response.`);
   }
 }
 
-// Helper to format a list of items for the model's response
+// --- CÁC HÀM CŨ CÓ THỂ GIỮ LẠI HOẶC XÓA ĐI ---
+
+/**
+ * @deprecated This function is no longer needed as UI actions now handle list display.
+ * The logic is now handled directly within the tool handlers to create structured responses.
+ */
 export function formatItemsForModel(items: any[], itemType: string): string {
   if (!items || items.length === 0) {
     return `You are not following any ${itemType}s.`;
@@ -124,6 +154,7 @@ export function formatItemsForModel(items: any[], itemType: string): string {
   return `Here are the ${itemType}s you are following:\n${formatted}`;
 }
 
+// Helper to safely get the 'url' argument from function call arguments
 export function getUrlArg(fcArgs: any): string | undefined {
     return fcArgs && typeof fcArgs === 'object' && typeof fcArgs.url === 'string'
       ? fcArgs.url

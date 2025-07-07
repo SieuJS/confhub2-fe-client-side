@@ -335,21 +335,44 @@ export const handleSocketConversationUpdatedAfterEdit = (
                     targetBotMsgForUpdate = chatMessages[targetBotMsgIndex];
                 }
             }
+
             if (targetBotMsgForUpdate && targetBotMsgIndex !== -1) {
-                // Cập nhật tin nhắn bot hiện có, giữ lại text/thoughts nếu đang stream, nhưng ghi đè sources
+                // Cập nhật tin nhắn bot hiện có bằng logic hợp nhất an toàn
                 chatMessages[targetBotMsgIndex] = {
-                    ...mappedNewBotMessageDataOnly, // Chứa parts, type, sources từ backend
-                    id: mappedNewBotMessageDataOnly.id || targetBotMsgForUpdate.id, // Ưu tiên ID từ backend
-                    text: targetBotMsgForUpdate.text, // Giữ lại text đang stream nếu có
-                    thoughts: targetBotMsgForUpdate.thoughts, // Giữ lại thoughts đang stream nếu có
-                    // sources đã có trong mappedNewBotMessageDataOnly
+                    // 1. Bắt đầu với tin nhắn hiện tại để lấy tất cả các thuộc tính
+                    //    (bao gồm text, thoughts, sources, và action đã nhận từ các event trước).
+                    ...targetBotMsgForUpdate,
+
+                    // 2. Ghi đè bằng dữ liệu "chốt hạ" từ server.
+                    //    Bước này có thể làm mất các thuộc tính tạm thời như `action` hoặc `sources`
+                    //    nếu chúng không có trong payload từ server.
+                    ...mappedNewBotMessageDataOnly,
+
+                    // 3. GHI ĐÈ TƯỜNG MINH để bảo toàn các dữ liệu quan trọng từ state hiện tại,
+                    //    tránh việc chúng bị ghi đè thành `undefined`.
+
+                    // Luôn ưu tiên ID cuối cùng từ server (nếu có).
+                    id: mappedNewBotMessageDataOnly.id || targetBotMsgForUpdate.id,
+
+                    // Giữ lại text đã được stream để không bị giật/nháy màn hình.
+                    text: targetBotMsgForUpdate.text,
+
+                    // Giữ lại thoughts đã hiển thị.
+                    thoughts: targetBotMsgForUpdate.thoughts,
+
+                    // Giữ lại sources nếu bản cập nhật cuối cùng không có.
+                    sources: mappedNewBotMessageDataOnly.sources || targetBotMsgForUpdate.sources,
+
+                    // ***** DÒNG SỬA LỖI QUAN TRỌNG NHẤT *****
+                    // Giữ lại action nếu bản cập nhật cuối cùng không có.
+                    action: mappedNewBotMessageDataOnly.action || targetBotMsgForUpdate.action,
                 };
                 // console.log(`[MessageStore _onSocketConvUpdatedAfterEdit] Updated/Finalized bot message (ID: ${chatMessages[targetBotMsgIndex].id}) preserving thoughts.`);
             } else {
                 // console.warn(`[MessageStore _onSocketConvUpdatedAfterEdit] Bot message (Placeholder ID: ${currentPendingBotId}, Backend ID: ${mappedNewBotMessageDataOnly.id}) not found. Inserting new.`);
                 // Find the index of the (potentially updated or removed) user message
                 const finalUserMsgIdx = mappedEditedUserMessage ? chatMessages.findIndex(m => m.id === mappedEditedUserMessage.id) : -1;
-                 const newBotMsgWithDefaults: ChatMessageType = {
+                const newBotMsgWithDefaults: ChatMessageType = {
                     ...mappedNewBotMessageDataOnly, // Chứa parts, type, sources từ backend
                     thoughts: undefined, // Không có thoughts khi chèn mới
                     timestamp: mappedNewBotMessageDataOnly.timestamp || new Date().toISOString(), // Đảm bảo có timestamp
@@ -360,7 +383,7 @@ export const handleSocketConversationUpdatedAfterEdit = (
                     chatMessages.push(newBotMsgWithDefaults);
                 }
             }
-         } else { 
+        } else {
             if (botPlaceholderBeingFinalized) {
                 const idxToRemove = chatMessages.findIndex(msg => msg.id === botPlaceholderBeingFinalized.id);
                 if (idxToRemove !== -1) {
@@ -371,7 +394,7 @@ export const handleSocketConversationUpdatedAfterEdit = (
         }
 
         // Final cleanup: ensure only the edited user message (if displayable) and its subsequent bot message (if displayable) remain after the original edit point.
-         if (mappedEditedUserMessage) {
+        if (mappedEditedUserMessage) {
             const finalUserMsgIdx = chatMessages.findIndex(m => m.id === mappedEditedUserMessage.id);
             if (finalUserMsgIdx !== -1) {
                 let cleanedMessages = chatMessages.slice(0, finalUserMsgIdx + 1);

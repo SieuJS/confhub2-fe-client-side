@@ -4,7 +4,6 @@ import { useEffect, memo } from "react";
 import { useLiveAPIContext } from '@/src/app/[locale]/chatbot/livechat/contexts/LiveAPIContext';
 import {
   englishGetConferencesDeclaration,
-  englishDrawChartDeclaration,
   englishGetWebsiteInfoDeclaration,
   englishManageCalendarDeclaration,
   englishManageFollowDeclaration,
@@ -25,23 +24,16 @@ import {
 
 import {
   FunctionDeclaration as SDKFunctionDeclaration,
-  // Tool as SDKTool, // Không dùng trực tiếp
   FunctionResponse as SDKFunctionResponse,
-  // LiveClientMessage as SDKLiveClientMessage, // Không dùng trực tiếp
   Content as SDKContent,
-  // GenerationConfig as SDKGenerationConfig, // Không dùng trực tiếp
-  SpeechConfig as SDKSpeechConfig,
   Modality as SDKModality,
-  AudioTranscriptionConfig as SDKAudioTranscriptionConfig,
 } from '@google/genai';
 
-import { appConfig } from "@/src/middleware"; // Đảm bảo đường dẫn đúng
-import { usePathname } from 'next/navigation'; // Sử dụng next/navigation thay vì src/navigation nếu đó là alias
+import { appConfig } from "@/src/middleware";
+import { usePathname } from 'next/navigation';
 import { useLoggerStore } from '@/src/app/[locale]/chatbot/livechat/lib/store-logger';
 import { toolHandlers } from './services/tool.handlers';
 import { getBcp47LanguageCode } from './utils/languageUtils';
-
-// export type OutputModalityString = "text" | "audio" | "image"; // Không còn dùng
 
 export type LiveChatAPIConfigProps = {
   outputModality: SDKModality;
@@ -52,7 +44,7 @@ export type LiveChatAPIConfigProps = {
 
 function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructions }: LiveChatAPIConfigProps) {
   const {
-    session, // session là SDKSession | null
+    session,
     setConfig,
     sendToolResponse,
     on,
@@ -63,13 +55,13 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
   const currentLocale = pathname.split('/')[1] as AppLanguage;
 
   useEffect(() => {
-    // console.log(
-    //   `[LiveChatAPIConfig] useEffect: Constructing LiveChatSessionConfig for: Modality=${SDKModality[outputModality]} (raw: ${outputModality}), Voice=${selectedVoice}, AppLanguage=${language}, Locale=${currentLocale}`
-    // );
+    console.log(
+      `[LiveChatAPIConfig] useEffect: Constructing LiveChatSessionConfig for: Modality=${SDKModality[outputModality]} (raw: ${outputModality}), Voice=${selectedVoice}, AppLanguage=${language}, Locale=${currentLocale}`
+    );
     const bcp47LanguageCode = getBcp47LanguageCode(language);
 
     const appLevelConfig: LiveChatSessionConfig = {
-      model: "models/gemini-2.0-flash-live-001",
+      model: "models/gemini-live-2.5-flash-preview",
       systemInstruction: {
         parts: [{ text: systemInstructions }],
       } as SDKContent,
@@ -110,7 +102,7 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
       appLevelConfig.tools = [{ functionDeclarations: activeFunctionDeclarations }];
     }
 
-    // console.log("[LiveChatAPIConfig] Attempting to set appLevelConfig:", JSON.stringify(appLevelConfig, null, 2));
+    console.log("[LiveChatAPIConfig] Attempting to set appLevelConfig:", JSON.stringify(appLevelConfig, null, 2));
 
     setConfig(appLevelConfig);
 
@@ -119,7 +111,7 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
   // useEffect này để đăng ký tool call event
   useEffect(() => {
     const onToolCallCallback = async (toolCallPayload: ToolCallPayload) => {
-      // console.log(`[LiveChatAPIConfig] Got toolcall payload (inside callback):`, toolCallPayload);
+      console.log(`[LiveChatAPIConfig] Got toolcall payload (inside callback):`, toolCallPayload);
 
       const NEXT_PUBLIC_DATABASE_URL = `${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1` || "https://confhub.ddns.net/database/api/v1";
       const NEXT_PUBLIC_FRONTEND_URL = appConfig.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:8386";
@@ -135,11 +127,11 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
       if (toolCallPayload.functionCalls) {
         for (const fc of toolCallPayload.functionCalls) {
           if (fc.name && fc.id) {
-            // console.log(`[LiveChatAPIConfig] Processing function call: Name='${fc.name}', ID='${fc.id}'`);
-            // console.log(`[LiveChatAPIConfig] Available tool handlers:`, Object.keys(toolHandlers));
+            console.log(`[LiveChatAPIConfig] Processing function call: Name='${fc.name}', ID='${fc.id}'`);
+            console.log(`[LiveChatAPIConfig] Available tool handlers:`, Object.keys(toolHandlers));
             const handler = toolHandlers[fc.name];
             if (handler) {
-              // console.log(`[LiveChatAPIConfig] Executing handler for ${fc.name} with id ${fc.id}`);
+              console.log(`[LiveChatAPIConfig] Executing handler for ${fc.name} with id ${fc.id}`);
               try {
                 const resultFromHandler = await handler(fc, handlerConfig);
                 responsesForSDK.push({
@@ -147,7 +139,7 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
                   name: fc.name,
                   response: resultFromHandler.response,
                 });
-                // console.log(`[LiveChatAPIConfig] Handler for ${fc.name} executed. Response added.`);
+                console.log(`[LiveChatAPIConfig] Handler for ${fc.name} executed. Response added.`);
               } catch (error: any) {
                 // console.error(`[LiveChatAPIConfig] Error in handler for ${fc.name}:`, error);
                 let errorMessage = error.message || "An unexpected error occurred in handler.";
@@ -186,7 +178,7 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
         // This matches the expected parameter type of `sendToolResponse`.
         const payloadForSend = { functionResponses: responsesForSDK };
 
-        // console.log("[LiveChatAPIConfig] Sending tool responses:", JSON.stringify(payloadForSend, null, 2));
+        console.log("[LiveChatAPIConfig] Sending tool responses:", JSON.stringify(payloadForSend, null, 2));
         sendToolResponse(payloadForSend); // Now type-correct
 
         // For logging, we can use the ToolResponsePayload type.
@@ -200,19 +192,19 @@ function LiveChatAPI({ outputModality, selectedVoice, language, systemInstructio
           count: responsesForSDK.length
         });
       } else {
-        // console.log("[LiveChatAPIConfig] No responses generated for this tool call batch (after processing).");
+        console.log("[LiveChatAPIConfig] No responses generated for this tool call batch (after processing).");
       }
     };
 
     if (session && typeof on === 'function' && typeof off === 'function') {
-      // console.log("[LiveChatAPIConfig] Session is available. Subscribing to 'toolcall' event.");
+      console.log("[LiveChatAPIConfig] Session is available. Subscribing to 'toolcall' event.");
       on("toolcall", onToolCallCallback);
       return () => {
-        // console.log("[LiveChatAPIConfig] Cleaning up 'toolcall' event subscription.");
+        console.log("[LiveChatAPIConfig] Cleaning up 'toolcall' event subscription.");
         off("toolcall", onToolCallCallback);
       };
     } else {
-      // console.log("[LiveChatAPIConfig] Session not available or on/off not ready, not subscribing to 'toolcall'. Current session:", session);
+      console.log("[LiveChatAPIConfig] Session not available or on/off not ready, not subscribing to 'toolcall'. Current session:", session);
     }
   }, [session, on, off, sendToolResponse, currentLocale, logToStore]);
   return null;

@@ -184,6 +184,8 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
             showConfirmationDialog
           }
           onRegisterFillFunction={handleSetFillInput}
+          isSmallContext={isSmallContext} // <<< THÊM DÒNG NÀY
+
         />
       </div>
 

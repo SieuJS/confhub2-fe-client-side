@@ -36,7 +36,9 @@ interface ChatInputProps {
     shouldUsePageContext: boolean
   ) => void
   onRegisterFillFunction: (fillFunc: (text: string) => void) => void
-  disabled?: boolean
+  disabled?: boolean,
+  isSmallContext?: boolean; // <<< THÊM DÒNG NÀY
+
 }
 
 const getFileIcon = (mimeType: string) => {
@@ -51,7 +53,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
   onInputChange,
   onSendFilesAndMessage,
   onRegisterFillFunction,
-  disabled = false
+  disabled = false,
+  isSmallContext = false // <<< NHẬN PROP Ở ĐÂY
+
 }) => {
   const t = useTranslations()
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([])
@@ -235,7 +239,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
         originalInputHadContextCommand = true
         const commandPattern = new RegExp(
           CURRENT_PAGE_CONTEXT_COMMAND.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') +
-            '\\s*',
+          '\\s*',
           'g'
         )
         messageToSend = inputValue.replace(commandPattern, '').trim()
@@ -305,7 +309,10 @@ const ChatInput: React.FC<ChatInputProps> = ({
     ]
   )
 
-  const placeholderText = t('Type_message_or_attach_files')
+  const placeholderText = isSmallContext
+    ? t('Type_message_or_attach_files_floating') // Dùng cho small context
+    : t('Type_message_or_attach_files'); // Dùng cho context lớn hơn
+  // 
   const buttonAriaLabel = t('Send_message')
 
   return (
@@ -451,7 +458,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
         <p>{modalMessage}</p>
       </Modal>
 
-      
+
     </div>
   )
 }

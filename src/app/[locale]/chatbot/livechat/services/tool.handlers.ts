@@ -7,13 +7,17 @@ import {
   getAuthTokenClientSide,
   makeFrontendApiCall,
   fetchItemDetailsFromApi,
-  // formatItemsForModel, // We'll create more specific formatters or inline messages
   getUrlArg
 } from '../utils/api.helpers';
 import { websiteInfo } from "../../language/functions";
 import { transformConferenceData } from '../../utils/transformApiData';
 
-// Define a common config type for handlers
+// =================================================================
+// --- TYPE DEFINITIONS ---
+// =================================================================
+
+// --- Common Interfaces ---
+
 interface HandlerConfig {
   databaseUrl: string;
   frontendUrl: string;
@@ -25,38 +29,238 @@ export interface ToolHandlerResponse {
   id: string;
 }
 
-// Helper to format a list of items for the model's response (generic)
-function formatGenericListForModel(items: any[], itemTypeName: string, listType: string, keyId = 'id', keyTitle = 'title', keyAcronym = 'acronym'): string {
-  if (!items || items.length === 0) {
-    return `You have no ${itemTypeName} in your ${listType} list.`;
-  }
-  const formatted = items.map(item => {
-    let display = `- ${item[keyTitle] || 'Unknown Title'}`;
-    if (item[keyAcronym]) display += ` (${item[keyAcronym]})`;
-    // Add more details if available and needed, e.g., dates, location
-    return display;
-  }).join('\n');
-  return `Here are the ${itemTypeName} in your ${listType} list:\n${formatted}`;
+export interface ItemDateRange {
+  fromDate: string;
+  toDate: string;
 }
 
+export interface ItemLocation {
+  address: string;
+  cityStateProvince: string;
+  country: string;
+  continent: string;
+}
 
-// --- Individual Handlers ---
+// --- Item Type Interfaces ---
+
+export interface FollowItem {
+  id: string;
+  title: string;
+  acronym: string;
+  dates: ItemDateRange[];
+  location: ItemLocation;
+  itemType?: "conference";
+}
+
+export interface CalendarItem {
+  id: string;
+  title: string;
+  acronym?: string;
+  creatorId: string | null;
+  adminId: string;
+  followedAt: string;
+  updatedAt: string;
+  status: string;
+  dates: ItemDateRange[];
+  location: ItemLocation;
+}
+
+export interface BlacklistItem {
+  conferenceId: string;
+  title: string;
+  acronym: string;
+}
+
+// --- UI Action Payloads and Types ---
+
+interface DisplayListPayload {
+  items: (FollowItem | CalendarItem | BlacklistItem)[];
+  itemType: 'conference';
+  listType: 'followed' | 'calendar' | 'blacklist' | string;
+  title?: string;
+}
+
+interface ItemFollowStatusUpdatePayload {
+  item: FollowItem;
+  itemType: 'conference';
+  followed: boolean;
+}
+
+interface ItemCalendarStatusUpdatePayload {
+  item: CalendarItem;
+  itemType: 'conference';
+  calendar: boolean;
+}
+
+interface ItemBlacklistStatusUpdatePayload {
+  item: { id: string; title: string; acronym?: string };
+  itemType: 'conference';
+  blacklisted: boolean;
+}
+
+type UIAction =
+  | { type: 'displayList'; payload: DisplayListPayload }
+  | { type: 'itemFollowStatusUpdated'; payload: ItemFollowStatusUpdatePayload }
+  | { type: 'itemCalendarStatusUpdated'; payload: ItemCalendarStatusUpdatePayload }
+  | { type: 'itemBlacklistStatusUpdated'; payload: ItemBlacklistStatusUpdatePayload }
+  | { type: 'display_map'; location: string };
+
+// --- Structured Response Content ---
+
+interface StructuredContent {
+  messageForModel: string;
+  uiAction?: UIAction;
+}
+
+// =================================================================
+// --- START: NEW HELPER FUNCTIONS (Copied and adapted from backendService.ts) ---
+// =================================================================
+
+/**
+ * Parses a query string into an object.
+ * Handles multiple values for the same key.
+ * @param queryString The URL-encoded query string.
+ * @returns An object representing the query parameters.
+ */
+function parseQueryString(queryString: string): Record<string, string | string[]> {
+  const params: Record<string, string | string[]> = {};
+  if (!queryString) return params;
+
+  queryString.split('&').forEach(pair => {
+    const parts = pair.split('=');
+    if (parts.length === 2) {
+      const key = decodeURIComponent(parts[0]);
+      const value = decodeURIComponent(parts[1]);
+      if (params.hasOwnProperty(key)) {
+        if (Array.isArray(params[key])) {
+          (params[key] as string[]).push(value);
+        } else {
+          params[key] = [params[key] as string, value];
+        }
+      } else {
+        params[key] = value;
+      }
+    }
+  });
+  return params;
+}
+
+/**
+ * Converts a parameter object back into a URL-encoded query string.
+ * @param params The object representing the query parameters.
+ * @returns A URL-encoded query string.
+ */
+function buildQueryString(params: Record<string, string | string[]>): string {
+  const parts: string[] = [];
+  for (const key in params) {
+    if (params.hasOwnProperty(key)) {
+      const value = params[key];
+      if (Array.isArray(value)) {
+        value.forEach(val => parts.push(`${key}=${val}`));
+      } else {
+        parts.push(`${key}=${value as string}`);
+      }
+    }
+  }
+  return parts.join('&');
+}
+
+/**
+ * Pre-processes the search query string to normalize dates and add detail mode if needed.
+ * This logic is mirrored from the backend service to ensure consistent query handling.
+ * @param queryString The initial query string from the model.
+ * @returns The processed query string, ready for the API call.
+ */
+function preprocessSearchQuery(queryString: string | undefined): string {
+  if (!queryString) {
+    return '';
+  }
+
+  let effectiveQueryString = queryString;
+
+  // --- 1. Date Normalization ---
+  const queryParams = parseQueryString(queryString);
+  const datePrefixes = ['sub', 'cameraReady', 'notification', 'registration', ''];
+  let modifiedForDates = false;
+
+  datePrefixes.forEach(prefix => {
+    const fromKey = `${prefix}FromDate`;
+    const toKey = `${prefix}ToDate`;
+    const hasFrom = queryParams.hasOwnProperty(fromKey);
+    const hasTo = queryParams.hasOwnProperty(toKey);
+
+    if (hasFrom && !hasTo) {
+      queryParams[toKey] = queryParams[fromKey];
+      modifiedForDates = true;
+    } else if (!hasFrom && hasTo) {
+      queryParams[fromKey] = queryParams[toKey];
+      modifiedForDates = true;
+    }
+  });
+
+  if (modifiedForDates) {
+    effectiveQueryString = buildQueryString(queryParams);
+  }
+
+  // --- 2. Detail Mode Logic ---
+  const detailModeKeywords = [
+    'subFromDate', 'subToDate',
+    'cameraReadyFromDate', 'cameraReadyToDate',
+    'notificationFromDate', 'notificationToDate',
+    'registrationFromDate', 'registrationToDate'
+  ];
+
+  const needsDetailMode = detailModeKeywords.some(keyword =>
+    effectiveQueryString.includes(keyword)
+  );
+
+  if (needsDetailMode && !effectiveQueryString.includes('mode=detail')) {
+    if (effectiveQueryString.length > 0 && !effectiveQueryString.endsWith('&')) {
+      effectiveQueryString += '&';
+    }
+    effectiveQueryString += 'mode=detail';
+  }
+
+  return effectiveQueryString;
+}
+
+// =================================================================
+// --- END: NEW HELPER FUNCTIONS ---
+// =================================================================
+
+
+// =================================================================
+// --- INDIVIDUAL HANDLERS (MODIFIED) ---
+// =================================================================
 
 async function handleGetConferences(fc: SDKFunctionCall, config: HandlerConfig): Promise<ToolHandlerResponse> {
   const apiUrl = `${config.databaseUrl}/conference`;
-  const searchQuery = fc.args && typeof fc.args['searchQuery'] === 'string'
+
+  // Lấy searchQuery ban đầu từ function call
+  const initialSearchQuery = fc.args && typeof fc.args['searchQuery'] === 'string'
     ? fc.args['searchQuery']
     : undefined;
-  const finalUrl = searchQuery ? `${apiUrl}?${searchQuery}` : apiUrl;
 
-  // console.log(`[LiveChat ToolHandler] Calling API for getConferences using GET at: ${finalUrl}`);
+  // *** MODIFICATION START: Áp dụng xử lý query tương tự backendService ***
+  // Xử lý searchQuery để chuẩn hóa ngày và thêm 'mode=detail' nếu cần
+  const effectiveSearchQuery = preprocessSearchQuery(initialSearchQuery);
+  // *** MODIFICATION END ***
+
+  // Xây dựng URL cuối cùng với query đã được xử lý
+  const finalUrl = effectiveSearchQuery ? `${apiUrl}?${effectiveSearchQuery}` : apiUrl;
+
+  console.log(`[ToolHandler] Executing API call: GET ${finalUrl}`); // Thêm log để debug
+
   const response = await fetch(finalUrl, { method: 'GET', headers: {} });
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(`API Error (${response.status}) for getConferences: ${errorText.substring(0, 200)}`);
   }
   const responseData = await response.json();
-  const contentToSend = transformConferenceData(responseData, searchQuery);
+
+  // Sử dụng `effectiveSearchQuery` khi gọi hàm transform để đảm bảo tính nhất quán
+  const contentToSend = transformConferenceData(responseData, effectiveSearchQuery);
+
   return { response: { content: contentToSend }, id: fc.id || `conf-fallback-${Date.now()}` };
 }
 
@@ -80,280 +284,291 @@ async function handleNavigation(fc: SDKFunctionCall, config: HandlerConfig): Pro
 
   if (typeof window !== 'undefined') {
     window.open(urlToOpen, '_blank', 'noopener,noreferrer');
-  } else {
-    // console.warn("[LiveChat ToolHandler] window object not available for navigation.");
   }
   return { response: { content: { message: `Navigating to ${urlToOpen}`, status: 'success' } }, id: fc.id || `nav-fallback-${Date.now()}` };
 }
 
 async function handleManageFollow(fc: SDKFunctionCall, config: HandlerConfig): Promise<ToolHandlerResponse> {
   const args = fc.args || {};
-  const itemType = args['itemType'] as 'conference' | undefined;
-  const action = args['action'] as 'follow' | 'unfollow' | 'list' | undefined;
+  const itemType = args['itemType'] as 'conference';
+  const action = args['action'] as 'follow' | 'unfollow' | 'list';
   const identifier = args['identifier'] as string | undefined;
   const identifierType = args['identifierType'] as 'acronym' | 'title' | 'id' | undefined;
 
-  // Validation
-  if (!itemType || !['conference'].includes(itemType)) {
-    throw new Error("Invalid or missing 'itemType' for manageFollow. Must be 'conference'.");
-  }
-  if (!action || !['follow', 'unfollow', 'list'].includes(action)) {
-    throw new Error("Invalid or missing 'action' for manageFollow. Must be 'follow', 'unfollow', or 'list'.");
-  }
-  if ((action === 'follow' || action === 'unfollow') && (!identifier || !identifierType)) {
-    throw new Error(`'identifier' and 'identifierType' are required for '${action}' action.`);
-  }
-  if (identifierType && !['acronym', 'title', 'id'].includes(identifierType)) {
-      throw new Error("Invalid 'identifierType'. Must be 'acronym', 'title', or 'id'.");
-  }
+  // --- Validation ---
+  if (itemType !== 'conference') throw new Error("Invalid 'itemType'. Must be 'conference'.");
+  if (!action || !['follow', 'unfollow', 'list'].includes(action)) throw new Error("Invalid 'action'.");
+  if ((action === 'follow' || action === 'unfollow') && (!identifier || !identifierType)) throw new Error(`'identifier' and 'identifierType' are required for '${action}'.`);
+  if (identifierType && !['acronym', 'title', 'id'].includes(identifierType)) throw new Error("Invalid 'identifierType'.");
 
   const token = await getAuthTokenClientSide();
-  if (!token) {
-    throw new Error("Authentication required to manage followed items. Please log in.");
-  }
+  if (!token) throw new Error("Authentication required. Please log in.");
 
-  let modelMessage = "";
+  let responseContent: StructuredContent;
 
   if (action === 'list') {
     const listUrl = `${config.databaseUrl}/follow-conference/followed`;
-    // console.log(`[LiveChat ToolHandler ManageFollow] Listing followed ${itemType}s from ${listUrl}`);
-    const followedItems: any[] = await makeFrontendApiCall(listUrl, 'GET', token); // API returns array of FollowItem
-    modelMessage = formatGenericListForModel(followedItems, itemType, 'followed');
+    const followedItems: FollowItem[] = await makeFrontendApiCall(listUrl, 'GET', token);
+
+    if (followedItems.length === 0) {
+      responseContent = { messageForModel: `The user is not following any conferences.` };
+    } else {
+      const textForModel = `The user is following ${followedItems.length} conferences. Displaying the list.`;
+      responseContent = {
+        messageForModel: textForModel,
+        uiAction: {
+          type: 'displayList',
+          payload: { items: followedItems, itemType: 'conference', listType: 'followed', title: `Your Followed Conferences` }
+        }
+      };
+    }
   } else { // 'follow' or 'unfollow'
     const itemDetails = await fetchItemDetailsFromApi(identifier!, identifierType!, itemType, config.databaseUrl);
     const itemId = itemDetails.id;
-    const itemName = itemDetails.name;
-    // console.log(`[LiveChat ToolHandler ManageFollow] Found item: ID=${itemId}, Name=${itemName} for ${action}`);
+    const itemName = itemDetails.title; // FIX: Changed from .name to .title
 
-    // Check current follow status
     const listUrl = `${config.databaseUrl}/follow-conference/followed`;
-    const currentFollowedItems: any[] = await makeFrontendApiCall(listUrl, 'GET', token);
+    const currentFollowedItems: FollowItem[] = await makeFrontendApiCall(listUrl, 'GET', token);
     const isCurrentlyFollowing = currentFollowedItems.some(item => item.id === itemId);
-    // console.log(`[LiveChat ToolHandler ManageFollow] Item ${itemId} currently following: ${isCurrentlyFollowing}`);
+
+    let messageForModel = "";
+    let uiAction: UIAction | undefined = undefined;
 
     if (action === 'follow') {
       if (isCurrentlyFollowing) {
-        modelMessage = `You are already following the ${itemType} "${itemName}".`;
+        messageForModel = `You are already following the conference "${itemName}".`;
       } else {
-        // CROSS-CHECK: For 'follow' conference, check blacklist
-        if (itemType === 'conference') {
-          const blacklistUrl = `${config.databaseUrl}/blacklist-conference`;
-          // console.log(`[LiveChat ToolHandler ManageFollow] Checking blacklist status for conference ${itemId} from ${blacklistUrl}`);
-          const blacklistedItems: any[] = await makeFrontendApiCall(blacklistUrl, 'GET', token); // API returns array of BlacklistItem
-          const isBlacklisted = blacklistedItems.some(item => item.conferenceId === itemId);
-          if (isBlacklisted) {
-            throw new Error(`The conference "${itemName}" is currently in your blacklist. You must remove it from the blacklist before following.`);
-          }
-          // console.log(`[LiveChat ToolHandler ManageFollow] Conference ${itemId} is not blacklisted. Safe to follow.`);
+        const blacklistUrl = `${config.databaseUrl}/blacklist-conference`;
+        const blacklistedItems: BlacklistItem[] = await makeFrontendApiCall(blacklistUrl, 'GET', token);
+        if (blacklistedItems.some(item => item.conferenceId === itemId)) {
+          throw new Error(`The conference "${itemName}" is in your blacklist. Remove it from the blacklist before following.`);
         }
 
-        const actionUrl = `${config.databaseUrl}/follow-conference/add`;
-        const payload = { conferenceId: itemId }
-        // console.log(`[LiveChat ToolHandler ManageFollow] Following ${itemType} ${itemId} at ${actionUrl}`);
-        await makeFrontendApiCall(actionUrl, 'POST', token, payload);
-        modelMessage = `Successfully followed the ${itemType} "${itemName}".`;
+        await makeFrontendApiCall(`${config.databaseUrl}/follow-conference/add`, 'POST', token, { conferenceId: itemId });
+        messageForModel = `Successfully followed the conference "${itemName}".`;
+
+        uiAction = {
+          type: 'itemFollowStatusUpdated',
+          payload: {
+            item: itemDetails as FollowItem, // Assert type for clarity
+            itemType: 'conference',
+            followed: true
+          }
+        };
       }
-    } else { // action === 'unfollow'
+    } else { // 'unfollow'
       if (!isCurrentlyFollowing) {
-        modelMessage = `You are not currently following the ${itemType} "${itemName}".`;
+        messageForModel = `You are not currently following the conference "${itemName}".`;
       } else {
-        const actionUrl = `${config.databaseUrl}/follow-conference/remove`;
-        const payload = { conferenceId: itemId }
-        // console.log(`[LiveChat ToolHandler ManageFollow] Unfollowing ${itemType} ${itemId} at ${actionUrl}`);
-        await makeFrontendApiCall(actionUrl, 'POST', token, payload);
-        modelMessage = `Successfully unfollowed the ${itemType} "${itemName}".`;
+        await makeFrontendApiCall(`${config.databaseUrl}/follow-conference/remove`, 'POST', token, { conferenceId: itemId });
+        messageForModel = `Successfully unfollowed the conference "${itemName}".`;
+
+        uiAction = {
+          type: 'itemFollowStatusUpdated',
+          payload: {
+            item: itemDetails as FollowItem, // Assert type for clarity
+            itemType: 'conference',
+            followed: false
+          }
+        };
       }
     }
+    responseContent = { messageForModel, uiAction };
   }
-  return { response: { content: modelMessage }, id: fc.id || `follow-fallback-${Date.now()}` };
+
+  return { response: { content: responseContent }, id: fc.id || `follow-fallback-${Date.now()}` };
 }
 
 async function handleManageCalendar(fc: SDKFunctionCall, config: HandlerConfig): Promise<ToolHandlerResponse> {
   const args = fc.args || {};
-  const itemType = args['itemType'] as string | undefined; // Should always be 'conference'
-  const action = args['action'] as 'add' | 'remove' | 'list' | undefined;
+  const itemType = args['itemType'] as 'conference';
+  const action = args['action'] as 'add' | 'remove' | 'list';
   const identifier = args['identifier'] as string | undefined;
   const identifierType = args['identifierType'] as 'acronym' | 'title' | 'id' | undefined;
 
-  // Validation
-  if (itemType !== 'conference') {
-    throw new Error("Invalid 'itemType' for manageCalendar. Must be 'conference'.");
-  }
-  if (!action || !['add', 'remove', 'list'].includes(action)) {
-    throw new Error("Invalid or missing 'action' for manageCalendar. Must be 'add', 'remove', or 'list'.");
-  }
-  if ((action === 'add' || action === 'remove') && (!identifier || !identifierType)) {
-    throw new Error(`'identifier' and 'identifierType' are required for calendar '${action}' action.`);
-  }
-   if (identifierType && !['acronym', 'title', 'id'].includes(identifierType)) {
-      throw new Error("Invalid 'identifierType'. Must be 'acronym', 'title', or 'id'.");
-  }
+  // --- Validation ---
+  if (itemType !== 'conference') throw new Error("Invalid 'itemType'. Must be 'conference'.");
+  if (!action || !['add', 'remove', 'list'].includes(action)) throw new Error("Invalid 'action'.");
+  if ((action === 'add' || action === 'remove') && (!identifier || !identifierType)) throw new Error(`'identifier' and 'identifierType' are required for '${action}'.`);
+  if (identifierType && !['acronym', 'title', 'id'].includes(identifierType)) throw new Error("Invalid 'identifierType'.");
 
   const token = await getAuthTokenClientSide();
-  if (!token) {
-    throw new Error("Authentication required to manage calendar items. Please log in.");
-  }
+  if (!token) throw new Error("Authentication required. Please log in.");
 
-  let modelMessage = "";
+  let responseContent: StructuredContent;
 
   if (action === 'list') {
     const listUrl = `${config.databaseUrl}/calendar/conference-events`;
-    // console.log(`[LiveChat ToolHandler ManageCalendar] Listing calendar items from ${listUrl}`);
-    const calendarItems: any[] = await makeFrontendApiCall(listUrl, 'GET', token); // API returns array of CalendarItem
-    modelMessage = formatGenericListForModel(calendarItems, 'conferences', 'calendar');
+    const calendarItems: CalendarItem[] = await makeFrontendApiCall(listUrl, 'GET', token);
+
+    if (calendarItems.length === 0) {
+      responseContent = { messageForModel: `The user has no conferences in their calendar.` };
+    } else {
+      const textForModel = `The user has ${calendarItems.length} conferences in their calendar. Displaying the list.`;
+      responseContent = {
+        messageForModel: textForModel,
+        uiAction: {
+          type: 'displayList',
+          payload: { items: calendarItems, itemType: 'conference', listType: 'calendar', title: `Your Calendar Conferences` }
+        }
+      };
+    }
   } else { // 'add' or 'remove'
     const itemDetails = await fetchItemDetailsFromApi(identifier!, identifierType!, "conference", config.databaseUrl);
-    const itemId = itemDetails.id; // This is the conferenceId
-    const itemName = itemDetails.name;
-    // console.log(`[LiveChat ToolHandler ManageCalendar] Found conference: ID=${itemId}, Name=${itemName} for ${action}`);
+    const itemId = itemDetails.id;
+    const itemName = itemDetails.title; // FIX: Changed from .name to .title
 
-    // Check current calendar status
     const listUrl = `${config.databaseUrl}/calendar/conference-events`;
-    const currentCalendarItems: any[] = await makeFrontendApiCall(listUrl, 'GET', token);
-    const isCurrentlyInCalendar = currentCalendarItems.some(item => item.id === itemId); // CalendarItem has 'id' which is conferenceId
-    // console.log(`[LiveChat ToolHandler ManageCalendar] Conference ${itemId} currently in calendar: ${isCurrentlyInCalendar}`);
+    const currentCalendarItems: CalendarItem[] = await makeFrontendApiCall(listUrl, 'GET', token);
+    const isCurrentlyInCalendar = currentCalendarItems.some(item => item.id === itemId);
+
+    let messageForModel = "";
+    let uiAction: UIAction | undefined = undefined;
 
     if (action === 'add') {
       if (isCurrentlyInCalendar) {
-        modelMessage = `The conference "${itemName}" is already in your calendar.`;
+        messageForModel = `The conference "${itemName}" is already in your calendar.`;
       } else {
-        // CROSS-CHECK: For 'add' to calendar, check blacklist
         const blacklistUrl = `${config.databaseUrl}/blacklist-conference`;
-        // console.log(`[LiveChat ToolHandler ManageCalendar] Checking blacklist status for conference ${itemId} from ${blacklistUrl}`);
-        const blacklistedItems: any[] = await makeFrontendApiCall(blacklistUrl, 'GET', token);
-        const isBlacklisted = blacklistedItems.some(item => item.conferenceId === itemId);
-        if (isBlacklisted) {
-          throw new Error(`The conference "${itemName}" is currently in your blacklist. You must remove it from the blacklist before adding it to the calendar.`);
+        const blacklistedItems: BlacklistItem[] = await makeFrontendApiCall(blacklistUrl, 'GET', token);
+        if (blacklistedItems.some(item => item.conferenceId === itemId)) {
+          throw new Error(`The conference "${itemName}" is in your blacklist. Remove it from the blacklist before adding to calendar.`);
         }
-        // console.log(`[LiveChat ToolHandler ManageCalendar] Conference ${itemId} is not blacklisted. Safe to add to calendar.`);
 
-        const actionUrl = `${config.databaseUrl}/calendar/add`;
-        const payload = { conferenceId: itemId };
-        // console.log(`[LiveChat ToolHandler ManageCalendar] Adding conference ${itemId} to calendar at ${actionUrl}`);
-        await makeFrontendApiCall(actionUrl, 'POST', token, payload);
-        modelMessage = `Successfully added conference "${itemName}" to your calendar.`;
+        const addedItemDetails = await makeFrontendApiCall(`${config.databaseUrl}/calendar/add`, 'POST', token, { conferenceId: itemId });
+        messageForModel = `Successfully added conference "${itemName}" to your calendar.`;
+
+        const finalItemDetails = { ...itemDetails, ...addedItemDetails };
+        const itemDataForFrontend: CalendarItem = {
+          id: itemId,
+          title: itemName,
+          acronym: finalItemDetails.acronym || '',
+          creatorId: finalItemDetails.creatorId || null,
+          adminId: finalItemDetails.adminId || '',
+          followedAt: finalItemDetails.followedAt || new Date().toISOString(),
+          updatedAt: finalItemDetails.updatedAt || new Date().toISOString(),
+          status: finalItemDetails.status || 'CRAWLED',
+          dates: finalItemDetails.dates || [],
+          location: finalItemDetails.location || { address: '', cityStateProvince: '', country: '', continent: '' },
+        };
+
+        uiAction = {
+          type: 'itemCalendarStatusUpdated',
+          payload: { item: itemDataForFrontend, itemType: 'conference', calendar: true }
+        };
       }
-    } else { // action === 'remove'
+    } else { // 'remove'
       if (!isCurrentlyInCalendar) {
-        modelMessage = `The conference "${itemName}" is not currently in your calendar.`;
+        messageForModel = `The conference "${itemName}" is not currently in your calendar.`;
       } else {
-        const actionUrl = `${config.databaseUrl}/calendar/remove`;
-        const payload = { conferenceId: itemId };
-        // console.log(`[LiveChat ToolHandler ManageCalendar] Removing conference ${itemId} from calendar at ${actionUrl}`);
-        await makeFrontendApiCall(actionUrl, 'POST', token, payload);
-        modelMessage = `Successfully removed conference "${itemName}" from your calendar.`;
+        await makeFrontendApiCall(`${config.databaseUrl}/calendar/remove`, 'POST', token, { conferenceId: itemId });
+        messageForModel = `Successfully removed conference "${itemName}" from your calendar.`;
+
+        uiAction = {
+          type: 'itemCalendarStatusUpdated',
+          payload: { item: itemDetails as CalendarItem, itemType: 'conference', calendar: false }
+        };
       }
     }
+    responseContent = { messageForModel, uiAction };
   }
-  return { response: { content: modelMessage }, id: fc.id || `calendar-fallback-${Date.now()}` };
+
+  return { response: { content: responseContent }, id: fc.id || `calendar-fallback-${Date.now()}` };
 }
 
 async function handleManageBlacklist(fc: SDKFunctionCall, config: HandlerConfig): Promise<ToolHandlerResponse> {
   const args = fc.args || {};
-  const itemType = args['itemType'] as string | undefined; // Should always be 'conference'
-  const action = args['action'] as 'add' | 'remove' | 'list' | undefined;
+  const itemType = args['itemType'] as 'conference';
+  const action = args['action'] as 'add' | 'remove' | 'list';
   const identifier = args['identifier'] as string | undefined;
   const identifierType = args['identifierType'] as 'acronym' | 'title' | 'id' | undefined;
 
-  // Validation
-  if (itemType !== 'conference') {
-    throw new Error("Invalid 'itemType' for manageBlacklist. Must be 'conference'.");
-  }
-  if (!action || !['add', 'remove', 'list'].includes(action)) {
-    throw new Error("Invalid or missing 'action' for manageBlacklist. Must be 'add', 'remove', or 'list'.");
-  }
-  if ((action === 'add' || action === 'remove') && (!identifier || !identifierType)) {
-    throw new Error(`'identifier' and 'identifierType' are required for blacklist '${action}' action.`);
-  }
-  if (identifierType && !['acronym', 'title', 'id'].includes(identifierType)) {
-      throw new Error("Invalid 'identifierType'. Must be 'acronym', 'title', or 'id'.");
-  }
+  // --- Validation ---
+  if (itemType !== 'conference') throw new Error("Invalid 'itemType'. Must be 'conference'.");
+  if (!action || !['add', 'remove', 'list'].includes(action)) throw new Error("Invalid 'action'.");
+  if ((action === 'add' || action === 'remove') && (!identifier || !identifierType)) throw new Error(`'identifier' and 'identifierType' are required for '${action}'.`);
+  if (identifierType && !['acronym', 'title', 'id'].includes(identifierType)) throw new Error("Invalid 'identifierType'.");
 
   const token = await getAuthTokenClientSide();
-  if (!token) {
-    throw new Error("Authentication required to manage blacklisted items. Please log in.");
-  }
+  if (!token) throw new Error("Authentication required. Please log in.");
 
-  let modelMessage = "";
+  let responseContent: StructuredContent;
 
   if (action === 'list') {
     const listUrl = `${config.databaseUrl}/blacklist-conference`;
-    // console.log(`[LiveChat ToolHandler ManageBlacklist] Listing blacklisted conferences from ${listUrl}`);
-    const blacklistedItems: any[] = await makeFrontendApiCall(listUrl, 'GET', token); // API returns array of BlacklistItem
-    modelMessage = formatGenericListForModel(blacklistedItems, 'conferences', 'blacklist', 'conferenceId');
+    const blacklistedItems: BlacklistItem[] = await makeFrontendApiCall(listUrl, 'GET', token);
+
+    if (blacklistedItems.length === 0) {
+      responseContent = { messageForModel: `The user's blacklist is empty.` };
+    } else {
+      const textForModel = `The user has ${blacklistedItems.length} conferences in their blacklist. Displaying the list.`;
+      responseContent = {
+        messageForModel: textForModel,
+        uiAction: {
+          type: 'displayList',
+          payload: { items: blacklistedItems, itemType: 'conference', listType: 'blacklist', title: `Your Blacklisted Conferences` }
+        }
+      };
+    }
   } else { // 'add' or 'remove'
     const itemDetails = await fetchItemDetailsFromApi(identifier!, identifierType!, "conference", config.databaseUrl);
-    const itemId = itemDetails.id; // This is the conferenceId
-    const itemName = itemDetails.name;
-    // console.log(`[LiveChat ToolHandler ManageBlacklist] Found conference: ID=${itemId}, Name=${itemName} for ${action}`);
+    const itemId = itemDetails.id;
+    const itemName = itemDetails.title; // FIX: Changed from .name to .title
 
-    // Check current blacklist status
     const listUrl = `${config.databaseUrl}/blacklist-conference`;
-    const currentBlacklistedItems: any[] = await makeFrontendApiCall(listUrl, 'GET', token);
+    const currentBlacklistedItems: BlacklistItem[] = await makeFrontendApiCall(listUrl, 'GET', token);
     const isCurrentlyBlacklisted = currentBlacklistedItems.some(item => item.conferenceId === itemId);
-    // console.log(`[LiveChat ToolHandler ManageBlacklist] Conference ${itemId} currently blacklisted: ${isCurrentlyBlacklisted}`);
+
+    let messageForModel = "";
+    let uiAction: UIAction | undefined = undefined;
 
     if (action === 'add') {
       if (isCurrentlyBlacklisted) {
-        modelMessage = `The conference "${itemName}" is already in your blacklist.`;
+        messageForModel = `The conference "${itemName}" is already in your blacklist.`;
       } else {
-        // CROSS-CHECKS: For 'add' to blacklist, check if followed or in calendar
-        let conflictMessages: string[] = [];
-
-        // 1. Check Follow status
-        const followUrl = `${config.databaseUrl}/follow-conference/followed`;
-        // console.log(`[LiveChat ToolHandler ManageBlacklist] Checking follow status for conference ${itemId} from ${followUrl}`);
-        const followedItems: any[] = await makeFrontendApiCall(followUrl, 'GET', token);
-        const isFollowed = followedItems.some(item => item.id === itemId);
-        if (isFollowed) {
-          conflictMessages.push(`it is currently in your followed list`);
-          // console.log(`[LiveChat ToolHandler ManageBlacklist] Conflict: Conference ${itemId} is followed.`);
+        // CROSS-CHECKS
+        const followedItems: FollowItem[] = await makeFrontendApiCall(`${config.databaseUrl}/follow-conference/followed`, 'GET', token);
+        if (followedItems.some(item => item.id === itemId)) {
+          throw new Error(`Cannot add "${itemName}" to blacklist because it is in your followed list. Please unfollow it first.`);
+        }
+        const calendarItems: CalendarItem[] = await makeFrontendApiCall(`${config.databaseUrl}/calendar/conference-events`, 'GET', token);
+        if (calendarItems.some(item => item.id === itemId)) {
+          throw new Error(`Cannot add "${itemName}" to blacklist because it is in your calendar. Please remove it from the calendar first.`);
         }
 
-        // 2. Check Calendar status
-        const calendarUrl = `${config.databaseUrl}/calendar/conference-events`;
-        // console.log(`[LiveChat ToolHandler ManageBlacklist] Checking calendar status for conference ${itemId} from ${calendarUrl}`);
-        const calendarItems: any[] = await makeFrontendApiCall(calendarUrl, 'GET', token);
-        const isInCalendar = calendarItems.some(item => item.id === itemId); // CalendarItem has 'id'
-        if (isInCalendar) {
-          conflictMessages.push(`it is currently in your calendar`);
-          // console.log(`[LiveChat ToolHandler ManageBlacklist] Conflict: Conference ${itemId} is in calendar.`);
-        }
+        await makeFrontendApiCall(`${config.databaseUrl}/blacklist-conference/add`, 'POST', token, { conferenceId: itemId });
+        messageForModel = `Successfully added conference "${itemName}" to your blacklist.`;
 
-        if (conflictMessages.length > 0) {
-          let fullConflictMessage = `Cannot add "${itemName}" to blacklist because ${conflictMessages.join(' and ')}.`;
-          if (isFollowed && isInCalendar) {
-             fullConflictMessage = `The conference "${itemName}" is currently in your followed list AND your calendar. You must unfollow it and remove it from calendar before adding to blacklist.`;
-          } else if (isFollowed) {
-             fullConflictMessage = `The conference "${itemName}" is currently in your followed list. You must unfollow it before adding it to the blacklist.`;
-          } else { // Only isInCalendar
-             fullConflictMessage = `The conference "${itemName}" is currently in your calendar. You must remove it from calendar before adding it to the blacklist.`;
+        uiAction = {
+          type: 'itemBlacklistStatusUpdated',
+          payload: {
+            item: { id: itemId, title: itemName, acronym: itemDetails.acronym },
+            itemType: 'conference',
+            blacklisted: true
           }
-          throw new Error(fullConflictMessage);
-        }
-        // console.log(`[LiveChat ToolHandler ManageBlacklist] Conference ${itemId} is not followed and not in calendar. Safe to blacklist.`);
-
-        const actionUrl = `${config.databaseUrl}/blacklist-conference/add`;
-        const payload = { conferenceId: itemId };
-        // console.log(`[LiveChat ToolHandler ManageBlacklist] Adding conference ${itemId} to blacklist at ${actionUrl}`);
-        await makeFrontendApiCall(actionUrl, 'POST', token, payload);
-        modelMessage = `Successfully added conference "${itemName}" to your blacklist.`;
+        };
       }
-    } else { // action === 'remove'
+    } else { // 'remove'
       if (!isCurrentlyBlacklisted) {
-        modelMessage = `The conference "${itemName}" is not currently in your blacklist.`;
+        messageForModel = `The conference "${itemName}" is not currently in your blacklist.`;
       } else {
-        const actionUrl = `${config.databaseUrl}/blacklist-conference/remove`;
-        const payload = { conferenceId: itemId };
-        // console.log(`[LiveChat ToolHandler ManageBlacklist] Removing conference ${itemId} from blacklist at ${actionUrl}`);
-        await makeFrontendApiCall(actionUrl, 'POST', token, payload);
-        modelMessage = `Successfully removed conference "${itemName}" from your blacklist.`;
+        await makeFrontendApiCall(`${config.databaseUrl}/blacklist-conference/remove`, 'POST', token, { conferenceId: itemId });
+        messageForModel = `Successfully removed conference "${itemName}" from your blacklist.`;
+
+        uiAction = {
+          type: 'itemBlacklistStatusUpdated',
+          payload: {
+            item: { id: itemId, title: itemName, acronym: itemDetails.acronym },
+            itemType: 'conference',
+            blacklisted: false
+          }
+        };
       }
     }
+    responseContent = { messageForModel, uiAction };
   }
-  return { response: { content: modelMessage }, id: fc.id || `blacklist-fallback-${Date.now()}` };
+  return { response: { content: responseContent }, id: fc.id || `blacklist-fallback-${Date.now()}` };
 }
-
 
 async function handleOpenGoogleMap(fc: SDKFunctionCall, _config: HandlerConfig): Promise<ToolHandlerResponse> {
   const args = fc.args || {};
@@ -363,27 +578,30 @@ async function handleOpenGoogleMap(fc: SDKFunctionCall, _config: HandlerConfig):
     throw new Error("Missing or invalid 'location' argument for openGoogleMap.");
   }
 
+  const responseContent: StructuredContent = {
+    messageForModel: `Map for "${location}" is being prepared for display.`,
+    uiAction: {
+      type: "display_map",
+      location: location,
+    }
+  };
+
   return {
-    response: {
-      content: {
-        messageForModel: `Map for "${location}" is being prepared for display.`,
-        uiAction: {
-          type: "display_map",
-          location: location,
-        }
-      }
-    },
+    response: { content: responseContent },
     id: fc.id || `map-fallback-${Date.now()}`
   };
 }
 
-// Dispatcher for tool handlers
+// =================================================================
+// --- DISPATCHER ---
+// =================================================================
+
 export const toolHandlers: Record<string, (fc: SDKFunctionCall, config: HandlerConfig) => Promise<ToolHandlerResponse>> = {
   "getConferences": handleGetConferences,
   "getWebsiteInfo": handleGetWebsiteInfo,
   "navigation": handleNavigation,
   "manageFollow": handleManageFollow,
   "manageCalendar": handleManageCalendar,
-  "manageBlacklist": handleManageBlacklist, // Added new handler
+  "manageBlacklist": handleManageBlacklist,
   "openGoogleMap": handleOpenGoogleMap,
 };

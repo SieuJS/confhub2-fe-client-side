@@ -83,7 +83,7 @@ const ConferenceSourceCard: React.FC<
 }
 
 // ... rest of the ConferenceSourceDisplay component remains the same
-const MAX_INITIAL_DISPLAY_SOURCES = 1
+const MAX_INITIAL_DISPLAY_SOURCES = 2
 
 const ConferenceSourceDisplay: React.FC<ConferenceSourceDisplayProps> = ({
   payload
