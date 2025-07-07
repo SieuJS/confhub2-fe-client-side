@@ -2,10 +2,15 @@
 
 import React from 'react'
 // IMPORT COMPONENT GIAO DIỆN CHATBOT
-import ChatbotInterface from './ChatbotInterface' // Giữ lại import này
-// BƯỚC 1: IMPORT 2 COMPONENT GIAO DIỆN MỚI
+import ChatbotInterface from './ChatbotInterface'
+// IMPORT COMPONENT GIAO DIỆN MỚI
 import ConferenceSearchInterface from './ConferenceSearchInterface'
 import ConferenceDetailInterface from './ConferenceDetailInterface'
+// IMPORT COMPONENT BẢNG SO SÁNH
+import ComparisonTable from './ComparisonTable'
+// IMPORT COMPONENT SƠ ĐỒ QUY TRÌNH MỚI
+import DataCollectionFlowchart from './DataCollectionFlowchart'
+import SystemArchitectureDiagram from './SystemArchitectureDiagram'
 
 const Poster: React.FC = () => {
   const A0_WIDTH_PX = 14043
@@ -83,10 +88,10 @@ const Poster: React.FC = () => {
         </div>
       </header>
 
-      {/* MAIN CONTENT */}
-      <div className='flex flex-1 gap-[156px] p-[125px]'>
-        {/* Column 1: Bối cảnh, Tóm tắt & Giải pháp (Giữ nguyên không đổi) */}
-        <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[125px] shadow-sm'>
+      {/* MAIN CONTENT - UPDATED TO 4 COLUMNS */}
+      <div className='flex flex-1 gap-[78px] p-[125px]'>
+        {/* Column 1: Bối cảnh, Tóm tắt & Giải pháp */}
+        <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[94px] shadow-sm'>
           <div className='mb-[94px]'>
             <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
               1. Bối cảnh & Mục tiêu
@@ -113,47 +118,43 @@ const Poster: React.FC = () => {
           </div>
           <div>
             <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
-              3. Giải pháp & Công nghệ
+              3. So sánh
             </h3>
-            <div className='mb-[94px] flex flex-1 flex-col'>
-              <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
-                Quy trình thu thập dữ liệu bằng LLM
-              </h4>
-              <ul className='m-0 mb-[78px] list-disc pl-[94px] text-[113px]'>
-                <li className='mb-[31px]'>Tìm trang web bằng Google API.</li>
-                <li className='mb-[31px]'>LLM (Gemini) phân loại trang chủ.</li>
-                <li className='mb-[31px]'>LLM (Gemini) bóc tách thông tin.</li>
-              </ul>
-              <div className='flex h-[400px] w-full items-center justify-center rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-200 text-[125px] font-bold text-gray-600'>
-                [SƠ ĐỒ]
-              </div>
+            <ComparisonTable />
+          </div>
+        </div>
+
+        {/* Column 2: Các tính năng chính */}
+        <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[94px] shadow-sm'>
+          <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
+            4. Giải pháp & Công nghệ
+          </h3>
+          <div className='mb-[94px] flex flex-1 flex-col'>
+            <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
+              Quy trình thu thập dữ liệu bằng LLM
+            </h4>
+
+            <div className='mt-[30px] min-h-[1600px] w-full'>
+              <DataCollectionFlowchart />
             </div>
-            <div className='flex flex-1 flex-col'>
-              <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
-                Kiến trúc Microservices
-              </h4>
-              <ul className='m-0 mb-[78px] list-disc pl-[94px] text-[113px]'>
-                <li className='mb-[31px]'>
-                  <strong>Frontend:</strong> Next.js, TailwindCSS.
-                </li>
-                <li className='mb-[31px]'>
-                  <strong>Backend:</strong> NestJS, BullMQ.
-                </li>
-                <li className='mb-[31px]'>
-                  <strong>Database:</strong> PostgreSQL, MongoDB.
-                </li>
-              </ul>
-              <div className='flex h-[400px] w-full items-center justify-center rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-200 text-[125px] font-bold text-gray-600'>
-                [SƠ ĐỒ]
-              </div>
+          </div>
+
+          <div className='flex flex-1 flex-col'>
+            <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
+              Kiến trúc Microservices
+            </h4>
+
+            {/* Tích hợp component sơ đồ kiến trúc mới */}
+            <div className='flex-grow'>
+              <SystemArchitectureDiagram />
             </div>
           </div>
         </div>
 
-        {/* Column 2: Các tính năng chính (ĐÃ CẬP NHẬT) */}
-        <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[125px] shadow-sm'>
+        {/* Column 3: Live Chat & Kết quả đánh giá */}
+        <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[94px] shadow-sm'>
           <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
-            4. Các tính năng chính
+            5. Các tính năng chính
           </h3>
           <div className='flex flex-1 flex-col'>
             <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
@@ -173,16 +174,12 @@ const Poster: React.FC = () => {
                 xuất hội nghị.
               </li>
             </ul>
-
-            {/* BƯỚC 2: THAY THẾ PLACEHOLDER BẰNG COMPONENT GIAO DIỆN */}
             <div className='mb-[78px] flex w-full  items-center justify-center overflow-hidden rounded-[31px] border-[6px] border-dashed border-gray-400 bg-white p-[31px]'>
-              {/* THAY ĐỔI Ở ĐÂY: Thêm class w-full */}
               <div className='w-full'>
                 <ConferenceSearchInterface />
               </div>
             </div>
             <div className='flex w-full flex-1 items-center justify-center overflow-hidden rounded-[31px] border-[6px] border-dashed border-gray-400 bg-white p-[31px]'>
-              {/* THAY ĐỔI Ở ĐÂY: Thêm class w-full */}
               <div className='w-full'>
                 <ConferenceDetailInterface />
               </div>
@@ -190,11 +187,11 @@ const Poster: React.FC = () => {
           </div>
         </div>
 
-        {/* Column 3: Live Chat & Kết quả đánh giá (Giữ nguyên không đổi) */}
-        <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[125px] shadow-sm'>
+        {/* BƯỚC 2: SỬ DỤNG COMPONENT BẢNG SO SÁNH */}
+        <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[94px] shadow-sm'>
           <div className='mb-[94px] flex flex-1 flex-col'>
             <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
-              5. Chatbot Đa Tác Tử
+              6. Chatbot Đa Tác Tử
             </h3>
             <p className='mb-[78px] text-[113px] leading-relaxed'>
               Điều phối câu hỏi đến các chatbot chuyên môn (tìm kiếm, hỏi
@@ -206,7 +203,7 @@ const Poster: React.FC = () => {
           </div>
           <div>
             <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
-              6. Kết quả đánh giá
+              7. Kết quả đánh giá
             </h3>
             <p className='mb-[78px] text-[113px] leading-relaxed'>
               Hệ thống cho thấy hiệu quả vượt trội trong việc tự động hóa thu

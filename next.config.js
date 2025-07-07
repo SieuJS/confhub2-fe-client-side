@@ -22,6 +22,37 @@ const nextConfig = {
             },
         ]
     },
+
+    // --- BẮT ĐẦU PHẦN THÊM VÀO ĐỂ XỬ LÝ SVG ---
+  webpack(config) {
+    // Lấy rule mặc định cho SVG để ghi đè nó
+    const fileLoaderRule = config.module.rules.find(rule =>
+      rule.test?.test?.('.svg')
+    )
+
+    config.module.rules.push(
+      // Cấu hình lại rule mặc định để loại trừ file SVG được import từ file .js/.ts
+      // để chúng ta có thể xử lý chúng bằng @svgr/webpack
+      {
+        ...fileLoaderRule,
+        test: /\.svg$/i,
+        resourceQuery: /url/ // chỉ xử lý các file svg có ?url ở cuối
+      },
+      // Thêm rule mới để xử lý SVG như là React Component
+      {
+        test: /\.svg$/i,
+        issuer: /\.[jt]sx?$/,
+        resourceQuery: { not: /url/ }, // loại trừ các file có ?url
+        use: ['@svgr/webpack']
+      }
+    )
+
+    // Sửa đổi fileLoaderRule để nó không xử lý các file SVG mà svgr sẽ xử lý
+    fileLoaderRule.exclude = /\.svg$/i
+
+    return config
+  }
+  // --- KẾT THÚC PHẦN THÊM VÀO ---
 }
 
 module.exports = withPWA(withNextIntl(nextConfig))
