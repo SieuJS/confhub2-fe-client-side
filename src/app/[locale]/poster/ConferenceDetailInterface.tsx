@@ -41,7 +41,6 @@ const ConferenceDetailInterface: React.FC = () => {
     'simulation',
     'retrieval',
     'Transparency',
-    '3D from multi-view and sensors',
     '3D from single images'
   ]
 
@@ -228,67 +227,119 @@ const ConferenceDetailInterface: React.FC = () => {
             {/* Map Content - tăng chiều cao của map */}
             <div id='map' className='rounded-2xl border-2 border-gray-200 p-8'>
               <h2 className='mb-8 text-7xl font-bold'>Map</h2>
-              <div className='h-[900px] w-full overflow-hidden rounded-2xl'>
+              <div className='h-[500px] w-full overflow-hidden rounded-2xl'>
                 <MapPoster location={conferenceLocation} />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Conference Feedback Section */}
-        <div className='mt-24 border-t-2 border-gray-200 pt-20'>
-          <div className='flex items-center justify-between'>
+        {/* --- START: PHẦN CONFERENCE FEEDBACK ĐÃ ĐƯỢC ĐIỀU CHỈNH KÍCH THƯỚC --- */}
+        <div className='mt-20 border-t-2 border-gray-200 pt-16 font-sans'>
+          {/* Header với tiêu đề và bộ lọc */}
+          <div className='flex flex-wrap items-center justify-between gap-8'>
             <div>
-              <h2 className='text-7xl font-bold'>Conference Feedback</h2>
-              <p className='mt-4 text-5xl '>
-                Showing 0 of 0 Conference Reviews
+              <h2 className='text-7xl font-bold text-gray-800'>
+                Conference Feedback
+              </h2>
+              <p className='mt-4 text-5xl text-gray-500'>
+                Showing 1 of 1 Conference Review
               </p>
             </div>
-            <div className='flex gap-6'>
-              <select className='rounded-xl border-2 border-gray-300 px-6 py-3 text-5xl shadow-sm'>
+            <div className='flex items-center gap-6'>
+              <select className='rounded-xl border-2 border-gray-300 bg-gray-100 px-8 py-4 text-5xl text-gray-700 shadow-lg focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'>
                 <option>All Feedback</option>
               </select>
-              <select className='rounded-xl border-2 border-gray-300 px-6 py-3 text-5xl shadow-sm'>
+              <select className='rounded-xl border-2 border-gray-300 bg-gray-100 px-8 py-4 text-5xl text-gray-700 shadow-lg focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'>
                 <option>Recently Added</option>
               </select>
             </div>
           </div>
-          <div className='mt-16 rounded-2xl border-2 border-gray-200 p-8'>
-            <div className='flex flex-row gap-8'>
-              <div className='w-1/3 border-r-2 pr-16'>
-                <p className='text-9xl font-bold'>0.0</p>
-                <div className='my-4 flex text-gray-300'>
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className='h-16 w-16 fill-current' />
-                  ))}
-                </div>
-                <p className='text-5xl '>No reviews yet</p>
-                <div className='mt-8 space-y-3'>
-                  {[5, 4, 3, 2, 1].map(rating => (
-                    <div key={rating} className='flex items-center gap-4'>
-                      <span className='text-5xl '>{rating} ★</span>
-                      <div className='h-5 w-full flex-1 rounded-full bg-gray-200'></div>
-                      <span className='w-8 text-right text-5xl '>0</span>
-                    </div>
-                  ))}
-                </div>
+
+          <div className='mt-16 grid grid-cols-2 gap-x-24 gap-y-16'>
+            {/* Bên trái: Tổng kết đánh giá */}
+            <div className='col-span-1'>
+              <p className='text-9xl font-bold text-gray-800'>5.0</p>
+              <div className='my-4 flex text-yellow-400'>
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className='h-14 w-14 fill-current' />
+                ))}
               </div>
-              <div className='flex flex-1 items-center justify-center'>
-                <p className='text-6xl '>No feedback yet.</p>
+              <p className='text-4xl text-gray-500'>Based on 1 review</p>
+              <div className='mt-8 space-y-4'>
+                {[
+                  { rating: 5, count: 1, percentage: 100 },
+                  { rating: 4, count: 0, percentage: 0 },
+                  { rating: 3, count: 0, percentage: 0 },
+                  { rating: 2, count: 0, percentage: 0 },
+                  { rating: 1, count: 0, percentage: 0 }
+                ].map(({ rating, count, percentage }) => (
+                  <div key={rating} className='flex items-center gap-6'>
+                    <span className='w-24 text-4xl text-gray-600'>
+                      {rating} ★
+                    </span>
+                    <div className='h-6 flex-1 rounded-full bg-gray-200'>
+                      <div
+                        className={`h-full rounded-full ${
+                          percentage > 0 ? 'bg-green-500' : ''
+                        }`}
+                        style={{ width: `${percentage}%` }}
+                      ></div>
+                    </div>
+                    <span className='w-12 text-right text-4xl text-gray-600'>
+                      {count}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Bên phải: Danh sách review */}
+            <div className='col-span-1'>
+              <div className='rounded-2xl border-2 border-gray-200 p-8'>
+                <div className='flex items-start justify-between'>
+                  <div className='flex items-center gap-6'>
+                    <img
+                      src='/avatar-placeholder.png' // Sử dụng ảnh placeholder
+                      alt='Reviewer Avatar'
+                      className='h-24 w-24 rounded-full bg-gray-300' // Tăng kích thước và thêm bg
+                    />
+                    <div>
+                      <p className='text-5xl font-semibold text-gray-800'>
+                        Nguyễn Hữu Thắng
+                      </p>
+                      <p className='mt-2 text-4xl text-gray-500'>
+                        3/7/2025 08:32
+                      </p>
+                    </div>
+                  </div>
+                  <div className='flex shrink-0 text-yellow-400'>
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className='h-10 w-10 fill-current' />
+                    ))}
+                  </div>
+                </div>
+                <p className='mt-6 text-5xl text-gray-700'>Hay</p>
               </div>
             </div>
           </div>
-          <div className='mt-16 rounded-2xl border-2 border-gray-200 p-8'>
+
+          {/* Dấu ngăn cách */}
+          <div className='my-16 border-t-2 border-gray-200'></div>
+
+          {/* Form gửi feedback */}
+          <div>
             <textarea
-              className='w-full rounded-xl border-2 border-gray-300 p-6 text-5xl shadow-sm focus:border-blue-500 focus:ring-blue-500'
+              className='w-full rounded-2xl border-2 border-gray-300 p-8 text-5xl shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
               rows={5}
               placeholder='Write your feedback...'
             ></textarea>
-            <button className='mt-8 rounded-xl bg-blue-600 px-12 py-6 text-5xl font-semibold text-white hover:bg-blue-700'>
+            <button className='mt-8 rounded-xl bg-[#4DB6AC] px-10 py-5 text-5xl font-semibold text-white shadow-lg transition-colors hover:bg-[#26A69A] focus:outline-none focus:ring-2 focus:ring-[#4DB6AC] focus:ring-offset-2'>
               Post Feedback
             </button>
           </div>
         </div>
+        {/* --- END: PHẦN CONFERENCE FEEDBACK --- */}
       </div>
     </div>
   )
