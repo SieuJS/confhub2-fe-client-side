@@ -88,7 +88,7 @@ const PosterExporter: React.FC = () => {
         )}
       </div>
       <div ref={posterRef}>
-        {/* <Poster /> */}
+        <Poster />
         {/* <DataProcessingFlowchartFinal /> */}
         {/* <DataProcessingFlowchartPhase2 /> */}
         {/* <DataProcessingFlowchartPhase3 /> */}

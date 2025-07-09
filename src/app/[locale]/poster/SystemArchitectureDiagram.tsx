@@ -7,10 +7,10 @@ import SystemDiagram from '../../../../public/system-architecture.svg'
 const SystemArchitectureDiagram = () => {
   return (
     <div
-      className='flex h-full w-full flex-col items-center justify-center rounded-[31px] bg-gray-100 p-8'
+      className='flex h-full w-full flex-col items-center justify-center rounded-[31px] bg-white p-8'
       style={{ fontFamily: 'Inter, sans-serif' }}
     >
-      <SystemDiagram className='h-full w-full' />
+      <SystemDiagram className='h-full w-[90%]' />
     </div>
   )
 }
