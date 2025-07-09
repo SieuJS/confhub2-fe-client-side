@@ -66,8 +66,7 @@ const FloatingChatWindow: React.FC<FloatingChatWindowProps> = ({
       onStart={dragHandlers.onStart}
       onStop={dragHandlers.onStop}
       bounds={bounds}
-      disabled={isSettingsOpen}
-            cancel="button, a, input, textarea, select"
+      cancel="button, a, input, textarea, select"
 
     >
       <div

@@ -60,3 +60,7 @@ export const openUrlInNewTab = (url: string): void => {
         // console.warn("[ChatUtils] Cannot open URL: 'window' object not available. This function is intended for client-side execution (e.g., in a browser).");
     }
 }
+
+
+
+

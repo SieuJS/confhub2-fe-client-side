@@ -460,116 +460,116 @@ const openMapIntroductions: IntroductionType = {
   }
 }
 
-const contactAdminIntroductions: IntroductionType = {
-  type: 'Send email to admin để contact hoặc report',
-  content: {
-    en: {
-      greeting: 'Hello',
-      description: 'Need to contact the admin or report an issue? Let me know.',
-      suggestions: [
-        'How can I contact the administrator?',
-        'I want to report a problem.',
-        'Send feedback to the admin.'
-      ]
-    },
-    vi: {
-      greeting: 'Xin chào',
-      description:
-        'Bạn cần liên hệ admin hoặc báo cáo sự cố? Hãy cho tôi biết.',
-      suggestions: [
-        'Làm thế nào để liên hệ với quản trị viên?',
-        'Tôi muốn báo cáo một vấn đề.',
-        'Gửi phản hồi đến admin.'
-      ]
-    },
-    zh: {
-      greeting: '你好',
-      description: '需要联系管理员或报告问题？告诉我吧。',
-      suggestions: [
-        '如何联系管理员？',
-        '我想报告一个问题。',
-        '向管理员发送反馈。'
-      ]
-    },
-    de: {
-      // German added
-      greeting: 'Hallo',
-      description:
-        'Müssen Sie den Administrator kontaktieren oder ein Problem melden? Lassen Sie es mich wissen.',
-      suggestions: [
-        'Wie kann ich den Administrator kontaktieren?',
-        'Ich möchte ein Problem melden.',
-        'Feedback an den Administrator senden.'
-      ]
-    },
-    es: {
-      // Spanish added
-      greeting: 'Hola',
-      description:
-        '¿Necesitas contactar al administrador o informar de un problema? Déjamelo saber.',
-      suggestions: [
-        '¿Cómo puedo contactar al administrador?',
-        'Quiero informar de un problema.',
-        'Enviar comentarios al administrador.'
-      ]
-    },
-    ko: {
-      // Korean added
-      greeting: '안녕하세요',
-      description: '관리자에게 연락하거나 문제를 보고해야 하나요? 알려주세요.',
-      suggestions: [
-        '관리자에게 어떻게 연락할 수 있나요?',
-        '문제를 보고하고 싶습니다.',
-        '관리자에게 피드백을 보내주세요.'
-      ]
-    },
-    ru: {
-      // Russian added
-      greeting: 'Здравствуйте',
-      description:
-        'Нужно связаться с администратором или сообщить о проблеме? Дайте знать.',
-      suggestions: [
-        'Как я могу связаться с администратором?',
-        'Я хочу сообщить о проблеме.',
-        'Отправить отзыв администратору.'
-      ]
-    },
-    ar: {
-      // Arabic added
-      greeting: 'مرحباً',
-      description:
-        'هل تحتاج للتواصل مع المسؤول أو الإبلاغ عن مشكلة؟ أخبرني بذلك.',
-      suggestions: [
-        'كيف يمكنني التواصل مع المسؤول؟',
-        'أرغب في الإبلاغ عن مشكلة.',
-        'أرسل ملاحظات للمسؤول.'
-      ]
-    },
+// const contactAdminIntroductions: IntroductionType = {
+//   type: 'Send email to admin để contact hoặc report',
+//   content: {
+//     en: {
+//       greeting: 'Hello',
+//       description: 'Need to contact the admin or report an issue? Let me know.',
+//       suggestions: [
+//         'How can I contact the administrator?',
+//         'I want to report a problem.',
+//         'Send feedback to the admin.'
+//       ]
+//     },
+//     vi: {
+//       greeting: 'Xin chào',
+//       description:
+//         'Bạn cần liên hệ admin hoặc báo cáo sự cố? Hãy cho tôi biết.',
+//       suggestions: [
+//         'Làm thế nào để liên hệ với quản trị viên?',
+//         'Tôi muốn báo cáo một vấn đề.',
+//         'Gửi phản hồi đến admin.'
+//       ]
+//     },
+//     zh: {
+//       greeting: '你好',
+//       description: '需要联系管理员或报告问题？告诉我吧。',
+//       suggestions: [
+//         '如何联系管理员？',
+//         '我想报告一个问题。',
+//         '向管理员发送反馈。'
+//       ]
+//     },
+//     de: {
+//       // German added
+//       greeting: 'Hallo',
+//       description:
+//         'Müssen Sie den Administrator kontaktieren oder ein Problem melden? Lassen Sie es mich wissen.',
+//       suggestions: [
+//         'Wie kann ich den Administrator kontaktieren?',
+//         'Ich möchte ein Problem melden.',
+//         'Feedback an den Administrator senden.'
+//       ]
+//     },
+//     es: {
+//       // Spanish added
+//       greeting: 'Hola',
+//       description:
+//         '¿Necesitas contactar al administrador o informar de un problema? Déjamelo saber.',
+//       suggestions: [
+//         '¿Cómo puedo contactar al administrador?',
+//         'Quiero informar de un problema.',
+//         'Enviar comentarios al administrador.'
+//       ]
+//     },
+//     ko: {
+//       // Korean added
+//       greeting: '안녕하세요',
+//       description: '관리자에게 연락하거나 문제를 보고해야 하나요? 알려주세요.',
+//       suggestions: [
+//         '관리자에게 어떻게 연락할 수 있나요?',
+//         '문제를 보고하고 싶습니다.',
+//         '관리자에게 피드백을 보내주세요.'
+//       ]
+//     },
+//     ru: {
+//       // Russian added
+//       greeting: 'Здравствуйте',
+//       description:
+//         'Нужно связаться с администратором или сообщить о проблеме? Дайте знать.',
+//       suggestions: [
+//         'Как я могу связаться с администратором?',
+//         'Я хочу сообщить о проблеме.',
+//         'Отправить отзыв администратору.'
+//       ]
+//     },
+//     ar: {
+//       // Arabic added
+//       greeting: 'مرحباً',
+//       description:
+//         'هل تحتاج للتواصل مع المسؤول أو الإبلاغ عن مشكلة؟ أخبرني بذلك.',
+//       suggestions: [
+//         'كيف يمكنني التواصل مع المسؤول؟',
+//         'أرغب في الإبلاغ عن مشكلة.',
+//         'أرسل ملاحظات للمسؤول.'
+//       ]
+//     },
 
-    fr: {
-      // French added
-      greeting: 'Bonjour',
-      description:
-        "Besoin de contacter l'administrateur ou de signaler un problème ? Faites-le moi savoir.",
-      suggestions: [
-        "Comment puis-je contacter l'administrateur ?",
-        'Je veux signaler un problème.',
-        "Envoyer des commentaires à l'administrateur."
-      ]
-    },
-    ja: {
-      // Japanese added
-      greeting: 'こんにちは',
-      description:
-        '管理者に連絡したり、問題を報告したりする必要がありますか？教えてください。',
-      suggestions: [
-        '管理者にどのように連絡できますか？',
-        '問題を報告したいです。',
-        '管理者にフィードバックを送ってください。'
-      ]
-    }
-  }
-}
+//     fr: {
+//       // French added
+//       greeting: 'Bonjour',
+//       description:
+//         "Besoin de contacter l'administrateur ou de signaler un problème ? Faites-le moi savoir.",
+//       suggestions: [
+//         "Comment puis-je contacter l'administrateur ?",
+//         'Je veux signaler un problème.',
+//         "Envoyer des commentaires à l'administrateur."
+//       ]
+//     },
+//     ja: {
+//       // Japanese added
+//       greeting: 'こんにちは',
+//       description:
+//         '管理者に連絡したり、問題を報告したりする必要がありますか？教えてください。',
+//       suggestions: [
+//         '管理者にどのように連絡できますか？',
+//         '問題を報告したいです。',
+//         '管理者にフィードバックを送ってください。'
+//       ]
+//     }
+//   }
+// }
 
 const followUnfollowIntroductions: IntroductionType = {
   type: 'Follow Unfollow Lấy danh sách follow conference',
@@ -580,7 +580,7 @@ const followUnfollowIntroductions: IntroductionType = {
       suggestions: [
         'List the conferences I am following.',
         'How to follow a conference?',
-        'Show me conferences I have followed.' // Example, might not be implemented
+        // 'Show me conferences I have followed.' // Example, might not be implemented
       ]
     },
     vi: {
@@ -589,7 +589,7 @@ const followUnfollowIntroductions: IntroductionType = {
       suggestions: [
         'Liệt kê các hội nghị tôi đang theo dõi.',
         'Làm thế nào để theo dõi một hội nghị?',
-        'Hiển thị các hội nghị tôi đã bỏ theo dõi.' // Ví dụ, có thể chưa triển khai
+        // 'Hiển thị các hội nghị tôi đã bỏ theo dõi.' // Ví dụ, có thể chưa triển khai
       ]
     },
     zh: {
@@ -598,7 +598,7 @@ const followUnfollowIntroductions: IntroductionType = {
       suggestions: [
         '列出我关注的会议。',
         '如何关注一个会议？',
-        '显示我已取消关注的会议。' // 示例，可能未实现
+        // '显示我已取消关注的会议。' // 示例，可能未实现
       ]
     },
     de: {
@@ -608,7 +608,7 @@ const followUnfollowIntroductions: IntroductionType = {
       suggestions: [
         'Listen Sie die Konferenzen auf, denen ich folge.',
         'Wie folge ich einer Konferenz?',
-        'Zeigen Sie mir Konferenzen, denen ich nicht mehr folge.' // Beispiel, vielleicht nicht implementiert
+        // 'Zeigen Sie mir Konferenzen, denen ich nicht mehr folge.' // Beispiel, vielleicht nicht implementiert
       ]
     },
     es: {
@@ -618,7 +618,7 @@ const followUnfollowIntroductions: IntroductionType = {
       suggestions: [
         'Listar las conferencias que sigo.',
         '¿Cómo seguir una conferencia?',
-        'Mostrar las conferencias que he dejado de seguir.' // Ejemplo, podría no estar implementado
+        // 'Mostrar las conferencias que he dejado de seguir.' // Ejemplo, podría no estar implementado
       ]
     },
     ko: {
@@ -628,7 +628,7 @@ const followUnfollowIntroductions: IntroductionType = {
       suggestions: [
         '팔로우 중인 컨퍼런스를 목록 표시해주세요.',
         '컨퍼런스를 팔로우하는 방법은 무엇인가요?',
-        '팔로우를 취소한 컨퍼런스를 보여주세요.' // 예시, 구현되지 않았을 수 있음
+        // '팔로우를 취소한 컨퍼런스를 보여주세요.' // 예시, 구현되지 않았을 수 있음
       ]
     },
     ru: {
@@ -638,7 +638,7 @@ const followUnfollowIntroductions: IntroductionType = {
       suggestions: [
         'Перечислить конференции, которые я отслеживаю.',
         'Как отслеживать конференцию?',
-        'Показать конференции, от которых я отписался.' // Пример, возможно, не реализовано
+        // 'Показать конференции, от которых я отписался.' // Пример, возможно, не реализовано
       ]
     },
     ar: {
@@ -648,7 +648,7 @@ const followUnfollowIntroductions: IntroductionType = {
       suggestions: [
         'اسرد المؤتمرات التي أتابعها.',
         'كيف أتابع مؤتمرًا؟',
-        'أظهر لي المؤتمرات التي ألغيت متابعتها.' // مثال، قد لا يكون مطبقًا
+        // 'أظهر لي المؤتمرات التي ألغيت متابعتها.' // مثال، قد لا يكون مطبقًا
       ]
     },
 
@@ -659,7 +659,7 @@ const followUnfollowIntroductions: IntroductionType = {
       suggestions: [
         'Lister les conférences que je suis.',
         'Comment suivre une conférence ?',
-        "Montrez-moi les conférences que j'ai cessé de suivre." // Exemple, pourrait ne pas être implémenté
+        // "Montrez-moi les conférences que j'ai cessé de suivre." // Exemple, pourrait ne pas être implémenté
       ]
     },
     ja: {
@@ -669,7 +669,7 @@ const followUnfollowIntroductions: IntroductionType = {
       suggestions: [
         'フォロー中の会議をリストアップしてください。',
         '会議をフォローするにはどうすればいいですか？',
-        'フォローを解除した会議を表示してください。' // 例、実装されていない可能性があります
+        // 'フォローを解除した会議を表示してください。' // 例、実装されていない可能性があります
       ]
     }
   }
@@ -892,7 +892,7 @@ const allIntroductionTypes: IntroductionType[] = [
   findInfoIntroductions,
   redirectToWebsiteIntroductions,
   openMapIntroductions,
-  contactAdminIntroductions,
+  // contactAdminIntroductions,
   followUnfollowIntroductions,
   calendarIntroductions,
   learnWebsiteIntroductions // Add the new type here

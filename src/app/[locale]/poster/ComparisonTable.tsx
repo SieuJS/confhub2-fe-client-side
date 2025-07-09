@@ -3,7 +3,7 @@
 import React from 'react'
 
 const ComparisonTable: React.FC = () => {
-  // Data remains the same
+  // Dữ liệu không đổi
   const competitors = [
     'WIKICFP',
     'ICORE\nCONFERENCE\nPORTAL',
@@ -14,7 +14,9 @@ const ComparisonTable: React.FC = () => {
     'GLOBAL\nCONFERENCE & JOURNAL HUB'
   ]
 
+  // Dữ liệu so sánh được cập nhật
   const comparisonData = [
+    // --- DỮ LIỆU CÓ SẴN ---
     {
       category: 'Tìm kiếm hội nghị',
       features: [
@@ -23,7 +25,7 @@ const ComparisonTable: React.FC = () => {
           values: [true, true, true, true, true, true, true]
         },
         {
-          name: 'Theo hình thức tổ chức',
+          name: 'Theo hình thức',
           values: [true, false, false, false, true, true, true]
         },
         {
@@ -39,7 +41,7 @@ const ComparisonTable: React.FC = () => {
           values: [true, false, true, true, true, true, true]
         },
         {
-          name: 'Theo rank core portal',
+          name: 'Theo rank',
           values: [false, true, false, false, false, true, true]
         }
       ]
@@ -87,7 +89,7 @@ const ComparisonTable: React.FC = () => {
       ]
     },
     {
-      category: 'Blacklist',
+      category: 'Danh sách đen',
       features: [
         { name: '', values: [false, false, false, false, false, false, true] }
       ]
@@ -126,6 +128,109 @@ const ComparisonTable: React.FC = () => {
       features: [
         { name: '', values: [false, false, false, false, false, false, true] }
       ]
+    },
+    // --- BẮT ĐẦU DỮ LIỆU MỚI TỪ ẢNH ---
+    {
+      category: 'crawl thông tin hội nghị',
+      features: [
+        {
+          name: 'Link chính',
+          values: [false, false, false, false, false, true, true]
+        },
+        {
+          name: 'Các ngày quan trọng',
+          values: [false, false, false, false, false, true, true]
+        },
+        {
+          name: 'Địa điểm',
+          values: [false, false, false, false, false, true, true]
+        },
+        {
+          name: 'Chủ đề',
+          values: [false, false, false, false, false, false, true]
+        },
+        {
+          name: 'Nhà xuất bản',
+          values: [false, false, false, false, false, false, true]
+        },
+        {
+          name: 'Call for paper',
+          values: [false, false, false, false, false, true, true]
+        }
+      ]
+    },
+    {
+      category: 'Phân tích kết quả crawl',
+      features: [
+        {
+          name: 'Thời gian crawl',
+          values: [false, false, false, false, false, false, true]
+        },
+        {
+          name: 'Số lượng thành công',
+          values: [false, false, false, false, false, false, true]
+        },
+        {
+          name: 'Số lượng thất bại',
+          values: [false, false, false, false, false, false, true]
+        },
+        {
+          name: 'Số lược call API',
+          values: [false, false, false, false, false, false, true]
+        },
+        {
+          name: 'Tổng token',
+          values: [false, false, false, false, false, false, true]
+        },
+        {
+          name: 'Lọc theo thời gian',
+          values: [false, false, false, false, false, false, true]
+        }
+      ]
+    },
+    {
+      category: 'Tự động cập nhật hội nghị',
+      features: [
+        {
+          name: 'Theo hằng ngày/tháng',
+          values: [false, false, false, false, false, true, true]
+        }
+      ]
+    },
+    {
+      category: 'Crawl journal',
+      features: [
+        {
+          name: 'Thông tin tạp chí',
+          values: [false, false, false, false, false, false, true]
+        },
+        {
+          name: 'Ảnh tạp chí',
+          values: [false, false, false, false, false, false, true]
+        },
+        {
+          name: 'Bảng phân vị',
+          values: [false, false, false, false, false, false, true]
+        }
+      ]
+    },
+    {
+      category: 'Duyệt hội nghị',
+      features: [
+        { name: '', values: [false, false, false, false, false, true, true] }
+      ]
+    },
+    {
+      category: 'Quản lí hội nghị',
+      features: [
+        { name: '', values: [false, false, false, false, false, true, true] }
+      ]
+    },
+    {
+      category: 'Quản lí người dùng',
+      features: [
+        { name: '', values: [false, false, false, false, false, true, true] }
+      ]
     }
   ]
 
@@ -138,19 +243,21 @@ const ComparisonTable: React.FC = () => {
   )
 
   return (
-    <div className=' overflow-hidden rounded-[31px] border-[3px] border-gray-300'>
+    // Bỏ border ở div ngoài, chỉ giữ lại bo góc và overflow-hidden
+    <div className='overflow-hidden rounded-[31px]'>
       <table
-        className=' w-full border-collapse text-center'
+        // Thêm border-separate, border-spacing và màu nền cho "đường kẻ"
+        className='w-full border-separate border-spacing-1 bg-gray-400 text-center'
         style={{ fontSize: '65px' }}
       >
         <thead className='font-bold'>
           <tr>
-            <th className='bg-purple-300 px-2 py-2' colSpan={2}></th>
+            <th className='bg-purple-300 px-2 py-0' colSpan={2}></th>
             {competitors.map((name, index) => (
               <th
                 key={index}
-                // THAY ĐỔI 1: Giảm padding dọc của header
-                className={`whitespace-pre-line border-l-2 border-white px-3 py-2 align-middle text-white ${
+                // Bỏ border-l-2 border-white
+                className={`whitespace-pre-line px-3 py-0 align-middle text-white ${
                   index === competitors.length - 1
                     ? 'bg-purple-600'
                     : 'bg-sky-500'
@@ -168,28 +275,26 @@ const ComparisonTable: React.FC = () => {
               {group.features.map((feature, featureIndex) => (
                 <tr
                   key={`${group.category}-${feature.name || featureIndex}`}
-                  className='border-t-2 border-white'
+                  // Bỏ border-t-2 border-white
                 >
                   {featureIndex === 0 && (
                     <td
                       rowSpan={group.features.length}
-                      // THAY ĐỔI 2: Giảm padding dọc của ô category
-                      className='w-[20%] border-r-2 border-white bg-purple-300 px-3 py-2 font-semibold text-purple-900'
+                      // Bỏ border-r-2 border-white
+                      className='w-[25%] bg-purple-300 px-3 py-0 font-semibold text-purple-900'
                     >
                       {group.category}
                     </td>
                   )}
-                  <td
-                    // THAY ĐỔI 3: Giảm padding dọc của ô feature name
-                    className='w-[25%] border-r-2 border-white bg-purple-300 px-3 py-2 text-left font-medium text-purple-900'
-                  >
+                  {/* Bỏ border-r-2 border-white */}
+                  <td className='w-[20%] bg-purple-300 px-3 py-0 text-left font-medium text-purple-900'>
                     {feature.name}
                   </td>
                   {feature.values.map((hasFeature, valueIndex) => (
                     <td
                       key={valueIndex}
-                      // THAY ĐỔI 4: Tăng kích thước dấu tick và giảm padding dọc
-                      className={`border-l-2 border-white py-0 align-middle text-9xl ${
+                      // Bỏ border-l-2 border-white
+                      className={`py-0 align-middle text-8xl ${
                         valueIndex === competitors.length - 1
                           ? 'bg-purple-300'
                           : 'bg-sky-100'

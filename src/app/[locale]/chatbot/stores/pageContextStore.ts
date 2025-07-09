@@ -3,21 +3,22 @@ import { create } from 'zustand';
 
 interface PageContextState {
   currentPageText: string | null;
-  currentPageUrl: string | null; // <<< THÊM MỚI
+  currentPageUrl: string | null;
   isCurrentPageFeatureEnabled: boolean;
   isContextAttachedNextSend: boolean;
 }
 
 interface PageContextActions {
-  setPageContext: (text: string | null, url: string | null, isEnabled: boolean) => void; // <<< CẬP NHẬT
+  setPageContext: (text: string | null, url: string | null, isEnabled: boolean) => void;
   clearPageContext: () => void;
-  toggleContextAttachedNextSend: (attach: boolean) => void;
+  // <<< THAY ĐỔI 1: Loại bỏ tham số `attach: boolean`
+  toggleContextAttachedNextSend: () => void;
   resetContextAttachedNextSend: () => void;
 }
 
 const initialState: PageContextState = {
   currentPageText: null,
-  currentPageUrl: null, // <<< THÊM MỚI
+  currentPageUrl: null,
   isCurrentPageFeatureEnabled: false,
   isContextAttachedNextSend: false,
 };
@@ -26,21 +27,24 @@ export const usePageContextStore = create<PageContextState & PageContextActions>
   (set) => ({
     ...initialState,
     setPageContext: (text, url, isEnabled) => set({ 
-      
       currentPageText: text, 
-      currentPageUrl: url, // <<< LƯU URL
+      currentPageUrl: url,
       isCurrentPageFeatureEnabled: isEnabled 
     }),
     clearPageContext: () => set({ 
       currentPageText: null, 
-      currentPageUrl: null, // <<< XÓA URL
+      currentPageUrl: null,
       isCurrentPageFeatureEnabled: false, 
       isContextAttachedNextSend: false 
     }),
-    toggleContextAttachedNextSend: (attach) => set(state => {
-      if (attach && state.isCurrentPageFeatureEnabled && state.currentPageText) {
-        return { isContextAttachedNextSend: true };
+    // <<< THAY ĐỔI 2: Cập nhật logic để tự động đảo ngược trạng thái
+    toggleContextAttachedNextSend: () => set(state => {
+      // Chỉ cho phép bật nếu tính năng được kích hoạt và có nội dung trang
+      if (state.isCurrentPageFeatureEnabled && state.currentPageText) {
+        // Đảo ngược giá trị hiện tại
+        return { isContextAttachedNextSend: !state.isContextAttachedNextSend };
       }
+      // Nếu không đủ điều kiện, luôn đảm bảo nó là false
       return { isContextAttachedNextSend: false };
     }),
     resetContextAttachedNextSend: () => set({ isContextAttachedNextSend: false }),

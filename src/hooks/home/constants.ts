@@ -33,12 +33,6 @@ export const sampleDataSets: ContinentData[][] = [
 export const chartTypes: ChartType[] = ['bar', 'pie', 'line']
 
 
-
-
-
-
-
-
 // ------ Super banner for -----
 
 // --- Framer Motion Animation Variants (Cho các phần tử nội dung chính) ---
@@ -1357,6 +1351,7 @@ export const countriesData: CountryData[] = [
     id: 'ZW'
   }
 ]
+
 // --- Tọa độ tâm quốc gia (Ước tính - ĐIỀU CHỈNH CẨN THẬN THEO SVG THỰC) ---
 // Giữ nguyên tọa độ
 export const countryCoordinates: { [key: string]: { x: number; y: number } } = {
@@ -1496,10 +1491,10 @@ export const exampleFlights = [
   // { from: 'ZA', to: 'AU', order: 8 } // Nam Phi -> Úc
 ]
 
-// --- Component WorldMap ---
 export interface WorldMapProps extends React.SVGProps<SVGSVGElement> {
   flights?: Flight[]
   coordinates?: { [key: string]: { x: number; y: number } }
+  showFlightEffect: boolean;
 }
 
 // --- Hằng số Thời gian Animation (tính bằng giây) ---

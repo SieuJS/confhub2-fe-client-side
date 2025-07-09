@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import {
   useConversationListState,
   useConversationActions,
@@ -15,20 +15,20 @@ import { useRouter } from '@/src/navigation'
 import HistoryTableRow from './HistoryTableRow'
 import Modal from '@/src/app/[locale]/chatbot/Modal'
 import Button from '../../utils/Button'
+import GeneralPagination from '../../utils/GeneralPagination'
 
 const ConversationHistoryPage: React.FC = () => {
   const t = useTranslations()
   const router = useRouter()
-  // --- THÊM STATE ĐỂ THEO DÕI MOUNTING ---
+
   const [hasMounted, setHasMounted] = useState(false)
   const {
     conversationList: initialListFromStore,
     searchResults,
     isSearching,
-    isLoadingHistory // Đây là state quan trọng nhất cho việc loading
+    isLoadingHistory
   } = useConversationListState()
 
-  // Xóa bỏ `loadHistory` vì nó không tồn tại trong actions của bạn
   const {
     loadConversation,
     deleteConversation,
@@ -44,8 +44,7 @@ const ConversationHistoryPage: React.FC = () => {
   const { chatMode } = useChatSettingsState()
 
   const [searchTerm, setSearchTerm] = useState('')
-  const [displayedConversations, setDisplayedConversations] =
-    useState<ConversationMetadata[]>(initialListFromStore)
+  // const [displayedConversations, setDisplayedConversations] = useState<ConversationMetadata[]>(initialListFromStore); // Sẽ được tính toán lại
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
   const [confirmModalTitle, setConfirmModalTitle] = useState('')
@@ -55,23 +54,42 @@ const ConversationHistoryPage: React.FC = () => {
     onCancel: (() => void) | null
   }>({ onConfirm: null, onCancel: null })
 
+  // --- THÊM STATE PHÂN TRANG ---
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10 // Số lượng cuộc hội thoại trên mỗi trang
+
   // --- SỬ DỤNG USEEFFECT ĐỂ CẬP NHẬT STATE SAU KHI MOUNT ---
   useEffect(() => {
     setHasMounted(true)
   }, [])
 
-
+  // Effect để gọi API tìm kiếm khi searchTerm thay đổi
   useEffect(() => {
     searchConversations(searchTerm)
+    setCurrentPage(1) // Reset về trang 1 khi tìm kiếm mới
   }, [searchTerm, searchConversations])
 
-  useEffect(() => {
-    if (searchTerm.trim() !== '') {
-      setDisplayedConversations(searchResults)
-    } else {
-      setDisplayedConversations(initialListFromStore)
-    }
+  // Dữ liệu nguồn cho phân trang (kết quả tìm kiếm hoặc toàn bộ danh sách)
+  const dataToPaginate = useMemo(() => {
+    return searchTerm.trim() !== '' ? searchResults : initialListFromStore
   }, [searchTerm, searchResults, initialListFromStore])
+
+  // Tính toán tổng số trang
+  const totalPages = useMemo(() => {
+    return Math.ceil(dataToPaginate.length / itemsPerPage)
+  }, [dataToPaginate.length, itemsPerPage])
+
+  // Lấy các cuộc hội thoại cho trang hiện tại
+  const paginatedConversations = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const endIndex = startIndex + itemsPerPage
+    return dataToPaginate.slice(startIndex, endIndex)
+  }, [dataToPaginate, currentPage, itemsPerPage])
+
+  // Xử lý thay đổi trang
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page)
+  }, [])
 
   const handleSelectAndGoToChat = useCallback(
     (conversationId: string) => {
@@ -128,6 +146,11 @@ const ConversationHistoryPage: React.FC = () => {
           async () => {
             try {
               await deleteConversation(id)
+              // Sau khi xóa, kiểm tra lại trang hiện tại
+              // Nếu trang hiện tại không còn dữ liệu và không phải trang 1, lùi về trang trước
+              if (paginatedConversations.length === 1 && currentPage > 1) {
+                setCurrentPage(prev => prev - 1);
+              }
               resolve()
             } catch (error) {
               reject(error)
@@ -137,7 +160,7 @@ const ConversationHistoryPage: React.FC = () => {
         )
       })
     },
-    [deleteConversation, t, showConfirmModal]
+    [deleteConversation, t, showConfirmModal, paginatedConversations.length, currentPage]
   )
 
   const handleClearWithConfirm = useCallback(
@@ -167,14 +190,9 @@ const ConversationHistoryPage: React.FC = () => {
     </div>
   )
 
-  // --- SỬA LẠI ĐIỀU KIỆN LOADING ---
-  // Hiển thị loading nếu:
-  // 1. Component chưa mount (để tránh "flash" của nội dung không chính xác).
-  // 2. Hoặc store đang trong quá trình tải lịch sử.
   if (!hasMounted || isLoadingHistory) {
     return renderLoading()
   }
-
 
   return (
     <div className='flex h-full flex-col bg-gray-10 p-4 dark:bg-gray-900 md:p-6'>
@@ -204,7 +222,8 @@ const ConversationHistoryPage: React.FC = () => {
         )}
       </div>
 
-      {displayedConversations.length === 0 ? (
+      {paginatedConversations.length === 0 && dataToPaginate.length === 0 ? (
+        // Hiển thị khi không có cuộc hội thoại nào (cả khi tìm kiếm và không tìm kiếm)
         <div className='flex flex-1 items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white p-12 text-center dark:border-gray-700 dark:bg-gray-800/30'>
           <div>
             <h3 className='text-lg font-medium text-gray-900 dark:text-white'>
@@ -220,45 +239,58 @@ const ConversationHistoryPage: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className='overflow-x-auto rounded-lg border border-gray-200 shadow-sm dark:border-gray-700'>
-          <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
-            <thead className='bg-gray-100 dark:bg-gray-800'>
-              <tr>
-                <th
-                  scope='col'
-                  className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider '
-                >
-                  {t('Title')}
-                </th>
-                <th
-                  scope='col'
-                  className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider '
-                >
-                  {t('Last_Activity')}
-                </th>
-                <th
-                  scope='col'
-                  className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider '
-                >
-                  {t('Actions')}
-                </th>
-              </tr>
-            </thead>
-            <tbody className='divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800/30'>
-              {displayedConversations.map(conv => (
-                <HistoryTableRow
-                  key={conv.id}
-                  conv={conv}
-                  onSelectAndGoToChat={handleSelectAndGoToChat}
-                  onDelete={handleDeleteWithConfirm}
-                  onClear={handleClearWithConfirm}
-                  onRename={renameConversation}
-                  onTogglePin={pinConversation}
-                />
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          <div className='overflow-x-auto rounded-lg border border-gray-200 shadow-sm dark:border-gray-700'>
+            <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
+              <thead className='bg-gray-100 dark:bg-gray-800'>
+                <tr>
+                  <th
+                    scope='col'
+                    className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider '
+                  >
+                    {t('Title')}
+                  </th>
+                  <th
+                    scope='col'
+                    className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider '
+                  >
+                    {t('Last_Activity')}
+                  </th>
+                  <th
+                    scope='col'
+                    className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider '
+                  >
+                    {t('Actions')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className='divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800/30'>
+                {paginatedConversations.map(conv => (
+                  <HistoryTableRow
+                    key={conv.id}
+                    conv={conv}
+                    onSelectAndGoToChat={handleSelectAndGoToChat}
+                    onDelete={handleDeleteWithConfirm}
+                    onClear={handleClearWithConfirm}
+                    onRename={renameConversation}
+                    onTogglePin={pinConversation}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {/* THÊM COMPONENT PHÂN TRANG */}
+          {totalPages > 1 && (
+            <div className='mt-6 flex justify-center'>
+              <GeneralPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                maxPageNumbersToShow={5} // Tùy chỉnh số lượng nút trang hiển thị
+              />
+            </div>
+          )}
+        </>
       )}
 
       {/* Modal xác nhận */}
@@ -266,19 +298,18 @@ const ConversationHistoryPage: React.FC = () => {
         isOpen={isConfirmModalOpen}
         onClose={handleCancelConfirm}
         title={confirmModalTitle}
-        // THAY ĐỔI QUAN TRỌNG Ở ĐÂY: Thêm div bọc và các lớp flexbox
         footer={
-          <div className='flex justify-end space-x-2'> {/* space-x-2 để các nút sát nhau */}
-            <Button variant='secondary' onClick={handleCancelConfirm} className="px-3 py-1.5 text-sm"> {/* Điều chỉnh padding và text-size */}
+          <div className='flex justify-end space-x-2'>
+            <Button variant='secondary' onClick={handleCancelConfirm} className="px-3 py-1.5 text-sm">
               {t('Common_Cancel')}
             </Button>
-            <Button variant='danger' onClick={handleConfirmAction} className="px-3 py-1.5 text-sm"> {/* Điều chỉnh padding và text-size */}
+            <Button variant='danger' onClick={handleConfirmAction} className="px-3 py-1.5 text-sm">
               {t('Common_Confirm')}
             </Button>
           </div>
         }
       >
-        <p className="text-gray-700 dark:text-gray-300">{confirmModalMessage}</p> {/* Thêm màu chữ */}
+        <p className="text-gray-700 dark:text-gray-300">{confirmModalMessage}</p>
       </Modal>
     </div>
   )

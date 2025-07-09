@@ -412,10 +412,10 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
       return;
     }
     setIsConnecting(true);
-    emitter.emit("log", { date: new Date(), type: "client.connect.attempt", message: `Attempting to connect with model: ${appConfig.model}` });
+    // emitter.emit("log", { date: new Date(), type: "client.connect.attempt", message: `Attempting to connect with model: ${appConfig.model}` });
     try {
       const sdkConfig = toSDKLiveConnectConfig(appConfig);
-      emitter.emit("log", { date: new Date(), type: "client.connect.sdkConfig", message: JSON.stringify(sdkConfig) });
+      // emitter.emit("log", { date: new Date(), type: "client.connect.sdkConfig", message: JSON.stringify(sdkConfig) });
       const newSession = await genAI.live.connect({
         model: appConfig.model,
         config: sdkConfig,
@@ -466,7 +466,7 @@ export function useLiveAPI({ apiKey }: { apiKey: string }): UseLiveAPIResults {
   }, [genAI, appConfig, emitter, handleServerMessage, isConnecting, session, debouncedEmitServerAudioLog]);
 
   const disconnect = useCallback(async () => {
-    emitter.emit("log", { date: new Date(), type: "client.disconnect.attempt", message: "Attempting to disconnect session." });
+    // emitter.emit("log", { date: new Date(), type: "client.disconnect.attempt", message: "Attempting to disconnect session." });
     if (session) {
       session.close();
     } else {

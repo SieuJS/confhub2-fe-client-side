@@ -1476,8 +1476,8 @@
   "ChatInput_Error_FileSize": "File \"{name}\" is too large. Maximum size is {maxSize}MB.",
   "ChatInput_Remove_File": "Remove file {fileName}",
   "ChatInput_Attach_File_Button_Label": "Attach file",
-  "Type_message_or_attach_files_floating": "Type message or @currentpage ...",
-  "Type_message_or_attach_files": "Type message or attach files ...",
+  "Type_message_or_attach_files_floating": "Type message...",
+  "Type_message_or_attach_files": "Type message...",
   "User_data_not_available": "User data not available",
   "dob_must_be_18_or_older": "Date of birth must indicate you are 18 years or older.",
   "Minimize_Chat": "Minimize Chat",
@@ -1984,5 +1984,12 @@
   "Please_enter_the_Call_for_Papers": "Please enter the Call for Papers",
   "Feedback_Error_MessageNotFound": "Feedback Error Message Not Found",
   "Feedback_Success_Message": "Feedback Success Message",
-  "Feedback_Error_SubmitFailed": "Feedback Error Submit Failed"
+  "Feedback_Error_SubmitFailed": "Feedback Error Submit Failed",
+  "Attach_files": "Attach files",
+  "Use_page_context": "Use page context",
+  "Using_page_context": "Using page context",
+  "Type_a_message": "Type a message...",
+  "Files": "Files",
+  "File_Upload_Error": "File Upload Error",
+  "File_Upload_MaxFilesExceeded": "Max Files Exceeded (5 files)"
 }
