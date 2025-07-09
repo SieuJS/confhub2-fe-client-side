@@ -206,23 +206,6 @@ const FloatingChatbotSettings: React.FC<FloatingChatbotSettingsProps> = ({
               onChange={handleStreamingToggle}
             />
 
-            {/* Hide Conversation Toolbar Setting */}
-            <ToggleSwitch
-              id='toolbar-toggle-floating'
-              label={t('FloatingChat_Hide_Toolbar')}
-              checked={isConversationToolbarHiddenInFloatingChat}
-              onChange={handleToolbarToggle}
-              description={t('FloatingChat_Hide_Toolbar_Description')}
-            />
-
-            {/* Hide Thought Process Setting */}
-            <ToggleSwitch
-              id='thought-process-toggle-floating'
-              label={t('FloatingChat_Hide_Thought_Process')}
-              checked={isThoughtProcessHiddenInFloatingChat}
-              onChange={handleThoughtProcessToggle}
-              description={t('FloatingChat_Hide_Thought_Process_Description')}
-            />
 
             {/* Personalization Toggle */}
             {chatMode === 'regular' && (
@@ -270,6 +253,26 @@ const FloatingChatbotSettings: React.FC<FloatingChatbotSettingsProps> = ({
                 disabled={false}
               />
             </div>
+
+            {/* Hide Conversation Toolbar Setting */}
+            <ToggleSwitch
+              id='toolbar-toggle-floating'
+              label={t('FloatingChat_Hide_Toolbar')}
+              checked={isConversationToolbarHiddenInFloatingChat}
+              onChange={handleToolbarToggle}
+              description={t('FloatingChat_Hide_Toolbar_Description')}
+            />
+
+            {/* Hide Thought Process Setting */}
+            <ToggleSwitch
+              id='thought-process-toggle-floating'
+              label={t('FloatingChat_Hide_Thought_Process')}
+              checked={isThoughtProcessHiddenInFloatingChat}
+              onChange={handleThoughtProcessToggle}
+              description={t('FloatingChat_Hide_Thought_Process_Description')}
+            />
+
+
           </div>
         </div>
       </div>
