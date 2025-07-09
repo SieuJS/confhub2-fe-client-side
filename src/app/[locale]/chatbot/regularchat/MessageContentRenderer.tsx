@@ -39,7 +39,18 @@ const MessageContentRenderer: React.FC<MessageContentRendererProps> = ({
   action,
   isUserMessage
 }) => {
-  // --- 1. Handle Specialized Message Types First ---
+  // --- 1. Call React Hooks Unconditionally at the Top ---
+  // This ensures useMessageContent is always called, satisfying the Rules of Hooks.
+  const { hasDisplayableContent, textElements, fileElements } = useMessageContent({
+    text,
+    parts,
+    files,
+    botFiles,
+    isUserMessage,
+  });
+
+  // --- 2. Handle Specialized Message Types First (Early Returns) ---
+  // These conditions check for specific message types that override the general content rendering.
 
   if (type === 'map' && location) {
     return <MapMessage text={text} location={location} />;
@@ -53,22 +64,15 @@ const MessageContentRenderer: React.FC<MessageContentRendererProps> = ({
     return <ConferenceSourcesMessage text={text} payload={action.payload as DisplayConferenceSourcesPayload} />;
   }
 
-  // --- 2. Handle General and Multimodal Content ---
+  // --- 3. Handle General and Multimodal Content (if no specialized type matched) ---
+  // Now, we use the results from the hook to render general text and file content.
 
-  const { hasDisplayableContent, textElements, fileElements } = useMessageContent({
-    text,
-    parts,
-    files,
-    botFiles,
-    isUserMessage,
-  });
-
-  // Early exit if there's nothing to display (logic is now in the hook)
+  // Early exit if there's nothing to display after processing by the hook
   if (!hasDisplayableContent) {
     return null;
   }
 
-  // --- 3. Assemble Final Content ---
+  // --- 4. Assemble Final Content ---
 
   const finalContent: React.ReactNode[] = [];
 
