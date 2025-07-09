@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useFlightAnimation } from '@/src/hooks/home/useFlightAnimation';
-import { WorldMapProps, countriesData } from '@/src/hooks/home/constants'; // Đảm bảo WorldMapProps được import
+import { WorldMapProps, countriesData } from '@/src/hooks/home/constants';
 
 const goldColor = '#FFD700';
 
@@ -10,14 +10,15 @@ const WorldMap: React.FC<WorldMapProps> = ({
   flights = [],
   coordinates = {},
   className,
-  showFlightEffect = true, // Nhận prop mới và đặt giá trị mặc định là true
+  showFlightEffect = true,
   ...restProps
 }) => {
-  // Gọi custom hook để lấy dữ liệu đã xử lý
-  // Chỉ xử lý flights nếu showFlightEffect là true
-  const processedFlights = showFlightEffect
-    ? useFlightAnimation({ flights, coordinates })
-    : [];
+  // Call useFlightAnimation unconditionally at the top level
+  // The hook itself should handle the logic of returning an empty array
+  // or no animations if flights/coordinates are empty or invalid.
+  // However, in your useFlightAnimation hook, you already have `if (!flights.length) return []`
+  // so it's safe to call it here.
+  const processedFlights = useFlightAnimation({ flights, coordinates });
 
   return (
     <svg
