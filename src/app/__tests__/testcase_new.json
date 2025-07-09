@@ -1690,5 +1690,662 @@
     "expectedResult": "Bảng dữ liệu được làm mới và chỉ hiển thị danh sách các tài khoản người dùng có trạng thái 'Banned'.",
     "actualResult": "",
     "status": ""
+  },
+  {
+    "testCaseId": "TC_Crawl_001",
+    "testCaseName": "Quy trình Crawl Conference thành công",
+    "description": "Kiểm tra toàn bộ quy trình từ lúc nhập file CSV, map dữ liệu, chọn conference, cấu hình và bắt đầu quá trình crawl một cách thành công.",
+    "preconditions": [
+      "Người dùng đã đăng nhập với tài khoản admin.",
+      "Người dùng đang ở trang 'Crawl' (Data Crawling Tools).",
+      "Người dùng đã chuẩn bị một file CSV hợp lệ chứa dữ liệu conference (có các cột Title, Acronym, Source, Rank...)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tại tab 'Crawl Conferences', nhấp vào nút 'Choose File' và chọn file CSV đã chuẩn bị."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Trên modal 'Review and Map Data', map các cột của CSV với các trường của hệ thống. Bắt buộc map 'Title' và 'Acronym'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Next' sau khi map xong."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Kiểm tra dữ liệu ở màn hình 'Final Data Preview' và nhấp vào 'Confirm & Complete'."
+      },
+      {
+        "stepNumber": 5,
+        "action": "Hệ thống chuyển sang Bước 2. Chọn một hoặc nhiều conferences từ danh sách bằng cách tích vào checkbox."
+      },
+      {
+        "stepNumber": 6,
+        "action": "Nhấp vào nút 'Next: Configure & Process'."
+      },
+      {
+        "stepNumber": 7,
+        "action": "Hệ thống chuyển sang Bước 3. Thực hiện cấu hình, ví dụ: bật 'Enable Document Chunking' và chọn các 'API Model Selection'."
+      },
+      {
+        "stepNumber": 8,
+        "action": "Nhấp vào nút 'Next: Start Processing'."
+      },
+      {
+        "stepNumber": 9,
+        "action": "Hệ thống chuyển sang Bước 4. Nhập mô tả tùy chọn vào ô 'Crawl Description'."
+      },
+      {
+        "stepNumber": 10,
+        "action": "Nhấp vào nút 'Start Processing'."
+      }
+    ],
+    "expectedResult": "Hệ thống bắt đầu thực thi quá trình crawl. Vùng 'Process Status & Log' hiển thị thông báo bắt đầu và cập nhật trạng thái tiến trình. Người dùng không gặp lỗi nào trong suốt quy trình.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Crawl_002",
+    "testCaseName": "Kiểm tra xác thực khi không map các trường bắt buộc",
+    "description": "Kiểm tra hệ thống ngăn người dùng tiếp tục nếu không map các trường dữ liệu bắt buộc (Title, Acronym) sau khi tải lên file CSV.",
+    "preconditions": [
+      "Người dùng đã đăng nhập với tài khoản admin.",
+      "Người dùng đang ở trang 'Crawl'.",
+      "Người dùng đã tải lên một file CSV hợp lệ."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Trong modal 'Review and Map Data', không thực hiện map cho các cột 'Title' và 'Acronym'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Next'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị một thông báo lỗi ở đầu modal, ví dụ: 'Please map all required fields to continue: Title, Acronym'. Người dùng không thể chuyển sang bước xem trước dữ liệu.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Crawl_003",
+    "testCaseName": "Kiểm tra khi chuyển sang bước 'Configure' mà không chọn conference nào",
+    "description": "Đảm bảo rằng người dùng không thể chuyển sang Bước 3 (Configure Settings) nếu chưa chọn ít nhất một conference ở Bước 2.",
+    "preconditions": [
+      "Người dùng đã hoàn thành Bước 1 (Import CSV) thành công.",
+      "Người dùng đang ở Bước 2 (Select Conferences)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Đảm bảo không có conference nào được chọn. Nếu có, nhấp vào 'Deselect All'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Next: Configure & Process'."
+      }
+    ],
+    "expectedResult": "Nút 'Next' bị vô hiệu hóa (disabled). Người dùng không thể chuyển sang bước cấu hình.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Crawl_004",
+    "testCaseName": "Kiểm tra chức năng 'Select All' và 'Apply to All Selected'",
+    "description": "Kiểm tra chức năng chọn tất cả các conference và áp dụng hành động cho tất cả các mục đã chọn.",
+    "preconditions": [
+      "Người dùng đã hoàn thành Bước 1 (Import CSV) thành công.",
+      "Người dùng đang ở Bước 2 (Select Conferences) và có 955 bản ghi được nhập."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Select All (955)'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Kiểm tra rằng tất cả checkbox trên trang hiện tại đã được chọn và thông báo 'Total selected: 955 conference(s)' hiển thị."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Chọn một hành động khác từ dropdown 'Action for Selected', ví dụ 'Update'."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Apply to All Selected (955)'."
+      }
+    ],
+    "expectedResult": "Cột 'Action Type' của tất cả 955 conference trong danh sách được cập nhật thành 'Update'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Crawl_005",
+    "testCaseName": "Kiểm tra chức năng 'Reset All & Start Over'",
+    "description": "Kiểm tra rằng nút 'Reset All & Start Over' ở bước cuối cùng sẽ xóa toàn bộ tiến trình và đưa người dùng về bước đầu tiên.",
+    "preconditions": [
+      "Người dùng đã đi qua các bước 1, 2, 3.",
+      "Người dùng đang ở Bước 4 (Process & View Status)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Reset All & Start Over'."
+      }
+    ],
+    "expectedResult": "Hệ thống hủy bỏ tất cả dữ liệu đã nhập và cấu hình. Giao diện quay trở lại trạng thái ban đầu của Bước 1 (Import CSV), với thanh tiến trình được đặt lại và không có file nào được chọn.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Crawl_006",
+    "testCaseName": "Kiểm tra điều hướng 'Previous'",
+    "description": "Kiểm tra các nút 'Previous' hoạt động chính xác, cho phép người dùng quay lại các bước trước đó để xem lại hoặc thay đổi thông tin.",
+    "preconditions": [
+      "Người dùng đã hoàn thành Bước 1 và Bước 2.",
+      "Người dùng đang ở Bước 3 (Configure Settings)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Previous: Select Conferences'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Kiểm tra hệ thống quay lại Bước 2. Các conference đã chọn trước đó vẫn được giữ nguyên."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Tại Bước 2, nhấp vào nút 'Previous: Import File'."
+      }
+    ],
+    "expectedResult": "Sau bước 1, hệ thống quay lại giao diện Bước 2. Sau bước 3, hệ thống quay lại giao diện Bước 1. Trạng thái của các bước trước đó (ví dụ: các lựa chọn) nên được bảo toàn.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Crawl_007",
+    "testCaseName": "Quy trình Crawl Journal thành công",
+    "description": "Kiểm tra người dùng có thể thực hiện thành công quy trình crawl journal qua 3 bước: Upload file, chọn journal, và bắt đầu crawl.",
+    "preconditions": [
+      "Người dùng đã đăng nhập với tài khoản admin.",
+      "Người dùng đang ở trang 'Crawl' và đã chọn tab 'Crawl Journals'.",
+      "Người dùng đã có sẵn một file danh sách journal hợp lệ (CSV hoặc Semicolon-delimited)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tại Bước 1 (Upload & Check DB), nhấp vào nút 'Choose File' và tải lên file journal."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Next Step'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Tại Bước 2 (Select Journals for Action), chọn một hoặc nhiều journal từ danh sách để thực hiện hành động."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Next Step' (hoặc tên tương tự để sang bước 3)."
+      },
+      {
+        "stepNumber": 5,
+        "action": "Tại Bước 3 (Review & Start Backend Crawl), xem lại các lựa chọn và nhấp vào nút để bắt đầu quá trình crawl."
+      }
+    ],
+    "expectedResult": "Hệ thống bắt đầu quá trình crawl cho các journal đã chọn. Người dùng có thể được chuyển hướng đến trang 'Analysis' để theo dõi tiến trình hoặc nhận được thông báo thành công.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Analysis_001",
+    "testCaseName": "Xem chi tiết một log request crawl",
+    "description": "Kiểm tra người dùng có thể xem chi tiết một log request từ trang tổng quan 'Conference Log Analysis Overview'.",
+    "preconditions": [
+      "Người dùng đã đăng nhập với tài khoản admin.",
+      "Người dùng đang ở trang 'Analysis'.",
+      "Có ít nhất một log request đã tồn tại trong danh sách 'Log Requests'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào một 'REQUEST ID' bất kỳ trong danh sách, ví dụ 'req-conf-175f954...'"
+      }
+    ],
+    "expectedResult": "Hệ thống chuyển hướng người dùng đến trang 'Detailed Conference Analysis', hiển thị danh sách chi tiết các conference thuộc về request đó, cùng với trạng thái (completed, failed) và các thông tin liên quan.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Analysis_002",
+    "testCaseName": "Xử lý lại các mục bị lỗi trong một log request",
+    "description": "Kiểm tra chức năng cho phép người dùng chọn và xử lý lại (Process Again) các mục bị lỗi trong một lần crawl.",
+    "preconditions": [
+      "Người dùng đã ở trang 'Detailed Conference Analysis'.",
+      "Trong danh sách có ít nhất một mục với trạng thái là 'failed'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tích vào checkbox của các dòng có trạng thái 'failed' (ví dụ: ISIT, ISMB, ISDA)."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Process Again'."
+      }
+    ],
+    "expectedResult": "Hệ thống khởi tạo một yêu cầu crawl mới chỉ cho các mục đã chọn. Trạng thái của các mục này có thể cập nhật thành 'pending' hoặc 'running'. Một log request mới được tạo ra trên trang tổng quan 'Analysis'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Cron_001",
+    "testCaseName": "Thiết lập một lịch cập nhật tự động (Cron Job)",
+    "description": "Kiểm tra người dùng có thể thiết lập một lịch cập nhật tự động hàng ngày thành công.",
+    "preconditions": [
+      "Người dùng đã đăng nhập với tài khoản admin.",
+      "Người dùng đang ở trang 'Cron'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Chọn 'Daily' trong phần 'Update Cycle'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Chọn một thời gian cụ thể trong trường 'Time', ví dụ '12:00 AM'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhập một số hợp lệ vào trường 'Batch Size', ví dụ '10'."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Schedule Update'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo 'Lịch cập nhật đã được thiết lập thành công'. Phần 'Current Status' có thể thay đổi để phản ánh trạng thái hoạt động của cron job. Các thông số đã nhập được lưu lại.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Cron_002",
+    "testCaseName": "Kiểm tra xác thực dữ liệu đầu vào không hợp lệ cho Cron",
+    "description": "Kiểm tra hệ thống hiển thị lỗi khi người dùng nhập dữ liệu không hợp lệ (ví dụ: batch size là chữ) vào form thiết lập Cron.",
+    "preconditions": [
+      "Người dùng đã đăng nhập với tài khoản admin.",
+      "Người dùng đang ở trang 'Cron'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập một chuỗi ký tự không phải là số vào trường 'Batch Size', ví dụ 'abc'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Schedule Update'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị một thông báo lỗi bên dưới hoặc bên cạnh trường 'Batch Size', yêu cầu người dùng nhập một số hợp lệ. Lịch trình không được tạo.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Moderation_001",
+    "testCaseName": "Duyệt thành công một hội nghị đang chờ xử lý (Approve)",
+    "description": "Kiểm tra quản trị viên có thể duyệt một hội nghị do người dùng gửi lên đang ở trạng thái chờ.",
+    "preconditions": [
+      "Người dùng đã đăng nhập với tài khoản admin.",
+      "Người dùng đang ở trang 'Moderation'.",
+      "Có ít nhất một hội nghị đang ở trạng thái 'Pending'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào một hội nghị đang ở trạng thái 'Pending' để xem chi tiết."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Trên trang chi tiết, xem lại thông tin và nhấp vào nút 'Approve'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Trong modal 'Approve Conference' hiện ra, nhấp vào nút 'Approve' (có thể nhập hoặc không nhập comment)."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo duyệt thành công. Hội nghị đó chuyển sang trạng thái 'Approved'. Khi quay lại trang 'Conference Moderation', hội nghị sẽ nằm trong tab 'Approved' và số đếm của tab 'Approved' và 'All' được cập nhật.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Moderation_002",
+    "testCaseName": "Từ chối thành công một hội nghị với lý do hợp lệ (Reject)",
+    "description": "Kiểm tra quản trị viên có thể từ chối một hội nghị đang chờ và cung cấp lý do bắt buộc.",
+    "preconditions": [
+      "Người dùng đã đăng nhập với tài khoản admin.",
+      "Người dùng đang ở trang 'Moderation'.",
+      "Có ít nhất một hội nghị đang ở trạng thái 'Pending'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào một hội nghị đang ở trạng thái 'Pending' để xem chi tiết."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Trên trang chi tiết, xem lại thông tin và nhấp vào nút 'Reject'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Trong modal 'Reject Conference', nhập một lý do hợp lệ vào ô 'Please provide a clear reason for rejection (required)...'."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Nhấp vào nút 'Reject'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo từ chối thành công. Hội nghị đó chuyển sang trạng thái 'Rejected'. Khi quay lại trang 'Conference Moderation', hội nghị sẽ nằm trong tab 'Rejected' và số đếm của tab 'Rejected' và 'All' được cập nhật.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Moderation_003",
+    "testCaseName": "Kiểm tra xác thực khi từ chối hội nghị mà không nhập lý do",
+    "description": "Kiểm tra hệ thống ngăn chặn việc từ chối một hội nghị nếu quản trị viên không cung cấp lý do.",
+    "preconditions": [
+      "Người dùng đang ở trên modal 'Reject Conference'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Để trống ô nhập lý do."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Reject'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị một thông báo lỗi trên modal. Modal không đóng lại và hành động từ chối không được thực hiện.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Moderation_004",
+    "testCaseName": "Kiểm tra chức năng lọc theo trạng thái (All, Pending, Approved, Rejected)",
+    "description": "Kiểm tra các tab lọc trên trang 'Conference Moderation' hoạt động chính xác.",
+    "preconditions": [
+      "Người dùng đang ở trang 'Conference Moderation'.",
+      "Có các hội nghị với nhiều trạng thái khác nhau (Pending, Approved, Rejected)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào tab 'Approved (2)'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Quan sát danh sách."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào tab 'Rejected (1)'."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Quan sát danh sách."
+      },
+      {
+        "stepNumber": 5,
+        "action": "Nhấp vào tab 'All (3)'."
+      }
+    ],
+    "expectedResult": "Ở bước 2, chỉ các hội nghị có trạng thái 'Approved' được hiển thị. Ở bước 4, chỉ các hội nghị có trạng thái 'Rejected' được hiển thị. Ở bước 5, tất cả các hội nghị được hiển thị. Số trong ngoặc đơn của mỗi tab phải khớp với số lượng mục trong danh sách tương ứng.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Moderation_005",
+    "testCaseName": "Kiểm tra chức năng tìm kiếm và sắp xếp trên trang Moderation",
+    "description": "Kiểm tra chức năng tìm kiếm theo tên hội nghị và sắp xếp danh sách hoạt động chính xác.",
+    "preconditions": [
+      "Người dùng đang ở trang 'Conference Moderation'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập 'Hội nghị XYZ' vào ô 'Search by conference title...'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Xóa nội dung tìm kiếm. Nhấp vào nút 'Sort by: Title'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào nút 'Sort by: Date Added'."
+      }
+    ],
+    "expectedResult": "Ở bước 1, danh sách chỉ hiển thị hội nghị có tên chứa 'Hội nghị XYZ'. Ở bước 2, danh sách được sắp xếp theo thứ tự bảng chữ cái của tên hội nghị. Ở bước 3, danh sách được sắp xếp theo ngày được thêm vào hệ thống.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Moderation_006",
+    "testCaseName": "Kiểm tra chức năng 'Cancel' trên modal Duyệt/Từ chối",
+    "description": "Đảm bảo rằng hành động của người dùng bị hủy bỏ khi nhấp vào nút 'Cancel' trên các modal.",
+    "preconditions": [
+      "Người dùng đã mở modal 'Approve Conference' hoặc 'Reject Conference'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhấp vào nút 'Cancel'."
+      }
+    ],
+    "expectedResult": "Modal đóng lại. Không có hành động nào được thực hiện. Trạng thái của hội nghị vẫn là 'Pending'. Người dùng được đưa trở lại trang chi tiết hội nghị.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_ConfMgmt_001",
+    "testCaseName": "Xem và chỉnh sửa Lịch sử Hội nghị (View & Edit History)",
+    "description": "Kiểm tra người dùng có thể xem lịch sử của một hội nghị và chỉnh sửa thành công thông tin chi tiết của một năm cụ thể.",
+    "preconditions": [
+      "Người dùng đã đăng nhập với tài khoản admin.",
+      "Người dùng đang ở trang 'Conferences'.",
+      "Có ít nhất một hội nghị đã được crawl và có dữ liệu lịch sử (ví dụ: 'World Multi-Conference...')."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm đến hội nghị 'World Multi-Conference...' trong danh sách."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào biểu tượng ba chấm (...) ở cuối hàng và chọn 'View History'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Modal 'Conference History' hiện ra. Nhấp vào nút 'Edit' màu xanh dương."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Giao diện chuyển sang form chỉnh sửa. Thay đổi một vài thông tin, ví dụ sửa trường 'Publisher' thành 'New Publisher IIIS'."
+      },
+      {
+        "stepNumber": 5,
+        "action": "Cuộn xuống cuối form và nhấp vào nút 'Save' (hoặc một nút lưu tương tự)."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo cập nhật thành công. Modal đóng lại hoặc quay về giao diện xem chi tiết. Khi mở lại Lịch sử Hội nghị, thông tin 'Publisher' đã được cập nhật thành 'New Publisher IIIS'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_ConfMgmt_002",
+    "testCaseName": "Xóa một hội nghị khỏi hệ thống",
+    "description": "Kiểm tra chức năng xóa toàn bộ một hội nghị (bao gồm tất cả lịch sử của nó) khỏi hệ thống.",
+    "preconditions": [
+      "Người dùng đã đăng nhập với tài khoản admin.",
+      "Người dùng đang ở trang 'Conferences'.",
+      "Có một hội nghị có thể xóa (ví dụ: một hội nghị 'TEST')."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm đến hội nghị 'TEST' trong danh sách."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào biểu tượng ba chấm (...) ở cuối hàng và chọn 'Delete'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Hệ thống hiển thị một modal xác nhận việc xóa. Nhấp vào nút 'Confirm' hoặc 'Delete'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo xóa thành công. Hội nghị 'TEST' biến mất khỏi danh sách trên trang 'Conference Management'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_001",
+    "testCaseName": "Thêm và xóa một 'Date' trong Lịch sử Hội nghị",
+    "description": "Kiểm tra chức năng thêm và xóa các mốc thời gian quan trọng trong màn hình chỉnh sửa Lịch sử Hội nghị.",
+    "preconditions": [
+      "Người dùng đang ở màn hình 'Edit Conference History'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Cuộn xuống phần 'Dates' và nhấp vào nút 'Add Date'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Một hàng mới xuất hiện. Nhập các thông tin cho ngày mới (Date Type, Date Name, Start Date, End Date)."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nhấp vào link 'Remove' ở một hàng 'Date' bất kỳ (ví dụ: hàng vừa tạo)."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Hàng đó biến mất khỏi danh sách. Nhấp 'Save' để lưu lại thay đổi."
+      }
+    ],
+    "expectedResult": "Hành động thêm và xóa 'Date' diễn ra thành công trên giao diện. Sau khi lưu, các thay đổi được áp dụng vào cơ sở dữ liệu.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_ConfHist_002",
+    "testCaseName": "Thêm và xóa một 'Topic' trong Lịch sử Hội nghị",
+    "description": "Kiểm tra chức năng thêm và xóa các chủ đề (Topics) trong màn hình chỉnh sửa Lịch sử Hội nghị.",
+    "preconditions": [
+      "Người dùng đang ở màn hình 'Edit Conference History'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Cuộn xuống phần 'Topics'. Nhập 'New Test Topic' vào ô 'Enter topic'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Add Topic'."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Chủ đề 'New Test Topic' xuất hiện trong danh sách. Nhấp vào nút 'Remove' tương ứng với chủ đề đó."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Chủ đề đó biến mất khỏi danh sách. Nhấp 'Save' để lưu lại."
+      }
+    ],
+    "expectedResult": "Người dùng có thể thêm và xóa các topic một cách linh hoạt. Các thay đổi được lưu thành công sau khi nhấp 'Save'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Accounts_001",
+    "testCaseName": "Chặn (Ban) một tài khoản người dùng đang hoạt động",
+    "description": "Kiểm tra quản trị viên có thể chặn một tài khoản người dùng đang ở trạng thái 'Active'.",
+    "preconditions": [
+      "Người dùng đã đăng nhập với tài khoản admin.",
+      "Người dùng đang ở trang 'Accounts'.",
+      "Có ít nhất một tài khoản người dùng với trạng thái 'Active' (ví dụ: VU1 VU1)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm đến tài khoản 'VU1 VU1' trong danh sách."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Ban' ở cột 'Actions' của hàng đó."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Nếu có modal xác nhận, nhấp 'Confirm'."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo thành công. Trạng thái của tài khoản 'VU1 VU1' chuyển thành 'Banned' (màu đỏ) và nút hành động chuyển thành 'Unban'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Accounts_002",
+    "testCaseName": "Bỏ chặn (Unban) một tài khoản người dùng đã bị chặn",
+    "description": "Kiểm tra quản trị viên có thể bỏ chặn một tài khoản người dùng đang ở trạng thái 'Banned'.",
+    "preconditions": [
+      "Người dùng đã đăng nhập với tài khoản admin.",
+      "Người dùng đang ở trang 'Accounts'.",
+      "Có ít nhất một tài khoản người dùng với trạng thái 'Banned' (ví dụ: VU2 VU2)."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Tìm đến tài khoản 'VU2 VU2' trong danh sách."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Nhấp vào nút 'Unban' ở cột 'Actions' của hàng đó."
+      }
+    ],
+    "expectedResult": "Hệ thống hiển thị thông báo thành công. Trạng thái của tài khoản 'VU2 VU2' chuyển thành 'Active' (màu xanh) và nút hành động chuyển thành 'Ban'.",
+    "actualResult": "",
+    "status": ""
+  },
+  {
+    "testCaseId": "TC_Accounts_003",
+    "testCaseName": "Tìm kiếm và lọc tài khoản người dùng",
+    "description": "Kiểm tra các chức năng tìm kiếm và lọc trên trang quản lý tài khoản hoạt động đúng.",
+    "preconditions": [
+      "Người dùng đã đăng nhập với tài khoản admin.",
+      "Người dùng đang ở trang 'Accounts'."
+    ],
+    "testSteps": [
+      {
+        "stepNumber": 1,
+        "action": "Nhập 'VU3' vào ô 'Search by name or email...'."
+      },
+      {
+        "stepNumber": 2,
+        "action": "Quan sát kết quả."
+      },
+      {
+        "stepNumber": 3,
+        "action": "Xóa nội dung tìm kiếm. Nhấp vào bộ lọc 'All Statuses' và chọn 'Banned'."
+      },
+      {
+        "stepNumber": 4,
+        "action": "Quan sát kết quả."
+      }
+    ],
+    "expectedResult": "Ở bước 2, danh sách chỉ hiển thị tài khoản 'VU3 VU3'. Ở bước 4, danh sách chỉ hiển thị các tài khoản có trạng thái 'Banned'.",
+    "actualResult": "",
+    "status": ""
   }
 ]

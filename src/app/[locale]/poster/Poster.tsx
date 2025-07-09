@@ -11,6 +11,8 @@ import ComparisonTable from './ComparisonTable'
 // IMPORT COMPONENT SƠ ĐỒ QUY TRÌNH MỚI
 import DataCollectionFlowchart from './DataCollectionFlowchart'
 import SystemArchitectureDiagram from './SystemArchitectureDiagram'
+import AdminServerFlowchart from './AdminServerFlowchart' // Đảm bảo đường dẫn chính xác
+import ClientServerFlowchart from './ClientServerFlowchart'
 
 const Poster: React.FC = () => {
   const A0_WIDTH_PX = 14043
@@ -98,22 +100,25 @@ const Poster: React.FC = () => {
             </h3>
             <p className='mb-[78px] text-[113px] leading-relaxed'>
               Đồ án giải quyết vấn đề khó khăn và tốn thời gian của các nhà khoa
-              học trong việc tìm kiếm, lựa chọn các hội nghị và tạp chí khoa học
-              phù hợp.
+              học trong việc tìm kiếm, lựa chọn các hội nghị phù hợp.
             </p>
             <p className='mb-[94px] text-[113px] leading-relaxed'>
-              Mục tiêu là xây dựng một ứng dụng web toàn diện để tự động hóa quy
-              trình này, cung cấp một công cụ thông minh, thân thiện và đáng tin
-              cậy.
+              Mục tiêu là xây dựng ứng dụng web giúp tìm kiếm hiệu quả với nền
+              tảng dữ liệu hội nghị khoa học đáng tin cậy cùng các tính năng tìm
+              kiếm thông minh và thân thiện.
             </p>
             <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
               2. Tóm tắt đồ án
             </h3>
             <p className='mb-[78px] text-[113px] leading-relaxed'>
-              Ứng dụng web thông minh với khả năng thu thập dữ liệu tự động từ
-              hàng ngàn nguồn thông qua{' '}
-              <strong className='text-[#e67e22]'>LLM</strong>, cung cấp các tính
-              năng tìm kiếm, quản lý và tương tác đa dạng.
+              Đồ án xây dựng một hệ thống hoàn chỉnh, áp dụng{' '}
+              <strong className='text-[#e67e22]'>
+                Mô hình ngôn ngữ lớn (LLM)
+              </strong>{' '}
+              để trích xuất dữ liệu, được xây dựng trên kiến trúc Microservices
+              linh hoạt. Sản phẩm cuối cùng gồm trang web cho người dùng với các
+              tính năng tìm kiếm, Chatbot thông minh và hệ thống giám sát trực
+              quan cho quản trị viên.
             </p>
           </div>
           <div>
@@ -157,31 +162,14 @@ const Poster: React.FC = () => {
             5. Các tính năng chính
           </h3>
           <div className='flex flex-1 flex-col'>
-            <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
-              Đối với người dùng
-            </h4>
-            <ul className='m-0 mb-[78px] list-disc pl-[94px] text-[113px] leading-relaxed'>
-              <li className='mb-[31px]'>
-                <strong>Tìm kiếm nâng cao:</strong> Theo chủ đề, thời gian, địa
-                điểm, xếp hạng...
-              </li>
-              <li className='mb-[31px]'>
-                <strong>Quản lý cá nhân:</strong> Theo dõi hội nghị, nhận thông
-                báo, thêm vào lịch.
-              </li>
-              <li className='mb-[31px]'>
-                <strong>Tương tác & Đóng góp:</strong> Đánh giá, bình luận, đề
-                xuất hội nghị.
-              </li>
-            </ul>
             <div className='mb-[78px] flex w-full  items-center justify-center overflow-hidden rounded-[31px] border-[6px] border-dashed border-gray-400 bg-white p-[31px]'>
               <div className='w-full'>
-                <ConferenceSearchInterface />
+                <ClientServerFlowchart />
               </div>
             </div>
-            <div className='flex w-full flex-1 items-center justify-center overflow-hidden rounded-[31px] border-[6px] border-dashed border-gray-400 bg-white p-[31px]'>
+            <div className='flex w-full items-center justify-center overflow-hidden rounded-[31px] border-[6px] border-dashed border-gray-400 bg-white p-[31px]'>
               <div className='w-full'>
-                <ConferenceDetailInterface />
+                <AdminServerFlowchart />
               </div>
             </div>
           </div>
