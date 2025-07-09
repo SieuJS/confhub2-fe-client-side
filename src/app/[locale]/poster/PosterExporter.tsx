@@ -5,6 +5,9 @@
 import React, { useRef, useState } from 'react'
 import domtoimage from 'dom-to-image-more'
 import Poster from './Poster'
+import DataProcessingFlowchartFinal from './DataProcessingFlowchart1'
+import DataProcessingFlowchartPhase2 from './DataProcessingFlowchart2'
+import DataProcessingFlowchartPhase3 from './FlowchartPhase3'
 
 const PosterExporter: React.FC = () => {
   const posterRef = useRef<HTMLDivElement>(null)
@@ -32,12 +35,10 @@ const PosterExporter: React.FC = () => {
         // --- SỬA LẠI PHẦN NÀY ---
         filter: (node: Node) => {
           if (node.nodeType === 1) {
-            // Chỉ áp dụng cho HTMLElement
             const element = node as HTMLElement
-            // Tấn công tổng lực: xóa hết các thuộc tính có khả năng gây ra viền
             element.style.outline = 'none'
-            element.style.border = 'none' // Thử xóa cả border
-            element.style.boxShadow = 'none' // Thử xóa cả box-shadow
+            element.style.border = 'none'
+            element.style.boxShadow = 'none'
           }
           return true
         },
@@ -87,7 +88,10 @@ const PosterExporter: React.FC = () => {
         )}
       </div>
       <div ref={posterRef}>
-        <Poster />
+        {/* <Poster /> */}
+        {/* <DataProcessingFlowchartFinal /> */}
+        {/* <DataProcessingFlowchartPhase2 /> */}
+        {/* <DataProcessingFlowchartPhase3 /> */}
       </div>
     </div>
   )
