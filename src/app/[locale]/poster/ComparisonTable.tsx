@@ -243,9 +243,11 @@ const ComparisonTable: React.FC = () => {
   )
 
   return (
-    <div className=' overflow-hidden rounded-[31px] border-[3px] border-gray-300'>
+    // Bỏ border ở div ngoài, chỉ giữ lại bo góc và overflow-hidden
+    <div className='overflow-hidden rounded-[31px]'>
       <table
-        className=' w-full border-collapse text-center'
+        // Thêm border-separate, border-spacing và màu nền cho "đường kẻ"
+        className='w-full border-separate border-spacing-1 bg-gray-400 text-center'
         style={{ fontSize: '65px' }}
       >
         <thead className='font-bold'>
@@ -254,7 +256,8 @@ const ComparisonTable: React.FC = () => {
             {competitors.map((name, index) => (
               <th
                 key={index}
-                className={`whitespace-pre-line border-l-2 border-white px-3 py-0 align-middle text-white ${
+                // Bỏ border-l-2 border-white
+                className={`whitespace-pre-line px-3 py-0 align-middle text-white ${
                   index === competitors.length - 1
                     ? 'bg-purple-600'
                     : 'bg-sky-500'
@@ -272,23 +275,26 @@ const ComparisonTable: React.FC = () => {
               {group.features.map((feature, featureIndex) => (
                 <tr
                   key={`${group.category}-${feature.name || featureIndex}`}
-                  className='border-t-2 border-white'
+                  // Bỏ border-t-2 border-white
                 >
                   {featureIndex === 0 && (
                     <td
                       rowSpan={group.features.length}
-                      className='w-[25%] border-r-2 border-white bg-purple-300 px-3 py-0 font-semibold text-purple-900'
+                      // Bỏ border-r-2 border-white
+                      className='w-[25%] bg-purple-300 px-3 py-0 font-semibold text-purple-900'
                     >
                       {group.category}
                     </td>
                   )}
-                  <td className='w-[20%] border-r-2 border-white bg-purple-300 px-3 py-0 text-left font-medium text-purple-900'>
+                  {/* Bỏ border-r-2 border-white */}
+                  <td className='w-[20%] bg-purple-300 px-3 py-0 text-left font-medium text-purple-900'>
                     {feature.name}
                   </td>
                   {feature.values.map((hasFeature, valueIndex) => (
                     <td
                       key={valueIndex}
-                      className={`border-l-2 border-white py-0 align-middle text-8xl ${
+                      // Bỏ border-l-2 border-white
+                      className={`py-0 align-middle text-8xl ${
                         valueIndex === competitors.length - 1
                           ? 'bg-purple-300'
                           : 'bg-sky-100'

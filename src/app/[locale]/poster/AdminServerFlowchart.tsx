@@ -5,7 +5,7 @@ import React from 'react'
 const ArrowIcon = () => (
   <svg
     // Giảm kích thước một chút cho phù hợp với layout cột
-    className='h-40 w-40 flex-shrink-0 text-gray-800'
+    className='h-52 w-52 flex-shrink-0 text-gray-800'
     xmlns='http://www.w3.org/2000/svg'
     fill='none'
     viewBox='0 0 24 24'
@@ -62,7 +62,7 @@ const AdminServerFlowchart: React.FC = () => {
       icon: (
         <svg
           xmlns='http://www.w3.org/2000/svg'
-          className='h-40 w-40'
+          className='h-52 w-52'
           fill='none'
           viewBox='0 0 24 24'
           stroke='currentColor'
@@ -75,8 +75,8 @@ const AdminServerFlowchart: React.FC = () => {
           />
         </svg>
       ),
-      title: 'Tiếp nhận yêu cầu',
-      description: 'Admin nhập tên hội nghị và tên viết tắt vào hệ thống.',
+      title: '1. Tiếp nhận yêu cầu',
+      description: 'Hệ thống tiếp nhận danh sách hội nghị.',
       bgColor: 'bg-blue-100',
       textColor: 'text-blue-800'
     },
@@ -85,7 +85,7 @@ const AdminServerFlowchart: React.FC = () => {
       icon: (
         <svg
           xmlns='http://www.w3.org/2000/svg'
-          className='h-40 w-40'
+          className='h-52 w-52'
           fill='none'
           viewBox='0 0 24 24'
           stroke='currentColor'
@@ -98,8 +98,8 @@ const AdminServerFlowchart: React.FC = () => {
           />
         </svg>
       ),
-      title: 'Google Search',
-      description: 'Sử dụng tên được cung cấp để tìm kiếm các link liên quan.',
+      title: '2. Google Search',
+      description: 'Tìm kiếm các link liên quan.',
       bgColor: 'bg-red-100',
       textColor: 'text-red-800'
     },
@@ -108,7 +108,7 @@ const AdminServerFlowchart: React.FC = () => {
       icon: (
         <svg
           xmlns='http://www.w3.org/2000/svg'
-          className='h-40 w-40'
+          className='h-52 w-52'
           fill='none'
           viewBox='0 0 24 24'
           stroke='currentColor'
@@ -121,9 +121,8 @@ const AdminServerFlowchart: React.FC = () => {
           />
         </svg>
       ),
-      title: 'Cào dữ liệu',
-      description:
-        'Dùng Playwright để truy cập và cào dữ liệu thô từ các link tìm được.',
+      title: '3. Thu thập dữ liệu',
+      description: 'Truy cập và thu thập dữ liệu thô từ các link.',
       bgColor: 'bg-yellow-100',
       textColor: 'text-yellow-800'
     },
@@ -132,7 +131,7 @@ const AdminServerFlowchart: React.FC = () => {
       icon: (
         <svg
           xmlns='http://www.w3.org/2000/svg'
-          className='h-40 w-40'
+          className='h-52 w-52'
           fill='none'
           viewBox='0 0 24 24'
           stroke='currentColor'
@@ -145,8 +144,8 @@ const AdminServerFlowchart: React.FC = () => {
           />
         </svg>
       ),
-      title: 'Xác định link chính',
-      description: 'Gọi API (LLM) để phân tích và xác định link chính.',
+      title: '4. Xác định link chính',
+      description: 'Gọi API (LLM) để xác định link chính.',
       bgColor: 'bg-indigo-100',
       textColor: 'text-indigo-800'
     },
@@ -155,7 +154,7 @@ const AdminServerFlowchart: React.FC = () => {
       icon: (
         <svg
           xmlns='http://www.w3.org/2000/svg'
-          className='h-40 w-40'
+          className='h-52 w-52'
           fill='none'
           viewBox='0 0 24 24'
           stroke='currentColor'
@@ -168,8 +167,8 @@ const AdminServerFlowchart: React.FC = () => {
           />
         </svg>
       ),
-      title: 'Trích xuất thông tin',
-      description: 'Trích xuất các thông tin quan trọng (ngày, địa điểm,...).',
+      title: '5. Rút trích thông tin',
+      description: 'Gọi API rút trích các thông tin quan trọng.',
       bgColor: 'bg-purple-100',
       textColor: 'text-purple-800'
     },
@@ -178,7 +177,7 @@ const AdminServerFlowchart: React.FC = () => {
       icon: (
         <svg
           xmlns='http://www.w3.org/2000/svg'
-          className='h-40 w-40'
+          className='h-52 w-52'
           fill='none'
           viewBox='0 0 24 24'
           stroke='currentColor'
@@ -191,8 +190,8 @@ const AdminServerFlowchart: React.FC = () => {
           />
         </svg>
       ),
-      title: 'Hợp nhất & Làm sạch',
-      description: 'Hợp nhất kết quả, kiểm tra và làm sạch dữ liệu.',
+      title: '6. Tổng hợp & Xử lý ',
+      description: 'Tổng hợp kết quả, kiểm tra và làm sạch dữ liệu.',
       bgColor: 'bg-teal-100',
       textColor: 'text-teal-800'
     },
@@ -201,7 +200,7 @@ const AdminServerFlowchart: React.FC = () => {
       icon: (
         <svg
           xmlns='http://www.w3.org/2000/svg'
-          className='h-40 w-40'
+          className='h-52 w-52'
           fill='none'
           viewBox='0 0 24 24'
           stroke='currentColor'
@@ -210,12 +209,12 @@ const AdminServerFlowchart: React.FC = () => {
             strokeLinecap='round'
             strokeLinejoin='round'
             strokeWidth={2}
-            d='M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7a8 8 0 0116 0'
+            d='M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375'
           />
         </svg>
       ),
-      title: 'Lưu Database',
-      description: 'Lưu thông tin đã được chuẩn hóa vào cơ sở dữ liệu.',
+      title: '7. Lưu Database',
+      description: 'Lưu thông tin vào cơ sở dữ liệu.',
       bgColor: 'bg-green-100',
       textColor: 'text-green-800'
     }
@@ -223,9 +222,9 @@ const AdminServerFlowchart: React.FC = () => {
 
   return (
     <div className='flex w-full flex-col items-center justify-center rounded-2xl bg-white p-10 font-sans'>
-      <h3 className='mb-12 text-center  text-8xl font-bold text-gray-700'>
+      {/* <h3 className='mb-12 text-center  text-8xl font-bold text-gray-700'>
         Sơ đồ tương tác Admin - Server (Thu thập dữ liệu)
-      </h3>
+      </h3> */}
       {/* Thay đổi layout thành cột và dùng gap-y */}
       <div className='flex flex-col items-center justify-center gap-y-8'>
         {steps.map((step, index) => (
@@ -238,7 +237,7 @@ const AdminServerFlowchart: React.FC = () => {
               textColor={step.textColor}
             />
             {/* Mũi tên sẽ hiển thị giữa các step */}
-            {index < steps.length - 1 && <ArrowIcon />}
+            {/* {index < steps.length - 1 && <ArrowIcon />} */}
           </React.Fragment>
         ))}
       </div>
