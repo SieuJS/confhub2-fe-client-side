@@ -11,7 +11,6 @@ import {
   exampleFlights,
 } from '@/src/hooks/home/constants';
 import WorldMap from './superbannerfor/WorldMap';
-import DecorativeElements from './superbannerfor/DecorativeElements';
 
 export default function SuperBannerFor() {
   const t = useTranslations('');
@@ -61,7 +60,7 @@ export default function SuperBannerFor() {
         />
       </div>
 
-      <DecorativeElements />
+      {/* <DecorativeElements /> */}
 
       <div className='relative z-10 mx-0 flex max-w-6xl -translate-y-40 flex-col items-center text-center'>
         <motion.h1

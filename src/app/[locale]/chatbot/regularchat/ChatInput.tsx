@@ -227,26 +227,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
     }
   }, [disabled, selectedFiles, setSelectedFiles, showAlertDialog, t]); // Thêm t vào dependencies
 
-  useEffect(() => {
-    const inputContainer = inputContainerRef.current;
-    if (inputContainer) {
-      inputContainer.addEventListener('paste', handlePaste as any);
-      // MỚI: Thêm event listeners cho kéo thả
-      inputContainer.addEventListener('dragover', handleDragOver as any);
-      inputContainer.addEventListener('dragleave', handleDragLeave as any);
-      inputContainer.addEventListener('drop', handleDrop as any);
-    }
-    return () => {
-      if (inputContainer) {
-        inputContainer.removeEventListener('paste', handlePaste as any);
-        // MỚI: Xóa event listeners khi unmount
-        inputContainer.removeEventListener('dragover', handleDragOver as any);
-        inputContainer.removeEventListener('dragleave', handleDragLeave as any);
-        inputContainer.removeEventListener('drop', handleDrop as any);
-      }
-    };
-  }, [handlePaste, handleDragOver, handleDragLeave, handleDrop]); // Thêm các hàm xử lý kéo thả vào dependencies
-
   const handleToggleContext = () => {
     if (!isCurrentPageFeatureEnabled) {
         onSetContextMessage(t(CURRENT_PAGE_CONTEXT_DISABLED_TEXT_KEY));
