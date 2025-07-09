@@ -39,7 +39,7 @@ const useSearchAdvanceForm = ({
   const [topicSuggestions, setTopicSuggestions] = useState<string[]>([]);
   const [fieldOfResearchInput, setFieldOfResearchInput] = useState('');
   const [fieldOfResearchSuggestions, setFieldOfResearchSuggestions] = useState<string[]>([]);
-  
+
   // --- KHÔNG CẦN FETCH Ở ĐÂY NỮA ---
   // const [availableTopics, setAvailableTopics] = useState<string[]>([]);
   // useEffect(() => { ... }, []);
@@ -76,13 +76,13 @@ const useSearchAdvanceForm = ({
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
       const trimmedInput = topicsInput.trim();
-      if (trimmedInput) {
-        // Sử dụng availableTopics từ props
-        if (!selectedTopics.includes(trimmedInput) && availableTopics.includes(trimmedInput)) {
-            onTopicsChange([...selectedTopics, trimmedInput]);
-        } else if (topicSuggestions.length > 0 ) {
-          handleTopicSuggestionClick(topicSuggestions[0]); // Select first suggestion
-        }
+
+      // Chỉ cần kiểm tra xem input có rỗng và đã tồn tại trong danh sách chọn chưa
+      if (trimmedInput && !selectedTopics.includes(trimmedInput)) {
+        // Thêm topic người dùng nhập vào danh sách đã chọn
+        onTopicsChange([...selectedTopics, trimmedInput]);
+
+        // Reset ô input và danh sách gợi ý
         setTopicsInput('');
         setTopicSuggestions([]);
       }
@@ -107,7 +107,7 @@ const useSearchAdvanceForm = ({
       setFieldOfResearchSuggestions([]);
     }
   };
-    const handleFieldOfResearchSuggestionClick = (suggestion: string) => {
+  const handleFieldOfResearchSuggestionClick = (suggestion: string) => {
     onFieldOfResearchChange([...selectedFieldsOfResearch, suggestion]);
     setFieldOfResearchInput('');
     setFieldOfResearchSuggestions([]);
@@ -116,12 +116,12 @@ const useSearchAdvanceForm = ({
   const handleFieldOfResearchInputKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
-       const trimmedInput = fieldOfResearchInput.trim();
+      const trimmedInput = fieldOfResearchInput.trim();
       if (trimmedInput) {
         if (!selectedFieldsOfResearch.includes(trimmedInput) && availableFieldsOfResearch.includes(trimmedInput)) {
-            onFieldOfResearchChange([...selectedFieldsOfResearch, trimmedInput]);
-        } else if(fieldOfResearchSuggestions.length > 0) {
-           handleFieldOfResearchSuggestionClick(fieldOfResearchSuggestions[0]); // Select the first suggestion on Enter
+          onFieldOfResearchChange([...selectedFieldsOfResearch, trimmedInput]);
+        } else if (fieldOfResearchSuggestions.length > 0) {
+          handleFieldOfResearchSuggestionClick(fieldOfResearchSuggestions[0]); // Select the first suggestion on Enter
         }
         setFieldOfResearchInput('');
         setFieldOfResearchSuggestions([]);
@@ -144,13 +144,13 @@ const useSearchAdvanceForm = ({
     onAverageScoreChange(event.target.value === "" ? null : event.target.value);
   };
 
-    const handlePublisherInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handlePublisherInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     onPublisherChange(event.target.value || null); // Directly update parent state
   };
-  const handlePublisherEnter = (event: KeyboardEvent<HTMLInputElement> ) => {
-      if(event.key === 'Enter'){
-        onPublisherChange(event.currentTarget.value || null)
-      }
+  const handlePublisherEnter = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      onPublisherChange(event.currentTarget.value || null)
+    }
   }
 
 

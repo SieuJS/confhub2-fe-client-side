@@ -1970,5 +1970,10 @@
   "Please_enter_the_Call_for_Papers": "Vui lòng nhập nội dung Kêu gọi bài viết",
   "Feedback_Error_MessageNotFound": "Có lỗi ảy ra khi gửi đánh giá",
   "Feedback_Success_Message": "Gửi đánh giá thành công",
-  "Feedback_Error_SubmitFailed": "Có lỗi xảy ra khi gửi đánh giá"
+  "Feedback_Error_SubmitFailed": "Có lỗi xảy ra khi gửi đánh giá",
+   "Attach_files": "Đính kèm tệp",
+  "Use_page_context": "Sử dụng ngữ cảnh trang",
+  "Using_page_context": "Đang sử dụng ngữ cảnh trang",
+  "Type_a_message": "Nhập tin nhắn...",
+  "Files": "Tệp"
 }

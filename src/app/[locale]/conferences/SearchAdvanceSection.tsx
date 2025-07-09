@@ -8,6 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import { appConfig } from '@/src/middleware'
 
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid' // Import icons
 
 interface SearchAdvanceSectionProps {
   isAdvancedOptionsVisible: boolean
@@ -149,17 +150,27 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
   })
 
   return (
-    // <--- Đặt Tooltip.Provider ở đây, bao quanh toàn bộ nội dung của component --->
     <Tooltip.Provider delayDuration={300}>
       <div>
         <div className='mt-4 flex justify-end'>
           <button
             onClick={toggleAdvancedOptionsVisibility}
-            className='text-sm hover:text-gray-80 focus:outline-none'
+            // Thêm các class để làm nút nổi bật hơn
+            className='flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800 focus:outline-none transition-colors duration-200 ease-in-out underline' // Added text-blue-600, font-semibold, hover:text-blue-800, underline, flex items-center
           >
-            {isAdvancedOptionsVisible
-              ? t('Hide_advanced_search_options')
-              : t('Show_more_advanced_search_options')}
+            {isAdvancedOptionsVisible ? (
+              <>
+                {t('Hide_advanced_search_options')}
+                <ChevronUpIcon className='ml-1 h-4 w-4' />{' '}
+                {/* Icon mũi tên lên */}
+              </>
+            ) : (
+              <>
+                {t('Show_more_advanced_search_options')}
+                <ChevronDownIcon className='ml-1 h-4 w-4' />{' '}
+                {/* Icon mũi tên xuống */}
+              </>
+            )}
           </button>
         </div>
 
@@ -172,7 +183,6 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                   className='mb-1  flex items-center text-sm font-bold'
                   htmlFor='submissionDateRange'
                 >
-                  {/* Radix Tooltip cho Submission Date - KHÔNG CÓ Provider ở đây nữa */}
                   <Tooltip.Root>
                     <Tooltip.Trigger asChild>
                       <span className='mr-1 inline-flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-gray-50 text-xs text-white hover:bg-gray-70'>
@@ -213,7 +223,6 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                   className='mb-1  flex items-center text-sm font-bold'
                   htmlFor='rank'
                 >
-                  {/* Radix Tooltip cho Rank - KHÔNG CÓ Provider ở đây nữa */}
                   <Tooltip.Root>
                     <Tooltip.Trigger asChild>
                       <span className='mr-1 inline-flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-gray-50 text-xs text-white hover:bg-gray-70'>
@@ -253,7 +262,6 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                   className='mb-1  flex items-center text-sm font-bold'
                   htmlFor='source'
                 >
-                  {/* Radix Tooltip cho Source - KHÔNG CÓ Provider ở đây nữa */}
                   <Tooltip.Root>
                     <Tooltip.Trigger asChild>
                       <span className='mr-1 inline-flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-gray-50 text-xs text-white hover:bg-gray-70'>
@@ -296,7 +304,6 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                   className='mb-1  flex items-center text-sm font-bold'
                   htmlFor='topics'
                 >
-                  {/* Radix Tooltip cho Topics - KHÔNG CÓ Provider ở đây nữa */}
                   <Tooltip.Root>
                     <Tooltip.Trigger asChild>
                       <span className='mr-1 inline-flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-gray-50 text-xs text-white hover:bg-gray-70'>
@@ -374,7 +381,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
           </div>
         )}
       </div>
-    </Tooltip.Provider> // <--- Đóng Tooltip.Provider ở đây --->
+    </Tooltip.Provider>
   )
 }
 

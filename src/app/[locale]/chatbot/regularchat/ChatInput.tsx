@@ -1,464 +1,367 @@
 // src/app/[locale]/chatbot/regularchat/ChatInput.tsx
-import React, { useRef, useEffect, useCallback, useState } from 'react'
-import TextareaAutosize from 'react-textarea-autosize'
-import Button from '../../utils/Button'
-import { GrSend } from 'react-icons/gr'
-import {
-  Paperclip,
-  X as LucideX,
-  FileText,
-  ImageIcon,
-  AlertTriangle,
-  Info
-} from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import { usePageContextStore } from '@/src/app/[locale]/chatbot/stores/pageContextStore'
+import React, { useRef, useEffect, useCallback, useState } from 'react'; // THÊM useState
+import TextareaAutosize from 'react-textarea-autosize';
+import Button from '../../utils/Button';
+import { GrSend } from 'react-icons/gr';
+import { Paperclip, FileText, ImageIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { usePageContextStore } from '@/src/app/[locale]/chatbot/stores/pageContextStore';
 import {
   CURRENT_PAGE_CONTEXT_COMMAND,
-  CURRENT_PAGE_CONTEXT_SUGGESTION_KEY,
-  CURRENT_PAGE_CONTEXT_INFO_TEXT_KEY,
   CURRENT_PAGE_CONTEXT_DISABLED_TEXT_KEY
-} from '@/src/app/[locale]/chatbot/lib/constants'
+} from '@/src/app/[locale]/chatbot/lib/constants';
+import { Tooltip } from 'react-tooltip';
 
-// Import Modal component
-import Modal from '@/src/app/[locale]/chatbot/Modal' // Đảm bảo đường dẫn đúng
+// Constants (giữ nguyên)
+export const ACCEPTED_FILE_TYPES = 'image/jpeg,image/png,application/pdf,text/csv'
+export const MAX_FILE_SIZE_MB = 50
+export const MAX_TOTAL_FILES = 5
 
-const ACCEPTED_FILE_TYPES = 'image/jpeg,image/png,application/pdf,text/csv'
-const MAX_FILE_SIZE_MB = 50
-const MAX_TOTAL_FILES = 5
+// Spinner Icon (giữ nguyên)
+const SpinnerIcon = () => (
+  <svg
+    className='h-5 w-5 animate-spin text-white'
+    xmlns='http://www.w3.org/2000/svg'
+    fill='none'
+    viewBox='0 0 24 24'
+  >
+    <circle
+      className='opacity-25'
+      cx='12'
+      cy='12'
+      r='10'
+      stroke='currentColor'
+      strokeWidth='4'
+    ></circle>
+    <path
+      className='opacity-100'
+      fill='currentColor'
+      d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+    ></path>
+  </svg>
+);
 
-interface ChatInputProps {
-  inputValue: string
-  onInputChange: (value: string) => void
-  onSendFilesAndMessage: (
-    message: string,
-    files: File[],
-    shouldUsePageContext: boolean
-  ) => void
-  onRegisterFillFunction: (fillFunc: (text: string) => void) => void
-  disabled?: boolean,
-  isSmallContext?: boolean; // <<< THÊM DÒNG NÀY
-
-}
-
-const getFileIcon = (mimeType: string) => {
-  if (mimeType.startsWith('image/')) return <ImageIcon size={24} className='' />
+// Utility function (giữ nguyên)
+export const getFileIcon = (mimeType: string): React.ReactNode => {
+  if (mimeType.startsWith('image/')) return <ImageIcon size={24} className='' />;
   if (mimeType === 'application/pdf')
-    return <FileText size={24} className='text-blue-500 dark:text-blue-400' />
-  return <Paperclip size={24} className='' />
+    return <FileText size={24} className='text-blue-500 dark:text-blue-400' />;
+  return <Paperclip size={24} className='' />;
+};
+
+
+export interface ChatInputProps {
+  inputValue: string;
+  onInputChange: (value: string) => void;
+  onSendFilesAndMessage: (message: string, files: File[], shouldUsePageContext: boolean) => void;
+  disabled?: boolean;
+  onRegisterFillFunction: (fillInputCallback: (text: string) => void) => void;
+  isSmallContext?: boolean;
+  onSetContextMessage: (message: string | null) => void;
+  // THÊM CÁC PROPS MỚI CHO VIỆC XỬ LÝ FILE
+  selectedFiles: File[];
+  setSelectedFiles: React.Dispatch<React.SetStateAction<File[]>>;
+  handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleRemoveFile: (fileName: string) => void; // Prop này không được sử dụng trực tiếp ở đây, nhưng là một phần của nhóm
+  showAlertDialog: (title: string, message: string) => void; // THÊM DÒNG NÀY
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({
   inputValue,
   onInputChange,
   onSendFilesAndMessage,
-  onRegisterFillFunction,
   disabled = false,
-  isSmallContext = false // <<< NHẬN PROP Ở ĐÂY
-
+  onRegisterFillFunction,
+  isSmallContext = false,
+  onSetContextMessage,
+  // CÁC PROPS MỚI
+  selectedFiles,
+  setSelectedFiles,
+  handleFileChange,
+  // handleRemoveFile, // Không sử dụng trực tiếp ở đây
+  showAlertDialog, // THÊM DÒNG NÀY
 }) => {
-  const t = useTranslations()
-  const [selectedFiles, setSelectedFiles] = React.useState<File[]>([])
-  const inputRef = useRef<HTMLTextAreaElement>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  // State cho gợi ý context
-  const [showContextSuggestions, setShowContextSuggestions] = useState(false)
-  const [contextSuggestionMessage, setContextSuggestionMessage] = useState<
-    string | null
-  >(null)
-
-  // State cho Modal thông báo lỗi
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [modalTitle, setModalTitle] = useState('')
-  const [modalMessage, setModalMessage] = useState('')
+  const t = useTranslations();
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputContainerRef = useRef<HTMLDivElement>(null);
+  const [isDragActive, setIsDragActive] = useState(false); // MỚI: State cho kéo thả
 
   const {
     isCurrentPageFeatureEnabled,
     isContextAttachedNextSend,
     toggleContextAttachedNextSend,
     resetContextAttachedNextSend
-  } = usePageContextStore()
+  } = usePageContextStore();
 
+  // Các hooks và hàm xử lý logic (giữ nguyên không thay đổi)
   useEffect(() => {
     const fillFunc = (text: string) => {
-      if (!disabled) {
-        onInputChange(text)
-        if (
-          text.includes(CURRENT_PAGE_CONTEXT_COMMAND) &&
-          isCurrentPageFeatureEnabled
-        ) {
-          toggleContextAttachedNextSend(true)
-        } else if (!text.includes(CURRENT_PAGE_CONTEXT_COMMAND)) {
-          resetContextAttachedNextSend()
-        }
-        setTimeout(
-          () =>
-            inputRef.current?.dispatchEvent(
-              new Event('input', { bubbles: true })
-            ),
-          0
-        )
-        inputRef.current?.focus()
-      }
-    }
+      if (disabled) return;
+      onInputChange(text);
+      setTimeout(() => inputRef.current?.dispatchEvent(new Event('input', { bubbles: true })), 0);
+      inputRef.current?.focus();
+    };
     if (onRegisterFillFunction) {
-      onRegisterFillFunction(fillFunc)
+      onRegisterFillFunction(fillFunc);
     }
-  }, [
-    onRegisterFillFunction,
-    disabled,
-    onInputChange,
-    isCurrentPageFeatureEnabled,
-    toggleContextAttachedNextSend,
-    resetContextAttachedNextSend
-  ])
+  }, [onRegisterFillFunction, disabled, onInputChange]);
 
-  const handleInputChangeInternal = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      if (disabled) return
-      const value = e.target.value
-      onInputChange(value)
-
-      if (value.endsWith('@') && isCurrentPageFeatureEnabled) {
-        setShowContextSuggestions(true)
-      } else {
-        setShowContextSuggestions(false)
-      }
-
-      if (
-        value.includes(CURRENT_PAGE_CONTEXT_COMMAND) &&
-        isCurrentPageFeatureEnabled
-      ) {
-        toggleContextAttachedNextSend(true)
-      } else if (
-        !value.includes(CURRENT_PAGE_CONTEXT_COMMAND) &&
-        isContextAttachedNextSend
-      ) {
-        resetContextAttachedNextSend()
-      }
-    },
-    [
-      disabled,
-      onInputChange,
-      isCurrentPageFeatureEnabled,
-      toggleContextAttachedNextSend,
-      resetContextAttachedNextSend,
-      isContextAttachedNextSend
-    ]
-  )
-
-  const handleSelectSuggestion = (suggestion: string) => {
-    if (suggestion === CURRENT_PAGE_CONTEXT_COMMAND) {
-      if (isCurrentPageFeatureEnabled) {
-        const currentVal = inputValue.endsWith('@')
-          ? inputValue.slice(0, -1)
-          : inputValue
-        const newVal =
-          (currentVal.endsWith(' ') || currentVal === ''
-            ? currentVal
-            : currentVal + ' ') +
-          CURRENT_PAGE_CONTEXT_COMMAND +
-          ' '
-        onInputChange(newVal)
-        toggleContextAttachedNextSend(true)
-        setContextSuggestionMessage(null)
-      } else {
-        setContextSuggestionMessage(t(CURRENT_PAGE_CONTEXT_DISABLED_TEXT_KEY))
-        setTimeout(() => setContextSuggestionMessage(null), 3000)
-      }
-    }
-    setShowContextSuggestions(false)
-    inputRef.current?.focus()
-  }
-
-  // Hàm hiển thị Modal
-  const showAlertDialog = (title: string, message: string) => {
-    setModalTitle(title)
-    setModalMessage(message)
-    setIsModalOpen(true)
-  }
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const newFiles = Array.from(event.target.files)
-      let validFiles: File[] = []
-      let alertShownForSize = false
-      let alertShownForMaxFiles = false
-
-      newFiles.forEach(file => {
-        if (selectedFiles.length + validFiles.length >= MAX_TOTAL_FILES) {
-          if (!alertShownForMaxFiles) {
-            showAlertDialog(
-              t('ChatInput_Error_Title_MaxFiles'), // Tiêu đề mới cho Modal
-              t('ChatInput_Error_MaxFiles', { max: MAX_TOTAL_FILES })
-            )
-            alertShownForMaxFiles = true
-          }
-          return
-        }
-        if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-          if (!alertShownForSize) {
-            showAlertDialog(
-              t('ChatInput_Error_Title_FileSize'), // Tiêu đề mới cho Modal
-              t('ChatInput_Error_FileSize', {
-                name: file.name,
-                maxSize: MAX_FILE_SIZE_MB
-              })
-            )
-            alertShownForSize = true
-          }
-          return
-        }
-        validFiles.push(file)
-      })
-
-      setSelectedFiles(prevFiles =>
-        [...prevFiles, ...validFiles].slice(0, MAX_TOTAL_FILES)
-      )
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
-    }
-  }
-
-  const handleRemoveFile = (fileName: string) => {
-    setSelectedFiles(prevFiles =>
-      prevFiles.filter(file => file.name !== fileName)
-    )
-  }
+  const handleInputChangeInternal = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (disabled) return;
+    onInputChange(e.target.value);
+  }, [disabled, onInputChange]);
 
   const handleSendMessageInternal = useCallback(() => {
-    let messageToSend = inputValue.trim()
-    let shouldUseContext = false
-    let originalInputHadContextCommand = false
+    const commandPattern = new RegExp(CURRENT_PAGE_CONTEXT_COMMAND.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*', 'g');
+    const messageToSend = inputValue.replace(commandPattern, '').trim();
+    const shouldUseContext = isContextAttachedNextSend && isCurrentPageFeatureEnabled;
 
-    if (isContextAttachedNextSend && isCurrentPageFeatureEnabled) {
-      if (inputValue.includes(CURRENT_PAGE_CONTEXT_COMMAND)) {
-        shouldUseContext = true
-        originalInputHadContextCommand = true
-        const commandPattern = new RegExp(
-          CURRENT_PAGE_CONTEXT_COMMAND.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') +
-          '\\s*',
-          'g'
-        )
-        messageToSend = inputValue.replace(commandPattern, '').trim()
-      } else {
-        resetContextAttachedNextSend()
-      }
-    }
-
-    if (
-      !disabled &&
-      (messageToSend || selectedFiles.length > 0 || shouldUseContext)
-    ) {
-      onSendFilesAndMessage(messageToSend, selectedFiles, shouldUseContext)
-      setSelectedFiles([])
-
-      if (shouldUseContext && originalInputHadContextCommand) {
-        onInputChange(CURRENT_PAGE_CONTEXT_COMMAND + ' ')
-      } else {
-        onInputChange('')
-        resetContextAttachedNextSend()
-      }
-
+    if (!disabled && (messageToSend || selectedFiles.length > 0 || shouldUseContext)) {
+      onSendFilesAndMessage(messageToSend, selectedFiles, shouldUseContext);
+      setSelectedFiles([]); // Sử dụng setSelectedFiles từ props
+      onInputChange('');
+      resetContextAttachedNextSend();
       if (inputRef.current) {
-        inputRef.current.style.height = 'auto'
+        inputRef.current.style.height = 'auto';
       }
     }
-  }, [
-    inputValue,
-    selectedFiles,
-    onSendFilesAndMessage,
-    disabled,
-    isCurrentPageFeatureEnabled,
-    isContextAttachedNextSend,
-    resetContextAttachedNextSend,
-    onInputChange
-  ])
+  }, [inputValue, selectedFiles, onSendFilesAndMessage, disabled, isCurrentPageFeatureEnabled, isContextAttachedNextSend, resetContextAttachedNextSend, onInputChange, setSelectedFiles]);
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (disabled) return
-      if (
-        showContextSuggestions &&
-        (e.key === 'ArrowDown' ||
-          e.key === 'ArrowUp' ||
-          e.key === 'Enter' ||
-          e.key === 'Tab')
-      ) {
-        if (e.key === 'Enter' || e.key === 'Tab') {
-          e.preventDefault()
-          handleSelectSuggestion(CURRENT_PAGE_CONTEXT_COMMAND)
-        }
-      } else if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault()
-        handleSendMessageInternal()
-      } else if (e.key === 'Escape') {
-        if (showContextSuggestions) {
-          setShowContextSuggestions(false)
-          e.preventDefault()
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (disabled) return;
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessageInternal();
+    }
+  }, [handleSendMessageInternal, disabled]);
+
+  // CẢI THIỆN: Xử lý paste để tránh trùng lặp
+  const handlePaste = useCallback((e: React.ClipboardEvent<HTMLDivElement>) => {
+    if (disabled) return;
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.indexOf('image') !== -1) {
+        e.preventDefault();
+        const blob = item.getAsFile();
+        if (blob) {
+          const now = new Date();
+          // Tạo tên file duy nhất hơn để tránh xung đột nếu paste nhiều lần cùng một ảnh
+          const fileName = `pasted_image_${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}_${now.getMilliseconds().toString().padStart(3, '0')}.png`;
+          const pastedFile = new File([blob], fileName, { type: blob.type });
+
+          setSelectedFiles(prevFiles => {
+            // Kiểm tra xem file đã tồn tại trong danh sách chưa (dựa trên tên và kích thước)
+            const isDuplicate = prevFiles.some(
+              f => f.name === pastedFile.name && f.size === pastedFile.size && f.type === pastedFile.type
+            );
+            if (isDuplicate) {
+              return prevFiles; // Không thêm nếu là trùng lặp
+            }
+            // Kiểm tra số lượng file tối đa
+            if (prevFiles.length >= MAX_TOTAL_FILES) {
+              showAlertDialog(t('File_Upload_Error'), t('File_Upload_MaxFilesExceeded', { maxFiles: MAX_TOTAL_FILES }));
+              return prevFiles;
+            }
+            return [...prevFiles, pastedFile];
+          });
         }
       }
-    },
-    [
-      handleSendMessageInternal,
-      disabled,
-      showContextSuggestions,
-      handleSelectSuggestion
-    ]
-  )
+    }
+  }, [disabled, setSelectedFiles, showAlertDialog, t]); // Thêm t vào dependencies
 
-  const placeholderText = isSmallContext
-    ? t('Type_message_or_attach_files_floating') // Dùng cho small context
-    : t('Type_message_or_attach_files'); // Dùng cho context lớn hơn
-  // 
-  const buttonAriaLabel = t('Send_message')
+  // MỚI: Xử lý kéo thả file
+  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation(); // Ngăn chặn sự kiện nổi bọt
+    if (disabled) return;
+    setIsDragActive(true);
+  }, [disabled]);
+
+  const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation(); // Ngăn chặn sự kiện nổi bọt
+    setIsDragActive(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation(); // Ngăn chặn sự kiện nổi bọt
+    setIsDragActive(false);
+    if (disabled) return;
+
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    const currentFilesCount = selectedFiles.length;
+    const newFilesToAdd: File[] = [];
+
+    for (const file of droppedFiles) {
+      // Kiểm tra loại file
+      if (!ACCEPTED_FILE_TYPES.split(',').includes(file.type)) {
+        showAlertDialog(t('File_Upload_Error'), t('File_Upload_InvalidType', { fileName: file.name }));
+        continue;
+      }
+
+      // Kiểm tra kích thước file
+      if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+        showAlertDialog(t('File_Upload_Error'), t('File_Upload_TooLarge', { fileName: file.name, maxSize: MAX_FILE_SIZE_MB }));
+        continue;
+      }
+
+      // Kiểm tra tổng số lượng file
+      if (currentFilesCount + newFilesToAdd.length >= MAX_TOTAL_FILES) {
+        showAlertDialog(t('File_Upload_Error'), t('File_Upload_MaxFilesExceeded', { maxFiles: MAX_TOTAL_FILES }));
+        break; // Dừng xử lý nếu đã đạt giới hạn
+      }
+
+      // Kiểm tra trùng lặp (theo tên và kích thước)
+      if (selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+        continue; // Bỏ qua file trùng lặp
+      }
+
+      newFilesToAdd.push(file);
+    }
+
+    if (newFilesToAdd.length > 0) {
+      setSelectedFiles(prevFiles => [...prevFiles, ...newFilesToAdd]);
+    }
+  }, [disabled, selectedFiles, setSelectedFiles, showAlertDialog, t]); // Thêm t vào dependencies
+
+  useEffect(() => {
+    const inputContainer = inputContainerRef.current;
+    if (inputContainer) {
+      inputContainer.addEventListener('paste', handlePaste as any);
+      // MỚI: Thêm event listeners cho kéo thả
+      inputContainer.addEventListener('dragover', handleDragOver as any);
+      inputContainer.addEventListener('dragleave', handleDragLeave as any);
+      inputContainer.addEventListener('drop', handleDrop as any);
+    }
+    return () => {
+      if (inputContainer) {
+        inputContainer.removeEventListener('paste', handlePaste as any);
+        // MỚI: Xóa event listeners khi unmount
+        inputContainer.removeEventListener('dragover', handleDragOver as any);
+        inputContainer.removeEventListener('dragleave', handleDragLeave as any);
+        inputContainer.removeEventListener('drop', handleDrop as any);
+      }
+    };
+  }, [handlePaste, handleDragOver, handleDragLeave, handleDrop]); // Thêm các hàm xử lý kéo thả vào dependencies
+
+  const handleToggleContext = () => {
+    if (!isCurrentPageFeatureEnabled) {
+        onSetContextMessage(t(CURRENT_PAGE_CONTEXT_DISABLED_TEXT_KEY));
+        setTimeout(() => onSetContextMessage(null), 3000);
+        return;
+    }
+    toggleContextAttachedNextSend();
+  }
+
+  const placeholderText = isSmallContext ? t('Type_message_or_attach_files_floating') : t('Type_message_or_attach_files');
+  const buttonAriaLabel = t('Send_message');
+  
+  // Đã đơn giản hóa class của wrapper để nó chỉ sắp xếp các phần tử bên trong
+  // MỚI: Thêm class cho hiệu ứng kéo thả
+  const inputWrapperClass = `flex w-full items-center gap-2 ${isDragActive ? 'border-blue-500 ring-2 ring-blue-500' : ''}`;
 
   return (
-    <div className='relative flex flex-col'>
-      {/* Suggestion Box */}
-      {showContextSuggestions && (
-        <div className='absolute bottom-full left-0 right-0 z-10 mb-1 max-h-40  overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg dark:border-gray-600'>
-          <ul>
-            <li
-              className='cursor-pointer px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600'
-              onClick={() =>
-                handleSelectSuggestion(CURRENT_PAGE_CONTEXT_COMMAND)
-              }
-              onMouseDown={e => e.preventDefault()}
-            >
-              <strong>{CURRENT_PAGE_CONTEXT_COMMAND}</strong> -{' '}
-              {t(CURRENT_PAGE_CONTEXT_SUGGESTION_KEY)}
-            </li>
-          </ul>
-        </div>
-      )}
-      {/* Thông báo lỗi/info cho context */}
-      {contextSuggestionMessage && (
-        <div className='mb-1 flex items-center rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs text-red-600 dark:border-red-700 dark:bg-red-900 dark:text-red-400'>
-          <AlertTriangle size={14} className='mr-2 flex-shrink-0' />
-          {contextSuggestionMessage}
-        </div>
-      )}
-      {/* Thông báo đang sử dụng context */}
-      {isContextAttachedNextSend && isCurrentPageFeatureEnabled && (
-        <div className='mb-1 flex items-center rounded-md border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs text-blue-600 dark:border-blue-700 dark:bg-blue-900 dark:text-blue-300'>
-          <Info size={14} className='mr-2 flex-shrink-0' />
-          {t(CURRENT_PAGE_CONTEXT_INFO_TEXT_KEY)}
-        </div>
-      )}
-      {/* Selected files preview */}
-      {selectedFiles.length > 0 && (
-        <div className='mb-2 max-h-48 overflow-y-auto rounded-t-lg  border bg-gray-10 p-3'>
-          <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3'>
-            {selectedFiles.map(file => (
-              <div
-                key={file.name}
-                className='relative flex flex-col items-center justify-center rounded-md border bg-white p-2 shadow-sm dark:border-gray-500 dark:bg-gray-600'
-              >
-                <button
-                  onClick={() => handleRemoveFile(file.name)}
-                  className='hover: absolute right-1 top-1 z-10  rounded-full  bg-gray-200  p-0.5 dark:hover:text-gray-200'
-                  aria-label={t('ChatInput_Remove_File', {
-                    fileName: file.name
-                  })}
-                >
-                  <LucideX size={12} />
-                </button>
-                <div className='mb-1.5 flex-shrink-0'>
-                  {getFileIcon(file.type)}
-                </div>
-                <span className='w-full break-all   px-1 text-center text-xs'>
-                  {file.name.length > 30
-                    ? `${file.name.substring(0, 27)}...`
-                    : file.name}
-                </span>
-                <span className='text-xxs  mt-0.5'>
-                  ({(file.size / 1024).toFixed(1)} KB)
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+    <div className='w-full'>
+      {/* Đã loại bỏ: <FilePreview files={selectedFiles} onRemoveFile={handleRemoveFile} /> */}
+
       <div
-        className={`flex w-full items-end bg-white-pure px-1 py-0.5 shadow-sm transition-all duration-200 ease-in-out focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500  dark:focus-within:border-blue-400 ${selectedFiles.length > 0 || (isContextAttachedNextSend && isCurrentPageFeatureEnabled) || contextSuggestionMessage ? 'rounded-b-2xl rounded-t-none border-t-0' : 'rounded-2xl'}`}
+        ref={inputContainerRef}
+        onPaste={handlePaste}
+        // MỚI: Gắn các sự kiện kéo thả vào đây
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className={inputWrapperClass}
       >
+        {/* Nút Tải File */}
         <Button
           variant='secondary'
           size='small'
           onClick={() => fileInputRef.current?.click()}
-          disabled={disabled || selectedFiles.length >= MAX_TOTAL_FILES}
+          disabled={disabled || selectedFiles.length >= MAX_TOTAL_FILES} // selectedFiles từ props
           aria-label={t('ChatInput_Attach_File_Button_Label')}
-          className='ml-0.25 hover: mb-0.5 mr-1.5 flex-shrink-0  rounded-xl  dark:hover:text-gray-200'
+          // Kích thước nút responsive
+          className='flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-gray-600 sm:h-9 sm:w-9'
+          data-tooltip-id='attach-file-tooltip'
+          data-tooltip-content={t('Attach_files')}
+          rounded
         >
-          <Paperclip size={16} />
+          {/* Kích thước icon responsive */}
+          <Paperclip size={18} className="sm:h-5 sm:w-5" />
         </Button>
         <input
           type='file'
           multiple
           accept={ACCEPTED_FILE_TYPES}
           ref={fileInputRef}
-          onChange={handleFileChange}
+          onChange={handleFileChange} // handleFileChange từ props
           className='hidden'
-          disabled={disabled || selectedFiles.length >= MAX_TOTAL_FILES}
+          disabled={disabled || selectedFiles.length >= MAX_TOTAL_FILES} // selectedFiles từ props
         />
+
+        {/* Nút Sử dụng Context Trang */}
+        {isSmallContext && (
+          <Button
+            variant='secondary'
+            size='small'
+            onClick={handleToggleContext}
+            disabled={disabled}
+            // Kích thước nút responsive
+            className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-50 sm:h-9 sm:w-9 ${isContextAttachedNextSend && isCurrentPageFeatureEnabled
+                ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300'
+                : 'text-gray-600 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-600'
+              }`}
+            aria-label={t('Use_page_context')}
+            data-tooltip-id='page-context-tooltip'
+            data-tooltip-content={isContextAttachedNextSend ? t('Using_page_context') : t('Use_page_context')}
+            rounded
+          >
+            {/* Kích thước icon responsive */}
+            <FileText size={16} className='h-4 w-4 sm:h-5 sm:w-5' />
+          </Button>
+        )}
+
+        {/* Khu vực nhập text */}
         <TextareaAutosize
           ref={inputRef}
           value={inputValue}
           onChange={handleInputChangeInternal}
           onKeyDown={handleKeyDown}
           placeholder={placeholderText}
-          className={`
-             max-h-28 flex-grow resize-none overflow-y-auto 
-            bg-transparent px-1.5 py-1 text-sm placeholder:text-primary
-            focus:border-transparent focus:outline-none disabled:cursor-not-allowed
-            disabled:bg-gray-100  dark:placeholder-gray-400 dark:disabled:bg-gray-600
-            ${selectedFiles.length > 0 ? 'rounded-l-none' : 'rounded-l-2xl'} 
-          `}
+          // Căn chỉnh, padding và quan trọng nhất là `placeholder:truncate`
+          className={`min-h-[32px] pt-1.75 w-full flex-grow resize-none self-center bg-transparent px-2 py-1.5 align-middle text-sm text-gray-900 outline-none disabled:cursor-not-allowed dark:text-gray-100 placeholder:truncate sm:min-h-[36px]`}
           rows={1}
+          maxRows={5}
           disabled={disabled}
-          onBlur={() => setTimeout(() => setShowContextSuggestions(false), 150)}
-          onFocus={() => {
-            if (inputValue.endsWith('@') && isCurrentPageFeatureEnabled) {
-              setShowContextSuggestions(true)
-            }
-          }}
+          spellCheck="false"
         />
+
+        {/* Nút Gửi */}
         <Button
-          variant={'secondary'}
-          size='mini'
-          rounded={true}
+          variant={'primary'}
+          size='small'
           onClick={handleSendMessageInternal}
-          disabled={
-            disabled ||
-            (!inputValue.trim() &&
-              selectedFiles.length === 0 &&
-              (!isContextAttachedNextSend || !isCurrentPageFeatureEnabled))
-          }
+          disabled={disabled || (!inputValue.trim() && selectedFiles.length === 0 && !isContextAttachedNextSend)} // selectedFiles từ props
           aria-label={buttonAriaLabel}
-          className='mr-0.25 mb-0.5 ml-1.5 flex-shrink-0 '
+          // Kích thước nút responsive
+          className='flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-800 sm:h-9 sm:w-9'
+          data-tooltip-id='send-message-tooltip'
+          data-tooltip-content={buttonAriaLabel}
+          rounded
         >
-          <GrSend size={16} className='h-4 w-4' />
+          {disabled ? <SpinnerIcon /> : <GrSend size={14} className='h-3.5 w-3.5 sm:h-4 sm:w-4' />}
         </Button>
       </div>
 
-      {/* Modal component */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={modalTitle}
-        footer={
-          <Button variant='primary' onClick={() => setIsModalOpen(false)}>
-            {t('Common_OK')} {/* Sử dụng bản dịch cho nút OK */}
-          </Button>
-        }
-      >
-        <p>{modalMessage}</p>
-      </Modal>
+      {/* Tooltips */}
+      <Tooltip id="attach-file-tooltip" place="top" />
+      <Tooltip id="page-context-tooltip" place="top" />
+      <Tooltip id="send-message-tooltip" place="top" />
 
-
+      {/* Đã loại bỏ: Modal liên quan đến useAlertDialog */}
     </div>
   )
 }

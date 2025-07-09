@@ -7,10 +7,13 @@ import LanguageDropdown from '../chatbot/LanguageDropdown'
 import { useTranslations } from 'next-intl'
 import { useSettingsStore } from '@/src/app/[locale]/chatbot/stores'
 import { useShallow } from 'zustand/react/shallow'
-import { LanguageOption } from '@/src/app/[locale]/chatbot/stores'
 import { useAuth } from '@/src/contexts/AuthContext'
 import PersonalizationConfirmationModal from '../chatbot/PersonalizationConfirmationModal'
 import { UserResponse } from '@/src/models/response/user.response'
+
+import ModelSelectionDropdown from '../chatbot/ModelSelectionDropdown'
+import { AVAILABLE_MODELS } from '../chatbot/lib/models'
+import { LanguageOption, ModelOption } from '@/src/app/[locale]/chatbot/stores'
 
 interface FloatingChatbotSettingsProps {
   isOpen: boolean
@@ -32,11 +35,13 @@ const FloatingChatbotSettings: React.FC<FloatingChatbotSettingsProps> = ({
     isConversationToolbarHiddenInFloatingChat,
     isThoughtProcessHiddenInFloatingChat,
     isPersonalizationEnabled,
+    selectedModel,
     setCurrentLanguage,
     setIsStreamingEnabled,
     setIsConversationToolbarHiddenInFloatingChat,
     setIsThoughtProcessHiddenInFloatingChat,
-    setIsPersonalizationEnabled
+    setIsPersonalizationEnabled,
+    setSelectedModel
   } = useSettingsStore(
     useShallow(state => ({
       chatMode: state.chatMode,
@@ -48,13 +53,15 @@ const FloatingChatbotSettings: React.FC<FloatingChatbotSettingsProps> = ({
       isThoughtProcessHiddenInFloatingChat:
         state.isThoughtProcessHiddenInFloatingChat,
       isPersonalizationEnabled: state.isPersonalizationEnabled,
+      selectedModel: state.selectedModel,
       setCurrentLanguage: state.setCurrentLanguage,
       setIsStreamingEnabled: state.setIsStreamingEnabled,
       setIsConversationToolbarHiddenInFloatingChat:
         state.setIsConversationToolbarHiddenInFloatingChat,
       setIsThoughtProcessHiddenInFloatingChat:
         state.setIsThoughtProcessHiddenInFloatingChat,
-      setIsPersonalizationEnabled: state.setIsPersonalizationEnabled
+      setIsPersonalizationEnabled: state.setIsPersonalizationEnabled,
+      setSelectedModel: state.setSelectedModel
     }))
   )
 
@@ -87,7 +94,7 @@ const FloatingChatbotSettings: React.FC<FloatingChatbotSettingsProps> = ({
   ) => {
     const enable = event.target.checked
     if (enable) {
-      if (!isLoggedIn || !user) { // Thêm kiểm tra isLoggedIn để đồng bộ
+      if (!isLoggedIn || !user) {
         alert(t('Error_Login_Required_Generic'))
         event.target.checked = false
         return
@@ -165,15 +172,12 @@ const FloatingChatbotSettings: React.FC<FloatingChatbotSettingsProps> = ({
   return (
     <>
       <div
-        // Container chính của Floating Chatbot Settings
-        className='absolute inset-0 z-10 flex h-full w-full flex-col overflow-hidden rounded-b-lg bg-white-pure shadow-inner transition-opacity duration-300 ease-in-out dark:bg-gray-800'
+        className='absolute inset-0 z-10 flex h-full w-80 flex-col overflow-hidden rounded-b-lg bg-white-pure shadow-inner transition-opacity duration-300 ease-in-out dark:bg-gray-800'
         aria-modal='true'
         role='dialog'
         aria-labelledby='floating-chatbot-settings-title'
       >
-        {/* Nội dung bên trong settings panel, cho phép cuộn */}
         <div className='flex h-full w-full flex-col overflow-y-auto px-4'>
-          {/* Header của Settings Panel */}
           <div className='flex flex-shrink-0 items-center justify-between border-b border-gray-200 pb-3 pt-3 dark:border-gray-700'>
             <div className='flex items-center space-x-2'>
               <h2
@@ -193,7 +197,6 @@ const FloatingChatbotSettings: React.FC<FloatingChatbotSettingsProps> = ({
             </button>
           </div>
 
-          {/* Các mục cài đặt */}
           <div className='flex-grow space-y-5 py-4'>
             {/* Stream Response Setting */}
             <ToggleSwitch
@@ -245,23 +248,33 @@ const FloatingChatbotSettings: React.FC<FloatingChatbotSettingsProps> = ({
               </div>
             )}
 
+            {/* Model Selection Dropdown */}
+            {chatMode === 'regular' && (
+              <div className='space-y-1'>
+                <ModelSelectionDropdown
+                  currentModel={selectedModel}
+                  availableModels={AVAILABLE_MODELS}
+                  onModelChange={setSelectedModel}
+                />
+              </div>
+            )}
+
             {/* Language Dropdown Setting */}
             <div className='space-y-1'>
-             
               <LanguageDropdown
                 currentLanguage={currentLanguage}
                 availableLanguages={availableLanguages}
                 onLanguageChange={(lang: LanguageOption) =>
                   setCurrentLanguage(lang)
                 }
-                disabled={false} // Language can always be changed in floating chat settings
+                disabled={false}
               />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Personalization Modals - Sử dụng positioning='absolute' và size='sm' */}
+      {/* Personalization Modals */}
       <PersonalizationConfirmationModal
         isOpen={isMissingInfoModalOpen}
         onClose={() => setIsMissingInfoModalOpen(false)}

@@ -1,8 +1,6 @@
-// src/app/[locale]/home/Banner.tsx
+'use client';
 
-'use client'; // BẮT BUỘC: Vì component này dùng framer-motion và hook
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Link } from '@/src/navigation';
@@ -15,10 +13,36 @@ import {
 import WorldMap from './superbannerfor/WorldMap';
 import DecorativeElements from './superbannerfor/DecorativeElements';
 
-// Đổi tên component để rõ ràng hơn
 export default function SuperBannerFor() {
   const t = useTranslations('');
   const sloganText = t('Slogan_Website');
+
+  // State để kiểm soát việc hiển thị hiệu ứng chuyến bay (màn hình >= 1024px)
+  const [showFlightEffect, setShowFlightEffect] = useState(true);
+  // State để kiểm soát việc hiển thị nút tìm kiếm (màn hình < 1440px)
+  const [showSearchButton, setShowSearchButton] = useState(true);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      // Logic cho hiệu ứng chuyến bay: hiển thị khi màn hình >= 1024px
+      setShowFlightEffect(window.innerWidth >= 1024);
+
+      // Logic cho nút tìm kiếm: hiển thị khi màn hình < 1440px
+      // (nghĩa là không hiển thị khi màn hình >= 1440px)
+      setShowSearchButton(window.innerWidth < 1440);
+    };
+
+    // Gọi hàm kiểm tra lần đầu khi component mount
+    checkScreenSize();
+
+    // Thêm event listener cho sự kiện resize
+    window.addEventListener('resize', checkScreenSize);
+
+    // Dọn dẹp event listener khi component unmount
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []); // [] đảm bảo useEffect chỉ chạy một lần khi mount và dọn dẹp khi unmount
 
   return (
     <motion.section
@@ -33,6 +57,7 @@ export default function SuperBannerFor() {
           coordinates={countryCoordinates}
           className='h-full w-full object-cover opacity-70'
           aria-hidden='true'
+          showFlightEffect={showFlightEffect}
         />
       </div>
 
@@ -54,13 +79,16 @@ export default function SuperBannerFor() {
           {t('Slogan_Website_describe')}
         </motion.p>
 
-        <motion.div variants={itemVariants}>
-          <Link href={`/conferences`}>
-            <button className='hover:bg-primary-dark rounded-md bg-button px-6 py-3 font-bold text-button-text transition-colors'>
-              {t('Search_Conferences')}
-            </button>
-          </Link>
-        </motion.div>
+        {/* Điều kiện render nút tìm kiếm */}
+        {showSearchButton && (
+          <motion.div variants={itemVariants}>
+            <Link href={`/conferences`}>
+              <button className='hover:bg-primary-dark rounded-md bg-button px-6 py-3 font-bold text-button-text transition-colors'>
+                {t('Search_Conferences')}
+              </button>
+            </Link>
+          </motion.div>
+        )}
       </div>
     </motion.section>
   );

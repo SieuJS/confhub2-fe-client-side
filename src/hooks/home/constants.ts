@@ -1500,6 +1500,7 @@ export const exampleFlights = [
 export interface WorldMapProps extends React.SVGProps<SVGSVGElement> {
   flights?: Flight[]
   coordinates?: { [key: string]: { x: number; y: number } }
+  showFlightEffect: boolean;
 }
 
 // --- Hằng số Thời gian Animation (tính bằng giây) ---
