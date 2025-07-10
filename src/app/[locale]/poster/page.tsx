@@ -20,8 +20,8 @@ export default function PosterPage() {
       {/* <DataProcessingFlowchartPhase2 /> */}
       {/* <DataProcessingFlowchartPhase3 /> */}
       {/* <ChatbotArchitectureDiagram /> */}
-      {/* <Poster /> */}
-      <PosterExporter />
+      <Poster />
+      {/* <PosterExporter /> */}
       {/* <A4PaperContainer title='Hình 1: Sơ đồ luồng xử lý API tích hợp cơ chế Retry và Fallback'>
         <FlowchartDiagram />
       </A4PaperContainer>

@@ -42,7 +42,7 @@ const Poster: React.FC = () => {
         width: `${A0_WIDTH_PX}px`,
         height: `${A0_HEIGHT_PX}px`,
         fontFamily: 'Arial, sans-serif',
-        // transform: 'scale(0.08)',
+        transform: 'scale(0.08)',
         transformOrigin: 'top left',
         margin: 'auto'
       }}
