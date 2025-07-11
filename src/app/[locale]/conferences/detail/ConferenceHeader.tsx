@@ -62,6 +62,9 @@ const ConferenceHeader: React.FC<ConferenceHeaderProps> = ({
   // === THÊM BIẾN ĐỂ XỬ LÝ ĐỊA ĐIỂM MỘT CÁCH AN TOÀN HƠN ===
   const firstLocation = lastOrganization?.locations?.[0];
 
+  // DETERMINE IF IT'S A "BY USERS" conferenceData
+  const isByUserEvent = conferenceData?.creatorId !== null && conferenceData?.creatorId !== undefined;
+
   return (
     <div className='flex flex-col items-start md:flex-row'>
       {/* Image container */}
@@ -82,7 +85,7 @@ const ConferenceHeader: React.FC<ConferenceHeaderProps> = ({
       {/* Text details container */}
       <div className='w-full md:w-3/4 md:pl-6'>
         {/* === BƯỚC 3: CẬP NHẬT SVG CẢNH BÁO === */}
-        {conferenceData?.ranks?.length === 0 && (
+        {isByUserEvent && (
           <div
             className='mb-4 rounded-md border-l-4 border-yellow-500 bg-yellow-100 p-4 text-yellow-700 shadow-sm'
             role='alert'

@@ -12,7 +12,7 @@ export interface ModelOption {
 export const AVAILABLE_MODELS: ModelOption[] = [
   {
     name: 'Sirius',
-    value: 'gemini-2.0-flash',
+    value: 'gemini-2.5-flash',
     // description: 'Ngôi sao cân bằng: Hiệu suất tối ưu, tốc độ ấn tượng.',
     detailedDescription:
       "Ngôi sao cân bằng: Hiệu suất tối ưu, tốc độ ấn tượng.",
@@ -20,7 +20,7 @@ export const AVAILABLE_MODELS: ModelOption[] = [
   },
   {
     name: 'Mercury',
-    value: 'gemini-2.5-flash-preview-05-20',
+    value: 'gemini-2.5-pro',
     // description: 'Bậc thầy phân tích: Sức mạnh vượt trội, giải quyết vấn đề chuyên sâu.',
     detailedDescription:
       'Bậc thầy phân tích: Sức mạnh vượt trội, giải quyết vấn đề chuyên sâu.',
@@ -28,7 +28,7 @@ export const AVAILABLE_MODELS: ModelOption[] = [
   },
   {
     name: 'Nebula',
-    value: 'gemini-2.0-flash-lite',
+    value: 'gemini-2.5-flash-lite-preview-06-17',
     // description: 'Chớp nhoáng tức thời: Phản hồi siêu tốc, độ trễ cực thấp.',
     detailedDescription:
       'Chớp nhoáng tức thời: Phản hồi siêu tốc, độ trễ cực thấp.',
