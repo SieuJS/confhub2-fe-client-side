@@ -14,7 +14,7 @@ export default function AILanding() {
       <AIBanner />
       <AIAbout />
       <AIAbilities />
-      <AIStatistics />
+      {/* <AIStatistics /> */}
       <AIFAQ />
       <ScrollToTopButton />
     </div>

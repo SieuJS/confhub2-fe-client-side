@@ -47,8 +47,10 @@ const FlowStep: React.FC<FlowStepProps> = ({
     </div>
 
     <div className='flex flex-col items-start'>
-      <h4 className={`text-left text-9xl font-bold ${textColor}`}>{title}</h4>
-      <p className={`mt-2 text-left text-8xl ${textColor} opacity-90`}>
+      <h4 className={`px-10 text-left text-9xl font-bold ${textColor}`}>
+        {title}
+      </h4>
+      <p className={`mt-2 px-10 text-left text-8xl ${textColor} opacity-90`}>
         {description}
       </p>
     </div>

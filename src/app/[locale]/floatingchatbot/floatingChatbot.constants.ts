@@ -18,7 +18,8 @@ export const CHATBOT_FULL_PAGE_PATHS_TO_HIDE_FLOATING: (keyof typeof appPathname
   '/chatbot/regularchat',
   '/chatbot/livechat',
   '/chatbot/history',
-  '/poster'
+  '/poster',
+  '/chatbot/landing'
 ];
 
 export const MIN_REASONABLE_TEXT_LENGTH = 500;

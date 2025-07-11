@@ -3,37 +3,20 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
+import { ru } from 'date-fns/locale'
 
 const languages = [
-  'mọi ngôn ngữ', // Vietnamese
-  'all languages', // English
-  'todas las lenguas', // Spanish
-  'toutes les langues', // French
-  'alle Sprachen', // German
-  'tutti le lingue', // Italian
-  'すべての言語', // Japanese
-  '所有语言', // Chinese (Simplified)
-  '모든 언어', // Korean
-  'барлық тілдер', // Kazakh
-  'جميع اللغات', // Arabic
-  'всі мови', // Ukrainian
-  'všechny jazyky', // Czech
-  'wszystkie języki', // Polish
-  'todos os idiomas', // Portuguese
-  'semua bahasa', // Indonesian
-  'всички езици', // Bulgarian
-  'toate limbile', // Romanian
-  'tüm diller', // Turkish
-  'כל השפות', // Hebrew (all ha-safot)
-  'όλες οι γλώσσες', // Greek (oles oi glosses)
-  'हर भाषाएँ', // Hindi (har bhashayen)
-  'ทุกภาษา', // Thai (thuk phasa)
-  'ሁሉም ቋንቋዎች', // Amharic (huloom quanqu'ochi)
-  'كل لغات', // Urdu (kul lughat)
-  'Všechny jazyky', // Slovak (Všetky jazyky)
-  'barcha tillar', //Uzbek (Cyrillic)
-  'ყველა ენაზე', // Georgian (qvela enaze)
-  'հոլսս լեզուներ' // Armenian (hols's lezunir)
+  'mọi ngôn ngữ', // Vietnamese vi
+  'all languages', // English en
+  'todas las lenguas', // Spanish es
+  'toutes les langues', // French fr
+  'alle Sprachen', // German de
+  'すべての言語', // Japanese ja
+  '所有语言', // Chinese (Simplified) zh-CN
+  '모든 언어', // Korean ko
+  'جميع اللغات', // Arabic ar
+  'все языки', // Russian ru
+  'تمام زبان‌ها' // Persian fa
 ]
 
 const AIAbout: React.FC = () => {
