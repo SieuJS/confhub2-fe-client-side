@@ -17,14 +17,14 @@ export default function SuperBannerFor() {
   const sloganText = t('Slogan_Website');
 
   // State để kiểm soát việc hiển thị hiệu ứng chuyến bay (màn hình >= 1024px)
-  const [showFlightEffect, setShowFlightEffect] = useState(true);
+  // const [showFlightEffect, setShowFlightEffect] = useState(true);
   // State để kiểm soát việc hiển thị nút tìm kiếm (màn hình < 1440px)
   const [showSearchButton, setShowSearchButton] = useState(true);
 
   useEffect(() => {
     const checkScreenSize = () => {
       // Logic cho hiệu ứng chuyến bay: hiển thị khi màn hình >= 1024px
-      setShowFlightEffect(window.innerWidth >= 1024);
+      // setShowFlightEffect(window.innerWidth >= 1024);
 
       // Logic cho nút tìm kiếm: hiển thị khi màn hình < 1440px
       // (nghĩa là không hiển thị khi màn hình >= 1440px)
@@ -56,7 +56,7 @@ export default function SuperBannerFor() {
           coordinates={countryCoordinates}
           className='h-full w-full object-cover opacity-70'
           aria-hidden='true'
-          showFlightEffect={showFlightEffect}
+          // showFlightEffect={showFlightEffect}
         />
       </div>
 

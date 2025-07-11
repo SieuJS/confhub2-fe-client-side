@@ -10,7 +10,7 @@ const WorldMap: React.FC<WorldMapProps> = ({
   flights = [],
   coordinates = {},
   className,
-  showFlightEffect = true,
+  // showFlightEffect = true,
   ...restProps
 }) => {
   // Call useFlightAnimation unconditionally at the top level
@@ -18,7 +18,7 @@ const WorldMap: React.FC<WorldMapProps> = ({
   // or no animations if flights/coordinates are empty or invalid.
   // However, in your useFlightAnimation hook, you already have `if (!flights.length) return []`
   // so it's safe to call it here.
-  const processedFlights = useFlightAnimation({ flights, coordinates });
+  // const processedFlights = useFlightAnimation({ flights, coordinates });
 
   return (
     <svg
@@ -43,13 +43,12 @@ const WorldMap: React.FC<WorldMapProps> = ({
         ))}
       </g>
 
-      {/* Layer 2: Vẽ hiệu ứng chuyến bay (đã được đơn giản hóa) */}
-      {/* CHỈ RENDER NẾU showFlightEffect LÀ TRUE */}
+{/*      
       {showFlightEffect && (
         <g id='flight-effects' strokeLinecap='round'>
           {processedFlights.map(flight => (
             <React.Fragment key={flight.key}>
-              {/* 1. ĐƯỜNG BAY HOẠT HÌNH */}
+              
               <motion.path
                 d={flight.pathData}
                 fill='none'
@@ -63,7 +62,6 @@ const WorldMap: React.FC<WorldMapProps> = ({
                 }}
                 transition={flight.pathTransition}
               />
-              {/* 2. HIỆU ỨNG SÓNG LAN TỎA TẠI ĐIỂM ĐẾN */}
               <motion.circle
                 cx={flight.endCoords.x}
                 cy={flight.endCoords.y}
@@ -89,7 +87,7 @@ const WorldMap: React.FC<WorldMapProps> = ({
             </React.Fragment>
           ))}
         </g>
-      )}
+      )} */}
     </svg>
   );
 };

@@ -1,7 +1,6 @@
 // src/components/conferences/EventCard.tsx
 
-import React, { useState, useCallback, memo } from 'react'; // Import memo
-import Image from 'next/image';
+import React, { useState, useCallback, memo } from 'react';
 import { ConferenceInfo } from '../../../models/response/conference.list.response';
 import { Link, useRouter } from '@/src/navigation';
 import { useTranslations } from 'next-intl';
@@ -19,7 +18,6 @@ interface EventCardProps {
   onToggleCalendar: (conferenceId: string, currentStatus: boolean) => Promise<void>;
 }
 
-// Đặt tên cho component gốc là EventCardComponent
 const EventCardComponent: React.FC<EventCardProps> = ({
   event,
   className,
@@ -102,7 +100,6 @@ const EventCardComponent: React.FC<EventCardProps> = ({
     ]
   )
 
-  // ... các hàm format, get color không đổi ...
   const formatDate = useCallback((dateString: string | undefined): string => {
     if (!dateString) return 'TBD'
     try {
@@ -114,7 +111,6 @@ const EventCardComponent: React.FC<EventCardProps> = ({
         day: 'numeric'
       })
     } catch (e) {
-      // console.error('Error formatting date:', dateString, e)
       return 'Invalid Date'
     }
   }, [])
@@ -167,7 +163,6 @@ const EventCardComponent: React.FC<EventCardProps> = ({
       case 'C':
         return 'bg-orange-100 text-orange-700 border border-orange-300'
       default:
-        // Default color for unknown ranks, though 'By Users' will override this
         return 'bg-gray-100 text-gray-60 border border-gray-300'
     }
   }, [])
@@ -186,7 +181,6 @@ const EventCardComponent: React.FC<EventCardProps> = ({
     }
   }, [])
 
-  // DETERMINE IF IT'S A "BY USERS" EVENT
   const isByUserEvent = event.creatorId !== null && event.creatorId !== undefined;
 
   return (
@@ -194,84 +188,64 @@ const EventCardComponent: React.FC<EventCardProps> = ({
       className={`flex flex-col overflow-hidden rounded-lg bg-white-pure shadow-lg transition duration-300 ease-in-out ${isBlacklisted ? '' : 'hover:shadow-xl'} ${className || ''}`}
       style={{ position: 'relative', ...style }}
     >
-      {/* Lớp phủ mờ và chữ Blacklisted */}
       {isBlacklisted && (
         <>
-          {/* Lớp phủ mờ */}
           <div className='pointer-events-none absolute inset-0 z-10 bg-gray-200 opacity-70 grayscale'></div>
-          {/* Chữ Blacklisted */}
           <div className='absolute left-2 top-2 z-20 rounded bg-red-600 px-2 py-1 text-xs font-semibold text-white'>
             {t('Blacklisted')}
           </div>
         </>
       )}
 
-      <div className='relative'>
-        <Image
-          src={'/bg-2.jpg'}
-          alt={event.title || 'Conference Image'}
-          width={400}
-          height={225}
-          style={{ objectFit: 'cover', width: '100%', height: '180px' }}
-          className={`w-full ${isBlacklisted ? 'grayscale' : 'hover:opacity-90'}`}
-          priority
-          onError={e => {
-            ; (e.target as HTMLImageElement).src = '/bg-2.jpg'
-          }}
-        />
-        <div className='absolute right-2 top-2 flex flex-col items-end space-y-1'>
-          {/* LOGIC ĐIỀU CHỈNH RANK/BY USERS */}
-          {isByUserEvent ? (
-            <span
-              className={`font-semibold bg-gray-100 text-gray-60 border border-gray-300 rounded px-2 py-1 text-xs`}
-            >
-              {t('By_Users')}
-            </span>
-          ) : (
-            (event.rank && 
-            <span
-              className={`font-semibold ${getRankColor(event?.rank || 'No info')} rounded px-2 py-1 text-xs`}
-            >
-              {`Rank: ${event.rank}`}
-            </span>)
-          )}
-          {event.accessType && (
-            <span
-              className={`rounded px-2 py-1 text-xs font-semibold ${getAccessTypeColor(event.accessType)}`}
-              title={`${t('Access_Type')}: ${event.accessType}`}
-            >
-              {event.accessType}
-            </span>
-          )}
-        </div>
-      </div>
-
-      <div
-        className={`flex flex-grow flex-col px-4 py-4 ${isBlacklisted ? 'pointer-events-none' : ''}`}
-      >
-        {' '}
-        {/* Thêm pointer-events-none vào đây để vô hiệu hóa tương tác */}
-        <div className='mb-2'>
-          {isBlacklisted ? (
-            <h3 className='text-left text-base font-bold opacity-50'>
-              {event.title} {event.acronym ? `(${event.acronym})` : ''}
-            </h3>
-          ) : (
-            <Link
-              href={{
-                pathname: `/conferences/detail`,
-                query: { id: event.id }
-              }}
-              className='group'
-            >
-              <h3 className='cursor-pointer text-left text-base font-bold  transition duration-300 group-hover:text-blue-600  dark:group-hover:text-blue-400'>
+      <div className={`flex flex-grow flex-col px-4 py-4 ${isBlacklisted ? 'pointer-events-none' : ''}`}>
+        <div className='relative mb-2 flex flex-col items-start'> {/* Thay đổi từ items-start justify-between sang flex-col items-start */}
+          <div className='flex-grow w-full'> {/* Đảm bảo title chiếm đủ không gian */}
+            {isBlacklisted ? (
+              <h3 className='text-left text-base font-bold opacity-50'>
                 {event.title} {event.acronym ? `(${event.acronym})` : ''}
               </h3>
-            </Link>
-          )}
+            ) : (
+              <Link
+                href={{
+                  pathname: `/conferences/detail`,
+                  query: { id: event.id }
+                }}
+                className='group'
+              >
+                <h3 className='cursor-pointer text-left text-base font-bold transition duration-300 group-hover:text-blue-600 dark:group-hover:text-blue-400'>
+                  {event.title} {event.acronym ? `(${event.acronym})` : ''}
+                </h3>
+              </Link>
+            )}
+          </div>
+          {/* Di chuyển phần rank và accessType xuống dưới title */}
+          <div className='mt-1 flex flex-wrap gap-1'> {/* Thêm mt-1 để tạo khoảng cách với title, dùng flex-wrap và gap-1 để các tag nằm cạnh nhau nếu đủ chỗ */}
+            {isByUserEvent ? (
+              <span
+                className={`font-semibold bg-gray-100 text-gray-60 border border-gray-300 rounded px-2 py-1 text-xs`}
+              >
+                {t('By_Users')}
+              </span>
+            ) : (
+              event.rank &&
+              <span
+                className={`font-semibold ${getRankColor(event?.rank || 'No info')} rounded px-2 py-1 text-xs`}
+              >
+                {`Rank: ${event.rank}`}
+              </span>
+            )}
+            {event.accessType && (
+              <span
+                className={`rounded px-2 py-1 text-xs font-semibold ${getAccessTypeColor(event.accessType)}`}
+                title={`${t('Access_Type')}: ${event.accessType}`}
+              >
+                {event.accessType}
+              </span>
+            )}
+          </div>
         </div>
-        <div className='mb-3 flex items-center text-xs  transition duration-300 '>
-          {/* Sử dụng Lucide MapPin */}
+
+        <div className='mb-3 flex items-center text-xs transition duration-300 '>
           <MapPin
             className='mr-1.5 flex-shrink-0 text-red-600'
             size={16}
@@ -279,8 +253,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({
           />
           <span className='line-clamp-1 text-left'>{locationString}</span>
         </div>
-        <div className='mb-3 flex items-center text-xs  transition duration-300 '>
-          {/* Sử dụng Lucide CalendarDays */}
+        <div className='mb-3 flex items-center text-xs transition duration-300 '>
           <CalendarDays
             className='mr-1.5 flex-shrink-0 text-red-600'
             size={16}
@@ -291,7 +264,6 @@ const EventCardComponent: React.FC<EventCardProps> = ({
           </span>
         </div>
         <div className='mb-4'>
-          {/* --- SỬA ĐỔI TẠI ĐÂY --- */}
           <div className='flex flex-wrap items-center gap-1.5'>
             {event.topics && event.topics.length > 0 ? (
               <>
@@ -299,7 +271,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({
                   isBlacklisted ? (
                     <span
                       key={topic}
-                      className='inline-flex max-w-full cursor-default items-center justify-center break-words rounded-full bg-gray-10 px-2.5 py-1.5 text-center text-xs font-medium leading-normal  opacity-50 '
+                      className='inline-flex max-w-full cursor-default items-center justify-center break-words rounded-full bg-gray-10 px-2.5 py-1.5 text-center text-xs font-medium leading-normal opacity-50 '
                       title={topic}
                     >
                       {topic}
@@ -313,7 +285,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({
                       }}
                     >
                       <span
-                        className='inline-flex max-w-full cursor-pointer items-center justify-center break-words rounded-full bg-gray-10 px-2.5 py-1 text-center text-xs font-medium leading-normal  transition duration-200 hover:bg-gray-20 '
+                        className='inline-flex max-w-full cursor-pointer items-center justify-center break-words rounded-full bg-gray-10 px-2.5 py-1 text-center text-xs font-medium leading-normal transition duration-200 hover:bg-gray-20 '
                         title={topic}
                       >
                         {topic}
@@ -322,7 +294,6 @@ const EventCardComponent: React.FC<EventCardProps> = ({
                   )
                 )}
                 {event.topics.length > 3 && (
-                  /* --- BỎ mt-2 TẠY ĐÂY --- */
                   <span
                     key='more-topics'
                     className='mt-1 inline-flex max-w-full cursor-default items-center justify-center rounded-full bg-gray-30 px-2.5 py-1 text-xs font-medium '
@@ -333,7 +304,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({
                 )}
               </>
             ) : (
-              <span className='text-xs italic  '>{t('No_topics_listed')}</span>
+              <span className='text-xs italic '>{t('No_topics_listed')}</span>
             )}
           </div>
         </div>
@@ -342,11 +313,10 @@ const EventCardComponent: React.FC<EventCardProps> = ({
             <div className='relative'>
               <button
                 onClick={e => handleGoToWebsite(e, event.link || undefined)}
-                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-10 p-2  transition hover:bg-gray-20 hover:text-gray-80 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1   ${isBlacklisted || !event.link ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''}`}
+                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-10 p-2 transition hover:bg-gray-20 hover:text-gray-80 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${isBlacklisted || !event.link ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''}`}
                 disabled={isBlacklisted || !event.link}
                 title={t('Go_to_Website')}
               >
-                {/* Sử dụng Lucide SquareArrowOutUpRight */}
                 <SquareArrowOutUpRight size={18} strokeWidth={1.75} />
               </button>
             </div>
@@ -354,7 +324,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({
             <div className='relative'>
               <button
                 onClick={handleAddCalendarClick}
-                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-10 p-2 transition hover:bg-gray-20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1  ${isBlacklisted ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''}  ${isAddToCalendar ? 'bg-blue-50 text-blue-600 hover:text-blue-700  dark:text-blue-400 dark:hover:text-blue-300' : ' hover:text-gray-80 '} ${calendarLoading ? 'opacity-70' : ''}`}
+                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-10 p-2 transition hover:bg-gray-20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${isBlacklisted ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''} ${isAddToCalendar ? 'bg-blue-50 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300' : ' hover:text-gray-80 '} ${calendarLoading ? 'opacity-70' : ''}`}
                 style={{ minWidth: '36px', minHeight: '36px' }}
                 disabled={isBlacklisted || calendarLoading}
                 title={
@@ -376,7 +346,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({
             <div className='relative'>
               <button
                 onClick={handleFavoriteClick}
-                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-10 p-2 transition hover:bg-gray-20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1  ${isBlacklisted ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''}  ${isFollowing ? 'bg-yellow-50 text-yellow-500 hover:text-yellow-600 ' : ' hover:text-gray-800 '} ${followLoading ? 'opacity-70' : ''}`}
+                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gray-10 p-2 transition hover:bg-gray-20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${isBlacklisted ? 'disabled:cursor-not-allowed disabled:opacity-50' : ''} ${isFollowing ? 'bg-yellow-50 text-yellow-500 hover:text-yellow-600 ' : ' hover:text-gray-80 '} ${followLoading ? 'opacity-70' : ''}`}
                 style={{ minWidth: '36px', minHeight: '36px' }}
                 disabled={isBlacklisted || followLoading}
                 title={isFollowing ? t('Unfollow') : t('Follow')}
@@ -401,8 +371,5 @@ const EventCardComponent: React.FC<EventCardProps> = ({
   )
 }
 
-// Sử dụng React.memo để bọc component
 export const EventCard = memo(EventCardComponent);
-
-// Giữ lại default export nếu các file khác đang dùng
 export default EventCard;

@@ -13,7 +13,7 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
   const [events, setEvents] = useState<ConferenceListResponse | undefined>(initialData);
   const [totalItems, setTotalItems] = useState(initialData?.meta.totalItems || 0);
   const [currentPage, setCurrentPage] = useState(initialData?.meta.curPage || 1);
-  const [eventsPerPage, setEventPerPage] = useState(initialData?.meta.perPage.toString() || '4');
+  const [eventsPerPage, setEventPerPage] = useState(initialData?.meta.perPage.toString() || '12');
   
   // Khởi tạo loading là false NẾU có initialData.
   // Điều này cực kỳ quan trọng để ngăn loading khi F5.
@@ -49,7 +49,7 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
         topics: currentParams.getAll('topics'),
         publisher: currentParams.get('publisher') || undefined,
         page: currentParams.get('page') || '1',
-        perPage: currentParams.get('perPage') || '4',
+        perPage: currentParams.get('perPage') || '12',
       };
 
       const data = await fetchConferences(params);
