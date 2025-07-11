@@ -156,7 +156,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
           <button
             onClick={toggleAdvancedOptionsVisibility}
             // Thêm các class để làm nút nổi bật hơn
-            className='flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800 focus:outline-none transition-colors duration-200 ease-in-out underline' // Added text-blue-600, font-semibold, hover:text-blue-800, underline, flex items-center
+            className='flex items-center text-sm font-semibold text-blue-600 underline transition-colors duration-200 ease-in-out hover:text-blue-800 focus:outline-none' // Added text-blue-600, font-semibold, hover:text-blue-800, underline, flex items-center
           >
             {isAdvancedOptionsVisible ? (
               <>
@@ -254,6 +254,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                   <option value='B'>B</option>
                   <option value='C'>C</option>
                   <option value='Unranked'>Unranked</option>
+                  <option value='other'>Other</option>
                 </select>
               </div>
 
