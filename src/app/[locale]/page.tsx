@@ -7,7 +7,6 @@ import dynamic from 'next/dynamic';
 // Import các component tĩnh (Server Components hoặc Client Components đã được tách)
 import SuperBannerFor from './home/Banner'; // Đổi tên component cho nhất quán
 import ConsumerInsights from './home/ConsumerInsights';
-import IntroduceVisualization from './home/IntroduceVisualization';
 import FeatureComparisonTable from './home/FeatureComparisonTable';
 
 // BƯỚC QUAN TRỌNG: THÊM DÒNG NÀY
@@ -34,7 +33,6 @@ export default function HomePage() {
     <div>
       <SuperBannerFor />
       <ConsumerInsights />
-      <IntroduceVisualization />
       <FeatureComparisonTable />
       <DynamicFloatingChatbot />
     </div>
