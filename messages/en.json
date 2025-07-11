@@ -16,6 +16,7 @@
     "Show_Less": "Show Less",
     "Show_More_Count": "Show {count} more"
   },
+  "No_longer_used": "No longer used",
   "Confirm_Deletion_Title": "Confirm Deletion",
   "Confirm_Deletion_Message": "Are you sure you want to permanently delete this notification?",
   "Confirm_Bulk_Deletion_Title": "Confirm Bulk Deletion",

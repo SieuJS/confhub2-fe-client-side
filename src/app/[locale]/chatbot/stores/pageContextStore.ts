@@ -11,7 +11,7 @@ interface PageContextState {
 interface PageContextActions {
   setPageContext: (text: string | null, url: string | null, isEnabled: boolean) => void;
   clearPageContext: () => void;
-  // <<< THAY ĐỔI 1: Loại bỏ tham số `attach: boolean`
+  // <<< THAY ĐỔI: Giữ nguyên các thay đổi của bạn, chúng rất hợp lý >>>
   toggleContextAttachedNextSend: () => void;
   resetContextAttachedNextSend: () => void;
 }
@@ -37,7 +37,7 @@ export const usePageContextStore = create<PageContextState & PageContextActions>
       isCurrentPageFeatureEnabled: false, 
       isContextAttachedNextSend: false 
     }),
-    // <<< THAY ĐỔI 2: Cập nhật logic để tự động đảo ngược trạng thái
+    // <<< THAY ĐỔI: Logic này đã được cập nhật đúng để tự động đảo ngược trạng thái >>>
     toggleContextAttachedNextSend: () => set(state => {
       // Chỉ cho phép bật nếu tính năng được kích hoạt và có nội dung trang
       if (state.isCurrentPageFeatureEnabled && state.currentPageText) {

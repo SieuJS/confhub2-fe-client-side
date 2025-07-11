@@ -70,7 +70,9 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
             throw new Error(`HTTP error! status: ${response.status}`)
           }
           const data: string[] = await response.json()
+       
           setAvailableTopics(data)
+          // CHANGE END
         } catch (error) {
           // console.error('Could not fetch topics:', error)
         } finally {
@@ -104,7 +106,14 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
             throw new Error(`HTTP error! status: ${response.status}`)
           }
           const data: string[] = await response.json()
-          setAvailableSources(data)
+          // CHANGE START: Lọc bỏ các source rỗng, null, undefined, hoặc 'unknown'
+          const filteredSources = data.filter(
+            source =>
+              source && // Loại bỏ null, undefined, chuỗi rỗng ''
+              source.trim().toLowerCase() !== 'unknown' // Loại bỏ 'unknown' (không phân biệt hoa thường)
+          )
+          setAvailableSources(filteredSources)
+          // CHANGE END
         } catch (error) {
           // console.error('Could not fetch sources:', error)
         } finally {

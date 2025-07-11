@@ -26,11 +26,10 @@ import { submitChatFeedback } from '@/src/app/apis/chatbot/feedback';
 import { notification } from '@/src/utils/toast/notification';
 import ContextBanners from './chatInput/ContextBanners';
 import { usePageContextStore } from '../stores/pageContextStore';
-// THÊM CÁC IMPORTS MỚI
 import { useAlertDialog } from '@/src/hooks/regularchat/chatInput/useAlertDialog';
 import { useFileHandling } from '@/src/hooks/regularchat/chatInput/useFileHandling';
 import FilePreview from './chatInput/FilePreview';
-import Modal from '@/src/app/[locale]/chatbot/Modal'; // Re-import Modal ở đây
+import Modal from '@/src/app/[locale]/chatbot/Modal';
 
 interface RegularChatProps {
   isSmallContext?: boolean;
@@ -56,12 +55,10 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
   const [chatInputValue, setChatInputValue] = useState('');
   const [contextMessage, setContextMessage] = useState<string | null>(null);
 
-  // MỚI: Di chuyển useAlertDialog và useFileHandling lên đây
   const { isModalOpen, modalTitle, modalMessage, showAlertDialog, closeModal } = useAlertDialog();
   const { selectedFiles, setSelectedFiles, handleFileChange, handleRemoveFile } = useFileHandling({ showAlertDialog });
 
-
-  // <<< THAY ĐỔI: Lấy thêm hàm reset từ store >>>
+  // <<< THAY ĐỔI: Lấy thêm hàm resetContextAttachedNextSend từ store >>>
   const { 
     isCurrentPageFeatureEnabled, 
     isContextAttachedNextSend,
@@ -122,10 +119,12 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
     }
   };
 
-  // <<< THAY ĐỔI: Thêm useEffect để dọn dẹp state >>>
+  // <<< THAY ĐỔI: Thêm useEffect để dọn dẹp state khi không ở trong small context >>>
   useEffect(() => {
     // Nếu component không ở trong "small context" (tức là trang chatbot chính),
     // chúng ta phải đảm bảo rằng trạng thái sử dụng context được reset.
+    // Điều này ngăn chặn việc trạng thái "bật" bị giữ lại khi người dùng
+    // chuyển từ floating chat sang trang chatbot chính.
     if (!isSmallContext) {
       resetContextAttachedNextSend();
     }
@@ -151,8 +150,8 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
   };
 
   return (
+    // ... (JSX giữ nguyên) ...
     <div className='relative mx-auto bg-white rounded-xl flex h-full w-full flex-col overflow-hidden shadow-lg dark:bg-gray-800'>
-      {/* Header (giữ nguyên) */}
       <div className='flex-shrink-0 border-b border-gray-200 p-1.5 text-center dark:border-gray-700 dark:bg-gray-800'>
         <div className='flex items-center justify-center space-x-1 text-xs text-gray-600 dark:text-gray-400'>
           <span className={`h-2 w-2 rounded-full ${isConnected ? 'animate-pulse bg-green-500' : 'bg-red-500'}`}></span>
@@ -165,10 +164,8 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
         </div>
       </div>
 
-      {/* Conversation Toolbar (giữ nguyên) */}
       {shouldShowToolbar && <ConversationToolbar />}
 
-      {/* Chat Area (giữ nguyên) */}
       <ChatArea
         messages={chatMessages}
         showIntroduction={showIntroduction}
@@ -180,7 +177,6 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
         onOpenFeedbackModal={handleOpenFeedbackModal}
       />
 
-      {/* Loading Indicator (giữ nguyên) */}
       {showLoadingIndicator && (
         <div className='flex-shrink-0 border-t border-gray-200 px-3 py-1.5 sm:px-4 sm:py-2 dark:border-gray-700 dark:bg-gray-800'>
           <LoadingIndicator
@@ -191,7 +187,6 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
         </div>
       )}
 
-      {/* Context Banners (giữ nguyên) */}
       <div className="px-2">
         <ContextBanners
           contextSuggestionMessage={contextMessage}
@@ -200,13 +195,10 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
         />
       </div>
 
-      {/* MỚI: File Preview nằm ngoài input bar */}
-      {/* Thêm padding và margin-bottom để căn chỉnh với input bar */}
       <div className="px-2 mb-2"> 
         <FilePreview files={selectedFiles} onRemoveFile={handleRemoveFile} />
       </div>
 
-      {/* Chat Input Area (giữ nguyên) */}
       <RegularChatInputBar
         inputValue={chatInputValue}
         onInputChange={setChatInputValue}
@@ -221,7 +213,6 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
         onRegisterFillFunction={handleSetFillInput}
         isSmallContext={isSmallContext}
         onSetContextMessage={setContextMessage}
-        // THÊM CÁC PROPS MỚI CHO VIỆC XỬ LÝ FILE
         selectedFiles={selectedFiles}
         setSelectedFiles={setSelectedFiles}
         handleFileChange={handleFileChange}
@@ -229,7 +220,6 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
         showAlertDialog={showAlertDialog}
       />
 
-      {/* Email Confirmation Dialog (giữ nguyên) */}
       <EmailConfirmationDialog
         isOpen={showConfirmationDialog}
         data={confirmationData}
@@ -238,7 +228,6 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
         onClose={handleDialogClose}
       />
 
-      {/* Feedback Modal (giữ nguyên) */}
       <FeedbackModal
         isOpen={feedbackState.isOpen}
         feedbackType={feedbackState.type}
@@ -247,7 +236,6 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
         isSubmitting={isSubmittingFeedback}
       />
 
-      {/* MỚI: Modal cho AlertDialog, đã di chuyển từ ChatInput */}
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}

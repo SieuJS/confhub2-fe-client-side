@@ -185,17 +185,21 @@ export const useFormatConferenceData = (
     conference.ranks.forEach(rank => {
       const source = rank.source || t('Not_Available')
       const rankValue = rank.rank || t('Not_Available')
-      const field = rank.fieldOfResearch
+
+      // MODIFIED: Điều chỉnh logic cho fieldOfResearch
+      let field = rank.fieldOfResearch;
       if (
-        !field ||
-        field.trim() === '' ||
-        field.toUpperCase() === 'UNDEFINED'
+        !field || // Kiểm tra null, undefined, rỗng
+        field.trim() === '' || // Kiểm tra chuỗi rỗng sau khi trim
+        field.toUpperCase() === 'UNDEFINED' // Kiểm tra chuỗi "UNDEFINED"
       ) {
-        return
+        field = t('No_longer_used'); // Gán giá trị mong muốn
       }
+
       const groupKey = `${source}-${rankValue}`
       if (rankGroups.has(groupKey)) {
         const existingGroup = rankGroups.get(groupKey)!
+        // Chỉ thêm field nếu nó chưa tồn tại trong mảng
         if (!existingGroup.fieldsOfResearch.includes(field)) {
           existingGroup.fieldsOfResearch.push(field)
         }
@@ -203,12 +207,12 @@ export const useFormatConferenceData = (
         rankGroups.set(groupKey, {
           source: source,
           rank: rankValue,
-          fieldsOfResearch: [field]
+          fieldsOfResearch: [field] // Luôn thêm field đã được xử lý
         })
       }
     })
     return Array.from(rankGroups.values())
-  }, [conference?.ranks, t])
+  }, [conference?.ranks, t]) // Thêm t vào dependency array
 
   const summary = latestOrganization?.summary || latestOrganization?.summerize
   const callForPaper = latestOrganization?.callForPaper
