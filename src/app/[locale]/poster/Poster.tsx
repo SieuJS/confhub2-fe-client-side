@@ -1,3 +1,4 @@
+// src/app/[locale]/poster/Poster.tsx
 'use client'
 
 import React from 'react'
@@ -19,13 +20,13 @@ const Poster: React.FC = () => {
   const A0_HEIGHT_PX = 9933
 
   const evaluationResults = [
-    { label: 'Tỷ lệ tìm link hội nghị chính xác', value: '90%' },
-    { label: 'Ngày diễn ra hội nghị ', value: '80%' },
-    { label: 'Địa điểm tổ chức', value: '80%' },
-    { label: 'Ngày nộp bài', value: '80%' },
-    { label: 'Ngày thông báo ', value: '80%' },
-    { label: 'Ngày camera ready ', value: '80%' },
-    { label: 'Ngày register ', value: '80%' }
+    { label: 'Tỷ lệ tìm link hội nghị chính xác', value: '96.2%' },
+    { label: 'Ngày diễn ra hội nghị ', value: '97.1%' },
+    { label: 'Địa điểm tổ chức', value: '96.6%' },
+    { label: 'Ngày nộp bài', value: '86.4%' },
+    { label: 'Ngày thông báo ', value: '86.1%' },
+    { label: 'Ngày camera ready ', value: '88.8%' },
+    { label: 'Ngày register ', value: '95.7%' }
   ]
 
   const mainResult = evaluationResults.find(
@@ -78,7 +79,7 @@ const Poster: React.FC = () => {
           </div>
           <div className='text-left'>
             <p className='m-0'>SINH VIÊN THỰC HIỆN:</p>
-            <ul className='m-0 list-none py-0 '>
+            <ul className='m-0 list-none py-0 pr-4'>
               <li>Lê Lâm Lợi - 21120284</li>
               <li>Nguyễn Văn Siêu - 21120321</li>
               <li>Nguyễn Trọng Trí - 21120344</li>
@@ -90,9 +91,9 @@ const Poster: React.FC = () => {
         </div>
       </header>
 
-      {/* MAIN CONTENT - UPDATED TO 4 COLUMNS */}
+      {/* MAIN CONTENT - CẬP NHẬT THÀNH 3 CỘT */}
       <div className='flex flex-1 gap-[78px] p-[125px]'>
-        {/* Column 1: Bối cảnh, Tóm tắt & Giải pháp */}
+        {/* === CỘT 1: Bối cảnh, Tóm tắt & So sánh === */}
         <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[94px] shadow-sm'>
           <div className='mb-[94px]'>
             <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
@@ -123,81 +124,53 @@ const Poster: React.FC = () => {
           </div>
           <div>
             <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
-              3. So sánh
+              3. So sánh các tính năng với các công cụ khác
             </h3>
             <ComparisonTable />
           </div>
         </div>
 
-        {/* Column 2: Các tính năng chính */}
+        {/* === CỘT 2: Giải pháp & Công nghệ (Phần 1) === */}
         <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[94px] shadow-sm'>
           <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
             4. Giải pháp & Công nghệ
           </h3>
           <div className='mb-[94px] flex flex-1 flex-col'>
             <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
-              Sơ đồ tương tác Admin - Server (Thu thập dữ liệu)
-            </h4>
-
-            <div className='mt-[30px] min-h-[1600px] w-full'>
-              {/* <DataCollectionFlowchart /> */}
-              <AdminServerFlowchart />
-            </div>
-          </div>
-
-          <div className='flex flex-1 flex-col'>
-            <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
               Kiến trúc hệ thống
             </h4>
-
-            {/* Tích hợp component sơ đồ kiến trúc mới */}
             <div className='flex-grow'>
               <SystemArchitectureDiagram />
             </div>
           </div>
-        </div>
-
-        {/* Column 3: Live Chat & Kết quả đánh giá */}
-        {/* <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[94px] shadow-sm'>
-          <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
-            5. Các tính năng chính
-          </h3>
           <div className='flex flex-1 flex-col'>
-            <div className='mb-[78px] flex w-full  items-center justify-center overflow-hidden rounded-[31px] border-[6px] border-dashed border-gray-400 bg-white p-[31px]'>
-              <div className='w-full'>
-                [Sơ đồ tương tác giữa Client và Server sẽ được hiển thị ở đây]
-              </div>
-            </div>
-            <div className='flex w-full items-center justify-center overflow-hidden rounded-[31px] border-[6px] border-dashed border-gray-400 bg-white p-[31px]'>
-              <div className='w-full'>
-                [Sơ đồ tương tác giữa Admin và Server sẽ được hiển thị ở đây]
-              </div>
+            <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
+              Sơ đồ tương tác Admin - Server (Thu thập dữ liệu)
+            </h4>
+            <div className='mt-[30px] flex-grow'>
+              <AdminServerFlowchart />
             </div>
           </div>
-        </div> */}
+        </div>
 
-        {/* BƯỚC 2: SỬ DỤNG COMPONENT BẢNG SO SÁNH */}
+        {/* === CỘT 3: Giải pháp (Phần 2) & Kết quả === */}
         <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[94px] shadow-sm'>
-          <div className='mb-[94px] flex flex-1 flex-col'>
-            <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
-              6. Sơ đồ tương tác client-server
-            </h3>
-
-            <div className='flex w-full  items-center justify-center rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-200 p-[31px]'>
-              {/* <ChatbotInterface /> */}
-              {/* [Sơ đồ tương tác giữa Client và Server sẽ được hiển thị ở đây] */}
+          {/* --- Section 1: Client-Server Diagram --- */}
+          <div className='mb-[94px] flex flex-col'>
+            <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
+              Sơ đồ tương tác client-server
+            </h4>
+            <div className='flex flex-grow items-center justify-center'>
               <ClientServerFlowchart />
             </div>
           </div>
-          <div>
+
+          {/* --- Section 2: Evaluation Results --- */}
+          <div className='flex flex-1 flex-col'>
             <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
-              7. Kết quả đánh giá
+              5. Kết quả đánh giá
             </h3>
-            {/* <p className='mb-[78px] text-[113px] leading-relaxed'>
-              Hệ thống cho thấy hiệu quả vượt trội trong việc tự động hóa thu
-              thập dữ liệu:
-            </p> */}
-            {/* START: UPDATED SECTION */}
+
             {mainResult && (
               <div className='mb-[62px] rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-100 p-[94px] text-center'>
                 <p className='mb-[31px] text-[150px] font-semibold text-gray-800'>
@@ -209,28 +182,25 @@ const Poster: React.FC = () => {
               </div>
             )}
 
-            {/* Tiêu đề cho các trường còn lại */}
             <p className='mb-[62px] text-center text-[150px] font-bold text-gray-800'>
               Tỷ lệ trích xuất các trường chính xác
             </p>
 
-            {/* Lưới hiển thị 6 trường còn lại */}
             <div className='grid grid-cols-2 gap-[62px]'>
               {otherResults.map((result, index) => (
                 <div
                   key={index}
-                  className='flex flex-col items-center justify-center rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-100 p-[62px]'
+                  className='flex flex-col items-center justify-center rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-100 p-[62px] px-12'
                 >
-                  <span className='mb-[20px] px-40 text-center text-[150px] text-gray-800'>
+                  <span className='mb-[20px] whitespace-nowrap px-16 text-center text-[150px] text-gray-800'>
                     {result.label}
                   </span>
-                  <span className='text-[220px] font-extrabold text-[#e67e22]'>
+                  <span className='px-96 text-[220px] font-extrabold text-[#e67e22]'>
                     {result.value}
                   </span>
                 </div>
               ))}
             </div>
-            {/* END: UPDATED SECTION */}
           </div>
         </div>
       </div>

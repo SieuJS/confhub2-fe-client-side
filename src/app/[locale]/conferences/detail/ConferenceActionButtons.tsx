@@ -18,7 +18,6 @@ import {
   Ban,
   Loader2, // Import icon loading,
   Send // Import icon cho nút Submit
-
 } from 'lucide-react'
 
 interface ConferenceActionButtonsProps {
@@ -91,14 +90,13 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
     setIsSubmitModalOpen(false)
   }
 
-
   const renderShareMenu = () => {
     if (openMenu !== 'share') return null
     const menuItemClass =
       'share-menu-container block w-full px-4 py-2 text-left text-sm hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed'
     return (
       <div
-        className='absolute right-0 z-20 mt-2 w-56 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'
+        className='absolute right-0 z-20 mt-2 w-56 rounded-md bg-white-pure shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'
         style={{ top: '100%' }}
       >
         <div className='py-1'>
@@ -376,7 +374,6 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
           </span>
         </Button>
 
-
         {/* NEW: Submit Paper Button */}
         <Button
           onClick={() => checkLoginAndRedirect(handleSubmitPaperClick)}
@@ -396,7 +393,6 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
           <span className='hidden sm:inline'>{t('Submit_Paper_Button')}</span>
         </Button>
 
-
         {/* Modal for Submit Paper */}
         <Modal
           isOpen={isSubmitModalOpen}
@@ -405,8 +401,16 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
           size='sm'
           footer={
             // THAY ĐỔI QUAN TRỌNG Ở ĐÂY: justify-start thay vì justify-end
-            <div className='flex justify-end'> {/* Thay đổi justify-end thành justify-start */}
-              <Button onClick={closeSubmitModal} variant='secondary' className='px-4 py-2 text-sm'> {/* Thêm padding và text-size để nút trông đẹp hơn */}
+            <div className='flex justify-end'>
+              {' '}
+              {/* Thay đổi justify-end thành justify-start */}
+              <Button
+                onClick={closeSubmitModal}
+                variant='secondary'
+                className='px-4 py-2 text-sm'
+              >
+                {' '}
+                {/* Thêm padding và text-size để nút trông đẹp hơn */}
                 {t('Close_Button')}
               </Button>
             </div>
@@ -414,7 +418,6 @@ const ConferenceActionButtons: React.FC<ConferenceActionButtonsProps> = ({
         >
           <p>{t('Submit_Paper_Modal_Message')}</p>
         </Modal>
-
       </div>
     </div>
   )
