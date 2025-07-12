@@ -368,7 +368,7 @@ const NotificationsTab: React.FC = () => {
         title={modalState.title}
         size='sm'
         footer={
-          <>
+          <div className='flex justify-between'>
             <Button
               variant='secondary'
               onClick={hideConfirmationModal}
@@ -386,7 +386,7 @@ const NotificationsTab: React.FC = () => {
               )}
               {t('Confirm') || 'Confirm'}
             </Button>
-          </>
+          </div>
         }
       >
         <p>{modalState.message}</p>
