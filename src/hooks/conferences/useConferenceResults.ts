@@ -47,6 +47,7 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
         subFromDate: currentParams.get('subFromDate') || undefined,
         subToDate: currentParams.get('subToDate') || undefined,
         topics: currentParams.getAll('topics'),
+        researchFields: currentParams.getAll('researchFields'),
         publisher: currentParams.get('publisher') || undefined,
         page: currentParams.get('page') || '1',
         perPage: currentParams.get('perPage') || '12',

@@ -22,10 +22,8 @@ interface SearchParamsForURL {
   type?: 'Online' | 'Offline' | 'Hybrid' | null;
   subFromDate?: Date | null;
   subToDate?: Date | null;
-  publisher?: string | null;
   rank?: string | null;
   source?: string | null;
-  averageScore?: string | null;
   topics?: string[];
   fieldOfResearch?: string[];
 }
@@ -55,15 +53,13 @@ export default function ConferencesPageClient({ locale, initialData }: Conferenc
       if (searchParamsFromComponent.toDate) newParams.set('toDate', searchParamsFromComponent.toDate.toISOString().split('T')[0]);
       if (searchParamsFromComponent.rank) newParams.set('rank', searchParamsFromComponent.rank);
       if (searchParamsFromComponent.source) newParams.set('source', searchParamsFromComponent.source);
-      if (searchParamsFromComponent.publisher) newParams.set('publisher', searchParamsFromComponent.publisher);
       if (searchParamsFromComponent.subFromDate) newParams.set('subFromDate', searchParamsFromComponent.subFromDate.toISOString().split('T')[0]);
       if (searchParamsFromComponent.subToDate) newParams.set('subToDate', searchParamsFromComponent.subToDate.toISOString().split('T')[0]);
-      if (searchParamsFromComponent.averageScore) newParams.set('averageScore', searchParamsFromComponent.averageScore);
       if (searchParamsFromComponent.topics && searchParamsFromComponent.topics.length > 0) {
         searchParamsFromComponent.topics.forEach(topic => newParams.append('topics', topic));
       }
       if (searchParamsFromComponent.fieldOfResearch && searchParamsFromComponent.fieldOfResearch.length > 0) {
-        searchParamsFromComponent.fieldOfResearch.forEach(field => newParams.append('fieldOfResearch', field));
+        searchParamsFromComponent.fieldOfResearch.forEach(field => newParams.append('researchFields', field));
       }
 
       // ĐIỀU CHỈNH Ở ĐÂY:
@@ -81,7 +77,6 @@ export default function ConferencesPageClient({ locale, initialData }: Conferenc
           query[key] = value;
         }
       }
-
       // Sử dụng cú pháp object cho router.push
       router.push({
         pathname: pathname as AppPathname, // Ép kiểu pathname để TypeScript hiểu nó là một đường dẫn hợp lệ

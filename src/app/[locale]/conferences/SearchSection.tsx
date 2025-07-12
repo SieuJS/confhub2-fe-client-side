@@ -19,10 +19,8 @@ interface SearchSectionProps {
     type?: 'Online' | 'Offline' | 'Hybrid' | null
     subFromDate?: Date | null
     subToDate?: Date | null
-    publisher?: string | null
     rank?: string | null
     source?: string | null
-    averageScore?: string | null
     topics?: string[]
     fieldOfResearch?: string[]
   }) => void
@@ -282,7 +280,9 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
             size='small'
             rounded
             className=''
-            onClick={handleSearchClick}
+            onClick={() => {
+              handleSearchClick();
+            }}
           >
             {t('Search')}
           </Button>

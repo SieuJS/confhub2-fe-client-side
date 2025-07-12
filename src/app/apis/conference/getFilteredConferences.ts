@@ -14,6 +14,7 @@ export interface FetchConferencesParams {
   rank?: string;
   source?: string;
   topics?: string[];
+  researchFields?: string[];
   publisher?: string;
   subFromDate?: string;
   subToDate?: string;

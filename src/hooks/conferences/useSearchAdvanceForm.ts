@@ -7,14 +7,10 @@ interface UseSearchAdvanceFormProps {
   selectedRank: string | null;
   onSourceChange: (source: string | null) => void;
   selectedSource: string | null;
-  onAverageScoreChange: (averageScore: string | null) => void;
-  selectedAverageScore: string | null;
   onTopicsChange: (topics: string[]) => void;
   selectedTopics: string[];
   onFieldOfResearchChange: (fields: string[]) => void;
   selectedFieldsOfResearch: string[];
-  onPublisherChange: (publisher: string | null) => void;
-  selectedPublisher: string | null;
   // --- THÊM PROP MỚI ---
   availableTopics: string[]; // Nhận danh sách topics từ component cha
 }
@@ -24,14 +20,10 @@ const useSearchAdvanceForm = ({
   selectedRank,
   onSourceChange,
   selectedSource,
-  onAverageScoreChange,
-  selectedAverageScore,
   onTopicsChange,
   selectedTopics,
   onFieldOfResearchChange,
   selectedFieldsOfResearch,
-  onPublisherChange,
-  selectedPublisher,
   // --- NHẬN PROP MỚI ---
   availableTopics,
 }: UseSearchAdvanceFormProps) => {
@@ -140,20 +132,6 @@ const useSearchAdvanceForm = ({
     onSourceChange(event.target.value === "" ? null : event.target.value);
   };
 
-  const handleAverageScoreChangeInput = (event: ChangeEvent<HTMLSelectElement>) => {
-    onAverageScoreChange(event.target.value === "" ? null : event.target.value);
-  };
-
-  const handlePublisherInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onPublisherChange(event.target.value || null); // Directly update parent state
-  };
-  const handlePublisherEnter = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      onPublisherChange(event.currentTarget.value || null)
-    }
-  }
-
-
   return {
     topicsInput,
     topicSuggestions,
@@ -168,10 +146,7 @@ const useSearchAdvanceForm = ({
     handleFieldOfResearchInputKeyDown,
     handleRemoveFieldOfResearch,
     handleRankChangeInput,
-    handleSourceChangeInput,
-    handleAverageScoreChangeInput,
-    handlePublisherInputChange,
-    handlePublisherEnter
+    handleSourceChangeInput
   };
 };
 
