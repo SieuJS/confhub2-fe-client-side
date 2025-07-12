@@ -22,12 +22,7 @@ interface SearchAdvanceSectionProps {
   selectedRank: string | null
   onSourceChange: (source: string | null) => void
   selectedSource: string | null
-  // Props mới cho Publisher
-  onPublisherChange: (publisher: string | null) => void
-  selectedPublisher: string | null
   // Props mới cho Average Score
-  onAverageScoreChange: (score: string | null) => void
-  selectedAverageScore: string | null
   onTopicsChange: (topics: string[]) => void
   selectedTopics: string[]
   onFieldOfResearchChange: (fields: string[]) => void
@@ -45,10 +40,6 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
   selectedRank,
   onSourceChange,
   selectedSource,
-  onPublisherChange,
-  selectedPublisher,
-  onAverageScoreChange,
-  selectedAverageScore,
   onTopicsChange,
   selectedTopics,
   onFieldOfResearchChange,
@@ -147,17 +138,17 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
     handleRemoveFieldOfResearch,
     handleRankChangeInput,
     handleSourceChangeInput,
-    handlePublisherChangeInput, // Handler mới từ hook
-    handleAverageScoreChangeInput // Handler mới từ hook
+    // handlePublisherChangeInput, // Handler mới từ hook
+    // handleAverageScoreChangeInput // Handler mới từ hook
   } = useSearchAdvanceForm({
     onRankChange,
     selectedRank,
     onSourceChange,
     selectedSource,
-    onPublisherChange,
-    selectedPublisher,
-    onAverageScoreChange,
-    selectedAverageScore,
+    // onPublisherChange,
+    // selectedPublisher,
+    // onAverageScoreChange,
+    // selectedAverageScore,
     onTopicsChange,
     selectedTopics,
     onFieldOfResearchChange,
@@ -190,7 +181,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
 
         {/* Khối nội dung bộ lọc nâng cao, chỉ hiển thị khi isAdvancedOptionsVisible là true */}
         {isAdvancedOptionsVisible && (
-          <div className='mt-2 rounded-lg border bg-gray-50 p-4 shadow-md transition-all duration-300 ease-in-out'>
+          <div className='mt-2 rounded-lg border p-4 shadow-md transition-all duration-300 ease-in-out'>
             {/* Hàng đầu tiên của bộ lọc */}
             <div className='mb-4 grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5'>
               {/* --- Submission Date --- */}
@@ -266,7 +257,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
               </div>
 
               {/* --- Publisher (MỚI) --- */}
-              <div className='col-span-1'>
+              {/* <div className='col-span-1'>
                 <label className='mb-1 flex items-center text-sm font-bold' htmlFor='publisher'>
                   {t('Publisher')}:
                 </label>
@@ -284,10 +275,10 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                     <option key={publisher} value={publisher}>{publisher}</option>
                   ))}
                 </select>
-              </div>
+              </div> */}
 
               {/* --- Average Score (MỚI) --- */}
-              <div className='col-span-1'>
+              {/* <div className='col-span-1'>
                 <label className='mb-1 flex items-center text-sm font-bold' htmlFor='averageScore'>
                   {t('Average_Score')}:
                 </label>
@@ -299,7 +290,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                   className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow placeholder:text-primary focus:outline-none'
                   placeholder={t('e.g., 3.5')}
                 />
-              </div>
+              </div> */}
             </div>
 
             {/* Hàng thứ hai của bộ lọc */}

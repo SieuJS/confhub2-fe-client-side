@@ -8,11 +8,11 @@ interface UseSearchAdvanceFormProps {
   onSourceChange: (source: string | null) => void;
   selectedSource: string | null;
   // ADDED: Props for Publisher
-  onPublisherChange: (publisher: string | null) => void;
-  selectedPublisher: string | null;
-  // ADDED: Props for Average Score
-  onAverageScoreChange: (score: string | null) => void;
-  selectedAverageScore: string | null;
+  // onPublisherChange: (publisher: string | null) => void;
+  // selectedPublisher: string | null;
+  // // ADDED: Props for Average Score
+  // onAverageScoreChange: (score: string | null) => void;
+  // selectedAverageScore: string | null;
   onTopicsChange: (topics: string[]) => void;
   selectedTopics: string[];
   onFieldOfResearchChange: (fields: string[]) => void;
@@ -26,10 +26,10 @@ const useSearchAdvanceForm = ({
   onSourceChange,
   selectedSource,
   // ADDED: Destructure new props
-  onPublisherChange,
-  selectedPublisher,
-  onAverageScoreChange,
-  selectedAverageScore,
+  // onPublisherChange,
+  // selectedPublisher,
+  // onAverageScoreChange,
+  // selectedAverageScore,
   onTopicsChange,
   selectedTopics,
   onFieldOfResearchChange,
@@ -129,14 +129,14 @@ const useSearchAdvanceForm = ({
   };
 
   // ADDED: Handler for Publisher dropdown
-  const handlePublisherChangeInput = (event: ChangeEvent<HTMLSelectElement>) => {
-    onPublisherChange(event.target.value === "" ? null : event.target.value);
-  };
+  // const handlePublisherChangeInput = (event: ChangeEvent<HTMLSelectElement>) => {
+  //   onPublisherChange(event.target.value === "" ? null : event.target.value);
+  // };
 
-  // ADDED: Handler for Average Score input
-  const handleAverageScoreChangeInput = (event: ChangeEvent<HTMLInputElement>) => {
-    onAverageScoreChange(event.target.value === "" ? null : event.target.value);
-  };
+  // // ADDED: Handler for Average Score input
+  // const handleAverageScoreChangeInput = (event: ChangeEvent<HTMLInputElement>) => {
+  //   onAverageScoreChange(event.target.value === "" ? null : event.target.value);
+  // };
 
   return {
     topicsInput,
@@ -154,8 +154,8 @@ const useSearchAdvanceForm = ({
     handleRankChangeInput,
     handleSourceChangeInput,
     // ADDED: Return new handlers
-    handlePublisherChangeInput,
-    handleAverageScoreChangeInput,
+    // handlePublisherChangeInput,
+    // handleAverageScoreChangeInput,
   };
 };
 
