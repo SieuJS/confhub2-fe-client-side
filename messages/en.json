@@ -1992,5 +1992,8 @@
   "Type_a_message": "Type a message...",
   "Files": "Files",
   "File_Upload_Error": "File Upload Error",
-  "File_Upload_MaxFilesExceeded": "Max Files Exceeded (5 files)"
+  "File_Upload_MaxFilesExceeded": "Max Files Exceeded (5 files)",
+  "All_Ranks": "All Ranks",
+  "All_Sources": "All Sources",
+  "Loading_publishers": "Loading publishers..."
 }

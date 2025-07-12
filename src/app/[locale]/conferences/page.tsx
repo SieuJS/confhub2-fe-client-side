@@ -32,7 +32,7 @@ export default async function ConferencesPage({ params, searchParams }: Conferen
     researchFields: searchParams.researchFields as string[] || [],
     publisher: searchParams.publisher as string || undefined,
     page: searchParams.page as string || '1',
-    perPage: searchParams.perPage as string || '4', // Đặt một giá trị mặc định hợp lý
+    perPage: searchParams.perPage as string || '12', // Đặt một giá trị mặc định hợp lý
   };
 
     // Khai báo initialData với kiểu dữ liệu rõ ràng
