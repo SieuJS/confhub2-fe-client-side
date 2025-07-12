@@ -1,4 +1,4 @@
-// src/hooks/useSearchAdvanceForm.ts
+// src/hooks/conferences/useSearchAdvanceForm.ts
 
 import { useState, ChangeEvent, KeyboardEvent } from 'react';
 
@@ -7,12 +7,17 @@ interface UseSearchAdvanceFormProps {
   selectedRank: string | null;
   onSourceChange: (source: string | null) => void;
   selectedSource: string | null;
+  // ADDED: Props for Publisher
+  onPublisherChange: (publisher: string | null) => void;
+  selectedPublisher: string | null;
+  // ADDED: Props for Average Score
+  onAverageScoreChange: (score: string | null) => void;
+  selectedAverageScore: string | null;
   onTopicsChange: (topics: string[]) => void;
   selectedTopics: string[];
   onFieldOfResearchChange: (fields: string[]) => void;
   selectedFieldsOfResearch: string[];
-  // --- THÊM PROP MỚI ---
-  availableTopics: string[]; // Nhận danh sách topics từ component cha
+  availableTopics: string[];
 }
 
 const useSearchAdvanceForm = ({
@@ -20,11 +25,15 @@ const useSearchAdvanceForm = ({
   selectedRank,
   onSourceChange,
   selectedSource,
+  // ADDED: Destructure new props
+  onPublisherChange,
+  selectedPublisher,
+  onAverageScoreChange,
+  selectedAverageScore,
   onTopicsChange,
   selectedTopics,
   onFieldOfResearchChange,
   selectedFieldsOfResearch,
-  // --- NHẬN PROP MỚI ---
   availableTopics,
 }: UseSearchAdvanceFormProps) => {
   const [topicsInput, setTopicsInput] = useState('');
@@ -32,23 +41,16 @@ const useSearchAdvanceForm = ({
   const [fieldOfResearchInput, setFieldOfResearchInput] = useState('');
   const [fieldOfResearchSuggestions, setFieldOfResearchSuggestions] = useState<string[]>([]);
 
-  // --- KHÔNG CẦN FETCH Ở ĐÂY NỮA ---
-  // const [availableTopics, setAvailableTopics] = useState<string[]>([]);
-  // useEffect(() => { ... }, []);
-
-  // This availableFieldsOfResearch should likely be fetched or come from config
   const availableFieldsOfResearch = [
     "Computer Science", "Information Technology", "Software Engineering", "Data Analytics", "Artificial Intelligence",
     "Cybersecurity", "Information Systems", "Human-Computer Interaction", "Bioinformatics", "Computational Linguistics"
   ];
 
-  // Logic của các hàm handler không đổi, chúng sẽ sử dụng `availableTopics` từ props
   const handleTopicInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     setTopicsInput(inputValue);
     const trimmedInput = inputValue.trim();
     if (trimmedInput) {
-      // Sử dụng availableTopics từ props
       const suggestions = availableTopics.filter(topic =>
         topic.toLowerCase().includes(trimmedInput.toLowerCase()) && !selectedTopics.includes(topic)
       );
@@ -68,20 +70,14 @@ const useSearchAdvanceForm = ({
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
       const trimmedInput = topicsInput.trim();
-
-      // Chỉ cần kiểm tra xem input có rỗng và đã tồn tại trong danh sách chọn chưa
       if (trimmedInput && !selectedTopics.includes(trimmedInput)) {
-        // Thêm topic người dùng nhập vào danh sách đã chọn
         onTopicsChange([...selectedTopics, trimmedInput]);
-
-        // Reset ô input và danh sách gợi ý
         setTopicsInput('');
         setTopicSuggestions([]);
       }
     }
   };
 
-  // ... các hàm handler khác không thay đổi ...
   const handleRemoveTopic = (topicToRemove: string) => {
     onTopicsChange(selectedTopics.filter(topic => topic !== topicToRemove));
   };
@@ -113,7 +109,7 @@ const useSearchAdvanceForm = ({
         if (!selectedFieldsOfResearch.includes(trimmedInput) && availableFieldsOfResearch.includes(trimmedInput)) {
           onFieldOfResearchChange([...selectedFieldsOfResearch, trimmedInput]);
         } else if (fieldOfResearchSuggestions.length > 0) {
-          handleFieldOfResearchSuggestionClick(fieldOfResearchSuggestions[0]); // Select the first suggestion on Enter
+          handleFieldOfResearchSuggestionClick(fieldOfResearchSuggestions[0]);
         }
         setFieldOfResearchInput('');
         setFieldOfResearchSuggestions([]);
@@ -132,6 +128,16 @@ const useSearchAdvanceForm = ({
     onSourceChange(event.target.value === "" ? null : event.target.value);
   };
 
+  // ADDED: Handler for Publisher dropdown
+  const handlePublisherChangeInput = (event: ChangeEvent<HTMLSelectElement>) => {
+    onPublisherChange(event.target.value === "" ? null : event.target.value);
+  };
+
+  // ADDED: Handler for Average Score input
+  const handleAverageScoreChangeInput = (event: ChangeEvent<HTMLInputElement>) => {
+    onAverageScoreChange(event.target.value === "" ? null : event.target.value);
+  };
+
   return {
     topicsInput,
     topicSuggestions,
@@ -146,7 +152,10 @@ const useSearchAdvanceForm = ({
     handleFieldOfResearchInputKeyDown,
     handleRemoveFieldOfResearch,
     handleRankChangeInput,
-    handleSourceChangeInput
+    handleSourceChangeInput,
+    // ADDED: Return new handlers
+    handlePublisherChangeInput,
+    handleAverageScoreChangeInput,
   };
 };
 

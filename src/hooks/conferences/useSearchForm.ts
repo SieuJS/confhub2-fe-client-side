@@ -1,10 +1,7 @@
 // src/hooks/conferences/useSearchForm.ts
 import { useState, useEffect, useRef, ChangeEvent, KeyboardEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
-// Thay thế import này
-// import continentList from '../../models/data/locations-list.json';
-// Bổ sung import mới cho country_en.json
-import countryData from '@/src/app/[locale]/addconference/countries_en.json'; // Đảm bảo đường dẫn chính xác
+import countryData from '@/src/app/[locale]/addconference/countries_en.json';
 
 // --- Type Definitions ---
 type SearchFieldType = 'keyword' | 'title' | 'acronym';
@@ -23,6 +20,8 @@ interface SearchParams {
   subToDate?: Date | null;
   rank?: string | null;
   source?: string | null;
+  publisher?: string | null; // ADDED
+  averageScore?: string | null; // ADDED
   topics?: string[];
   fieldOfResearch?: string[];
 }
@@ -34,7 +33,6 @@ interface UseSearchFormProps {
 
 // --- Helper Functions for Initialization ---
 
-// Generic helper for single string parameters
 const getInitialStringParam = (
   searchParams: URLSearchParams,
   paramName: string
@@ -42,7 +40,6 @@ const getInitialStringParam = (
   return searchParams.get(paramName);
 };
 
-// Generic helper for array parameters (like topics)
 const getInitialArrayParam = (
   searchParams: URLSearchParams,
   paramName: string
@@ -101,7 +98,6 @@ const getInitialDateFromUrl = (
   return null;
 };
 
-// Helper to check if any advanced params exist to auto-show the section
 const shouldShowAdvancedOptionsInitially = (searchParams: URLSearchParams): boolean => {
   const advancedParams = ['submissionDate', 'publisher', 'rank', 'source', 'averageScore', 'topics', 'fieldOfResearch', 'subFromDate', 'subToDate'];
   return advancedParams.some(param => searchParams.has(param));
@@ -111,24 +107,15 @@ const dbUrl = process.env.NEXT_PUBLIC_DATABASE_URL;
 // --- Custom Hook ---
 const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
 
-  // Hàm trợ giúp để chuẩn hóa Date object về nửa đêm UTC của ngày đã chọn
   const adjustToUTCMidnight = (date: Date | null): Date | null => {
     if (!date) return null;
-    // Lấy năm, tháng, ngày từ đối tượng Date theo múi giờ cục bộ của nó
-    // Điều này quan trọng để đảm bảo chúng ta lấy đúng ngày mà người dùng nhìn thấy
     const year = date.getFullYear();
     const month = date.getMonth();
     const day = date.getDate();
-    // Tạo một đối tượng Date mới đại diện cho nửa đêm của ngày đó theo múi giờ UTC
-    // Điều này đảm bảo khi toISOString() được gọi, nó sẽ trả về đúng ngày
     return new Date(Date.UTC(year, month, day));
   };
 
-
-  // --- State Initialization ---
   const searchParams = new URLSearchParams(useSearchParams().toString());
-
-  // Thay đổi cách lấy danh sách quốc gia từ cấu trúc mới của country_en.json
   const countriesList: string[] = countryData.map((country: { name: string }) => country.name);
   const [availableLocations] = useState<string[]>(countriesList);
 
@@ -142,6 +129,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   // Initialize Advanced Fields
   const initialRank = getInitialStringParam(searchParams, 'rank');
   const initialSource = getInitialStringParam(searchParams, 'source');
+  const initialPublisher = getInitialStringParam(searchParams, 'publisher'); // ADDED
+  const initialAverageScore = getInitialStringParam(searchParams, 'averageScore'); // ADDED
   const initialTopics = getInitialArrayParam(searchParams, 'topics');
   const initialFieldsOfResearch = getInitialArrayParam(searchParams, 'researchFields');
   const initialShowAdvanced = shouldShowAdvancedOptionsInitially(searchParams);
@@ -171,6 +160,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   const [subToDate, setsubToDate] = useState<Date | null>(initialsubToDate);
   const [selectedRank, setSelectedRank] = useState<string | null>(initialRank);
   const [selectedSource, setSelectedSource] = useState<string | null>(initialSource);
+  const [selectedPublisher, setSelectedPublisher] = useState<string | null>(initialPublisher); // ADDED
+  const [selectedAverageScore, setSelectedAverageScore] = useState<string | null>(initialAverageScore); // ADDED
   const [selectedTopics, setSelectedTopics] = useState<string[]>(initialTopics);
   const [selectedFieldsOfResearch, setSelectedFieldsOfResearch] = useState<string[]>(initialFieldsOfResearch);
 
@@ -212,13 +203,14 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   const toggleAdvancedOptionsVisibility = () => { setIsAdvancedOptionsVisible(!isAdvancedOptionsVisible); };
   const handleSubmissionDateRangeChange = (dates: [Date | null, Date | null]) => {
     const [start, end] = dates;
-    // Áp dụng hàm chuẩn hóa cho cả ngày bắt đầu và ngày kết thúc
     setsubFromDate(adjustToUTCMidnight(start));
     setsubToDate(adjustToUTCMidnight(end));
   };
 
   const handleRankChange = (rank: string | null) => { setSelectedRank(rank); };
   const handleSourceChange = (source: string | null) => { setSelectedSource(source); };
+  const handlePublisherChange = (publisher: string | null) => { setSelectedPublisher(publisher); }; // ADDED
+  const handleAverageScoreChange = (score: string | null) => { setSelectedAverageScore(score); }; // ADDED
   const handleTopicsChange = (topics: string[]) => { setSelectedTopics(topics); };
   const handleFieldsOfResearchChange = (fields: string[]) => { setSelectedFieldsOfResearch(fields); };
 
@@ -233,6 +225,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
       subToDate: subToDate,
       rank: selectedRank,
       source: selectedSource,
+      publisher: selectedPublisher, // ADDED
+      averageScore: selectedAverageScore, // ADDED
       topics: selectedTopics && selectedTopics.length > 0 ? selectedTopics : undefined,
       fieldOfResearch: selectedFieldsOfResearch && selectedFieldsOfResearch.length > 0 ? selectedFieldsOfResearch : undefined,
     };
@@ -265,6 +259,8 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     setsubToDate(null);
     setSelectedRank(null);
     setSelectedSource(null);
+    setSelectedPublisher(null); // ADDED
+    setSelectedAverageScore(null); // ADDED
     setSelectedTopics([]);
     setSelectedFieldsOfResearch([]);
 
@@ -321,13 +317,16 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     subToDate,
     selectedRank,
     selectedSource,
+    selectedPublisher, // ADDED
+    selectedAverageScore, // ADDED
     selectedTopics,
     selectedFieldsOfResearch,
     toggleAdvancedOptionsVisibility,
     handleSubmissionDateRangeChange,
     handleRankChange,
     handleSourceChange,
-    handleAverageScoreChange, // FIX: Add this line
+    handlePublisherChange, // ADDED
+    handleAverageScoreChange,
     handleTopicsChange,
     handleFieldsOfResearchChange,
 
