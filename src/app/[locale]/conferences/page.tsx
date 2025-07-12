@@ -29,6 +29,7 @@ export default async function ConferencesPage({ params, searchParams }: Conferen
     subFromDate: searchParams.subFromDate as string || undefined,
     subToDate: searchParams.subToDate as string || undefined,
     topics: searchParams.topics as string[] || [],
+    researchFields: searchParams.researchFields as string[] || [],
     publisher: searchParams.publisher as string || undefined,
     page: searchParams.page as string || '1',
     perPage: searchParams.perPage as string || '4', // Đặt một giá trị mặc định hợp lý
