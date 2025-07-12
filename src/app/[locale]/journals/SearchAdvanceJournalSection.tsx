@@ -174,6 +174,7 @@ const SearchAdvanceJournalSection: React.FC<
                 placeholder={t('hIndexPlaceholder')}
                 value={hIndex}
                 onChange={e => onHIndexChange(e.target.value)}
+                maxLength={5}
               />
             </div>
           </div>
