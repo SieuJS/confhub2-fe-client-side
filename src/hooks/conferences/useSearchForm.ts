@@ -343,7 +343,7 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     handlePublisherChange,
     handleRankChange,
     handleSourceChange,
-    handleAverageScoreChange,
+    handleAverageScoreChange, // FIX: Add this line
     handleTopicsChange,
     handleFieldsOfResearchChange,
 
