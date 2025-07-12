@@ -20,10 +20,14 @@ interface SearchAdvanceSectionProps {
   selectedRank: string | null
   onSourceChange: (source: string | null) => void
   selectedSource: string | null
+  onAverageScoreChange: (averageScore: string | null) => void
+  selectedAverageScore: string | null
   onTopicsChange: (topics: string[]) => void
   selectedTopics: string[]
   onFieldOfResearchChange: (fields: string[]) => void
   selectedFieldsOfResearch: string[]
+  onPublisherChange: (publisher: string | null) => void
+  selectedPublisher: string | null
 }
 
 const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
@@ -36,10 +40,14 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
   selectedRank,
   onSourceChange,
   selectedSource,
+  onAverageScoreChange,
+  selectedAverageScore,
   onTopicsChange,
   selectedTopics,
   onFieldOfResearchChange,
-  selectedFieldsOfResearch
+  selectedFieldsOfResearch,
+  onPublisherChange,
+  selectedPublisher
 }) => {
   const t = useTranslations('')
 
@@ -130,16 +138,23 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
     handleFieldOfResearchInputKeyDown,
     handleRemoveFieldOfResearch,
     handleRankChangeInput,
-    handleSourceChangeInput
+    handleSourceChangeInput,
+    handleAverageScoreChangeInput,
+    handlePublisherInputChange,
+    handlePublisherEnter
   } = useSearchAdvanceForm({
     onRankChange,
     selectedRank,
     onSourceChange,
     selectedSource,
+    onAverageScoreChange,
+    selectedAverageScore,
     onTopicsChange,
     selectedTopics,
     onFieldOfResearchChange,
     selectedFieldsOfResearch,
+    onPublisherChange,
+    selectedPublisher,
     availableTopics: availableTopics
   })
 
@@ -354,86 +369,6 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                         type='button'
                         className='hover:text-gray-700 focus:outline-none'
                         onClick={() => handleRemoveTopic(topic)}
-                      >
-                        <svg
-                          xmlns='http://www.w3.org/2000/svg'
-                          className='h-3 w-3'
-                          viewBox='0 0 20 20'
-                          fill='currentColor'
-                        >
-                          <path
-                            fillRule='evenodd'
-                            d='M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z'
-                            clipRule='evenodd'
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Second row with Field of Research and other filters */}
-            <div className='mb-2 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
-              {/* Field of Research Section */}
-              <div className='relative col-span-2'>
-                <label
-                  className='mb-1  flex items-center text-sm font-bold'
-                  htmlFor='fieldOfResearch'
-                >
-                  <Tooltip.Root>
-                    <Tooltip.Trigger asChild>
-                      <span className='mr-1 inline-flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-gray-50 text-xs text-white hover:bg-gray-70'>
-                        !
-                      </span>
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content
-                        className='!z-50 !max-w-xs !rounded-md !bg-gray-800 !px-3 !py-2 !text-sm !text-white !opacity-100 !shadow-lg'
-                        sideOffset={5}
-                        side='bottom'
-                      >
-                        {t('tooltip_field_of_research')}
-                        <Tooltip.Arrow className='fill-gray-800' />
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
-                  {t('Field_of_Research')}:
-                </label>
-                <input
-                  type='text'
-                  id='fieldOfResearch'
-                  value={fieldOfResearchInput}
-                  onChange={handleFieldOfResearchInputChange}
-                  onKeyDown={handleFieldOfResearchInputKeyDown}
-                  className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow placeholder:text-primary focus:outline-none'
-                  placeholder={t('Enter_field_of_research')}
-                />
-                {fieldOfResearchSuggestions.length > 0 && (
-                  <ul className='absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded border border-gray-300 bg-white-pure shadow-md '>
-                    {fieldOfResearchSuggestions.map((suggestion, index) => (
-                      <li
-                        key={index}
-                        className='cursor-pointer px-3 py-1 text-sm hover:bg-gray-10 '
-                        onClick={() => handleFieldOfResearchSuggestionClick(suggestion)}
-                      >
-                        {suggestion}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <div className='mt-2 flex flex-wrap gap-1'>
-                  {selectedFieldsOfResearch.map((field, index) => (
-                    <div
-                      key={index}
-                      className='flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-sm '
-                    >
-                      <span>{field}</span>
-                      <button
-                        type='button'
-                        className='hover:text-gray-700 focus:outline-none'
-                        onClick={() => handleRemoveFieldOfResearch(field)}
                       >
                         <svg
                           xmlns='http://www.w3.org/2000/svg'

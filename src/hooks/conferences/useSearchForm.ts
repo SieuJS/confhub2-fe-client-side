@@ -21,8 +21,10 @@ interface SearchParams {
   type?: ConferenceType | null;
   subFromDate?: Date | null;
   subToDate?: Date | null;
+  publisher?: string | null;
   rank?: string | null;
   source?: string | null;
+  averageScore?: string | null;
   topics?: string[];
   fieldOfResearch?: string[];
 }
@@ -140,10 +142,12 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   const initialToDate = getInitialDateFromUrl(searchParams, 'toDate');
 
   // Initialize Advanced Fields
+  const initialPublisher = getInitialStringParam(searchParams, 'publisher');
   const initialRank = getInitialStringParam(searchParams, 'rank');
   const initialSource = getInitialStringParam(searchParams, 'source');
+  const initialAverageScore = getInitialStringParam(searchParams, 'averageScore');
   const initialTopics = getInitialArrayParam(searchParams, 'topics');
-  const initialFieldsOfResearch = getInitialArrayParam(searchParams, 'researchFields');
+  const initialFieldsOfResearch = getInitialArrayParam(searchParams, 'fieldOfResearch');
   const initialShowAdvanced = shouldShowAdvancedOptionsInitially(searchParams);
   const initialsubFromDate = getInitialDateFromUrl(searchParams, 'subFromDate');
   const initialsubToDate = getInitialDateFromUrl(searchParams, 'subToDate');
@@ -169,8 +173,10 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
   const [isAdvancedOptionsVisible, setIsAdvancedOptionsVisible] = useState<boolean>(initialShowAdvanced);
   const [subFromDate, setsubFromDate] = useState<Date | null>(initialsubFromDate);
   const [subToDate, setsubToDate] = useState<Date | null>(initialsubToDate);
+  const [selectedPublisher, setSelectedPublisher] = useState<string | null>(initialPublisher);
   const [selectedRank, setSelectedRank] = useState<string | null>(initialRank);
   const [selectedSource, setSelectedSource] = useState<string | null>(initialSource);
+  const [selectedAverageScore, setSelectedAverageScore] = useState<string | null>(initialAverageScore);
   const [selectedTopics, setSelectedTopics] = useState<string[]>(initialTopics);
   const [selectedFieldsOfResearch, setSelectedFieldsOfResearch] = useState<string[]>(initialFieldsOfResearch);
 
@@ -217,8 +223,10 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     setsubToDate(adjustToUTCMidnight(end));
   };
 
+  const handlePublisherChange = (publisher: string | null) => { setSelectedPublisher(publisher); };
   const handleRankChange = (rank: string | null) => { setSelectedRank(rank); };
   const handleSourceChange = (source: string | null) => { setSelectedSource(source); };
+  const handleAverageScoreChange = (averageScore: string | null) => { setSelectedAverageScore(averageScore); };
   const handleTopicsChange = (topics: string[]) => { setSelectedTopics(topics); };
   const handleFieldsOfResearchChange = (fields: string[]) => { setSelectedFieldsOfResearch(fields); };
 
@@ -231,8 +239,10 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
       type: selectedType,
       subFromDate: subFromDate,
       subToDate: subToDate,
+      publisher: selectedPublisher,
       rank: selectedRank,
       source: selectedSource,
+      averageScore: selectedAverageScore,
       topics: selectedTopics && selectedTopics.length > 0 ? selectedTopics : undefined,
       fieldOfResearch: selectedFieldsOfResearch && selectedFieldsOfResearch.length > 0 ? selectedFieldsOfResearch : undefined,
     };
@@ -240,6 +250,7 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     if (confKeyword) {
       searchParamsData[selectSearchType] = confKeyword;
     }
+
     onSearch(searchParamsData);
   };
 
@@ -263,8 +274,10 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     // Reset Advanced state
     setsubFromDate(null);
     setsubToDate(null);
+    setSelectedPublisher(null);
     setSelectedRank(null);
     setSelectedSource(null);
+    setSelectedAverageScore(null);
     setSelectedTopics([]);
     setSelectedFieldsOfResearch([]);
 
@@ -319,12 +332,15 @@ const useSearchForm = ({ onSearch, onClear }: UseSearchFormProps) => {
     isAdvancedOptionsVisible,
     subFromDate,
     subToDate,
+    selectedPublisher,
     selectedRank,
     selectedSource,
+    selectedAverageScore,
     selectedTopics,
     selectedFieldsOfResearch,
     toggleAdvancedOptionsVisibility,
     handleSubmissionDateRangeChange,
+    handlePublisherChange,
     handleRankChange,
     handleSourceChange,
     handleAverageScoreChange, // FIX: Add this line
