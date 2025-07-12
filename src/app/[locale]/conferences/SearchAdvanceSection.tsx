@@ -101,25 +101,25 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
   }, [isAdvancedOptionsVisible, availableSources.length, sourcesLoading])
 
   // Fetch Publishers
-  useEffect(() => {
-    if (isAdvancedOptionsVisible && availablePublishers.length === 0 && !publishersLoading) {
-      const fetchPublishers = async () => {
-        setPublishersLoading(true)
-        try {
-          const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/admin/conferences/filter-options/publishers`)
-          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
-          const data: string[] = await response.json()
-          const filteredPublishers = data.filter(p => p && p.trim().toLowerCase() !== 'unknown')
-          setAvailablePublishers(filteredPublishers)
-        } catch (error) {
-          // console.error('Could not fetch publishers:', error)
-        } finally {
-          setPublishersLoading(false)
-        }
-      }
-      fetchPublishers()
-    }
-  }, [isAdvancedOptionsVisible, availablePublishers.length, publishersLoading])
+  // useEffect(() => {
+  //   if (isAdvancedOptionsVisible && availablePublishers.length === 0 && !publishersLoading) {
+  //     const fetchPublishers = async () => {
+  //       setPublishersLoading(true)
+  //       try {
+  //         const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/admin/conferences/filter-options/publishers`)
+  //         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+  //         const data: string[] = await response.json()
+  //         const filteredPublishers = data.filter(p => p && p.trim().toLowerCase() !== 'unknown')
+  //         setAvailablePublishers(filteredPublishers)
+  //       } catch (error) {
+  //         // console.error('Could not fetch publishers:', error)
+  //       } finally {
+  //         setPublishersLoading(false)
+  //       }
+  //     }
+  //     fetchPublishers()
+  //   }
+  // }, [isAdvancedOptionsVisible, availablePublishers.length, publishersLoading])
 
   // --- SỬ DỤNG CUSTOM HOOK ĐỂ QUẢN LÝ LOGIC INPUT ---
   // Truyền tất cả các props cần thiết vào hook

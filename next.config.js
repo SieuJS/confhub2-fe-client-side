@@ -50,29 +50,10 @@ const nextConfig = {
     // Sửa đổi fileLoaderRule để nó không xử lý các file SVG mà svgr sẽ xử lý
     fileLoaderRule.exclude = /\.svg$/i
 
-    // Fix vendor chunks issue for react-icons and other modules
-    config.optimization = {
-      ...config.optimization,
-      splitChunks: {
-        ...config.optimization.splitChunks,
-        cacheGroups: {
-          ...config.optimization.splitChunks?.cacheGroups,
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-          },
-        },
-      },
-    };
-
     return config
   },
 
-  // Additional configuration to handle build issues
-  experimental: {
-    esmExternals: 'loose',
-  },
+  // Remove experimental esmExternals to avoid module loading issues
   // --- KẾT THÚC PHẦN THÊM VÀO ---
 }
 
