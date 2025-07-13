@@ -52,12 +52,10 @@ const Modal: React.FC<ModalProps> = ({
         {/* Header: Không co lại */}
         {title && (
           <div className='flex flex-shrink-0 items-center justify-between border-b border-gray-200 p-4 dark:border-gray-700'>
-            <h3 className='text-base font-semibold text-gray-900 dark:text-white-pure'>
-              {title}
-            </h3>
+            <h3 className='text-base font-semibold '>{title}</h3>
             <button
               onClick={onClose}
-              className='rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:bg-gray-700'
+              className='rounded-full p-1  hover:bg-gray-10 hover:text-gray-60 focus:outline-none focus:ring-2 focus:ring-blue-500 '
               aria-label='Close modal'
             >
               <X size={20} />
@@ -66,13 +64,13 @@ const Modal: React.FC<ModalProps> = ({
         )}
 
         {/* Body: Tự động co giãn và cuộn nếu cần */}
-        <div className='flex-grow overflow-y-auto p-4 text-sm leading-relaxed text-gray-600 dark:text-gray-300'>
+        <div className='flex-grow overflow-y-auto p-4 text-sm leading-relaxed '>
           {children}
         </div>
 
         {/* Footer: Không co lại */}
         {footer && (
-          <div className='flex-shrink-0 rounded-b-lg border-t border-gray-200 bg-gray-10 p-3 dark:border-gray-700 dark:bg-gray-800'>
+          <div className='flex-shrink-0 rounded-b-lg border-t border-gray-20 bg-gray-10 p-3 '>
             {footer}
           </div>
         )}

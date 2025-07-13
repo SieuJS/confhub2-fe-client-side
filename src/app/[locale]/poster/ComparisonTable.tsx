@@ -294,7 +294,7 @@ const ComparisonTable: React.FC = () => {
                     <td
                       key={valueIndex}
                       // Bỏ border-l-2 border-white
-                      className={`py-0 align-middle text-8xl ${
+                      className={`py-0 align-middle text-9xl ${
                         valueIndex === competitors.length - 1
                           ? 'bg-purple-300'
                           : 'bg-sky-100'
