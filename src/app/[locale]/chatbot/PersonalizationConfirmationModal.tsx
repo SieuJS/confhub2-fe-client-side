@@ -83,13 +83,11 @@ const PersonalizationConfirmationModal: React.FC<
         <div className='flex w-full flex-row items-center justify-center space-x-2'>
           {/* Nút "Cancel" hoặc "Update Profile" (Secondary) */}
           {type === 'missingInfo' ? (
-            <Link
-              href={{ pathname: '/dashboard', query: { tab: 'profile' } }}
-            >
+            <Link href={{ pathname: '/dashboard', query: { tab: 'profile' } }}>
               <button
                 type='button'
                 onClick={onClose}
-                className='rounded-md bg-white-pure px-3 py-1.5 text-xs font-medium shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-10 dark:bg-gray-700 dark:text-gray-200 dark:ring-gray-600 dark:hover:bg-gray-600'
+                className='rounded-md bg-white-pure px-3 py-1.5 text-xs font-medium shadow-sm ring-1 ring-inset ring-gray-30 hover:bg-gray-10  '
               >
                 {content.cancelText}
               </button>
@@ -98,7 +96,7 @@ const PersonalizationConfirmationModal: React.FC<
             <button
               type='button'
               onClick={onClose}
-              className='rounded-md bg-white-pure px-3 py-1.5 text-xs font-medium shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-10 dark:bg-gray-700 dark:text-gray-200 dark:ring-gray-600 dark:hover:bg-gray-600'
+              className='rounded-md bg-white-pure px-3 py-1.5 text-xs font-medium shadow-sm ring-1 ring-inset ring-gray-30 hover:bg-gray-10  '
             >
               {content.cancelText}
             </button>
@@ -128,7 +126,7 @@ const PersonalizationConfirmationModal: React.FC<
         </div>
 
         {/* Message với font nhỏ hơn */}
-        <div className='text-sm text-gray-600 dark:text-gray-300'>
+        <div className='text-sm  '>
           <p className='whitespace-pre-line leading-snug'>{content.message}</p>
           {content.additionalMessage && (
             <p className='mt-2 whitespace-pre-line leading-snug'>
@@ -139,18 +137,18 @@ const PersonalizationConfirmationModal: React.FC<
 
         {/* Privacy Section nhỏ gọn */}
         {type === 'enableBenefit' && (
-          <div className='mt-3 rounded-md border border-slate-200 bg-gray-10 p-2 text-left text-xs dark:border-gray-700 dark:bg-gray-800'>
+          <div className='mt-3 rounded-md border border-slate-200 bg-gray-10 p-2 text-left text-xs '>
             <div className='flex items-start space-x-2'>
               <ShieldCheck
                 className='mt-0.5 h-5 w-5 flex-shrink-0 text-green-600'
                 aria-hidden='true'
               />
               <div>
-                <h4 className='mb-0.5 font-semibold text-gray-800 dark:text-gray-100'>
+                <h4 className='mb-0.5 font-semibold  '>
                   {t('Personalization_Privacy_Subheading') ||
                     'Your Privacy Matters'}
                 </h4>
-                <p className='leading-snug text-gray-500 dark:text-gray-400'>
+                <p className='leading-snug  '>
                   {t('Personalization_Privacy_Detail') ||
                     'We are committed to protecting your data...'}
                 </p>

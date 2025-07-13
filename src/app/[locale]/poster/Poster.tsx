@@ -72,13 +72,13 @@ const Poster: React.FC = () => {
         <div className='ml-[94px] flex flex-shrink-0 gap-[94px] text-[100px] leading-relaxed'>
           <div className='text-left'>
             <p className='m-0'>GIẢNG VIÊN HƯỚNG DẪN:</p>
-            <ul className='m-0 list-none p-0'>
+            <ul className='m-0 list-none p-0 pr-20'>
               <li>ThS. Hồ Thị Hoàng Vy</li>
               <li>PGS.TS Lê Nguyễn Hoài Nam</li>
             </ul>
           </div>
           <div className='text-left'>
-            <p className='m-0'>SINH VIÊN THỰC HIỆN:</p>
+            {/* <p className='m-0'>SINH VIÊN THỰC HIỆN:</p> */}
             <ul className='m-0 list-none py-0 pr-4'>
               <li>Lê Lâm Lợi - 21120284</li>
               <li>Nguyễn Văn Siêu - 21120321</li>
@@ -92,11 +92,11 @@ const Poster: React.FC = () => {
       </header>
 
       {/* MAIN CONTENT - CẬP NHẬT THÀNH 3 CỘT */}
-      <div className='flex flex-1 gap-[78px] p-[125px]'>
+      <div className='flex flex-1 gap-[78px] p-[0px]'>
         {/* === CỘT 1: Bối cảnh, Tóm tắt & So sánh === */}
         <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[94px] shadow-sm'>
           <div className='mb-[94px]'>
-            <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
+            <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[0px] text-[188px] font-bold text-[#0056b3]'>
               1. Bối cảnh & Mục tiêu
             </h3>
             <p className='mb-[78px] text-[113px] leading-relaxed'>
@@ -108,10 +108,10 @@ const Poster: React.FC = () => {
               tảng dữ liệu hội nghị khoa học đáng tin cậy cùng các tính năng tìm
               kiếm thông minh và thân thiện.
             </p>
-            <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
+            <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[0px] text-[188px] font-bold text-[#0056b3]'>
               2. Tóm tắt đồ án
             </h3>
-            <p className='mb-[78px] text-[113px] leading-relaxed'>
+            <p className='mb-[0px] text-[113px] leading-relaxed'>
               Đồ án xây dựng một hệ thống hoàn chỉnh, áp dụng{' '}
               <strong className='text-[#e67e22]'>
                 Mô hình ngôn ngữ lớn (LLM)
@@ -123,7 +123,7 @@ const Poster: React.FC = () => {
             </p>
           </div>
           <div>
-            <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
+            <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[0px] text-[188px] font-bold text-[#0056b3]'>
               3. So sánh các tính năng với các công cụ khác
             </h3>
             <ComparisonTable />
@@ -132,20 +132,21 @@ const Poster: React.FC = () => {
 
         {/* === CỘT 2: Giải pháp & Công nghệ (Phần 1) === */}
         <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[94px] shadow-sm'>
-          <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
+          <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[0px] text-[188px] font-bold text-[#0056b3]'>
             4. Giải pháp & Công nghệ
           </h3>
           <div className='mb-[94px] flex flex-1 flex-col'>
             <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
-              Kiến trúc hệ thống
+              Sơ đồ tổng quan tương tác client-server
             </h4>
             <div className='flex-grow'>
-              <SystemArchitectureDiagram />
+              {/* <SystemArchitectureDiagram /> */}
+              <ClientServerFlowchart />
             </div>
           </div>
           <div className='flex flex-1 flex-col'>
             <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
-              Sơ đồ tương tác Admin - Server (Thu thập dữ liệu)
+              Sơ đồ tổng quan tương tác Admin - Server (Thu thập dữ liệu)
             </h4>
             <div className='mt-[30px] flex-grow'>
               <AdminServerFlowchart />
@@ -158,16 +159,17 @@ const Poster: React.FC = () => {
           {/* --- Section 1: Client-Server Diagram --- */}
           <div className='mb-[94px] flex flex-col'>
             <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
-              Sơ đồ tương tác client-server
+              Kiến trúc chi tiết hệ thống
             </h4>
             <div className='flex flex-grow items-center justify-center'>
-              <ClientServerFlowchart />
+              {/* <ClientServerFlowchart /> */}
+              <SystemArchitectureDiagram />
             </div>
           </div>
 
           {/* --- Section 2: Evaluation Results --- */}
           <div className='flex flex-1 flex-col'>
-            <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[47px] text-[188px] font-bold text-[#0056b3]'>
+            <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[0px] text-[188px] font-bold text-[#0056b3]'>
               5. Kết quả đánh giá
             </h3>
 
