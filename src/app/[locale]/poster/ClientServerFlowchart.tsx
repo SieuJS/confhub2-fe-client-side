@@ -32,13 +32,13 @@ const ActionBox = ({
 }) => (
   <div
     // Thay đổi: Tăng padding từ p-4 lên p-6
-    className={`flex w-full items-center justify-center rounded-lg p-6 text-center shadow-lg ${className}`}
+    // Giữ flex và items-center để căn giữa theo chiều dọc
+    className={`flex w-full items-center rounded-lg p-6 shadow-lg ${className}`}
   >
-    <div className='flex flex-row items-center justify-center gap-4'>
-      {/* Thay đổi: Tăng kích thước icon và text */}
-      {icon && <div className='text-[200px]'>{icon}</div>}
-      <span className='text-8xl font-semibold'>{children}</span>
-    </div>
+    {/* Icon được căn trái */}
+    {icon && <div className='text-[200px] pl-8'>{icon}</div>} {/* Thêm pl-8 để tạo padding trái cho icon */}
+    {/* Text được căn giữa trong không gian còn lại */}
+    <span className='flex-grow text-8xl font-semibold text-center'>{children}</span>
   </div>
 )
 
@@ -75,7 +75,7 @@ const ClientServerFlowchart: React.FC = () => {
     fe: 'bg-blue-100',
     be: 'bg-teal-100',
     db: 'bg-amber-100',
-    crawl: 'bg-indigo-100'
+    crawl: 'bg-indigo-200'
   }
 
   // BỘ MÀU 2: Dành cho các hộp hành động bên trong (màu đậm, chữ trắng)
@@ -91,8 +91,8 @@ const ClientServerFlowchart: React.FC = () => {
       {/* Thay đổi: Tăng khoảng trống giữa các cột từ gap-6 lên gap-8 */}
       <div className='grid grid-cols-[1fr_200px_1fr_200px_1fr] gap-8'>
         {/* CỘT 1: FE */}
-        {/* Thay đổi: Tăng chiều cao tổng thể của cột từ h-[1200px] lên h-[1600px] */}
-        <div className='flex h-[2200px] flex-col'>
+        {/* ĐIỀU CHỈNH: Giảm chiều cao tổng thể của cột */}
+        <div className='flex h-[1600px] flex-col'>
           <div
             className={`flex h-full flex-col justify-between rounded-xl p-6 ${columnColors.fe}`}
           >
@@ -100,7 +100,7 @@ const ClientServerFlowchart: React.FC = () => {
             <h3 className='mb-4 text-center text-8xl font-bold text-blue-900'>
               Frontend (FE)
             </h3>
-            {/* Thay đổi: Tăng chiều cao các khối ActionBox */}
+            {/* ĐIỀU CHỈNH: Giảm chiều cao các khối ActionBox */}
             <ActionBox
               icon={<HiMagnifyingGlass />}
               className={`h-80 ${boxColors.fe}`}
@@ -109,7 +109,7 @@ const ClientServerFlowchart: React.FC = () => {
             </ActionBox>
             <ActionBox
               icon={<HiOutlineQueueList />}
-              className={`h-[1300px] ${boxColors.fe}`}
+              className={`h-[700px] ${boxColors.fe}`}
             >
               Hiển thị kết quả
             </ActionBox>
@@ -125,15 +125,16 @@ const ClientServerFlowchart: React.FC = () => {
         {/* KHOẢNG TRỐNG 1 */}
         <div className='relative h-full'>
           {/* THAY ĐỔI: Thêm prop 'color' để tô màu khác cho 4 mũi tên này */}
-          <FlowArrow direction='right' y='16%' color='text-sky-500' />
-          <FlowArrow direction='left' y='32%' color='text-sky-500' />
-          <FlowArrow direction='right' y='93%' />
-          <FlowArrow direction='left' y='60%' />
+          {/* ĐIỀU CHỈNH: Điều chỉnh lại vị trí mũi tên */}
+          <FlowArrow direction='right' y='18%' color='text-sky-500' />
+          <FlowArrow direction='left' y='40%' color='text-sky-500' />
+          <FlowArrow direction='right' y='90%' />
+          <FlowArrow direction='left' y='65%' />
         </div>
 
         {/* CỘT 2: BE */}
-        {/* Thay đổi: Tăng chiều cao tổng thể của cột từ h-[1200px] lên h-[1600px] */}
-        <div className='flex h-[2200px] flex-col'>
+        {/* ĐIỀU CHỈNH: Giảm chiều cao tổng thể của cột */}
+        <div className='flex h-[1600px] flex-col'>
           <div
             className={`flex h-full flex-col justify-between rounded-xl p-6 ${columnColors.be}`}
           >
@@ -141,25 +142,25 @@ const ClientServerFlowchart: React.FC = () => {
             <h3 className='mb-4 text-center text-8xl font-bold text-teal-900'>
               Backend (BE)
             </h3>
-            {/* Thay đổi: Tăng chiều cao các khối ActionBox */}
+            {/* ĐIỀU CHỈNH: Giảm chiều cao các khối ActionBox */}
             <ActionBox
               icon={<HiArrowsRightLeft />}
               className={`h-80 ${boxColors.be}`}
             >
               Gửi yêu cầu cho DB
             </ActionBox>
-            <ActionBox icon={<HiServer />} className={`h-80 ${boxColors.be}`}>
+            <ActionBox icon={<HiServer />} className={`h-72 ${boxColors.be}`}>
               Trả kết quả về FE
             </ActionBox>
             <ActionBox
               icon={<HiOutlineInboxArrowDown />}
-              className={`h-[950px] ${boxColors.be}`}
+              className={`h-[450px] ${boxColors.be}`}
             >
-              Nhận kết quả cào dữ liệu
+              Nhận kết quả <br/>cào dữ liệu
             </ActionBox>
             <ActionBox
               icon={<HiArrowsRightLeft />}
-              className={`h-80 ${boxColors.be}`}
+              className={`h-[300px] ${boxColors.be}`}
             >
               Gửi yêu cầu cho Server Crawl
             </ActionBox>
@@ -169,46 +170,47 @@ const ClientServerFlowchart: React.FC = () => {
         {/* KHOẢNG TRỐNG 2 */}
         <div className='relative h-full'>
           {/* THAY ĐỔI: 5 mũi tên này sẽ giữ màu mặc định (text-slate-500) */}
-          <FlowArrow direction='right' y='16%' color='text-sky-500' />
-          <FlowArrow direction='left' y='32%' color='text-sky-500' />
-          <FlowArrow direction='right' y='93%' />
-          <FlowArrow direction='left' y='74%' />
-          <FlowArrow direction='right' y='48%' />
+          {/* ĐIỀU CHỈNH: Điều chỉnh lại vị trí mũi tên */}
+          <FlowArrow direction='right' y='18%' color='text-sky-500' />
+          <FlowArrow direction='left' y='40%' color='text-sky-500' />
+          <FlowArrow direction='right' y='90%' />
+          <FlowArrow direction='left' y='72%' />
+          <FlowArrow direction='right' y='55%' />
         </div>
 
         {/* CỘT 3: DB & Server Crawl */}
         <div className='flex flex-col'>
-          <div className='flex h-full flex-col justify-between gap-8'>
+          <div className='flex h-full flex-col justify-between gap-4'>
             <div
-              className={`flex flex-col gap-8 rounded-xl p-6 ${columnColors.db}`}
+              className={`flex flex-col gap-8 rounded-xl p-4 ${columnColors.db}`}
             >
               {/* Thay đổi: Tăng kích thước tiêu đề */}
-              <h3 className='mb-12 text-center text-8xl font-bold text-amber-900'>
+              <h3 className='text-center text-8xl font-bold text-amber-900'>
                 Database (DB)
               </h3>
-              {/* Thay đổi: Tăng chiều cao các khối ActionBox */}
+              {/* ĐIỀU CHỈNH: Giảm chiều cao các khối ActionBox */}
               <ActionBox
                 icon={<HiCircleStack />}
-                className={`h-[660px] ${boxColors.db}`}
+                className={`h-[550px] ${boxColors.db}`}
               >
                 Truy vấn
               </ActionBox>
               <ActionBox
                 icon={<HiOutlineBookmarkSquare />}
-                className={`h-80 ${boxColors.db}`}
+                className={`h-72 ${boxColors.db}`}
               >
                 Lưu kết quả
               </ActionBox>
             </div>
             <div className={`rounded-xl p-6 ${columnColors.crawl}`}>
               {/* Thay đổi: Tăng kích thước tiêu đề */}
-              <h3 className='mb-4 text-center text-8xl font-bold text-indigo-900'>
+              <h3 className='mb-4 text-center text-8xl font-bold text-indigo-1000'>
                 Backend (Server Crawl)
               </h3>
-              {/* Thay đổi: Tăng chiều cao khối ActionBox */}
+              {/* ĐIỀU CHỈNH: Giảm chiều cao khối ActionBox */}
               <ActionBox
                 icon={<HiGlobeAlt />}
-                className={`h-[700px] ${boxColors.crawl}`}
+                className={`h-[375px] ${boxColors.crawl}`}
               >
                 Cào dữ liệu
               </ActionBox>

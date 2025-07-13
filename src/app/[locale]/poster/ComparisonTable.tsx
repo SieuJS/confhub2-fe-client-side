@@ -6,12 +6,12 @@ const ComparisonTable: React.FC = () => {
   // Dữ liệu không đổi
   const competitors = [
     'WIKICFP',
-    'ICORE\nCONFERENCE\nPORTAL',
-    'WORLD\nCONFERENCE\nALERTS',
-    'INTERNATIONAL\nCONFERENCE\nALERTS',
+    'CORE PORTAL',
+    'WORLD CONF.\nALERTS',
+    'INTER. CONF.\nALERTS',
     '10TIMES',
     'CONFHUB',
-    'GLOBAL\nCONFERENCE & JOURNAL HUB'
+    'GLOBAL CONFERENCE\n& JOURNAL HUB'
   ]
 
   // Dữ liệu so sánh được cập nhật
@@ -20,10 +20,10 @@ const ComparisonTable: React.FC = () => {
     {
       category: 'Tìm kiếm hội nghị',
       features: [
-        {
-          name: 'Theo lĩnh vực',
-          values: [true, true, true, true, true, true, true]
-        },
+        // {
+        //   name: 'Theo lĩnh vực',
+        //   values: [true, true, true, true, true, true, true]
+        // },
         {
           name: 'Theo hình thức',
           values: [true, false, false, false, true, true, true]
@@ -47,7 +47,7 @@ const ComparisonTable: React.FC = () => {
       ]
     },
     {
-      category: 'Cập nhật thông tin hội nghị',
+      category: 'Cập nhật hội nghị',
       features: [
         { name: '', values: [false, false, false, false, false, true, true] }
       ]
@@ -65,7 +65,7 @@ const ComparisonTable: React.FC = () => {
       ]
     },
     {
-      category: 'Bình luận, đánh giá hội nghị',
+      category: 'Bình luận, đánh giá',
       features: [
         { name: '', values: [false, false, false, false, true, true, true] }
       ]
@@ -131,7 +131,7 @@ const ComparisonTable: React.FC = () => {
     },
     // --- BẮT ĐẦU DỮ LIỆU MỚI TỪ ẢNH ---
     {
-      category: 'crawl thông tin hội nghị',
+      category: 'Crawl thông tin hội nghị',
       features: [
         {
           name: 'Link chính',
@@ -189,16 +189,16 @@ const ComparisonTable: React.FC = () => {
       ]
     },
     {
-      category: 'Tự động cập nhật hội nghị',
+      category: 'Tự động cập nhật',
       features: [
         {
-          name: 'Theo hằng ngày/tháng',
+          name: 'Theo ngày/tháng',
           values: [false, false, false, false, false, true, true]
         }
       ]
     },
     {
-      category: 'Crawl journal',
+      category: 'Crawl tạp chí',
       features: [
         {
           name: 'Thông tin tạp chí',
@@ -234,9 +234,14 @@ const ComparisonTable: React.FC = () => {
     }
   ]
 
+  // Mảng chứa độ rộng tùy chỉnh cho từng cột (bao gồm cả 2 cột đầu tiên)
+  // Bạn có thể điều chỉnh các giá trị này theo ý muốn
+  const columnWidths = ['23%', '22%', '5%', '5%', '8%', '8%', '7%', '7%', '12%']; 
+  // Đảm bảo tổng các giá trị này là 100% hoặc sử dụng các đơn vị khác như 'px'
+
   const CheckMark = ({ isOurProduct }: { isOurProduct: boolean }) => (
     <span
-      className={`font-black ${isOurProduct ? 'text-blue-700' : 'text-purple-600'}`}
+      className={`font-black text-8xl ${isOurProduct ? 'text-blue-700' : 'text-purple-600'}`}
     >
       ✓
     </span>
@@ -248,7 +253,7 @@ const ComparisonTable: React.FC = () => {
       <table
         // Thêm border-separate, border-spacing và màu nền cho "đường kẻ"
         className='w-full border-separate border-spacing-1 bg-gray-400 text-center'
-        style={{ fontSize: '65px' }}
+        style={{ fontSize: '90px' }}
       >
         <thead className='font-bold'>
           <tr>
@@ -257,12 +262,12 @@ const ComparisonTable: React.FC = () => {
               <th
                 key={index}
                 // Bỏ border-l-2 border-white
-                className={`whitespace-pre-line px-3 py-0 align-middle text-white ${
+                className={`whitespace-pre-line px-3 py-1 align-middle text-white ${
                   index === competitors.length - 1
                     ? 'bg-purple-600'
                     : 'bg-sky-500'
                 }`}
-                style={{ fontSize: '40px' }}
+                style={{ fontSize: '70px', width: columnWidths[index + 2] }} // Áp dụng độ rộng cho các cột đối thủ
               >
                 {name}
               </th>
@@ -281,13 +286,17 @@ const ComparisonTable: React.FC = () => {
                     <td
                       rowSpan={group.features.length}
                       // Bỏ border-r-2 border-white
-                      className='w-[25%] bg-purple-300 px-3 py-0 font-semibold text-purple-900'
+                      className='bg-purple-300 px-3 py-0 font-semibold text-purple-900'
+                      style={{ width: columnWidths[0] }} // Áp dụng độ rộng cho cột "Category"
                     >
                       {group.category}
                     </td>
                   )}
                   {/* Bỏ border-r-2 border-white */}
-                  <td className='w-[20%] bg-purple-300 px-3 py-0 text-left font-medium text-purple-900'>
+                  <td 
+                    className='bg-purple-300 px-3 pl-16 py-0 text-left font-medium text-purple-900'
+                    style={{ width: columnWidths[1] }} // Áp dụng độ rộng cho cột "Feature Name"
+                  >
                     {feature.name}
                   </td>
                   {feature.values.map((hasFeature, valueIndex) => (
@@ -299,6 +308,7 @@ const ComparisonTable: React.FC = () => {
                           ? 'bg-purple-300'
                           : 'bg-sky-100'
                       }`}
+                      style={{ width: columnWidths[valueIndex + 2] }} // Áp dụng độ rộng cho các cột giá trị
                     >
                       {hasFeature ? (
                         <CheckMark

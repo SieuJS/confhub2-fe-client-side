@@ -1,247 +1,129 @@
 // src/components/AdminServerFlowchart.tsx
 import React from 'react'
-
-// Component Icon Mũi tên đã được cập nhật thành mũi tên chỉ xuống
-const ArrowIcon = () => (
-  <svg
-    // Giảm kích thước một chút cho phù hợp với layout cột
-    className='h-52 w-52 flex-shrink-0 text-gray-800'
-    xmlns='http://www.w3.org/2000/svg'
-    fill='none'
-    viewBox='0 0 24 24'
-    stroke='currentColor'
-    strokeWidth={2}
-  >
-    {/* Thay đổi path data để vẽ mũi tên xuống */}
-    <path
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      d='M19 14l-7 7m0 0l-7-7m7 7V3'
-    />
-  </svg>
-)
-
-// Component cho một bước trong sơ đồ
-interface FlowStepProps {
-  icon: React.ReactNode
-  title: string
-  description: string
-  bgColor: string
-  textColor: string
-}
-
-const FlowStep: React.FC<FlowStepProps> = ({
-  icon,
-  title,
-  description,
-  bgColor,
-  textColor
-}) => (
-  <div
-    className={`flex w-full flex-row items-center justify-start gap-10 rounded-3xl p-8 shadow-lg ${bgColor}`}
-  >
-    <div
-      className={`flex-shrink-0 rounded-full p-10 ${textColor} bg-white bg-opacity-50`}
-    >
-      {icon}
-    </div>
-
-    <div className='flex flex-col items-start'>
-      <h4 className={`px-10 text-left text-9xl font-bold ${textColor}`}>
-        {title}
-      </h4>
-      <p className={`mt-2 px-10 text-left text-8xl ${textColor} opacity-90`}>
-        {description}
-      </p>
-    </div>
-  </div>
-)
+import {
+  Users,
+  Search,
+  HardDrive,
+  Code,
+  FileText,
+  List,
+  Database,
+  ArrowRight // Import icon mũi tên từ Lucide
+} from 'lucide-react' // Import các icon từ lucide-react
 
 const AdminServerFlowchart: React.FC = () => {
   const steps = [
     {
       actor: 'Admin',
-      icon: (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          className='h-52 w-52'
-          fill='none'
-          viewBox='0 0 24 24'
-          stroke='currentColor'
-        >
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            strokeWidth={2}
-            d='M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z'
-          />
-        </svg>
-      ),
+      icon: <Users size={144} strokeWidth={1.5} />, // Sử dụng icon Users từ Lucide, điều chỉnh kích thước và độ dày nét
       title: '1. Tiếp nhận yêu cầu',
       description: 'Hệ thống tiếp nhận danh sách hội nghị.',
-      bgColor: 'bg-blue-100',
-      textColor: 'text-blue-800'
+      bgColor: 'bg-blue-500', // Màu nền đậm hơn cho icon
+      textColor: 'text-white' // Màu chữ trắng cho icon
     },
     {
       actor: 'Server',
-      icon: (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          className='h-52 w-52'
-          fill='none'
-          viewBox='0 0 24 24'
-          stroke='currentColor'
-        >
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            strokeWidth={2}
-            d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
-          />
-        </svg>
-      ),
-      title: '2. Google Search',
+      icon: <Search size={144} strokeWidth={1.5} />, // Sử dụng icon Search từ Lucide
+      title: '2. Google Search API',
       description: 'Tìm kiếm các link liên quan.',
-      bgColor: 'bg-red-100',
-      textColor: 'text-red-800'
+      bgColor: 'bg-red-500',
+      textColor: 'text-white'
     },
     {
       actor: 'Server',
-      icon: (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          className='h-52 w-52'
-          fill='none'
-          viewBox='0 0 24 24'
-          stroke='currentColor'
-        >
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            strokeWidth={2}
-            d='M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'
-          />
-        </svg>
-      ),
-      title: '3. Thu thập dữ liệu',
+      icon: <HardDrive size={144} strokeWidth={1.5} />, // Sử dụng icon HardDrive từ Lucide (tương tự máy tính)
+      title: '3. Playwright cào dữ liệu',
       description: 'Truy cập và thu thập dữ liệu thô từ các link.',
-      bgColor: 'bg-yellow-100',
-      textColor: 'text-yellow-800'
+      bgColor: 'bg-yellow-500',
+      textColor: 'text-white'
     },
     {
       actor: 'Server',
-      icon: (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          className='h-52 w-52'
-          fill='none'
-          viewBox='0 0 24 24'
-          stroke='currentColor'
-        >
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            strokeWidth={2}
-            d='M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'
-          />
-        </svg>
-      ),
-      title: '4. Xác định link chính',
+      icon: <Code size={144} strokeWidth={1.5} />, // Sử dụng icon Code từ Lucide (tương tự terminal/code)
+      title: '4. LLM xác định link chính',
       description: 'Gọi API (LLM) để xác định link chính.',
-      bgColor: 'bg-indigo-100',
-      textColor: 'text-indigo-800'
+      bgColor: 'bg-indigo-500',
+      textColor: 'text-white'
     },
     {
       actor: 'Server',
-      icon: (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          className='h-52 w-52'
-          fill='none'
-          viewBox='0 0 24 24'
-          stroke='currentColor'
-        >
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            strokeWidth={2}
-            d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-          />
-        </svg>
-      ),
-      title: '5. Rút trích thông tin',
+      icon: <FileText size={144} strokeWidth={1.5} />, // Sử dụng icon FileText từ Lucide (tương tự tài liệu)
+      title: '5. LLM rút trích thông tin',
       description: 'Gọi API rút trích các thông tin quan trọng.',
-      bgColor: 'bg-purple-100',
-      textColor: 'text-purple-800'
+      bgColor: 'bg-purple-500',
+      textColor: 'text-white'
     },
     {
       actor: 'Server',
-      icon: (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          className='h-52 w-52'
-          fill='none'
-          viewBox='0 0 24 24'
-          stroke='currentColor'
-        >
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            strokeWidth={2}
-            d='M4 6h16M4 12h16m-7 6h7'
-          />
-        </svg>
-      ),
+      icon: <List size={144} strokeWidth={1.5} />, // Sử dụng icon List từ Lucide (tương tự danh sách/tổ chức)
       title: '6. Tổng hợp & Xử lý ',
       description: 'Tổng hợp kết quả, kiểm tra và làm sạch dữ liệu.',
-      bgColor: 'bg-teal-100',
-      textColor: 'text-teal-800'
+      bgColor: 'bg-teal-500',
+      textColor: 'text-white'
     },
     {
       actor: 'Server',
-      icon: (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          className='h-52 w-52'
-          fill='none'
-          viewBox='0 0 24 24'
-          stroke='currentColor'
-        >
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            strokeWidth={2}
-            d='M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375'
-          />
-        </svg>
-      ),
+      icon: <Database size={144} strokeWidth={1.5} />, // Sử dụng icon Database từ Lucide
       title: '7. Lưu Database',
       description: 'Lưu thông tin vào cơ sở dữ liệu.',
-      bgColor: 'bg-green-100',
-      textColor: 'text-green-800'
+      bgColor: 'bg-green-500',
+      textColor: 'text-white'
     }
   ]
 
   return (
-    <div className='flex w-full flex-col items-center justify-center rounded-2xl bg-white p-10 font-sans'>
-      {/* <h3 className='mb-12 text-center  text-8xl font-bold text-gray-700'>
-        Sơ đồ tương tác Admin - Server (Thu thập dữ liệu)
-      </h3> */}
-      {/* Thay đổi layout thành cột và dùng gap-y */}
-      <div className='flex flex-col items-center justify-center gap-y-8'>
-        {steps.map((step, index) => (
-          <React.Fragment key={index}>
-            <FlowStep
-              icon={step.icon}
-              title={step.title}
-              description={step.description}
-              bgColor={step.bgColor}
-              textColor={step.textColor}
-            />
-            {/* Mũi tên sẽ hiển thị giữa các step */}
-            {/* {index < steps.length - 1 && <ArrowIcon />} */}
-          </React.Fragment>
-        ))}
+    <div className='w-full overflow-x-auto bg-white p-10 font-sans'>
+      <div
+        className='relative flex items-center'
+        // Đặt chiều cao đủ lớn và chiều rộng tối thiểu để chứa tất cả các bước
+        style={{ minWidth: '4000px', height: '1600px' }}
+      >
+        {/* Trục thời gian chính */}
+        <div className='absolute left-0 top-1/2 z-0 h-4 w-full -translate-y-1/2 bg-gray-700'></div>{' '}
+        {/* Tăng độ dày và đổi màu đậm hơn */}
+        {/* Mũi tên ở cuối trục */}
+        <div className='absolute right-0 top-1/2 z-0 h-0 w-0 -translate-y-1/2 border-y-[1.5rem] border-y-transparent border-l-[2.5rem] border-l-gray-700'></div>{' '}
+        {/* Tăng kích thước và đổi màu đậm hơn */}
+        {/* Wrapper cho các bước */}
+        <div className='relative z-10 flex w-full justify-around'>
+          {steps.map((step, index) => (
+            <div
+              key={index}
+              // Container cho mỗi bước, dùng để định vị các thành phần con
+              className='relative flex h-24 flex-col items-center'
+            >
+              {/* Điểm chấm trên trục thời gian */}
+              <div className='absolute top-1/2 h-10 w-10 -translate-y-1/2 rounded-full border-6 border-gray-700 bg-white'></div>{' '}
+              {/* Tăng độ dày viền và đổi màu đậm hơn */}
+              {/* Đường nối dọc */}
+              <div
+                className={`absolute w-2 bg-gray-700 ${
+                  index % 2 === 0 ? 'bottom-full h-16' : 'top-full h-16'
+                }`}
+              ></div>{' '}
+              {/* Tăng độ dày và đổi màu đậm hơn */}
+              {/* Nội dung của bước (icon và text) */}
+              <div
+                className={`absolute w-max ${
+                  index % 2 === 0 ? 'bottom-full mb-24' : 'top-full mt-24'
+                }`}
+              >
+                <div className='flex flex-col items-center gap-6'>
+                  {/* Icon hình tròn */}
+                  <div
+                    className={`flex h-72 w-72 items-center justify-center rounded-full ${step.bgColor}`}
+                  >
+                    <div className={`${step.textColor}`}>{step.icon}</div>
+                  </div>
+                  {/* Tên bước - Giữ nguyên kích thước chữ theo yêu cầu */}
+                  <h4 className='w-[60rem] text-center text-9xl font-bold text-gray-700'>
+                    {step.title}
+                  </h4>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )

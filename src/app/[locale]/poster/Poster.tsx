@@ -2,15 +2,8 @@
 'use client'
 
 import React from 'react'
-// IMPORT COMPONENT GIAO DIỆN CHATBOT
-import ChatbotInterface from './ChatbotInterface'
-// IMPORT COMPONENT GIAO DIỆN MỚI
-import ConferenceSearchInterface from './ConferenceSearchInterface'
-import ConferenceDetailInterface from './ConferenceDetailInterface'
-// IMPORT COMPONENT BẢNG SO SÁNH
+
 import ComparisonTable from './ComparisonTable'
-// IMPORT COMPONENT SƠ ĐỒ QUY TRÌNH MỚI
-import DataCollectionFlowchart from './DataCollectionFlowchart'
 import SystemArchitectureDiagram from './SystemArchitectureDiagram'
 import AdminServerFlowchart from './AdminServerFlowchart' // Đảm bảo đường dẫn chính xác
 import ClientServerFlowchart from './ClientServerFlowchart'
@@ -49,12 +42,12 @@ const Poster: React.FC = () => {
       }}
     >
       {/* HEADER (Giữ nguyên không đổi) */}
-      <header className='flex items-center justify-between bg-gray-900 px-[188px] py-[125px] font-bold text-white shadow-md'>
+      <header className='flex items-center justify-between bg-gray-900 px-[188px] py-[100px] font-bold text-white shadow-md'>
         <div className='flex items-center'>
           <img
             src='/hcmus_logo.png'
             alt='Logo ĐH Khoa học Tự nhiên'
-            className='mr-[94px] h-[469px] w-auto'
+            className='mr-[60px] h-[469px] w-auto'
           />
           <div>
             <p className='m-0 text-[120px]'>ĐẠI HỌC KHOA HỌC TỰ NHIÊN</p>
@@ -65,11 +58,11 @@ const Poster: React.FC = () => {
           <h1 className='mb-[63px] text-[320px] font-extrabold leading-tight'>
             GLOBAL CONFERENCE & JOURNAL HUB
           </h1>
-          <h2 className='mb-[31px] text-[180px] font-bold'>
+          <h2 className='mb-[31px] text-[160px] font-bold'>
             HỆ THỐNG TÌM KIẾM KHOA HỌC TÍCH HỢP MÔ HÌNH NGÔN NGỮ LỚN
           </h2>
         </div>
-        <div className='ml-[94px] flex flex-shrink-0 gap-[94px] text-[100px] leading-relaxed'>
+        <div className='ml-[60px] flex flex-shrink-0 gap-[60px] text-[100px] leading-relaxed'>
           <div className='text-left'>
             <p className='m-0'>GIẢNG VIÊN HƯỚNG DẪN:</p>
             <ul className='m-0 list-none p-0 pr-20'>
@@ -92,23 +85,23 @@ const Poster: React.FC = () => {
       </header>
 
       {/* MAIN CONTENT - CẬP NHẬT THÀNH 3 CỘT */}
-      <div className='flex flex-1 gap-[78px] p-[0px]'>
+      <div className='flex flex-1 p-[0px]'>
         {/* === CỘT 1: Bối cảnh, Tóm tắt & So sánh === */}
-        <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[94px] shadow-sm'>
-          <div className='mb-[94px]'>
-            <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[0px] text-[188px] font-bold text-[#0056b3]'>
+        <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[60px] shadow-sm'>
+          <div className='mb-[60px]'>
+            <h3 className='mb-[60px] pb-[0px] text-[188px] font-bold text-[#0056b3]'>
               1. Bối cảnh & Mục tiêu
             </h3>
-            <p className='mb-[78px] text-[113px] leading-relaxed'>
+            <p className='mb-[60px] text-[113px] leading-relaxed'>
               Đồ án giải quyết vấn đề khó khăn và tốn thời gian của các nhà khoa
               học trong việc tìm kiếm, lựa chọn các hội nghị phù hợp.
             </p>
-            <p className='mb-[94px] text-[113px] leading-relaxed'>
+            <p className='mb-[60px] text-[113px] leading-relaxed'>
               Mục tiêu là xây dựng ứng dụng web giúp tìm kiếm hiệu quả với nền
               tảng dữ liệu hội nghị khoa học đáng tin cậy cùng các tính năng tìm
               kiếm thông minh và thân thiện.
             </p>
-            <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[0px] text-[188px] font-bold text-[#0056b3]'>
+            <h3 className='mb-[60px] pb-[0px] text-[188px] font-bold text-[#0056b3]'>
               2. Tóm tắt đồ án
             </h3>
             <p className='mb-[0px] text-[113px] leading-relaxed'>
@@ -116,14 +109,13 @@ const Poster: React.FC = () => {
               <strong className='text-[#e67e22]'>
                 Mô hình ngôn ngữ lớn (LLM)
               </strong>{' '}
-              để trích xuất dữ liệu, được xây dựng trên kiến trúc Microservices
-              linh hoạt. Sản phẩm cuối cùng gồm trang web cho người dùng với các
+              để rút trích dữ liệu. Sản phẩm cuối cùng gồm trang web cho người dùng với các
               tính năng tìm kiếm, Chatbot thông minh và hệ thống giám sát trực
               quan cho quản trị viên.
             </p>
           </div>
           <div>
-            <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[0px] text-[188px] font-bold text-[#0056b3]'>
+            <h3 className='mb-[60px] pb-[0px] text-[188px] font-bold text-[#0056b3]'>
               3. So sánh các tính năng với các công cụ khác
             </h3>
             <ComparisonTable />
@@ -131,12 +123,12 @@ const Poster: React.FC = () => {
         </div>
 
         {/* === CỘT 2: Giải pháp & Công nghệ (Phần 1) === */}
-        <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[94px] shadow-sm'>
-          <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[0px] text-[188px] font-bold text-[#0056b3]'>
-            4. Giải pháp & Công nghệ
+        <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[60px] shadow-sm'>
+          <h3 className='mb-[60px] pb-[0px] text-[188px] font-bold text-[#0056b3]'>
+            4. Giải pháp & Kiến trúc
           </h3>
-          <div className='mb-[94px] flex flex-1 flex-col'>
-            <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
+          <div className='mb-[100px]'>
+            <h4 className='mb-[78px] text-[150px] font-bold text-[#2980b9]'>
               Sơ đồ tổng quan tương tác client-server
             </h4>
             <div className='flex-grow'>
@@ -144,8 +136,8 @@ const Poster: React.FC = () => {
               <ClientServerFlowchart />
             </div>
           </div>
-          <div className='flex flex-1 flex-col'>
-            <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
+          <div className=''>
+            <h4 className='mb-[78px] text-[150px] font-bold text-[#2980b9]'>
               Sơ đồ tổng quan tương tác Admin - Server (Thu thập dữ liệu)
             </h4>
             <div className='mt-[30px] flex-grow'>
@@ -155,9 +147,9 @@ const Poster: React.FC = () => {
         </div>
 
         {/* === CỘT 3: Giải pháp (Phần 2) & Kết quả === */}
-        <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[94px] shadow-sm'>
+        <div className='flex flex-1 flex-col rounded-[47px] border-[3px] border-gray-200 p-[60px] shadow-sm'>
           {/* --- Section 1: Client-Server Diagram --- */}
-          <div className='mb-[94px] flex flex-col'>
+          <div className='mb-[60px] flex flex-col'>
             <h4 className='mb-[78px] text-[125px] font-bold text-[#2980b9]'>
               Kiến trúc chi tiết hệ thống
             </h4>
@@ -169,16 +161,16 @@ const Poster: React.FC = () => {
 
           {/* --- Section 2: Evaluation Results --- */}
           <div className='flex flex-1 flex-col'>
-            <h3 className='mb-[94px] border-b-[16px] border-[#0056b3] pb-[0px] text-[188px] font-bold text-[#0056b3]'>
+            <h3 className='mb-[60px] pb-[0px] text-[188px] font-bold text-[#0056b3]'>
               5. Kết quả đánh giá
             </h3>
 
             {mainResult && (
-              <div className='mb-[62px] rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-100 p-[94px] text-center'>
+              <div className='mb-[62px] rounded-[31px] border-[6px] border-dashed border-gray-400 bg-gray-100 p-[60px] text-center'>
                 <p className='mb-[31px] text-[150px] font-semibold text-gray-800'>
                   {mainResult.label}
                 </p>
-                <p className='text-[280px] font-extrabold text-[#e67e22]'>
+                <p className='text-[260px] font-extrabold text-[#e67e22]'>
                   {mainResult.value}
                 </p>
               </div>
