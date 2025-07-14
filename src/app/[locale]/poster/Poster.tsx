@@ -7,6 +7,7 @@ import ComparisonTable from './ComparisonTable'
 import SystemArchitectureDiagram from './SystemArchitectureDiagram'
 import AdminServerFlowchart from './AdminServerFlowchart' // Đảm bảo đường dẫn chính xác
 import ClientServerFlowchart from './ClientServerFlowchart'
+import UserChatbotInteractionDiagram from './UserChatbotInteractionDiagram'
 
 const Poster: React.FC = () => {
   const A0_WIDTH_PX = 14043
@@ -109,9 +110,9 @@ const Poster: React.FC = () => {
               <strong className='text-[#e67e22]'>
                 Mô hình ngôn ngữ lớn (LLM)
               </strong>{' '}
-              để rút trích dữ liệu. Sản phẩm cuối cùng gồm trang web cho người dùng với các
-              tính năng tìm kiếm, Chatbot thông minh và hệ thống giám sát trực
-              quan cho quản trị viên.
+              để rút trích dữ liệu. Sản phẩm cuối cùng gồm trang web cho người
+              dùng với các tính năng tìm kiếm, Chatbot thông minh và hệ thống
+              giám sát trực quan cho quản trị viên.
             </p>
           </div>
           <div>
@@ -132,16 +133,24 @@ const Poster: React.FC = () => {
               Sơ đồ tổng quan tương tác client-server
             </h4>
             <div className='flex-grow'>
-              {/* <SystemArchitectureDiagram /> */}
               <ClientServerFlowchart />
             </div>
           </div>
           <div className=''>
             <h4 className='mb-[78px] text-[150px] font-bold text-[#2980b9]'>
-              Sơ đồ tổng quan tương tác Admin - Server (Thu thập dữ liệu)
+              Sơ đồ tổng quan tương tác Admin - Server
             </h4>
             <div className='mt-[30px] flex-grow'>
               <AdminServerFlowchart />
+            </div>
+          </div>
+
+          <div className=''>
+            <h4 className='mb-[78px] text-[150px] font-bold text-[#2980b9]'>
+              Sơ đồ tổng quan tương tác người dùng với Chatbot
+            </h4>
+            <div className='mt-[30px] flex-grow'>
+              <UserChatbotInteractionDiagram />
             </div>
           </div>
         </div>
