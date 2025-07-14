@@ -284,7 +284,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         )
         const data = await response.json()
         if (response.ok && data.user && data.token) {
-          _handleAuthSuccess(data as AuthResponse)
+          if (!data.user.isVerified) {
+            setError('Not verified')
+            localStorage.setItem(LOCAL_STORAGE_KEYS.TOKEN, data.token)
+          }
+          else _handleAuthSuccess(data as AuthResponse)
         } else {
           setError(data.message || 'Incorrect email or password.')
         }

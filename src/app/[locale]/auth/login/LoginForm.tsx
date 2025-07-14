@@ -165,7 +165,7 @@ const LoginForm: React.FC<LoginFormProps> = (/* props: LoginFormProps */) => {
               </div>
 
               {error && (
-                <div className='rounded-md bg-red-50 p-4'>
+                <div className='flex rounded-md bg-red-50 p-4'>
                   <div className='flex'>
                     <div className='flex-shrink-0'>
                       {/* SVG for error icon */}
@@ -184,7 +184,16 @@ const LoginForm: React.FC<LoginFormProps> = (/* props: LoginFormProps */) => {
                     <div className='ml-3'>
                       <p className='text-sm text-red-700'>{error}</p>
                     </div>
+                    {error == 'Not verified' && <div className='flex text-sm ml-3'>
+                      <Link
+                        href='/auth/verify-email' // Use next-intl Link
+                        className='hover:text-button/80 font-medium text-button'
+                      >
+                        {t('Verify_Your_Email_Address')}
+                      </Link>
+                    </div>}
                   </div>
+                  
                 </div>
               )}
 
