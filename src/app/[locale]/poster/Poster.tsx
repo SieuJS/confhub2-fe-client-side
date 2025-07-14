@@ -14,13 +14,13 @@ const Poster: React.FC = () => {
   const A0_HEIGHT_PX = 9933
 
   const evaluationResults = [
-    { label: 'Tỷ lệ tìm link hội nghị chính xác', value: '96.2%' },
-    { label: 'Ngày diễn ra hội nghị ', value: '97.1%' },
-    { label: 'Địa điểm tổ chức', value: '96.6%' },
-    { label: 'Ngày nộp bài', value: '86.4%' },
-    { label: 'Ngày thông báo ', value: '86.1%' },
-    { label: 'Ngày camera ready ', value: '88.8%' },
-    { label: 'Ngày register ', value: '95.7%' }
+    { label: 'Tỷ lệ tìm link hội nghị chính xác', value: '98.5%' },
+    { label: 'Ngày diễn ra hội nghị ', value: '99.9%' },
+    { label: 'Địa điểm tổ chức', value: '100%' },
+    { label: 'Ngày nộp bài', value: '99.2%' },
+    { label: 'Ngày thông báo ', value: '99.2%' },
+    { label: 'Ngày camera ready ', value: '99.3%' },
+    { label: 'Ngày register ', value: '99.8%' }
   ]
 
   const mainResult = evaluationResults.find(
