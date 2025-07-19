@@ -47,6 +47,17 @@ export type ConferenceResponse = {
       type: string;
       name: string;
     }[];
+    submissionDates: {
+      id: string;
+      organizedId: string;
+      fromDate: string;
+      toDate: string;
+      type: string;
+      name: string;
+      createdAt: string;
+      updatedAt: string;
+      isAvailable: boolean;
+    }[];
   }[];
   feedbacks: any[]; // Nên thay any bằng Feedback[] nếu có thể
   followBy: any[];  // Nên thay any bằng FollowerInfo[] nếu có thể

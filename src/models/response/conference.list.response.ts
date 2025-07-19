@@ -14,6 +14,7 @@ export type ConferenceInfo = {
   researchFields: string;
   topics: string[];
   dates: ImportantDates | null;
+  submissionDates: SubmissionDate[];
   link: string | null;
   publisher: string | null;
   createdAt: string;
@@ -30,6 +31,18 @@ export type Location = {
   country: string | null;
   address: string | null;
   continent: string | null;
+};
+
+export type SubmissionDate = {
+  id: string;
+  organizedId: string;
+  fromDate: string;
+  toDate: string;
+  type: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  isAvailable: boolean;
 };
 
 

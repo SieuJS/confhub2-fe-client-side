@@ -5,7 +5,8 @@ import { ConferenceInfo } from '../../../models/response/conference.list.respons
 import { Link, useRouter } from '@/src/navigation';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/src/contexts/AuthContext';
-import { MapPin, CalendarDays, SquareArrowOutUpRight, CalendarPlus, Star } from 'lucide-react';
+import { MapPin, CalendarDays, SquareArrowOutUpRight, CalendarPlus, Star, Clock } from 'lucide-react';
+import * as Tooltip from '@radix-ui/react-tooltip';
 
 interface EventCardProps {
   event: ConferenceInfo;
@@ -133,6 +134,60 @@ const EventCardComponent: React.FC<EventCardProps> = ({
     },
     [formatDate]
   )
+
+  const getEarliestSubmissionDate = useCallback(() => {
+    if (!event.submissionDates || event.submissionDates.length === 0) {
+      return null;
+    }
+
+    const now = new Date();
+    const validDates = event.submissionDates
+      .filter(subDate => {
+        const date = new Date(subDate.fromDate);
+        return !isNaN(date.getTime()) && date >= now; // Only future dates
+      })
+      .sort((a, b) => new Date(a.fromDate).getTime() - new Date(b.fromDate).getTime());
+
+    return validDates.length > 0 ? validDates[0] : null;
+  }, [event.submissionDates])
+
+  const formatSubmissionDate = useCallback(() => {
+    const earliestSubmission = getEarliestSubmissionDate();
+    if (!earliestSubmission) {
+      return 'No upcoming deadlines';
+    }
+
+    const formatted = formatDateRange(earliestSubmission.fromDate, earliestSubmission.toDate);
+    return formatted;
+  }, [getEarliestSubmissionDate, formatDateRange])
+
+  const getSubmissionDateTooltipContent = useCallback(() => {
+    if (!event.submissionDates || event.submissionDates.length === 0) {
+      return 'No submission dates available';
+    }
+
+    const now = new Date();
+    const upcomingDates = event.submissionDates
+      .filter(subDate => {
+        const date = new Date(subDate.fromDate);
+        return !isNaN(date.getTime()) && date >= now;
+      })
+      .sort((a, b) => new Date(a.fromDate).getTime() - new Date(b.fromDate).getTime());
+
+    if (upcomingDates.length === 0) {
+      return 'No upcoming submission deadlines';
+    }
+
+    return upcomingDates.map(subDate => {
+      const dateRange = formatDateRange(subDate.fromDate, subDate.toDate);
+      return `${subDate.name}: ${dateRange}`;
+    }).join('\n');
+  }, [event.submissionDates, formatDateRange])
+
+  const getSubmissionDateName = useCallback(() => {
+    const earliestSubmission = getEarliestSubmissionDate();
+    return earliestSubmission ? earliestSubmission.name : '';
+  }, [getEarliestSubmissionDate])
 
   const handleGoToWebsite = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>, url: string | undefined) => {
@@ -263,6 +318,44 @@ const EventCardComponent: React.FC<EventCardProps> = ({
             {formatDateRange(event.dates?.fromDate, event.dates?.toDate)}
           </span>
         </div>
+        
+        {/* Submission Date Section - Only display if submission dates exist */}
+        {event.submissionDates && event.submissionDates.length > 0 && getEarliestSubmissionDate() && (
+          <div className='mb-3 flex items-center text-xs transition duration-300'>
+            <Tooltip.Provider>
+              <Tooltip.Root>
+                <Tooltip.Trigger asChild>
+                  <div className='flex items-center cursor-help'>
+                    <Clock
+                      className='mr-1.5 flex-shrink-0 text-blue-600'
+                      size={16}
+                      strokeWidth={1.5}
+                    />
+                    <div className='flex flex-col text-left'>
+                      <span className='font-medium text-blue-700'>
+                        {getSubmissionDateName()}
+                      </span>
+                      <span className='text-gray-600'>
+                        {formatSubmissionDate()}
+                      </span>
+                    </div>
+                  </div>
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content
+                    className='max-w-xs rounded-md bg-gray-900 px-3 py-2 text-sm text-white shadow-lg'
+                    sideOffset={5}
+                  >
+                    <div className='whitespace-pre-line'>
+                      {getSubmissionDateTooltipContent()}
+                    </div>
+                    <Tooltip.Arrow className='fill-gray-900' />
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            </Tooltip.Provider>
+          </div>
+        )}
         <div className='mb-4'>
           <div className='flex flex-wrap items-center gap-1.5'>
             {event.topics && event.topics.length > 0 ? (
