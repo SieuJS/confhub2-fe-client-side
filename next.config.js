@@ -1,10 +1,4 @@
 const createNextIntlPlugin = require('next-intl/plugin')
-const withPWA = require('next-pwa')({
-    dest: 'public',
-    register: true,
-    skipWaiting: true,
-    disable: process.env.NODE_ENV === 'development'
-})
 
 const withNextIntl = createNextIntlPlugin()
 
@@ -57,4 +51,4 @@ const nextConfig = {
   // --- KẾT THÚC PHẦN THÊM VÀO ---
 }
 
-module.exports = withPWA(withNextIntl(nextConfig))
+module.exports = withNextIntl(nextConfig)
