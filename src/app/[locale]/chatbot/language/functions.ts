@@ -243,11 +243,10 @@ GCJH is a comprehensive online platform designed to connect researchers, academi
 export const englishGetConferencesDeclaration: FunctionDeclaration = {
     name: "getConferences",
     // Mô tả rõ mục đích là tạo query string
-    description: "Generates a URL-encoded query string to search for conferences based on user-specified criteria. This query string will be used to fetch data from the backend API." +
-        " It is crucial that *all* values in the query string are properly URL-encoded to ensure the backend API correctly interprets the search criteria. Failure to properly encode values can lead to incorrect search results or errors." +
-        " Be mindful of the maximum length of a URL, as excessively long query strings may be truncated by browsers or servers. Consider limiting the number of `topics` or `researchFields` parameters if necessary." +
-        " The backend API may be case-sensitive for certain parameters (e.g., `country`, `continent`). Ensure the casing of the values matches the expected format." +
-        " A comprehensive example combining multiple criteria: `acronym=AAAI&topics=AI&topics=Machine+Learning&country=Vietnam&fromDate=2024-01-01&toDate=2024-12-31&rank=A*`",
+    description: `*   **Finding Conference Information or Quantity (Number of conferences)**
+        *   **When to use:** Use this function if the task is to find any information about conferences, such as links, location, dates, summary, call for papers, etc. (e.g., "Find information about the X conference", "Details about Y conference", "Tìm thông tin về hội nghị X", "Conférences sur l'intelligence artificielle en France").
+        *   **How to use:** You must construct a single URL-encoded query string for the 'searchQuery' parameter. This query string is built from key=value pairs separated by '&'.
+        *   **CRITICAL TRANSLATION RULE:** All values used in the query string MUST be in English. For example: "Trí tuệ nhân tạo" MUST become "Artificial+Intelligence", "Việt Nam" MUST become "Vietnam", "Mỹ" MUST become "United+States", and "Allemagne" MUST become "Germany".`,
     parameters: {
         type: Type.OBJECT, // Vẫn là OBJECT theo cấu trúc chung
         properties: {
@@ -255,53 +254,44 @@ export const englishGetConferencesDeclaration: FunctionDeclaration = {
             searchQuery: {
                 type: Type.STRING,
                 // Hướng dẫn chi tiết cách tạo query string
-                description: "A URL-encoded query string constructed from the user's search criteria for conferences. Format as key=value pairs separated by '&'. " +
-                    "**Crucially, regardless of the input language (e.g., Vietnamese, English, French, etc.), all values used in the query string MUST be in English.** " +
-                    "For example, if the user asks for conferences in 'Việt Nam' (Vietnamese), the value for the `country` parameter must be 'Vietnam', not 'Việt Nam'. Similarly, 'Mỹ' (Vietnamese) should be 'United+States', 'Allemagne' (French) should be 'Germany'." +
-                    "Available keys based on potential user queries include: " +
-                    "`title` (string):  The full, formal name of the conference.(e.g., International Conference on Management of Digital EcoSystems) " +
-                    "`acronym` (string): The abbreviated name of the conference, often represented by capital letters (e.g., ICCCI, SIGGRAPH, ABZ). " +
-                    "`fromDate` (string, e.g., YYYY-MM-DD), " +
-                    "`toDate` (string, e.g., YYYY-MM-DD), " +
-                    "`topics` (string, repeat key for multiple values, e.g., topics=AI&topics=ML), " +
-                    "`cityStateProvince` (string), " +
-                    "`country` (string), " +
-                    "`continent` (string), " +
-                    "`address` (string), " +
-                    "`researchFields` (string, repeat key for multiple values), " +
-                    "`rank` (string), " +
-                    "`source` (string), " +
-                    "`accessType` (string), " +
-                    "`keyword` (string), " +
-                    "`subFromDate` (string), `subToDate` (string), " +
-                    "`cameraReadyFromDate` (string), `cameraReadyToDate` (string), " +
-                    "`notificationFromDate` (string), `notificationToDate` (string), " +
-                    "`registrationFromDate` (string), `registrationToDate` (string), " +
-                    "`mode` (string): If the user requests detailed information, the value is always `detail`. " +
-                    "`perPage` (number):  The number of conferences to return per page. If the user specifies a number, use that value. If the user doesn't specify a number, default to 5." +
-                    "`page` (number):  The page number of the results to return. If the user wants to see the next set of conferences, use page=2, page=3, etc. If the user doesn't specify a page number, default to 1." +
-                    "Ensure all values are properly URL-encoded (e.g., spaces become +). " +
-
-                    "**Distinguishing between Title and Acronym:** It is crucial to correctly identify whether the user is providing the full conference title or the acronym.  Here's how to differentiate them:" +
-                    "* **Title:** This is the complete, unabbreviated name of the conference.  It is typically a phrase or sentence that describes the conference's focus. Example: 'International Conference on Machine Learning'.  Use the `title` parameter for this." +
-                    "* **Acronym:** This is a short, usually capitalized, abbreviation of the conference name. Example: 'ICML' (for International Conference on Machine Learning).  Use the `acronym` parameter for this." +
-
-                    "**Examples:**" +
-                    "* User query: 'Tìm hội nghị về ICML'. `acronym=ICML&perPage=5&page=1` (Default perPage and page, 'Tìm hội nghị về' is ignored)" +
-                    "* User query: 'Tìm hội nghị tại Việt Nam'. `country=Vietnam&perPage=5&page=1` (Default perPage and page, 'Việt Nam' is converted to 'Vietnam')" +
-                    "* User query: 'Tìm hội nghị ở Mỹ'. `country=United+States&perPage=5&page=1` (Default perPage and page, 'Mỹ' is converted to 'United States' and URL-encoded)" +
-                    "* User query: 'Cherche des conférences en Allemagne'. `country=Germany&perPage=5&page=1` (Default perPage and page, 'Allemagne' is converted to 'Germany')" +
-                    "* User query: 'Search for the International Conference on Management of Digital EcoSystems'. `title=International+Conference+on+Management+of+Digital+EcoSystems&perPage=5&page=1` (Default perPage and page)" +
-                    "* User query: 'Find MEDES conferences'. `acronym=MEDES&perPage=5&page=1` (Default perPage and page)" +
-                    "* User query: 'Search for conferences with the full name International Conference on Recent Trends in Image Processing, Pattern Recognition and Machine Learning'. `title=International+Conference+on+Recent+Trends+in+Image+Processing,+Pattern+Recognition+and+Machine+Learning&perPage=5&page=1` (Default perPage and page)" +
-                    "* User query 1: 'Find 3 conferences in United States'. `country=United+States&perPage=3&page=1` User query 2: 'Find 5 different conferences in USA'. `country=United+States&perPage=5&page=2`" +
-
-                    "For example, if a topic contains both spaces and special characters, like 'Data Science & Analysis', it should be encoded as 'Data+Science+&+Analysis'. " +
-                    "If a user doesn't specify a value for a particular key, it should be omitted entirely from the query string.  Do not include keys with empty values (e.g., `title=`). " +
-                    "To specify multiple topics or research fields, repeat the key for each value. For example: `topics=AI&topics=Machine+Learning&researchFields=Computer+Vision&researchFields=Natural+Language+Processing`. " +
-                    "Always URL-encode special characters in values. For example, use `+` for spaces. " +
-                    "To search for conferences between two dates, use `fromDate` and `toDate`. For example, to search for conferences happening between January 1, 2023, and December 31, 2023, use `fromDate=2023-01-01&toDate=2023-12-31`. " +
-                    "If the user requests *detailed* information about the conferences (e.g., details information, full descriptions, specific dates, call for papers, summary, etc.), add the parameter `mode=detail` in beginning of the query string."
+                description: `*   **Available Keys for the Query String:**
+            *   'title' (string): The full, formal name of the conference (e.g., International Conference on Management of Digital EcoSystems, Conference on Theory and Applications of Models of Computation).
+            *   'acronym' (string): The abbreviated name of the conference (e.g., ICCCI, SIGGRAPH, ABZ, DaWaK).
+            *   'fromDate' (string, YYYY-MM-DD): Start date of the conference.
+            *   'toDate' (string, YYYY-MM-DD): End date of the conference.
+            *   'topics' (string): A topic of interest. Repeat this key for multiple topics (e.g., 'topics=AI&topics=ML').
+            *   'cityStateProvince' (string): The city, state, or province.
+            *   'country' (string): The country name (in English).
+            *   'continent' (string): The continent name (in English).
+            *   'address' (string): The specific address.
+            *   'rank' (string): The conference ranking (e.g., A*).
+            *   'source' (string): The source of the ranking (e.g., CORE2023).
+            *   'accessType' (string): The access type (Offline, Online, Hybrid).
+            *   'publisher' (string): The publisher name (e.g., IEEE, Springer).
+            *   'keyword' (string): A general keyword for searching.
+            *   'subFromDate', 'subToDate' (string, YYYY-MM-DD): Submission deadline range.
+            *   'cameraReadyFromDate', 'cameraReadyToDate' (string, YYYY-MM-DD): Camera-ready deadline range.
+            *   'notificationFromDate', 'notificationToDate' (string, YYYY-MM-DD): Notification date range.
+            *   'registrationFromDate', 'registrationToDate' (string, YYYY-MM-DD): Registration date range.
+            *   'mode' (string): Use 'mode=detail' if the user requests detailed information (full descriptions, specific dates, call for papers, summary, etc.). Place it at the beginning of the query string.
+            *   'perPage' (number): The number of results per page. Default to 5 if not specified by the user.
+            *   'page' (number): The page number of results. Default to 1. Use subsequent numbers for follow-up requests (e.g., "find 5 more").
+        *   **Specific Construction Rules:**
+            *   **URL Encoding:** All values must be URL-encoded. Spaces MUST be replaced with '+'. Special characters must be encoded (e.g., 'Data Science & Analysis' becomes 'Data+Science+&+Analysis').
+            *   **Title vs. Acronym:** It is crucial to differentiate. 'International Conference on Machine Learning' uses 'title'. 'ICML' uses 'acronym'.
+            *   **Date Ranges:** For any date parameter, if the user gives a single date (e.g., 'on March 15, 2024'), set both the 'From' and 'To' parameters to that same date (e.g., 'fromDate=2024-03-15&toDate=2024-03-15'). If a range is given, use both parameters accordingly.
+            *   **Omit Empty Keys:** If a user doesn't specify a value for a key, omit it entirely from the query string. Do not include keys with empty values (e.g., 'title=').
+        *   **Comprehensive Examples:**
+            *   User: "Tìm hội nghị về ICML" -> 'searchQuery: "acronym=ICML"'
+            *   User: "Tìm hội nghị tại Việt Nam trong năm nay" -> 'searchQuery: "country=Vietnam&fromDate=2025-01-01&toDate=2025-12-31"'
+            *   User: "Có bao nhiêu hội nghị tổ chức trực tiếp" -> 'searchQuery: "accessType=Offline"
+            *   User: "Cherche des conférences en Allemagne" -> 'searchQuery: "country=Germany"'
+            *   User: "Search for the International Conference on Management of Digital EcoSystems" -> 'searchQuery: "title=International+Conference+on+Management+of+Digital+EcoSystems"'
+            *   User 1: "Find 3 conferences in United States" -> 'searchQuery: "country=United+States&perPage=3&page=1"'
+            *   User 2 (follow-up): "Find 5 different conferences in USA" -> 'searchQuery: "country=United+States&perPage=5&page=2"'
+            *   User: "Tìm hội nghị có hạn nộp bài từ ngày 1 đến ngày 31 tháng 1 năm 2025" -> 'searchQuery: "subFromDate=2025-01-01&subToDate=2025-01-31"'
+            *   User: "Find details for AAAI conference" -> 'searchQuery: "mode=detail&acronym=AAAI"'
+            *   User: "Conferences on AI and Machine Learning in Vietnam" -> 'searchQuery: "topics=AI&topics=Machine+Learning&country=Vietnam"`
             }
         },
         // Đảm bảo Gemini luôn cung cấp tham số này
