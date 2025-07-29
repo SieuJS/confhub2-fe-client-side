@@ -1,4 +1,3 @@
-// src/hooks/conferences/useSearchForm.ts
 import { useState, useEffect, useRef, ChangeEvent, KeyboardEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import countryData from '@/src/app/[locale]/addconference/countries_en.json';

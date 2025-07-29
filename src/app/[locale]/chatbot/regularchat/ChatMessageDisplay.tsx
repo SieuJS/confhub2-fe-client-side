@@ -7,7 +7,7 @@ import {
   ChatMessageType,
   SourceItem
 } from '@/src/app/[locale]/chatbot/lib/regular-chat.types'
-import { TriangleAlert, Info } from 'lucide-react' // <<< MODIFIED: Thêm Info icon
+import { TriangleAlert, Info } from 'lucide-react'
 import ThoughtProcess from './ThoughtProcess'
 import { useSettingsStore } from '../stores'
 import { useShallow } from 'zustand/react/shallow'
@@ -38,7 +38,6 @@ interface ChatMessageDisplayProps {
   isInsideSmallContainer?: boolean
   isLatestUserMessage: boolean
   onConfirmEdit: (messageId: string, newText: string) => void
-  // <<< NEW PROP
   onOpenFeedbackModal: (messageId: string, type: 'like' | 'dislike') => void;
 }
 
@@ -58,7 +57,6 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
   isInsideSmallContainer = false,
   isLatestUserMessage,
   onConfirmEdit,
-  // <<< NEW PROP
   onOpenFeedbackModal
 }) => {
   const { isThoughtProcessHiddenInFloatingChat } = useSettingsStore(
@@ -123,16 +121,19 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
     cancelEdit()
   }
 
-  // <<< NEW: Handler for feedback buttons
   const handleFeedback = (type: 'like' | 'dislike') => {
     onOpenFeedbackModal(id, type);
   };
 
-  const canMessageBeEdited = type === 'text' || (type === 'multimodal' && !!text);
+  // <<< MODIFICATION START >>>
+  // A message can be edited only if it has editable text AND it does NOT contain any files.
+  const hasEditableText = type === 'text' || (type === 'multimodal' && !!primaryTextContent);
+  const hasFiles = (files && files.length > 0) || (botFiles && botFiles.length > 0);
+  const canMessageBeEdited = hasEditableText && !hasFiles;
+  // <<< MODIFICATION END >>>
 
   return (
     <div ref={bubbleRef} className={bubbleClasses}>
-      {/* ... (Error/Warning icons) ... */}
       {type === 'error' && (
         <TriangleAlert className='absolute -left-1.5 -top-1.5 mr-1.5 inline-block h-4 w-4 rounded-full bg-white p-0.5 text-red-600 shadow dark:bg-gray-800 dark:text-red-400' />
       )}
@@ -174,11 +175,10 @@ const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({
         onStartEdit={handleEditButtonClick}
         onConfirmEdit={handleConfirmEditClick}
         onCancelEdit={handleCancelEditClick}
-        canEditText={canMessageBeEdited}
-        onFeedback={handleFeedback} // <<< PASS HANDLER
+        canEditText={canMessageBeEdited} // This prop now correctly reflects the file check
+        onFeedback={handleFeedback}
       />
 
-      {/* <<< NEW: Survey Notification Message (only for bot messages) >>> */}
       {!isUser && type !== 'error' && type !== 'warning' && (
         <div className="mt-2.5 border-t border-black/10 pt-1.5 dark:border-white/20">
           <p className="flex items-center text-xs text-green-500 dark:text-gray-400">

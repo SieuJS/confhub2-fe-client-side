@@ -1,4 +1,3 @@
-// src/components/SearchSection.tsx
 'use client'
 
 import React from 'react'
@@ -21,6 +20,8 @@ interface SearchSectionProps {
     subToDate?: Date | null
     rank?: string | null
     source?: string | null
+    // ADDED: Publisher to search params type
+    publisher?: string | null
     topics?: string[]
     fieldOfResearch?: string[]
   }) => void
@@ -72,6 +73,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
     selectedTopics,
     handleFieldsOfResearchChange,
     selectedFieldsOfResearch,
+    // ADDED: Destructure publisher state and handler
     handlePublisherChange,
     selectedPublisher,
     subFromDate,
@@ -311,8 +313,9 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch, onClear }) => {
         selectedTopics={selectedTopics}
         onFieldOfResearchChange={handleFieldsOfResearchChange}
         selectedFieldsOfResearch={selectedFieldsOfResearch}
-        // onPublisherChange={handlePublisherChange}
-        // selectedPublisher={selectedPublisher}
+        // ADDED: Pass publisher props
+        onPublisherChange={handlePublisherChange}
+        selectedPublisher={selectedPublisher}
         subFromDate={subFromDate}
         subToDate={subToDate}
         onSubmissionDateRangeChange={handleSubmissionDateRangeChange}

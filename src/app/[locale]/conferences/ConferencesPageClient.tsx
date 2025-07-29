@@ -23,7 +23,8 @@ interface SearchParamsForURL {
   subFromDate?: Date | null;
   subToDate?: Date | null;
   rank?: string | null;
-  source?: string | null;
+  source?: string | null;  
+  publisher?: string | null;
   topics?: string[];
   fieldOfResearch?: string[];
 }
@@ -43,7 +44,6 @@ export default function ConferencesPageClient({ locale, initialData }: Conferenc
   const handleSearch = useCallback(
     (searchParamsFromComponent: SearchParamsForURL) => {
       const newParams = new URLSearchParams()
-      // ... (toàn bộ logic tạo newParams của bạn giữ nguyên) ...
       if (searchParamsFromComponent.keyword) newParams.set('keyword', searchParamsFromComponent.keyword);
       if (searchParamsFromComponent.title) newParams.set('title', searchParamsFromComponent.title);
       if (searchParamsFromComponent.acronym) newParams.set('acronym', searchParamsFromComponent.acronym);
@@ -53,6 +53,7 @@ export default function ConferencesPageClient({ locale, initialData }: Conferenc
       if (searchParamsFromComponent.toDate) newParams.set('toDate', searchParamsFromComponent.toDate.toISOString().split('T')[0]);
       if (searchParamsFromComponent.rank) newParams.set('rank', searchParamsFromComponent.rank);
       if (searchParamsFromComponent.source) newParams.set('source', searchParamsFromComponent.source);
+      if (searchParamsFromComponent.publisher) newParams.set('publisher', searchParamsFromComponent.publisher);
       if (searchParamsFromComponent.subFromDate) newParams.set('subFromDate', searchParamsFromComponent.subFromDate.toISOString().split('T')[0]);
       if (searchParamsFromComponent.subToDate) newParams.set('subToDate', searchParamsFromComponent.subToDate.toISOString().split('T')[0]);
       if (searchParamsFromComponent.topics && searchParamsFromComponent.topics.length > 0) {

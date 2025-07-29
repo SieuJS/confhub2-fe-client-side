@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import useSearchAdvanceForm from '../../../hooks/conferences/useSearchAdvanceForm' // Giả sử hook này đã được cập nhật
+import useSearchAdvanceForm from '../../../hooks/conferences/useSearchAdvanceForm'
 import { useTranslations } from 'next-intl'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
@@ -10,8 +10,7 @@ import { appConfig } from '@/src/middleware'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid'
 
-// --- GIAO DIỆN PROPS HOÀN CHỈNH ---
-// Interface này định nghĩa tất cả các props mà component cần nhận từ cha (SearchSection)
+// --- PROPS INTERFACE ---
 interface SearchAdvanceSectionProps {
   isAdvancedOptionsVisible: boolean
   toggleAdvancedOptionsVisibility: () => void
@@ -22,7 +21,9 @@ interface SearchAdvanceSectionProps {
   selectedRank: string | null
   onSourceChange: (source: string | null) => void
   selectedSource: string | null
-  // Props mới cho Average Score
+  // ADDED: Props for Publisher
+  onPublisherChange: (publisher: string | null) => void
+  selectedPublisher: string | null
   onTopicsChange: (topics: string[]) => void
   selectedTopics: string[]
   onFieldOfResearchChange: (fields: string[]) => void
@@ -30,7 +31,6 @@ interface SearchAdvanceSectionProps {
 }
 
 const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
-  // Destructure tất cả các props để sử dụng trong component
   isAdvancedOptionsVisible,
   toggleAdvancedOptionsVisibility,
   onSubmissionDateRangeChange,
@@ -40,6 +40,9 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
   selectedRank,
   onSourceChange,
   selectedSource,
+  // ADDED: Destructure Publisher props
+  onPublisherChange,
+  selectedPublisher,
   onTopicsChange,
   selectedTopics,
   onFieldOfResearchChange,
@@ -47,17 +50,14 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
 }) => {
   const t = useTranslations('')
 
-  // --- STATE NỘI BỘ ĐỂ QUẢN LÝ VIỆC TẢI DỮ LIỆU ---
+  // --- INTERNAL STATE FOR DATA LOADING ---
   const [availableTopics, setAvailableTopics] = useState<string[]>([])
   const [topicsLoading, setTopicsLoading] = useState(false)
 
   const [availableSources, setAvailableSources] = useState<string[]>([])
   const [sourcesLoading, setSourcesLoading] = useState(false)
 
-  const [availablePublishers, setAvailablePublishers] = useState<string[]>([])
-  const [publishersLoading, setPublishersLoading] = useState(false)
-
-  // --- CÁC HOOK useEffect ĐỂ FETCH DỮ LIỆU TỪ API ---
+  // --- useEffect HOOKS FOR API FETCHING ---
 
   // Fetch Topics
   useEffect(() => {
@@ -100,29 +100,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
     }
   }, [isAdvancedOptionsVisible, availableSources.length, sourcesLoading])
 
-  // Fetch Publishers
-  // useEffect(() => {
-  //   if (isAdvancedOptionsVisible && availablePublishers.length === 0 && !publishersLoading) {
-  //     const fetchPublishers = async () => {
-  //       setPublishersLoading(true)
-  //       try {
-  //         const response = await fetch(`${appConfig.NEXT_PUBLIC_DATABASE_URL}/api/v1/admin/conferences/filter-options/publishers`)
-  //         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
-  //         const data: string[] = await response.json()
-  //         const filteredPublishers = data.filter(p => p && p.trim().toLowerCase() !== 'unknown')
-  //         setAvailablePublishers(filteredPublishers)
-  //       } catch (error) {
-  //         // console.error('Could not fetch publishers:', error)
-  //       } finally {
-  //         setPublishersLoading(false)
-  //       }
-  //     }
-  //     fetchPublishers()
-  //   }
-  // }, [isAdvancedOptionsVisible, availablePublishers.length, publishersLoading])
-
-  // --- SỬ DỤNG CUSTOM HOOK ĐỂ QUẢN LÝ LOGIC INPUT ---
-  // Truyền tất cả các props cần thiết vào hook
+  // --- CUSTOM HOOK FOR INPUT LOGIC ---
   const {
     topicsInput,
     topicSuggestions,
@@ -138,17 +116,16 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
     handleRemoveFieldOfResearch,
     handleRankChangeInput,
     handleSourceChangeInput,
-    // handlePublisherChangeInput, // Handler mới từ hook
-    // handleAverageScoreChangeInput // Handler mới từ hook
+    // ADDED: Handler for Publisher
+    handlePublisherChangeInput
   } = useSearchAdvanceForm({
     onRankChange,
     selectedRank,
     onSourceChange,
     selectedSource,
-    // onPublisherChange,
-    // selectedPublisher,
-    // onAverageScoreChange,
-    // selectedAverageScore,
+    // ADDED: Pass publisher props to hook
+    onPublisherChange,
+    selectedPublisher,
     onTopicsChange,
     selectedTopics,
     onFieldOfResearchChange,
@@ -159,7 +136,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
   return (
     <Tooltip.Provider delayDuration={300}>
       <div>
-        {/* Nút bật/tắt bộ lọc nâng cao */}
+        {/* Toggle advanced filters button */}
         <div className='mt-4 flex justify-end'>
           <button
             onClick={toggleAdvancedOptionsVisibility}
@@ -179,10 +156,10 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
           </button>
         </div>
 
-        {/* Khối nội dung bộ lọc nâng cao, chỉ hiển thị khi isAdvancedOptionsVisible là true */}
+        {/* Advanced filters content block */}
         {isAdvancedOptionsVisible && (
           <div className='mt-2 rounded-lg border p-4 shadow-md transition-all duration-300 ease-in-out'>
-            {/* Hàng đầu tiên của bộ lọc */}
+            {/* First row of filters */}
             <div className='mb-4 grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5'>
               {/* --- Submission Date --- */}
               <div className='col-span-1 md:col-span-3 lg:col-span-1'>
@@ -256,28 +233,22 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
                 </select>
               </div>
 
-              {/* --- Publisher (MỚI) --- */}
-              {/* <div className='col-span-1'>
+              {/* --- Publisher (NEW) --- */}
+              <div className='col-span-1'>
                 <label className='mb-1 flex items-center text-sm font-bold' htmlFor='publisher'>
                   {t('Publisher')}:
                 </label>
-                <select
+                <input
+                  type='text'
                   id='publisher'
-                  className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow focus:outline-none'
+                  className='focus:shadow-outline w-full appearance-none rounded border px-2 py-1 text-sm leading-tight shadow placeholder:text-primary focus:outline-none'
                   value={selectedPublisher || ''}
                   onChange={handlePublisherChangeInput}
-                  disabled={publishersLoading}
-                >
-                  <option value=''>
-                    {publishersLoading ? t('Loading_publishers') : t('All_Publishers')}
-                  </option>
-                  {availablePublishers.map(publisher => (
-                    <option key={publisher} value={publisher}>{publisher}</option>
-                  ))}
-                </select>
-              </div> */}
+                  placeholder={t('Enter_publisher_name') ?? 'Enter publisher name'}
+                />
+              </div>
 
-              {/* --- Average Score (MỚI) --- */}
+              {/* --- Average Score (Commented out) --- */}
               {/* <div className='col-span-1'>
                 <label className='mb-1 flex items-center text-sm font-bold' htmlFor='averageScore'>
                   {t('Average_Score')}:
@@ -293,7 +264,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = ({
               </div> */}
             </div>
 
-            {/* Hàng thứ hai của bộ lọc */}
+            {/* Second row of filters */}
             <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
               {/* --- Topics --- */}
               <div className='relative col-span-1'>
