@@ -514,28 +514,6 @@
   "Confirmation": "Confirmation",
   "Please_log_in_to_add_new_Conference": "Please log in to add new Conference",
   "Terms_and_Conditions_Description": "By clicking the Add Conference button, I confirm that I have read, understood, and agree to comply with all the terms and conditions for conference organizers/posters on this platform. I also agree with the platform's privacy policy.",
-  "Visualization": {
-    "Visualization": "Visualization",
-    "invalidDrop": "Cannot drop a {fieldType} field into the {zoneLabel} zone. This zone requires a {acceptedType} field.",
-    "downloadFailed": "Failed to download the chart. Please try again later.",
-    "downloadSuccess": "Chart downloaded successfully!",
-    "downloadNotReady": "The chart is not ready to be downloaded.",
-    "chartGenerationError": "An error occurred while generating the chart. Please check the configuration.",
-    "errorLoadingData": "Error loading visualization data",
-    "noDataAvailable": "No data loaded or available for visualization",
-    "expandFieldsPanel": "Expand Fields Panel",
-    "expandConfigPanel": "Expand Configuration Panel",
-    "zones": {
-      "xAxis": "X-Axis",
-      "yAxis": "Y-Axis",
-      "color": "Color",
-      "size": "Size"
-    },
-    "fieldTypes": {
-      "dimension": "Dimension",
-      "measure": "Measure"
-    }
-  },
   "offline": "offline",
   "online": "online",
   "hybrid": "hybrid",
@@ -1995,5 +1973,60 @@
   "File_Upload_MaxFilesExceeded": "Max Files Exceeded (5 files)",
   "All_Ranks": "All Ranks",
   "All_Sources": "All Sources",
-  "Loading_publishers": "Loading publishers..."
+  "Loading_publishers": "Loading publishers...",
+  "Visualization": {
+    "Visualization": "Visualization",
+    "Configuration": "Configuration",
+    "Collapse_Configuration_Panel": "Collapse Configuration Panel",
+    "Chart_Type": "Chart Type",
+    "Dimensions": "Dimensions",
+    "Measures": "Measures",
+    "No_dimensions_available": "No dimensions available",
+    "No_measures_available": "No measures available",
+    "invalidDrop": "Cannot drop '{fieldType}' field into '{zoneLabel}' zone. This zone only accepts '{acceptedType}'.",
+    "downloadSuccess": "Chart downloaded successfully!",
+    "downloadFailed": "Chart download failed.",
+    "downloadNotReady": "Download failed: Chart not ready.",
+    "errorLoadingData": "Error loading data",
+    "noDataAvailable": "No data available for visualization.",
+    "expandFieldsPanel": "Expand Fields Panel",
+    "expandConfigPanel": "Expand Configuration Panel",
+    "configPanel": {
+      "title": "Chart Configuration",
+      "collapse": "Collapse Configuration Panel",
+      "chartType": "Chart Type",
+      "zones": {
+        "xAxisBar": "X-Axis (Category)",
+        "yAxisBar": "Y-Axis (Value)",
+        "colorBar": "Color (Group)",
+        "xAxisLine": "X-Axis (Category)",
+        "yAxisLine": "Y-Axis (Value)",
+        "colorLine": "Color (Group)",
+        "yAxisPie": "Value (Slice Size)",
+        "colorPie": "Slices (Category)",
+        "xAxisScatter": "X-Axis (Value)",
+        "yAxisScatter": "Y-Axis (Value)",
+        "colorScatter": "Color (Group)",
+        "xAxisMap": "Location (Country/Continent)",
+        "yAxisMap": "Color Value (Measure)",
+        "xAxisTreemap": "Hierarchy (Category)",
+        "yAxisTreemap": "Size (Measure)",
+        "colorTreemap": "Color (Category)"
+      },
+      "options": {
+        "title": "Chart Options",
+        "chartTitle": "Chart Title",
+        "chartTitlePlaceholder": "Enter chart title",
+        "showLegend": "Show Legend",
+        "hideLegend": "Hide Legend",
+        "showToolbox": "Show Toolbox",
+        "hideToolbox": "Hide Toolbox"
+      },
+      "fieldTypes": {
+        "dimension": "dimension",
+        "measure": "measure",
+        "any": "any field"
+      }
+    }
+  }
 }

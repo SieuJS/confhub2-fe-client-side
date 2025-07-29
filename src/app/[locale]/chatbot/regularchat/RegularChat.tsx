@@ -56,11 +56,18 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
   const [contextMessage, setContextMessage] = useState<string | null>(null);
 
   const { isModalOpen, modalTitle, modalMessage, showAlertDialog, closeModal } = useAlertDialog();
-  const { selectedFiles, setSelectedFiles, handleFileChange, handleRemoveFile } = useFileHandling({ showAlertDialog });
+  // <<< MODIFIED: Lấy thêm hàm `addFiles` từ hook >>>
+  const {
+    selectedFiles,
+    setSelectedFiles,
+    handleFileChange,
+    handleRemoveFile,
+    addFiles
+  } = useFileHandling({ showAlertDialog })
 
   // <<< THAY ĐỔI: Lấy thêm hàm resetContextAttachedNextSend từ store >>>
-  const { 
-    isCurrentPageFeatureEnabled, 
+  const {
+    isCurrentPageFeatureEnabled,
     isContextAttachedNextSend,
     resetContextAttachedNextSend // Lấy hàm reset
   } = usePageContextStore();
@@ -195,7 +202,7 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
         />
       </div>
 
-      <div className="px-2 mb-2"> 
+      <div className="px-2 mb-2">
         <FilePreview files={selectedFiles} onRemoveFile={handleRemoveFile} />
       </div>
 
@@ -218,6 +225,8 @@ function RegularChat({ isSmallContext = false }: RegularChatProps) {
         handleFileChange={handleFileChange}
         handleRemoveFile={handleRemoveFile}
         showAlertDialog={showAlertDialog}
+        addFiles={addFiles} // <<< NEW: Truyền hàm `addFiles` xuống
+
       />
 
       <EmailConfirmationDialog

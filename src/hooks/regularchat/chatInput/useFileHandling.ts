@@ -1,7 +1,10 @@
 // src/app/[locale]/chatbot/regularchat/chat-input/hooks/useFileHandling.ts
 import { useState, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
-import { MAX_TOTAL_FILES, MAX_FILE_SIZE_MB } from '@/src/app/[locale]/chatbot/regularchat/ChatInput'
+import {
+  MAX_TOTAL_FILES,
+  MAX_FILE_SIZE_MB
+} from '@/src/app/[locale]/chatbot/regularchat/ChatInput'
 
 interface UseFileHandlingProps {
   showAlertDialog: (title: string, message: string) => void
@@ -11,17 +14,16 @@ export const useFileHandling = ({ showAlertDialog }: UseFileHandlingProps) => {
   const t = useTranslations()
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
 
-  const handleFileChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (!event.target.files) return
-
-      const newFiles = Array.from(event.target.files)
+  // <<< NEW: Hàm dùng chung để thêm và xác thực tệp >>>
+  const addFiles = useCallback(
+    (filesToAdd: File[]) => {
+      const currentFileCount = selectedFiles.length
       let validFiles: File[] = []
       let alertShownForSize = false
       let alertShownForMaxFiles = false
 
-      newFiles.forEach(file => {
-        if (selectedFiles.length + validFiles.length >= MAX_TOTAL_FILES) {
+      filesToAdd.forEach(file => {
+        if (currentFileCount + validFiles.length >= MAX_TOTAL_FILES) {
           if (!alertShownForMaxFiles) {
             showAlertDialog(
               t('ChatInput_Error_Title_MaxFiles'),
@@ -44,19 +46,40 @@ export const useFileHandling = ({ showAlertDialog }: UseFileHandlingProps) => {
           }
           return
         }
-        validFiles.push(file)
+        // Ngăn việc thêm các tệp trùng lặp
+        if (
+          !selectedFiles.some(
+            existingFile =>
+              existingFile.name === file.name && existingFile.size === file.size
+          )
+        ) {
+          validFiles.push(file)
+        }
       })
 
-      setSelectedFiles(prevFiles =>
-        [...prevFiles, ...validFiles].slice(0, MAX_TOTAL_FILES)
-      )
-      
-      // Reset input value to allow selecting the same file again
+      if (validFiles.length > 0) {
+        setSelectedFiles(prevFiles =>
+          [...prevFiles, ...validFiles].slice(0, MAX_TOTAL_FILES)
+        )
+      }
+    },
+    [selectedFiles, showAlertDialog, t]
+  )
+
+  // <<< MODIFIED: Sử dụng hàm addFiles mới >>>
+  const handleFileChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (!event.target.files) return
+
+      const newFiles = Array.from(event.target.files)
+      addFiles(newFiles)
+
+      // Reset giá trị input để cho phép chọn lại cùng một tệp
       if (event.target) {
         event.target.value = ''
       }
     },
-    [selectedFiles.length, showAlertDialog, t]
+    [addFiles]
   )
 
   const handleRemoveFile = useCallback((fileName: string) => {
@@ -69,6 +92,7 @@ export const useFileHandling = ({ showAlertDialog }: UseFileHandlingProps) => {
     selectedFiles,
     setSelectedFiles,
     handleFileChange,
-    handleRemoveFile
+    handleRemoveFile,
+    addFiles // <<< NEW: Xuất hàm mới
   }
 }

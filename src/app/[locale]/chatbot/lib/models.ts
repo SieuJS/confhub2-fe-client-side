@@ -28,7 +28,7 @@ export const AVAILABLE_MODELS: ModelOption[] = [
   },
   {
     name: 'Nebula',
-    value: 'gemini-2.5-flash-lite-preview-06-17',
+    value: 'gemini-2.5-flash-lite',
     // description: 'Chớp nhoáng tức thời: Phản hồi siêu tốc, độ trễ cực thấp.',
     detailedDescription:
       'Chớp nhoáng tức thời: Phản hồi siêu tốc, độ trễ cực thấp.',

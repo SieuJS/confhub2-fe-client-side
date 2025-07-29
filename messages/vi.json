@@ -514,28 +514,6 @@
   "Confirmation": "Xác nhận",
   "Please_log_in_to_add_new_Conference": "Vui lòng đăng nhập để thêm Hội nghị mới",
   "Terms_and_Conditions_Description": "Bằng cách nhấp vào nút Thêm Hội nghị, tôi xác nhận rằng tôi đã đọc, hiểu và đồng ý tuân thủ tất cả các điều khoản và điều kiện dành cho người tổ chức/đăng bài hội nghị trên nền tảng này. Tôi cũng đồng ý với chính sách bảo mật của nền tảng.",
-  "Visualization": {
-    "Visualization": "Trực quan hóa",
-    "invalidDrop": "Không thể thả một trường {fieldType} vào vùng {zoneLabel}. Vùng này yêu cầu một trường {acceptedType}.",
-    "downloadFailed": "Tải biểu đồ thất bại. Vui lòng thử lại sau.",
-    "downloadSuccess": "Tải biểu đồ thành công!",
-    "downloadNotReady": "Biểu đồ chưa sẵn sàng để tải xuống.",
-    "chartGenerationError": "Đã xảy ra lỗi khi tạo biểu đồ. Vui lòng kiểm tra cấu hình.",
-    "errorLoadingData": "Lỗi khi tải dữ liệu trực quan",
-    "noDataAvailable": "Không có dữ liệu nào được tải hoặc có sẵn để trực quan hóa",
-    "expandFieldsPanel": "Mở rộng Bảng các trường",
-    "expandConfigPanel": "Mở rộng Bảng cấu hình",
-    "zones": {
-      "xAxis": "Trục X",
-      "yAxis": "Trục Y",
-      "color": "Màu sắc",
-      "size": "Kích thước"
-    },
-    "fieldTypes": {
-      "dimension": "Thứ nguyên",
-      "measure": "Thước đo"
-    }
-  },
   "offline": "trực tiếp",
   "online": "trực tuyến",
   "hybrid": "kết hợp",
@@ -1995,5 +1973,59 @@
   "File_Upload_MaxFilesExceeded": "Đã vượt quá số lượng tệp tối đa (5 tệp)",
   "All_Ranks": "Tất cả các Xếp hạng",
   "All_Sources": "Tất cả các Nguồn",
-  "Loading_publishers": "Đang tải các nhà xuất bản..."
+  "Loading_publishers": "Đang tải các nhà xuất bản...",
+  "Visualization": {
+    "Configuration": "Cấu hình",
+    "Collapse_Configuration_Panel": "Thu gọn bảng cấu hình",
+    "Chart_Type": "Loại biểu đồ",
+    "Dimensions": "Chiều (Dimensions)",
+    "Measures": "Đo lường (Measures)",
+    "No_dimensions_available": "Không có chiều nào khả dụng",
+    "No_measures_available": "Không có đo lường nào khả dụng",
+    "invalidDrop": "Không thể thả trường '{fieldType}' vào vùng '{zoneLabel}'. Vùng này chỉ chấp nhận '{acceptedType}'.",
+    "downloadSuccess": "Tải biểu đồ thành công!",
+    "downloadFailed": "Tải biểu đồ thất bại.",
+    "downloadNotReady": "Tải xuống thất bại: Biểu đồ chưa sẵn sàng.",
+    "errorLoadingData": "Lỗi khi tải dữ liệu",
+    "noDataAvailable": "Không có dữ liệu khả dụng để trực quan hóa.",
+    "expandFieldsPanel": "Mở rộng bảng trường dữ liệu",
+    "expandConfigPanel": "Mở rộng bảng cấu hình",
+    "configPanel": {
+      "title": "Cấu hình biểu đồ",
+      "collapse": "Thu gọn bảng cấu hình",
+      "chartType": "Loại biểu đồ",
+      "zones": {
+        "xAxisBar": "Trục X (Danh mục)",
+        "yAxisBar": "Trục Y (Giá trị)",
+        "colorBar": "Màu sắc (Nhóm)",
+        "xAxisLine": "Trục X (Danh mục)",
+        "yAxisLine": "Trục Y (Giá trị)",
+        "colorLine": "Màu sắc (Nhóm)",
+        "yAxisPie": "Giá trị (Kích thước lát cắt)",
+        "colorPie": "Lát cắt (Danh mục)",
+        "xAxisScatter": "Trục X (Giá trị)",
+        "yAxisScatter": "Trục Y (Giá trị)",
+        "colorScatter": "Màu sắc (Nhóm)",
+        "xAxisMap": "Vị trí (Quốc gia/Châu lục)",
+        "yAxisMap": "Giá trị màu sắc (Đo lường)",
+        "xAxisTreemap": "Phân cấp (Danh mục)",
+        "yAxisTreemap": "Kích thước (Đo lường)",
+        "colorTreemap": "Màu sắc (Danh mục)"
+      },
+      "options": {
+        "title": "Tùy chọn biểu đồ",
+        "chartTitle": "Tiêu đề biểu đồ",
+        "chartTitlePlaceholder": "Nhập tiêu đề biểu đồ",
+        "showLegend": "Hiển thị chú giải",
+        "hideLegend": "Ẩn chú giải",
+        "showToolbox": "Hiển thị hộp công cụ",
+        "hideToolbox": "Ẩn hộp công cụ"
+      },
+      "fieldTypes": {
+        "dimension": "chiều",
+        "measure": "đo lường",
+        "any": "bất kỳ trường nào"
+      }
+    }
+  }
 }

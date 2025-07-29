@@ -1,180 +1,183 @@
 // src/app/[locale]/visualization/utils/processor.ts
-import { groupBy, mapValues, sumBy } from 'lodash';
+import { groupBy, mapValues, sumBy, meanBy } from 'lodash';
 import { ChartConfig, ProcessedChartData, DataField, ChartType } from '../../../../models/visualization/visualization';
 import { ConferenceResponse } from '@/src/models/response/conference.response';
-import { getNestedValue, parseNumericValue } from './helpers'; // Import helpers
-import { UNKNOWN_CATEGORY } from './fields'; // Import constants if needed
+import { getNestedValue, parseNumericValue } from './helpers';
+import { UNKNOWN_CATEGORY } from './fields';
 
-const logPrefixProcessor = 'PROCESSOR:';
-
+// --- IMPORTANT HELPER: Data Flattening ---
 /**
- * Aggregates data within groups based on the measure field's aggregation type.
- * (Internal helper function for processDataForChart)
+ * "Làm phẳng" dữ liệu hội nghị dựa trên mảng `ranks`.
+ * Một hội nghị có N ranks sẽ tạo ra N object mới.
+ * @param rawData Mảng dữ liệu hội nghị gốc.
+ * @returns Mảng dữ liệu đã được làm phẳng.
  */
+export const flattenDataByRank = (rawData: ConferenceResponse[]): any[] => {
+    const flattenedData: any[] = [];
+    rawData.forEach(conf => {
+        const ranks = getNestedValue(conf, 'ranks');
+        if (Array.isArray(ranks) && ranks.length > 0) {
+            ranks.forEach(rank => {
+                flattenedData.push({
+                    ...conf, // Giữ lại toàn bộ thông tin hội nghị gốc
+                    ...rank, // Thêm các thuộc tính của rank vào cấp cao nhất
+                });
+            });
+        } else {
+            // Nếu hội nghị không có rank, vẫn giữ lại nó trong bộ dữ liệu
+            flattenedData.push({ ...conf, rank: UNKNOWN_CATEGORY, source: UNKNOWN_CATEGORY, researchField: UNKNOWN_CATEGORY });
+        }
+    });
+    return flattenedData;
+};
+
+
 const aggregateData = (
-    groupedData: Record<string, ConferenceResponse[]>,
+    groupedData: Record<string, any[]>,
     measureField: DataField
 ): Record<string, number> => {
-    const measureId = measureField.id;
     const aggregationType = measureField.aggregation;
-    // console.log(`${logPrefixProcessor} aggregateData: Aggregating "${measureId}" (${aggregationType}) for groups: [${Object.keys(groupedData).join(', ')}]`);
-
-    if (!aggregationType) {
-        // console.warn(`${logPrefixProcessor} aggregateData: Missing aggregation type for "${measureId}". Returning 0.`);
-        return mapValues(groupedData, () => 0);
-    }
+    if (!aggregationType) return mapValues(groupedData, () => 0);
 
     switch (aggregationType) {
-        case 'sum':
-            if (!measureField.accessor) {
-                // console.warn(`${logPrefixProcessor} aggregateData: SUM needs accessor for "${measureId}". Returning 0.`);
-                return mapValues(groupedData, () => 0);
-            }
-            return mapValues(groupedData, (group, key) => {
-                const sum = sumBy(group, item => parseNumericValue(measureField.accessor!(item), `${measureId} for SUM in group ${key}`));
-                return sum;
-            });
-
-        case 'average':
-            const avgTargetProp = (measureField as any).avgTargetProperty;
-            // console.log(`${logPrefixProcessor} aggregateData: AVERAGE for "${measureId}" ${avgTargetProp ? `(prop: "${avgTargetProp}")` : ''}.`);
-            if (!measureField.accessor) {
-                // console.warn(`${logPrefixProcessor} aggregateData: AVERAGE needs accessor for "${measureId}". Returning 0.`);
-                return mapValues(groupedData, () => 0);
-            }
-            return mapValues(groupedData, (group, key) => {
-                const allValues: number[] = [];
-                group.forEach((item, index) => {
-                    const accessedValue = measureField.accessor!(item);
-                    if (avgTargetProp && Array.isArray(accessedValue)) {
-                        const arrayValues = accessedValue
-                            .map((subItem: any, subIndex: number) => parseNumericValue(getNestedValue(subItem, avgTargetProp), `${avgTargetProp} from ${measureId}[${subIndex}]`))
-                            .filter(v => !isNaN(v));
-                        allValues.push(...arrayValues);
-                    } else if (!avgTargetProp) {
-                        const numValue = parseNumericValue(accessedValue, `${measureId} for AVERAGE item ${index}`);
-                        if (!isNaN(numValue)) allValues.push(numValue);
-                    } else {
-                        // console.warn(`${logPrefixProcessor} aggregateData: AVERAGE - Mismatch for "${measureId}" in group "${key}". Expected array for avgTargetProp.`);
-                    }
-                });
-                const average = allValues.length > 0 ? sumBy(allValues) / allValues.length : 0;
-                return average;
-            });
-
         case 'count':
-            return mapValues(groupedData, (group, key) => {
-                const count = group.length;
-                return count;
+            return mapValues(groupedData, group => group.length);
+        case 'sum':
+            if (!measureField.accessor) return mapValues(groupedData, () => 0);
+            return mapValues(groupedData, group =>
+                sumBy(group, item => parseNumericValue(measureField.accessor!(item)))
+            );
+        case 'average':
+            if (!measureField.accessor) return mapValues(groupedData, () => 0);
+            return mapValues(groupedData, group => {
+                // Lọc ra các giá trị không phải null/undefined trước khi tính trung bình
+                const validItems = group.map(item => measureField.accessor!(item)).filter(val => val !== null && val !== undefined);
+                return meanBy(validItems, val => parseNumericValue(val));
             });
-
         default:
-            // console.warn(`${logPrefixProcessor} aggregateData: Unknown aggregation type: "${aggregationType}" for "${measureId}". Returning 0.`);
             return mapValues(groupedData, () => 0);
     }
 };
 
-
-/**
- * Processes raw data based on chart configuration into a structure suitable for ECharts.
- * @param rawData Array of ConferenceResponse items.
- * @param config User's chart configuration.
- * @param availableFields List of all defined DataFields.
- * @returns Processed chart data (categories, series, legend).
- * @throws Error on invalid configuration.
- */
 export const processDataForChart = (
     rawData: ConferenceResponse[],
     config: ChartConfig,
     availableFields: DataField[]
 ): ProcessedChartData => {
-    const chartType = config.chartType as ChartType;
-    // console.log(`${logPrefixProcessor} processDataForChart: Start. Type: "${chartType}", Data length: ${rawData?.length ?? 0}`);
+    const { chartType } = config;
 
     if (!rawData || rawData.length === 0) {
-        // console.warn(`${logPrefixProcessor} processDataForChart: No raw data. Returning empty.`);
-        return { categories: [], series: [], legendData: [] };
+        return { series: [] };
     }
 
-    // Tìm các trường đã chọn
-    const xAxisField = availableFields.find(f => f.id === config.xAxis?.fieldId);
     const yAxisField = availableFields.find(f => f.id === config.yAxis?.fieldId);
+    const xAxisField = availableFields.find(f => f.id === config.xAxis?.fieldId);
     const colorField = availableFields.find(f => f.id === config.color?.fieldId);
-    // REMOVED: sizeField không còn cần thiết
 
-    // console.log(`${logPrefixProcessor} processDataForChart: Fields - X:${xAxisField?.id || 'N/A'} Y:${yAxisField?.id || 'N/A'} Color:${colorField?.id || 'N/A'}`);
+    // --- IMPORTANT: Decide which dataset to use ---
+    const rankFieldIds = ['rank.value', 'rank.source', 'rank.researchField'];
+    const usesRankFields = [config.xAxis.fieldId, config.yAxis.fieldId, config.color.fieldId].some(id => id && rankFieldIds.includes(id));
+    
+    const processedData = usesRankFields ? flattenDataByRank(rawData) : rawData;
 
-    // --- Xác thực đầu vào ---
-    if (!yAxisField) {
-        const errorMsg = `Chart requires a Measure field for Y-Axis/Value (Selected: ${config.yAxis?.fieldId || 'none'}).`;
-        throw new Error(errorMsg);
-    }
-    if (yAxisField.type !== 'measure') {
-        const errorMsg = `Field '${yAxisField.name}' (ID: ${yAxisField.id}) selected for Y-Axis/Value is not a Measure (Type: ${yAxisField.type}).`;
-        throw new Error(errorMsg);
-    }
-    // Tất cả các loại biểu đồ còn lại đều yêu cầu một phương thức tổng hợp
-    if (!yAxisField.aggregation) {
-        const errorMsg = `Measure field '${yAxisField.name}' (ID: ${yAxisField.id}) requires an 'aggregation' type but has none.`;
-        throw new Error(errorMsg);
+    // --- Validation ---
+    const requiresMeasure = ['bar', 'line', 'pie', 'map', 'treemap', 'scatter'];
+    if (requiresMeasure.includes(chartType) && (!yAxisField || yAxisField.type !== 'measure')) {
+        throw new Error(`Chart type '${chartType}' requires a Measure on the Y-Axis/Value.`);
     }
 
     let categories: string[] = [];
     let series: any[] = [];
     let legendData: string[] = [];
+    let visualMap: any = undefined;
 
-    // console.log(`${logPrefixProcessor} processDataForChart: Processing logic for ${chartType}...`);
-
-    // --- Logic Biểu đồ Cột/Đường ---
+    // --- Chart Logic ---
     if (chartType === 'bar' || chartType === 'line') {
-        if (!xAxisField?.accessor || !yAxisField?.aggregation) throw new Error("Bar/Line chart requires valid X (Dimension w/ accessor) and Y (Measure w/ aggregation) fields.");
-
-        const groupKeyAccessor = (item: ConferenceResponse): string => xAxisField.accessor!(item)?.toString() ?? UNKNOWN_CATEGORY;
-
-        const groupedByX = groupBy(rawData, groupKeyAccessor);
+        if (!xAxisField?.accessor || !yAxisField?.aggregation) throw new Error("Bar/Line chart requires a Dimension on X-Axis and a Measure on Y-Axis.");
+        
+        const groupKeyAccessor = (item: any): string => xAxisField.accessor!(item)?.toString() ?? UNKNOWN_CATEGORY;
+        const groupedByX = groupBy(processedData, groupKeyAccessor);
         categories = Object.keys(groupedByX).sort();
 
-        if (!colorField?.accessor) { // Một chuỗi duy nhất
+        if (!colorField?.accessor) { // Single series
             const aggregatedValues = aggregateData(groupedByX, yAxisField);
             const data = categories.map(cat => aggregatedValues[cat] ?? 0);
-            series.push({ name: yAxisField.name, type: chartType, data, emphasis: { focus: 'series' }, smooth: chartType === 'line' });
+            series.push({ name: yAxisField.name, type: chartType, data, emphasis: { focus: 'series' } });
             legendData.push(yAxisField.name);
-        } else { // Nhiều chuỗi theo màu sắc
-            const colorKeyAccessor = (item: ConferenceResponse): string => colorField.accessor!(item)?.toString() ?? UNKNOWN_CATEGORY;
-            const groupedByColor = groupBy(rawData, colorKeyAccessor);
+        } else { // Multi-series by color
+            const colorKeyAccessor = (item: any): string => colorField.accessor!(item)?.toString() ?? UNKNOWN_CATEGORY;
+            const groupedByColor = groupBy(processedData, colorKeyAccessor);
             legendData = Object.keys(groupedByColor).sort();
             series = legendData.map(colorValue => {
                 const colorGroupData = groupedByColor[colorValue];
                 const groupedSubsetByX = groupBy(colorGroupData, groupKeyAccessor);
                 const aggregatedValues = aggregateData(groupedSubsetByX, yAxisField);
                 const data = categories.map(cat => aggregatedValues[cat] ?? 0);
-                return { name: colorValue, type: chartType, stack: 'total', emphasis: { focus: 'series' }, smooth: chartType === 'line', data };
+                return { name: colorValue, type: chartType, stack: 'total', emphasis: { focus: 'series' }, data };
             });
         }
-    }
-    // --- Logic Biểu đồ Tròn ---
-    else if (chartType === 'pie') {
-        if (!colorField?.accessor || !yAxisField?.aggregation) throw new Error("Pie chart requires valid Color (Dimension w/ accessor) and Value (Measure w/ aggregation) fields.");
-        const groupKeyAccessor = (item: ConferenceResponse): string => colorField.accessor!(item)?.toString() ?? UNKNOWN_CATEGORY;
-        const groupedByColor = groupBy(rawData, groupKeyAccessor);
+    } else if (chartType === 'pie') {
+        // For Pie, Color field acts as the category
+        if (!colorField?.accessor || !yAxisField?.aggregation) throw new Error("Pie chart requires a Dimension on Color and a Measure on Value (Y-Axis).");
+        
+        const groupKeyAccessor = (item: any): string => colorField.accessor!(item)?.toString() ?? UNKNOWN_CATEGORY;
+        const groupedByColor = groupBy(processedData, groupKeyAccessor);
         legendData = Object.keys(groupedByColor).sort();
         const aggregatedValues = aggregateData(groupedByColor, yAxisField);
-        const data = legendData.map(name => ({ name, value: aggregatedValues[name] ?? 0 }));
+        
         series.push({
             name: yAxisField.name,
             type: 'pie',
             radius: ['40%', '70%'],
-            avoidLabelOverlap: true,
-            itemStyle: { borderRadius: 8, borderColor: '#fff', borderWidth: 1 },
-            label: { show: false, position: 'center' },
-            emphasis: { label: { show: true, fontSize: 16, fontWeight: 'bold' } },
-            labelLine: { show: false },
-            data: data,
+            data: legendData.map(name => ({ name, value: aggregatedValues[name] ?? 0 })),
         });
-        categories = [];
-    }
-    // --- Logic Biểu đồ Phân tán đã được loại bỏ ---
+    } else if (chartType === 'map') {
+        // For Map, X-Axis is Location, Y-Axis is Value
+        if (!xAxisField?.accessor || !yAxisField?.aggregation) throw new Error("Map chart requires a Location Dimension (e.g., Country) on X-Axis and a Measure on Y-Axis.");
 
-    // console.log(`${logPrefixProcessor} processDataForChart: Finished. Series: ${series.length}, Categories: ${categories.length}, Legend: ${legendData.length}`);
-    return { categories, series, legendData };
+        const groupKeyAccessor = (item: any): string => xAxisField.accessor!(item)?.toString() ?? UNKNOWN_CATEGORY;
+        const groupedByLocation = groupBy(processedData, groupKeyAccessor);
+        const aggregatedValues = aggregateData(groupedByLocation, yAxisField);
+
+        const data = Object.keys(aggregatedValues)
+            .map(name => ({ name, value: aggregatedValues[name] ?? 0 }))
+            .filter(item => item.name !== UNKNOWN_CATEGORY); // Don't plot 'Unknown' on map
+
+        series.push({
+            name: yAxisField.name,
+            type: 'map',
+            map: 'world',
+            roam: true,
+            data,
+        });
+
+        const values = data.map(d => d.value);
+        visualMap = {
+            left: 'left',
+            min: Math.min(...values),
+            max: Math.max(...values),
+            inRange: { color: ['#e0ffff', '#006edd'] }, // Light blue to dark blue
+            calculable: true,
+            text: ['High', 'Low'],
+        };
+    } else if (chartType === 'treemap') {
+        // For Treemap, X-Axis is hierarchy, Y-Axis is size
+        if (!xAxisField?.accessor || !yAxisField?.aggregation) throw new Error("Treemap requires a Dimension on X-Axis and a Measure on Y-Axis.");
+
+        const groupKeyAccessor = (item: any): string => xAxisField.accessor!(item)?.toString() ?? UNKNOWN_CATEGORY;
+        const groupedByX = groupBy(processedData, groupKeyAccessor);
+        const aggregatedValues = aggregateData(groupedByX, yAxisField);
+
+        const data = Object.keys(aggregatedValues)
+            .map(name => ({ name, value: aggregatedValues[name] ?? 0 }))
+            .filter(item => item.name !== UNKNOWN_CATEGORY);
+
+        series.push({
+            name: xAxisField.name,
+            type: 'treemap',
+            data,
+        });
+    }
+
+    return { categories, series, legendData, visualMap };
 };

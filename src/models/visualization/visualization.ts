@@ -1,59 +1,59 @@
-// src/models/visualization.ts
+// src/models/visualization/visualization.ts
 
 export type FieldType = 'dimension' | 'measure';
 
 export interface DataField {
-  id: string; // Unique ID, e.g., 'location.continent', 'count_conferences'
-  name: string; // Display name, e.g., 'Continent', 'Number of Conferences'
+  id: string;
+  name: string;
   type: FieldType;
-  // Optional: Function to extract value from raw data item
-  accessor?: (dataItem: any) => string | number | null | string[];
-  // Optional: Aggregation function for measures (e.g., 'count', 'average', 'sum')
-  aggregation?: 'count' | 'average' | 'sum' | 'none'; // 'none' for pre-aggregated or direct values
+  accessor?: (dataItem: any) => string | number | null | any[];
+  aggregation?: 'count' | 'average' | 'sum' | 'none';
 }
 
-export type ChartType = 'none'| 'bar' | 'line' | 'pie' ; // Add more as needed
+// MODIFIED: Thêm các loại biểu đồ mới
+export type ChartType = 'none' | 'bar' | 'line' | 'pie' | 'scatter' | 'map' | 'treemap';
 
 export interface ChartAxisConfig {
-  fieldId: string | null; // ID of the field dropped here
+  fieldId: string | null;
 }
 
 export interface ChartColorConfig {
-  fieldId: string | null; // ID of the field dropped for color encoding
+  fieldId: string | null;
 }
 
 export interface ChartSizeConfig {
-    fieldId: string | null; // ID of the field dropped for size encoding (e.g., scatter plot bubble size)
+    fieldId: string | null;
 }
-
 
 export interface ChartConfig {
   chartType: ChartType;
-  xAxis: ChartAxisConfig;
-  yAxis: ChartAxisConfig;
-  color: ChartColorConfig;
-  size?: ChartSizeConfig; // For charts like scatter
-  // Add other potential drop zones like 'tooltipFields', 'filters', etc.
+  xAxis: ChartAxisConfig; // Sẽ được dùng cho 'Category' hoặc 'Location' tùy biểu đồ
+  yAxis: ChartAxisConfig; // Sẽ được dùng cho 'Value' hoặc 'Size'
+  color: ChartColorConfig; // Sẽ được dùng cho 'Legend' hoặc 'Color'
+  // Tạm thời chưa dùng size, có thể thêm sau
 }
 
 export interface ChartOptions {
   title: string;
   showLegend: boolean;
-  showToolbox: boolean; // ECharts built-in toolbox (zoom, save, etc.)
-  // Add more specific ECharts options (colors, axis labels, etc.)
+  showToolbox: boolean;
 }
 
-// Example structure for processed data ready for ECharts
 export interface ProcessedChartData {
-  categories?: string[]; // For bar/line X-axis
-  series: any[];       // ECharts series data
-  legendData?: string[]; // For pie/grouped charts
+  categories?: string[];
+  series: any[];
+  legendData?: string[];
+  // NEW: Thêm các thuộc tính cho biểu đồ bản đồ
+  visualMap?: any; 
 }
 
+// MODIFIED: Cập nhật danh sách các loại biểu đồ có sẵn
 export const AVAILABLE_CHART_TYPES: { id: ChartType, name: string }[] = [
     { id: 'none', name: 'Select Chart Type' },
     { id: 'bar', name: 'Bar Chart' },
     { id: 'line', name: 'Line Chart' },
     { id: 'pie', name: 'Pie Chart' },
-    // { id: 'scatter', name: 'Scatter Plot' },
+    { id: 'map', name: 'Map Chart' },
+    { id: 'treemap', name: 'Treemap' },
+    { id: 'scatter', name: 'Scatter Plot' },
 ];
