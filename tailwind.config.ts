@@ -108,7 +108,7 @@ const config = {
     //   preflight: false
     // }
   },
-  plugins: [require('tailwind-scrollbar'), require('tailwindcss-animate'), require('tailwind-scrollbar-hide'), require('@tailwindcss/typography')]
+  plugins: [require('tailwind-scrollbar'), require('tailwindcss-animate'), require('tailwind-scrollbar-hide'), require('@tailwindcss/typography'), require('@tailwindcss/aspect-ratio')]
 
 } satisfies Config
 

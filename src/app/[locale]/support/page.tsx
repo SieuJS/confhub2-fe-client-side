@@ -13,45 +13,32 @@ const FAQ = ({ params: { locale } }: { params: { locale: string } }) => {
   const sampleTutorials = [
     {
       id: 'tut-1',
-      title: 'Dashboard admin features',
+      title: 'Dashboard Admin Features',
       description:
         'Includes how to manage user accounts, manage conferences, crawl conferences and journals data, analyze date, moderate conferences, and more.',
-      youtubeUrl: 'https://youtu.be/R4hw0Kd3frU' // Thay bằng URL thật
+      youtubeUrl: 'https://youtu.be/st-DAnQz-ZY' // Thay bằng URL thật
     },
     {
       id: 'tut-2',
-      title: 'Chatbot features',
+      title: 'Find Conferences and View Details',
       description:
-        'Demo how to use the chatbot to get answers to your questions about conferences.',
-      youtubeUrl: 'https://youtu.be/-c3DDqzTBLo' // Định dạng youtu.be cũng hoạt động
+        'Demo how to use the find conferences feature to search for conferences by keywords, categories, and more.',
+      youtubeUrl: 'https://youtu.be/dfn_GnzyOh0' // Định dạng youtu.be cũng hoạt động
     },
     {
       id: 'tut-3',
-      title: 'Publish conference feature',
+      title:
+        'Other features: Chatbot, Visualization, Publish conference, Dashboard User',
       description:
-        'Demo how to publish a conference, including setting up the conference details, managing submissions, and more.',
-      youtubeUrl: 'https://youtu.be/JFrMYOIhzRU' // Định dạng embed cũng hoạt động
-    },
-    {
-      id: 'tut-4',
-      title: 'Find conferences feature',
-      description:
-        'Demo how to use the find conferences feature to search for conferences by keywords, categories, and more.',
-      youtubeUrl: 'https://youtu.be/elfUCmlHJjI'
-    },
-    {
-      id: 'tut-5',
-      title: 'Sign up and login features',
-      description:
-        'Demo how to sign up for an account and log in to the platform.',
-      youtubeUrl: 'https://youtu.be/DJcZmTq4sz4'
+        'Demo how to use the other features of the platform, including the chatbot, data visualization, and user dashboard.',
+      youtubeUrl: 'https://youtu.be/B5Xz1tw3Vg8' // Định dạng embed cũng hoạt động
     }
   ]
   return (
     <>
       <About />
-      <PolicyPage />
       <FeatureTutorials tutorials={sampleTutorials} title='Feature Tutorials' />
+      <PolicyPage />
       <Support />
       {/* <SupportForm /> */}
       {/* <ContactMethods /> */}
