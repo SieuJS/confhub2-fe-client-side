@@ -2,15 +2,39 @@
 
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
+import FeatureTutorials from './FeatureTutorials'
 
 const About = () => {
   const t = useTranslations('AboutPage') // Use a namespace for your translations
-
+  const sampleTutorials = [
+    {
+      id: 'tut-1',
+      title: 'Dashboard Admin Features',
+      description:
+        'Includes how to manage user accounts, manage conferences, crawl conferences and journals data, analyze date, moderate conferences, and more.',
+      youtubeUrl: 'https://youtu.be/st-DAnQz-ZY' // Thay bằng URL thật
+    },
+    {
+      id: 'tut-2',
+      title: 'Find Conferences and View Details',
+      description:
+        'Demo how to use the find conferences feature to search for conferences by keywords, categories, and more.',
+      youtubeUrl: 'https://youtu.be/dfn_GnzyOh0' // Định dạng youtu.be cũng hoạt động
+    },
+    {
+      id: 'tut-3',
+      title:
+        'Other features: Chatbot, Visualization, Publish conference, Dashboard User',
+      description:
+        'Demo how to use the other features of the platform, including the chatbot, data visualization, and user dashboard.',
+      youtubeUrl: 'https://youtu.be/B5Xz1tw3Vg8' // Định dạng embed cũng hoạt động
+    }
+  ]
   return (
     <>
       <div className='bg-gradient-to-r from-background to-background-secondary'>
         {/* Hero Section */}
-        <section className='relative bg-span-bg py-20 text-[--button-text]'>
+        <section className='relative bg-span-bg py-10 text-[--button-text]'>
           <div className='container relative z-10 mx-auto px-4'>
             <div className='text-center'>
               <h1 className='mb-4 text-3xl font-bold md:text-6xl'>
@@ -24,7 +48,7 @@ const About = () => {
         </section>
 
         {/* Mission Section */}
-        <section className='px-4 py-16 md:px-8'>
+        <section className=' px-4 py-4 md:px-8'>
           <div className='container mx-auto'>
             <div className='grid items-center gap-12 md:grid-cols-2'>
               <div>
@@ -40,14 +64,19 @@ const About = () => {
                 <Image
                   src='/bg-2.jpg' // Replace!
                   alt='Researchers Collaborating'
-                  width={600}
-                  height={400}
+                  width={150}
+                  height={100}
                   className='h-full w-full object-cover'
                 />
               </div>
             </div>
           </div>
         </section>
+
+        <FeatureTutorials
+          tutorials={sampleTutorials}
+          title='Feature Tutorials'
+        />
 
         {/* Features/Services Section */}
         <section className='bg-gradient-to-r from-background to-background-secondary px-4 py-16 md:px-8'>

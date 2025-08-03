@@ -37,7 +37,7 @@ const FAQ = ({ params: { locale } }: { params: { locale: string } }) => {
   return (
     <>
       <About />
-      <FeatureTutorials tutorials={sampleTutorials} title='Feature Tutorials' />
+      {/* <FeatureTutorials tutorials={sampleTutorials} title='Feature Tutorials' /> */}
       <PolicyPage />
       <Support />
       {/* <SupportForm /> */}
