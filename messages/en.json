@@ -137,12 +137,12 @@
   "All": "All",
   "AboutPage": {
     "hero": {
-      "title": "About Global Conference Hub",
+      "title": "About FIT-Conference Hub",
       "subtitle": "A comprehensive platform for scientific conferences and journals."
     },
     "mission": {
       "title": "Our Mission",
-      "description": "Global Conference Hub is built with the goal of helping researchers, scholars, and students easily find and access scientific events and publications relevant to their fields. We believe that connecting the research community is key to the advancement of science."
+      "description": "FIT-Conference Hub is built with the goal of helping researchers, scholars, and students easily find and access scientific events and publications relevant to their fields. We believe that connecting the research community is key to the advancement of science."
     },
     "features": {
       "title": "What We Offer",
@@ -410,7 +410,7 @@
   "Sat": "Sat",
   "Loading_settings": "Loading settings...",
   "No_user_data_available": "No user data available",
-  "Welcome_Global_Conference_Hub": "Welcome to Global Conference Hub",
+  "Welcome_Global_Conference_Hub": "Welcome to FIT-Conference Hub",
   "Sign_in_to_your_account": "Sign in to your account",
   "Continue_with_Google": "Continue with Google",
   "Email": "Email",
@@ -543,7 +543,7 @@
   "ConsumerInsights": {
     "title": "HUB STATISTICS",
     "subtitle": "Your Gateway to Worldwide Conferences & Journals",
-    "description": "The Global Conference Hub connects researchers, academics, and professionals with the latest advancements across diverse scientific fields. Discover upcoming conferences, browse leading journals, and stay informed about breakthroughs worldwide.",
+    "description": "The FIT-Conference Hub connects researchers, academics, and professionals with the latest advancements across diverse scientific fields. Discover upcoming conferences, browse leading journals, and stay informed about breakthroughs worldwide.",
     "stats": [
       "Conferences Listed",
       "Journals Indexed",

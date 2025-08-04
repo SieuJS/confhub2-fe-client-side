@@ -137,12 +137,12 @@
   "All": "Tout",
   "AboutPage": {
     "hero": {
-      "title": "À propos de Global Conference Hub",
+      "title": "À propos de FIT-Conference Hub",
       "subtitle": "Une plateforme complète pour les conférences et revues scientifiques."
     },
     "mission": {
       "title": "Notre Mission",
-      "description": "Global Conference Hub a été créé dans le but d'aider les chercheurs, universitaires et étudiants à trouver et accéder facilement aux événements et publications scientifiques pertinents pour leurs domaines. Nous croyons que la connexion de la communauté de recherche est la clé de l'avancement de la science."
+      "description": "FIT-Conference Hub a été créé dans le but d'aider les chercheurs, universitaires et étudiants à trouver et accéder facilement aux événements et publications scientifiques pertinents pour leurs domaines. Nous croyons que la connexion de la communauté de recherche est la clé de l'avancement de la science."
     },
     "features": {
       "title": "Ce que nous offrons",
@@ -410,7 +410,7 @@
   "Sat": "Sam",
   "Loading_settings": "Chargement des paramètres...",
   "No_user_data_available": "Aucune donnée utilisateur disponible",
-  "Welcome_Global_Conference_Hub": "Bienvenue sur Global Conference Hub",
+  "Welcome_Global_Conference_Hub": "Bienvenue sur FIT-Conference Hub",
   "Sign_in_to_your_account": "Connectez-vous à votre compte",
   "Continue_with_Google": "Continuer avec Google",
   "Email": "E-mail",
@@ -543,7 +543,7 @@
   "ConsumerInsights": {
     "title": "STATISTIQUES DU HUB",
     "subtitle": "Votre portail vers les conférences et revues mondiales",
-    "description": "Le Global Conference Hub connecte les chercheurs, les universitaires et les professionnels avec les dernières avancées dans divers domaines scientifiques. Découvrez les conférences à venir, parcourez les principales revues et restez informé des percées dans le monde entier.",
+    "description": "Le FIT-Conference Hub connecte les chercheurs, les universitaires et les professionnels avec les dernières avancées dans divers domaines scientifiques. Découvrez les conférences à venir, parcourez les principales revues et restez informé des percées dans le monde entier.",
     "stats": [
       "Conférences listées",
       "Revues indexées",

@@ -41,9 +41,9 @@ GCJH is a comprehensive online platform designed to connect researchers, academi
 **4. How to Use the Website:**
 
     **4.1. Login (For users with an existing account)**
-        1.  Access Homepage: Open the Global Conference Hub website.
+        1.  Access Homepage: Open the FIT-Conference Hub website.
         2.  Click Login Button: Find and click the 'Login' button in the top-right corner of the screen.
-        3.  Login Page: On the 'Welcome to Global Conference Hub' page, choose one of the methods:
+        3.  Login Page: On the 'Welcome to FIT-Conference Hub' page, choose one of the methods:
             *   **Login with Google:** Click the 'Continue with Google' button.
             *   **Login with Email:**
                 *   Enter your Email address in the corresponding field.
@@ -52,7 +52,7 @@ GCJH is a comprehensive online platform designed to connect researchers, academi
             *   **Forgot Password?:** Click the 'Forgot Password?' link.
 
     **4.2. Register a New Account (For users without an account)**
-        1.  Access Homepage: Open the Global Conference Hub website.
+        1.  Access Homepage: Open the FIT-Conference Hub website.
         2.  Click Login Button: Click the 'Login' button in the top-right corner.
         3.  Go to Registration Page: On the login page, find and click the 'Sign Up Now' link at the bottom.
         4.  Fill Registration Information: On the 'Create your account' page, fill in all required information (fields marked with * are mandatory):
@@ -117,7 +117,7 @@ GCJH is a comprehensive online platform designed to connect researchers, academi
         *   4.8.1. **Hello [Username]:** Greeting.
         *   4.8.2. **Analysis:** Access the data aggregation, analysis, and visualization page. (See detailed guide in Section 4.11).
         *   4.8.3. **Profile:** View and edit personal information, password. (See details in Section 4.9).
-        *   4.8.4. **My Conferences:** This page is used to manage the conferences that you have added or submitted to the Global Conference Hub system. This is where you track the review status of the conferences you contributed.
+        *   4.8.4. **My Conferences:** This page is used to manage the conferences that you have added or submitted to the FIT-Conference Hub system. This is where you track the review status of the conferences you contributed.
             *   **Access:** Click on 'My Conferences' in the navigation bar or from the avatar menu.
             *   **Add New Conference:** Click the blue 'Add Conference' button to start the process of submitting new conference information (See Section 4.10).
             *   **View Conference Status:**

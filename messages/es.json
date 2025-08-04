@@ -137,12 +137,12 @@
   "All": "Todos",
   "AboutPage": {
     "hero": {
-      "title": "Acerca de Global Conference Hub",
+      "title": "Acerca de FIT-Conference Hub",
       "subtitle": "Una plataforma completa para congresos y revistas científicas."
     },
     "mission": {
       "title": "Nuestra Misión",
-      "description": "Global Conference Hub se ha creado con el objetivo de ayudar a investigadores, académicos y estudiantes a encontrar y acceder fácilmente a eventos y publicaciones científicas relevantes para sus campos. Creemos que conectar a la comunidad investigadora es clave para el avance de la ciencia."
+      "description": "FIT-Conference Hub se ha creado con el objetivo de ayudar a investigadores, académicos y estudiantes a encontrar y acceder fácilmente a eventos y publicaciones científicas relevantes para sus campos. Creemos que conectar a la comunidad investigadora es clave para el avance de la ciencia."
     },
     "features": {
       "title": "Qué Ofrecemos",
@@ -410,7 +410,7 @@
   "Sat": "Sáb",
   "Loading_settings": "Cargando configuración...",
   "No_user_data_available": "No hay datos de usuario disponibles",
-  "Welcome_Global_Conference_Hub": "Bienvenido a Global Conference Hub",
+  "Welcome_Global_Conference_Hub": "Bienvenido a FIT-Conference Hub",
   "Sign_in_to_your_account": "Inicia sesión en tu cuenta",
   "Continue_with_Google": "Continuar con Google",
   "Email": "Correo Electrónico",
@@ -543,7 +543,7 @@
   "ConsumerInsights": {
     "title": "ESTADÍSTICAS DEL HUB",
     "subtitle": "Tu Puerta de Entrada a Congresos y Revistas Mundiales",
-    "description": "El Global Conference Hub conecta a investigadores, académicos y profesionales con los últimos avances en diversos campos científicos. Descubre próximos congresos, explora revistas líderes y mantente informado sobre los avances en todo el mundo.",
+    "description": "El FIT-Conference Hub conecta a investigadores, académicos y profesionales con los últimos avances en diversos campos científicos. Descubre próximos congresos, explora revistas líderes y mantente informado sobre los avances en todo el mundo.",
     "stats": [
       "Congresos Listados",
       "Revistas Indexadas",

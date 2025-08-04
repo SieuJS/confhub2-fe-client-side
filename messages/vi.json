@@ -137,12 +137,12 @@
   "All": "Tất cả",
   "AboutPage": {
     "hero": {
-      "title": "Về Global Conference Hub",
+      "title": "Về FIT-Conference Hub",
       "subtitle": "Một nền tảng toàn diện cho các hội nghị khoa học và tạp chí."
     },
     "mission": {
       "title": "Sứ mệnh của chúng tôi",
-      "description": "Global Conference Hub được xây dựng với mục tiêu giúp các nhà nghiên cứu, học giả và sinh viên dễ dàng tìm kiếm và truy cập các sự kiện khoa học và các ấn phẩm liên quan đến lĩnh vực của họ. Chúng tôi tin rằng việc kết nối cộng đồng nghiên cứu là chìa khóa cho sự tiến bộ của khoa học."
+      "description": "FIT-Conference Hub được xây dựng với mục tiêu giúp các nhà nghiên cứu, học giả và sinh viên dễ dàng tìm kiếm và truy cập các sự kiện khoa học và các ấn phẩm liên quan đến lĩnh vực của họ. Chúng tôi tin rằng việc kết nối cộng đồng nghiên cứu là chìa khóa cho sự tiến bộ của khoa học."
     },
     "features": {
       "title": "Chúng tôi cung cấp những gì",
@@ -410,7 +410,7 @@
   "Sat": "T7",
   "Loading_settings": "Đang tải cài đặt...",
   "No_user_data_available": "Không có dữ liệu người dùng",
-  "Welcome_Global_Conference_Hub": "Chào mừng đến với Global Conference Hub",
+  "Welcome_Global_Conference_Hub": "Chào mừng đến với FIT-Conference Hub",
   "Sign_in_to_your_account": "Đăng nhập vào tài khoản của bạn",
   "Continue_with_Google": "Tiếp tục với Google",
   "Email": "Email",
@@ -543,7 +543,7 @@
   "ConsumerInsights": {
     "title": "THỐNG KÊ HUB",
     "subtitle": "Cổng thông tin của bạn đến các Hội nghị & Tạp chí trên toàn thế giới",
-    "description": "Global Conference Hub kết nối các nhà nghiên cứu, học giả và chuyên gia với những tiến bộ mới nhất trên các lĩnh vực khoa học đa dạng. Khám phá các hội nghị sắp tới, duyệt qua các tạp chí hàng đầu và luôn cập nhật về những đột phá trên toàn thế giới.",
+    "description": "FIT-Conference Hub kết nối các nhà nghiên cứu, học giả và chuyên gia với những tiến bộ mới nhất trên các lĩnh vực khoa học đa dạng. Khám phá các hội nghị sắp tới, duyệt qua các tạp chí hàng đầu và luôn cập nhật về những đột phá trên toàn thế giới.",
     "stats": [
       "Hội nghị được liệt kê",
       "Tạp chí được chỉ mục",

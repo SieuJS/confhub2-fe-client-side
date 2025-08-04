@@ -137,12 +137,12 @@
   "All": "Alle",
   "AboutPage": {
     "hero": {
-      "title": "Über Global Conference Hub",
+      "title": "Über FIT-Conference Hub",
       "subtitle": "Eine umfassende Plattform für wissenschaftliche Konferenzen und Fachzeitschriften."
     },
     "mission": {
       "title": "Unsere Mission",
-      "description": "Global Conference Hub wurde mit dem Ziel entwickelt, Forschern, Akademikern und Studierenden dabei zu helfen, wissenschaftliche Veranstaltungen und Publikationen, die für ihre Fachgebiete relevant sind, einfach zu finden und darauf zuzugreifen. Wir glauben, dass die Vernetzung der Forschungsgemeinschaft der Schlüssel zum Fortschritt der Wissenschaft ist."
+      "description": "FIT-Conference Hub wurde mit dem Ziel entwickelt, Forschern, Akademikern und Studierenden dabei zu helfen, wissenschaftliche Veranstaltungen und Publikationen, die für ihre Fachgebiete relevant sind, einfach zu finden und darauf zuzugreifen. Wir glauben, dass die Vernetzung der Forschungsgemeinschaft der Schlüssel zum Fortschritt der Wissenschaft ist."
     },
     "features": {
       "title": "Was wir bieten",
@@ -410,7 +410,7 @@
   "Sat": "Sa",
   "Loading_settings": "Einstellungen werden geladen...",
   "No_user_data_available": "Keine Benutzerdaten verfügbar",
-  "Welcome_Global_Conference_Hub": "Willkommen beim Global Conference Hub",
+  "Welcome_Global_Conference_Hub": "Willkommen beim FIT-Conference Hub",
   "Sign_in_to_your_account": "Melden Sie sich bei Ihrem Konto an",
   "Continue_with_Google": "Mit Google fortfahren",
   "Email": "E-Mail",
@@ -543,7 +543,7 @@
   "ConsumerInsights": {
     "title": "HUB-STATISTIKEN",
     "subtitle": "Ihr Tor zu weltweiten Konferenzen & Journals",
-    "description": "Der Global Conference Hub verbindet Forscher, Akademiker und Fachleute mit den neuesten Fortschritten in verschiedenen wissenschaftlichen Bereichen. Entdecken Sie kommende Konferenzen, durchsuchen Sie führende Journals und bleiben Sie weltweit über Durchbrüche informiert.",
+    "description": "Der FIT-Conference Hub verbindet Forscher, Akademiker und Fachleute mit den neuesten Fortschritten in verschiedenen wissenschaftlichen Bereichen. Entdecken Sie kommende Konferenzen, durchsuchen Sie führende Journals und bleiben Sie weltweit über Durchbrüche informiert.",
     "stats": [
       "Gelistete Konferenzen",
       "Indexierte Journals",

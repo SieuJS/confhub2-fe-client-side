@@ -137,12 +137,12 @@
   "All": "전체",
   "AboutPage": {
     "hero": {
-      "title": "Global Conference Hub 소개",
+      "title": "FIT-Conference Hub 소개",
       "subtitle": "과학 컨퍼런스와 저널을 위한 종합 플랫폼입니다."
     },
     "mission": {
       "title": "우리의 미션",
-      "description": "Global Conference Hub는 연구자, 학자, 학생들이 자신의 분야와 관련된 과학 행사 및 출판물을 쉽게 찾고 접근할 수 있도록 돕는 것을 목표로 만들어졌습니다. 우리는 연구 커뮤니티를 연결하는 것이 과학 발전의 핵심이라고 믿습니다."
+      "description": "FIT-Conference Hub는 연구자, 학자, 학생들이 자신의 분야와 관련된 과학 행사 및 출판물을 쉽게 찾고 접근할 수 있도록 돕는 것을 목표로 만들어졌습니다. 우리는 연구 커뮤니티를 연결하는 것이 과학 발전의 핵심이라고 믿습니다."
     },
     "features": {
       "title": "제공하는 기능",
@@ -410,7 +410,7 @@
   "Sat": "토",
   "Loading_settings": "설정 로딩 중...",
   "No_user_data_available": "사용자 데이터 없음",
-  "Welcome_Global_Conference_Hub": "Global Conference Hub에 오신 것을 환영합니다",
+  "Welcome_Global_Conference_Hub": "FIT-Conference Hub에 오신 것을 환영합니다",
   "Sign_in_to_your_account": "계정에 로그인하세요",
   "Continue_with_Google": "Google로 계속하기",
   "Email": "이메일",
@@ -543,7 +543,7 @@
   "ConsumerInsights": {
     "title": "허브 통계",
     "subtitle": "전 세계 컨퍼런스 및 저널로의 관문",
-    "description": "Global Conference Hub는 연구자, 학자 및 전문가들을 다양한 과학 분야의 최신 발전과 연결합니다. 다가오는 컨퍼런스를 발견하고, 선도적인 저널을 탐색하며, 전 세계의 혁신에 대한 정보를 얻으세요.",
+    "description": "FIT-Conference Hub는 연구자, 학자 및 전문가들을 다양한 과학 분야의 최신 발전과 연결합니다. 다가오는 컨퍼런스를 발견하고, 선도적인 저널을 탐색하며, 전 세계의 혁신에 대한 정보를 얻으세요.",
     "stats": [
       "등록된 컨퍼런스",
       "인덱싱된 저널",
