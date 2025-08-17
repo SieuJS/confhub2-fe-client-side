@@ -70,7 +70,7 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = (props) => {
         {props.isAdvancedOptionsVisible && (
           <div className="mt-2 rounded-lg border p-4 shadow-md transition-all duration-300 ease-in-out">
             {/* --- MODIFICATION: Changed grid layout to accommodate the new slider --- */}
-            <div className="mb-4 grid grid-cols-1 gap-x-4 gap-y-6 md:grid-cols-3 lg:grid-cols-5">
+            <div className="mb-8 grid grid-cols-1 gap-x-4 gap-y-6 md:grid-cols-3 lg:grid-cols-5">
               <SubmissionDatePicker
                 subFromDate={props.subFromDate}
                 subToDate={props.subToDate}
