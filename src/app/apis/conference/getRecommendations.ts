@@ -3,7 +3,7 @@
 import { appConfig } from "@/src/middleware";
 
 // This is the URL of your running Python API server
-const API_RECOMMENDATION_ENDPOINT = appConfig.NEXT_PUBLIC_RECOMMENDATION_SYSTEM_URL;
+const API_RECOMMENDATION_ENDPOINT = `${appConfig.NEXT_PUBLIC_RECOMMENDATION_SYSTEM_URL}/predict`;
 
 export interface RecommendationRequest {
   user_id: string;
