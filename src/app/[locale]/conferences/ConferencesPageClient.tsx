@@ -1,17 +1,17 @@
-// app/[locale]/conferences/ConferencesPageClient.tsx
-
 'use client'
 
 import { useTranslations } from 'next-intl'
-import SearchSection from '@/src/app/[locale]/conferences/SearchSection' // Cập nhật đường dẫn
-import ResultsSection from '@/src/app/[locale]/conferences/ResultsSection' // Cập nhật đường dẫn
-import { useRouter, usePathname } from '@/src/navigation'
+import SearchSection from '@/src/app/[locale]/conferences/SearchSection'
+import ResultsSection from '@/src/app/[locale]/conferences/ResultsSection'
+// --- MODIFICATION 1: Import useSearchParams ---
+import { useRouter, usePathname } from '@/src/navigation' 
+import { useSearchParams } from 'next/navigation'
 import { useCallback } from 'react'
 import useUserBlacklist from '@/src/hooks/auth/useUserBlacklist'
 import { ConferenceListResponse } from '@/src/models/response/conference.list.response'
 import { AppPathname } from '@/src/navigation'
 
-// Định nghĩa lại interface cho đúng
+// ... (interface definitions remain the same)
 interface SearchParamsForURL {
   keyword?: string;
   title?: string;
@@ -27,11 +27,12 @@ interface SearchParamsForURL {
   publisher?: string | null;
   topics?: string[];
   fieldOfResearch?: string[];
+  matchScoreRange?: number[];
 }
 
 interface ConferencesPageClientProps {
   locale: string;
-  initialData: ConferenceListResponse; // Nhận dữ liệu ban đầu từ Server Component
+  initialData: ConferenceListResponse;
 }
 
 export default function ConferencesPageClient({ locale, initialData }: ConferencesPageClientProps) {
@@ -40,10 +41,18 @@ export default function ConferencesPageClient({ locale, initialData }: Conferenc
 
   const router = useRouter()
   const pathname = usePathname()
+  // --- MODIFICATION 2: Get the current search params ---
+  const searchParams = useSearchParams()
 
   const handleSearch = useCallback(
     (searchParamsFromComponent: SearchParamsForURL) => {
-      const newParams = new URLSearchParams()
+      // --- MODIFICATION 3: Preserve the 'perPage' value ---
+      const currentPerPage = searchParams.get('perPage');
+      
+      // Start with a blank slate for the new search filters
+      const newParams = new URLSearchParams();
+
+      // --- (The rest of this block is unchanged) ---
       if (searchParamsFromComponent.keyword) newParams.set('keyword', searchParamsFromComponent.keyword);
       if (searchParamsFromComponent.title) newParams.set('title', searchParamsFromComponent.title);
       if (searchParamsFromComponent.acronym) newParams.set('acronym', searchParamsFromComponent.acronym);
@@ -62,12 +71,25 @@ export default function ConferencesPageClient({ locale, initialData }: Conferenc
       if (searchParamsFromComponent.fieldOfResearch && searchParamsFromComponent.fieldOfResearch.length > 0) {
         searchParamsFromComponent.fieldOfResearch.forEach(field => newParams.append('researchFields', field));
       }
+      const range = searchParamsFromComponent.matchScoreRange;
+      if (range) {
+        const isDefaultRange = range[0] === 0 && range[1] === 100;
+        if (!isDefaultRange) {
+          newParams.set('matchScoreRange', range.join(','));
+        }
+      }
 
-      // ĐIỀU CHỈNH Ở ĐÂY:
-      // Chuyển đổi URLSearchParams thành một object đơn giản
+      // --- MODIFICATION 4: Add the preserved 'perPage' value back to the new params ---
+      // If a 'perPage' value exists in the current URL, add it to the new search.
+      if (currentPerPage) {
+        newParams.set('perPage', currentPerPage);
+      }
+      // Note: We intentionally do NOT add the 'page' parameter.
+      // A new search should always reset the user to page 1.
+      // Our data fetching hook defaults to page 1 if the param is missing, which is the correct behavior.
+
       const query: { [key: string]: string | string[] } = {};
       for (const [key, value] of newParams.entries()) {
-        // Xử lý các param có thể có nhiều giá trị (như 'topics')
         if (query[key]) {
           if (Array.isArray(query[key])) {
             (query[key] as string[]).push(value);
@@ -78,18 +100,16 @@ export default function ConferencesPageClient({ locale, initialData }: Conferenc
           query[key] = value;
         }
       }
-      // Sử dụng cú pháp object cho router.push
+      
       router.push({
-        pathname: pathname as AppPathname, // Ép kiểu pathname để TypeScript hiểu nó là một đường dẫn hợp lệ
+        pathname: pathname as AppPathname,
         query: query,
       });
     },
-    [pathname, router]
+    [pathname, router, searchParams] // --- MODIFICATION 5: Add searchParams to dependency array
   );
 
-
   const handleClear = useCallback(() => {
-    // Cách clear này vẫn đúng
     router.push(pathname as AppPathname);
   }, [pathname, router]);
 

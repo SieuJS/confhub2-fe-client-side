@@ -10,13 +10,15 @@ interface Config {
   GOOGLE_REDIRECT_URI: string;
   NEXT_PUBLIC_FRONTEND_URL: string;
   NEXT_PUBLIC_GOOGLE_MAP_API_KEY: string | undefined;
+  NEXT_PUBLIC_RECOMMENDATION_SYSTEM_URL: string;
 }
 export const appConfig: Config = {
   NEXT_PUBLIC_DATABASE_URL: process.env.NEXT_PUBLIC_DATABASE_URL  || 'http://localhost:3000', // Provide a default value
   NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001', // Provide a default value
   GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:8386/api/auth/google/callback', // Provide a default value
   NEXT_PUBLIC_FRONTEND_URL: process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:8386',
-  NEXT_PUBLIC_GOOGLE_MAP_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY
+  NEXT_PUBLIC_GOOGLE_MAP_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY,
+  NEXT_PUBLIC_RECOMMENDATION_SYSTEM_URL: process.env.NEXT_PUBLIC_RECOMMENDATION_SYSTEM_URL || "http://127.0.0.1:8000/predict"
 };
 
 

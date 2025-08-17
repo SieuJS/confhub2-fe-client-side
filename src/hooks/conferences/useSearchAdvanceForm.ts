@@ -1,11 +1,14 @@
-import { useState, ChangeEvent, KeyboardEvent } from 'react';
+// src/hooks/conferences/useSearchAdvanceForm.ts
 
+import { ChangeEvent } from 'react';
+import { useTagInput } from './useTagInput'; // Import our new generic hook
+
+// The props interface remains unchanged
 interface UseSearchAdvanceFormProps {
   onRankChange: (rank: string | null) => void;
   selectedRank: string | null;
   onSourceChange: (source: string | null) => void;
   selectedSource: string | null;
-  // ADDED: Props for Publisher
   onPublisherChange: (publisher: string | null) => void;
   selectedPublisher: string | null;
   onTopicsChange: (topics: string[]) => void;
@@ -15,103 +18,40 @@ interface UseSearchAdvanceFormProps {
   availableTopics: string[];
 }
 
-const useSearchAdvanceForm = ({
-  onRankChange,
-  selectedRank,
-  onSourceChange,
-  selectedSource,
-  // ADDED: Destructure new props
-  onPublisherChange,
-  selectedPublisher,
-  onTopicsChange,
-  selectedTopics,
-  onFieldOfResearchChange,
-  selectedFieldsOfResearch,
-  availableTopics,
-}: UseSearchAdvanceFormProps) => {
-  const [topicsInput, setTopicsInput] = useState('');
-  const [topicSuggestions, setTopicSuggestions] = useState<string[]>([]);
-  const [fieldOfResearchInput, setFieldOfResearchInput] = useState('');
-  const [fieldOfResearchSuggestions, setFieldOfResearchSuggestions] = useState<string[]>([]);
+// A hardcoded list for fields of research
+const availableFieldsOfResearch = [
+  "Computer Science", "Information Technology", "Software Engineering", "Data Analytics", "Artificial Intelligence",
+  "Cybersecurity", "Information Systems", "Human-Computer Interaction", "Bioinformatics", "Computational Linguistics"
+];
 
-  const availableFieldsOfResearch = [
-    "Computer Science", "Information Technology", "Software Engineering", "Data Analytics", "Artificial Intelligence",
-    "Cybersecurity", "Information Systems", "Human-Computer Interaction", "Bioinformatics", "Computational Linguistics"
-  ];
+const useSearchAdvanceForm = (props: UseSearchAdvanceFormProps) => {
+  const {
+    onRankChange,
+    onSourceChange,
+    onPublisherChange,
+    onTopicsChange,
+    selectedTopics,
+    onFieldOfResearchChange,
+    selectedFieldsOfResearch,
+    availableTopics,
+  } = props;
 
-  const handleTopicInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    setTopicsInput(inputValue);
-    const trimmedInput = inputValue.trim();
-    if (trimmedInput) {
-      const suggestions = availableTopics.filter(topic =>
-        topic.toLowerCase().includes(trimmedInput.toLowerCase()) && !selectedTopics.includes(topic)
-      );
-      setTopicSuggestions(suggestions);
-    } else {
-      setTopicSuggestions([]);
-    }
-  };
+  // Instantiate the generic hook for Topics
+  const topicsManager = useTagInput({
+    availableSuggestions: availableTopics,
+    selectedTags: selectedTopics,
+    onTagsChange: onTopicsChange,
+  });
 
-  const handleTopicSuggestionClick = (suggestion: string) => {
-    onTopicsChange([...selectedTopics, suggestion]);
-    setTopicsInput('');
-    setTopicSuggestions([]);
-  };
+  // Instantiate the generic hook for Fields of Research
+  const fieldsManager = useTagInput({
+    availableSuggestions: availableFieldsOfResearch,
+    selectedTags: selectedFieldsOfResearch,
+    onTagsChange: onFieldOfResearchChange,
+  });
 
-  const handleTopicInputKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      const trimmedInput = topicsInput.trim();
-      if (trimmedInput && !selectedTopics.includes(trimmedInput)) {
-        onTopicsChange([...selectedTopics, trimmedInput]);
-        setTopicsInput('');
-        setTopicSuggestions([]);
-      }
-    }
-  };
-
-  const handleRemoveTopic = (topicToRemove: string) => {
-    onTopicsChange(selectedTopics.filter(topic => topic !== topicToRemove));
-  };
-
-  const handleFieldOfResearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    setFieldOfResearchInput(inputValue);
-    const trimmedInput = inputValue.trim();
-    if (trimmedInput) {
-      const suggestions = availableFieldsOfResearch.filter(field =>
-        field.toLowerCase().includes(trimmedInput.toLowerCase()) && !selectedFieldsOfResearch.includes(field)
-      );
-      setFieldOfResearchSuggestions(suggestions);
-    } else {
-      setFieldOfResearchSuggestions([]);
-    }
-  };
-  const handleFieldOfResearchSuggestionClick = (suggestion: string) => {
-    onFieldOfResearchChange([...selectedFieldsOfResearch, suggestion]);
-    setFieldOfResearchInput('');
-    setFieldOfResearchSuggestions([]);
-  };
-
-  const handleFieldOfResearchInputKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      const trimmedInput = fieldOfResearchInput.trim();
-      if (trimmedInput) {
-        if (!selectedFieldsOfResearch.includes(trimmedInput) && availableFieldsOfResearch.includes(trimmedInput)) {
-          onFieldOfResearchChange([...selectedFieldsOfResearch, trimmedInput]);
-        } else if (fieldOfResearchSuggestions.length > 0) {
-          handleFieldOfResearchSuggestionClick(fieldOfResearchSuggestions[0]);
-        }
-        setFieldOfResearchInput('');
-        setFieldOfResearchSuggestions([]);
-      }
-    }
-  };
-  const handleRemoveFieldOfResearch = (fieldToRemove: string) => {
-    onFieldOfResearchChange(selectedFieldsOfResearch.filter(field => field !== fieldToRemove));
-  };
+  // --- Simple Event Handlers ---
+  // These are simple enough to remain here. They adapt a DOM event to the parent's callback.
 
   const handleRankChangeInput = (event: ChangeEvent<HTMLSelectElement>) => {
     onRankChange(event.target.value === "" ? null : event.target.value);
@@ -121,27 +61,31 @@ const useSearchAdvanceForm = ({
     onSourceChange(event.target.value === "" ? null : event.target.value);
   };
 
-  // ADDED: Handler for Publisher text input
   const handlePublisherChangeInput = (event: ChangeEvent<HTMLInputElement>) => {
     onPublisherChange(event.target.value === "" ? null : event.target.value);
   };
 
+  // --- Return the exact same API as before ---
   return {
-    topicsInput,
-    topicSuggestions,
-    fieldOfResearchInput,
-    fieldOfResearchSuggestions,
-    handleTopicInputChange,
-    handleTopicSuggestionClick,
-    handleTopicInputKeyDown,
-    handleRemoveTopic,
-    handleFieldOfResearchInputChange,
-    handleFieldOfResearchSuggestionClick,
-    handleFieldOfResearchInputKeyDown,
-    handleRemoveFieldOfResearch,
+    // Values and handlers for Topics from its dedicated manager
+    topicsInput: topicsManager.inputValue,
+    topicSuggestions: topicsManager.suggestions,
+    handleTopicInputChange: topicsManager.handleInputChange,
+    handleTopicSuggestionClick: topicsManager.handleSuggestionClick,
+    handleTopicInputKeyDown: topicsManager.handleInputKeyDown,
+    handleRemoveTopic: topicsManager.handleRemoveTag,
+
+    // Values and handlers for Fields of Research from its dedicated manager
+    fieldOfResearchInput: fieldsManager.inputValue,
+    fieldOfResearchSuggestions: fieldsManager.suggestions,
+    handleFieldOfResearchInputChange: fieldsManager.handleInputChange,
+    handleFieldOfResearchSuggestionClick: fieldsManager.handleSuggestionClick,
+    handleFieldOfResearchInputKeyDown: fieldsManager.handleInputKeyDown,
+    handleRemoveFieldOfResearch: fieldsManager.handleRemoveTag,
+
+    // The simple handlers that remained
     handleRankChangeInput,
     handleSourceChangeInput,
-    // ADDED: Return new handler
     handlePublisherChangeInput,
   };
 };

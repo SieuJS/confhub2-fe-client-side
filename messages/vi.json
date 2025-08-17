@@ -8,6 +8,13 @@
   "Journal Details": "Chi tiết Tạp chí",
   "Setting": "Cài đặt",
   "Access": "Truy cập",
+  "Default": "Mặc định",
+  "Match_Score": "Độ phù hợp",
+  "Match": "Độ phù hợp",
+  "Descending": "Giảm dần",
+  "Ascending": "Tăng dần",
+  "Match_Score_Range": "Độ phù hợp",
+  "tooltip_match_score_filter": "Bộ lọc sẽ chỉ áp dụng cho số hội nghị đang được hiển thị ở trang hiện tại, không áp dụng cho toàn bộ hội nghị trong cơ sở dữ liệu",
   "Chatbot": {
     "Chatbot": "Chatbot",
     "View_Details": "Xem chi tiết",

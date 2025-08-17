@@ -1,16 +1,20 @@
 // src/components/conferences/EventTable.tsx
+
 import React, { useCallback } from 'react'
 import { ConferenceInfo } from '../../../models/response/conference.list.response'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/src/navigation'
-import { CalendarDays, MapPin, Award, KeyRound, Tags, Ban } from 'lucide-react'
+import { CalendarDays, MapPin, Award, KeyRound, Tags, Ban, Sparkles } from 'lucide-react'
+import * as Tooltip from '@radix-ui/react-tooltip'
+
 
 interface EventTableProps {
   events: ConferenceInfo[]
   userBlacklist: string[]
+  recommendationScores: { [key: string]: number }
 }
 
-const EventTable: React.FC<EventTableProps> = ({ events, userBlacklist }) => {
+const EventTable: React.FC<EventTableProps> = ({ events, userBlacklist, recommendationScores }) => {
   const t = useTranslations('')
 
   const getRankColor = useCallback((rank?: string) => {
@@ -42,6 +46,25 @@ const EventTable: React.FC<EventTableProps> = ({ events, userBlacklist }) => {
         return 'bg-gray-100 text-gray-600 border border-gray-300'
     }
   }, [])
+
+  // --- CHANGE 1: Add a new function to determine match score color ---
+  const getMatchScoreColor = useCallback((score?: number) => {
+    if (score === undefined) {
+      return 'bg-gray-100 text-gray-600 border border-gray-300';
+    }
+    const percentage = (score / 5) * 100;
+    if (percentage >= 80) {
+      return 'bg-emerald-100 text-emerald-700 border border-emerald-300'; // Excellent
+    }
+    if (percentage >= 60) {
+      return 'bg-sky-100 text-sky-700 border border-sky-300'; // Good
+    }
+    if (percentage >= 40) {
+      return 'bg-amber-100 text-amber-700 border border-amber-300'; // Moderate
+    }
+    return 'bg-gray-100 text-gray-600 border border-gray-300'; // Low
+  }, []);
+
 
   const renderBadge = (text: string, colorClass: string) => (
     <span
@@ -75,12 +98,6 @@ const EventTable: React.FC<EventTableProps> = ({ events, userBlacklist }) => {
         options
       )} - ${endDate.toLocaleDateString('en-US', options)}`
     } catch (e) {
-      // console.error(
-      //   'Error formatting date range in table:',
-      //   fromDate,
-      //   toDate,
-      //   e
-      // )
       return 'Invalid Date Range'
     }
   }
@@ -92,28 +109,27 @@ const EventTable: React.FC<EventTableProps> = ({ events, userBlacklist }) => {
         <div className='col-span-3 text-center text-xs font-medium uppercase tracking-wider '>
           {t('Conference')}
         </div>
-        {/* Date Column Header with Icon */}
         <div className='col-span-2 flex items-center justify-center gap-1 text-xs font-medium uppercase tracking-wider '>
           <CalendarDays className='h-4 w-4 flex-shrink-0' />
           {t('Date')}
         </div>
-        {/* Location Column Header with Icon */}
         <div className='col-span-2 flex items-center justify-center gap-1 text-xs font-medium uppercase tracking-wider '>
           <MapPin className='h-4 w-4 flex-shrink-0' />
           {t('Location')}
         </div>
-        {/* Rank Column Header with Icon */}
         <div className='col-span-1 flex items-center justify-center gap-1 text-xs font-medium uppercase tracking-wider '>
           <Award className='h-4 w-4 flex-shrink-0' />
           {t('Rank')}
         </div>
-        {/* Access Column Header with Icon */}
+        <div className='col-span-1 flex items-center justify-center gap-1 text-xs font-medium uppercase tracking-wider '>
+          <Sparkles className='h-4 w-4 flex-shrink-0' />
+          {t('Match')}
+        </div>
         <div className='col-span-1 flex items-center justify-center gap-1 text-xs font-medium uppercase tracking-wider '>
           <KeyRound className='h-4 w-4 flex-shrink-0' />
           {t('Access')}
         </div>
-        {/* Topics Column Header with Icon */}
-        <div className='col-span-3 flex items-center justify-center gap-1 text-xs font-medium uppercase tracking-wider '>
+        <div className='col-span-2 flex items-center justify-center gap-1 text-xs font-medium uppercase tracking-wider '>
           <Tags className='h-4 w-4 flex-shrink-0' />
           {t('Topics')}
         </div>
@@ -122,6 +138,11 @@ const EventTable: React.FC<EventTableProps> = ({ events, userBlacklist }) => {
       {/* Table Body */}
       <div className='space-y-4 md:space-y-0'>
         {events.map(event => {
+          const conferenceKey = `${event.acronym} - ${event.title}`;
+          const score = recommendationScores[conferenceKey];
+          // --- CHANGE 2: Get the dynamic color class for the score ---
+          const scoreColorClass = getMatchScoreColor(score);
+
           const isBlacklisted = userBlacklist?.includes(event.id) ?? false
           const rowClasses = isBlacklisted
             ? 'opacity-60 pointer-events-none cursor-not-allowed'
@@ -144,7 +165,6 @@ const EventTable: React.FC<EventTableProps> = ({ events, userBlacklist }) => {
             isLocationPlaceholder = true
           }
 
-          // Kiểm tra xem có topic nào để hiển thị không
           const hasTopics = event.topics && event.topics.length > 0
 
           return (
@@ -189,7 +209,7 @@ const EventTable: React.FC<EventTableProps> = ({ events, userBlacklist }) => {
                 )}
               </div>
 
-              {/* --- Date Column (No Icon) --- */}
+              {/* --- Date Column --- */}
               <div
                 className='responsive-table-cell col-span-2 flex items-center justify-center gap-2 p-4 pt-0 text-sm  md:p-6 md:pt-6'
                 data-label={`${t('Date')}: `}
@@ -199,23 +219,21 @@ const EventTable: React.FC<EventTableProps> = ({ events, userBlacklist }) => {
                 </span>
               </div>
 
-              {/* --- Location Column (No Icon) --- */}
+              {/* --- Location Column --- */}
               <div
                 className='responsive-table-cell col-span-2 flex items-center justify-center gap-2 p-4 pt-0 text-sm  md:p-6 md:pt-6'
                 data-label={`${t('Location')}: `}
               >
                 <span
-                  // Áp dụng hover:text-blue-600 và cursor-pointer cho tất cả trường hợp
-                  // Áp dụng in nghiêng và màu xám chỉ khi là placeholder
                   className={`cursor-pointer truncate transition-colors duration-200 
                               ${isLocationPlaceholder ? 'italic  hover:text-blue-600' : ' hover:text-blue-600'}`}
-                  title={locationText} // Thêm title để hiển thị tooltip khi hover
+                  title={locationText}
                 >
                   {locationText}
                 </span>
               </div>
 
-              {/* --- Rank Column (No Icon) --- */}
+              {/* --- Rank Column --- */}
               <div
                 className='responsive-table-cell col-span-1 flex items-center justify-center gap-2 p-4 pt-0 md:p-6 md:pt-6'
                 data-label={`${t('Rank')}: `}
@@ -225,22 +243,53 @@ const EventTable: React.FC<EventTableProps> = ({ events, userBlacklist }) => {
                   : renderBadge(t('Unranked'), getRankColor(''))}
               </div>
 
-              {/* --- Access Type Column (No Icon) --- */}
+              {/* --- Match Column --- */}
+              <div
+                className='responsive-table-cell col-span-1 flex items-center justify-center gap-2 p-4 pt-0 md:p-6 md:pt-6'
+                data-label={`${t('Match')}: `}
+              >
+                {score !== undefined ? (
+                  <Tooltip.Provider>
+                    <Tooltip.Root>
+                      <Tooltip.Trigger asChild>
+                        {/* --- CHANGE 3: Apply the dynamic color class --- */}
+                        <span className={`flex cursor-help items-center rounded px-2 py-1 text-xs font-semibold ${scoreColorClass}`}>
+                          <Sparkles className='mr-1 h-3 w-3' />
+                          {`${(score / 5 * 100).toFixed(0)}%`}
+                        </span>
+                      </Tooltip.Trigger>
+                      <Tooltip.Portal>
+                        <Tooltip.Content
+                          className='max-w-xs rounded-md bg-gray-900 px-3 py-2 text-sm text-white shadow-lg'
+                          sideOffset={5}
+                        >
+                          Personalized match score based on your activity.
+                          <Tooltip.Arrow className='fill-gray-900' />
+                        </Tooltip.Content>
+                      </Tooltip.Portal>
+                    </Tooltip.Root>
+                  </Tooltip.Provider>
+                ) : (
+                  <span className='text-sm text-gray-500'>-</span>
+                )}
+              </div>
+
+              {/* --- Access Type Column --- */}
               <div
                 className='responsive-table-cell col-span-1 flex items-center justify-center gap-2 p-4 pt-0 md:p-6 md:pt-6'
                 data-label={`${t('Access')}: `}
               >
                 {event.accessType
                   ? renderBadge(
-                      event.accessType,
-                      getAccessTypeColor(event.accessType)
-                    )
+                    event.accessType,
+                    getAccessTypeColor(event.accessType)
+                  )
                   : renderBadge(t('N/A'), getAccessTypeColor(''))}
               </div>
 
-              {/* --- Topics Column (No Icon) --- */}
+              {/* --- Topics Column --- */}
               <div
-                className='responsive-table-cell col-span-3 flex p-4 pb-4 pt-0 md:p-6 md:pt-6'
+                className='responsive-table-cell col-span-2 flex p-4 pb-4 pt-0 md:p-6 md:pt-6'
                 data-label={`${t('Topics')}: `}
               >
                 <div
@@ -268,7 +317,7 @@ const EventTable: React.FC<EventTableProps> = ({ events, userBlacklist }) => {
                 </div>
               </div>
 
-              {/* Blacklist indicator - only shows on desktop in the flow */}
+              {/* Blacklist indicator */}
               {isBlacklisted && (
                 <div className='absolute right-6 top-6 hidden md:block'>
                   <span title={t('Blacklisted')}>
