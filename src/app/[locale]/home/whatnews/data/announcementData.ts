@@ -56,7 +56,7 @@ export interface GuideCategory {
 
 // Dữ liệu cho tab Chào mừng
 export const welcomeData = {
-  title: `Chào mừng đến với Global Conference & Journal Hub (GCJH)!`,
+  title: `Chào mừng đến với FIT-Conference Hub (GCJH)!`,
   description: `GCJH là cổng thông tin học thuật toàn diện, giúp bạn kết nối với thế giới tri thức. Khám phá các hội nghị, tạp chí và những công cụ mạnh mẽ được thiết kế dành riêng cho các nhà nghiên cứu như bạn.`
 };
 
