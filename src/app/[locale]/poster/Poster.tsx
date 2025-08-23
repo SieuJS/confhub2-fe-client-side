@@ -57,7 +57,7 @@ const Poster: React.FC = () => {
         </div>
         <div className='flex-grow px-[60px] text-center'>
           <h1 className='mb-[63px] text-[320px] font-extrabold leading-tight'>
-            GLOBAL CONFERENCE & JOURNAL HUB
+            FIT-Conference Hub
           </h1>
           <h2 className='mb-[31px] text-[160px] font-bold'>
             HỆ THỐNG TÌM KIẾM KHOA HỌC TÍCH HỢP MÔ HÌNH NGÔN NGỮ LỚN

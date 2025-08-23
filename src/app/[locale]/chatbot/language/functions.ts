@@ -5,11 +5,11 @@ import {
 
 
 
-export const websiteInfo = `Guide to Using the Global Conference & Journal Hub (GCJH)
+export const websiteInfo = `Guide to Using the FIT-Conference Hub (GCJH)
 
 ## PART 1: GENERAL WEBSITE OVERVIEW
 
-**1. Website Name:** Global Conference & Journal Hub (GCJH)
+**1. Website Name:** FIT-Conference Hub (GCJH)
 
 **2. Website Overview:**
 GCJH is a comprehensive online platform designed to connect researchers, academics, and professionals with relevant conferences and journals across all disciplines globally. We provide a centralized, searchable database with detailed information to facilitate efficient research and networking opportunities. Our goal is to simplify the process of discovering and participating in relevant academic events and accessing high-quality scholarly publications.

@@ -169,7 +169,7 @@ export default function FooterClientContent({ linkColumns, socialLinks, texts }:
                   <Image src={`/hcmus_logo.png`} alt='Company Logo' width={80} height={80} className='h-18 w-18' />
                   <Image src={`/icon-512x512-removebg-preview.png`} alt='Company Logo' width={120} height={120} className='h-18 w-18 mb-1' />
                 </div>
-                <p className='ml-1 text-xl font-bold'>Global Conference & Journal Hub</p>
+                <p className='ml-1 text-xl font-bold'>FIT-Conference Hub</p>
                 <p className='text-md mt-4'>{texts.footerDescription}</p>
               </div>
               <div className='md:col-span-8'>
@@ -210,7 +210,7 @@ export default function FooterClientContent({ linkColumns, socialLinks, texts }:
         <div className={`${bottomBarMarginTopClass} flex flex-col items-center border-t border-slate-700 pt-8`}>
           <div className='mb-4 text-center sm:mb-0'>
             <p className='text-sm leading-relaxed'>
-              <span>Global Conference & Journal Hub.</span>
+              <span>FIT-Conference Hub.</span>
               <br />
               <span>{texts.copyrights}</span>
             </p>

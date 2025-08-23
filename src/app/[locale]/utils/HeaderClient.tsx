@@ -65,7 +65,7 @@ const HeaderClient: FC<HeaderClientProps> = ({ locale }) => {
         )}
         <Link href='/' locale={locale} className='flex items-center'>
           <div className='h-14 w-14'><LogoIcon /></div>
-          <strong className='mx-2 hidden select-none md:block'>Global Conference & Journal Hub</strong>
+          <strong className='mx-2 hidden select-none md:block'>FIT-Conference Hub</strong>
         </Link>
       </div>
 
