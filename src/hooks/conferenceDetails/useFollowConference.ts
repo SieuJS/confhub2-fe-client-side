@@ -46,6 +46,7 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
         const follows: Follow[] = await response.json();
         setIsFollowing(
           follows.some(
@@ -104,6 +105,25 @@ const useFollowConference = (conferenceData: ConferenceResponse | null) => {
           );
         }
       }
+      const userData = await JSON.parse(localStorage.getItem('user') || 'null'); // Use localStorage
+        if(userData) {
+          const t = await fetch(
+            '/apis/logs/user-conference',
+            {
+              method: 'POST',
+              body: JSON.stringify({
+                userId: userData.id,
+                trustCredit: userData.trustCredit || 0,
+                action: `${isFollowing ? 'unfollow' : 'follow'}`,
+                conferenceId: conferenceData.id
+              }),
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+          console.log('Log interaction response:', t);
+        }
 
       const follows: Follow[] = await response.json();
       // console.log('follows', follows);

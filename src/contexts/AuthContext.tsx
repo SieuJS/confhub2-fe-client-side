@@ -40,8 +40,10 @@ const _persistUserToLocalStorage = (userData: UserResponse | null): void => {
   if (typeof window === 'undefined') return
   if (userData) {
     localStorage.setItem(LOCAL_STORAGE_KEYS.USER, JSON.stringify(userData))
+    sessionStorage.setItem(LOCAL_STORAGE_KEYS.USER, JSON.stringify(userData))
   } else {
     localStorage.removeItem(LOCAL_STORAGE_KEYS.USER)
+    sessionStorage.removeItem(LOCAL_STORAGE_KEYS.USER)
   }
 }
 
@@ -50,6 +52,7 @@ const _persistAuthDataToLocalStorage = (authData: AuthResponse): void => {
   localStorage.setItem(LOCAL_STORAGE_KEYS.USER, JSON.stringify(authData.user))
   localStorage.setItem(LOCAL_STORAGE_KEYS.TOKEN, authData.token)
   localStorage.setItem(LOCAL_STORAGE_KEYS.LOGIN_STATUS, 'true')
+  sessionStorage.setItem(LOCAL_STORAGE_KEYS.USER, JSON.stringify(authData.user))
 }
 
 const _clearAuthDataFromLocalStorage = (): void => {

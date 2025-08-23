@@ -16,6 +16,25 @@ const useAddFeedback = () => {
             const feedback = await addFeedback({ conferenceId, description, star }); // Pass conferenceId
             setNewFeedback(feedback); // Store the new feedback
             //window.location.reload();
+
+            const userData = JSON.parse(localStorage.getItem('user') || 'null'); // Use localStorage
+            if(userData) {
+                const t = await fetch(
+                    '/apis/logs/user-conference',
+                    {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            userId: userData.id,
+                            trustCredit: userData.trustCredit || 0,
+                            action: 'add feedback',
+                            conferenceId
+                        }),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    }
+                );
+            }
             return feedback
         } catch (err: any) {
             setError(err.message || 'An error occurred while submitting feedback.');

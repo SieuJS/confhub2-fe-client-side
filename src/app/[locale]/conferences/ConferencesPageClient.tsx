@@ -45,7 +45,7 @@ export default function ConferencesPageClient({ locale, initialData }: Conferenc
   const searchParams = useSearchParams()
 
   const handleSearch = useCallback(
-    (searchParamsFromComponent: SearchParamsForURL) => {
+    async (searchParamsFromComponent: SearchParamsForURL) => {
       // --- MODIFICATION 3: Preserve the 'perPage' value ---
       const currentPerPage = searchParams.get('perPage');
       
@@ -100,7 +100,23 @@ export default function ConferencesPageClient({ locale, initialData }: Conferenc
           query[key] = value;
         }
       }
-      
+      const userData = JSON.parse(localStorage.getItem('user') || 'null');
+      if(userData) {
+        const t = await fetch('/apis/logs/user-interaction', {
+          method: 'POST',
+          body: JSON.stringify({
+            userId: userData.id,
+            trustCredit: userData.trustCredit || 0,
+            action: 'search',
+            content: JSON.stringify(query),
+          }),
+          headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('Log interaction response:', t);
+    }
+
       router.push({
         pathname: pathname as AppPathname,
         query: query,

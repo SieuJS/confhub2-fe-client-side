@@ -42,6 +42,7 @@ export const toggleFollowConference = async (
     body: JSON.stringify({ conferenceId, userId: user.id })
   })
 
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({})) // Bắt lỗi nếu body không phải JSON
     throw new Error(

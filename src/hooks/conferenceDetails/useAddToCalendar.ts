@@ -45,6 +45,7 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
             (calendarConf) => calendarConf.id === conferenceData?.id
           ) ?? false
         );
+        
       } catch (err: any) {
         setError(err.message || 'Error fetching calendar data');
         // console.error('Error fetching calendar data:', err);
@@ -74,6 +75,25 @@ const useAddToCalendar = (conferenceData: ConferenceResponse | null) => {
         },
         body: JSON.stringify({ conferenceId: conferenceData.id }),
       });
+      const userData = await JSON.parse(localStorage.getItem('user') || 'null'); // Use localStorage
+        if(userData) {
+          const t = await fetch(
+            '/apis/logs/user-conference',
+            {
+              method: 'POST',
+              body: JSON.stringify({
+                userId: userData.id,
+                trustCredit: userData.trustCredit || 0,
+                action: `${isAddToCalendar ? 'remove from' : 'add to'} calendar`,
+                conferenceId: conferenceData.id
+              }),
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+          console.log('Log interaction response:', t);
+        }
 
       if (!response.ok) {
         if (response.status === 403) {

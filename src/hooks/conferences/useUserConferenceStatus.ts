@@ -58,6 +58,21 @@ export const useUserConferenceStatus = (isLoggedIn: boolean) => {
       // Perform API call
       try {
         await toggleFollowConference(conferenceId, currentStatus);
+        const userData = JSON.parse(localStorage.getItem('user') || 'null');
+        if (userData) {
+          await fetch('/apis/logs/user-conference', {
+            method: 'POST',
+            body: JSON.stringify({
+              userId: userData.id,
+              trustCredit: userData.trustCredit || 0,
+              action: currentStatus ? 'unfollow' : 'follow',
+              conferenceId
+            }),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+        }
       } catch (error) {
         // Revert on error
         setFollowedIds(prevIds => {
@@ -89,6 +104,22 @@ export const useUserConferenceStatus = (isLoggedIn: boolean) => {
       // Perform API call
       try {
         await toggleCalendarConference(conferenceId, currentStatus);
+        const userData = JSON.parse(localStorage.getItem('user') || 'null');
+        if (userData) {
+          const t = await fetch('/apis/logs/user-conference', {
+            method: 'POST',
+            body: JSON.stringify({
+              userId: userData.id,
+              trustCredit: userData.trustCredit || 0,
+              action: currentStatus ? 'uncalendar' : 'calendar',
+              conferenceId
+            }),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+          console.log('Log interaction response:', t);
+        }
       } catch (error) {
         // Revert on error
         setCalendarIds(prevIds => {

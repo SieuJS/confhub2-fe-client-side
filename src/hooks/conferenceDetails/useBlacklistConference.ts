@@ -82,9 +82,30 @@ const useBlacklistConference = (conferenceData: ConferenceResponse | null) => {
         } catch (e) { /* Bỏ qua nếu response không phải JSON */ }
         throw new Error(errorMsg);
       }
-
       // 6. Đơn giản hóa việc cập nhật state
       // Chỉ cần đảo ngược trạng thái hiện tại là đủ và an toàn nhất
+      const userData = JSON.parse(localStorage.getItem('user') || 'null');
+      if(userData) {
+        const t = await fetch(
+          '/apis/logs/user-conference',
+          {
+            method: 'POST',
+            body: JSON.stringify({
+              userId: userData.id,
+              trustCredit: userData.trustCredit || 0,
+              action: `
+                ${isBlacklisted ? 'remove from' : 'add to'} blacklist
+              `.trim(),
+              conferenceId: conferenceData.id
+            }),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        console.log('Log interaction response:', t);
+      }
+
       setIsBlacklisted(prevState => !prevState);
 
     } catch (err: any) {

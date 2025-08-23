@@ -60,6 +60,25 @@ export default function ConferenceDetailPageClient({ locale, initialData }: Conf
     const { displayedTopics, hasMoreTopics, showAllTopics, setShowAllTopics } = useTopicsDisplay(lastOrganization?.topics || [])
     const { dateDisplay } = useFormatConferenceDates(transformedDatesData, language)
 
+    useEffect(() => {
+        const userData = JSON.parse(localStorage.getItem('user') || 'null');
+        if (userData) {
+            const t = fetch('/apis/logs/user-conference', {
+                method: 'POST',
+                body: JSON.stringify({
+                    userId: userData.id,
+                    trustCredit: userData.trustCredit || 0,
+                    action: 'view detail',
+                    conferenceId: conferenceDataFromDB.id
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            console.log('Log interaction response:', t);
+        }
+    }, []);
+
     const checkLoginAndRedirect = useCallback(
         (callback: () => void) => {
             if (isAuthInitializing) {
