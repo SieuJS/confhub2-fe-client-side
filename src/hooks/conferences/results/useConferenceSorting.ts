@@ -28,8 +28,8 @@ export const useConferenceSorting = (
 
     if (sortConfig.field === 'match') {
       newSortedPayload.sort((a, b) => {
-        const keyA = `${a.acronym} - ${a.title}`;
-        const keyB = `${b.acronym} - ${b.title}`;
+        const keyA = `${a.id}`;
+        const keyB = `${b.id}`;
         const scoreA = recommendationScores[keyA] || 0;
         const scoreB = recommendationScores[keyB] || 0;
         return sortConfig.direction === 'desc' ? scoreB - scoreA : scoreA - scoreB;

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { ConferenceListResponse } from '@/src/models/response/conference.list.response';
 import { fetchRecommendations } from '@/src/app/apis/conference/getRecommendations';
 
-const SAMPLE_USER_IDS = ['user_24', 'user_31'];
+const SAMPLE_USER_IDS = ['cc9be4e7-f4c7-48b5-a12e-fa4b78234b1b'];
 
 export const useRecommendationScores = (events: ConferenceListResponse | undefined) => {
   const [recommendationScores, setRecommendationScores] = useState<Record<string, number>>({});
@@ -19,7 +19,7 @@ export const useRecommendationScores = (events: ConferenceListResponse | undefin
 
       setRecommendationLoading(true);
       const randomUserId = SAMPLE_USER_IDS[Math.floor(Math.random() * SAMPLE_USER_IDS.length)];
-      const conferenceKeys = events.payload.map(event => `${event.acronym} - ${event.title}`);
+      const conferenceKeys = events.payload.map(event => `${event.id}`);
 
       try {
         const scores = await fetchRecommendations({

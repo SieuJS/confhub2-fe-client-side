@@ -27,7 +27,7 @@ export const useConferenceFiltering = (
     }
 
     const filteredPayload = events.payload.filter(event => {
-      const key = `${event.acronym} - ${event.title}`;
+      const key = `${event.id}`;
       const scoreOutOf5 = recommendationScores[key] || 0;
       
       // Convert the 0-5 score to a 0-100 percentage to match the slider

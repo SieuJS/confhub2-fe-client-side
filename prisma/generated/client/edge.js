@@ -129,7 +129,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/sieunguyen/Desktop/sieu-works/confhub-2/all the sources of conhuf/confhub2-fe-client-side/prisma/generated/client",
+      "value": "D:\\confhub2-fe-client-side\\prisma\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -138,16 +138,16 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "darwin-arm64",
+        "value": "windows",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/sieunguyen/Desktop/sieu-works/confhub-2/all the sources of conhuf/confhub2-fe-client-side/prisma/schema.prisma",
+    "sourceFilePath": "D:\\confhub2-fe-client-side\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../.env",
+    "rootEnvPath": null,
     "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../..",
@@ -157,6 +157,7 @@ const config = {
     "db"
   ],
   "activeProvider": "mongodb",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
