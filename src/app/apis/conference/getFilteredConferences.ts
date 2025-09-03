@@ -18,6 +18,7 @@ export interface FetchConferencesParams {
   publisher?: string;
   subFromDate?: string;
   subToDate?: string;
+  recommendId?: string;
   page?: string;
   // sortBy?: 'date' | 'rank' | 'name' | 'submissionDate' | 'fromDate' | 'toDate';
   sortOrder?: 'asc' | 'desc';

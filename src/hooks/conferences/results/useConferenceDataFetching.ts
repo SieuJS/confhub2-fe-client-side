@@ -26,6 +26,7 @@ export const useConferenceDataFetching = ({ initialData }: UseConferenceDataFetc
     setError(null);
     try {
       const currentParams = new URLSearchParams(searchParams.toString());
+      
       const params: FetchConferencesParams = {
         keyword: currentParams.get('keyword') || undefined,
         title: currentParams.get('title') || undefined,
@@ -44,7 +45,11 @@ export const useConferenceDataFetching = ({ initialData }: UseConferenceDataFetc
         page: currentParams.get('page') || '1',
         perPage: currentParams.get('perPage') || '12',
       };
-
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        const { id: recommendId } = JSON.parse(userData);
+        params.recommendId = recommendId;
+      }
       const data = await fetchConferences(params);
       setEvents(data);
       setTotalItems(data.meta.totalItems);
