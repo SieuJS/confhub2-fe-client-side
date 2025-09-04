@@ -17,7 +17,7 @@ import { RankSelector } from './searchAdvanceSection/RankSelector';
 import { SourceSelector } from './searchAdvanceSection/SourceSelector';
 import { PublisherInput } from './searchAdvanceSection/PublisherInput';
 import { TagInput } from './searchAdvanceSection/TagInput';
-import { MatchScoreSlider } from './searchAdvanceSection/MatchScoreSlider';
+// import { MatchScoreSlider } from './searchAdvanceSection/MatchScoreSlider';
 
 // Props interface remains the same
 interface SearchAdvanceSectionProps {
@@ -95,11 +95,11 @@ const SearchAdvanceSection: React.FC<SearchAdvanceSectionProps> = (props) => {
                 t={t}
               />
               {/* --- ADD 3: Add the new MatchScoreSlider component --- */}
-              <MatchScoreSlider
+              {/* <MatchScoreSlider
                 value={props.selectedMatchScoreRange}
                 onValueChange={props.onMatchScoreRangeChange}
                 t={t}
-              />
+              /> */}
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <TagInput
