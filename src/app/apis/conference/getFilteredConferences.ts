@@ -20,7 +20,7 @@ export interface FetchConferencesParams {
   subToDate?: string;
   recommendId?: string;
   page?: string;
-  // sortBy?: 'date' | 'rank' | 'name' | 'submissionDate' | 'fromDate' | 'toDate';
+  sortBy?: string;
   sortOrder?: 'asc' | 'desc';
   perPage?: string;
 }

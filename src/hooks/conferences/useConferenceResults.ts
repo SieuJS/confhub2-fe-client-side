@@ -5,7 +5,7 @@ import { ConferenceListResponse } from '@/src/models/response/conference.list.re
 
 // Import the new, specialized hooks
 import { useConferenceDataFetching } from './results/useConferenceDataFetching';
-import { useRecommendationScores } from './results/useRecommendationScores';
+// import { useRecommendationScores } from './results/useRecommendationScores';
 import { useConferenceFiltering } from './results/useConferenceFiltering'; // Import our new hook
 import { useConferenceSorting } from './results/useConferenceSorting';
 import { useConferencePagination } from './results/useConferencePagination';
@@ -20,21 +20,23 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
   const rangeParam = searchParams.get('matchScoreRange');
   const matchScoreRange = rangeParam ? rangeParam.split(',').map(Number) : [0, 100];
 
-  // 1. Fetch the core conference data from the API
-  const { events, totalItems, currentPage, eventsPerPage, loading, error } = 
-    useConferenceDataFetching({ initialData });
+  // 4. Handle sorting config only (no local sorting)
+  const { sortConfig, handleSortChange } = useConferenceSorting();
 
-  // 2. Fetch recommendation scores for the *unfiltered* data
-  const { recommendationScores, recommendationLoading } = 
-    useRecommendationScores(events);
+  // 1. Fetch the core conference data from the API, passing sortConfig
+  const { events, totalItems, currentPage, eventsPerPage, loading, error } = 
+    useConferenceDataFetching({ initialData, sortConfig });
+
+  // 2. Recommendation scores are no longer used.
+  const recommendationScores = {};
+  const recommendationLoading = false;
 
   // --- NEW STEP 3: Filter the data on the client-side ---
   const { filteredEvents, filteredTotalItems } = 
     useConferenceFiltering(events, recommendationScores, matchScoreRange);
 
-  // 4. Handle sorting based on the *filtered* data and scores
-  const { sortedEvents, sortConfig, handleSortChange } = 
-    useConferenceSorting(filteredEvents, recommendationScores);
+
+  // (moved above)
 
   // 5. Handle pagination and URL updates
   const { paginate, handleEventPerPageChange } = 
@@ -42,7 +44,7 @@ const useConferenceResults = ({ initialData }: UseConferenceResultsProps = {}) =
 
   // 6. Return the combined state and handlers
   return {
-    sortedEvents,
+    events, // Use backend data as-is
     // IMPORTANT: Return the total count *after* filtering
     totalItems: loading ? totalItems : filteredTotalItems, 
     eventsPerPage,

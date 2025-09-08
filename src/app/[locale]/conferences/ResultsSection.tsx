@@ -26,7 +26,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist, initialD
   const [viewType, setViewType] = useState<'card' | 'table'>('card');
 
   const {
-    sortedEvents,
+    events,
     totalItems,
     eventsPerPage,
     currentPage,
@@ -65,13 +65,13 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist, initialD
         onEventsPerPageChange={handleEventPerPageChange}
         onSortChange={handleSortChange}
         t={t}
+        isLoggedIn={isLoggedIn}
       />
-
-      {sortedEvents && sortedEvents.payload?.length > 0 ? (
+      {events && events.payload?.length > 0 ? (
         <>
           <ResultsContent
             viewType={viewType}
-            events={sortedEvents.payload}
+            events={events.payload}
             userBlacklist={userBlacklist}
             followedIds={followedIds}
             calendarIds={calendarIds}

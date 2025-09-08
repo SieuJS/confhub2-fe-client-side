@@ -1,53 +1,27 @@
 // src/hooks/conferences/results/useConferenceSorting.ts
 
-import { useState, useMemo } from 'react'; // <--- Import useMemo
-import { ConferenceListResponse } from '@/src/models/response/conference.list.response';
+import { useState } from 'react';
 
 export interface SortConfig {
-  field: 'default' | 'match';
-  direction: 'asc' | 'desc';
+  field: 'default' | 'match' | 'submissionDate';
+  direction: 'asc' | 'desc'; // direction is ignored for 'match'
 }
 
-export const useConferenceSorting = (
-  events: ConferenceListResponse | undefined,
-  recommendationScores: Record<string, number>
-) => {
-  // This state is for user interaction and is correct.
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ field: 'default', direction: 'desc' });
-
-  // --- REFACTORED PART ---
-  // Instead of useEffect + useState, we calculate sortedEvents directly with useMemo.
-  // This memoizes the result, returning the same object reference if the inputs haven't changed.
-  const sortedEvents = useMemo(() => {
-    if (!events?.payload) {
-      return events;
-    }
-
-    // Create a mutable copy to sort
-    let newSortedPayload = [...events.payload];
-
-    if (sortConfig.field === 'match') {
-      newSortedPayload.sort((a, b) => {
-        const keyA = `${a.id}`;
-        const keyB = `${b.id}`;
-        const scoreA = recommendationScores[keyA] || 0;
-        const scoreB = recommendationScores[keyB] || 0;
-        return sortConfig.direction === 'desc' ? scoreB - scoreA : scoreA - scoreB;
-      });
-    }
-    // If sortConfig.field is 'default', we don't sort and use the payload as is.
-
-    // Return a new object with the sorted payload
-    return { ...events, payload: newSortedPayload };
-
-  }, [sortConfig, events, recommendationScores]); // Dependencies are correct
+export const useConferenceSorting = () => {
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ field: 'submissionDate', direction: 'desc' });
 
   const handleSortChange = (newField?: string, newDirection?: 'asc' | 'desc') => {
-    setSortConfig(prevConfig => ({
-      field: (newField as SortConfig['field']) ?? prevConfig.field,
-      direction: newDirection ?? prevConfig.direction,
-    }));
+    setSortConfig(prevConfig => {
+      const nextField = (newField as SortConfig['field']) ?? prevConfig.field;
+      if (nextField === 'match') {
+        return { field: 'match', direction: 'desc' };
+      }
+      return {
+        field: nextField,
+        direction: newDirection ?? prevConfig.direction,
+      };
+    });
   };
 
-  return { sortedEvents, sortConfig, handleSortChange };
+  return { sortConfig, handleSortChange };
 };

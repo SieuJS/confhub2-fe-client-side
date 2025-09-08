@@ -5,11 +5,14 @@ import { useSearchParams } from 'next/navigation';
 import { ConferenceListResponse } from '@/src/models/response/conference.list.response';
 import { fetchConferences, FetchConferencesParams } from '@/src/app/apis/conference/getFilteredConferences';
 
+import { SortConfig } from './useConferenceSorting';
+
 interface UseConferenceDataFetchingProps {
   initialData?: ConferenceListResponse;
+  sortConfig?: SortConfig;
 }
 
-export const useConferenceDataFetching = ({ initialData }: UseConferenceDataFetchingProps) => {
+export const useConferenceDataFetching = ({ initialData, sortConfig }: UseConferenceDataFetchingProps) => {
   const [events, setEvents] = useState<ConferenceListResponse | undefined>(initialData);
   const [totalItems, setTotalItems] = useState(initialData?.meta.totalItems || 0);
   const [currentPage, setCurrentPage] = useState(initialData?.meta.curPage || 1);
@@ -26,7 +29,6 @@ export const useConferenceDataFetching = ({ initialData }: UseConferenceDataFetc
     setError(null);
     try {
       const currentParams = new URLSearchParams(searchParams.toString());
-      
       const params: FetchConferencesParams = {
         keyword: currentParams.get('keyword') || undefined,
         title: currentParams.get('title') || undefined,
@@ -45,6 +47,15 @@ export const useConferenceDataFetching = ({ initialData }: UseConferenceDataFetc
         page: currentParams.get('page') || '1',
         perPage: currentParams.get('perPage') || '12',
       };
+      // Add sort params if present
+      if (sortConfig) {
+        if (sortConfig.field && sortConfig.field !== 'default') {
+          params.sortBy = sortConfig.field;
+        }
+        if (sortConfig.direction && sortConfig.field !== 'match') {
+          params.sortOrder = sortConfig.direction;
+        }
+      }
       const userData = localStorage.getItem('user');
       if (userData) {
         const { id: recommendId } = JSON.parse(userData);
@@ -60,24 +71,13 @@ export const useConferenceDataFetching = ({ initialData }: UseConferenceDataFetc
     } finally {
       setLoading(false);
     }
-  }, [searchParams]);
+  }, [searchParams, sortConfig]);
 
   useEffect(() => {
-    if (prevSearchParamsString.current === null) {
-      if (initialData) {
-        prevSearchParamsString.current = searchParamsString;
-        return;
-      } else {
-        fetchData();
-        prevSearchParamsString.current = searchParamsString;
-        return;
-      }
-    }
-    if (prevSearchParamsString.current !== searchParamsString) {
-      fetchData();
-      prevSearchParamsString.current = searchParamsString;
-    }
-  }, [searchParamsString, initialData, fetchData]);
+    // Always fetch when sortConfig or searchParams change
+    fetchData();
+    prevSearchParamsString.current = searchParamsString;
+  }, [searchParamsString, initialData, fetchData, sortConfig]);
 
   return { events, totalItems, currentPage, eventsPerPage, loading, error };
 };

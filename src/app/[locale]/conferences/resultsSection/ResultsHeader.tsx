@@ -11,6 +11,7 @@ interface ResultsHeaderProps {
   onEventsPerPageChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onSortChange: (field?: string, direction?: 'asc' | 'desc') => void;
   t: (key: string) => string;
+  isLoggedIn: boolean;
 }
 
 export const ResultsHeader: React.FC<ResultsHeaderProps> = ({
@@ -22,6 +23,7 @@ export const ResultsHeader: React.FC<ResultsHeaderProps> = ({
   onEventsPerPageChange,
   onSortChange,
   t,
+  isLoggedIn,
 }) => (
   <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
     <h2 className="text-xl font-semibold">
@@ -40,8 +42,9 @@ export const ResultsHeader: React.FC<ResultsHeaderProps> = ({
           onChange={(e) => onSortChange(e.target.value)}
           title="Select sort criteria"
         >
+          <option value="submissionDate">{t('Submission_Date')}</option>
           <option value="default">{t('Default')}</option>
-          <option value="match">{t('Match_Score')}</option>
+          {isLoggedIn && <option value="match">{t('Match_Score')}</option>}
         </select>
         <select
           id="sort-direction"
