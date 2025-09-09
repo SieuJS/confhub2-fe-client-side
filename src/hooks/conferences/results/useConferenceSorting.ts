@@ -3,8 +3,8 @@
 import { useState } from 'react';
 
 export interface SortConfig {
-  field: 'default' | 'match' | 'submissionDate';
-  direction: 'asc' | 'desc'; // direction is ignored for 'match'
+  field: 'default' | 'relevant' | 'submissionDate' | 'conferenceDate' | 'rank' | 'type';
+  direction: 'asc' | 'desc'; // direction is ignored for 'relevant'
 }
 
 export const useConferenceSorting = () => {
@@ -13,8 +13,8 @@ export const useConferenceSorting = () => {
   const handleSortChange = (newField?: string, newDirection?: 'asc' | 'desc') => {
     setSortConfig(prevConfig => {
       const nextField = (newField as SortConfig['field']) ?? prevConfig.field;
-      if (nextField === 'match') {
-        return { field: 'match', direction: 'desc' };
+      if (nextField === 'relevant') {
+        return { field: 'relevant', direction: 'desc' };
       }
       return {
         field: nextField,

@@ -43,8 +43,11 @@ export const ResultsHeader: React.FC<ResultsHeaderProps> = ({
           title="Select sort criteria"
         >
           <option value="submissionDate">{t('Submission_Date')}</option>
+          <option value="conferenceDate">Conference Date</option>
+          <option value="rank">{t('Rank')}</option>
+          <option value="type">{t('Type')}</option>
           <option value="default">{t('Default')}</option>
-          {isLoggedIn && <option value="match">{t('Match_Score')}</option>}
+          {isLoggedIn && <option value="relevant">{t('Relevant')}</option>}
         </select>
         <select
           id="sort-direction"
