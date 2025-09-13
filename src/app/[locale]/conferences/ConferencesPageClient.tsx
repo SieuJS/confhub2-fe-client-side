@@ -6,7 +6,7 @@ import ResultsSection from '@/src/app/[locale]/conferences/ResultsSection'
 // --- MODIFICATION 1: Import useSearchParams ---
 import { useRouter, usePathname } from '@/src/navigation' 
 import { useSearchParams } from 'next/navigation'
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import useUserBlacklist from '@/src/hooks/auth/useUserBlacklist'
 import { ConferenceListResponse } from '@/src/models/response/conference.list.response'
 import { AppPathname } from '@/src/navigation'
@@ -124,6 +124,29 @@ export default function ConferencesPageClient({ locale, initialData }: Conferenc
     },
     [pathname, router, searchParams] // --- MODIFICATION 5: Add searchParams to dependency array
   );
+
+  useEffect(() => {
+    async function logUserInteraction() {
+      const userData = JSON.parse(localStorage.getItem('user') || 'null');
+      if(userData) {
+        const t = await fetch('/apis/logs/user-interaction', {
+          method: 'POST',
+          body: JSON.stringify({
+            userId: userData.id,
+            trustCredit: userData.trustCredit || 0,
+            action: 'search',
+            content: JSON.stringify({
+              conferences : initialData?.payload.map(conference => conference.id) || []
+            }),
+          }),
+          headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    }
+     } 
+    logUserInteraction();
+  }, [initialData]);
 
   const handleClear = useCallback(() => {
     router.push(pathname as AppPathname);
