@@ -128,7 +128,7 @@ export default function ConferencesPageClient({ locale, initialData }: Conferenc
   useEffect(() => {
     async function logUserInteraction() {
       const userData = JSON.parse(localStorage.getItem('user') || 'null');
-      if(userData) {
+      if(userData && searchParams.toString() !== '') {
         const t = await fetch('/apis/logs/user-interaction', {
           method: 'POST',
           body: JSON.stringify({

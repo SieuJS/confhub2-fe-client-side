@@ -50,6 +50,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist, initialD
     return <LoadingSpinner message={t('Loading_conferences')} />;
   }
 
+  // Show general error (relevant sorting errors are handled by dialog)
   if (error) {
     return <div className="text-red-500 p-4">{t('Error')}: {error}</div>;
   }
@@ -66,6 +67,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ userBlacklist, initialD
         onSortChange={handleSortChange}
         t={t}
         isLoggedIn={isLoggedIn}
+        notHaveRelevantSort={events?.notHaveRelevantSort}
       />
       {events && events.payload?.length > 0 ? (
         <>

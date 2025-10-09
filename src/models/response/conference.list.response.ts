@@ -1,6 +1,7 @@
 export type ConferenceListResponse = {
   payload: ConferenceInfo[];
   meta: Meta;
+  notHaveRelevantSort?: boolean;
 };
 
 export type ConferenceInfo = {

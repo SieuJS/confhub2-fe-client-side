@@ -1,5 +1,5 @@
 // src/components/conferences/resultsSection/ResultsHeader.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { LayoutGrid, Sheet } from 'lucide-react';
 
 interface ResultsHeaderProps {
@@ -12,6 +12,7 @@ interface ResultsHeaderProps {
   onSortChange: (field?: string, direction?: 'asc' | 'desc') => void;
   t: (key: string) => string;
   isLoggedIn: boolean;
+  notHaveRelevantSort?: boolean; // Add flag to indicate if relevant sorting is available
 }
 
 export const ResultsHeader: React.FC<ResultsHeaderProps> = ({
@@ -24,7 +25,19 @@ export const ResultsHeader: React.FC<ResultsHeaderProps> = ({
   onSortChange,
   t,
   isLoggedIn,
-}) => (
+  notHaveRelevantSort,
+}) => {
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [showScoreNotReadyDialog, setShowScoreNotReadyDialog] = useState(false);
+
+  // Check if relevant sorting is not available when user is trying to use it
+  React.useEffect(() => {
+    if (sortConfig.field === 'relevant' && notHaveRelevantSort === true && isLoggedIn) {
+      setShowScoreNotReadyDialog(true);
+    }
+  }, [sortConfig.field, notHaveRelevantSort, isLoggedIn]);
+
+  return (
   <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
     <h2 className="text-xl font-semibold">
       {t('Conference_Results')} ({totalItems})
@@ -39,7 +52,13 @@ export const ResultsHeader: React.FC<ResultsHeaderProps> = ({
           id="sort-field"
           className="rounded border bg-gray-10 px-2 py-1 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={sortConfig.field}
-          onChange={(e) => onSortChange(e.target.value)}
+          onChange={(e) => {
+            if (e.target.value === 'relevant' && !isLoggedIn) {
+              setShowLoginDialog(true);
+              return;
+            }
+            onSortChange(e.target.value);
+          }}
           title="Select sort criteria"
         >
           <option value="submissionDate">{t('Submission_Date')}</option>
@@ -47,7 +66,7 @@ export const ResultsHeader: React.FC<ResultsHeaderProps> = ({
           <option value="rank">{t('Rank')}</option>
           <option value="type">{t('Type')}</option>
           <option value="default">{t('Default')}</option>
-          {isLoggedIn && <option value="relevant">{t('Relevant')}</option>}
+          <option value="relevant">{t('Relevant')}</option>
         </select>
         <select
           id="sort-direction"
@@ -92,5 +111,59 @@ export const ResultsHeader: React.FC<ResultsHeaderProps> = ({
         {viewType === 'card' ? <Sheet className="h-5 w-5" /> : <LayoutGrid className="h-5 w-5" />}
       </button>
     </div>
+
+    {/* Login Dialog */}
+    {showLoginDialog && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="rounded bg-white p-6 shadow-lg max-w-sm w-full">
+          <h3 className="mb-2 text-lg font-semibold text-gray-900">Login Required</h3>
+          <p className="mb-6 text-gray-700">You need to be logged in to use the &quot;Relevant&quot; sorting option. Please log in to access this feature.</p>
+          <div className="flex gap-3">
+            <button
+              className="flex-1 rounded bg-gray-200 py-2 px-4 text-gray-800 font-medium hover:bg-gray-300"
+              onClick={() => {
+                setShowLoginDialog(false);
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              className="flex-1 rounded bg-blue-600 py-2 px-4 text-white font-medium hover:bg-blue-700"
+              onClick={() => {
+                setShowLoginDialog(false);
+                // Get locale from localStorage and navigate to login page
+                const locale = localStorage.getItem('locale') || 'en';
+                window.location.href = `/${locale}/auth/login`;
+              }}
+            >
+              Go to Login
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* Score Not Ready Dialog */}
+    {showScoreNotReadyDialog && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="rounded bg-white p-6 shadow-lg max-w-sm w-full">
+          <h3 className="mb-2 text-lg font-semibold text-gray-900">Relevance Score Not Ready</h3>
+          <p className="mb-6 text-gray-700">The relevance scoring system is not yet ready for your account. Please try again later or use other sorting options.</p>
+          <div className="flex gap-3">
+            <button
+              className="flex-1 rounded bg-blue-600 py-2 px-4 text-white font-medium hover:bg-blue-700"
+              onClick={() => {
+                setShowScoreNotReadyDialog(false);
+                // Reset to default sorting
+                onSortChange('submissionDate', 'desc');
+              }}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
   </div>
-);
+  );
+};

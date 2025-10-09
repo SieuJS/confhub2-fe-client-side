@@ -52,7 +52,7 @@ export const useConferenceDataFetching = ({ initialData, sortConfig }: UseConfer
         if (sortConfig.field && sortConfig.field !== 'default') {
           params.sortBy = sortConfig.field;
         }
-        if (sortConfig.direction && sortConfig.field !== 'match') {
+        if (sortConfig.direction && sortConfig.field !== 'relevant') {
           params.sortOrder = sortConfig.direction;
         }
       }
