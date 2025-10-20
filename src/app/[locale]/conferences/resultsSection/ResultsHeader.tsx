@@ -148,7 +148,8 @@ export const ResultsHeader: React.FC<ResultsHeaderProps> = ({
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
         <div className="rounded bg-white p-6 shadow-lg max-w-sm w-full">
           <h3 className="mb-2 text-lg font-semibold text-gray-900">Relevance Score Not Ready</h3>
-          <p className="mb-6 text-gray-700">The relevance scoring system is not yet ready for your account. Please try again later or use other sorting options.</p>
+          <p className="mb-6 text-gray-700">The system does not have enough data about your preferences to provide recommendations.
+Please rate, write reviews, or interact more with the conferences you are interested in so the system can offer personalized recommendations for you.</p>
           <div className="flex gap-3">
             <button
               className="flex-1 rounded bg-blue-600 py-2 px-4 text-white font-medium hover:bg-blue-700"
